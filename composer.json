@@ -1,0 +1,28 @@
+{
+    "name": "skeeks/cms-shop",
+    "description": "Интернет магазин для SkeekS CMS",
+    "keywords": ["module", "cms", "skeeks", "sx", "app", "yii2", "shop"],
+    "homepage": "http://www.skeeks.com/",
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "http://cms.skeeks.com",
+        "wiki": "http://git.skeeks.com/skeeks/cms/wikis/home",
+        "source": "http://git.skeeks.com/skeeks/cms"
+    },
+    "authors": [
+        {
+            "name": "Semenov Alexander",
+            "email": "semenov@skeeks.com"
+        }
+    ],
+    "require": {
+        "skeeks/cms": "*",
+        "skeeks/cms-module-money": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "skeeks\\cms\\shop\\": ""
+        }
+    }
+}
