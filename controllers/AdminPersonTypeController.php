@@ -14,21 +14,22 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopOrderStatus;
+use skeeks\cms\shop\models\ShopPersonType;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminOrderStatusController
  * @package skeeks\cms\shop\controllers
  */
-class AdminOrderStatusController extends AdminModelEditorController
+class AdminPersonTypeController extends AdminModelEditorController
 {
     use AdminModelEditorStandartControllerTrait;
 
     public function init()
     {
-        $this->name                     = "Статусы заказов";
+        $this->name                     = "Типы плательщиков";
         $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopOrderStatus::className();
+        $this->modelClassName           = ShopPersonType::className();
 
         parent::init();
     }
@@ -43,9 +44,7 @@ class AdminOrderStatusController extends AdminModelEditorController
                 'index' =>
                 [
                     "columns"      => [
-                        'code',
                         'name',
-                        'description',
                         'priority',
                     ],
                 ]

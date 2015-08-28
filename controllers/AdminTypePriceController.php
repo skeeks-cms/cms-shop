@@ -28,7 +28,7 @@ class AdminTypePriceController extends AdminModelEditorController
     public function init()
     {
         $this->name                     = "Типы цен";
-        $this->modelShowAttribute       = "id";
+        $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopTypePrice::className();
 
         parent::init();

@@ -6,6 +6,7 @@ use skeeks\cms\components\Cms;
 use Yii;
 use yii\base\Event;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_type_price}}".
@@ -81,7 +82,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
      */
     public function rules()
     {
-        return [
+        return ArrayHelper::merge(parent::rules(), [
             [['priority'], 'integer'],
             [['code', 'name'], 'required'],
             [['description'], 'string'],
@@ -90,7 +91,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             [['xml_id'], 'string', 'max' => 255],
             [['def'], 'string', 'max' => 1],
             [['code'], 'unique']
-        ];
+        ]);
     }
 
     /**
@@ -98,12 +99,12 @@ class ShopTypePrice extends \skeeks\cms\models\Core
      */
     public function attributeLabels()
     {
-        return [
+        return array_merge(parent::attributeLabels(), [
             'code' => Yii::t('app', 'Code'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'priority' => Yii::t('app', 'Priority'),
             'def' => Yii::t('app', 'Default'),
-        ];
+        ]);
     }
 }

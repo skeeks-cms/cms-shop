@@ -28,6 +28,11 @@ return [
                         "label"     => "Типы цен",
                         "url"       => ["shop/admin-type-price"],
                     ],
+
+                    [
+                        "label"     => "Типы плательщиков",
+                        "url"       => ["shop/admin-person-type"],
+                    ],
                 ]
             ],
         ]
