@@ -20,8 +20,13 @@ return [
                 'items' =>
                 [
                     [
+                        "label"     => "Статусы",
+                        "url"       => ["shop/admin-order-status"],
+                    ],
+
+                    [
                         "label"     => "Типы цен",
-                        "url"       => ["shop/admin-price"],
+                        "url"       => ["shop/admin-type-price"],
                     ],
                 ]
             ],
