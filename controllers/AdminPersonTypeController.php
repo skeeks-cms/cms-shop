@@ -8,6 +8,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
@@ -15,6 +16,7 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
+use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -46,6 +48,21 @@ class AdminPersonTypeController extends AdminModelEditorController
                     "columns"      => [
                         'name',
                         'priority',
+
+                        [
+                            'class'         => DataColumn::className(),
+                            'attribute'     => "siteCodes",
+                            'filter'        => false,
+                            'value'         => function(ShopPersonType $model)
+                            {
+                                return implode(", ", $model->siteCodes);
+                            }
+                        ],
+
+                        [
+                            'class'         => BooleanColumn::className(),
+                            'attribute'     => "active"
+                        ]
                     ],
                 ]
             ]
