@@ -33,6 +33,11 @@ return [
                         "label"     => "Типы плательщиков",
                         "url"       => ["shop/admin-person-type"],
                     ],
+
+                    [
+                        "label"     => "Платежные системы",
+                        "url"       => ["shop/admin-pay-system"],
+                    ],
                 ]
             ],
         ]
