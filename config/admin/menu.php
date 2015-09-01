@@ -10,6 +10,7 @@ return [
     'shop' =>
     [
         'label' => 'Магазин',
+        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/shop.png'],
 
         'items' =>
         [
@@ -37,6 +38,22 @@ return [
                     [
                         "label"     => "Платежные системы",
                         "url"       => ["shop/admin-pay-system"],
+                    ],
+
+                    [
+                        "label"     => "Налоги",
+                        'items' =>
+                        [
+                            [
+                                "label"     => "Список налогов",
+                                "url"       => ["shop/admin-tax"],
+                            ],
+
+                            [
+                                "label"     => "Ставки НДС",
+                                "url"       => ["shop/admin-vat"],
+                            ],
+                        ],
                     ],
                 ]
             ],
