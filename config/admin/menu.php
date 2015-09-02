@@ -60,6 +60,30 @@ return [
                             ],
                         ],
                     ],
+
+                    [
+                        "label"     => "Валюты",
+                        "img"       => ['\skeeks\modules\cms\money\assets\Asset', 'images/money_16_16.png'],
+
+                        'items' =>
+                        [
+                            [
+                                "label"     => "Валюты",
+                                "url"       => ["money/admin-currency"],
+                                "img"       => ['\skeeks\modules\cms\money\assets\Asset', 'images/money_16_16.png']
+                            ],
+
+                            [
+                                "label" => "Настройки",
+                                "url"   => ["cms/admin-settings", "component" => 'skeeks\modules\cms\money\components\money\Money'],
+                                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                                "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                                {
+                                    return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                                },
+                            ],
+                        ]
+                    ],
                 ]
             ],
         ]
