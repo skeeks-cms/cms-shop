@@ -50,6 +50,11 @@ return [
                             ],
 
                             [
+                                "label"     => "Ставки налогов",
+                                "url"       => ["shop/admin-tax-rate"],
+                            ],
+
+                            [
                                 "label"     => "Ставки НДС",
                                 "url"       => ["shop/admin-vat"],
                             ],
