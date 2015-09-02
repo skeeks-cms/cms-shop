@@ -40,6 +40,7 @@ return [
                         "url"       => ["shop/admin-pay-system"],
                     ],
 
+
                     [
                         "label"     => "Налоги",
                         'items' =>
@@ -59,6 +60,11 @@ return [
                                 "url"       => ["shop/admin-vat"],
                             ],
                         ],
+                    ],
+
+                    [
+                        "label"     => "Наценки",
+                        "url"       => ["shop/admin-extra"],
                     ],
 
                     [
