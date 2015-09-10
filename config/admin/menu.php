@@ -90,6 +90,30 @@ return [
                             ],
                         ]
                     ],
+
+                    [
+                        "label"     => "База местопложений",
+                        "img"       => ['\skeeks\cms\kladr\assets\Asset', 'icons/global.png'],
+
+                        'items' =>
+                        [
+                            [
+                                "label"     => "База местопложений",
+                                "url"       => ["kladr/admin-kladr-location"],
+                                "img"       => ['\skeeks\cms\kladr\assets\Asset', 'icons/global.png'],
+                            ],
+
+                            [
+                                "label" => "Настройки",
+                                "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\kladr\components\KladrComponent'],
+                                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                                "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                                {
+                                    return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                                },
+                            ],
+                        ]
+                    ],
                 ]
             ],
         ]

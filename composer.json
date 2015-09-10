@@ -18,7 +18,8 @@
     ],
     "require": {
         "skeeks/cms": "*",
-        "skeeks/cms-module-money": "*"
+        "skeeks/cms-module-money": "*",
+        "skeeks/cms-kladr": "*"
     },
     "autoload": {
         "psr-4": {
