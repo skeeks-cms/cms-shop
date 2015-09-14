@@ -74,7 +74,6 @@ class ShopTypePrice extends \skeeks\cms\models\Core
                 'def' => Cms::BOOL_N
             ]);
         }
-
     }
 
     /**
