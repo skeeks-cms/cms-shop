@@ -2,11 +2,12 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (�����)
+ * @copyright 2010 SkeekS (СкикС)
  * @date 14.09.2015
  */
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\measure\models\Measure;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
@@ -70,7 +71,11 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['quantity', 'weight', 'purchasing_price', 'quantity_reserved', 'width', 'length', 'height'], 'number'],
             [['quantity_trace', 'price_type', 'recur_scheme_type', 'without_order', 'select_best_price', 'vat_included', 'can_buy_zero', 'negative_amount_trace', 'barcode_multi', 'subscribe'], 'string', 'max' => 1],
             [['tmp_id'], 'string', 'max' => 40],
-            [['purchasing_currency'], 'string', 'max' => 3]
+            [['purchasing_currency'], 'string', 'max' => 3],
+            [['quantity_trace', 'can_buy_zero', 'negative_amount_trace'], 'default', 'value' => Cms::BOOL_N],
+            [['weight', 'width', 'length', 'height', 'purchasing_price'], 'default', 'value' => 0],
+            [['subscribe'], 'default', 'value' => Cms::BOOL_Y],
+            [['purchasing_currency'], 'default', 'value' => Yii::$app->money->currencyCode],
         ];
     }
 
@@ -85,29 +90,29 @@ class ShopProduct extends \skeeks\cms\models\Core
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'quantity' => Yii::t('app', 'Quantity'),
-            'quantity_trace' => Yii::t('app', 'Quantity Trace'),
-            'weight' => Yii::t('app', 'Weight'),
+            'quantity' => Yii::t('app', 'Доступное количество'),
+            'quantity_trace' => Yii::t('app', 'Включить количественный учет'),
+            'weight' => Yii::t('app', 'Вес (грамм)'),
             'price_type' => Yii::t('app', 'Price Type'),
             'recur_scheme_length' => Yii::t('app', 'Recur Scheme Length'),
             'recur_scheme_type' => Yii::t('app', 'Recur Scheme Type'),
             'trial_price_id' => Yii::t('app', 'Trial Price ID'),
             'without_order' => Yii::t('app', 'Without Order'),
             'select_best_price' => Yii::t('app', 'Select Best Price'),
-            'vat_id' => Yii::t('app', 'Vat ID'),
-            'vat_included' => Yii::t('app', 'Vat Included'),
+            'vat_id' => Yii::t('app', 'Ставка НДС'),
+            'vat_included' => Yii::t('app', 'НДС включен в цену'),
             'tmp_id' => Yii::t('app', 'Tmp ID'),
-            'can_buy_zero' => Yii::t('app', 'Can Buy Zero'),
-            'negative_amount_trace' => Yii::t('app', 'Negative Amount Trace'),
+            'can_buy_zero' => Yii::t('app', 'Разрешить покупку при отсутствии товара'),
+            'negative_amount_trace' => Yii::t('app', 'Разрешить отрицательное количество товара'),
             'barcode_multi' => Yii::t('app', 'Barcode Multi'),
-            'purchasing_price' => Yii::t('app', 'Purchasing Price'),
-            'purchasing_currency' => Yii::t('app', 'Purchasing Currency'),
-            'quantity_reserved' => Yii::t('app', 'Quantity Reserved'),
+            'purchasing_price' => Yii::t('app', 'Закупочная цена'),
+            'purchasing_currency' => Yii::t('app', 'Валюта закупочной цены'),
+            'quantity_reserved' => Yii::t('app', 'Зарезервированное количество'),
             'measure_id' => Yii::t('app', 'Measure ID'),
-            'width' => Yii::t('app', 'Width'),
-            'length' => Yii::t('app', 'Length'),
-            'height' => Yii::t('app', 'Height'),
-            'subscribe' => Yii::t('app', 'Subscribe'),
+            'width' => Yii::t('app', 'Ширина (мм)'),
+            'length' => Yii::t('app', 'Длина (мм)'),
+            'height' => Yii::t('app', 'Высота (мм)'),
+            'subscribe' => Yii::t('app', 'Разрешить подписку при отсутствии товара'),
         ];
     }
 
