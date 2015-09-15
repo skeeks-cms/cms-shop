@@ -21,6 +21,11 @@ return [
                 'items' =>
                 [
                     [
+                        "label"     => "Настройка контента",
+                        "url"       => ["shop/admin-content"],
+                    ],
+
+                    [
                         "label"     => "Статусы",
                         "url"       => ["shop/admin-order-status"],
                     ],
