@@ -28,12 +28,23 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         \Yii::$app->money->activeCurrencies, 'code', 'name'
     )); ?>
 
+    <?= $form->field($model, 'baseProductPriceValue')->textInput()->label('Базовая цена'); ?>
+    <?= $form->fieldSelect($model, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
+        \Yii::$app->money->activeCurrencies, 'code', 'name'
+    ))->label('Валюта базовой цены'); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Количество и учет'); ?>
 
     <?= $form->field($model, 'quantity')->textInput(); ?>
     <?= $form->field($model, 'quantity_reserved')->textInput(); ?>
+
+    <?= $form->fieldSelect($model, 'measure_id', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\measure\models\Measure::find()->all(), 'id', 'name'
+    )); ?>
+
+    <?= $form->field($model, 'measure_ratio')->textInput(); ?>
 
 
 <?= $form->fieldSetEnd(); ?>

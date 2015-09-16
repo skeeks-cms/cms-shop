@@ -62,6 +62,7 @@ class m150914_180601_create_table__shop_product extends Migration
             'quantity_reserved'     => $this->double()->defaultValue(0),
 
             'measure_id'            => $this->integer(),
+            'measure_ratio'         => $this->double()->notNull()->defaultValue(1),
 
             'width'                 => $this->double(),
             'length'                => $this->double(),
@@ -98,6 +99,7 @@ class m150914_180601_create_table__shop_product extends Migration
         $this->createIndex('length', '{{%shop_product}}', 'length');
         $this->createIndex('height', '{{%shop_product}}', 'height');
         $this->createIndex('subscribe', '{{%shop_product}}', 'subscribe');
+        $this->createIndex('measure_ratio', '{{%shop_product}}', 'measure_ratio');
 
 
         $this->execute("ALTER TABLE {{%shop_product}} COMMENT = 'Товары';");

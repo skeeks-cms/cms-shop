@@ -3,6 +3,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\modules\cms\money\models\Currency;
+use skeeks\modules\cms\money\Money;
 use Yii;
 
 /**
@@ -24,6 +25,7 @@ use Yii;
  * @property Currency $currencyCode
  * @property ShopProduct $product
  * @property ShopTypePrice $typePrice
+ * @property Money $money
  */
 class ShopProductPrice extends \skeeks\cms\models\Core
 {
@@ -42,10 +44,11 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'product_id', 'type_price_id', 'quantity_from', 'quantity_to'], 'integer'],
-            [['product_id', 'type_price_id', 'price', 'currency_code'], 'required'],
+            [['product_id', 'type_price_id', 'price'], 'required'],
             [['price'], 'number'],
             [['currency_code'], 'string', 'max' => 3],
-            [['tmp_id'], 'string', 'max' => 40]
+            [['tmp_id'], 'string', 'max' => 40],
+            [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
         ];
     }
 
@@ -92,5 +95,13 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function getTypePrice()
     {
         return $this->hasOne(ShopTypePrice::className(), ['id' => 'type_price_id']);
+    }
+
+    /**
+     * @return Money
+     */
+    public function getMoney()
+    {
+        return Money::fromString($this->price, $this->currency_code);
     }
 }

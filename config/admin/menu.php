@@ -5,6 +5,38 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 12.03.2015
  */
+
+
+/**
+ * Меню контента
+ * @return array
+ */
+function shopProductsMenu()
+{
+    $result = [];
+
+    if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority DESC")->andWhere([
+        'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id')
+    ])->all())
+    {
+        /**
+         * @var $content \skeeks\cms\models\CmsContent
+         */
+        foreach ($contents as $content)
+        {
+            $itemData = [
+                'label'     => $content->name,
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+                'url'   => ["shop/admin-cms-content-element/index", "content_id" => $content->id],
+            ];
+
+            $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
+        }
+    }
+
+    return $result;
+};
+
 return [
 
     'shop' =>
@@ -14,6 +46,14 @@ return [
 
         'items' =>
         [
+
+            [
+                'priority'  => 0,
+                'label'     => 'Товары',
+
+                'items' => shopProductsMenu()
+            ],
+
             [
                 "label"     => "Настройки",
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],

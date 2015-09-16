@@ -16,9 +16,12 @@ use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\reviews2\actions\AdminOneModelMessagesAction;
 use skeeks\cms\shop\actions\AdminContentElementShopAction;
 use skeeks\cms\shop\models\ShopContent;
+use skeeks\cms\shop\models\ShopTypePrice;
 use yii\helpers\ArrayHelper;
 
 /**
+ * @property ShopTypePrice $baseTypePrice
+ *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
  */
@@ -41,7 +44,7 @@ class ShopComponent extends Component
 
         \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
 
-            if ($e->controller instanceof AdminCmsContentElementController)
+            if ($e->controller instanceof AdminCmsContentElementController || $e->controller instanceof \skeeks\cms\shop\controllers\AdminCmsContentElementController)
             {
                 /**
                  * @var $model CmsContentElement
@@ -74,5 +77,17 @@ class ShopComponent extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
         ]);
+    }
+
+
+    /**
+     *
+     * Тип цены по умолчанию
+     *
+     * @return ShopTypePrice
+     */
+    public function getBaseTypePrice()
+    {
+        return ShopTypePrice::find()->def()->one();
     }
 }
