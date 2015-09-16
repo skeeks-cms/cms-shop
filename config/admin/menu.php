@@ -49,6 +49,20 @@ return [
 
             [
                 'priority'  => 0,
+                'label'     => 'Покупатели',
+
+                'items' =>
+                [
+                    [
+                        "label"     => "Счета",
+                        "url"       => ["shop/admin-user-account"],
+                    ]
+                ],
+
+            ],
+
+            [
+                'priority'  => 0,
                 'label'     => 'Товары',
 
                 'items' => shopProductsMenu()
