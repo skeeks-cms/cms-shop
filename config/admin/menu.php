@@ -49,6 +49,20 @@ return [
 
             [
                 'priority'  => 0,
+                'label'     => 'Заказы',
+
+                'items' =>
+                [
+                    [
+                        "label"     => "Заказы",
+                        "url"       => ["shop/admin-order"],
+                    ]
+                ],
+
+            ],
+
+            [
+                'priority'  => 0,
                 'label'     => 'Покупатели',
 
                 'items' =>
@@ -61,9 +75,12 @@ return [
 
             ],
 
+
+
             [
                 'priority'  => 0,
                 'label'     => 'Товары',
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
 
                 'items' => shopProductsMenu()
             ],
@@ -198,6 +215,47 @@ return [
                         ]
                     ],
                 ]
+            ],
+
+
+            [
+                'priority'  => 0,
+                'label'     => 'Складской учет',
+
+                'items' =>
+                [
+                    [
+                        "label"     => "Склады",
+                        "url"       => ["shop/admin-store"],
+                    ],
+
+                ],
+
+            ],
+
+            [
+                'priority'  => 0,
+                'label'     => 'Аффилиаты',
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate-icon.png'],
+
+                'items' =>
+                [
+                    [
+                        "label"     => "Аффилиаты",
+                        "url"       => ["shop/admin-affiliate"],
+                    ],
+
+                    [
+                        "label"     => "Планы коммисий",
+                        "url"       => ["shop/admin-affiliate-plan"],
+                    ],
+
+                    [
+                        "label"     => "Пирамида",
+                        "url"       => ["shop/admin-affiliate-tier"],
+                    ]
+                ],
+
             ],
         ]
     ]

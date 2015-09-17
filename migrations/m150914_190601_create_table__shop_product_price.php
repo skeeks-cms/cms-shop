@@ -82,7 +82,7 @@ class m150914_190601_create_table__shop_product_price extends Migration
 
         $this->addForeignKey(
             'shop_product_currency_code', "{{%shop_product_price}}",
-            'currency_code', '{{%money_currency}}', 'code', 'RESTRICT', 'CASCADE'
+            'currency_code', '{{%money_currency}}', 'code', 'RESTRICT', 'RESTRICT'
         );
 
     }

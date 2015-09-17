@@ -74,7 +74,7 @@ class m150915_110601_create_table__shop_user_account extends Migration
 
         $this->addForeignKey(
             'shop_user_account_currency_code', "{{%shop_user_account}}",
-            'currency_code', '{{%money_currency}}', 'code', 'RESTRICT', 'CASCADE'
+            'currency_code', '{{%money_currency}}', 'code', 'RESTRICT', 'RESTRICT'
         );
     }
 
