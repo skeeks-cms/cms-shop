@@ -84,7 +84,9 @@ class ShopBasket extends \skeeks\cms\models\Core
             [['name', 'callback_func', 'notes', 'order_callback_func', 'detail_page_url', 'cancel_callback_func', 'pay_callback_func', 'discount_name', 'dimensions', 'recommendation'], 'string', 'max' => 255],
             [['catalog_xml_id', 'product_xml_id'], 'string', 'max' => 100],
             [['discount_value', 'discount_coupon'], 'string', 'max' => 32],
-            [['measure_name'], 'string', 'max' => 50]
+            [['measure_name'], 'string', 'max' => 50],
+            [['site_code'], 'default', 'value' => \Yii::$app->cms->site->code],
+            [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode]
         ];
     }
 

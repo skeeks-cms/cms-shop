@@ -20,6 +20,7 @@ use skeeks\cms\shop\models\ShopTypePrice;
 use yii\helpers\ArrayHelper;
 
 /**
+ * @property CartComponent $cart
  * @property ShopTypePrice $baseTypePrice
  *
  * Class ShopComponent
@@ -27,6 +28,11 @@ use yii\helpers\ArrayHelper;
  */
 class ShopComponent extends Component
 {
+    /**
+     * @var CartComponent
+     */
+    private $_cart = null;
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -89,5 +95,21 @@ class ShopComponent extends Component
     public function getBaseTypePrice()
     {
         return ShopTypePrice::find()->def()->one();
+    }
+
+    /**
+     * Объект корзины
+     *
+     * @return CartComponent
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getCart()
+    {
+        if ($this->_cart === null)
+        {
+            $this->_cart = \Yii::createObject(['class' => CartComponent::className()]);
+        }
+
+        return $this->_cart;
     }
 }
