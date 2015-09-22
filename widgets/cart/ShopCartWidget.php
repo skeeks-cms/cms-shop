@@ -9,6 +9,7 @@ namespace skeeks\cms\shop\widgets\cart;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\shop\assets\ShopAsset;
+use skeeks\cms\shop\widgets\ShopGlobalWidget;
 use skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -19,8 +20,6 @@ use yii\helpers\Json;
  */
 class ShopCartWidget extends WidgetRenderable
 {
-    static public $isRegisteredAssets = false;
-
     /**
      * Подключить стандартные скрипты
      *
@@ -28,14 +27,12 @@ class ShopCartWidget extends WidgetRenderable
      */
     public $allowRegisterAsset = true;
 
-    public $clientOptions = [];
-
-    public function init()
-    {
-        parent::init();
-
-        $this->clientOptions = ArrayHelper::merge($this->baseClientOptions(), $this->clientOptions);
-    }
+    /**
+     * Глобавльные опции магазина
+     *
+     * @var array
+     */
+    public $shopClientOptions = [];
 
     public function rules()
     {
@@ -51,18 +48,6 @@ class ShopCartWidget extends WidgetRenderable
         ]);
     }
 
-    /**
-     * @return array
-     */
-    public function baseClientOptions()
-    {
-        return [
-            'backend-add-product'   => UrlHelper::construct('shop/cart/add-product')->toString(),
-            'backend-remove-basket' => UrlHelper::construct('shop/cart/remove-basket')->toString(),
-            'backend-update-basket' => UrlHelper::construct('shop/cart/update-basket')->toString(),
-            'backend-clear'         => UrlHelper::construct('shop/cart/clear-all')->toString()
-        ];
-    }
 
     /**
      * Подготовка данных для шаблона
@@ -70,20 +55,9 @@ class ShopCartWidget extends WidgetRenderable
      */
     public function run()
     {
-        if (static::$isRegisteredAssets === false && $this->allowRegisterAsset)
+        if ($this->allowRegisterAsset)
         {
-            ShopAsset::register($this->getView());
-            $options = $this->clientOptions;
-            $options = Json::encode($options);
-
-            $this->getView()->registerJs(<<<JS
-    (function(sx, $, _)
-    {
-        sx.Shop = new sx.classes.shop.App($options);
-    })(sx, sx.$, sx._);
-JS
-);
-            static::$isRegisteredAssets = true;
+            ShopGlobalWidget::widget(['clientOptions' => $this->shopClientOptions]);
         }
 
         return parent::run();

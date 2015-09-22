@@ -19,6 +19,16 @@ use yii\helpers\Json;
  */
 class CartController extends Controller
 {
+
+    /**
+     * @return string
+     */
+    public function actionIndex()
+    {
+        $this->view->title = 'Корзина | Магазин';
+        return $this->render($this->action->id);
+    }
+
     /**
      * Добавление продукта в корзину.
      *
@@ -30,8 +40,9 @@ class CartController extends Controller
 
         if ($rr->isRequestAjaxPost())
         {
-            $product_id = \Yii::$app->request->post('product_id');
-            $quantity   = \Yii::$app->request->post('quantity');
+            $product_id         = \Yii::$app->request->post('product_id');
+            $quantity           = \Yii::$app->request->post('quantity');
+            $product_price_id   = \Yii::$app->request->post('product_price_id');
 
             /**
              * @var ShopProduct $product
@@ -44,6 +55,11 @@ class CartController extends Controller
                 return (array) $rr;
             }
 
+            if (!$product_price_id)
+            {
+                $productPrice = $product->baseProductPrice;
+            }
+
             $shopBasket = ShopBasket::find()->where([
                 'fuser_id'      => \Yii::$app->shop->cart->shopFuser->id,
                 'product_id'    => $product_id,
@@ -53,17 +69,22 @@ class CartController extends Controller
             if (!$shopBasket)
             {
                 $shopBasket = new ShopBasket([
-                    'fuser_id'      => \Yii::$app->shop->cart->shopFuser->id,
-                    'name'          => $product->cmsContentElement->name,
-                    'product_id'    => $product->id,
-                    'price'         => $product->baseProductPrice->price,
-                    'currency_code' => \Yii::$app->money->currencyCode,
-                    'site_code'     => \Yii::$app->cms->site->code,
-                    'quantity'      => 0,
+                    'fuser_id'          => \Yii::$app->shop->cart->shopFuser->id,
+                    'name'              => $product->cmsContentElement->name,
+                    'product_id'        => $product->id,
+                    'price'             => $productPrice->price,
+                    'currency_code'     => \Yii::$app->money->currencyCode,
+                    'site_code'         => \Yii::$app->cms->site->code,
+                    'quantity'          => 0,
+                    'measure_name'      => $product->measure->name,
+                    'measure_code'      => $product->measure->code,
+                    'detail_page_url'   => $product->cmsContentElement->url,
                 ]);
             }
 
-            $shopBasket->quantity = $shopBasket->quantity + $quantity;
+            $shopBasket->product_price_id   = $productPrice->id;
+            $shopBasket->quantity           = $shopBasket->quantity + $quantity;
+
             if (!$shopBasket->save())
             {
                 $rr->success = false;
@@ -74,16 +95,14 @@ class CartController extends Controller
                 $rr->message = 'Позиция добавлена в корзину';
             }
 
-            //$shopBasket->recalculate();
-
-
-
+            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
             return (array) $rr;
         } else
         {
             return $this->goBack();
         }
     }
+
 
     public function actionRemoveBasket()
     {
@@ -103,7 +122,7 @@ class CartController extends Controller
                 }
             }
 
-
+            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
             return (array) $rr;
         } else
         {
@@ -130,8 +149,6 @@ class CartController extends Controller
                     {
                         $rr->success = true;
                         $rr->message = 'Позиция успешно обновлена';
-
-                        $shopBasket->recalculate();
                     }
 
                 } else
@@ -145,7 +162,7 @@ class CartController extends Controller
 
             }
 
-
+            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
             return (array) $rr;
         } else
         {

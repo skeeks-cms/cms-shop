@@ -62,10 +62,14 @@
          * Добавление продукта в корзину
          * @param product_id
          * @param quantity
+         * @param data
          */
-        addProduct: function(product_id, quantity)
+        addProduct: function(product_id, quantity, data)
         {
             var self = this;
+
+            //TODO: реализовать
+            data = data || {};
 
             this.trigger('beforeAddProduct', {
                 'product_id'    : product_id,
@@ -81,6 +85,8 @@
 
             ajax.onSuccess(function(e, data)
             {
+                self.set('cartData', data.response.data);
+
                 self.trigger('addProduct', {
                     'product_id'    : product_id,
                     'quantity'      : quantity,
@@ -108,6 +114,8 @@
 
             ajax.onSuccess(function(e, data)
             {
+                self.set('cartData', data.response.data);
+
                 self.trigger('removeBasket', {
                     'basket_id'    : basket_id,
                     'response'     : data.response,
@@ -117,9 +125,12 @@
             ajax.execute();
         },
 
-        updateBasket: function(basket_id, quantity)
+        updateBasket: function(basket_id, quantity, data)
         {
             var self = this;
+
+            //TODO
+            data = data || {};
 
             this.trigger('beforeUpdateBasket', {
                 'basket_id'     : basket_id,
@@ -135,10 +146,12 @@
 
             ajax.onSuccess(function(e, data)
             {
+                self.set('cartData', data.response.data);
+
                 self.trigger('updateBasket', {
-                    'basket_id'    : basket_id,
-                    'quantity'    : quantity,
-                    'response'     : data.response,
+                    'basket_id'     : basket_id,
+                    'quantity'      : quantity,
+                    'response'      : data.response,
                 });
             });
 

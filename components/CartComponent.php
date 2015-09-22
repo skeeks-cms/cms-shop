@@ -14,26 +14,44 @@ use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\reviews2\actions\AdminOneModelMessagesAction;
 use skeeks\cms\shop\actions\AdminContentElementShopAction;
+use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopTypePrice;
+use skeeks\modules\cms\money\Money;
+use yii\base\Arrayable;
+use yii\base\ArrayableTrait;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
+ * @property int $countShopBaskets
+ * @property ShopBasket[] $shopBaskets
  * @property ShopFuser $shopFuser
+ * @property Money $money
  *
  * Class CartComponent
  * @package skeeks\cms\shop\components
  */
-class CartComponent extends \yii\base\Component
+class CartComponent extends \yii\base\Component implements Arrayable
 {
+    use ArrayableTrait;
+
     private $_shopFuser = null;
 
     /**
      * @var string
      */
     public $sessionFuserName = 'SKEEKS_CMS_SHOP';
+
+    public function extraFields()
+    {
+        return [
+            'countShopBaskets',
+            'shopBaskets',
+            'shopFuser',
+        ];
+    }
 
     /**
      * Если нет будет создан
@@ -82,7 +100,8 @@ class CartComponent extends \yii\base\Component
                      */
                     if ($shopFuser)
                     {
-                        $this->shopFuser->addBaskets($shopFuser->shopBaskets);
+                        $this->_shopFuser->addBaskets($shopFuser->shopBaskets);
+                        $shopFuser->delete();
                     }
 
                     //Эти данные в сессии больше не нужны
@@ -122,8 +141,57 @@ class CartComponent extends \yii\base\Component
         return $this->_shopFuser;
     }
 
+    /**
+     * TODO: реализовать
+     * @param $shopFuser
+     * @throws Exception
+     */
     public function setShopFuser($shopFuser)
     {
         throw new Exception('Не реализовано');
+    }
+
+
+    /**
+     * Позиции корзины
+     *
+     * @return \skeeks\cms\shop\models\ShopBasket[]
+     */
+    public function getShopBaskets()
+    {
+        return $this->shopFuser->shopBaskets;
+    }
+
+    /**
+     * Количество позиций в корзине
+     *
+     * @return int
+     */
+    public function getCountShopBaskets()
+    {
+        return count($this->shopBaskets);
+    }
+
+    /**
+     * @return Money
+     */
+    public function getMoney()
+    {
+        $money = \Yii::$app->money->newMoney();
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $money = $money->add($shopBasket->money);
+        }
+
+        return $money;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return (bool) $this->countShopBaskets == 0;
     }
 }

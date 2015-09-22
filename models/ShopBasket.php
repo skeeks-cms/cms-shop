@@ -1,10 +1,20 @@
 <?php
+/**
+ * @author Semenov Alexander <semenov@skeeks.com>
+ * @link http://skeeks.com/
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 22.09.2015
+ */
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsSite;
+use skeeks\modules\cms\catalog\models\Product;
 use skeeks\modules\cms\money\Currency;
+use skeeks\modules\cms\money\Money;
 use Yii;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "{{%shop_basket}}".
@@ -58,6 +68,8 @@ use Yii;
  * @property ShopProduct $product
  * @property ShopProductPrice $productPrice
  * @property CmsSite $site
+ *
+ * @property Money $money
  */
 class ShopBasket extends \skeeks\cms\models\Core
 {
@@ -68,6 +80,38 @@ class ShopBasket extends \skeeks\cms\models\Core
     {
         return '{{%shop_basket}}';
     }
+
+    /*public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            HasJsonFieldsBehavior::className() => [
+                'class'     => HasJsonFieldsBehavior::className(),
+                'fields'    => ['dimensions']
+            ]
+        ]);
+    }*/
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+    }
+
+    /**
+     * @param $event
+     */
+    public function beforeSaveEvent($event)
+    {
+        if ($this->isAttributeChanged('quantity'))
+        {
+            $this->initData();
+        }
+    }
+
 
     /**
      * @inheritdoc
@@ -188,5 +232,52 @@ class ShopBasket extends \skeeks\cms\models\Core
     public function getSite()
     {
         return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+    }
+
+
+
+    /**
+     * Обюновление данных позиции
+     *
+     * @return $this
+     */
+    public function initData()
+    {
+        $product                = $this->product;
+        $productPrice           = $this->productPrice;
+        if (!$product || !$productPrice)
+        {
+            return $this;
+        }
+
+        $money                  = $productPrice->money; //цена продукта
+        $money                  = $money->multiply($this->quantity); //умножаем на количество
+
+        $this->price            = $money->getAmount() / $money->getCurrency()->getSubUnit();
+        $this->currency_code    = (string) $money->getCurrency();
+
+        $this->measure_name     = $product->measure->name;
+        $this->measure_code     = $product->measure->code;
+
+        $this->detail_page_url  = $product->cmsContentElement->url;
+        $this->name             = $product->cmsContentElement->name;
+        $this->weight           = $product->weight * $this->quantity;
+
+        $this->dimensions       = Json::encode([
+            'height'    => $this->product->height,
+            'width'     => $this->product->width,
+            'length'    => $this->product->length,
+        ]);
+
+        return $this;
+    }
+
+
+    /**
+     * @return Money
+     */
+    public function getMoney()
+    {
+        return Money::fromString($this->price, $this->currency_code);
     }
 }

@@ -11,7 +11,13 @@ return [
     [
         'shop' => [
             'class'         => 'skeeks\cms\shop\components\ShopComponent',
-        ]
+        ],
+
+        'urlManager' => [
+            'rules' => [
+                '~<_c:(cart)>'               => 'shop/<_c>/index',
+            ]
+        ],
     ],
 
     'modules' =>
