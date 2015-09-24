@@ -37,7 +37,7 @@ class ShopGlobalWidget extends Widget
             'backend-add-product'   => UrlHelper::construct('shop/cart/add-product')->toString(),
             'backend-remove-basket' => UrlHelper::construct('shop/cart/remove-basket')->toString(),
             'backend-update-basket' => UrlHelper::construct('shop/cart/update-basket')->toString(),
-            'backend-clear'         => UrlHelper::construct('shop/cart/clear-all')->toString()
+            'backend-clear-cart'    => UrlHelper::construct('shop/cart/clear')->toString()
         ];
     }
 

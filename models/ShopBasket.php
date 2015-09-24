@@ -2,7 +2,7 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (�����)
+ * @copyright 2010 SkeekS (�����)
  * @date 22.09.2015
  */
 
@@ -70,6 +70,8 @@ use yii\helpers\Json;
  * @property CmsSite $site
  *
  * @property Money $money
+ * @property Money $moneyNoDiscount
+ * @property Money $moneyDiscount
  */
 class ShopBasket extends \skeeks\cms\models\Core
 {
@@ -235,10 +237,7 @@ class ShopBasket extends \skeeks\cms\models\Core
     }
 
 
-
     /**
-     * ����������� ������ �������
-     *
      * @return $this
      */
     public function initData()
@@ -250,8 +249,8 @@ class ShopBasket extends \skeeks\cms\models\Core
             return $this;
         }
 
-        $money                  = $productPrice->money; //���� ��������
-        $money                  = $money->multiply($this->quantity); //�������� �� ����������
+        $money                  = $productPrice->money;
+        $money                  = $money->multiply($this->quantity);
 
         $this->price            = $money->getAmount() / $money->getCurrency()->getSubUnit();
         $this->currency_code    = (string) $money->getCurrency();
@@ -274,10 +273,35 @@ class ShopBasket extends \skeeks\cms\models\Core
 
 
     /**
+     * Итоговая стоимость позиции корзины с учетом скидки
+     *
      * @return Money
      */
     public function getMoney()
     {
         return Money::fromString($this->price, $this->currency_code);
+    }
+
+    /**
+     * Итоговая стоимость позиции корзины без скидки
+     * Цена единицы продукта * количество
+     * @return Money
+     */
+    public function getMoneyNoDiscount()
+    {
+        $money                  = $this->productPrice->money;
+        $money                  = $money->multiply($this->quantity);
+        $money                  = $money->convertToCurrency($this->currency_code);
+
+        return $money;
+    }
+
+    /**
+     * Итоговая стоимость скидки
+     * @return Money
+     */
+    public function getMoneyDiscount()
+    {
+        return \Yii::$app->money->newMoney();
     }
 }

@@ -126,6 +126,17 @@ class ShopProduct extends \skeeks\cms\models\Core
             }
 
             $baseProductPrice->save();
+        } else
+        {
+            if (!$this->baseProductPrice)
+            {
+                $baseProductPrice                   = new ShopProductPrice([
+                    'product_id' => $this->id
+                ]);
+
+                $baseProductPrice->type_price_id    = \Yii::$app->shop->baseTypePrice->id;
+                $baseProductPrice->save();
+            }
         }
     }
 

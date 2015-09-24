@@ -97,8 +97,6 @@ class ShopFuser extends Core
                 $currentBasket->save();
 
                 $basket->delete();
-
-                $currentBasket->recalculate();
             } else
             {
                 $basket->fuser_id = $this->id;

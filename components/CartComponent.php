@@ -28,7 +28,11 @@ use yii\helpers\ArrayHelper;
  * @property int $countShopBaskets
  * @property ShopBasket[] $shopBaskets
  * @property ShopFuser $shopFuser
+ *
  * @property Money $money
+ * @property Money $moneyNoDiscount
+ * @property Money $moneyDiscount
+ * @property Money $moneyDelivery
  *
  * Class CartComponent
  * @package skeeks\cms\shop\components
@@ -173,6 +177,9 @@ class CartComponent extends \yii\base\Component implements Arrayable
     }
 
     /**
+     *
+     * Итоговая стоимость корзины с учетом скидок, то что будет платить человек
+     *
      * @return Money
      */
     public function getMoney()
@@ -186,6 +193,52 @@ class CartComponent extends \yii\base\Component implements Arrayable
 
         return $money;
     }
+
+    /**
+     *
+     * Итоговая стоимость корзины, без учета скидок
+     *
+     * @return Money
+     */
+    public function getMoneyNoDiscount()
+    {
+        $money = \Yii::$app->money->newMoney();
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $money = $money->add($shopBasket->moneyNoDiscount);
+        }
+
+        return $money;
+    }
+
+    /**
+     *
+     * Итоговая скидка по всей корзине
+     *
+     * @return Money
+     */
+    public function getMoneyDiscount()
+    {
+        $money = \Yii::$app->money->newMoney();
+        return $money;
+    }
+
+    /**
+     *
+     * Итоговая скидка по всей корзине
+     *
+     * @return Money
+     */
+    public function getMoneyDelivery()
+    {
+        $money = \Yii::$app->money->newMoney();
+        return $money;
+    }
+
+
+
+
 
     /**
      * @return bool

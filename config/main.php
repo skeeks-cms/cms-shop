@@ -15,7 +15,8 @@ return [
 
         'urlManager' => [
             'rules' => [
-                '~<_c:(cart)>'               => 'shop/<_c>/index',
+                '~shop-cart'                             => 'shop/cart',
+                '~shop-<_a:(checkout)>'                  => 'shop/cart/<_a>',
             ]
         ],
     ],

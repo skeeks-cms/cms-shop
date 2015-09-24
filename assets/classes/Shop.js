@@ -29,7 +29,7 @@
             var self = this;
             this.carts = [];
 
-            this.bind('removeBasket addProduct updateBasket', function(e, data)
+            this.bind('removeBasket addProduct updateBasket clearCart', function(e, data)
             {
                 self.trigger('change', {
                     'Shop' : this
@@ -151,6 +151,27 @@
                 self.trigger('updateBasket', {
                     'basket_id'     : basket_id,
                     'quantity'      : quantity,
+                    'response'      : data.response,
+                });
+            });
+
+            ajax.execute();
+        },
+
+
+        clearCart: function()
+        {
+            var self = this;
+
+            this.trigger('beforeClearCart');
+
+            var ajax = this.ajaxQuery().setUrl(this.get('backend-clear-cart'));
+
+            ajax.onSuccess(function(e, data)
+            {
+                self.set('cartData', data.response.data);
+
+                self.trigger('clearCart', {
                     'response'      : data.response,
                 });
             });

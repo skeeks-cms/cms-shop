@@ -44,11 +44,12 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'product_id', 'type_price_id', 'quantity_from', 'quantity_to'], 'integer'],
-            [['product_id', 'type_price_id', 'price'], 'required'],
+            [['product_id', 'type_price_id'], 'required'],
             [['price'], 'number'],
             [['currency_code'], 'string', 'max' => 3],
             [['tmp_id'], 'string', 'max' => 40],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
+            [['price'], 'default', 'value' => 0],
         ];
     }
 

@@ -19,13 +19,22 @@ use yii\helpers\Json;
  */
 class CartController extends Controller
 {
+    public $defaultAction = 'cart';
+    /**
+     * @return string
+     */
+    public function actionCart()
+    {
+        $this->view->title = 'Корзина | Магазин';
+        return $this->render($this->action->id);
+    }
 
     /**
      * @return string
      */
-    public function actionIndex()
+    public function actionCheckout()
     {
-        $this->view->title = 'Корзина | Магазин';
+        $this->view->title = 'Оформление заказа | Магазин';
         return $this->render($this->action->id);
     }
 
@@ -123,6 +132,29 @@ class CartController extends Controller
             }
 
             $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
+            return (array) $rr;
+        } else
+        {
+            return $this->goBack();
+        }
+    }
+
+
+    public function actionClear()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost())
+        {
+            foreach (\Yii::$app->shop->cart->shopBaskets as $basket)
+            {
+                $basket->delete();
+            }
+
+            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
+            $rr->success = true;
+            $rr->message = "";
+
             return (array) $rr;
         } else
         {
