@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m150916_111201_create_table__shop_basket extends Migration
+class m150926_131201_create_table__shop_basket extends Migration
 {
     public function safeUp()
     {

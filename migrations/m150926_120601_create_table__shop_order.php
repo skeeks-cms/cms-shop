@@ -8,7 +8,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m150915_120601_create_table__shop_order extends Migration
+class m150926_120601_create_table__shop_order extends Migration
 {
     public function safeUp()
     {
@@ -35,6 +35,7 @@ class m150915_120601_create_table__shop_order extends Migration
             'site_code'             => $this->string(15)->notNull(),
 
             'person_type_id'        => $this->integer()->notNull(),
+            'buyer_id'              => $this->integer()->notNull(),
 
             'payed'                 => $this->string(1)->notNull()->defaultValue('N'),
             'payed_at'              => $this->integer(),
@@ -188,6 +189,11 @@ class m150915_120601_create_table__shop_order extends Migration
         $this->addForeignKey(
             'shop_order__locked_by', "{{%shop_order}}",
             'locked_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
+        );
+
+        $this->addForeignKey(
+            'shop_order__buyer_id', "{{%shop_order}}",
+            'buyer_id', '{{%shop_buyer}}', 'id', 'RESTRICT', 'RESTRICT'
         );
 
         $this->addForeignKey(

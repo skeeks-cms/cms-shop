@@ -91,6 +91,7 @@ use Yii;
  * @property CmsSite $site
  * @property ShopOrderStatus $status
  * @property CmsUser $user
+ * @property ShopBuyer $buyer
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
@@ -274,5 +275,13 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getUser()
     {
         return $this->hasOne(CmsUser::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBuyer()
+    {
+        return $this->hasOne(ShopBuyer::className(), ['id' => 'buyer_id']);
     }
 }

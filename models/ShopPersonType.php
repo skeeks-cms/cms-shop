@@ -7,8 +7,12 @@
  */
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\HasRelatedProperties;
+use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\CmsSite;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -27,9 +31,19 @@ use yii\helpers\ArrayHelper;
  *
  * @property ShopPersonTypeSite[]   $shopPersonTypeSites
  * @property CmsSite[]              $sites
+ *
+ * @property ShopBuyer[] $shopBuyers
+ * @property ShopOrder[] $shopOrders
+ * @property ShopPaySystemPersonType[] $shopPaySystemPersonTypes
+ * @property ShopPaySystem[] $paySystems
+ * @property CmsUser $createdBy
+ * @property CmsUser $updatedBy
+ * @property ShopPersonTypeProperty[] $shopPersonTypeProperties
+ * @property ShopTaxRate[] $shopTaxRates
  */
 class ShopPersonType extends \skeeks\cms\models\Core
 {
+
     /**
      * @inheritdoc
      */
@@ -40,6 +54,9 @@ class ShopPersonType extends \skeeks\cms\models\Core
 
     protected $_siteCodes = [];
 
+
+
+
     /**
      * @inheritdoc
      */
@@ -49,6 +66,22 @@ class ShopPersonType extends \skeeks\cms\models\Core
 
         $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterSaveEvent"]);
         $this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterSaveEvent"]);
+
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+    }
+
+    /**
+     * @param $event
+     */
+    public function beforeSaveEvent($event)
+    {
+        if ($this->isAttributeChanged('active') && $this->active == Cms::BOOL_N)
+        {
+            if (!static::find()->active()->andWhere(['!=', 'id', $this->id])->count())
+            {
+                throw new Exception("Необходим хотя бы один активный типа плательщика");
+            }
+        }
     }
 
     /**
@@ -99,8 +132,18 @@ class ShopPersonType extends \skeeks\cms\models\Core
             [['name'], 'string', 'max' => 255],
             [['active'], 'string', 'max' => 1],
             [['name'], 'unique'],
-            [['siteCodes'], 'safe']
+            [['siteCodes'], 'safe'],
+            [['active'], 'default', 'value' => Cms::BOOL_Y],
+            [['active'], 'validateActive'],
         ]);
+    }
+
+    public function validateActive($attribute)
+    {
+        if($this->$attribute == Cms::BOOL_N && !static::find()->active()->andWhere(['!=', 'id', $this->id])->count())
+        {
+            $this->addError($attribute, 'Необходимо оставить на сайте хотя бы один активный тип плательщика');
+        }
     }
 
     /**
@@ -114,6 +157,61 @@ class ShopPersonType extends \skeeks\cms\models\Core
             'active' => Yii::t('app', 'Active'),
             'siteCodes' => Yii::t('app', 'Сайты'),
         ]);
+    }
+
+
+
+
+
+
+     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopBuyers()
+    {
+        return $this->hasMany(ShopBuyer::className(), ['shop_person_type_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrders()
+    {
+        return $this->hasMany(ShopOrder::className(), ['person_type_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopPaySystemPersonTypes()
+    {
+        return $this->hasMany(ShopPaySystemPersonType::className(), ['person_type_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaySystems()
+    {
+        return $this->hasMany(ShopPaySystem::className(), ['id' => 'pay_system_id'])->viaTable('shop_pay_system_person_type', ['person_type_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopPersonTypeProperties()
+    {
+        return $this->hasMany(ShopPersonTypeProperty::className(), ['shop_person_type_id' => 'id'])->orderBy(['priority' => SORT_DESC]);
+    }
+
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopTaxRates()
+    {
+        return $this->hasMany(ShopTaxRate::className(), ['person_type_id' => 'id']);
     }
 
 
@@ -155,6 +253,23 @@ class ShopPersonType extends \skeeks\cms\models\Core
         return $this;
     }
 
+
+
+    /**
+     * @return ShopBuyer
+     * @throws InvalidParamException
+     */
+    public function createModelShopBuyer()
+    {
+        if ($this->isNewRecord)
+        {
+            throw new InvalidParamException;
+        }
+
+        return new ShopBuyer([
+            'shop_person_type_id' => (int) $this->id
+        ]);
+    }
 
 
 }

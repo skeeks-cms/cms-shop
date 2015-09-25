@@ -64,12 +64,23 @@ return [
             [
                 'priority'  => 0,
                 'label'     => 'Покупатели',
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png'],
 
                 'items' =>
                 [
                     [
+                        "label"     => "Покупатели",
+                        "url"       => ["shop/admin-buyer"],
+                    ],
+
+                    [
                         "label"     => "Счета",
                         "url"       => ["shop/admin-user-account"],
+                    ],
+
+                    [
+                        "label"     => "Корзины",
+                        "url"       => ["shop/admin-fuser"],
                     ]
                 ],
 

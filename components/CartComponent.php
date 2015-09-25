@@ -64,6 +64,11 @@ class CartComponent extends \yii\base\Component implements Arrayable
      */
     public function getShopFuser()
     {
+        if ($this->_shopFuser instanceof ShopFuser)
+        {
+            return $this->_shopFuser;
+        }
+
         //Если пользователь гость
         if (\Yii::$app->user->isGuest)
         {
@@ -146,13 +151,13 @@ class CartComponent extends \yii\base\Component implements Arrayable
     }
 
     /**
-     * TODO: реализовать
-     * @param $shopFuser
-     * @throws Exception
+     * @param ShopFuser $shopFuser
+     * @return $this
      */
-    public function setShopFuser($shopFuser)
+    public function setShopFuser(ShopFuser $shopFuser)
     {
-        throw new Exception('Не реализовано');
+        $this->_shopFuser = $shopFuser;
+        return $this;
     }
 
 

@@ -16,12 +16,15 @@ use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\reviews2\actions\AdminOneModelMessagesAction;
 use skeeks\cms\shop\actions\AdminContentElementShopAction;
 use skeeks\cms\shop\models\ShopContent;
+use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
  * @property CartComponent $cart
  * @property ShopTypePrice $baseTypePrice
+ * @property ShopPersonType[] $shopPersonTypes
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -95,6 +98,15 @@ class ShopComponent extends Component
     public function getBaseTypePrice()
     {
         return ShopTypePrice::find()->def()->one();
+    }
+
+
+    /**
+     * @return ShopPersonType[]
+     */
+    public function getShopPersonTypes()
+    {
+        return ShopPersonType::find()->active()->all();
     }
 
     /**
