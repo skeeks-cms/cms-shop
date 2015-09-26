@@ -21,6 +21,7 @@ use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\ActionEvent;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -47,6 +48,23 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
+                'index' =>
+                [
+                    "dataProviderCallback" => function(ActiveDataProvider $dataProvider)
+                    {
+                        $query = $dataProvider->query;
+                        /**
+                         * @var ActiveQuery $query
+                         */
+                        //$query->select(['app_company.*', 'count(`app_company_officer_user`.`id`) as countOfficer']);
+
+                        $query->with('image');
+                        $query->with('cmsTree');
+                        $query->with('cmsContentElementTrees');
+                        $query->with('cmsContentElementTrees.tree');
+                    },
+                ],
+
                 'settings' =>
                 [
                     'class'         => AdminModelEditorAction::className(),

@@ -23,6 +23,7 @@ use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTax;
 use skeeks\cms\shop\models\ShopVat;
+use yii\data\ActiveDataProvider;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -53,6 +54,21 @@ class AdminFuserController extends AdminModelEditorController
             [
                 'index' =>
                 [
+                    "dataProviderCallback" => function(ActiveDataProvider $dataProvider)
+                    {
+                        $query = $dataProvider->query;
+                        /**
+                         * @var ActiveQuery $query
+                         */
+                        //$query->select(['app_company.*', 'count(`app_company_officer_user`.`id`) as countOfficer']);
+                        $query->groupBy(['shop_fuser.id']);
+
+                        $query->with('user');
+                        $query->with('shopBaskets');
+                        $query->with('shopBaskets.product');
+                    },
+
+
                     "columns"      => [
                         [
                             'class'         => UpdatedAtColumn::className(),
