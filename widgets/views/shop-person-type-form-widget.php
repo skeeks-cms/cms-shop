@@ -10,7 +10,6 @@
 ?>
 
 
-<? $modelHasProperties = $widget->shopPersonType->createModelShopBuyer(); ?>
 
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
         'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct('shop/backend/shop-person-type-validate')->toString(),
@@ -45,9 +44,9 @@ JS
     echo \yii\helpers\Html::hiddenInput("shop_person_type_id",   $widget->shopPersonType->id);
 ?>
 
-<? if ($properties = $modelHasProperties->relatedProperties) : ?>
+<? if ($properties = $widget->shopBuyer->relatedProperties) : ?>
     <? foreach ($properties as $property) : ?>
-        <?= $property->renderActiveForm($form, $modelHasProperties); ?>
+        <?= $property->renderActiveForm($form, $widget->shopBuyer); ?>
     <? endforeach; ?>
 <? endif; ?>
 

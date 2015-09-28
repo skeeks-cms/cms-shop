@@ -78,9 +78,9 @@ class ShopBuyer extends RelatedElementModel
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'cms_user_id' => Yii::t('app', 'Cms User ID'),
-            'shop_person_type_id' => Yii::t('app', 'Shop Person Type ID'),
+            'name' => Yii::t('app', 'Название профиля'),
+            'cms_user_id' => Yii::t('app', 'Пользователь сайта'),
+            'shop_person_type_id' => Yii::t('app', 'Тип плательщика'),
         ];
     }
 

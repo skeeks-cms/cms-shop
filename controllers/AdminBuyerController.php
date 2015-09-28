@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\components\Cms;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\SiteColumn;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
@@ -51,13 +52,20 @@ class AdminBuyerController extends AdminModelEditorController
                 [
                     "columns"      => [
                         'name',
-                        /*'name',
-                        'code',
+                        [
+                            'class' => UserColumnData::className(),
+                            'attribute' => 'cms_user_id'
+                        ],
 
                         [
-                            'class'         => SiteColumn::className(),
-                            'attribute'     => "site_code"
-                        ]*/
+                            'class' => DataColumn::className(),
+                            'attribute' => 'shop_person_type_id',
+                            'value' => function(ShopBuyer $model)
+                            {
+                                return $model->shopPersonType->name;
+                            }
+                        ]
+
                     ],
                 ]
             ]

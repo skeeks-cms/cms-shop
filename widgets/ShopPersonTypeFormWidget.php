@@ -8,6 +8,7 @@
 namespace skeeks\cms\shop\widgets;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\shop\assets\ShopAsset;
+use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopPersonType;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
@@ -28,9 +29,32 @@ class ShopPersonTypeFormWidget extends Widget
      */
     public $shopPersonType  = null;
 
+    /**
+     * @var ShopBuyer
+     */
+    public $shopBuyer  = null;
+
     public function init()
     {
         parent::init();
+
+        if (!$this->shopPersonType)
+        {
+            $this->shopPersonType = \Yii::$app->shop->shopFuser->personType;
+        }
+
+        if (!$this->shopBuyer)
+        {
+            $this->shopBuyer = \Yii::$app->shop->shopFuser->buyer;
+        }
+
+        if ($this->shopBuyer)
+        {
+            $this->shopPersonType = $this->shopBuyer->shopPersonType;
+        } else
+        {
+            $this->shopBuyer = $this->shopPersonType->createModelShopBuyer();
+        }
     }
 
     /**
@@ -42,6 +66,4 @@ class ShopPersonTypeFormWidget extends Widget
             'widget' => $this
         ]);
     }
-
-
 }

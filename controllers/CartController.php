@@ -10,6 +10,8 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\shop\models\ShopBasket;
+use skeeks\cms\shop\models\ShopBuyer;
+use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\helpers\Json;
 
@@ -70,7 +72,7 @@ class CartController extends Controller
             }
 
             $shopBasket = ShopBasket::find()->where([
-                'fuser_id'      => \Yii::$app->shop->cart->shopFuser->id,
+                'fuser_id'      => \Yii::$app->shop->shopFuser->id,
                 'product_id'    => $product_id,
                 'order_id'      => null,
             ])->one();
@@ -78,7 +80,7 @@ class CartController extends Controller
             if (!$shopBasket)
             {
                 $shopBasket = new ShopBasket([
-                    'fuser_id'          => \Yii::$app->shop->cart->shopFuser->id,
+                    'fuser_id'          => \Yii::$app->shop->shopFuser->id,
                     'name'              => $product->cmsContentElement->name,
                     'product_id'        => $product->id,
                     'price'             => $productPrice->price,
@@ -104,7 +106,7 @@ class CartController extends Controller
                 $rr->message = 'Позиция добавлена в корзину';
             }
 
-            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             return (array) $rr;
         } else
         {
@@ -131,7 +133,7 @@ class CartController extends Controller
                 }
             }
 
-            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             return (array) $rr;
         } else
         {
@@ -146,12 +148,12 @@ class CartController extends Controller
 
         if ($rr->isRequestAjaxPost())
         {
-            foreach (\Yii::$app->shop->cart->shopBaskets as $basket)
+            foreach (\Yii::$app->shop->shopFuser->shopBaskets as $basket)
             {
                 $basket->delete();
             }
 
-            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             $rr->success = true;
             $rr->message = "";
 
@@ -194,7 +196,58 @@ class CartController extends Controller
 
             }
 
-            $rr->data = \Yii::$app->shop->cart->toArray([], \Yii::$app->shop->cart->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            return (array) $rr;
+        } else
+        {
+            return $this->goBack();
+        }
+    }
+
+
+    public function actionUpdateBuyer()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost())
+        {
+            $buyerId  = \Yii::$app->request->post('buyer');
+            $buyer = null;
+
+            if ($buyerId == (int) $buyerId)
+            {
+                /**
+                 * @var $buyer ShopBuyer
+                 * @var $shopPersonType ShopPersonType
+                 */
+                $buyer = ShopBuyer::findOne($buyerId);
+            } else
+            {
+                $shopPersonTypeId = explode("-", $buyerId);
+                $shopPersonTypeId = $shopPersonTypeId[1];
+
+                $shopPersonType = ShopPersonType::findOne($shopPersonTypeId);
+
+            }
+
+            if ($buyer)
+            {
+                \Yii::$app->shop->shopFuser->buyer_id = $buyer->id;
+                \Yii::$app->shop->shopFuser->person_type_id = $buyer->shopPersonType->id;
+            } else if ($shopPersonType)
+            {
+                \Yii::$app->shop->shopFuser->person_type_id = $shopPersonType->id;
+                \Yii::$app->shop->shopFuser->buyer_id = null;
+            }
+
+            \Yii::$app->shop->shopFuser->save();
+            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
+
+            $rr->message = "";
+            $rr->success = true;
+
+
+            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             return (array) $rr;
         } else
         {

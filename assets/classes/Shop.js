@@ -178,6 +178,32 @@
 
             ajax.execute();
         },
+
+        /**
+         * Сохранить в состоянии корзины данные о типе покупателя.
+         *
+         * @param buyer
+         */
+        saveBuyer: function(buyer)
+        {
+            var self = this;
+
+            this.trigger('beforeSaveBuyer');
+
+            var ajax = this.ajaxQuery().setUrl(this.get('backend-update-buyer'));
+            ajax.setData({
+                'buyer' : buyer
+            });
+
+            ajax.onSuccess(function(e, data)
+            {
+                self.trigger('saveBuyer', {
+                    'response'      : data.response,
+                });
+            });
+
+            ajax.execute();
+        },
     });
 
     sx.classes.shop.App = sx.classes.shop._App.extend({});

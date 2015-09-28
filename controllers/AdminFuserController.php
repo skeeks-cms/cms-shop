@@ -12,8 +12,10 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\CreatedAtColumn;
 use skeeks\cms\grid\SiteColumn;
 use skeeks\cms\grid\UpdatedAtColumn;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
@@ -64,6 +66,8 @@ class AdminFuserController extends AdminModelEditorController
                         $query->groupBy(['shop_fuser.id']);
 
                         $query->with('user');
+                        $query->with('personType');
+                        $query->with('buyer');
                         $query->with('shopBaskets');
                         $query->with('shopBaskets.product');
                     },
@@ -77,7 +81,7 @@ class AdminFuserController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'filter'        => false,
-                            'label'         => 'Покупатель',
+                            'label'         => 'Пользователь',
                             'value'         => function(ShopFuser $model)
                             {
                                 return $model->user ? $model->user->displayName : "Неавторизован";
@@ -87,12 +91,37 @@ class AdminFuserController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'filter'        => false,
+                            'format'        => 'raw',
+                            'label'         => 'Профиль покупателя',
+                            'value'         => function(ShopFuser $model)
+                            {
+                                if (!$model->buyer)
+                                {
+                                    return null;
+                                }
+
+                                return Html::a($model->buyer->name . " [{$model->buyer->id}]", UrlHelper::construct('shop/admin-buyer/related-properties', ['pk' => $model->buyer->id])->enableAdmin()->toString());
+                            },
+                        ],
+
+                        [
+                            'class'         => DataColumn::className(),
+                            'filter'        => ArrayHelper::map(ShopPersonType::find()->active()->all(), 'id', 'name'),
+                            'attribute'     => 'person_type_id',
+                            'label'         => 'Тип профиля',
+                            'value'         => function(ShopFuser $model)
+                            {
+                                return $model->personType->name;
+                            },
+                        ],
+
+                        [
+                            'class'         => DataColumn::className(),
+                            'filter'        => false,
                             'label'         => 'Цена корзины',
                             'value'         => function(ShopFuser $model)
                             {
-                                $cart = new CartComponent();
-                                $cart->shopFuser = $model;
-                                return \Yii::$app->money->intlFormatter()->format($cart->money);
+                                return \Yii::$app->money->intlFormatter()->format($model->money);
                             },
                         ],
 
@@ -102,9 +131,7 @@ class AdminFuserController extends AdminModelEditorController
                             'label'         => 'Количество наименований',
                             'value'         => function(ShopFuser $model)
                             {
-                                $cart = new CartComponent();
-                                $cart->shopFuser = $model;
-                                return $cart->countShopBaskets;
+                                return $model->countShopBaskets;
                             },
                         ],
 
@@ -128,6 +155,18 @@ HTML;
                                     }
                                     return implode('<hr />', $result);
                                 }
+                            },
+                        ],
+
+                        [
+                            'class'         => DataColumn::className(),
+                            'filter'        => ArrayHelper::map(CmsSite::find()->active()->all(), 'id', 'name'),
+                            'attribute'     => 'site_id',
+                            'format'        => 'raw',
+                            'label'         => 'Сайт',
+                            'value'         => function(ShopFuser $model)
+                            {
+                                return $model->site->name . " [{$model->site->code}]";
                             },
                         ],
 

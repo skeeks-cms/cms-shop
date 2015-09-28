@@ -34,10 +34,11 @@ class ShopGlobalWidget extends Widget
     public function baseClientOptions()
     {
         return [
-            'backend-add-product'   => UrlHelper::construct('shop/cart/add-product')->toString(),
-            'backend-remove-basket' => UrlHelper::construct('shop/cart/remove-basket')->toString(),
-            'backend-update-basket' => UrlHelper::construct('shop/cart/update-basket')->toString(),
-            'backend-clear-cart'    => UrlHelper::construct('shop/cart/clear')->toString()
+            'backend-add-product'       => UrlHelper::construct('shop/cart/add-product')->toString(),
+            'backend-remove-basket'     => UrlHelper::construct('shop/cart/remove-basket')->toString(),
+            'backend-update-basket'     => UrlHelper::construct('shop/cart/update-basket')->toString(),
+            'backend-clear-cart'        => UrlHelper::construct('shop/cart/clear')->toString(),
+            'backend-update-buyer'      => UrlHelper::construct('shop/cart/update-buyer')->toString()
         ];
     }
 

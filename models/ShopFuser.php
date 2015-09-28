@@ -6,16 +6,45 @@
  * @date 28.08.2015
  */
 namespace skeeks\cms\shop\models;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Core;
 use skeeks\cms\models\User;
+use skeeks\modules\cms\money\Money;
 use \Yii;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "shop_fuser".
  *
+ *
  * @property User           $user
  * @property ShopBasket[]   $shopBaskets
+ * @property ShopBuyer      $buyer
+ *
+ * @property ShopPersonType $personType
+ * @property CmsSite $site
+ *
+ * @property int $countShopBaskets
+ * @property ShopBuyer[] $shopBuyers
+ *
+ * @property integer $id
+ * @property integer $created_by
+ * @property integer $updated_by
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property integer $user_id
+ * @property string $additional
+ * @property integer $person_type_id
+ * @property integer $site_id
+ * @property string $delivery_code
+ * @property integer $buyer_id
+ *
+ * @property Money $money
+ * @property Money $moneyNoDiscount
+ * @property Money $moneyDiscount
+ * @property Money $moneyDelivery
+ *
  */
 class ShopFuser extends Core
 {
@@ -44,6 +73,11 @@ class ShopFuser extends Core
     {
         return array_merge(parent::attributeLabels(), [
             'user_id' => Yii::t('app', 'User'),
+            'additional' => Yii::t('app', 'Additional'),
+            'person_type_id' => Yii::t('app', 'Person Type ID'),
+            'site_id' => Yii::t('app', 'Site ID'),
+            'delivery_code' => Yii::t('app', 'Delivery Code'),
+            'buyer_id' => Yii::t('app', 'Buyer ID'),
         ]);
     }
 
@@ -53,8 +87,20 @@ class ShopFuser extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['user_id'], 'unique']
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'user_id', 'person_type_id', 'site_id'], 'integer'],
+            [['additional'], 'string'],
+            [['delivery_code'], 'string', 'max' => 50],
+            [['user_id'], 'unique'],
+            [['buyer_id'], 'integer']
         ]);
+    }
+
+    public function extraFields()
+    {
+        return [
+            'countShopBaskets',
+            'shopBaskets',
+        ];
     }
 
     /**
@@ -66,8 +112,30 @@ class ShopFuser extends Core
     }
 
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPersonType()
+    {
+        return $this->hasOne(ShopPersonType::className(), ['id' => 'person_type_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSite()
+    {
+        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
+    }
 
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBuyer()
+    {
+        return $this->hasOne(ShopBuyer::className(), ['id' => 'buyer_id']);
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -75,6 +143,15 @@ class ShopFuser extends Core
     public function getShopBaskets()
     {
         return $this->hasMany(ShopBasket::className(), ['fuser_id' => 'id']);
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getShopBuyers()
+    {
+        return $this->hasMany(ShopBuyer::className(), ['cms_user_id' => 'id'])->via('user');
     }
 
     /**
@@ -106,4 +183,121 @@ class ShopFuser extends Core
 
         return $this;
     }
+
+
+
+
+
+
+     /**
+     * Количество позиций в корзине
+     *
+     * @return int
+     */
+    public function getCountShopBaskets()
+    {
+        return count($this->shopBaskets);
+    }
+
+    /**
+     *
+     * Итоговая стоимость корзины с учетом скидок, то что будет платить человек
+     *
+     * @return Money
+     */
+    public function getMoney()
+    {
+        $money = \Yii::$app->money->newMoney();
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $money = $money->add($shopBasket->money);
+        }
+
+        return $money;
+    }
+
+    /**
+     *
+     * Итоговая стоимость корзины, без учета скидок
+     *
+     * @return Money
+     */
+    public function getMoneyNoDiscount()
+    {
+        $money = \Yii::$app->money->newMoney();
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $money = $money->add($shopBasket->moneyNoDiscount);
+        }
+
+        return $money;
+    }
+
+    /**
+     *
+     * Итоговая скидка по всей корзине
+     *
+     * @return Money
+     */
+    public function getMoneyDiscount()
+    {
+        $money = \Yii::$app->money->newMoney();
+        return $money;
+    }
+
+    /**
+     *
+     * Итоговая скидка по всей корзине
+     *
+     * @return Money
+     */
+    public function getMoneyDelivery()
+    {
+        $money = \Yii::$app->money->newMoney();
+        return $money;
+    }
+
+
+
+
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return (bool) $this->countShopBaskets == 0;
+    }
+
+
+
+    /**
+     * Возможные опции для выбора покупателя
+     * @return array
+     */
+    public function getBuyersList()
+    {
+        $result = [];
+
+        if (\Yii::$app->shop->shopPersonTypes)
+        {
+            foreach (\Yii::$app->shop->shopPersonTypes as $shopPersonType)
+            {
+                $result[$shopPersonType->name] = [
+                    'shopPersonType-' . $shopPersonType->id => ' + Новый профиль'
+                ];
+
+                if ($existsBuyers = $this->getShopBuyers()->andWhere(['shop_person_type_id' => $shopPersonType->id])->all())
+                {
+                    $result[$shopPersonType->name] = ArrayHelper::merge($result[$shopPersonType->name], ArrayHelper::map($existsBuyers, 'id', 'name'));
+                }
+            }
+        }
+
+        return $result;
+    }
+
+
 }
