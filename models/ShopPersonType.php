@@ -193,7 +193,8 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getPaySystems()
     {
-        return $this->hasMany(ShopPaySystem::className(), ['id' => 'pay_system_id'])->viaTable('shop_pay_system_person_type', ['person_type_id' => 'id']);
+        return $this->hasMany(ShopPaySystem::className(), ['id' => 'pay_system_id'])
+                ->viaTable('shop_pay_system_person_type', ['person_type_id' => 'id']);
     }
 
     /**

@@ -51,7 +51,7 @@ class ShopPersonTypeFormWidget extends Widget
         if ($this->shopBuyer)
         {
             $this->shopPersonType = $this->shopBuyer->shopPersonType;
-        } else
+        } else if ($this->shopPersonType)
         {
             $this->shopBuyer = $this->shopPersonType->createModelShopBuyer();
         }

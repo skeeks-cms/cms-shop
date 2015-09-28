@@ -14,6 +14,7 @@ use skeeks\cms\models\forms\PasswordChangeForm;
 use skeeks\cms\models\User;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use skeeks\cms\relatedProperties\models\RelatedPropertiesModel;
+use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\modules\cms\form2\models\Form2Form;
 use skeeks\modules\cms\form2\models\Form2FormSend;
@@ -60,10 +61,12 @@ class BackendController extends Controller
             if (\Yii::$app->request->post('shop_person_type_id'))
             {
                 $shop_person_type_id = \Yii::$app->request->post('shop_person_type_id');
+                $shop_buyer_id = \Yii::$app->request->post('shop_buyer_id');
 
                 /**
                  * @var $shopPersonType ShopPersonType
                  */
+                $modelBuyer = ShopBuyer::findOne($shop_buyer_id);
                 $shopPersonType = ShopPersonType::find()->active()->andWhere(['id' => $shop_person_type_id])->one();
                 if (!$shopPersonType)
                 {
@@ -72,12 +75,16 @@ class BackendController extends Controller
                     return $rr;
                 }
 
-                $modelBuyer     = $shopPersonType->createModelShopBuyer();
+                if (!$modelBuyer)
+                {
+                    $modelBuyer     = $shopPersonType->createModelShopBuyer();
+                }
+
                 $validateModel  = $modelBuyer->relatedPropertiesModel;
 
                 if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate())
                 {
-                    $modelBuyer->name = 'test';
+                    $modelBuyer->name = 'test 1';
                     $modelBuyer->cms_user_id = \Yii::$app->user->identity->id;
 
                     if (!$modelBuyer->save())
@@ -89,8 +96,8 @@ class BackendController extends Controller
 
                     $validateModel->save();
 
-                    //$rr->success = true;
-                    //$rr->message = 'Успешно отправлена';
+                    $rr->success = true;
+                    $rr->message = 'Успешно отправлена';
 
                 } else
                 {

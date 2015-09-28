@@ -39,6 +39,14 @@ class CartController extends Controller
         $this->view->title = 'Оформление заказа | Магазин';
         return $this->render($this->action->id);
     }
+    /**
+     * @return string
+     */
+    public function actionPayment()
+    {
+        $this->view->title = 'Выбор способоа оплаты | Магазин';
+        return $this->render($this->action->id);
+    }
 
     /**
      * Добавление продукта в корзину.
@@ -106,6 +114,7 @@ class CartController extends Controller
                 $rr->message = 'Позиция добавлена в корзину';
             }
 
+            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
             $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             return (array) $rr;
         } else
@@ -133,6 +142,7 @@ class CartController extends Controller
                 }
             }
 
+            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
             $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             return (array) $rr;
         } else
@@ -153,6 +163,7 @@ class CartController extends Controller
                 $basket->delete();
             }
 
+            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
             $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             $rr->success = true;
             $rr->message = "";
@@ -196,6 +207,7 @@ class CartController extends Controller
 
             }
 
+            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
             $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
             return (array) $rr;
         } else
@@ -214,7 +226,7 @@ class CartController extends Controller
             $buyerId  = \Yii::$app->request->post('buyer');
             $buyer = null;
 
-            if ($buyerId == (int) $buyerId)
+            if (strpos($buyerId, '-') === false)
             {
                 /**
                  * @var $buyer ShopBuyer

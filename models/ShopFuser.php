@@ -6,6 +6,7 @@
  * @date 28.08.2015
  */
 namespace skeeks\cms\shop\models;
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Core;
 use skeeks\cms\models\User;
@@ -21,12 +22,15 @@ use yii\helpers\ArrayHelper;
  * @property User           $user
  * @property ShopBasket[]   $shopBaskets
  * @property ShopBuyer      $buyer
+ * @property ShopPaySystem $paySystem
  *
  * @property ShopPersonType $personType
  * @property CmsSite $site
  *
  * @property int $countShopBaskets
  * @property ShopBuyer[] $shopBuyers
+ * @property ShopPaySystem[] $paySystems
+ *
  *
  * @property integer $id
  * @property integer $created_by
@@ -39,6 +43,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $site_id
  * @property string $delivery_code
  * @property integer $buyer_id
+ * @property integer $pay_system_id
  *
  * @property Money $money
  * @property Money $moneyNoDiscount
@@ -78,6 +83,7 @@ class ShopFuser extends Core
             'site_id' => Yii::t('app', 'Site ID'),
             'delivery_code' => Yii::t('app', 'Delivery Code'),
             'buyer_id' => Yii::t('app', 'Buyer ID'),
+            'pay_system_id' => Yii::t('app', 'Платежная система'),
         ]);
     }
 
@@ -91,7 +97,8 @@ class ShopFuser extends Core
             [['additional'], 'string'],
             [['delivery_code'], 'string', 'max' => 50],
             [['user_id'], 'unique'],
-            [['buyer_id'], 'integer']
+            [['buyer_id'], 'integer'],
+            [['pay_system_id'], 'integer']
         ]);
     }
 
@@ -147,12 +154,23 @@ class ShopFuser extends Core
 
 
     /**
+     *
      * @return ActiveQuery
      */
     public function getShopBuyers()
     {
         return $this->hasMany(ShopBuyer::className(), ['cms_user_id' => 'id'])->via('user');
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaySystem()
+    {
+        return $this->hasOne(ShopPaySystem::className(), ['id' => 'pay_system_id']);
+    }
+
+
 
     /**
      * Добавить корзины этому пользователю
@@ -286,7 +304,7 @@ class ShopFuser extends Core
             foreach (\Yii::$app->shop->shopPersonTypes as $shopPersonType)
             {
                 $result[$shopPersonType->name] = [
-                    'shopPersonType-' . $shopPersonType->id => ' + Новый профиль'
+                    'shopPersonType-' . $shopPersonType->id => " + Новый профиль ({$shopPersonType->name})"
                 ];
 
                 if ($existsBuyers = $this->getShopBuyers()->andWhere(['shop_person_type_id' => $shopPersonType->id])->all())
@@ -299,5 +317,15 @@ class ShopFuser extends Core
         return $result;
     }
 
+
+    /**
+     * Доступные платежные системы
+     *
+     * @return ShopPaySystem[]
+     */
+    public function getPaySystems()
+    {
+        return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
+    }
 
 }

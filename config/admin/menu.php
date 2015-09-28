@@ -127,6 +127,11 @@ return [
                         "url"       => ["shop/admin-pay-system"],
                     ],
 
+                    [
+                        "label"     => "Службы доставки",
+                        "url"       => ["shop/admin-delivery"],
+                    ],
+
 
                     [
                         "label"     => "Налоги",
