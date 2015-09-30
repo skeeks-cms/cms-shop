@@ -19,14 +19,26 @@ class m150927_100558_alter_table__shop_fuser extends Migration
         $this->execute("ALTER TABLE {{%shop_fuser}} ADD `delivery_code` VARCHAR(50) NULL ;");
         $this->execute("ALTER TABLE {{%shop_fuser}} ADD `buyer_id` INT NULL ;");
 
+        $this->execute("ALTER TABLE {{%shop_fuser}} ADD `pay_system_id` INT NULL ;");
+
+        $this->addForeignKey(
+            'shop_fuser__pay_system_id', "{{%shop_fuser}}",
+            'pay_system_id', '{{%shop_pay_system}}', 'id', 'SET NULL', 'SET NULL'
+        );
+
         $this->addForeignKey(
             'shop_fuser__person_type_id', "{{%shop_fuser}}",
             'person_type_id', '{{%shop_person_type}}', 'id', 'SET NULL', 'SET NULL'
         );
 
         $this->addForeignKey(
-            'shop_fuser__site_code', "{{%shop_fuser}}",
+            'shop_fuser__site_id', "{{%shop_fuser}}",
             'site_id', '{{%cms_site}}', 'id', 'SET NULL', 'SET NULL'
+        );
+
+        $this->addForeignKey(
+            'shop_fuser__shop_buyer', "{{%shop_fuser}}",
+            'buyer_id', '{{%shop_buyer}}', 'id', 'SET NULL', 'SET NULL'
         );
 
     }

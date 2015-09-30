@@ -32,7 +32,7 @@ use yii\helpers\Json;
  * @property string $currency_code
  * @property string $weight
  * @property string $quantity
- * @property string $site_code
+ * @property integer $site_id
  * @property string $delay
  * @property string $name
  * @property string $can_buy
@@ -122,16 +122,17 @@ class ShopBasket extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'fuser_id', 'order_id', 'product_id', 'product_price_id', 'type', 'set_parent_id', 'measure_code'], 'integer'],
-            [['fuser_id', 'price', 'currency_code', 'site_code', 'name'], 'required'],
+            [['fuser_id', 'price', 'currency_code', 'name'], 'required'],
             [['price', 'weight', 'quantity', 'discount_price', 'vat_rate', 'reserve_quantity'], 'number'],
             [['currency_code'], 'string', 'max' => 3],
-            [['site_code'], 'string', 'max' => 15],
+            [['site_id'], 'integer'],
             [['delay', 'can_buy', 'subscribe', 'barcode_multi', 'reserved', 'deducted', 'custom_price'], 'string', 'max' => 1],
             [['name', 'callback_func', 'notes', 'order_callback_func', 'detail_page_url', 'cancel_callback_func', 'pay_callback_func', 'discount_name', 'dimensions', 'recommendation'], 'string', 'max' => 255],
             [['catalog_xml_id', 'product_xml_id'], 'string', 'max' => 100],
             [['discount_value', 'discount_coupon'], 'string', 'max' => 32],
             [['measure_name'], 'string', 'max' => 50],
-            [['site_code'], 'default', 'value' => \Yii::$app->cms->site->code],
+
+            [['site_id'], 'default', 'value' => \Yii::$app->cms->site->id],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode]
         ];
     }
@@ -155,7 +156,7 @@ class ShopBasket extends \skeeks\cms\models\Core
             'currency_code' => Yii::t('app', 'Currency Code'),
             'weight' => Yii::t('app', 'Weight'),
             'quantity' => Yii::t('app', 'Quantity'),
-            'site_code' => Yii::t('app', 'Site Code'),
+            'site_id' => Yii::t('app', 'Site'),
             'delay' => Yii::t('app', 'Delay'),
             'name' => Yii::t('app', 'Name'),
             'can_buy' => Yii::t('app', 'Can Buy'),
@@ -233,7 +234,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
     }
 
 

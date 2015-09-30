@@ -140,6 +140,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <?= $form->fieldRadioListBoolean($model, 'is_user_username')?>
     <?= $form->fieldRadioListBoolean($model, 'is_user_name')?>
 
+    <?= $form->fieldRadioListBoolean($model, 'is_buyer_name')?>
+
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Связь с заказом') ?>

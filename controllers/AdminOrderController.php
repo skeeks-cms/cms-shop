@@ -28,6 +28,7 @@ use skeeks\cms\shop\models\ShopTax;
 use skeeks\cms\shop\models\ShopVat;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * Class AdminExtraController
@@ -57,6 +58,23 @@ class AdminOrderController extends AdminModelEditorController
                 [
                     "columns"               => [
                         'id',
+
+                        [
+                            'class'     => DataColumn::className(),
+                            'attribute'     => 'status_code',
+                            'format'     => 'raw',
+                            'value'     => function(ShopOrder $order)
+                            {
+                                return $order->status->name . "<br />" . Html::tag('small', $order->status->description);
+                            }
+                        ],
+
+                        [
+                            'class'     => BooleanColumn::className(),
+                            'attribute'     => 'payed',
+                            'format'     => 'raw',
+
+                        ],
 
                         [
                             'class'     => CreatedAtColumn::className(),

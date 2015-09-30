@@ -66,9 +66,7 @@ class ShopFuser extends Core
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-
-        ]);
+        return ArrayHelper::merge(parent::behaviors(), []);
     }
 
     /**
@@ -87,6 +85,15 @@ class ShopFuser extends Core
         ]);
     }
 
+    const SCENARIO_CREATE_ORDER = 'scentarioCreateOrder';
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_CREATE_ORDER] = $scenarios[self::SCENARIO_DEFAULT];
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -98,7 +105,9 @@ class ShopFuser extends Core
             [['delivery_code'], 'string', 'max' => 50],
             [['user_id'], 'unique'],
             [['buyer_id'], 'integer'],
-            [['pay_system_id'], 'integer']
+            [['pay_system_id'], 'integer'],
+            [['pay_system_id', 'buyer_id', 'site_id', 'person_type_id', 'user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
+
         ]);
     }
 

@@ -15,6 +15,15 @@ function shopProductsMenu()
 {
     $result = [];
 
+    try
+    {
+        $table = \skeeks\cms\models\CmsContent::getTableSchema();
+        $table = \skeeks\cms\shop\models\ShopContent::getTableSchema();
+    } catch (\Exception $e)
+    {
+        return $result;
+    }
+
     if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority DESC")->andWhere([
         'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id')
     ])->all())

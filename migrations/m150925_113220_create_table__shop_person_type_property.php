@@ -53,14 +53,16 @@ class m150925_113220_create_table__shop_person_type_property extends Migration
 
             'shop_person_type_id'   => $this->integer()->notNull(),
 
-            'is_order_location_delivery'  => $this->string()->notNull()->defaultValue('N'), //Значение свойства будет использовано как местоположение покупателя для расчета стоимости доставки (только для свойств типа LOCATION)
-            'is_order_location_tax'       => $this->string()->notNull()->defaultValue('N'), //Значение свойства будет использовано как местоположение покупателя для расчета налогов (только для свойств типа LOCATION)
-            'is_order_postcode'           => $this->string()->notNull()->defaultValue('N'), //Значение свойства будет использовано как почтовый индекс покупателя для расчета стоимости доставки
+            'is_order_location_delivery'  => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как местоположение покупателя для расчета стоимости доставки (только для свойств типа LOCATION)
+            'is_order_location_tax'       => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как местоположение покупателя для расчета налогов (только для свойств типа LOCATION)
+            'is_order_postcode'           => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как почтовый индекс покупателя для расчета стоимости доставки
 
-            'is_user_email'               => $this->string()->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
-            'is_user_phone'               => $this->string()->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
-            'is_user_username'            => $this->string()->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
-            'is_user_name'                => $this->string()->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
+            'is_user_email'               => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
+            'is_user_phone'               => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
+            'is_user_username'            => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
+            'is_user_name'                => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
+
+            'is_buyer_name'               => $this->string(1)->notNull()->defaultValue('N'), //Значение свойства будет использовано как E-Mail при регистрации нового пользователя
 
         ], $tableOptions);
 
@@ -98,6 +100,7 @@ class m150925_113220_create_table__shop_person_type_property extends Migration
         $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_phone);");
         $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_username);");
         $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_name);");
+        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_buyer_name);");
 
         $this->execute("ALTER TABLE {{%shop_person_type_property}} COMMENT = 'Свойства типов пользователей';");
 

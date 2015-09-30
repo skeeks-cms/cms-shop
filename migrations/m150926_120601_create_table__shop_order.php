@@ -32,7 +32,7 @@ class m150926_120601_create_table__shop_order extends Migration
             'created_at'            => $this->integer(),
             'updated_at'            => $this->integer(),
 
-            'site_code'             => $this->string(15)->notNull(),
+            'site_id'               => $this->integer(),
 
             'person_type_id'        => $this->integer()->notNull(),
             'buyer_id'              => $this->integer()->notNull(),
@@ -64,7 +64,7 @@ class m150926_120601_create_table__shop_order extends Migration
 
             'pay_system_id'         => $this->integer(),
 
-            'delivery_code'         => $this->string(50),
+            'delivery_id'           => $this->integer(),
             'user_description'      => $this->string(255),
             'additional_info'       => $this->string(255),
 
@@ -134,7 +134,7 @@ class m150926_120601_create_table__shop_order extends Migration
         $this->createIndex('created_at', '{{%shop_order}}', 'created_at');
         $this->createIndex('updated_at', '{{%shop_order}}', 'updated_at');
 
-        $this->createIndex('site_code', '{{%shop_order}}', 'site_code');
+        $this->createIndex('site_id', '{{%shop_order}}', 'site_id');
         $this->createIndex('person_type_id', '{{%shop_order}}', 'person_type_id');
         $this->createIndex('status_code', '{{%shop_order}}', 'status_code');
         $this->createIndex('currency_code', '{{%shop_order}}', 'currency_code');
@@ -143,6 +143,7 @@ class m150926_120601_create_table__shop_order extends Migration
         $this->createIndex('locked_by', '{{%shop_order}}', 'locked_by');
         $this->createIndex('affiliate_id', '{{%shop_order}}', 'affiliate_id');
         $this->createIndex('store_id', '{{%shop_order}}', 'store_id');
+        $this->createIndex('delivery_id', '{{%shop_order}}', 'delivery_id');
 
 
         $this->createIndex('payed', '{{%shop_order}}', 'payed');
@@ -162,8 +163,8 @@ class m150926_120601_create_table__shop_order extends Migration
         );
 
         $this->addForeignKey(
-            'shop_order__site_code', "{{%shop_order}}",
-            'site_code', '{{%cms_site}}', 'code', 'RESTRICT', 'CASCADE'
+            'shop_order__site_id', "{{%shop_order}}",
+            'site_id', '{{%cms_site}}', 'id', 'SET NULL', 'SET NULL'
         );
 
         $this->addForeignKey(

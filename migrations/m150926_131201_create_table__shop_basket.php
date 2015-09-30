@@ -32,7 +32,7 @@ class m150926_131201_create_table__shop_basket extends Migration
             'created_at'                => $this->integer(),
             'updated_at'                => $this->integer(),
 
-            'fuser_id'                  => $this->integer()->notNull(),
+            'fuser_id'                  => $this->integer(),
             'order_id'                  => $this->integer(),
             'product_id'                => $this->integer(),
             'product_price_id'          => $this->integer(),
@@ -43,7 +43,7 @@ class m150926_131201_create_table__shop_basket extends Migration
             'weight'                    => $this->decimal(18,2),
             'quantity'                  => $this->decimal(18,2)->notNull()->defaultValue(0),
 
-            'site_code'                 => $this->string(15)->notNull(),
+            'site_id'                   => $this->integer(),
 
             'delay'                     => $this->string(1)->notNull()->defaultValue('N'),
             'name'                      => $this->string(255)->notNull(),
@@ -91,7 +91,7 @@ class m150926_131201_create_table__shop_basket extends Migration
         $this->createIndex('updated_at', '{{%shop_basket}}', 'updated_at');
 
 
-        $this->createIndex('site_code', '{{%shop_basket}}', ['site_code']);
+        $this->createIndex('site_id', '{{%shop_basket}}', ['site_id']);
         $this->createIndex('fuser_id', '{{%shop_basket}}', ['fuser_id']);
         $this->createIndex('order_id', '{{%shop_basket}}', ['order_id']);
         $this->createIndex('product_id', '{{%shop_basket}}', ['product_id']);
@@ -120,8 +120,8 @@ class m150926_131201_create_table__shop_basket extends Migration
         );
 
         $this->addForeignKey(
-            'shop_basket__site_code', "{{%shop_basket}}",
-            'site_code', '{{%cms_site}}', 'code', 'RESTRICT', 'CASCADE'
+            'shop_basket__site_id', "{{%shop_basket}}",
+            'site_id', '{{%cms_site}}', 'id', 'SET NULL', 'SET NULL'
         );
 
         $this->addForeignKey(
@@ -131,7 +131,7 @@ class m150926_131201_create_table__shop_basket extends Migration
 
         $this->addForeignKey(
             'shop_basket__order_id', "{{%shop_basket}}",
-            'order_id', '{{%shop_order}}', 'id', 'SET NULL', 'SET NULL'
+            'order_id', '{{%shop_order}}', 'id', 'CASCADE', 'CASCADE'
         );
 
         $this->addForeignKey(

@@ -55,9 +55,9 @@ class ShopDelivery extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'site_id', 'period_from', 'period_to', 'weight_from', 'weight_to', 'priority', 'logo_id'], 'integer'],
-            [['site_id', 'price', 'currency_code'], 'required'],
+            [['site_id', 'price', 'currency_code', 'name'], 'required'],
             [['order_price_from', 'order_price_to', 'price'], 'number'],
-            [['description', 'store'], 'string'],
+            [['description', 'store', 'name'], 'string'],
             [['period_type', 'active'], 'string', 'max' => 1],
             [['order_currency_code', 'currency_code'], 'string', 'max' => 3]
         ];
@@ -75,6 +75,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
             'site_id' => Yii::t('app', 'Site ID'),
+            'name' => Yii::t('app', 'Name'),
             'period_from' => Yii::t('app', 'Period From'),
             'period_to' => Yii::t('app', 'Period To'),
             'period_type' => Yii::t('app', 'Period Type'),

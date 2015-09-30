@@ -32,6 +32,8 @@ class m150927_141201_create_table__shop_delivery extends Migration
             'created_at'                => $this->integer(),
             'updated_at'                => $this->integer(),
 
+            'name'                      => $this->string(255)->notNull(),
+
             'site_id'                   => $this->integer()->notNull(),
 
             'period_from'               => $this->integer(),
@@ -62,6 +64,7 @@ class m150927_141201_create_table__shop_delivery extends Migration
         $this->createIndex('created_at', '{{%shop_delivery}}', 'created_at');
         $this->createIndex('updated_at', '{{%shop_delivery}}', 'updated_at');
 
+        $this->createIndex('name', '{{%shop_delivery}}', 'name');
 
         $this->createIndex('site_id', '{{%shop_delivery}}', 'site_id');
         $this->createIndex('period_from', '{{%shop_delivery}}', 'period_from');
@@ -111,6 +114,11 @@ class m150927_141201_create_table__shop_delivery extends Migration
         $this->addForeignKey(
             'shop_delivery__site_id', "{{%shop_delivery}}",
             'site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'shop_order__delivery_id', "{{%shop_order}}",
+            'delivery_id', '{{%shop_delivery}}', 'id', 'SET NULL', 'SET NULL'
         );
     }
 

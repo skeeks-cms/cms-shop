@@ -2,10 +2,12 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\modules\cms\money\Currency;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "{{%shop_order}}".
@@ -15,10 +17,11 @@ use Yii;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $site_code
+ * @property integer $site_id
  * @property integer $person_type_id
  * @property string $payed
  * @property integer $payed_at
+ * @property integer $buyer_id
  * @property integer $emp_payed_id
  * @property string $canceled
  * @property integer $canceled_at
@@ -36,7 +39,7 @@ use Yii;
  * @property string $discount_value
  * @property integer $user_id
  * @property integer $pay_system_id
- * @property string $delivery_code
+ * @property integer $delivery_id
  * @property string $user_description
  * @property string $additional_info
  * @property string $ps_status
@@ -103,6 +106,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         return '{{%shop_order}}';
     }
 
+
     /**
      * @inheritdoc
      */
@@ -110,17 +114,25 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'person_type_id', 'payed_at', 'emp_payed_id', 'canceled_at', 'emp_canceled_id', 'status_at', 'emp_status_id', 'allow_delivery_at', 'emp_allow_delivery_id', 'user_id', 'pay_system_id', 'ps_response_at', 'recuring_id', 'pay_voucher_at', 'locked_by', 'locked_at', 'affiliate_id', 'delivery_doc_at', 'deducted_at', 'emp_deducted_id', 'marked_at', 'emp_marked_id', 'store_id', 'responsible_id', 'pay_before_at', 'account_id', 'bill_at', 'version'], 'integer'],
-            [['site_code', 'person_type_id', 'status_at', 'currency_code', 'user_id'], 'required'],
+            [['person_type_id', 'user_id'], 'required'],
             [['price_delivery', 'price', 'discount_value', 'ps_sum', 'tax_value', 'sum_paid'], 'number'],
             [['comments'], 'string'],
-            [['site_code', 'id_1c', 'version_1c'], 'string', 'max' => 15],
+            [['buyer_id'], 'integer'],
+            [['site_id'], 'integer'],
+            [['id_1c', 'version_1c'], 'string', 'max' => 15],
             [['payed', 'canceled', 'status_code', 'allow_delivery', 'ps_status', 'recount_flag', 'update_1c', 'deducted', 'marked', 'reserved', 'external_order'], 'string', 'max' => 1],
             [['reason_canceled', 'user_description', 'additional_info', 'ps_status_description', 'ps_status_message', 'stat_gid', 'reason_undo_deducted', 'reason_marked', 'order_topic', 'xml_id'], 'string', 'max' => 255],
             [['currency_code', 'ps_currency_code'], 'string', 'max' => 3],
-            [['delivery_code'], 'string', 'max' => 50],
+            [['delivery_id'], 'integer'],
             [['ps_status_code'], 'string', 'max' => 5],
             [['pay_voucher_num', 'delivery_doc_num'], 'string', 'max' => 20],
-            [['tracking_number'], 'string', 'max' => 100]
+            [['tracking_number'], 'string', 'max' => 100],
+
+            [['payed', 'canceled', 'status_code', 'allow_delivery', 'update_1c', 'deducted', 'marked', 'reserved', 'external_order'], 'default', 'value' => Cms::BOOL_N],
+            [['recount_flag'], 'default', 'value' => Cms::BOOL_Y],
+            [['status_at'], 'default', 'value' => \Yii::$app->formatter->asTimestamp(time())],
+            [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
+            [['site_id'], 'default', 'value' => \Yii::$app->cms->site->id],
         ];
     }
 
@@ -135,7 +147,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'site_code' => Yii::t('app', 'Site Code'),
+            'site_id' => Yii::t('app', 'Site'),
             'person_type_id' => Yii::t('app', 'Person Type ID'),
             'payed' => Yii::t('app', 'Payed'),
             'payed_at' => Yii::t('app', 'Payed At'),
@@ -156,7 +168,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'discount_value' => Yii::t('app', 'Discount Value'),
             'user_id' => Yii::t('app', 'User ID'),
             'pay_system_id' => Yii::t('app', 'Pay System ID'),
-            'delivery_code' => Yii::t('app', 'Delivery Code'),
+            'delivery_id' => Yii::t('app', 'Delivery'),
             'user_description' => Yii::t('app', 'User Description'),
             'additional_info' => Yii::t('app', 'Additional Info'),
             'ps_status' => Yii::t('app', 'Ps Status'),
@@ -201,7 +213,35 @@ class ShopOrder extends \skeeks\cms\models\Core
             'version_1c' => Yii::t('app', 'Version 1c'),
             'version' => Yii::t('app', 'Version'),
             'external_order' => Yii::t('app', 'External Order'),
+            'buyer_id' => Yii::t('app', 'Покупатель'),
         ];
+    }
+
+
+    /**
+     * @param ShopFuser $shopFuser
+     * @return static
+     */
+    static public function createOrderByFuser(ShopFuser $shopFuser)
+    {
+        $order = new static();
+
+        $order->site_id         = $shopFuser->site->id;
+        $order->person_type_id  = $shopFuser->personType->id;
+        $order->buyer_id        = $shopFuser->buyer->id;
+        $order->user_id         = $shopFuser->user->id;
+
+        $order->price           = $shopFuser->money->getAmount() / $shopFuser->money->getCurrency()->getSubUnit();
+        $order->currency_code   = $shopFuser->money->getCurrency()->getCurrencyCode();
+        $order->pay_system_id   = $shopFuser->paySystem->id;
+        $order->pay_system_id   = $shopFuser->delivery_code;
+
+        if ($order->save())
+        {
+
+        }
+
+        return $order;
     }
 
     /**
@@ -258,7 +298,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
     }
 
     /**
