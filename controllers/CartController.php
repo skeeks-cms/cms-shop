@@ -309,6 +309,11 @@ class CartController extends Controller
             {
                 $fuser = \Yii::$app->shop->shopFuser;
 
+                if (!$fuser->shopBaskets)
+                {
+                    throw new Exception("Ваша корзина пуста");
+                }
+
                 if ($fuser->load(\Yii::$app->request->post()) && $fuser->save())
                 {
                     $rr->success = true;
@@ -320,9 +325,13 @@ class CartController extends Controller
                     {
                         $order = ShopOrder::createOrderByFuser($fuser);
 
-                        if ($order->save())
+                        if (!$order->isNewRecord)
                         {
-
+                            $rr->message = "Заказ успешно создан";
+                            $rr->success = true;
+                            $rr->data = [
+                                'order' => $order
+                            ];
                         } else
                         {
                             throw new Exception("Некорректные даныне нового заказа: " . array_shift($order->getFirstErrors()));

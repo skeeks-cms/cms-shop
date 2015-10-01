@@ -85,6 +85,7 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $version
  * @property string $external_order
  *
+ * @property ShopBasket[] $shopBaskets
  * @property ShopStore $store
  * @property ShopAffiliate $affiliate
  * @property Currency $currency
@@ -149,14 +150,14 @@ class ShopOrder extends \skeeks\cms\models\Core
             'updated_at' => Yii::t('app', 'Updated At'),
             'site_id' => Yii::t('app', 'Site'),
             'person_type_id' => Yii::t('app', 'Person Type ID'),
-            'payed' => Yii::t('app', 'Payed'),
+            'payed' => Yii::t('app', 'Оплачен'),
             'payed_at' => Yii::t('app', 'Payed At'),
             'emp_payed_id' => Yii::t('app', 'Emp Payed ID'),
             'canceled' => Yii::t('app', 'Canceled'),
             'canceled_at' => Yii::t('app', 'Canceled At'),
             'emp_canceled_id' => Yii::t('app', 'Emp Canceled ID'),
             'reason_canceled' => Yii::t('app', 'Reason Canceled'),
-            'status_code' => Yii::t('app', 'Status Code'),
+            'status_code' => Yii::t('app', 'Status'),
             'status_at' => Yii::t('app', 'Status At'),
             'emp_status_id' => Yii::t('app', 'Emp Status ID'),
             'price_delivery' => Yii::t('app', 'Price Delivery'),
@@ -166,7 +167,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'price' => Yii::t('app', 'Price'),
             'currency_code' => Yii::t('app', 'Currency Code'),
             'discount_value' => Yii::t('app', 'Discount Value'),
-            'user_id' => Yii::t('app', 'User ID'),
+            'user_id' => Yii::t('app', 'Пользователь сайта'),
             'pay_system_id' => Yii::t('app', 'Pay System ID'),
             'delivery_id' => Yii::t('app', 'Delivery'),
             'user_description' => Yii::t('app', 'User Description'),
@@ -213,7 +214,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'version_1c' => Yii::t('app', 'Version 1c'),
             'version' => Yii::t('app', 'Version'),
             'external_order' => Yii::t('app', 'External Order'),
-            'buyer_id' => Yii::t('app', '����������'),
+            'buyer_id' => Yii::t('app', 'Профиль покупателя'),
         ];
     }
 
@@ -238,7 +239,11 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         if ($order->save())
         {
-
+            foreach ($shopFuser->shopBaskets as $basket)
+            {
+                $basket->unlink('fuser', $shopFuser);
+                $basket->link('order', $order);
+            }
         }
 
         return $order;
@@ -323,5 +328,13 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getBuyer()
     {
         return $this->hasOne(ShopBuyer::className(), ['id' => 'buyer_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopBaskets()
+    {
+        return $this->hasMany(ShopBasket::className(), ['order_id' => 'id']);
     }
 }

@@ -13,17 +13,4 @@ namespace skeeks\cms\shop;
 class Module extends \skeeks\cms\base\Module
 {
     public $controllerNamespace = 'skeeks\cms\shop\controllers';
-
-    /**
-     * @return array
-     */
-    static public function descriptorConfig()
-    {
-        return array_merge(parent::descriptorConfig(), [
-            "version"               => file_get_contents(__DIR__ . "/VERSION"),
-
-            "name"          => "Магазин",
-        ]);
-    }
-
 }

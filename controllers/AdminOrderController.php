@@ -12,8 +12,10 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\CreatedAtColumn;
 use skeeks\cms\grid\SiteColumn;
 use skeeks\cms\grid\UserColumnData;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
@@ -63,9 +65,30 @@ class AdminOrderController extends AdminModelEditorController
                             'class'     => DataColumn::className(),
                             'attribute'     => 'status_code',
                             'format'     => 'raw',
+                            'filter'     => ArrayHelper::map(ShopOrderStatus::find()->all(), 'code', 'name'),
                             'value'     => function(ShopOrder $order)
                             {
-                                return $order->status->name . "<br />" . Html::tag('small', $order->status->description);
+                                return Html::label($order->status->name, null, [
+                                    'style' => "background: {$order->status->color}",
+                                    'class' => "label"
+                                ]) . "<br />" .
+                                    Html::tag("small", \Yii::$app->formatter->asDatetime($order->status_at) . " (" . \Yii::$app->formatter->asRelativeTime($order->status_at) . ")")
+                                ;
+                            }
+                        ],
+
+                        [
+                            'class'     => DataColumn::className(),
+                            'attribute' => 'buyer_id',
+                            'format'    => 'raw',
+                            'value'     => function(ShopOrder $model)
+                            {
+                                if (!$model->buyer)
+                                {
+                                    return null;
+                                }
+
+                                return Html::a($model->buyer->name . " [{$model->buyer->id}]", UrlHelper::construct('shop/admin-buyer/related-properties', ['pk' => $model->buyer->id])->enableAdmin()->toString());
                             }
                         ],
 
@@ -73,7 +96,46 @@ class AdminOrderController extends AdminModelEditorController
                             'class'     => BooleanColumn::className(),
                             'attribute'     => 'payed',
                             'format'     => 'raw',
+                        ],
 
+                        [
+                            'class'         => UserColumnData::className(),
+                            'attribute'     => "user_id",
+                        ],
+
+                        [
+                            'class'         => DataColumn::className(),
+                            'filter'        => false,
+                            'format'        => 'raw',
+                            'label'         => 'Товар',
+                            'value'         => function(ShopOrder $model)
+                            {
+                                if ($model->shopBaskets)
+                                {
+                                    $result = [];
+                                    foreach ($model->shopBaskets as $shopBasket)
+                                    {
+                                        $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
+                                        $result[] = Html::a($shopBasket->product->cmsContentElement->name, $shopBasket->product->cmsContentElement->url, ['target' => '_blank']) . <<<HTML
+ ($shopBasket->quantity $shopBasket->measure_name) — {$money}
+HTML;
+
+                                    }
+                                    return implode('<hr />', $result);
+                                }
+                            },
+                        ],
+
+                        [
+                            'class'         => DataColumn::className(),
+                            'filter'        => ArrayHelper::map(CmsSite::find()->active()->all(), 'id', 'name'),
+                            'attribute'     => 'site_id',
+                            'format'        => 'raw',
+                            'label'         => 'Сайт',
+                            'value'         => function(ShopOrder $model)
+                            {
+                                return $model->site->name . " [{$model->site->code}]";
+                            },
                         ],
 
                         [

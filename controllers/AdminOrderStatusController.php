@@ -14,7 +14,9 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopOrderStatus;
+use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * Class AdminOrderStatusController
@@ -44,7 +46,19 @@ class AdminOrderStatusController extends AdminModelEditorController
                 [
                     "columns"      => [
                         'code',
-                        'name',
+                        [
+                            'class'     => DataColumn::className(),
+                            'attribute'     => 'name',
+                            'format'     => 'raw',
+                            'value'     => function(ShopOrderStatus $model)
+                            {
+                                return Html::label($model->name, null, [
+                                    'style' => "background: {$model->color}",
+                                    'class' => "label"
+                                ]);
+                            }
+                        ],
+
                         'description',
                         'priority',
                     ],
