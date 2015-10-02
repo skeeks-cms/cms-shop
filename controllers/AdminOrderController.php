@@ -77,7 +77,7 @@ class AdminOrderController extends AdminModelEditorController
                             }
                         ],
 
-                        [
+                        /*[
                             'class'     => DataColumn::className(),
                             'attribute' => 'buyer_id',
                             'format'    => 'raw',
@@ -90,7 +90,7 @@ class AdminOrderController extends AdminModelEditorController
 
                                 return Html::a($model->buyer->name . " [{$model->buyer->id}]", UrlHelper::construct('shop/admin-buyer/related-properties', ['pk' => $model->buyer->id])->enableAdmin()->toString());
                             }
-                        ],
+                        ],*/
 
                         [
                             'class'     => BooleanColumn::className(),
@@ -99,8 +99,22 @@ class AdminOrderController extends AdminModelEditorController
                         ],
 
                         [
-                            'class'         => UserColumnData::className(),
+                            'class'         => DataColumn::className(),
                             'attribute'     => "user_id",
+                            'label'         => "Покупатель",
+                            'format'        => "raw",
+                            'value'         => function(ShopOrder $shopOrder)
+                            {
+                                if (!$srcImage = $shopOrder->user->avatarSrc)
+                                {
+                                    $srcImage = \Yii::$app->cms->moduleAdmin()->noImage;
+                                }
+
+                                return Html::a( Html::img($srcImage, [
+                                    'width' => 25,
+                                    'style' => 'margin-right: 5px;'
+                                ]) . $shopOrder->user->displayName,  UrlHelper::construct('shop/admin-buyer-user/update', ['pk' => $shopOrder->user->id])->enableAdmin()->toString() );
+                            },
                         ],
 
                         [

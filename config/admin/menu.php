@@ -51,7 +51,7 @@ return [
     'shop' =>
     [
         'label' => 'Магазин',
-        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/shop.png'],
+        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
 
         'items' =>
         [
@@ -59,12 +59,14 @@ return [
             [
                 'priority'  => 0,
                 'label'     => 'Заказы',
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
 
                 'items' =>
                 [
                     [
                         "label"     => "Заказы",
                         "url"       => ["shop/admin-order"],
+                        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
                     ]
                 ],
 
@@ -73,13 +75,19 @@ return [
             [
                 'priority'  => 0,
                 'label'     => 'Покупатели',
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/user.png'],
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
 
                 'items' =>
                 [
-                    [
+                    /*[
                         "label"     => "Покупатели",
                         "url"       => ["shop/admin-buyer"],
+                    ],*/
+
+                    [
+                        "label"     => "Покупатели",
+                        "url"       => ["shop/admin-buyer-user"],
+                        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
                     ],
 
                     [
@@ -90,6 +98,11 @@ return [
                     [
                         "label"     => "Корзины",
                         "url"       => ["shop/admin-fuser"],
+                    ],
+
+                    [
+                        "label"     => "Просмотренные товары",
+                        "url"       => ["shop/admin-viewed-product"],
                     ]
                 ],
 
@@ -246,12 +259,14 @@ return [
             [
                 'priority'  => 0,
                 'label'     => 'Складской учет',
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
 
                 'items' =>
                 [
                     [
                         "label"     => "Склады",
                         "url"       => ["shop/admin-store"],
+                        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                     ],
 
                 ],
@@ -261,13 +276,14 @@ return [
             [
                 'priority'  => 0,
                 'label'     => 'Аффилиаты',
-                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate-icon.png'],
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
 
                 'items' =>
                 [
                     [
                         "label"     => "Аффилиаты",
                         "url"       => ["shop/admin-affiliate"],
+                        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
                     ],
 
                     [

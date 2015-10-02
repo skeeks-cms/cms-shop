@@ -253,6 +253,8 @@ class ShopBasket extends \skeeks\cms\models\Core
         $money                  = $productPrice->money;
         $money                  = $money->multiply($this->quantity);
 
+        $money                  = $money->convertToCurrency(\Yii::$app->money->currencyCode);
+
         $this->price            = $money->getAmount() / $money->getCurrency()->getSubUnit();
         $this->currency_code    = (string) $money->getCurrency();
 

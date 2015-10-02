@@ -53,6 +53,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopVat            $vat
  * @property Currency           $purchasingCurrency
  * @property ShopProductPrice[] $shopProductPrices
+ * @property ShopViewedProduct[] $shopViewedProducts
  *
  * @property ShopProductPrice   $baseProductPrice
  */
@@ -206,6 +207,29 @@ class ShopProduct extends \skeeks\cms\models\Core
     }
 
     /**
+     *
+     * Отметить просмотр текущего товара согласно текущим данным
+     *
+     * @return bool
+     */
+    public function createNewView()
+    {
+        if ($this->isNewRecord)
+        {
+            return false;
+        }
+
+        $shopViewdProduct                   = new ShopViewedProduct();
+        $shopViewdProduct->name             = $this->cmsContentElement->name;
+        $shopViewdProduct->shop_product_id  = $this->id;
+        $shopViewdProduct->site_id          = \Yii::$app->cms->site->id;
+        $shopViewdProduct->shop_fuser_id    = \Yii::$app->shop->shopFuser->id;
+
+        return $shopViewdProduct->save();
+    }
+
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getMeasure()
@@ -256,8 +280,13 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasMany(ShopProductPrice::className(), ['product_id' => 'id']);
     }
 
-
-
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopViewedProducts()
+    {
+        return $this->hasMany(ShopViewedProduct::className(), ['shop_product_id' => 'id']);
+    }
 
 
 
