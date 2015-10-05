@@ -133,7 +133,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet("Заказы"); ?>
+<?= $form->fieldSet("Заказы (" . \skeeks\cms\shop\models\ShopOrder::find()->where([
+                'user_id' => $model->id
+            ])->count() .  ")"); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => 'Последние заказы'
@@ -194,15 +196,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Корзина'); ?>
+
+<?
+    $fuser = \skeeks\cms\shop\models\ShopFuser::find()->where(['user_id' => $model->id])->one();
+?>
+
+<?= $form->fieldSet('Корзина (' . \skeeks\cms\shop\models\ShopBasket::find()->where([
+                'fuser_id' => $fuser->id
+            ])->count() . ")"); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => 'В текущий момент в коризине у пользователя'
     ]); ?>
 
-    <?
-        $fuser = \skeeks\cms\shop\models\ShopFuser::find()->where(['user_id' => $model->id])->one();
-    ?>
     <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
         'dataProvider' => new \yii\data\ActiveDataProvider([
             'query' => \skeeks\cms\shop\models\ShopBasket::find()->where([
@@ -239,6 +245,43 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 'class'     => \yii\grid\DataColumn::className(),
                 'attribute' => 'site_id'
             ]
+
+        ]
+    ]); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
+
+<?= $form->fieldSet("Просмотренные товары (" . \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
+                'shop_fuser_id' => $fuser->id
+            ])->count() .  ")"); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+        'dataProvider' => new \yii\data\ActiveDataProvider([
+            'query' => \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
+                'shop_fuser_id' => $fuser->id
+            ])
+        ]),
+        'columns' =>
+        [
+            [
+                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'label' => "Дата просмотра",
+            ],
+
+            [
+                'class' => \yii\grid\DataColumn::className(),
+                'label' => "Товар",
+                'value' => function(\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct)
+                {
+                    if ($shopViewedProduct->shopProduct)
+                    {
+                        return $shopViewedProduct->shopProduct->cmsContentElement->name;
+                    }
+
+                    return null;
+                },
+            ],
 
         ]
     ]); ?>
