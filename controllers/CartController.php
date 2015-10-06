@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\forms\SignupForm;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopFuser;
@@ -21,6 +22,8 @@ use yii\base\Exception;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\helpers\Url;
+use yii\validators\EmailValidator;
 
 /**
  * Class CartController
@@ -329,9 +332,15 @@ class CartController extends Controller
                         {
                             $rr->message = "Заказ успешно создан";
                             $rr->success = true;
+                            $rr->redirect = Url::to(['/shop/order/view', 'id' => $order->id]);
                             $rr->data = [
                                 'order' => $order
                             ];
+
+
+
+
+
                         } else
                         {
                             throw new Exception("Некорректные даныне нового заказа: " . array_shift($order->getFirstErrors()));
@@ -441,25 +450,46 @@ class CartController extends Controller
                         if (\Yii::$app->user->isGuest)
                         {
 
-                        } else
-                        {
-                            $modelBuyer->name                   = $modelBuyerName ? implode(", ", $modelBuyerName) : $shopPersonType->name . " от (" . \Yii::$app->formatter->asDate(time(), 'medium') . ")";
-                            $modelBuyer->cms_user_id            = \Yii::$app->user->identity->id;
-                            $modelBuyer->shop_person_type_id    = $shopPersonType->id;
-
-                            if (!$modelBuyer->save())
+                            if (!$userEmail)
                             {
-                                throw new Exception('Данные покупателя не сохранены.');
+                                throw new Exception('Не указан email пользователя.');
                             }
 
-                            $validateModel->save();
 
-                            \Yii::$app->shop->shopFuser->buyer_id           = $modelBuyer->id;
-                            \Yii::$app->shop->shopFuser->person_type_id     = $modelBuyer->shopPersonType->id;
+                            $newUser             = new SignupForm();
+                            $newUser->scenario   = SignupForm::SCENARION_ONLYEMAIL;
 
-                            $rr->success = true;
-                            $rr->message = 'Успешно отправлена';
+                            $newUser->email      = $userEmail;
+
+                            if (!$user = $newUser->signup())
+                            {
+                                throw new Exception('Не создан профиль пользователя.');
+                            }
+
+                            //Авторизация пользователя
+                            \Yii::$app->user->login($user, 0);
+
                         }
+
+
+                        $modelBuyer->name                   = $modelBuyerName ? implode(", ", $modelBuyerName) : $shopPersonType->name . " от (" . \Yii::$app->formatter->asDate(time(), 'medium') . ")";
+                        $modelBuyer->cms_user_id            = \Yii::$app->user->identity->id;
+                        $modelBuyer->shop_person_type_id    = $shopPersonType->id;
+
+                        if (!$modelBuyer->save())
+                        {
+                            throw new Exception('Данные покупателя не сохранены.');
+                        }
+
+                        $validateModel->save();
+
+                        \Yii::$app->shop->shopFuser->buyer_id           = $modelBuyer->id;
+                        \Yii::$app->shop->shopFuser->person_type_id     = $modelBuyer->shopPersonType->id;
+
+                        \Yii::$app->shop->shopFuser->save();
+
+                        $rr->success = true;
+                        $rr->message = 'Успешно отправлена';
 
                     } else
                     {

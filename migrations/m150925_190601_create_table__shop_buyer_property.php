@@ -61,12 +61,12 @@ class m150925_190601_create_table__shop_buyer_property extends Migration
 
         $this->addForeignKey(
             'shop_buyer_property_created_by', "{{%shop_buyer_property}}",
-            'created_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
         );
 
         $this->addForeignKey(
             'shop_buyer_property_updated_by', "{{%shop_buyer_property}}",
-            'updated_by', '{{%cms_user}}', 'id', 'RESTRICT', 'RESTRICT'
+            'updated_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
         );
 
         $this->addForeignKey(

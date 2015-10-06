@@ -96,6 +96,7 @@ use yii\behaviors\TimestampBehavior;
  * @property ShopOrderStatus $status
  * @property CmsUser $user
  * @property ShopBuyer $buyer
+ * @property ShopDelivery $delivery
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
@@ -156,7 +157,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'canceled' => Yii::t('app', 'Canceled'),
             'canceled_at' => Yii::t('app', 'Canceled At'),
             'emp_canceled_id' => Yii::t('app', 'Emp Canceled ID'),
-            'reason_canceled' => Yii::t('app', 'Reason Canceled'),
+            'reason_canceled' => Yii::t('app', 'Причина отмены'),
             'status_code' => Yii::t('app', 'Status'),
             'status_at' => Yii::t('app', 'Status At'),
             'emp_status_id' => Yii::t('app', 'Emp Status ID'),
@@ -244,6 +245,25 @@ class ShopOrder extends \skeeks\cms\models\Core
                 $basket->unlink('fuser', $shopFuser);
                 $basket->link('order', $order);
             }
+
+            //Письмо тому кто заказывает
+            if ($order->user->email)
+            {
+                \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                \Yii::$app->mailer->compose('create-order', [
+                    'order'  => $order
+                ])
+                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                    ->setTo($order->user->email)
+                    ->setSubject('Новый заказ #' . $order->id . ' на сайте ' . \Yii::$app->cms->appName)
+                    ->send();
+            }
+
+            if (\Yii::$app->shop->email)
+            {
+                //Уведомить ответственных за магазин
+            }
         }
 
         return $order;
@@ -280,6 +300,14 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getLockedBy()
     {
         return $this->hasOne(CmsUser::className(), ['id' => 'locked_by']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDelivery()
+    {
+        return $this->hasOne(ShopDelivery::className(), ['id' => 'delivery_id']);
     }
 
     /**

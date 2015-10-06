@@ -23,7 +23,6 @@ use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property CartComponent $cart
  * @property ShopTypePrice $baseTypePrice
  * @property ShopPersonType[] $shopPersonTypes
  *
@@ -38,6 +37,11 @@ class ShopComponent extends Component
      * @var CartComponent
      */
     private $_cart = null;
+
+    /**
+     * @var string Email отдела продаж
+     */
+    public $email = "";
 
     /**
      * Можно задать название и описание компонента

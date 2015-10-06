@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\Core;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -93,7 +94,9 @@ class ShopPaySystem extends Core
             [['name'], 'string', 'max' => 255],
             [['active'], 'string', 'max' => 1],
             [['name'], 'unique'],
-            [['personTypeIds'], 'safe']
+            [['personTypeIds'], 'safe'],
+            [['priority'], 'default', 'value' => 100],
+            [['active'], 'default', 'value' => Cms::BOOL_Y]
         ]);
     }
 

@@ -46,9 +46,17 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 [                      // the owner name of the model
                     'label' => 'Статус',
                     'format' => 'raw',
-                    'value' => $form->fieldSelect($model, 'status', \yii\helpers\ArrayHelper::map(
-                        \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
-                    ))->label(false),
+                    'value' => "<p>" . $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
+                                    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
+                                ))->label(false) . "</p>"
+                ],
+
+                [                      // the owner name of the model
+                    'label' => 'Отменен',
+                    'format' => 'raw',
+                    'value' => "<p>" . $form->fieldRadioListBoolean($model, 'canceled')->label(false) . "</p><p>" .
+                            $form->field($model, 'reason_canceled')->textarea(['rows' => 5])
+                        . "</p>",
                 ],
 
                 [                      // the owner name of the model
@@ -72,7 +80,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 [                      // the owner name of the model
                     'label'     => 'Пользователь',
                     'format'    => 'raw',
-                    'value'     => $model->user->displayName,
+                    'value'     => Html::a($model->user->displayName. " [{$model->user->id}]", \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-user/update', 'pk' => $model->user->id ])->enableAdmin(), [
+                        'data-pjax' => 0
+                    ] ),
                 ],
 
                 [                      // the owner name of the model
@@ -84,12 +94,25 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 [                      // the owner name of the model
                     'label' => 'Профиль покупателя',
                     'format' => 'raw',
-                    'value' => $model->buyer->name,
+                    'value' => Html::a($model->buyer->name . " [{$model->buyer->id}]", \skeeks\cms\helpers\UrlHelper::construct(['/shop/admin-buyer/update', 'pk' => $model->buyer->id ])->enableAdmin(), [
+                        'data-pjax' => 0
+                    ] ),
                 ],
 
 
             ]
         ])?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Данные покупателя'
+    ])?>
+        <?= \yii\widgets\DetailView::widget([
+            'model' => $model->buyer->relatedPropertiesModel,
+            'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+            'attributes' => array_keys($model->buyer->relatedPropertiesModel->attributeValues())
+
+        ])?>
+
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => 'Оплата'
@@ -120,6 +143,42 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
             ]
         ])?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Доставка'
+    ])?>
+
+        <?= \yii\widgets\DetailView::widget([
+            'model' => $model,
+            'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+            'attributes' =>
+            [
+                [                      // the owner name of the model
+                    'label'     => 'Служба доставки',
+                    'format'    => 'raw',
+                    'value'     => $model->delivery->id,
+                ],
+            ]
+        ])?>
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Комментарий'
+    ])?>
+    <?= \yii\widgets\DetailView::widget([
+            'model' => $model,
+            'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+            'attributes' =>
+            [
+                [                      // the owner name of the model
+                    'label'     => 'Комментарий',
+                    'format'    => 'raw',
+                    'value'     => $form->field($model, 'comments')->textarea([
+                        'rows' => 5
+                    ])->hint('Внутренний комментарий, клиент (покупатель) не видит')->label(false),
+                ],
+            ]
+        ])?>
+
 
 <?= $form->fieldSetEnd(); ?>
 
