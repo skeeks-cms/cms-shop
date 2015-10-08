@@ -10,6 +10,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopProduct */
+/* @var $productPrices \skeeks\cms\shop\models\ShopProductPrice[] */
 
 ?>
 
@@ -51,10 +52,28 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         </div>
     </div>
 
-
+    <? if ($productPrices) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => 'Дополнительные цены'
         ])?>
+
+        <? foreach ($productPrices as $productPrice) : ?>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <?= Html::textInput($productPrice->typePrice->code . "[price]", $productPrice->price); ?>
+                </div>
+                <div class="col-md-2">
+                    <?= Html::listBox($productPrice->typePrice->code . "[currency_code]", $productPrice->price, \yii\helpers\ArrayHelper::map(
+                        \Yii::$app->money->activeCurrencies, 'code', 'name'
+                    )); ?>
+                </div>
+            </div>
+
+        <? endforeach; ?>
+
+    <? endif; ?>
+
 
 
 

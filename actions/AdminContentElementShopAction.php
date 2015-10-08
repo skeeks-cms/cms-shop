@@ -6,10 +6,13 @@
  * @date 14.07.2015
  */
 namespace skeeks\cms\shop\actions;
+use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopProductPrice;
+use skeeks\cms\shop\models\ShopTypePrice;
 
 /**
  * Class AdminContentElementShopAction
@@ -23,15 +26,43 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
         /**
          * @var $contentElement CmsContentElement
          */
-        $contentElement          = $this->controller->model;
-        $model          = ShopProduct::find()->where(['id' => $contentElement->id])->one();
+        $contentElement             = $this->controller->model;
+        $model                      = ShopProduct::find()->where(['id' => $contentElement->id])->one();
+
+        $productPrices = [];
 
         if (!$model)
         {
             $model = new ShopProduct([
                 'id' => $contentElement->id
             ]);
+        } else
+        {
+            if ($typePrices = ShopTypePrice::find()->where(['!=', 'def', Cms::BOOL_Y])->all())
+            {
+                foreach ($typePrices as $typePrice)
+                {
+                    $productPrice = ShopProductPrice::find()->where([
+                        'product_id' => $model->id,
+                        'type_price_id' => $typePrice->id
+                    ])->one();
+
+                    if (!$productPrice)
+                    {
+                        $productPrice = new ShopProductPrice([
+                            'product_id' => $model->id,
+                            'type_price_id' => $typePrice->id
+                        ]);
+                    }
+
+                    $productPrices[] = $productPrice;
+                }
+            }
         }
+
+
+
+
 
 
         $rr = new RequestResponse();
@@ -67,7 +98,8 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
         $this->viewParams =
         [
-            'model' => $model
+            'model'         => $model,
+            'productPrices' => $productPrices
         ];
 
         return parent::run();
