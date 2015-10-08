@@ -80,9 +80,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 [                      // the owner name of the model
                     'label'     => 'Пользователь',
                     'format'    => 'raw',
-                    'value'     => Html::a($model->user->displayName. " [{$model->user->id}]", \skeeks\cms\helpers\UrlHelper::construct(['/cms/admin-user/update', 'pk' => $model->user->id ])->enableAdmin(), [
-                        'data-pjax' => 0
-                    ] ),
+                    'value'     => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->user]))->run()
                 ],
 
                 [                      // the owner name of the model
@@ -123,7 +121,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label'     => 'Сбособ оплаты',
+                    'label'     => 'Способ оплаты',
                     'format'    => 'raw',
                     'value'     => $model->paySystem->name,
                 ],
@@ -138,6 +136,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'label' => 'Оплачен',
                     'format' => 'raw',
                     'value' => $model->payed,
+                ],
+
+                [                      // the owner name of the model
+                    'label' => 'Разрешить оплату',
+                    'format' => 'raw',
+                    'value' => $form->fieldRadioListBoolean($model, 'allow_payment')->label(false),
                 ],
 
 
@@ -157,6 +161,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'label'     => 'Служба доставки',
                     'format'    => 'raw',
                     'value'     => $model->delivery->id,
+                ],
+
+
+                [                      // the owner name of the model
+                    'label' => 'Разрешить доставку',
+                    'format' => 'raw',
+                    'value' => $form->fieldRadioListBoolean($model, 'allow_delivery')->label(false),
                 ],
             ]
         ])?>
@@ -179,6 +190,131 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             ]
         ])?>
 
+
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => 'Состав заказа'
+    ])?>
+
+        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+            'dataProvider' => new \yii\data\ArrayDataProvider([
+                'models' => $model->shopBaskets
+            ]),
+
+            'columns' =>
+            [
+                [
+                    'class' => \yii\grid\SerialColumn::className()
+                ],
+
+                [
+                    'class'     => \yii\grid\DataColumn::className(),
+                    'attribute' => 'name',
+                    'format'    => 'raw',
+                    'value'     => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                    {
+                        $widget = new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
+                            'image' => $shopBasket->product->cmsContentElement->image
+                        ]);
+                        return $widget->run();
+                    }
+                ],
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'attribute' => 'name',
+                    'format' => 'raw',
+                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                    {
+                        return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
+                            'target' => '_blank',
+                            'data-pjax' => 0
+                        ]);
+                    }
+                ],
+
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'attribute' => 'quantity',
+                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                    {
+                        return $shopBasket->quantity . " " . $shopBasket->measure_name;
+                    }
+                ],
+
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'label' => 'Цена',
+                    'attribute' => 'price',
+                    'format' => 'raw',
+                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                    {
+                        return \Yii::$app->money->intlFormatter()->format($shopBasket->productPrice->money) . "<br />" . Html::tag('small', $shopBasket->productPrice->typePrice->name);
+                    }
+                ],
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'label' => 'Сумма',
+                    'attribute' => 'price',
+                    'format' => 'raw',
+                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                    {
+                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money);
+                    }
+                ],
+            ]
+        ]); ?>
+
+
+<?= $form->fieldSetEnd(); ?>
+
+
+
+<?= $form->fieldSet('История изменений'); ?>
+
+        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+            'dataProvider' => new \yii\data\ArrayDataProvider([
+                'models' => $model->shopOrderChanges
+            ]),
+
+            'columns' =>
+            [
+                [
+                    'class' => \skeeks\cms\grid\UpdatedAtColumn::className()
+                ],
+
+                [
+                    'class'     => \yii\grid\DataColumn::className(),
+                    'label'     => 'Пользователь',
+                    'format'    => 'raw',
+                    'value'     => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
+                    {
+                        return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrderChange->createdBy]))->run();
+                    }
+                ],
+
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'attribute' => 'type',
+                    'label' => 'Операция',
+                    'format' => 'raw',
+                    'value' => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
+                    {
+                        return \skeeks\cms\shop\models\ShopOrderChange::types()[$shopOrderChange->type];
+                    }
+                ],
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'attribute' => 'type',
+                    'label' => 'Описание',
+                    'format' => 'raw',
+                    'value' => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
+                    {
+                        return $shopOrderChange->description;
+                    }
+                ],
+
+
+            ]
+        ]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

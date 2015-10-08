@@ -155,7 +155,7 @@ class ShopBasket extends \skeeks\cms\models\Core
             'price' => Yii::t('app', 'Price'),
             'currency_code' => Yii::t('app', 'Currency Code'),
             'weight' => Yii::t('app', 'Weight'),
-            'quantity' => Yii::t('app', 'Quantity'),
+            'quantity' => Yii::t('app', 'Количество'),
             'site_id' => Yii::t('app', 'Site'),
             'delay' => Yii::t('app', 'Delay'),
             'name' => Yii::t('app', 'Name'),
@@ -258,7 +258,7 @@ class ShopBasket extends \skeeks\cms\models\Core
         $this->price            = $money->getAmount() / $money->getCurrency()->getSubUnit();
         $this->currency_code    = (string) $money->getCurrency();
 
-        $this->measure_name     = $product->measure->name;
+        $this->measure_name     = $product->measure->symbol_rus;
         $this->measure_code     = $product->measure->code;
 
         $this->detail_page_url  = $product->cmsContentElement->url;

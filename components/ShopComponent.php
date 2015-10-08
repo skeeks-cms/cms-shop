@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\components;
 use skeeks\cms\base\Component;
+use skeeks\cms\components\Cms;
 use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\kladr\models\KladrLocation;
 use skeeks\cms\models\CmsContentElement;
@@ -43,6 +44,13 @@ class ShopComponent extends Component
      */
     public $email = "";
 
+
+    /**
+     * Оплата заказов онлайн системами, только после проверки менеджером
+     * @var string
+     */
+    public $payAfterConfirmation = Cms::BOOL_N;
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -52,6 +60,16 @@ class ShopComponent extends Component
         return array_merge(parent::descriptorConfig(), [
             'name'          => 'Магазин',
         ]);
+    }
+
+    /**
+     * Файл с формой настроек, по умолчанию
+     *
+     * @return string
+     */
+    public function getConfigFormFile()
+    {
+        return __DIR__ . '/shop/_form.php';
     }
 
     public function init()
@@ -86,12 +104,16 @@ class ShopComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            [['email'], 'string'],
+            [['payAfterConfirmation'], 'string'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
+            'email'                 => 'Email',
+            'payAfterConfirmation'  => 'Включить оплату заказов, только после подтверждения менеджером'
         ]);
     }
 

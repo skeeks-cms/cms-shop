@@ -80,7 +80,15 @@ class ShopProduct extends \skeeks\cms\models\Core
             return $self;
         }
 
-        $self = static::find()->where(['id' => $cmsContentElement->id])->one();
+        if (!$self = static::find()->where(['id' => $cmsContentElement->id])->one())
+        {
+            $self = new static([
+                'id' => $cmsContentElement->id
+            ]);
+
+            $self->save();
+        }
+
         static::$instances[$cmsContentElement->id] = $self;
 
         return $self;

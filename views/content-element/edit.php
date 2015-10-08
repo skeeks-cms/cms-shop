@@ -23,15 +23,42 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <?= $form->fieldRadioListBoolean($model, 'vat_included'); ?>
 
-    <?= $form->field($model, 'purchasing_price')->textInput(); ?>
-    <?= $form->fieldSelect($model, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
-        \Yii::$app->money->activeCurrencies, 'code', 'name'
-    )); ?>
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => 'Основные цены'
+        ])?>
 
-    <?= $form->field($model, 'baseProductPriceValue')->textInput()->label('Базовая цена'); ?>
-    <?= $form->fieldSelect($model, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
-        \Yii::$app->money->activeCurrencies, 'code', 'name'
-    ))->label('Валюта базовой цены'); ?>
+
+    <div class="row">
+        <div class="col-md-3">
+            <?= $form->field($model, 'purchasing_price')->textInput(); ?>
+        </div>
+        <div class="col-md-2">
+            <?= $form->fieldSelect($model, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
+                \Yii::$app->money->activeCurrencies, 'code', 'name'
+            )); ?>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-3">
+            <?= $form->field($model, 'baseProductPriceValue')->textInput()->label('Базовая цена'); ?>
+        </div>
+        <div class="col-md-2">
+            <?= $form->fieldSelect($model, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
+                \Yii::$app->money->activeCurrencies, 'code', 'name'
+            ))->label('Валюта базовой цены'); ?>
+        </div>
+    </div>
+
+
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => 'Дополнительные цены'
+        ])?>
+
+
+
+
 
 <?= $form->fieldSetEnd(); ?>
 

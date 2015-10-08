@@ -125,6 +125,16 @@ return [
                 'items' =>
                 [
                     [
+                        "label" => "Основные настройки",
+                        "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\shop\components\ShopComponent'],
+                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                        "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                        {
+                            return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
+                        },
+                    ],
+
+                    [
                         "label"     => "Настройка контента",
                         "url"       => ["shop/admin-content"],
                     ],

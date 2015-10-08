@@ -76,6 +76,9 @@ class OrderController extends Controller
     public function actionView()
     {
         $this->view->title = 'Заказ | Магазин';
-        return $this->render($this->action->id);
+
+        return $this->render($this->action->id, [
+            'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))
+        ]);
     }
 }

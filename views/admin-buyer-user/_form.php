@@ -179,6 +179,17 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
             [
                 'class'         => \yii\grid\DataColumn::className(),
+                'format'        => 'raw',
+                'attribute'     => 'price',
+                'label'         => 'Сумма',
+                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
+                {
+                    return \Yii::$app->money->intlFormatter()->format($model->money);
+                },
+            ],
+
+            [
+                'class'         => \yii\grid\DataColumn::className(),
                 'attribute'     => 'site_id',
                 'format'        => 'raw',
                 'label'         => 'Сайт',
