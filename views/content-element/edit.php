@@ -61,12 +61,21 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
             <div class="row">
                 <div class="col-md-3">
-                    <?= Html::textInput($productPrice->typePrice->code . "[price]", $productPrice->price); ?>
+                    <label><?= $productPrice->typePrice->name; ?></label>
+                    <?= Html::textInput($productPrice->typePrice->code . "[price]", $productPrice->price, [
+                        'class' => 'form-control'
+                    ]); ?>
                 </div>
                 <div class="col-md-2">
-                    <?= Html::listBox($productPrice->typePrice->code . "[currency_code]", $productPrice->price, \yii\helpers\ArrayHelper::map(
-                        \Yii::$app->money->activeCurrencies, 'code', 'name'
-                    )); ?>
+                    <label>Валюта</label>
+
+                    <?= \skeeks\widget\chosen\Chosen::widget([
+                        'name' => $productPrice->typePrice->code . "[currency_code]",
+                        'value' => $productPrice->currency_code,
+                        'items' => \yii\helpers\ArrayHelper::map(
+                            \Yii::$app->money->activeCurrencies, 'code', 'name'
+                        )
+                    ])?>
                 </div>
             </div>
 
