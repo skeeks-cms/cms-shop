@@ -90,7 +90,6 @@ class CartController extends Controller
         {
             $product_id         = \Yii::$app->request->post('product_id');
             $quantity           = \Yii::$app->request->post('quantity');
-            $product_price_id   = \Yii::$app->request->post('product_price_id');
 
             /**
              * @var ShopProduct $product
@@ -103,11 +102,6 @@ class CartController extends Controller
                 return (array) $rr;
             }
 
-            if (!$product_price_id)
-            {
-                $productPrice = $product->baseProductPrice;
-            }
-
             $shopBasket = ShopBasket::find()->where([
                 'fuser_id'      => \Yii::$app->shop->shopFuser->id,
                 'product_id'    => $product_id,
@@ -118,22 +112,15 @@ class CartController extends Controller
             {
                 $shopBasket = new ShopBasket([
                     'fuser_id'          => \Yii::$app->shop->shopFuser->id,
-                    'name'              => $product->cmsContentElement->name,
                     'product_id'        => $product->id,
-                    'price'             => $productPrice->price,
-                    'currency_code'     => \Yii::$app->money->currencyCode,
-                    'site_id'           => \Yii::$app->cms->site->id,
                     'quantity'          => 0,
-                    'measure_name'      => $product->measure->name,
-                    'measure_code'      => $product->measure->code,
-                    'detail_page_url'   => $product->cmsContentElement->url,
                 ]);
             }
 
-            $shopBasket->product_price_id   = $productPrice->id;
-            $shopBasket->quantity           = $shopBasket->quantity + $quantity;
+            $shopBasket->quantity                   = $shopBasket->quantity + $quantity;
 
-            if (!$shopBasket->save())
+
+            if (!$shopBasket->recalculate()->save())
             {
                 $rr->success = false;
                 $rr->message = 'Ошибка добавления позиции в корзину';
@@ -219,7 +206,7 @@ class CartController extends Controller
                 if ($quantity > 0)
                 {
                     $shopBasket->quantity = $quantity;
-                    if ($shopBasket->save())
+                    if ($shopBasket->recalculate()->save())
                     {
                         $rr->success = true;
                         $rr->message = 'Позиция успешно обновлена';

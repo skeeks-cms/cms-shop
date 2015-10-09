@@ -22,6 +22,9 @@ use yii\helpers\ArrayHelper;
  * @property integer $priority
  * @property string $def
  * @property string $xml_id
+ *
+ * @property string $buyPermissionName
+ * @property string $viewPermissionName
  */
 class ShopTypePrice extends \skeeks\cms\models\Core
 {
@@ -105,5 +108,22 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             'priority' => Yii::t('app', 'Priority'),
             'def' => Yii::t('app', 'Default'),
         ]);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getViewPermissionName()
+    {
+        return "view-shop-type-price-" . $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBuyPermissionName()
+    {
+        return "view-shop-type-price-" . $this->id;
     }
 }

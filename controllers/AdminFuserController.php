@@ -25,6 +25,7 @@ use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTax;
 use skeeks\cms\shop\models\ShopVat;
+use skeeks\cms\shop\widgets\AdminBuyerUserWidget;
 use yii\data\ActiveDataProvider;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
@@ -81,10 +82,11 @@ class AdminFuserController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'filter'        => false,
+                            'format'        => raw,
                             'label'         => 'Пользователь',
                             'value'         => function(ShopFuser $model)
                             {
-                                return $model->user ? $model->user->displayName : "Неавторизован";
+                                return $model->user ? ( new AdminBuyerUserWidget(['user' => $model->user]) )->run() : "Неавторизован";
                             },
                         ],
 
@@ -148,7 +150,7 @@ class AdminFuserController extends AdminModelEditorController
                                     foreach ($model->shopBaskets as $shopBasket)
                                     {
                                         $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
-                                        $result[] = Html::a($shopBasket->product->cmsContentElement->name, $shopBasket->product->cmsContentElement->url, ['target' => '_blank']) . <<<HTML
+                                        $result[] = Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, ['target' => '_blank']) . <<<HTML
  ($shopBasket->quantity $shopBasket->measure_name) — {$money}
 HTML;
 

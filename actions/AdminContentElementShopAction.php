@@ -13,6 +13,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopTypePrice;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminContentElementShopAction
@@ -55,6 +56,12 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
                         ]);
                     }
 
+                    if ($post = \Yii::$app->request->post())
+                    {
+                        $data = ArrayHelper::getValue($post, 'prices.' . $typePrice->id);
+                        $productPrice->load($data, "");
+                    }
+
                     $productPrices[] = $productPrice;
                 }
             }
@@ -62,18 +69,31 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
 
 
-
-
-
         $rr = new RequestResponse();
 
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
         {
+
             return $rr->ajaxValidateForm($model);
         }
 
         if ($rr->isRequestPjaxPost())
         {
+            /**
+             * @var $productPrice ShopProductPrice
+             */
+            foreach ($productPrices as $productPrice)
+            {
+                if ($productPrice->save())
+                {
+
+                } else
+                {
+                    \Yii::$app->getSession()->setFlash('error', 'Проверьте правильность заполнения цен');
+                }
+
+            }
+
             if ($model->load(\Yii::$app->request->post()) && $model->save())
             {
                 \Yii::$app->getSession()->setFlash('success', 'Сохранено');

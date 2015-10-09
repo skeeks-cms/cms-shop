@@ -200,6 +200,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 'models' => $model->shopBaskets
             ]),
 
+            'layout' => "{items}\n{pager}",
+
             'columns' =>
             [
                 [
@@ -224,10 +226,18 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
-                        return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
-                            'target' => '_blank',
-                            'data-pjax' => 0
-                        ]);
+                        if ($shopBasket->product)
+                        {
+                            return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
+                                'target' => '_blank',
+                                'titla' => "Смотреть на сайте",
+                                'data-pjax' => 0
+                            ]);
+                        } else
+                        {
+                            return $shopBasket->name;
+                        }
+
                     }
                 ],
 
@@ -247,7 +257,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
-                        return \Yii::$app->money->intlFormatter()->format($shopBasket->productPrice->money) . "<br />" . Html::tag('small', $shopBasket->productPrice->typePrice->name);
+                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
                     }
                 ],
                 [
@@ -257,11 +267,72 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
-                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money);
+                        return \Yii::$app->money->intlFormatter()->format($shopBasket->moneySumm);
                     }
                 ],
             ]
         ]); ?>
+
+        <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+                    <div class="sx-result">
+                <?
+                $this->registerCss(<<<CSS
+.sx-result
+{
+    background-color: #ecf2d3;
+}
+CSS
+);
+                ?>
+                <?=
+                \yii\widgets\DetailView::widget([
+                    'model' => $model,
+                    "template" => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
+                    "options" => ['class' => 'sx-result-table table detail-view'],
+                    'attributes' => [
+                        [
+                            'label' => 'Общая стоимость товаров',
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->money),
+                        ],
+
+                        [
+                            'label' => 'Скидка, наценка',
+                            'value' => "",
+                        ],
+
+                        [
+                            'label' => 'Доставка',
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDelivery),
+                        ],
+
+                        [
+                            'label' => 'Налог',
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyVat),
+                        ],
+
+                        [
+                            'label' => 'Вес',
+                            'value' => $model->weight . " г.",
+                        ],
+
+                        [
+                            'label' => 'Уже оплачено',
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneySummPaid),
+                        ],
+
+                        [
+                            'label' => 'Итого',
+                            'format' => 'raw',
+                            'value' => Html::tag('b', \Yii::$app->money->intlFormatter()->format($model->money)),
+                        ]
+                    ]
+                ])
+                ?>
+                    </div>
+            </div>
+        </div>
 
 
 <?= $form->fieldSetEnd(); ?>

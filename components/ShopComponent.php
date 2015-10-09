@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
 /**
  * @property ShopTypePrice $baseTypePrice
  * @property ShopPersonType[] $shopPersonTypes
+ * @property ShopTypePrice[] $shopTypePrices
  *
  * @property ShopFuser $shopFuser
  *
@@ -136,6 +137,15 @@ class ShopComponent extends Component
     public function getShopPersonTypes()
     {
         return ShopPersonType::find()->active()->all();
+    }
+
+    /**
+     * Все типы цен магазина
+     * @return ShopTypePrice[]
+     */
+    public function getShopTypePrices()
+    {
+        return ShopTypePrice::find()->all();
     }
 
 

@@ -46,9 +46,14 @@ use yii\helpers\ArrayHelper;
  * @property integer $pay_system_id
  *
  * @property Money $money
- * @property Money $moneyNoDiscount
+ * @property Money $moneyOriginal
+ * @property Money $moneyVat
  * @property Money $moneyDiscount
  * @property Money $moneyDelivery
+ * @property int $weight
+ *
+ * @property ShopTypePrice $buyTypePrices
+ * @property ShopTypePrice $viewTypePrices
  *
  */
 class ShopFuser extends Core
@@ -238,7 +243,7 @@ class ShopFuser extends Core
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $money = $money->add($shopBasket->money);
+            $money = $money->add($shopBasket->moneySumm);
         }
 
         return $money;
@@ -250,13 +255,47 @@ class ShopFuser extends Core
      *
      * @return Money
      */
-    public function getMoneyNoDiscount()
+    public function getMoneyOriginal()
     {
         $money = \Yii::$app->money->newMoney();
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $money = $money->add($shopBasket->moneyNoDiscount);
+            $money = $money->add($shopBasket->moneyOriginal);
+        }
+
+        return $money;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getWeight()
+    {
+        $result = 0;
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $result = $result + $shopBasket->weightSumm;
+        }
+
+        return $result;
+    }
+
+    /**
+     *
+     * Итоговая стоимость налога
+     *
+     * @return Money
+     */
+    public function getMoneyVat()
+    {
+        $money = \Yii::$app->money->newMoney();
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $money = $money->add($shopBasket->moneyVatSumm);
         }
 
         return $money;
@@ -271,6 +310,10 @@ class ShopFuser extends Core
     public function getMoneyDiscount()
     {
         $money = \Yii::$app->money->newMoney();
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $money = $money->add($shopBasket->moneyDiscount);
+        }
         return $money;
     }
 
@@ -335,6 +378,50 @@ class ShopFuser extends Core
     public function getPaySystems()
     {
         return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
+    }
+
+
+
+    /**
+     *
+     * Доступные типы цен для просмотра
+     *
+     * @return ShopTypePrice[]
+     */
+    public function getViewTypePrices()
+    {
+        $result = [];
+
+        foreach (\Yii::$app->shop->shopTypePrices as $typePrice)
+        {
+            if (\Yii::$app->authManager->checkAccess($this->user->id, $typePrice->viewPermissionName))
+            {
+                $result[$typePrice->id] = $typePrice;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     *
+     * Доступные цены для покупки на сайте
+     *
+     * @return ShopTypePrice[]
+     */
+    public function getBuyTypePrices()
+    {
+        $result = [];
+
+        foreach (\Yii::$app->shop->shopTypePrices as $typePrice)
+        {
+            if (\Yii::$app->authManager->checkAccess($this->user->id, $typePrice->buyPermissionName))
+            {
+                $result[$typePrice->id] = $typePrice;
+            }
+        }
+
+        return $result;
     }
 
 }

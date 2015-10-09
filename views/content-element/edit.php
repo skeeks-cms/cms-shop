@@ -35,7 +35,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         </div>
         <div class="col-md-2">
             <?= $form->fieldSelect($model, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
-                \Yii::$app->money->activeCurrencies, 'code', 'name'
+                \Yii::$app->money->activeCurrencies, 'code', 'code'
             )); ?>
         </div>
     </div>
@@ -43,11 +43,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($model, 'baseProductPriceValue')->textInput()->label('Базовая цена'); ?>
+            <?= $form->field($model, 'baseProductPriceValue')->textInput()->label("Базовая цена (Тип цены \"{$model->baseProductPrice->typePrice->name}\")"); ?>
         </div>
         <div class="col-md-2">
             <?= $form->fieldSelect($model, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
-                \Yii::$app->money->activeCurrencies, 'code', 'name'
+                \Yii::$app->money->activeCurrencies, 'code', 'code'
             ))->label('Валюта базовой цены'); ?>
         </div>
     </div>
@@ -62,7 +62,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             <div class="row">
                 <div class="col-md-3">
                     <label><?= $productPrice->typePrice->name; ?></label>
-                    <?= Html::textInput($productPrice->typePrice->code . "[price]", $productPrice->price, [
+                    <?= Html::textInput("prices[" . $productPrice->typePrice->id . "][price]", $productPrice->price, [
                         'class' => 'form-control'
                     ]); ?>
                 </div>
@@ -70,10 +70,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     <label>Валюта</label>
 
                     <?= \skeeks\widget\chosen\Chosen::widget([
-                        'name' => $productPrice->typePrice->code . "[currency_code]",
+                        'name' => "prices[" . $productPrice->typePrice->id . "][currency_code]",
                         'value' => $productPrice->currency_code,
+                        'allowDeselect' => false,
                         'items' => \yii\helpers\ArrayHelper::map(
-                            \Yii::$app->money->activeCurrencies, 'code', 'name'
+                            \Yii::$app->money->activeCurrencies, 'code', 'code'
                         )
                     ])?>
                 </div>

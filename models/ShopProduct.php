@@ -56,6 +56,8 @@ use yii\helpers\ArrayHelper;
  * @property ShopViewedProduct[] $shopViewedProducts
  *
  * @property ShopProductPrice   $baseProductPrice
+ * @property ShopProductPrice   $minProductPrice
+ * @property ShopProductPrice[]   $viewProductPrices
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -311,6 +313,61 @@ class ShopProduct extends \skeeks\cms\models\Core
         ])->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id]);
         //return $this->getShopProductPrices()->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id])->one();
     }
+
+    /**
+     * Цены доступные к просмотру
+     *
+     * @param null $shopFuser
+     * @return $this
+     */
+    public function getViewProductPrices($shopFuser = null)
+    {
+        if ($shopFuser === null)
+        {
+            $shopFuser = \Yii::$app->shop->shopFuser;
+        }
+
+        return $this->hasMany(ShopProductPrice::className(), [
+            'product_id' => 'id'
+        ])->andWhere(['type_price_id' => ArrayHelper::map($shopFuser->viewTypePrices, 'id', 'id')] )->orderBy(['price' => SORT_ASC]);
+    }
+
+    /**
+     *
+     * Лучшая цена по которой может купить этот товар пользователь, среди всех доступных
+     * Операемся на курс
+     *
+     * @param null $shopFuser
+     * @return $this
+     */
+    public function getMinProductPrice($shopFuser = null)
+    {
+        if ($shopFuser === null)
+        {
+            $shopFuser = \Yii::$app->shop->shopFuser;
+        }
+
+
+        return $this->hasOne(ShopProductPrice::className(), [
+            'product_id' => 'id'
+        ])
+            ->select(['shop_product_price.*', 'realPrice' => '( (SELECT course FROM `money_currency` WHERE `money_currency`.`code` = `shop_product_price`.`currency_code`) * `shop_product_price`.`price` )'])
+            ->leftJoin('money_currency', '`money_currency`.`code` = `shop_product_price`.`currency_code`')
+
+            ->orWhere([
+                'and',
+                ['>', 'price', 0],
+                ['type_price_id' => ArrayHelper::map($shopFuser->buyTypePrices, 'id', 'id')]
+            ])
+
+            ->orWhere(
+                ['type_price_id' => \Yii::$app->shop->baseTypePrice->id]
+            )
+
+
+            ->orderBy(['realPrice' => SORT_ASC]);
+    }
+
 
     /**
      * Значение базовой цены

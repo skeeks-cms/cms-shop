@@ -104,6 +104,10 @@ use yii\behaviors\TimestampBehavior;
  * @property ShopUserTransact[] $shopUserTransacts
  *
  * @property Money $money
+ * @property Money $moneyVat
+ * @property Money $moneySummPaid
+ * @property Money $moneyDelivery
+ * @property int $weight
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
@@ -392,7 +396,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->price           = $shopFuser->money->getAmount() / $shopFuser->money->getCurrency()->getSubUnit();
         $order->currency_code   = $shopFuser->money->getCurrency()->getCurrencyCode();
         $order->pay_system_id   = $shopFuser->paySystem->id;
-        //$order->delivery_id     = $shopFuser->del;
+        $order->tax_value       = $shopFuser->moneyVat->getValue();
 
         if ($order->save())
         {
@@ -543,5 +547,52 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getMoney()
     {
         return Money::fromString($this->price, $this->currency_code);
+    }
+
+    /**
+     * Налог
+     *
+     * @return Money
+     */
+    public function getMoneyVat()
+    {
+        return Money::fromString($this->tax_value, $this->currency_code);
+    }
+
+    /**
+     * Уже оплачено по заказу
+     *
+     * @return Money
+     */
+    public function getMoneySummPaid()
+    {
+        return Money::fromString($this->sum_paid, $this->currency_code);
+    }
+
+    /**
+     * Стоимость доставки
+     *
+     * @return Money
+     */
+    public function getMoneyDelivery()
+    {
+        return Money::fromString($this->price_delivery, $this->currency_code);
+    }
+
+
+
+    /**
+     * @return int
+     */
+    public function getWeight()
+    {
+        $result = 0;
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $result = $result + $shopBasket->weightSumm;
+        }
+
+        return $result;
     }
 }

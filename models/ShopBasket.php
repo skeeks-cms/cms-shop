@@ -2,18 +2,20 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (�����)
- * @date 22.09.2015
+ * @copyright 2010 SkeekS (СкикС)
+ * @date 09.10.2015
  */
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsSite;
 use skeeks\modules\cms\catalog\models\Product;
 use skeeks\modules\cms\money\Currency;
 use skeeks\modules\cms\money\Money;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\Json;
 
 /**
@@ -70,8 +72,14 @@ use yii\helpers\Json;
  * @property CmsSite $site
  *
  * @property Money $money
- * @property Money $moneyNoDiscount
+ * @property Money $moneyOriginal
  * @property Money $moneyDiscount
+ * @property Money $moneySumm
+ * @property Money $moneyVat
+ * @property Money $moneyVatSumm
+
+ * @property string $weightSumm
+ *
  */
 class ShopBasket extends \skeeks\cms\models\Core
 {
@@ -99,7 +107,7 @@ class ShopBasket extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
+        //$this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
         $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
     }
 
@@ -108,9 +116,12 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function beforeSaveEvent($event)
     {
-        if ($this->isAttributeChanged('quantity'))
+        if ( $this->isAttributeChanged('price') )
         {
-            $this->initData();
+            /*if ( round($this->getAttribute('price'), 4) != round($this->getOldAttribute('price'), 4))
+            {
+                throw new Exception("TODO: реализовать");
+            }*/
         }
     }
 
@@ -122,7 +133,7 @@ class ShopBasket extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'fuser_id', 'order_id', 'product_id', 'product_price_id', 'type', 'set_parent_id', 'measure_code'], 'integer'],
-            [['fuser_id', 'price', 'currency_code', 'name'], 'required'],
+            [['fuser_id', 'currency_code', 'name'], 'required'],
             [['price', 'weight', 'quantity', 'discount_price', 'vat_rate', 'reserve_quantity'], 'number'],
             [['currency_code'], 'string', 'max' => 3],
             [['site_id'], 'integer'],
@@ -133,7 +144,8 @@ class ShopBasket extends \skeeks\cms\models\Core
             [['measure_name'], 'string', 'max' => 50],
 
             [['site_id'], 'default', 'value' => \Yii::$app->cms->site->id],
-            [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode]
+            [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
+            [['price'], 'default', 'value' => 0]
         ];
     }
 
@@ -238,45 +250,9 @@ class ShopBasket extends \skeeks\cms\models\Core
     }
 
 
-    /**
-     * @return $this
-     */
-    public function initData()
-    {
-        $product                = $this->product;
-        $productPrice           = $this->productPrice;
-        if (!$product || !$productPrice)
-        {
-            return $this;
-        }
-
-        $money                  = $productPrice->money;
-        $money                  = $money->multiply($this->quantity);
-
-        $money                  = $money->convertToCurrency(\Yii::$app->money->currencyCode);
-
-        $this->price            = $money->getAmount() / $money->getCurrency()->getSubUnit();
-        $this->currency_code    = (string) $money->getCurrency();
-
-        $this->measure_name     = $product->measure->symbol_rus;
-        $this->measure_code     = $product->measure->code;
-
-        $this->detail_page_url  = $product->cmsContentElement->url;
-        $this->name             = $product->cmsContentElement->name;
-        $this->weight           = $product->weight * $this->quantity;
-
-        $this->dimensions       = Json::encode([
-            'height'    => $this->product->height,
-            'width'     => $this->product->width,
-            'length'    => $this->product->length,
-        ]);
-
-        return $this;
-    }
-
 
     /**
-     * Итоговая стоимость позиции корзины с учетом скидки
+     * Итоговая стоимость одной позиции  включая скидки и наценки
      *
      * @return Money
      */
@@ -286,17 +262,14 @@ class ShopBasket extends \skeeks\cms\models\Core
     }
 
     /**
-     * Итоговая стоимость позиции корзины без скидки
-     * Цена единицы продукта * количество
+     * Итоговая стоимость позиции без скидок и наценок
+     * Цена товара в момент укладки товара в корзину
+     *
      * @return Money
      */
-    public function getMoneyNoDiscount()
+    public function getMoneyOriginal()
     {
-        $money                  = $this->productPrice->money;
-        $money                  = $money->multiply($this->quantity);
-        $money                  = $money->convertToCurrency($this->currency_code);
-
-        return $money;
+        return  Money::fromString((string) ($this->price + $this->discount_price), $this->currency_code);
     }
 
     /**
@@ -305,6 +278,115 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyDiscount()
     {
-        return \Yii::$app->money->newMoney();
+        return Money::fromString($this->discount_price, $this->currency_code);
+    }
+
+    /**
+     * Итоговая цена позиции корзины
+     *
+     * @return Money
+     */
+    public function getMoneySumm()
+    {
+        $money = $this->money;
+        return $money->multiply($this->quantity);;
+    }
+
+    /**
+     * Суммарный вес позиции корзины
+     *
+     * @return string
+     */
+    public function getWeightSumm()
+    {
+        return ($this->weight * $this->quantity);
+    }
+
+
+    /**
+     *
+     * Пересчет состояния позиции согласно текущемим данным
+     *
+     *
+     * @return $this
+     */
+    public function recalculate()
+    {
+        if (!$this->product)
+        {
+            return $this;
+        }
+
+        $product = $this->product;
+
+        $productPrice                           = $product->minProductPrice;
+        $productPriceMoney                      = $productPrice->money->convertToCurrency(\Yii::$app->money->getCurrencyObject());
+
+        $this->measure_name               = $product->measure->symbol_rus;
+        $this->measure_code               = $product->measure->code;
+        $this->product_price_id           = $productPrice->id;
+        $this->notes                      = $productPrice->typePrice->name;
+
+        $this->detail_page_url            = $product->cmsContentElement->url;
+        $this->name                       = $product->cmsContentElement->name;
+        $this->weight                     = $product->weight;
+        $this->site_id                    = \Yii::$app->cms->site->id;
+
+
+        $this->dimensions       = Json::encode([
+            'height'    => $product->height,
+            'width'     => $product->width,
+            'length'    => $product->length,
+        ]);
+
+        if ($product->vat)
+        {
+            $this->vat_rate         = $product->vat->rate;
+
+            if ($product->vat_included == Cms::BOOL_Y)
+            {
+                $this->price            = $productPriceMoney->getValue();
+            } else
+            {
+                $this->price            = $productPriceMoney->getValue() * $this->vat_rate;
+            }
+
+        } else
+        {
+            $this->price            = $productPriceMoney->getValue();
+        }
+
+        $this->currency_code    = $productPriceMoney->getCurrency()->getCurrencyCode();
+
+        return $this;
+    }
+
+    /**
+     * Значение налога за одну единицу товара
+     *
+     * @return Money
+     */
+    public function getMoneyVat()
+    {
+        if (!$this->vat_rate)
+        {
+            return Money::fromString("0", $this->currency_code);
+        }
+
+        $value          = $this->money->getValue();
+        $calculateValue = $value - ($value * 100 / 118);
+
+        return Money::fromString((string) $calculateValue, $this->currency_code);
+    }
+
+    /**
+     *
+     * Значение налога вычисленное суммарное
+     *
+     * @return Money
+     */
+    public function getMoneyVatSumm()
+    {
+        return $this->moneyVat->multiply($this->quantity);
     }
 }
