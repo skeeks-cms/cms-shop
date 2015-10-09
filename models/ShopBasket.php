@@ -73,6 +73,7 @@ use yii\helpers\Json;
  *
  * @property Money $money
  * @property Money $moneyOriginal
+ * @property Money $moneyOriginalSumm
  * @property Money $moneyDiscount
  * @property Money $moneySumm
  * @property Money $moneyVat
@@ -270,6 +271,15 @@ class ShopBasket extends \skeeks\cms\models\Core
     public function getMoneyOriginal()
     {
         return  Money::fromString((string) ($this->price + $this->discount_price), $this->currency_code);
+    }
+
+    /**
+     *
+     * @return Money
+     */
+    public function getMoneyOriginalSumm()
+    {
+        return $this->moneyOriginal->multiply($this->quantity);
     }
 
     /**

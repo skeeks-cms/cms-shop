@@ -171,6 +171,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['baseProductPriceValue'], 'number'],
             [['baseProductPriceCurrency'], 'string', 'max' => 3],
 
+            [['vat_included'], 'default', 'value' => Cms::BOOL_Y],
             [['measure_id'], 'default', 'value' => function()
             {
                 return (int) Measure::find()->def()->one()->id;

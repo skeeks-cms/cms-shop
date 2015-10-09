@@ -261,7 +261,7 @@ class ShopFuser extends Core
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $money = $money->add($shopBasket->moneyOriginal);
+            $money = $money->add($shopBasket->moneyOriginalSumm);
         }
 
         return $money;
