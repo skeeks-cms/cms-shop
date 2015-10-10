@@ -74,6 +74,14 @@ return [
 
             [
                 'priority'  => 0,
+                'label'     => 'Товары',
+                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+
+                'items' => shopProductsMenu()
+            ],
+
+            [
+                'priority'  => 0,
                 'label'     => 'Покупатели',
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
 
@@ -112,11 +120,92 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Товары',
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+                'label'     => 'Управление маркетингом',
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
-                'items' => shopProductsMenu()
+                'items' => [
+
+                    [
+                        "label"     => "Правила работы с корзиной",
+                        'items' =>
+                        [
+                            [
+                                "label"     => "Правила работы с корзиной",
+                                "url"       => ["shop/admin-discsave"],
+                            ],
+
+                            [
+                                "label"     => "Купоны правил работы с корзиной",
+                                "url"       => ["shop/admin-discsave"],
+                            ]
+
+                        ]
+                    ],
+
+                    [
+                        "label"     => "Скидки на товар",
+                        'items' =>
+                        [
+                            [
+                                "label"     => "Скидки на товар",
+                                "url"       => ["shop/admin-discsave"],
+                            ],
+
+                            [
+                                "label"     => "Купоны скидок на товар",
+                                "url"       => ["shop/admin-discsave"],
+                            ]
+
+                        ]
+                    ],
+
+                    [
+                        "label"     => "Накопительные скидки",
+                        "url"       => ["shop/admin-discsave"],
+                    ],
+
+                ]
             ],
+
+            [
+                'priority'  => 0,
+                'label'     => 'Складской учет',
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+
+                'items' =>
+                [
+                    [
+                        "label"     => "Склады",
+                        "url"       => ["shop/admin-store"],
+                        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+                    ],
+
+                ],
+
+            ],
+
+
+            [
+                'priority'  => 0,
+                'label'     => 'Отчеты',
+                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/reports.png'],
+
+                'items' =>
+                [
+                    [
+                        "label"     => "Заказы",
+                        "url"       => ["shop/admin-store"],
+                    ],
+
+                    [
+                        "label"     => "Товары",
+                        "url"       => ["shop/admin-store"],
+                    ],
+
+                ],
+
+            ],
+
 
             [
                 "label"     => "Настройки",
@@ -266,22 +355,6 @@ return [
             ],
 
 
-            [
-                'priority'  => 0,
-                'label'     => 'Складской учет',
-                "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-
-                'items' =>
-                [
-                    [
-                        "label"     => "Склады",
-                        "url"       => ["shop/admin-store"],
-                        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-                    ],
-
-                ],
-
-            ],
 
             [
                 'priority'  => 0,
