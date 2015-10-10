@@ -38,7 +38,7 @@ class m151001_191201_create_table__shop_discount extends Migration
             'active_from'               => $this->integer(),
             'active_to'                 => $this->integer(),
             'renewal'                   => $this->string(1)->notNull()->defaultValue('N'),
-            'name'                      => $this->string(255),
+            'name'                      => $this->string(255)->notNull(),
             'max_uses'                  => $this->integer()->notNull()->defaultValue(0),
             'count_uses'                => $this->integer()->notNull()->defaultValue(0),
             'coupon'                    => $this->string(20),
@@ -111,6 +111,11 @@ class m151001_191201_create_table__shop_discount extends Migration
         $this->addForeignKey(
             'shop_discount__currency_code', "{{%shop_discount}}",
             'currency_code', '{{%money_currency}}', 'code', 'RESTRICT', 'RESTRICT'
+        );
+
+        $this->addForeignKey(
+            'shop_discount__site_id', "{{%shop_discount}}",
+            'site_id', '{{%cms_site}}', 'code', 'SET NULL', 'SET NULL'
         );
     }
 

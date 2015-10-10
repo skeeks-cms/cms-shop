@@ -7,6 +7,8 @@
  */
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\modules\cms\money\models\Currency;
 use Yii;
@@ -50,9 +52,25 @@ use Yii;
  * @property integer $version
  *
  * @property Currency $currencyCode
+ * @property CmsSite $site
  */
 class ShopDiscount extends \skeeks\cms\models\Core
 {
+    CONST VALUE_TYPE_P = "P";
+    CONST VALUE_TYPE_F = "F";
+    CONST VALUE_TYPE_S = "S";
+
+    const TYPE_DEFAULT          = 0;
+    const TYPE_DISCOUNT_SAVE    = 1; //накопительная скидка
+
+    static public function getValueTypes()
+    {
+        return [
+            self::VALUE_TYPE_P => "В процентах",
+            self::VALUE_TYPE_F => "Фиксированная сумма",
+            self::VALUE_TYPE_S => "Установить цену на товар",
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -69,12 +87,15 @@ class ShopDiscount extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'site_id', 'active_from', 'active_to', 'max_uses', 'count_uses', 'type', 'count_size', 'count_from', 'count_to', 'action_size', 'priority', 'version'], 'integer'],
             [['max_discount', 'value', 'min_order_sum'], 'number'],
-            [['currency_code'], 'required'],
+            [['currency_code', 'name'], 'required'],
             [['conditions', 'unpack'], 'string'],
             [['active', 'renewal', 'value_type', 'count_period', 'count_type', 'action_type', 'last_discount'], 'string', 'max' => 1],
             [['name', 'notes', 'xml_id'], 'string', 'max' => 255],
             [['coupon'], 'string', 'max' => 20],
-            [['currency_code'], 'string', 'max' => 3]
+            [['currency_code'], 'string', 'max' => 3],
+            [['active', 'last_discount'], 'default', 'value' => Cms::BOOL_Y],
+            [['type'], 'default', 'value' => self::TYPE_DEFAULT],
+            [['value_type'], 'default', 'value' => self::VALUE_TYPE_P]
         ];
     }
 
@@ -89,7 +110,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
             'updated_by' => Yii::t('app', 'Updated By'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
-            'site_id' => Yii::t('app', 'Site ID'),
+            'site_id' => Yii::t('app', 'Site'),
             'active' => Yii::t('app', 'Active'),
             'active_from' => Yii::t('app', 'Active From'),
             'active_to' => Yii::t('app', 'Active To'),
@@ -98,12 +119,12 @@ class ShopDiscount extends \skeeks\cms\models\Core
             'max_uses' => Yii::t('app', 'Max Uses'),
             'count_uses' => Yii::t('app', 'Count Uses'),
             'coupon' => Yii::t('app', 'Coupon'),
-            'max_discount' => Yii::t('app', 'Max Discount'),
-            'value_type' => Yii::t('app', 'Value Type'),
-            'value' => Yii::t('app', 'Value'),
-            'currency_code' => Yii::t('app', 'Currency Code'),
+            'max_discount' => Yii::t('app', 'Максимальная сумма скидки (в валюте скидки; 0 - скидка не ограничена)'),
+            'value_type' => Yii::t('app', 'Тип скидки'),
+            'value' => Yii::t('app', 'Величина скидки'),
+            'currency_code' => Yii::t('app', 'Валюта скидки'),
             'min_order_sum' => Yii::t('app', 'Min Order Sum'),
-            'notes' => Yii::t('app', 'Notes'),
+            'notes' => Yii::t('app', 'Краткое описание (до 255 символов)'),
             'type' => Yii::t('app', 'Type'),
             'xml_id' => Yii::t('app', 'Xml ID'),
             'count_period' => Yii::t('app', 'Count Period'),
@@ -113,8 +134,8 @@ class ShopDiscount extends \skeeks\cms\models\Core
             'count_to' => Yii::t('app', 'Count To'),
             'action_size' => Yii::t('app', 'Action Size'),
             'action_type' => Yii::t('app', 'Action Type'),
-            'priority' => Yii::t('app', 'Priority'),
-            'last_discount' => Yii::t('app', 'Last Discount'),
+            'priority' => Yii::t('app', 'Приоритет применимости'),
+            'last_discount' => Yii::t('app', 'Прекратить дальнейшее применение скидок'),
             'conditions' => Yii::t('app', 'Conditions'),
             'unpack' => Yii::t('app', 'Unpack'),
             'version' => Yii::t('app', 'Version'),
@@ -127,6 +148,13 @@ class ShopDiscount extends \skeeks\cms\models\Core
     public function getCurrencyCode()
     {
         return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSite()
+    {
+        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
     }
 
 

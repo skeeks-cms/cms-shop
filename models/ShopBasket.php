@@ -378,7 +378,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyVat()
     {
-        if (!$this->vat_rate)
+        if ((float) $this->vat_rate == 0)
         {
             return Money::fromString("0", $this->currency_code);
         }

@@ -131,7 +131,7 @@ return [
                         [
                             [
                                 "label"     => "Правила работы с корзиной",
-                                "url"       => ["shop/admin-discsave"],
+                                "url"       => ["shop/admin-discount"],
                             ],
 
                             [
@@ -148,7 +148,7 @@ return [
                         [
                             [
                                 "label"     => "Скидки на товар",
-                                "url"       => ["shop/admin-discsave"],
+                                "url"       => ["shop/admin-discount"],
                             ],
 
                             [
