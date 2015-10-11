@@ -203,4 +203,5 @@ class ShopDiscount extends \skeeks\cms\models\Core
     }
 
 
+
 }

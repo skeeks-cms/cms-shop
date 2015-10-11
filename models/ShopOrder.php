@@ -105,6 +105,8 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property Money $money
  * @property Money $moneyVat
+ * @property Money $moneyDiscount
+ * @property Money $moneyOriginal
  * @property Money $moneySummPaid
  * @property Money $moneyDelivery
  * @property int $weight
@@ -397,6 +399,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->currency_code   = $shopFuser->money->getCurrency()->getCurrencyCode();
         $order->pay_system_id   = $shopFuser->paySystem->id;
         $order->tax_value       = $shopFuser->moneyVat->getValue();
+        $order->discount_value  = $shopFuser->moneyDiscount->getValue();
 
         if ($order->save())
         {
@@ -560,6 +563,27 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
     /**
+     * Скидка наценка
+     *
+     * @return Money
+     */
+    public function getMoneyDiscount()
+    {
+        return Money::fromString($this->discount_value, $this->currency_code);
+    }
+
+    /**
+     * Итоговая стоимость позиции без скидок и наценок
+     * Цена товара в момент укладки товара в корзину
+     *
+     * @return Money
+     */
+    public function getMoneyOriginal()
+    {
+        return  Money::fromString((string) ($this->price + $this->discount_value), $this->currency_code);
+    }
+
+    /**
      * Уже оплачено по заказу
      *
      * @return Money
@@ -590,7 +614,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $result = $result + $shopBasket->weightSumm;
+            $result = $result + ($shopBasket->weight * $shopBasket->quantity);
         }
 
         return $result;

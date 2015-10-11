@@ -257,7 +257,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
-                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
+                        if ($shopBasket->discount_value)
+                        {
+                            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', "Скидка: " . $shopBasket->discount_value);
+                        } else
+                        {
+                            return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
+                        }
+
                     }
                 ],
                 [
@@ -267,7 +274,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
-                        return \Yii::$app->money->intlFormatter()->format($shopBasket->moneySumm);
+                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money->multiply($shopBasket->quantity));
                     }
                 ],
             ]
@@ -294,12 +301,12 @@ CSS
                     'attributes' => [
                         [
                             'label' => 'Общая стоимость товаров',
-                            'value' => \Yii::$app->money->intlFormatter()->format($model->money),
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyOriginal),
                         ],
 
                         [
                             'label' => 'Скидка, наценка',
-                            'value' => "",
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDiscount),
                         ],
 
                         [

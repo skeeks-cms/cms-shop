@@ -73,14 +73,8 @@ use yii\helpers\Json;
  *
  * @property Money $money
  * @property Money $moneyOriginal
- * @property Money $moneyOriginalSumm
  * @property Money $moneyDiscount
- * @property Money $moneySumm
  * @property Money $moneyVat
- * @property Money $moneyVatSumm
-
- * @property string $weightSumm
- *
  */
 class ShopBasket extends \skeeks\cms\models\Core
 {
@@ -273,14 +267,7 @@ class ShopBasket extends \skeeks\cms\models\Core
         return  Money::fromString((string) ($this->price + $this->discount_price), $this->currency_code);
     }
 
-    /**
-     *
-     * @return Money
-     */
-    public function getMoneyOriginalSumm()
-    {
-        return $this->moneyOriginal->multiply($this->quantity);
-    }
+
 
     /**
      * Итоговая стоимость скидки
@@ -289,27 +276,6 @@ class ShopBasket extends \skeeks\cms\models\Core
     public function getMoneyDiscount()
     {
         return Money::fromString($this->discount_price, $this->currency_code);
-    }
-
-    /**
-     * Итоговая цена позиции корзины
-     *
-     * @return Money
-     */
-    public function getMoneySumm()
-    {
-        $money = $this->money;
-        return $money->multiply($this->quantity);;
-    }
-
-    /**
-     * Суммарный вес позиции корзины
-     *
-     * @return string
-     */
-    public function getWeightSumm()
-    {
-        return ($this->weight * $this->quantity);
     }
 
 
@@ -329,8 +295,8 @@ class ShopBasket extends \skeeks\cms\models\Core
 
         $product = $this->product;
 
-        $productPrice                           = $product->minProductPrice;
-        $productPriceMoney                      = $productPrice->money->convertToCurrency(\Yii::$app->money->getCurrencyObject());
+        $productPrice                     = $product->minProductPrice;
+        $productPriceMoney                = $productPrice->money->convertToCurrency(\Yii::$app->money->getCurrencyObject());
 
         $this->measure_name               = $product->measure->symbol_rus;
         $this->measure_code               = $product->measure->code;
@@ -349,6 +315,7 @@ class ShopBasket extends \skeeks\cms\models\Core
             'length'    => $product->length,
         ]);
 
+        //Рассчет налогов
         if ($product->vat)
         {
             $this->vat_rate         = $product->vat->rate;
@@ -367,6 +334,59 @@ class ShopBasket extends \skeeks\cms\models\Core
         }
 
         $this->currency_code    = $productPriceMoney->getCurrency()->getCurrencyCode();
+
+
+        //Проверка скидок
+        /**
+         * @var ShopDiscount $shopDiscount
+         */
+         $shopDiscounts = ShopDiscount::find()->active()->orderBy(['shop_discount.priority' => SORT_ASC])
+             ->leftJoin('shop_discount2type_price', '`shop_discount2type_price`.`discount_id` = `shop_discount`.`id`')
+             ->andWhere([
+                'or',
+                ['shop_discount.site_id' => ""],
+                ['shop_discount.site_id' => null],
+                ['shop_discount.site_id' => \Yii::$app->cms->site->id]
+             ])
+             ->andWhere([
+                'shop_discount2type_price.type_price_id' => $this->productPrice->typePrice->id,
+             ])
+             ->all();
+             //->createCommand()->rawSql;
+
+
+        $price = $this->price;
+        $this->discount_price = 0;
+        $this->discount_value = "";
+        $this->discount_name = "";
+
+        if ($shopDiscounts)
+        {
+            foreach ($shopDiscounts as $shopDiscount)
+            {
+                if (\Yii::$app->user->can($shopDiscount->permissionName))
+                {
+                    $this->discount_name    = $shopDiscount->name;
+
+                    if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P)
+                    {
+                        $percent = $shopDiscount->value / 100;
+                        $this->discount_value = \Yii::$app->formatter->asPercent($percent);
+
+                        $discountPrice          = $price * $percent;
+                        $this->price            = $this->price - $discountPrice;
+                        $this->discount_price   = $this->discount_price + $discountPrice;
+
+                        //Нужно остановится и не применять другие скидки
+                        if ($shopDiscount->last_discount === Cms::BOOL_Y)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
 
         return $this;
     }
@@ -389,14 +409,4 @@ class ShopBasket extends \skeeks\cms\models\Core
         return Money::fromString((string) $calculateValue, $this->currency_code);
     }
 
-    /**
-     *
-     * Значение налога вычисленное суммарное
-     *
-     * @return Money
-     */
-    public function getMoneyVatSumm()
-    {
-        return $this->moneyVat->multiply($this->quantity);
-    }
 }

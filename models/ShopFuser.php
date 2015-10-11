@@ -243,7 +243,7 @@ class ShopFuser extends Core
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $money = $money->add($shopBasket->moneySumm);
+            $money = $money->add($shopBasket->money->multiply($shopBasket->quantity));
         }
 
         return $money;
@@ -261,7 +261,7 @@ class ShopFuser extends Core
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $money = $money->add($shopBasket->moneyOriginalSumm);
+            $money = $money->add($shopBasket->moneyOriginal->multiply($shopBasket->quantity));
         }
 
         return $money;
@@ -277,7 +277,7 @@ class ShopFuser extends Core
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $result = $result + $shopBasket->weightSumm;
+            $result = $result + ($shopBasket->weight * $shopBasket->quantity);
         }
 
         return $result;
@@ -295,7 +295,7 @@ class ShopFuser extends Core
 
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $money = $money->add($shopBasket->moneyVatSumm);
+            $money = $money->add($shopBasket->moneyVat->multiply($shopBasket->quantity));
         }
 
         return $money;
@@ -312,7 +312,7 @@ class ShopFuser extends Core
         $money = \Yii::$app->money->newMoney();
         foreach ($this->shopBaskets as $shopBasket)
         {
-            $money = $money->add($shopBasket->moneyDiscount);
+            $money = $money->add($shopBasket->moneyDiscount->multiply($shopBasket->quantity));
         }
         return $money;
     }
