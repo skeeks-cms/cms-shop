@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -51,8 +52,12 @@ use Yii;
  * @property string $unpack
  * @property integer $version
  *
+ * @property string $permissionName
+ *
  * @property Currency $currencyCode
  * @property CmsSite $site
+ * @property ShopDiscount2typePrice[] $shopDiscount2typePrices
+ * @property ShopTypePrice[] $typePrices
  */
 class ShopDiscount extends \skeeks\cms\models\Core
 {
@@ -79,6 +84,14 @@ class ShopDiscount extends \skeeks\cms\models\Core
         return '{{%shop_discount}}';
     }
 
+    public function behaviors()
+    {
+        return [
+            RelationalBehavior::className()
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -95,7 +108,10 @@ class ShopDiscount extends \skeeks\cms\models\Core
             [['currency_code'], 'string', 'max' => 3],
             [['active', 'last_discount'], 'default', 'value' => Cms::BOOL_Y],
             [['type'], 'default', 'value' => self::TYPE_DEFAULT],
-            [['value_type'], 'default', 'value' => self::VALUE_TYPE_P]
+            [['value_type'], 'default', 'value' => self::VALUE_TYPE_P],
+            [['value'], 'default', 'value' =>  0],
+            [['priority'], 'default', 'value' =>  1],
+            ['typePrices', 'safe'], // allow set permissions with setAttributes()
         ];
     }
 
@@ -139,6 +155,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
             'conditions' => Yii::t('app', 'Conditions'),
             'unpack' => Yii::t('app', 'Unpack'),
             'version' => Yii::t('app', 'Version'),
+            'typePrices' => Yii::t('app', 'Типы цен, к которым применима скидка'),
         ];
     }
 
@@ -155,6 +172,34 @@ class ShopDiscount extends \skeeks\cms\models\Core
     public function getSite()
     {
         return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopDiscount2typePrices()
+    {
+        return $this->hasMany(ShopDiscount2typePrice::className(), ['discount_id' => 'id']);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getTypePrices()
+    {
+        return $this->hasMany(ShopTypePrice::className(), ['id' => 'type_price_id'])
+            ->viaTable('{{%shop_discount2type_price}}', ['discount_id' => 'id']);
+    }
+
+
+
+
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        return "shop-discount-" . $this->id;
     }
 
 

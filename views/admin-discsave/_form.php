@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet('Накопительная программа'); ?>
 
     <?= $form->fieldCheckboxBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
@@ -22,23 +22,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         \skeeks\cms\models\CmsSite::find()->all(), 'id', 'name'
     )); ?>
 
-    <?= $form->fieldSelect($model, 'value_type', \skeeks\cms\shop\models\ShopDiscount::getValueTypes()); ?>
-    <?= $form->field($model, 'value')->textInput(); ?>
-    <?= $form->field($model, 'max_discount')->textInput(); ?>
 
+<?= $form->fieldSetEnd(); ?>
+
+<?= $form->fieldSet('Валюта сумм оплаченных заказов и скидок'); ?>
     <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
         \skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'
     )); ?>
 
-    <?= $form->fieldInputInt($model, 'priority'); ?>
-    <?= $form->fieldCheckboxBoolean($model, 'last_discount'); ?>
-    <?= $form->field($model, 'notes')->textarea(['rows' => 3]); ?>
-
 <?= $form->fieldSetEnd(); ?>
-
-<?= $form->fieldSet('Условия'); ?>
-<?= $form->fieldSetEnd(); ?>
-
 
 <?= $form->fieldSet('Ограничения'); ?>
 
@@ -64,8 +56,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Купоны'); ?>
-<?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

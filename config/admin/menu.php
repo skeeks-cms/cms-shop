@@ -131,12 +131,12 @@ return [
                         [
                             [
                                 "label"     => "Правила работы с корзиной",
-                                "url"       => ["shop/admin-discount"],
+                                "url"       => ["shop/admin-discount1"],
                             ],
 
                             [
                                 "label"     => "Купоны правил работы с корзиной",
-                                "url"       => ["shop/admin-discsave"],
+                                "url"       => ["shop/admin-discsav1e"],
                             ]
 
                         ]
@@ -153,7 +153,7 @@ return [
 
                             [
                                 "label"     => "Купоны скидок на товар",
-                                "url"       => ["shop/admin-discsave"],
+                                "url"       => ["shop/admin-cupon"],
                             ]
 
                         ]

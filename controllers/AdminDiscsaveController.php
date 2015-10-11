@@ -38,13 +38,13 @@ use yii\helpers\ArrayHelper;
  * Class AdminExtraController
  * @package skeeks\cms\shop\controllers
  */
-class AdminDiscountController extends AdminModelEditorController
+class AdminDiscsaveController extends AdminModelEditorController
 {
     use AdminModelEditorStandartControllerTrait;
 
     public function init()
     {
-        $this->name                     = "Скидки на товар";
+        $this->name                     = "Накопительные скидки";
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopDiscount::className();
 
@@ -62,44 +62,20 @@ class AdminDiscountController extends AdminModelEditorController
                 [
                     "dataProviderCallback" => function(ActiveDataProvider $activeDataProvider)
                     {
-                        $activeDataProvider->query->andWhere(['type' => ShopDiscount::TYPE_DEFAULT]);
+                        $activeDataProvider->query->andWhere(['type' => ShopDiscount::TYPE_DISCOUNT_SAVE]);
+
                     },
                     "columns"               => [
                         'id',
 
                         [
-                            'attribute' => 'name',
-                        ],
-
-                        [
-                            'attribute'     => 'value',
-                            'class'         => DataColumn::className(),
-                            'value' => function(ShopDiscount $shopDiscount)
-                            {
-                                if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P)
-                                {
-                                    return \Yii::$app->formatter->asPercent($shopDiscount->value / 100);
-                                } else
-                                {
-                                    $money = Money::fromString((string) $shopDiscount->value, $shopDiscount->currency_code);
-                                    return \Yii::$app->money->intlFormatter()->format($money);
-                                }
-                            },
+                            'attribute'     => 'name',
+                            'label'         => 'Название программы',
                         ],
 
                         [
                             'attribute'     => 'active',
                             'class'         => BooleanColumn::className(),
-                        ],
-
-                        [
-                            'attribute'     => 'active_from',
-                            'class'         => DateTimeColumnData::className(),
-                        ],
-
-                        [
-                            'attribute'     => 'active_to',
-                            'class'         => DateTimeColumnData::className(),
                         ],
 
                         [
