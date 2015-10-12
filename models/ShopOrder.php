@@ -269,13 +269,18 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['pay_voucher_num', 'delivery_doc_num'], 'string', 'max' => 20],
             [['tracking_number'], 'string', 'max' => 100],
 
-            [['payed', 'canceled', 'status_code', 'allow_delivery', 'update_1c', 'deducted', 'marked', 'reserved', 'external_order', 'allow_payment'], 'default', 'value' => Cms::BOOL_N],
+            [['payed', 'canceled', 'status_code', 'allow_delivery', 'update_1c', 'deducted', 'marked', 'reserved', 'external_order'], 'default', 'value' => Cms::BOOL_N],
             [['recount_flag'], 'default', 'value' => Cms::BOOL_Y],
             [['status_at'], 'default', 'value' => \Yii::$app->formatter->asTimestamp(time())],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
             [['site_id'], 'default', 'value' => \Yii::$app->cms->site->id],
 
             [['canceled', 'reason_canceled'], 'validateCanceled'],
+
+            [['allow_payment'], 'default', 'value' => function()
+            {
+                return (\Yii::$app->shop->payAfterConfirmation == Cms::BOOL_Y) ? Cms::BOOL_N: Cms::BOOL_Y;
+            }],
 
             /*['reason_canceled', 'required', 'when' => function($model) {
                 return $model->canceled == Cms::BOOL_Y;

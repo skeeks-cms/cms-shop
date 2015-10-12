@@ -28,8 +28,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <div class="row">
         <div class="col-md-6">
             <?= $form->fieldSelect($model, 'component', [
-                'Базовые типы'          => \Yii::$app->cms->basePropertyTypes(),
-                'Пользовательские типы' => \Yii::$app->cms->userPropertyTypes(),
+                'Базовые платежные системы'          =>
+                [
+                    \skeeks\cms\shop\paySystems\RobocassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobocassaPaySystem())->descriptor->name
+                ],
             ], [
                 'allowDeselect' => true
             ]); ?>

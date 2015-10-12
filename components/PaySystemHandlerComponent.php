@@ -6,7 +6,7 @@
  * @date 12.10.2015
  */
 namespace skeeks\cms\shop\components;
-use yii\base\Component;
+use skeeks\cms\base\Component;
 
 /**
  * Class PaySystemHandlerComponent
@@ -14,8 +14,5 @@ use yii\base\Component;
  */
 class PaySystemHandlerComponent extends Component
 {
-    /**
-     * @var bool Если платежная система онлайн, то пользователь может платить сам
-     */
-    public $isOnline = false;
+
 }

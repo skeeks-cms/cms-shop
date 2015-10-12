@@ -41,7 +41,7 @@ class OrderController extends Controller
 
             'accessToView' => [
                 'class' => CmsAccessControl::className(),
-                'only' => ['view'],
+                'only' => ['view', 'pay'],
                 'rules' => [
                       // deny all POST request
                       //
@@ -80,5 +80,18 @@ class OrderController extends Controller
         return $this->render($this->action->id, [
             'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))
         ]);
+    }
+
+    public function actionPay()
+    {
+        /**
+         * @var $shopOrder ShopOrder
+         */
+        $shopOrder = ShopOrder::findOne(\Yii::$app->request->get('id'));
+
+        //TODO: проверки
+
+        return $shopOrder->paySystem->paySystemHandler->paymentResponse($shopOrder);
+
     }
 }

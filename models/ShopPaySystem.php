@@ -7,9 +7,11 @@
  */
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
+use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
@@ -26,6 +28,8 @@ use yii\helpers\StringHelper;
  *
  * @property ShopPaySystemPersonType[] $shopPaySystemPersonTypes
  * @property ShopPersonType[] $personTypes
+ *
+ * @property PaySystemHandlerComponent $paySystemHandler
  */
 class ShopPaySystem extends Core
 {
@@ -188,5 +192,25 @@ class ShopPaySystem extends Core
     {
         $this->_personTypes = $ids;
         return $this;
+    }
+
+    /**
+     * @return null|PaySystemHandlerComponent
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getPaySystemHandler()
+    {
+        if ($this->component)
+        {
+            /**
+             * @var $component Component
+             */
+            $component = \Yii::createObject($this->component);
+            $component->load($this->component_settings, "");
+
+            return $component;
+        }
+
+        return null;
     }
 }
