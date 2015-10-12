@@ -8,9 +8,11 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\StringHelper;
 
 /**
  * This is the model class for table "{{%shop_pay_system}}".
@@ -19,6 +21,8 @@ use yii\helpers\ArrayHelper;
  * @property integer $priority
  * @property string $active
  * @property string $description
+ * @property string $component
+ * @property string $component_settings
  *
  * @property ShopPaySystemPersonType[] $shopPaySystemPersonTypes
  * @property ShopPersonType[] $personTypes
@@ -34,6 +38,17 @@ class ShopPaySystem extends Core
     }
 
     protected $_personTypes = [];
+
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            Serialize::className() =>
+            [
+                'class' => Serialize::className(),
+                'fields' => ['component_settings']
+            ]
+        ]);
+    }
 
     /**
      * @inheritdoc
@@ -90,8 +105,9 @@ class ShopPaySystem extends Core
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
             [['name'], 'required'],
-            [['description'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['description', 'componentSettingsString'], 'string'],
+            [['component_settings'], 'safe'],
+            [['name', 'component'], 'string', 'max' => 255],
             [['active'], 'string', 'max' => 1],
             [['name'], 'unique'],
             [['personTypeIds'], 'safe'],
@@ -111,9 +127,28 @@ class ShopPaySystem extends Core
             'active' => Yii::t('app', 'Active'),
             'description' => Yii::t('app', 'Description'),
             'personTypeIds' => Yii::t('app', 'Плательщики'),
+            'component' => Yii::t('app', 'Обработчик'),
         ]);
     }
 
+
+    protected $_componentSettingsString = "";
+    /**
+     * @return string
+     */
+    public function getComponentSettingsString()
+    {
+        return \skeeks\cms\helpers\StringHelper::base64EncodeUrl(serialize((array) $this->component_settings));
+    }
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setComponentSettingsString($value)
+    {
+        $this->component_settings = unserialize(\skeeks\cms\helpers\StringHelper::base64DecodeUrl($value));
+        return $this;
+    }
 
     /**
      * @return \yii\db\ActiveQuery
