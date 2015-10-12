@@ -27,7 +27,8 @@ return [
         'value'     => function(\skeeks\cms\models\CmsContentElement $model)
         {
 
-            return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$model->cmsTree->name}</a></small>";
+            $path = implode(" / ", \yii\helpers\ArrayHelper::map($model->cmsTree->parents, 'id', 'name'));
+            return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
 
         },
         'format'    => 'raw',
