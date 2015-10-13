@@ -56,8 +56,18 @@ JS
             <?= $form->field($widget->searchModel, "type_price_id")->hiddenInput([
                 'value' => $widget->typePrice->id
             ])->label(false); ?>
-            <?= $form->field($widget->searchModel, "price_from")->textInput(); ?>
-            <?= $form->field($widget->searchModel, "price_to")->textInput(); ?>
+            <div class="col-md-6">
+                <?= $form->field($widget->searchModel, "price_from")->textInput([
+                    'placeholder' => \Yii::$app->money->currencyCode
+                ]); ?>
+            </div>
+            <div class="col-md-6">
+                <?= $form->field($widget->searchModel, "price_to")->textInput([
+                    'placeholder' => \Yii::$app->money->currencyCode
+                ]); ?>
+            </div>
+
+
         <? endif; ?>
 
         <? if (in_array('image', $widget->searchModelAttributes)) : ?>

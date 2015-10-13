@@ -66,6 +66,17 @@ class OrderController extends Controller
                         }
                     ],
                 ]
+            ],
+
+            'accessToList' => [
+                'class' => CmsAccessControl::className(),
+                'only' => ['list'],
+                'rules' => [
+                    [
+                      'allow' => true,
+                      'roles' => ['@'],
+                    ],
+                ]
             ]
         ]);
     }
