@@ -73,6 +73,16 @@ class OrderController extends Controller
     /**
      * @return string
      */
+    public function actionList()
+    {
+        $this->view->title = 'Мои заказы | Магазин';
+
+        return $this->render($this->action->id);
+    }
+
+    /**
+     * @return string
+     */
     public function actionView()
     {
         $this->view->title = 'Заказ | Магазин';
