@@ -86,17 +86,21 @@ class ShopComponent extends Component
                  */
                 $model = $e->controller->model;
 
-                if ( ShopContent::find()->where(['content_id' => $model->content_id])->exists() )
+                if ($model->content_id)
                 {
-                    $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
-                        'shop' =>
-                            [
-                                'class'         => AdminContentElementShopAction::className(),
-                                'name'          => 'Для магазина',
-                                'priority'      => 1000,
-                            ],
-                    ]);
+                    if ( ShopContent::find()->where(['content_id' => $model->content_id])->exists() )
+                    {
+                        $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
+                            'shop' =>
+                                [
+                                    'class'         => AdminContentElementShopAction::className(),
+                                    'name'          => 'Для магазина',
+                                    'priority'      => 1000,
+                                ],
+                        ]);
+                    }
                 }
+
             }
         });
     }
