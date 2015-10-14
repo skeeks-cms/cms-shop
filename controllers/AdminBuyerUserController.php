@@ -39,7 +39,7 @@ class AdminBuyerUserController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Покупатели";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Buyers');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = CmsUser::className();
 
@@ -71,7 +71,7 @@ class AdminBuyerUserController extends AdminModelEditorController
                         [
                             'class'         => UserColumnData::className(),
                             'attribute'     => 'id',
-                            'label'         => 'Покупатель'
+                            'label'         => \Yii::t('skeeks/shop/app', 'Buyer')
                         ],
                         'email',
                         'phone',
@@ -79,12 +79,12 @@ class AdminBuyerUserController extends AdminModelEditorController
                         [
                             'class'         => DateTimeColumnData::className(),
                             'attribute'     => 'created_at',
-                            'label'         => 'Дата регистрации',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Date of registration'),
                         ],
 
                         [
                             'class'         => DataColumn::className(),
-                            'label'         => 'Дата последнего заказа',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Date of last order'),
                             'value'         => function(CmsUser $model)
                             {
                                 if ($order = ShopOrder::find()->where(['user_id' => $model->id])->orderBy(['created_at' => SORT_DESC])->one())
@@ -98,7 +98,7 @@ class AdminBuyerUserController extends AdminModelEditorController
 
                         [
                             'class'         => DataColumn::className(),
-                            'label'         => 'Количество оплаеченных заказов',
+                            'label'         => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
                             'value'         => function(CmsUser $model)
                             {
                                 return ShopOrder::find()->where([

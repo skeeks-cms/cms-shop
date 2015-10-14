@@ -72,18 +72,18 @@ JS
 
         <? if (in_array('image', $widget->searchModelAttributes)) : ?>
             <?= $form->fieldSelect($widget->searchModel, "image", [
-                '' => 'Не важно',
-                'Y' => 'С фото',
-                'N' => 'Без фото',
+                '' => \Yii::t('skeeks/shop/app', 'Does not matter'),
+                'Y' => \Yii::t('skeeks/shop/app', 'With_photo'),
+                'N' => \Yii::t('skeeks/shop/app', 'Without_photo'),
             ]); ?>
         <? endif; ?>
 
         <? if (in_array('hasQuantity', $widget->searchModelAttributes)) : ?>
-            <?= $form->field($widget->searchModel, "hasQuantity")->checkbox()->label('Наличие'); ?>
+            <?= $form->field($widget->searchModel, "hasQuantity")->checkbox()->label(\Yii::t('skeeks/shop/app', 'Availability')); ?>
         <? endif; ?>
 
     <? endif ; ?>
 
-    <button class="btn btn-primary">Применить</button>
+    <button class="btn btn-primary"><?=\Yii::t('skeeks/shop/app', 'Apply');?></button>
 
 <? \skeeks\cms\base\widgets\ActiveForm::end(); ?>

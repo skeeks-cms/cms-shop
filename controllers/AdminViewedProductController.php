@@ -32,7 +32,7 @@ class AdminViewedProductController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Просмотренные товары";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Viewed_products');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopViewedProduct::className();
 
@@ -66,11 +66,11 @@ class AdminViewedProductController extends AdminModelEditorController
                     "columns"      => [
                         [
                             'class' => CreatedAtColumn::className(),
-                            'label' => "Дата просмотра",
+                            'label' => \Yii::t('skeeks/shop/app', 'Date views'),
                         ],
                         [
                             'class' => DataColumn::className(),
-                            'label' => "Пользователь",
+                            'label' => \Yii::t('skeeks/shop/app', 'User'),
                             'value' => function(ShopViewedProduct $shopViewedProduct)
                             {
                                 if ($shopViewedProduct->shopFuser->user)
@@ -78,13 +78,13 @@ class AdminViewedProductController extends AdminModelEditorController
                                     return $shopViewedProduct->shopFuser->user->displayName;
                                 }
 
-                                return "Неавторизован [{$shopViewedProduct->shopFuser->id}]";
+                                return \Yii::t('skeeks/shop/app', 'Not_authorized')." [{$shopViewedProduct->shopFuser->id}]";
                             },
                         ],
 
                         [
                             'class' => DataColumn::className(),
-                            'label' => "Товар",
+                            'label' => \Yii::t('skeeks/shop/app', 'Good'),
                             'value' => function(ShopViewedProduct $shopViewedProduct)
                             {
                                 if ($shopViewedProduct->shopProduct)

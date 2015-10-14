@@ -34,7 +34,7 @@ class AdminBuyerController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Покупатели";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Buyers');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopBuyer::className();
 

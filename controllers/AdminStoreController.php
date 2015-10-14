@@ -41,7 +41,7 @@ class AdminStoreController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Склады";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Stocks');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopStore::className();
 

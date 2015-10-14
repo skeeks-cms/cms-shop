@@ -63,11 +63,11 @@ class SearchProductsModel extends Model
     public function attributeLabels()
     {
         return [
-            'image' => 'Наличие фото',
-            'price_from' => 'Цена от',
-            'price_to' => 'Цена до',
-            'type_price_id' => 'Тип цены',
-            'hasQuantity' => 'Есть в наличии'
+            'image' => \Yii::t('skeeks/shop/app', 'With_photo'),
+            'price_from' => \Yii::t('skeeks/shop/app', 'Price_from'),
+            'price_to' => \Yii::t('skeeks/shop/app', 'Price_to'),
+            'type_price_id' => \Yii::t('skeeks/shop/app', 'Price_type'),
+            'hasQuantity' => \Yii::t('skeeks/shop/app', 'In stock')
         ];
     }
 

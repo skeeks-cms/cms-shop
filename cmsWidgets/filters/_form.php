@@ -19,16 +19,16 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
 }
 ?>
 <?php $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSet('Отображение'); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Showing')); ?>
         <?= $form->field($model, 'viewFile')->textInput(); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet('Источник данных'); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Data source')); ?>
         <?= $form->fieldSelect($model, 'content_id', $result); ?>
 
         <?= $form->fieldSelectMulti($model, 'searchModelAttributes', [
-            'image' => 'Фильтр по наличию фото',
-            'hasQuantity' => 'Фильтр наличия'
+            'image' => \Yii::t('skeeks/shop/app', 'Filter by photo'),
+            'hasQuantity' => \Yii::t('skeeks/shop/app', 'Filter by availability')
         ]); ?>
 
         <?= $form->fieldSelect($model, 'type_price_id', \yii\helpers\ArrayHelper::map(

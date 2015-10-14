@@ -33,7 +33,7 @@ class AdminTaxRateController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Ставки налогов";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Tax_rates');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopTaxRate::className();
 

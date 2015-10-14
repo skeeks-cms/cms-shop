@@ -7,13 +7,13 @@ $url = \yii\helpers\Url::to(['/shop/order/view', 'id' => $order->id], true);
 ?>
 
 <?= Html::beginTag('h1'); ?>
-    Отмена заказа #<?= $order->id; ?> на сайте <?= \Yii::$app->cms->appName ?>
+    <?= \Yii::t('skeeks/shop/app', 'Cancellations'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app', 'Online'); ?> <?= \Yii::$app->cms->appName ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Ваш заказ отменен по причине: <?= $order->reason_canceled; ?>.<br>
+    <?= \Yii::t('skeeks/shop/app', 'Order_is_canceled'); ?>: <?= $order->reason_canceled; ?>.<br>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Подробные данные по заказу, вы можете отслеживать на странице: <?= Html::a($url, $url); ?>
+    <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
 <?= Html::endTag('p'); ?>

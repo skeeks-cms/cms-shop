@@ -50,7 +50,7 @@ return [
 
     'shop' =>
     [
-        'label' => 'Магазин',
+        'label' => \Yii::t('skeeks/shop/app', 'Shop'),
         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
 
         'items' =>
@@ -58,13 +58,13 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Заказы',
+                'label'     => \Yii::t('skeeks/shop/app', 'Orders'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
 
                 'items' =>
                 [
                     [
-                        "label"     => "Заказы",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Orders'),
                         "url"       => ["shop/admin-order"],
                         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
                     ]
@@ -74,7 +74,7 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Товары',
+                'label'     => \Yii::t('skeeks/shop/app', 'Goods'),
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
 
                 'items' => shopProductsMenu()
@@ -82,7 +82,7 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Покупатели',
+                'label'     => \Yii::t('skeeks/shop/app', 'Buyers'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
 
                 'items' =>
@@ -93,23 +93,23 @@ return [
                     ],*/
 
                     [
-                        "label"     => "Покупатели",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Buyers'),
                         "url"       => ["shop/admin-buyer-user"],
                         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
                     ],
 
                     [
-                        "label"     => "Счета",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Accounts'),
                         "url"       => ["shop/admin-user-account"],
                     ],
 
                     [
-                        "label"     => "Корзины",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Baskets'),
                         "url"       => ["shop/admin-fuser"],
                     ],
 
                     [
-                        "label"     => "Просмотренные товары",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Viewed_products'),
                         "url"       => ["shop/admin-viewed-product"],
                     ]
                 ],
@@ -120,22 +120,22 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Управление маркетингом',
+                'label'     => \Yii::t('skeeks/shop/app', 'Marketing_management'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
                 'items' => [
 
                     [
-                        "label"     => "Правила работы с корзиной",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Rules_of_the_basket'),
                         'items' =>
                         [
                             [
-                                "label"     => "Правила работы с корзиной",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Rules_of_the_basket'),
                                 "url"       => ["shop/admin-discount1"],
                             ],
 
                             [
-                                "label"     => "Купоны правил работы с корзиной",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Coupons of rules work to basket'),
                                 "url"       => ["shop/admin-discsav1e"],
                             ]
 
@@ -143,16 +143,16 @@ return [
                     ],
 
                     [
-                        "label"     => "Скидки на товар",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Discount goods'),
                         'items' =>
                         [
                             [
-                                "label"     => "Скидки на товар",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Discount goods'),
                                 "url"       => ["shop/admin-discount"],
                             ],
 
                             [
-                                "label"     => "Купоны скидок на товар",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Coupons_discount_goods'),
                                 "url"       => ["shop/admin-cupon"],
                             ]
 
@@ -160,7 +160,7 @@ return [
                     ],
 
                     [
-                        "label"     => "Накопительные скидки",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Cumulative discounts'),
                         "url"       => ["shop/admin-discsave"],
                     ],
 
@@ -169,13 +169,13 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Складской учет',
+                'label'     => \Yii::t('skeeks/shop/app', 'Inventory_control'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
 
                 'items' =>
                 [
                     [
-                        "label"     => "Склады",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Stocks'),
                         "url"       => ["shop/admin-store"],
                         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                     ],
@@ -187,18 +187,18 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Отчеты',
+                'label'     => \Yii::t('skeeks/shop/app', 'Reports'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/reports.png'],
 
                 'items' =>
                 [
                     [
-                        "label"     => "Заказы",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Orders'),
                         "url"       => ["shop/admin-store"],
                     ],
 
                     [
-                        "label"     => "Товары",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Goods'),
                         "url"       => ["shop/admin-store"],
                     ],
 
@@ -208,13 +208,13 @@ return [
 
 
             [
-                "label"     => "Настройки",
+                "label"     => \Yii::t('skeeks/shop/app', 'Settings'),
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
 
                 'items' =>
                 [
                     [
-                        "label" => "Основные настройки",
+                        "label" => \Yii::t('skeeks/shop/app', 'Main_settings'),
                         "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\shop\components\ShopComponent'],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
                         "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
@@ -224,76 +224,76 @@ return [
                     ],
 
                     [
-                        "label"     => "Настройка контента",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Content settings'),
                         "url"       => ["shop/admin-content"],
                     ],
 
                     [
-                        "label"     => "Статусы",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Updates'),
                         "url"       => ["shop/admin-order-status"],
                     ],
 
                     [
-                        "label"     => "Типы цен",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Types_of_prices'),
                         "url"       => ["shop/admin-type-price"],
                     ],
 
                     [
-                        "label"     => "Типы плательщиков",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Types_of_payers'),
                         "url"       => ["shop/admin-person-type"],
                     ],
 
                     [
-                        "label"     => "Платежные системы",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Payment_systems'),
                         "url"       => ["shop/admin-pay-system"],
                     ],
 
                     [
-                        "label"     => "Службы доставки",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Delivery services'),
                         "url"       => ["shop/admin-delivery"],
                     ],
 
 
                     [
-                        "label"     => "Налоги",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Taxes'),
                         'items' =>
                         [
                             [
-                                "label"     => "Список налогов",
+                                "label"     => \Yii::t('skeeks/shop/app', 'List_of_taxes'),
                                 "url"       => ["shop/admin-tax"],
                             ],
 
                             [
-                                "label"     => "Ставки налогов",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Tax_rates'),
                                 "url"       => ["shop/admin-tax-rate"],
                             ],
 
                             [
-                                "label"     => "Ставки НДС",
+                                "label"     => \Yii::t('skeeks/shop/app', 'VAT_rates'),
                                 "url"       => ["shop/admin-vat"],
                             ],
                         ],
                     ],
 
                     [
-                        "label"     => "Наценки",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Surcharges'),
                         "url"       => ["shop/admin-extra"],
                     ],
 
                     [
-                        "label"     => "Валюты",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Surcharges'),
                         "img"       => ['\skeeks\modules\cms\money\assets\Asset', 'images/money_16_16.png'],
 
                         'items' =>
                         [
                             [
-                                "label"     => "Валюты",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Currency'),
                                 "url"       => ["money/admin-currency"],
                                 "img"       => ['\skeeks\modules\cms\money\assets\Asset', 'images/money_16_16.png']
                             ],
 
                             [
-                                "label" => "Настройки",
+                                "label" => \Yii::t('skeeks/shop/app', 'Settings'),
                                 "url"   => ["cms/admin-settings", "component" => 'skeeks\modules\cms\money\components\money\Money'],
                                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
                                 "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
@@ -305,19 +305,19 @@ return [
                     ],
 
                     [
-                        "label"     => "База местопложений",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Settings'),
                         "img"       => ['\skeeks\cms\kladr\assets\Asset', 'icons/global.png'],
 
                         'items' =>
                         [
                             [
-                                "label"     => "База местопложений",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Base of locations'),
                                 "url"       => ["kladr/admin-kladr-location"],
                                 "img"       => ['\skeeks\cms\kladr\assets\Asset', 'icons/global.png'],
                             ],
 
                             [
-                                "label" => "Настройки",
+                                "label" => \Yii::t('skeeks/shop/app', 'Settings'),
                                 "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\kladr\components\KladrComponent'],
                                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
                                 "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
@@ -329,19 +329,19 @@ return [
                     ],
 
                     [
-                        "label"     => "Единицы измерений",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Settings'),
                         "img"       => ['\skeeks\cms\measure\assets\Asset', 'icons/misc.png'],
 
                         'items' =>
                         [
                             [
-                                "label"     => "Единицы измерений",
+                                "label"     => \Yii::t('skeeks/shop/app', 'Units_of_measurement'),
                                 "url"       => ["measure/admin-measure"],
                                 "img"       => ['\skeeks\cms\measure\assets\Asset', 'icons/misc.png'],
                             ],
 
                             [
-                                "label" => "Настройки",
+                                "label" => \Yii::t('skeeks/shop/app', 'Settings'),
                                 "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\measure\components\MeasureComponent'],
                                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
                                 "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
@@ -358,24 +358,24 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => 'Аффилиаты',
+                'label'     => \Yii::t('skeeks/shop/app', 'Settings'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
 
                 'items' =>
                 [
                     [
-                        "label"     => "Аффилиаты",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Affiliates'),
                         "url"       => ["shop/admin-affiliate"],
                         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
                     ],
 
                     [
-                        "label"     => "Планы коммисий",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Plans_of_Commission'),
                         "url"       => ["shop/admin-affiliate-plan"],
                     ],
 
                     [
-                        "label"     => "Пирамида",
+                        "label"     => \Yii::t('skeeks/shop/app', 'Pyramid'),
                         "url"       => ["shop/admin-affiliate-tier"],
                     ]
                 ],
