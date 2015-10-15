@@ -73,8 +73,8 @@ JS
         <? if (in_array('image', $widget->searchModelAttributes)) : ?>
             <?= $form->fieldSelect($widget->searchModel, "image", [
                 '' => \Yii::t('skeeks/shop/app', 'Does not matter'),
-                'Y' => \Yii::t('skeeks/shop/app', 'With_photo'),
-                'N' => \Yii::t('skeeks/shop/app', 'Without_photo'),
+                'Y' => \Yii::t('skeeks/shop/app', 'With photo'),
+                'N' => \Yii::t('skeeks/shop/app', 'Without photo'),
             ]); ?>
         <? endif; ?>
 

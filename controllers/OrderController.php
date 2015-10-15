@@ -86,7 +86,7 @@ class OrderController extends Controller
      */
     public function actionList()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'My_orders').' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'My orders').' | ' . \Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id);
     }

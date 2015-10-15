@@ -11,7 +11,7 @@ $url = \yii\helpers\Url::to(['/shop/order/view', 'id' => $order->id], true);
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>
-    <?= \Yii::t('skeeks/shop/app', 'Status_of_order'); ?> <?= Html::a(\Yii::$app->name, \yii\helpers\Url::home(true)) ?> <?= \Yii::t('skeeks/shop/app', 'Changed to'); ?>: "<?= $order->status->name; ?>" .<br>
+    <?= \Yii::t('skeeks/shop/app', 'The status of your order in site'); ?> <?= Html::a(\Yii::$app->name, \yii\helpers\Url::home(true)) ?> <?= \Yii::t('skeeks/shop/app', 'changed to'); ?>: "<?= $order->status->name; ?>" .<br>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>

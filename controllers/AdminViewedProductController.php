@@ -32,7 +32,7 @@ class AdminViewedProductController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Viewed_products');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Viewed products');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopViewedProduct::className();
 
@@ -78,7 +78,7 @@ class AdminViewedProductController extends AdminModelEditorController
                                     return $shopViewedProduct->shopFuser->user->displayName;
                                 }
 
-                                return \Yii::t('skeeks/shop/app', 'Not_authorized')." [{$shopViewedProduct->shopFuser->id}]";
+                                return \Yii::t('skeeks/shop/app', 'Not authorized')." [{$shopViewedProduct->shopFuser->id}]";
                             },
                         ],
 

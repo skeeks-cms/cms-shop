@@ -70,7 +70,7 @@ class AdminDiscsaveController extends AdminModelEditorController
 
                         [
                             'attribute'     => 'name',
-                            'label'         => \Yii::t('skeeks/shop/app', 'Name_of_the_program'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Name of the program'),
                         ],
 
                         [

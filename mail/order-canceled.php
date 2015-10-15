@@ -7,11 +7,11 @@ $url = \yii\helpers\Url::to(['/shop/order/view', 'id' => $order->id], true);
 ?>
 
 <?= Html::beginTag('h1'); ?>
-    <?= \Yii::t('skeeks/shop/app', 'Cancellations'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app', 'Online'); ?> <?= \Yii::$app->cms->appName ?>
+    <?= \Yii::t('skeeks/shop/app', 'Cancellations'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app', 'in site'); ?> <?= \Yii::$app->cms->appName ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>
-    <?= \Yii::t('skeeks/shop/app', 'Order_is_canceled'); ?>: <?= $order->reason_canceled; ?>.<br>
+    <?= \Yii::t('skeeks/shop/app', 'Your order is canceled due'); ?>: <?= $order->reason_canceled; ?>.<br>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>

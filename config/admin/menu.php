@@ -109,7 +109,7 @@ return [
                     ],
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Viewed_products'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Viewed products'),
                         "url"       => ["shop/admin-viewed-product"],
                     ]
                 ],
@@ -120,17 +120,17 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => \Yii::t('skeeks/shop/app', 'Marketing_management'),
+                'label'     => \Yii::t('skeeks/shop/app', 'Marketing management'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
                 'items' => [
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Rules_of_the_basket'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Rules for the basket'),
                         'items' =>
                         [
                             [
-                                "label"     => \Yii::t('skeeks/shop/app', 'Rules_of_the_basket'),
+                                "label"     => \Yii::t('skeeks/shop/app', 'Rules for the basket'),
                                 "url"       => ["shop/admin-discount1"],
                             ],
 
@@ -169,7 +169,7 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => \Yii::t('skeeks/shop/app', 'Inventory_control'),
+                'label'     => \Yii::t('skeeks/shop/app', 'Inventory control'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
 
                 'items' =>
@@ -214,7 +214,7 @@ return [
                 'items' =>
                 [
                     [
-                        "label" => \Yii::t('skeeks/shop/app', 'Main_settings'),
+                        "label" => \Yii::t('skeeks/shop/app', 'Main settings'),
                         "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\shop\components\ShopComponent'],
                         "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
                         "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
@@ -234,17 +234,17 @@ return [
                     ],
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Types_of_prices'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Types of prices'),
                         "url"       => ["shop/admin-type-price"],
                     ],
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Types_of_payers'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Types of payers'),
                         "url"       => ["shop/admin-person-type"],
                     ],
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Payment_systems'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Payment systems'),
                         "url"       => ["shop/admin-pay-system"],
                     ],
 
@@ -259,17 +259,17 @@ return [
                         'items' =>
                         [
                             [
-                                "label"     => \Yii::t('skeeks/shop/app', 'List_of_taxes'),
+                                "label"     => \Yii::t('skeeks/shop/app', 'List of taxes'),
                                 "url"       => ["shop/admin-tax"],
                             ],
 
                             [
-                                "label"     => \Yii::t('skeeks/shop/app', 'Tax_rates'),
+                                "label"     => \Yii::t('skeeks/shop/app', 'Tax rates'),
                                 "url"       => ["shop/admin-tax-rate"],
                             ],
 
                             [
-                                "label"     => \Yii::t('skeeks/shop/app', 'VAT_rates'),
+                                "label"     => \Yii::t('skeeks/shop/app', 'VAT rates'),
                                 "url"       => ["shop/admin-vat"],
                             ],
                         ],
@@ -335,7 +335,7 @@ return [
                         'items' =>
                         [
                             [
-                                "label"     => \Yii::t('skeeks/shop/app', 'Units_of_measurement'),
+                                "label"     => \Yii::t('skeeks/shop/app', 'Units of measurement'),
                                 "url"       => ["measure/admin-measure"],
                                 "img"       => ['\skeeks\cms\measure\assets\Asset', 'icons/misc.png'],
                             ],
@@ -370,7 +370,7 @@ return [
                     ],
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Plans_of_Commission'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Plans of Commission'),
                         "url"       => ["shop/admin-affiliate-plan"],
                     ],
 

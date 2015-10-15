@@ -86,7 +86,7 @@ class AdminFuserController extends AdminModelEditorController
                             'label'         => \Yii::t('skeeks/shop/app', 'User'),
                             'value'         => function(ShopFuser $model)
                             {
-                                return $model->user ? ( new AdminBuyerUserWidget(['user' => $model->user]) )->run() : \Yii::t('skeeks/shop/app', 'Not_authorized');
+                                return $model->user ? ( new AdminBuyerUserWidget(['user' => $model->user]) )->run() : \Yii::t('skeeks/shop/app', 'Not authorized');
                             },
                         ],
 
@@ -110,7 +110,7 @@ class AdminFuserController extends AdminModelEditorController
                             'class'         => DataColumn::className(),
                             'filter'        => ArrayHelper::map(ShopPersonType::find()->active()->all(), 'id', 'name'),
                             'attribute'     => 'person_type_id',
-                            'label'         => \Yii::t('skeeks/shop/app', 'Profile_type'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Profile type'),
                             'value'         => function(ShopFuser $model)
                             {
                                 return $model->personType->name;
@@ -130,7 +130,7 @@ class AdminFuserController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'filter'        => false,
-                            'label'         => \Yii::t('skeeks/shop/app', 'Number_of_items'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Number of items'),
                             'value'         => function(ShopFuser $model)
                             {
                                 return $model->countShopBaskets;

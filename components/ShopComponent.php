@@ -114,7 +114,7 @@ class ShopComponent extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'email'                 => 'Email',
-            'payAfterConfirmation'  => \Yii::t('skeeks/shop/app', 'Payment_after_manager')
+            'payAfterConfirmation'  => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval')
         ]);
     }
 

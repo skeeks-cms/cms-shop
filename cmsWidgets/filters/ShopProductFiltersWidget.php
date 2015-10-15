@@ -55,7 +55,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
             'content_id'                => \Yii::t('skeeks/shop/app', 'Content'),
             'searchModelAttributes'     => \Yii::t('skeeks/shop/app', 'Fields'),
             'realatedProperties'        => \Yii::t('skeeks/shop/app', 'Properties'),
-            'type_price_id'             => \Yii::t('skeeks/shop/app', 'Types_of_prices'),
+            'type_price_id'             => \Yii::t('skeeks/shop/app', 'Types of prices'),
         ]);
     }
 
