@@ -11,6 +11,7 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\Search;
@@ -24,8 +25,9 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 
 /**
- * @property ShopTypePrice typePrice;
- * @property CmsContentElement $cmsContentElement;
+ * @property ShopTypePrice      $typePrice;
+ * @property CmsContent         $cmsContent;
+ * @property CmsContentElement  $cmsContentElement;
  *
  * Class ShopProductFiltersWidget
  * @package skeeks\cms\shop\cmsWidgets\filters
@@ -83,11 +85,28 @@ class ShopProductFiltersWidget extends WidgetRenderable
     }
 
     /**
+     * @var CmsContentElement
+     */
+    protected $_cmsContentElement = null;
+    /**
      * @return CmsContentElement
      */
     public function getCmsContentElement()
     {
-        return new CmsContentElement();
+        if ($this->_cmsContentElement === null)
+        {
+            $this->_cmsContentElement = new CmsContentElement([
+                'content_id' => $this->content_id
+            ]);
+        }
+        return $this->_cmsContentElement;
     }
 
+    /**
+     * @return CmsContent
+     */
+    public function getCmsContent()
+    {
+        return CmsContent::findOne($this->content_id);
+    }
 }

@@ -8,7 +8,6 @@
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\shop\cmsWidgets\filters\ShopProductFiltersWidget */
 ?>
-
 <?
 $this->registerJs(<<<JS
 (function(sx, $, _)
@@ -83,6 +82,20 @@ JS
         <? endif; ?>
 
     <? endif ; ?>
+
+
+
+    <? if ($widget->cmsContent->cmsContentProperties) : ?>
+        <? foreach ($widget->cmsContent->cmsContentProperties as $property) : ?>
+            <? if (in_array($property->code, $widget->realatedProperties)) : ?>
+                <?= $property->renderActiveForm($form, $widget->cmsContentElement); ?>
+            <? endif; ?>
+
+            <?/*= $form->field($widget->cmsContentElement->relatedPropertiesModel, $property->code)->label($property->name)->textInput(); */?>
+        <? endforeach; ?>
+    <? endif; ?>
+
+
 
     <button class="btn btn-primary">Применить</button>
 
