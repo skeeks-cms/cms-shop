@@ -85,13 +85,37 @@ JS
 
 
 
-    <? if ($widget->cmsContent->cmsContentProperties) : ?>
-        <? foreach ($widget->cmsContent->cmsContentProperties as $property) : ?>
+    <? if ($properties = $widget->searchRelatedPropertiesModel->properties) : ?>
+
+        <? foreach ($properties as $property) : ?>
             <? if (in_array($property->code, $widget->realatedProperties)) : ?>
-                <?= $property->renderActiveForm($form, $widget->cmsContentElement); ?>
+
+                <? if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
+
+                    <?
+                        $propertyType = $property->createPropertyType();
+                        $options = \skeeks\cms\models\CmsContentElement::find()->active()->andWhere([
+                            'content_id' => $propertyType->content_id
+                        ])->all();
+
+                        $options = \yii\helpers\ArrayHelper::map(
+                            $options, 'id', 'name'
+                        );
+
+                    ?>
+                    <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList($options); ?>
+
+                <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
+                    <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(\yii\helpers\ArrayHelper::map(
+                        $property->enums, 'id', 'value'
+                    )); ?>
+                <? else : ?>
+                    <?= $property->property_type; ?>
+                <? endif; ?>
+
             <? endif; ?>
 
-            <?/*= $form->field($widget->cmsContentElement->relatedPropertiesModel, $property->code)->label($property->name)->textInput(); */?>
+
         <? endforeach; ?>
     <? endif; ?>
 

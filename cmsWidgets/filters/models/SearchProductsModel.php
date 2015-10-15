@@ -28,13 +28,8 @@ use yii\helpers\Json;
  * Class SearchProductsModel
  * @package skeeks\cms\shop\cmsWidgets\filters\models
  */
-class SearchProductsModel extends Model
+class SearchProductsModel extends DynamicModel
 {
-    /**
-     * @var ShopProductFiltersWidget
-     */
-    public $widgetFilters = null;
-
     public function init()
     {
         parent::init();

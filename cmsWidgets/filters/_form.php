@@ -33,7 +33,7 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
         ]); ?>
 
         <? if ($model->cmsContent) : ?>
-            <?= $form->fieldSelectMulti($model, 'realatedProperties', $model->cmsContentElement->relatedPropertiesModel->attributeLabels()); ?>
+            <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
         <? else: ?>
             Дополнительные свойства появятся после сохранения настроек
         <? endif; ?>
