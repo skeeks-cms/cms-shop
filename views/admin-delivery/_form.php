@@ -48,8 +48,75 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-4">
+            <?= $form->field($model, 'order_price_from')->textInput(); ?>
+
+        </div>
+        <div class="col-md-4">
+            <?= $form->field($model, 'order_price_to')->textInput(); ?>
+        </div>
+        <div class="col-md-4">
+            <?= $form->fieldSelect($model, 'order_currency_code', \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'));?>
+        </div>
+    </div>
+
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
+
+    <div class="row">
+        <div class="col-md-4">
+            <?= $form->field($model, 'price')->textInput(); ?>
+
+        </div>
+
+        <div class="col-md-4">
+            <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'));?>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-8">
+            <?= $form->field($model, 'priority')->textInput(); ?>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-8">
+            <?= $form->field($model, 'description')->textarea(); ?>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-8">
+            <?= $form->field($model, 'store')->textInput(); ?>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-8">
+            <?= $form->field($model, 'logo_id')->widget(
+                \skeeks\cms\widgets\formInputs\StorageImage::className()
+            ); ?>
+        </div>
+
+    </div>
+
+
+
+<?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSet('Платежные системы'); ?>
+
+    <?= $form->field($model, 'shopPaySystems')->checkboxList(\yii\helpers\ArrayHelper::map(
+        \skeeks\cms\shop\models\ShopPaySystem::find()->active()->all(), 'id', 'name'
+    ))->hint('если ничего не выделено, то подразумеваются все'); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
