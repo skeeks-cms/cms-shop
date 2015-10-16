@@ -123,4 +123,13 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         return CmsContent::findOne($this->content_id);
     }
+
+    /**
+     * @param ActiveDataProvider $activeDataProvider
+     */
+    public function search(ActiveDataProvider $activeDataProvider)
+    {
+        $this->searchModel->search($activeDataProvider);
+        $this->searchRelatedPropertiesModel->search($activeDataProvider);
+    }
 }

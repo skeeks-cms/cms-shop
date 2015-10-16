@@ -11,6 +11,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use yii\base\DynamicModel;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -70,5 +71,14 @@ class SearchRelatedPropertiesModel extends DynamicModel
         }
 
         return $result;
+    }
+
+
+    /**
+     * @param ActiveDataProvider $activeDataProvider
+     */
+    public function search(ActiveDataProvider $activeDataProvider)
+    {
+
     }
 }
