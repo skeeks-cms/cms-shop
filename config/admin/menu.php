@@ -281,7 +281,7 @@ return [
                     ],
 
                     [
-                        "label"     => \skeeks\cms\shop\Module::t('app', 'Surcharges'),
+                        "label"     => \skeeks\cms\shop\Module::t('app', 'Currency'),
                         "img"       => ['\skeeks\modules\cms\money\assets\Asset', 'images/money_16_16.png'],
 
                         'items' =>
@@ -305,7 +305,7 @@ return [
                     ],
 
                     [
-                        "label"     => \skeeks\cms\shop\Module::t('app', 'Settings'),
+                        "label"     => \skeeks\cms\shop\Module::t('app', 'Base of locations'),
                         "img"       => ['\skeeks\cms\kladr\assets\Asset', 'icons/global.png'],
 
                         'items' =>
@@ -329,7 +329,7 @@ return [
                     ],
 
                     [
-                        "label"     => \skeeks\cms\shop\Module::t('app', 'Settings'),
+                        "label"     => \skeeks\cms\shop\Module::t('app', 'Units of measurement'),
                         "img"       => ['\skeeks\cms\measure\assets\Asset', 'icons/misc.png'],
 
                         'items' =>
@@ -358,7 +358,7 @@ return [
 
             [
                 'priority'  => 0,
-                'label'     => \skeeks\cms\shop\Module::t('app', 'Settings'),
+                'label'     => \skeeks\cms\shop\Module::t('app', 'Affiliates'),
                 "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
 
                 'items' =>
