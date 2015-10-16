@@ -86,7 +86,7 @@ class OrderController extends Controller
      */
     public function actionList()
     {
-        $this->view->title = 'Мои заказы | Магазин';
+        $this->view->title = \Yii::t('skeeks/shop/app', 'My orders').' | ' . \Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id);
     }
@@ -96,7 +96,7 @@ class OrderController extends Controller
      */
     public function actionView()
     {
-        $this->view->title = 'Заказ | Магазин';
+        $this->view->title =  \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id, [
             'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))

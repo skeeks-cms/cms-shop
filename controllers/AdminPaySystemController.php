@@ -30,7 +30,7 @@ class AdminPaySystemController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Платежные системы";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Payment systems');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopPaySystem::className();
 

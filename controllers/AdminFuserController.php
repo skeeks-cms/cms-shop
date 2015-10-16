@@ -41,7 +41,7 @@ class AdminFuserController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Корзины";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Baskets');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopFuser::className();
 
@@ -83,10 +83,10 @@ class AdminFuserController extends AdminModelEditorController
                             'class'         => DataColumn::className(),
                             'filter'        => false,
                             'format'        => raw,
-                            'label'         => 'Пользователь',
+                            'label'         => \Yii::t('skeeks/shop/app', 'User'),
                             'value'         => function(ShopFuser $model)
                             {
-                                return $model->user ? ( new AdminBuyerUserWidget(['user' => $model->user]) )->run() : "Неавторизован";
+                                return $model->user ? ( new AdminBuyerUserWidget(['user' => $model->user]) )->run() : \Yii::t('skeeks/shop/app', 'Not authorized');
                             },
                         ],
 
@@ -94,7 +94,7 @@ class AdminFuserController extends AdminModelEditorController
                             'class'         => DataColumn::className(),
                             'filter'        => false,
                             'format'        => 'raw',
-                            'label'         => 'Профиль покупателя',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
                             'value'         => function(ShopFuser $model)
                             {
                                 if (!$model->buyer)
@@ -110,7 +110,7 @@ class AdminFuserController extends AdminModelEditorController
                             'class'         => DataColumn::className(),
                             'filter'        => ArrayHelper::map(ShopPersonType::find()->active()->all(), 'id', 'name'),
                             'attribute'     => 'person_type_id',
-                            'label'         => 'Тип профиля',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Profile type'),
                             'value'         => function(ShopFuser $model)
                             {
                                 return $model->personType->name;
@@ -120,7 +120,7 @@ class AdminFuserController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'filter'        => false,
-                            'label'         => 'Цена корзины',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Price of basket'),
                             'value'         => function(ShopFuser $model)
                             {
                                 return \Yii::$app->money->intlFormatter()->format($model->money);
@@ -130,7 +130,7 @@ class AdminFuserController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'filter'        => false,
-                            'label'         => 'Количество наименований',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Number of items'),
                             'value'         => function(ShopFuser $model)
                             {
                                 return $model->countShopBaskets;
@@ -141,7 +141,7 @@ class AdminFuserController extends AdminModelEditorController
                             'class'         => DataColumn::className(),
                             'filter'        => false,
                             'format'        => 'raw',
-                            'label'         => 'Товар',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Good'),
                             'value'         => function(ShopFuser $model)
                             {
                                 if ($model->shopBaskets)
@@ -165,7 +165,7 @@ HTML;
                             'filter'        => ArrayHelper::map(CmsSite::find()->active()->all(), 'id', 'name'),
                             'attribute'     => 'site_id',
                             'format'        => 'raw',
-                            'label'         => 'Сайт',
+                            'label'         => \Yii::t('skeeks/shop/app', 'Site'),
                             'value'         => function(ShopFuser $model)
                             {
                                 return $model->site->name . " [{$model->site->code}]";

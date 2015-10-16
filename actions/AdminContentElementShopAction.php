@@ -89,14 +89,14 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
                 } else
                 {
-                    \Yii::$app->getSession()->setFlash('error', 'Проверьте правильность заполнения цен');
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
                 }
 
             }
 
             if ($model->load(\Yii::$app->request->post()) && $model->save())
             {
-                \Yii::$app->getSession()->setFlash('success', 'Сохранено');
+                \Yii::$app->getSession()->setFlash('success', 'Saved');
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -112,7 +112,7 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', 'Не удалось сохранить');
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Failed to save'));
             }
         }
 

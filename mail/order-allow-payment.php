@@ -8,17 +8,17 @@ $urlPay = \yii\helpers\Url::to(['/shop/order/pay', 'id' => $order->id], true);
 ?>
 
 <?= Html::beginTag('h1'); ?>
-    Разрешение оплаты по заказу #<?= $order->id; ?> на сайте <?= \Yii::$app->cms->appName ?>
+    <?= \Yii::t('skeeks/shop/app', 'Resolution on the payment for order'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app', 'Online'); ?> <?= \Yii::$app->cms->appName ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Ваш заказ на сайте: <?= Html::a(\Yii::$app->name, \yii\helpers\Url::home(true)) ?> проверен модератором, и утвержден, теперь вы можете его оплатить.<br>
+    <?= \Yii::t('skeeks/shop/app', 'Your order in site'); ?>: <?= Html::a(\Yii::$app->name, \yii\helpers\Url::home(true)) ?> <?= \Yii::t('skeeks/shop/app', 'approved moderation, now you can pay for it.'); ?><br>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Подробные данные по заказу вы можете посмотреть в <?= Html::a("карточке заказа", $url); ?>.
+    <?= \Yii::t('skeeks/shop/app', 'The details of the order you can view in'); ?> <?= Html::a(\Yii::t('skeeks/shop/app', 'order card'), $url); ?>.
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Для оплаты: <?= Html::a("перейти к оплате заказа", $urlPay); ?>.
+    Для оплаты: <?= Html::a( \Yii::t('skeeks/shop/app', 'Go to payment'), $urlPay); ?>.
 <?= Html::endTag('p'); ?>

@@ -21,7 +21,7 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = "Управление свойствами плательщика";
+        $this->name                   = \Yii::t('skeeks/shop/app', 'Control of properties payer');
         $this->modelShowAttribute      = "name";
         $this->modelClassName          = ShopPersonTypeProperty::className();
 

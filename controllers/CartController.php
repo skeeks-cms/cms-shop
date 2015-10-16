@@ -56,7 +56,7 @@ class CartController extends Controller
      */
     public function actionCart()
     {
-        $this->view->title = 'Корзина | Магазин';
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Basket').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
 
@@ -65,7 +65,7 @@ class CartController extends Controller
      */
     public function actionCheckout()
     {
-        $this->view->title = 'Оформление заказа | Магазин';
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Checkout').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
     /**
@@ -73,7 +73,7 @@ class CartController extends Controller
      */
     public function actionPayment()
     {
-        $this->view->title = 'Выбор способоа оплаты | Магазин';
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Choose payment method').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
 
@@ -98,7 +98,7 @@ class CartController extends Controller
 
             if (!$product)
             {
-                $rr->message = 'Товар не найден, возможно его только что удалили.';
+                $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
                 return (array) $rr;
             }
 
@@ -123,11 +123,11 @@ class CartController extends Controller
             if (!$shopBasket->recalculate()->save())
             {
                 $rr->success = false;
-                $rr->message = 'Ошибка добавления позиции в корзину';
+                $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
             } else
             {
                 $rr->success = true;
-                $rr->message = 'Позиция добавлена в корзину';
+                $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
             \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
@@ -154,7 +154,7 @@ class CartController extends Controller
                 if ($shopBasket->delete())
                 {
                     $rr->success = true;
-                    $rr->message = 'Позиция успешно удалена';
+                    $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
                 }
             }
 
@@ -209,7 +209,7 @@ class CartController extends Controller
                     if ($shopBasket->recalculate()->save())
                     {
                         $rr->success = true;
-                        $rr->message = 'Позиция успешно обновлена';
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
                     }
 
                 } else
@@ -217,7 +217,7 @@ class CartController extends Controller
                     if ($shopBasket->delete())
                     {
                         $rr->success = true;
-                        $rr->message = 'Позиция успешно удалена';
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
                     }
                 }
 
@@ -301,7 +301,7 @@ class CartController extends Controller
 
                 if (!$fuser->shopBaskets)
                 {
-                    throw new Exception("Ваша корзина пуста");
+                    throw new Exception(\Yii::t('skeeks/shop/app', 'Your basket is empty'));
                 }
 
                 if ($fuser->load(\Yii::$app->request->post()) && $fuser->save())
@@ -317,7 +317,7 @@ class CartController extends Controller
 
                         if (!$order->isNewRecord)
                         {
-                            $rr->message = "Заказ успешно создан";
+                            $rr->message = \Yii::t('skeeks/shop/app', 'The order created successfully');
                             $rr->success = true;
                             $rr->redirect = Url::to(['/shop/order/view', 'id' => $order->id]);
                             $rr->data = [
@@ -330,17 +330,17 @@ class CartController extends Controller
 
                         } else
                         {
-                            throw new Exception("Некорректные даныне нового заказа: " . array_shift($order->getFirstErrors()));
+                            throw new Exception(\Yii::t('skeeks/shop/app', 'Incorrect data of the new order').": " . array_shift($order->getFirstErrors()));
                         }
 
                     } else
                     {
-                        throw new Exception("Недостаточно данных для оформления заказа: " . array_shift($fuser->getFirstErrors()));
+                        throw new Exception(\Yii::t('skeeks/shop/app', 'Not enogh data for ordering').": " . array_shift($fuser->getFirstErrors()));
                     }
 
                 } else
                 {
-                    throw new Exception("Недостаточно данных для оформления заказа: " . array_shift($fuser->getFirstErrors()));
+                    throw new Exception(\Yii::t('skeeks/shop/app', 'Not enogh data for ordering').": " . array_shift($fuser->getFirstErrors()));
                 }
 
             } catch (Exception $e)
@@ -386,7 +386,7 @@ class CartController extends Controller
                     $shopPersonType = ShopPersonType::find()->active()->andWhere(['id' => $shop_person_type_id])->one();
                     if (!$shopPersonType)
                     {
-                        throw new Exception('Данный плательщик отключен или удален. Обновите страницу.');
+                        throw new Exception(\Yii::t('skeeks/shop/app', 'This payer is disabled or deleted. Refresh the page.'));
                     }
 
                     if (!$modelBuyer)
@@ -439,7 +439,7 @@ class CartController extends Controller
 
                             if (!$userEmail)
                             {
-                                throw new Exception('Не указан email пользователя.');
+                                throw new Exception(\Yii::t('skeeks/shop/app', 'Unknown email address user'));
                             }
 
 
@@ -450,7 +450,7 @@ class CartController extends Controller
 
                             if (!$user = $newUser->signup())
                             {
-                                throw new Exception('Не создан профиль пользователя.');
+                                throw new Exception(\Yii::t('skeeks/shop/app', 'Do not create a user profile.'));
                             }
 
                             //Авторизация пользователя
@@ -465,7 +465,7 @@ class CartController extends Controller
 
                         if (!$modelBuyer->save())
                         {
-                            throw new Exception('Данные покупателя не сохранены.');
+                            throw new Exception(\Yii::t('skeeks/shop/app', 'The data for the buyer are not saved.'));
                         }
 
                         $validateModel->save();
@@ -476,11 +476,11 @@ class CartController extends Controller
                         \Yii::$app->shop->shopFuser->save();
 
                         $rr->success = true;
-                        $rr->message = 'Успешно отправлена';
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Successfully sent');
 
                     } else
                     {
-                        throw new Exception('Проверьте правильность заполнения полей формы');
+                        throw new Exception(\Yii::t('skeeks/shop/app', 'Check the correctness of filling the form fields'));
                     }
 
 
@@ -515,7 +515,7 @@ class CartController extends Controller
                 $shopPersonType = ShopPersonType::find()->active()->andWhere(['id' => $shop_person_type_id])->one();
                 if (!$shopPersonType)
                 {
-                    $rr->message = 'Данный плательщик отключен или удален. Обновите страницу.';
+                    $rr->message = \Yii::t('skeeks/shop/app', 'This payer is disabled or deleted. Refresh the page.');
                     $rr->success = false;
                     return $rr;
                 }

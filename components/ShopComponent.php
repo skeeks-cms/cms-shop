@@ -59,7 +59,7 @@ class ShopComponent extends Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Магазин',
+            'name'          =>  \Yii::t('skeeks/shop/app', 'Shop'),
         ]);
     }
 
@@ -118,7 +118,7 @@ class ShopComponent extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'email'                 => 'Email',
-            'payAfterConfirmation'  => 'Включить оплату заказов, только после подтверждения менеджером'
+            'payAfterConfirmation'  => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval')
         ]);
     }
 

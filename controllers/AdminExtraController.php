@@ -33,7 +33,7 @@ class AdminExtraController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = "Наценки";
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Surcharges');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopExtra::className();
 

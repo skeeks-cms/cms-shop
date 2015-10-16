@@ -86,10 +86,10 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
         [
-            'content_id'                => 'Контент',
-            'searchModelAttributes'     => 'Поля',
-            'realatedProperties'        => 'Свойства',
-            'type_price_id'             => 'Типы цен'
+            'content_id'                => \Yii::t('skeeks/shop/app', 'Content'),
+            'searchModelAttributes'     => \Yii::t('skeeks/shop/app', 'Fields'),
+            'realatedProperties'        => \Yii::t('skeeks/shop/app', 'Properties'),
+            'type_price_id'             => \Yii::t('skeeks/shop/app', 'Types of prices'),
         ]);
     }
 
