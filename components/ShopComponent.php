@@ -59,7 +59,7 @@ class ShopComponent extends Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          =>  \\skeeks\cms\shop\Module::t('app', 'Shop'),
+            'name'          =>  \skeeks\cms\shop\Module::t('app', 'Shop'),
         ]);
     }
 
