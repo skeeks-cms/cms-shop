@@ -58,11 +58,11 @@ class SearchProductsModel extends Model
     public function attributeLabels()
     {
         return [
-            'image' => skeeks\cms\shop\Module::t('app', 'With photo'),
-            'price_from' => skeeks\cms\shop\Module::t('app', 'Price from'),
-            'price_to' => skeeks\cms\shop\Module::t('app', 'Price to'),
-            'type_price_id' => skeeks\cms\shop\Module::t('app', 'Price type'),
-            'hasQuantity' => skeeks\cms\shop\Module::t('app', 'In stock')
+            'image' => \skeeks\cms\shop\Module::t('app', 'With photo'),
+            'price_from' => \skeeks\cms\shop\Module::t('app', 'Price from'),
+            'price_to' => \skeeks\cms\shop\Module::t('app', 'Price to'),
+            'type_price_id' => \skeeks\cms\shop\Module::t('app', 'Price type'),
+            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'In stock')
         ];
     }
 

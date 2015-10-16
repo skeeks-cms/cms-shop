@@ -21,7 +21,7 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
 {
     public function init()
     {
-        $this->name                   = skeeks\cms\shop\Module::t('app', 'Control of properties payer');
+        $this->name                   = \skeeks\cms\shop\Module::t('app', 'Control of properties payer');
         $this->modelShowAttribute      = "name";
         $this->modelClassName          = ShopPersonTypeProperty::className();
 

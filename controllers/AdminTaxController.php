@@ -32,7 +32,7 @@ class AdminTaxController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = skeeks\cms\shop\Module::t('app', 'List of taxes');
+        $this->name                     = \skeeks\cms\shop\Module::t('app', 'List of taxes');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopTax::className();
 

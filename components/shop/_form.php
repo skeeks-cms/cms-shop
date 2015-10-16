@@ -14,9 +14,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?php $form = ActiveForm::begin(); ?>
 
 
-<?= $form->fieldSet(skeeks\cms\shop\Module::t('app', 'Main')); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
-    <?= $form->field($model, 'email')->textInput()->hint(skeeks\cms\shop\Module::t('app', 'Email of sales department')); ?>
+    <?= $form->field($model, 'email')->textInput()->hint(\skeeks\cms\shop\Module::t('app', 'Email of sales department')); ?>
     <?= $form->fieldRadioListBoolean($model, 'payAfterConfirmation'); ?>
 
 <?= $form->fieldSetEnd(); ?>

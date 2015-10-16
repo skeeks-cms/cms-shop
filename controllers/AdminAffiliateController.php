@@ -38,7 +38,7 @@ class AdminAffiliateController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = skeeks\cms\shop\Module::t('app', 'Affiliates');
+        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Affiliates');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopAffiliate::className();
 

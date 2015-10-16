@@ -86,7 +86,7 @@ class OrderController extends Controller
      */
     public function actionList()
     {
-        $this->view->title = skeeks\cms\shop\Module::t('app', 'My orders').' | ' . skeeks\cms\shop\Module::t('app', 'Shop');
+        $this->view->title = \skeeks\cms\shop\Module::t('app', 'My orders').' | ' . \skeeks\cms\shop\Module::t('app', 'Shop');
 
         return $this->render($this->action->id);
     }
@@ -96,7 +96,7 @@ class OrderController extends Controller
      */
     public function actionView()
     {
-        $this->view->title =  skeeks\cms\shop\Module::t('app', 'Order') . ' | ' . skeeks\cms\shop\Module::t('app', 'Shop');
+        $this->view->title =  \skeeks\cms\shop\Module::t('app', 'Order') . ' | ' . \skeeks\cms\shop\Module::t('app', 'Shop');
 
         return $this->render($this->action->id, [
             'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))

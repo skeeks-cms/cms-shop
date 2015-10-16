@@ -14,28 +14,35 @@ class Module extends \skeeks\cms\base\Module
 {
     public $controllerNamespace = 'skeeks\cms\shop\controllers';
 
+    static public $isRegisteredTranslations = false;
+
     public function init()
     {
         parent::init();
-        $this->registerTranslations();
+        self::registerTranslations();
     }
 
-    public function registerTranslations()
+    static public function registerTranslations()
     {
-        \Yii::$app->i18n->translations['skeeks/shop/app'] = [
-            'class' => 'yii\i18n\PhpMessageSource',
-            'sourceLanguage' => 'en-US',
-            'basePath' => '@skeeks/cms/shop/messages',
-            'fileMap' => [
-                'skeeks/shop/app' => 'app.php',
-            ],
-            'on missingTranslation' => ['skeeks\cms\components\TranslationEventHandler', 'handleMissingTranslation']
-        ];
+        if (self::$isRegisteredTranslations === false)
+        {
+            \Yii::$app->i18n->translations['skeeks/shop/app'] = [
+                'class' => 'yii\i18n\PhpMessageSource',
+                'sourceLanguage' => 'en-US',
+                'basePath' => '@skeeks/cms/shop/messages',
+                'fileMap' => [
+                    'skeeks/shop/app' => 'app.php',
+                ],
+                'on missingTranslation' => ['skeeks\cms\components\TranslationEventHandler', 'handleMissingTranslation']
+            ];
+
+            self::$isRegisteredTranslations = true;
+        }
     }
 
     public static function t($category, $message, $params = [], $language = null)
     {
-        \Yii::$app->getModule('shop');
+        self::registerTranslations();
         return \Yii::t('skeeks/shop/' . $category, $message, $params, $language);
     }
 }

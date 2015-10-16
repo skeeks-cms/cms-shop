@@ -30,7 +30,7 @@ class AdminVatController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = skeeks\cms\shop\Module::t('app', 'VAT_rates');
+        $this->name                     = \skeeks\cms\shop\Module::t('app', 'VAT_rates');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopVat::className();
 

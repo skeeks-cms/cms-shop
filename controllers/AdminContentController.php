@@ -34,7 +34,7 @@ class AdminContentController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = skeeks\cms\shop\Module::t('app', 'Content settings');
+        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Content settings');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopContent::className();
 

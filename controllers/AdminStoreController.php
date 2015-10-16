@@ -41,7 +41,7 @@ class AdminStoreController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = skeeks\cms\shop\Module::t('app', 'Stocks');
+        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Stocks');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopStore::className();
 

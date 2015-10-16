@@ -86,10 +86,10 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
         [
-            'content_id'                => skeeks\cms\shop\Module::t('app', 'Content'),
-            'searchModelAttributes'     => skeeks\cms\shop\Module::t('app', 'Fields'),
-            'realatedProperties'        => skeeks\cms\shop\Module::t('app', 'Properties'),
-            'type_price_id'             => skeeks\cms\shop\Module::t('app', 'Types of prices'),
+            'content_id'                => \skeeks\cms\shop\Module::t('app', 'Content'),
+            'searchModelAttributes'     => \skeeks\cms\shop\Module::t('app', 'Fields'),
+            'realatedProperties'        => \skeeks\cms\shop\Module::t('app', 'Properties'),
+            'type_price_id'             => \skeeks\cms\shop\Module::t('app', 'Types of prices'),
         ]);
     }
 

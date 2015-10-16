@@ -20,16 +20,16 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
 }
 ?>
 <?php $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSet(skeeks\cms\shop\Module::t('app', 'Showing')); ?>
+    <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Showing')); ?>
         <?= $form->field($model, 'viewFile')->textInput(); ?>
     <?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(skeeks\cms\shop\Module::t('app', 'Data source')); ?>
+    <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Data source')); ?>
         <?= $form->fieldSelect($model, 'content_id', $result); ?>
 
         <?= $form->fieldSelectMulti($model, 'searchModelAttributes', [
-            'image' => skeeks\cms\shop\Module::t('app', 'Filter by photo'),
-            'hasQuantity' => skeeks\cms\shop\Module::t('app', 'Filter by availability')
+            'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
+            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
         ]); ?>
 
         <? if ($model->cmsContent) : ?>

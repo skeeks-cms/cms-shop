@@ -39,7 +39,7 @@ class AdminAffiliateTierController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = skeeks\cms\shop\Module::t('app', 'Pyramid');
+        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Pyramid');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopAffiliateTier::className();
 
