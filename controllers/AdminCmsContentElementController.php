@@ -13,6 +13,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiDialogModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
@@ -86,7 +87,24 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     "name" => \Yii::t('skeeks/shop/app', 'Deactivate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
-                ]
+                ],
+
+
+                "change-tree-multi" =>
+                [
+                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    "name"              => "Основной раздел",
+                    "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
+                    "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTree'],
+                ],
+
+                "change-trees-multi" =>
+                [
+                    'class'             => AdminMultiDialogModelEditAction::className(),
+                    "name"              => "Дополнительные разделы",
+                    "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-trees-form",
+                    "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTrees'],
+                ],
             ]
         );
     }

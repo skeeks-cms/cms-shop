@@ -7,6 +7,7 @@
  */
 /* @var $this yii\web\View */
 /* @var $contentType \skeeks\cms\models\CmsContentType */
+/* @var $model \skeeks\cms\shop\cmsWidgets\filters\ShopProductFiltersWidget */
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 $result = [];
@@ -30,6 +31,13 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
             'image' => \Yii::t('skeeks/shop/app', 'Filter by photo'),
             'hasQuantity' => \Yii::t('skeeks/shop/app', 'Filter by availability')
         ]); ?>
+
+        <? if ($model->cmsContent) : ?>
+            <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
+        <? else: ?>
+            Дополнительные свойства появятся после сохранения настроек
+        <? endif; ?>
+
 
         <?= $form->fieldSelect($model, 'type_price_id', \yii\helpers\ArrayHelper::map(
             \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'

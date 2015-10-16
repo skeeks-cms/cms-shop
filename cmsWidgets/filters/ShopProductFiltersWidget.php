@@ -11,12 +11,15 @@ use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel;
+use skeeks\cms\shop\cmsWidgets\filters\models\SearchRelatedPropertiesModel;
 use skeeks\cms\shop\models\ShopTypePrice;
+use yii\base\DynamicModel;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
@@ -24,8 +27,8 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 
 /**
- * @property ShopTypePrice typePrice;
- * @property CmsContentElement $cmsContentElement;
+ * @property ShopTypePrice      $typePrice;
+ * @property CmsContent         $cmsContent;
  *
  * Class ShopProductFiltersWidget
  * @package skeeks\cms\shop\cmsWidgets\filters
@@ -33,13 +36,22 @@ use yii\helpers\Json;
 class ShopProductFiltersWidget extends WidgetRenderable
 {
     //Навигация
-    public $content_id                  = CMS::BOOL_Y;
+    public $content_id;
     public $searchModelAttributes       = [];
 
     public $realatedProperties          = [];
     public $type_price_id               = "";
 
-    public $searchModel                = null;
+    /**
+     * @var \skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel
+     */
+    public $searchModel                 = null;
+
+
+    /**
+     * @var SearchRelatedPropertiesModel
+     */
+    public $searchRelatedPropertiesModel  = null;
 
     static public function descriptorConfig()
     {
@@ -47,6 +59,28 @@ class ShopProductFiltersWidget extends WidgetRenderable
             'name'          => 'Фильтры',
         ]);
     }
+
+    public function init()
+    {
+        parent::init();
+
+        if (!$this->searchModel)
+        {
+            $this->searchModel = new \skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel();
+        }
+
+        if (!$this->searchRelatedPropertiesModel)
+        {
+            $this->searchRelatedPropertiesModel = new SearchRelatedPropertiesModel();
+            $this->searchRelatedPropertiesModel->initCmsContent($this->cmsContent);
+        }
+
+        $this->searchModel->load(\Yii::$app->request->get());
+        $this->searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+    }
+
+
+
 
     public function attributeLabels()
     {
@@ -83,11 +117,10 @@ class ShopProductFiltersWidget extends WidgetRenderable
     }
 
     /**
-     * @return CmsContentElement
+     * @return CmsContent
      */
-    public function getCmsContentElement()
+    public function getCmsContent()
     {
-        return new CmsContentElement();
+        return CmsContent::findOne($this->content_id);
     }
-
 }
