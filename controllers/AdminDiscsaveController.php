@@ -44,7 +44,7 @@ class AdminDiscsaveController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Cumulative discounts');
+        $this->name                     = skeeks\cms\shop\Module::t('app', 'Cumulative discounts');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopDiscount::className();
 
@@ -70,7 +70,7 @@ class AdminDiscsaveController extends AdminModelEditorController
 
                         [
                             'attribute'     => 'name',
-                            'label'         => \Yii::t('skeeks/shop/app', 'Name of the program'),
+                            'label'         => skeeks\cms\shop\Module::t('app', 'Name of the program'),
                         ],
 
                         [

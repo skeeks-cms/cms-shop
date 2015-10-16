@@ -35,7 +35,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Elements');
+        $this->name                     = skeeks\cms\shop\Module::t('app', 'Elements');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = CmsContentElement::className();
 
@@ -69,14 +69,14 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 'settings' =>
                 [
                     'class'         => AdminModelEditorAction::className(),
-                    'name'          => \Yii::t('skeeks/shop/app', 'Settings'),
+                    'name'          => skeeks\cms\shop\Module::t('app', 'Settings'),
                     "icon"          => "glyphicon glyphicon-cog",
                 ],
 
                 "activate-multi" =>
                 [
                     'class' => AdminMultiModelEditAction::className(),
-                    "name" => \Yii::t('skeeks/shop/app', 'Activate'),
+                    "name" => skeeks\cms\shop\Module::t('app', 'Activate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiActivate'],
                 ],
@@ -84,7 +84,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "inActivate-multi" =>
                 [
                     'class' => AdminMultiModelEditAction::className(),
-                    "name" => \Yii::t('skeeks/shop/app', 'Deactivate'),
+                    "name" => skeeks\cms\shop\Module::t('app', 'Deactivate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
                 ],

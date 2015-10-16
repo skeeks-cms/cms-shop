@@ -28,7 +28,7 @@ use yii\helpers\Json;
  * Class SearchProductsModel
  * @package skeeks\cms\shop\cmsWidgets\filters\models
  */
-class SearchProductsModel extends DynamicModel
+class SearchProductsModel extends Model
 {
     public function init()
     {
@@ -58,11 +58,11 @@ class SearchProductsModel extends DynamicModel
     public function attributeLabels()
     {
         return [
-            'image' => \Yii::t('skeeks/shop/app', 'With photo'),
-            'price_from' => \Yii::t('skeeks/shop/app', 'Price from'),
-            'price_to' => \Yii::t('skeeks/shop/app', 'Price to'),
-            'type_price_id' => \Yii::t('skeeks/shop/app', 'Price type'),
-            'hasQuantity' => \Yii::t('skeeks/shop/app', 'In stock')
+            'image' => skeeks\cms\shop\Module::t('app', 'With photo'),
+            'price_from' => skeeks\cms\shop\Module::t('app', 'Price from'),
+            'price_to' => skeeks\cms\shop\Module::t('app', 'Price to'),
+            'type_price_id' => skeeks\cms\shop\Module::t('app', 'Price type'),
+            'hasQuantity' => skeeks\cms\shop\Module::t('app', 'In stock')
         ];
     }
 

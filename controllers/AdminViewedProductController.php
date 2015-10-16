@@ -32,7 +32,7 @@ class AdminViewedProductController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Viewed products');
+        $this->name                     = skeeks\cms\shop\Module::t('app', 'Viewed products');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopViewedProduct::className();
 
@@ -66,11 +66,11 @@ class AdminViewedProductController extends AdminModelEditorController
                     "columns"      => [
                         [
                             'class' => CreatedAtColumn::className(),
-                            'label' => \Yii::t('skeeks/shop/app', 'Date views'),
+                            'label' => skeeks\cms\shop\Module::t('app', 'Date views'),
                         ],
                         [
                             'class' => DataColumn::className(),
-                            'label' => \Yii::t('skeeks/shop/app', 'User'),
+                            'label' => skeeks\cms\shop\Module::t('app', 'User'),
                             'value' => function(ShopViewedProduct $shopViewedProduct)
                             {
                                 if ($shopViewedProduct->shopFuser->user)
@@ -78,13 +78,13 @@ class AdminViewedProductController extends AdminModelEditorController
                                     return $shopViewedProduct->shopFuser->user->displayName;
                                 }
 
-                                return \Yii::t('skeeks/shop/app', 'Not authorized')." [{$shopViewedProduct->shopFuser->id}]";
+                                return skeeks\cms\shop\Module::t('app', 'Not authorized')." [{$shopViewedProduct->shopFuser->id}]";
                             },
                         ],
 
                         [
                             'class' => DataColumn::className(),
-                            'label' => \Yii::t('skeeks/shop/app', 'Good'),
+                            'label' => skeeks\cms\shop\Module::t('app', 'Good'),
                             'value' => function(ShopViewedProduct $shopViewedProduct)
                             {
                                 if ($shopViewedProduct->shopProduct)

@@ -22,10 +22,10 @@ class Module extends \skeeks\cms\base\Module
 
     public function registerTranslations()
     {
-        \Yii::$app->i18n->translations['skeeks/company24/*'] = [
+        \Yii::$app->i18n->translations['skeeks/shop/app'] = [
             'class' => 'yii\i18n\PhpMessageSource',
             'sourceLanguage' => 'en-US',
-            'basePath' => '@skeeks/shop/messages',
+            'basePath' => '@skeeks/cms/shop/messages',
             'fileMap' => [
                 'skeeks/shop/app' => 'app.php',
             ],

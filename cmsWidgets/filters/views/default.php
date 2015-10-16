@@ -72,14 +72,14 @@ JS
 
         <? if (in_array('image', $widget->searchModelAttributes)) : ?>
             <?= $form->fieldSelect($widget->searchModel, "image", [
-                '' => \Yii::t('skeeks/shop/app', 'Does not matter'),
-                'Y' => \Yii::t('skeeks/shop/app', 'With photo'),
-                'N' => \Yii::t('skeeks/shop/app', 'Without photo'),
+                '' => skeeks\cms\shop\Module::t('app', 'Does not matter'),
+                'Y' => skeeks\cms\shop\Module::t('app', 'With photo'),
+                'N' => skeeks\cms\shop\Module::t('app', 'Without photo'),
             ]); ?>
         <? endif; ?>
 
         <? if (in_array('hasQuantity', $widget->searchModelAttributes)) : ?>
-            <?= $form->field($widget->searchModel, "hasQuantity")->checkbox()->label(\Yii::t('skeeks/shop/app', 'Availability')); ?>
+            <?= $form->field($widget->searchModel, "hasQuantity")->checkbox()->label(skeeks\cms\shop\Module::t('app', 'Availability')); ?>
         <? endif; ?>
 
     <? endif ; ?>
@@ -122,6 +122,6 @@ JS
 
 
 
-    <button class="btn btn-primary"><?=\Yii::t('skeeks/shop/app', 'Apply');?></button>
+    <button class="btn btn-primary"><?=skeeks\cms\shop\Module::t('app', 'Apply');?></button>
 
 <? \skeeks\cms\base\widgets\ActiveForm::end(); ?>

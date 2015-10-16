@@ -36,7 +36,7 @@ class AdminDeliveryController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Delivery services');
+        $this->name                     = skeeks\cms\shop\Module::t('app', 'Delivery services');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopDelivery::className();
 

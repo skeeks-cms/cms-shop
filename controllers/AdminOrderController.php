@@ -42,7 +42,7 @@ class AdminOrderController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Orders');
+        $this->name                     = skeeks\cms\shop\Module::t('app', 'Orders');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopOrder::className();
 
@@ -101,7 +101,7 @@ class AdminOrderController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'attribute'     => "user_id",
-                            'label'         => \Yii::t('skeeks/shop/app', 'Buyer'),
+                            'label'         => skeeks\cms\shop\Module::t('app', 'Buyer'),
                             'format'        => "raw",
                             'value'         => function(ShopOrder $shopOrder)
                             {
@@ -113,7 +113,7 @@ class AdminOrderController extends AdminModelEditorController
                             'class'         => DataColumn::className(),
                             'filter'        => false,
                             'format'        => 'raw',
-                            'label'         => \Yii::t('skeeks/shop/app', 'Good'),
+                            'label'         => skeeks\cms\shop\Module::t('app', 'Good'),
                             'value'         => function(ShopOrder $model)
                             {
                                 if ($model->shopBaskets)
@@ -136,7 +136,7 @@ HTML;
                             'class'         => DataColumn::className(),
                             'format'        => 'raw',
                             'attribute'     => 'price',
-                            'label'         => \Yii::t('skeeks/shop/app', 'Sum'),
+                            'label'         => skeeks\cms\shop\Module::t('app', 'Sum'),
                             'value'         => function(ShopOrder $model)
                             {
                                 return \Yii::$app->money->intlFormatter()->format($model->money);
@@ -148,7 +148,7 @@ HTML;
                             'filter'        => ArrayHelper::map(CmsSite::find()->active()->all(), 'id', 'name'),
                             'attribute'     => 'site_id',
                             'format'        => 'raw',
-                            'label'         => \Yii::t('skeeks/shop/app', 'Site'),
+                            'label'         => skeeks\cms\shop\Module::t('app', 'Site'),
                             'value'         => function(ShopOrder $model)
                             {
                                 return $model->site->name . " [{$model->site->code}]";

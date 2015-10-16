@@ -44,7 +44,7 @@ class AdminDiscountController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Discount goods');
+        $this->name                     = skeeks\cms\shop\Module::t('app', 'Discount goods');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopDiscount::className();
 
