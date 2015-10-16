@@ -5,6 +5,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\modules\cms\money\models\Currency;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use Yii;
 
 /**
@@ -37,6 +38,7 @@ use Yii;
  * @property CmsStorageFile $logo
  * @property Currency $orderCurrency
  * @property ShopDelivery2paySystem[] $shopDelivery2paySystems
+ * @property ShopPaySystems[] $shopPaySystems
  */
 class ShopDelivery extends \skeeks\cms\models\Core
 {
@@ -59,7 +61,9 @@ class ShopDelivery extends \skeeks\cms\models\Core
             [['order_price_from', 'order_price_to', 'price'], 'number'],
             [['description', 'store', 'name'], 'string'],
             [['period_type', 'active'], 'string', 'max' => 1],
-            [['order_currency_code', 'currency_code'], 'string', 'max' => 3]
+            [['priority'], 'default', 'value' =>  1],
+            [['order_currency_code', 'currency_code'], 'string', 'max' => 3],
+            ['shopPaySystems', 'safe']
         ];
     }
 
@@ -69,29 +73,45 @@ class ShopDelivery extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'site_id' => Yii::t('app', 'Site ID'),
-            'name' => Yii::t('app', 'Name'),
-            'period_from' => Yii::t('app', 'Period From'),
-            'period_to' => Yii::t('app', 'Period To'),
-            'period_type' => Yii::t('app', 'Period Type'),
-            'weight_from' => Yii::t('app', 'Weight From'),
-            'weight_to' => Yii::t('app', 'Weight To'),
-            'order_price_from' => Yii::t('app', 'Order Price From'),
-            'order_price_to' => Yii::t('app', 'Order Price To'),
-            'order_currency_code' => Yii::t('app', 'Order Currency Code'),
-            'active' => Yii::t('app', 'Active'),
-            'price' => Yii::t('app', 'Price'),
-            'currency_code' => Yii::t('app', 'Currency Code'),
-            'priority' => Yii::t('app', 'Priority'),
-            'description' => Yii::t('app', 'Description'),
-            'logo_id' => Yii::t('app', 'Logo ID'),
-            'store' => Yii::t('app', 'Store'),
+            'id' => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by' => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by' => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at' => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at' => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'site_id' => \skeeks\cms\shop\Module::t('app', 'Site'),
+            'name' => \skeeks\cms\shop\Module::t('app', 'Name'),
+            'period_from' => \skeeks\cms\shop\Module::t('app', 'Period From'),
+            'period_to' => \skeeks\cms\shop\Module::t('app', 'Period To'),
+            'period_type' => \skeeks\cms\shop\Module::t('app', 'Period Type'),
+            'weight_from' => \skeeks\cms\shop\Module::t('app', 'Weight From'),
+            'weight_to' => \skeeks\cms\shop\Module::t('app', 'Weight To'),
+            'order_price_from' => \skeeks\cms\shop\Module::t('app', 'Order price from'),
+            'order_price_to' => \skeeks\cms\shop\Module::t('app', 'Order price to'),
+            'order_currency_code' => \skeeks\cms\shop\Module::t('app', 'Order currency code'),
+            'active' => \skeeks\cms\shop\Module::t('app', 'Active'),
+            'price' => \skeeks\cms\shop\Module::t('app', 'Price'),
+            'currency_code' => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
+            'priority' => \skeeks\cms\shop\Module::t('app', 'Priority'),
+            'description' => \skeeks\cms\shop\Module::t('app', 'Description'),
+            'logo_id' => \skeeks\cms\shop\Module::t('app', 'Logo ID'),
+            'store' => \skeeks\cms\shop\Module::t('app', 'Store'),
+            'shopPaySystems' => \skeeks\cms\shop\Module::t('app', 'Payment systems'),
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            \skeeks\cms\behaviors\RelationalBehavior::className(),
+            HasStorageFile::className() =>
+            [
+                'class'     => HasStorageFile::className(),
+                'fields'    => ['logo_id']
+            ]
+        ]);
     }
 
     /**
@@ -134,4 +154,15 @@ class ShopDelivery extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopDelivery2paySystem::className(), ['delivery_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopPaySystems()
+    {
+        return $this->hasMany(ShopPaySystem::className(), ['id' => 'pay_system_id'])
+            ->viaTable('shop_delivery2pay_system', ['delivery_id' => 'id']);
+    }
+
+
 }

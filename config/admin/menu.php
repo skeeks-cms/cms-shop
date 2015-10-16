@@ -152,7 +152,7 @@ return [
                             ],
 
                             [
-                                "label"     => \skeeks\cms\shop\Module::t('app', 'Coupons_discount_goods'),
+                                "label"     => \skeeks\cms\shop\Module::t('app', 'Coupons discount goods'),
                                 "url"       => ["shop/admin-cupon"],
                             ]
 

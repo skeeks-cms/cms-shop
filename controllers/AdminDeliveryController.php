@@ -53,12 +53,23 @@ class AdminDeliveryController extends AdminModelEditorController
                 'index' =>
                 [
                     "columns"      => [
-                        [
-                            'class' => ImageColumn2::className(),
-                            'relationName' => 'logo'
-                        ],
                         'name',
+                        'priority',
 
+                        [
+                            'class'         => DataColumn::className(),
+                            'attribute'     => "personTypeIds",
+                            'filter'        => false,
+                            'value'         => function(ShopPaySystem $model)
+                            {
+                                return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
+                            }
+                        ],
+
+                        [
+                            'class'         => BooleanColumn::className(),
+                            'attribute'     => "active"
+                        ]
                     ],
                 ]
             ]
