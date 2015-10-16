@@ -30,11 +30,6 @@ use yii\helpers\Json;
  */
 class SearchProductsModel extends Model
 {
-    public function init()
-    {
-        parent::init();
-    }
-
     public $image;
 
     public $price_from;
@@ -60,9 +55,9 @@ class SearchProductsModel extends Model
         return [
             'image' => \skeeks\cms\shop\Module::t('app', 'With photo'),
             'price_from' => \skeeks\cms\shop\Module::t('app', 'Price from'),
-            'price_to' => \skeeks\cms\shop\Module::t('app', 'Price to'),
-            'type_price_id' => \skeeks\cms\shop\Module::t('app', 'Price type'),
-            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'In stock')
+            'price_to' => \skeeks\cms\shop\Module::t('app', 'Price to1'),
+            'type_price_id' => \skeeks\cms\shop\Module::t('app', 'Price type1'),
+            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'In stock1')
         ];
     }
 
