@@ -58,11 +58,11 @@ class AdminDeliveryController extends AdminModelEditorController
 
                         [
                             'class'         => DataColumn::className(),
-                            'attribute'     => "personTypeIds",
+                            'attribute'     => "shopPaySystems",
                             'filter'        => false,
-                            'value'         => function(ShopPaySystem $model)
+                            'value'         => function(ShopDelivery $model)
                             {
-                                return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
+                                return implode(", ", ArrayHelper::map($model->shopPaySystems, 'id', 'name'));
                             }
                         ],
 
