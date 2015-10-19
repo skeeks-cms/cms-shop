@@ -98,6 +98,7 @@ return
     'Period From'                                               => 'Срок доставки от',
     'Period Type'                                               => 'Период',
     'Period To'                                                 => 'Срок доставки до',
+    'Person Type Ids'                                           => 'Срок доставки до',
     'Plan ID'                                                   => 'План комиссии',
     'Plans of Commission'                                       => 'Планы комиссий',
     'Plans affiliate commissions'                               => 'Планы партнерской комиссии',
