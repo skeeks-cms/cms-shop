@@ -27,10 +27,18 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
     <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Data source')); ?>
         <?= $form->fieldSelect($model, 'content_id', $result); ?>
 
-        <?= $form->fieldSelectMulti($model, 'searchModelAttributes', [
+        <?/*= $form->fieldSelectMulti($model, 'searchModelAttributes', [
             'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
             'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
-        ]); ?>
+        ]); */?>
+
+        <?= $form->field($model, 'searchModelAttributes')->dropDownList([
+            'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
+            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
+        ], [
+    'multiple' => true,
+    'size' => 4
+]); ?>
 
         <? if ($model->cmsContent) : ?>
             <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>

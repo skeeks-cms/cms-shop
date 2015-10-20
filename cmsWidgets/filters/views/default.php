@@ -56,15 +56,17 @@ JS
             <?= $form->field($widget->searchModel, "type_price_id")->hiddenInput([
                 'value' => $widget->typePrice->id
             ])->label(false); ?>
-            <div class="col-md-6">
-                <?= $form->field($widget->searchModel, "price_from")->textInput([
-                    'placeholder' => \Yii::$app->money->currencyCode
-                ]); ?>
-            </div>
-            <div class="col-md-6">
-                <?= $form->field($widget->searchModel, "price_to")->textInput([
-                    'placeholder' => \Yii::$app->money->currencyCode
-                ]); ?>
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($widget->searchModel, "price_from")->textInput([
+                        'placeholder' => \Yii::$app->money->currencyCode
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($widget->searchModel, "price_to")->textInput([
+                        'placeholder' => \Yii::$app->money->currencyCode
+                    ]); ?>
+                </div>
             </div>
 
 
@@ -110,8 +112,27 @@ JS
                     <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(\yii\helpers\ArrayHelper::map(
                         $property->enums, 'id', 'value'
                     )); ?>
+                <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
+                    <?/*= $form->field($widget->searchRelatedPropertiesModel, $property->code)->textInput(); */?>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?= $form->field($widget->searchRelatedPropertiesModel, $widget->searchRelatedPropertiesModel->getAttributeNameRangeFrom($property->code) )->textInput([
+                                'placeholder' => 'от'
+                            ])->label(
+                                $property->name . ""
+                            ); ?>
+                        </div>
+                        <div class="col-md-6">
+                            <?= $form->field($widget->searchRelatedPropertiesModel, $widget->searchRelatedPropertiesModel->getAttributeNameRangeTo($property->code) )->textInput([
+                                'placeholder' => 'до'
+                            ])->label("до"); ?>
+                        </div>
+                    </div>
+
                 <? else : ?>
-                    <?= $property->property_type; ?>
+
+                    <?/*= $property->property_type; */?>
                 <? endif; ?>
 
             <? endif; ?>

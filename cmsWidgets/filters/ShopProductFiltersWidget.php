@@ -64,6 +64,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         parent::init();
 
+        if (!$this->searchModelAttributes)
+        {
+            $this->searchModelAttributes = [];
+        }
+
         if (!$this->searchModel)
         {
             $this->searchModel = new \skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel();
