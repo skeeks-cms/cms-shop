@@ -123,37 +123,6 @@ class SearchRelatedPropertiesModel extends DynamicModel
         return false;
     }
 
-    /**
-     * @inheritdoc
-     */
-    /*public function __get($name)
-    {
-        if ($this->isAttributeRange($name)) {
-            if (!isset($this->{$name}))
-            {
-                $this->defineAttribute($name, '');
-                $this->addRule([$name], "safe");
-            }
-
-            return parent::__get($name);
-        } else {
-            return parent::__get($name);
-        }
-    }*/
-
-    /**
-     * @inheritdoc
-     */
-    /*public function __set($name, $value)
-    {
-        if ($this->isAttributeRange($name)) {
-            $this->defineAttribute($name, $value);
-            $this->addRule([$name], "safe");
-        } else {
-            parent::__set($name, $value);
-        }
-    }*/
-
 
     /**
      * @param ActiveDataProvider $activeDataProvider
@@ -173,28 +142,47 @@ class SearchRelatedPropertiesModel extends DynamicModel
 
             if ($property = $this->getProperty($propertyCode))
             {
-                $applyFilters = true;
-
                 if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER)
                 {
-                    $elementIds = (new \yii\db\Query())->from(CmsContentElementProperty::tableName())->select(['element_id'])->where([
+                    $elementIds = [];
+                    $query = (new \yii\db\Query())->from(CmsContentElementProperty::tableName())->select(['element_id'])->where([
                         "property_id"   => $property->id
-                    ])->andWhere([
-                        'and',
-                        ['>=', 'value_num', $this->{$this->getAttributeNameRangeFrom($propertyCode)}],
-                        ['<=', 'value_num', $this->{$this->getAttributeNameRangeTo($propertyCode)}]
-                    ])->all();
+                    ]);
+
+                    if ($fromValue = $this->{$this->getAttributeNameRangeFrom($propertyCode)})
+                    {
+                        $applyFilters = true;
+
+                        $query->andWhere(['>=', 'value_num', (float) $fromValue]);
+                    }
+
+                    if ($toValue = $this->{$this->getAttributeNameRangeTo($propertyCode)})
+                    {
+                        $applyFilters = true;
+
+                        $query->andWhere(['<=', 'value_num', (float) $toValue]);
+                    }
+
+                    if (!$fromValue && !$toValue)
+                    {
+                        continue;
+                    }
+
+                    $elementIds = $query->all();
 
                 } else
                 {
-                    if ($value)
+                    if (!$value)
                     {
-                        $elementIds = (new \yii\db\Query())->from(CmsContentElementProperty::tableName())->select(['element_id'])->where([
-                            "value"         => $value,
-                            "property_id"   => $property->id
-                        ])->all();
+                        continue;
                     }
 
+                    $applyFilters = true;
+
+                    $elementIds = (new \yii\db\Query())->from(CmsContentElementProperty::tableName())->select(['element_id'])->where([
+                        "value"         => $value,
+                        "property_id"   => $property->id
+                    ])->all();
                 }
 
 
