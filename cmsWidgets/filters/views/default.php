@@ -126,7 +126,7 @@ JS
                         <div class="col-md-6">
                             <?= $form->field($widget->searchRelatedPropertiesModel, $widget->searchRelatedPropertiesModel->getAttributeNameRangeTo($property->code) )->textInput([
                                 'placeholder' => 'до'
-                            ])->label("до"); ?>
+                            ])->label("&nbsp;"); ?>
                         </div>
                     </div>
 
