@@ -46,13 +46,13 @@ class ShopDiscount2typePrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'discount_id' => Yii::t('app', 'Discount ID'),
-            'type_price_id' => Yii::t('app', 'Type Price ID'),
+            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'discount_id'   => \skeeks\cms\shop\Module::t('app', 'Discount ID'),
+            'type_price_id' => \skeeks\cms\shop\Module::t('app', 'Type Price ID'),
         ];
     }
 

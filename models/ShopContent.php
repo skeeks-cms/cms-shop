@@ -55,15 +55,15 @@ class ShopContent extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'content_id' => Yii::t('app', 'Контент'),
-            'yandex_export' => Yii::t('app', 'Экспортировать в Яндекс.Товары'),
-            'subscription' => Yii::t('app', 'Subscription'),
-            'vat_id' => Yii::t('app', 'Vat ID'),
+            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'content_id'    => \skeeks\cms\shop\Module::t('app', 'Content'),
+            'yandex_export' => \skeeks\cms\shop\Module::t('app', 'Export to Yandex.Products'),
+            'subscription'  => \skeeks\cms\shop\Module::t('app', 'Subscription'),
+            'vat_id'        => \skeeks\cms\shop\Module::t('app', 'Vat ID'),
         ];
     }
 
