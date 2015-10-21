@@ -73,14 +73,14 @@ class ShopBuyer extends RelatedElementModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Название профиля'),
-            'cms_user_id' => Yii::t('app', 'Пользователь сайта'),
-            'shop_person_type_id' => Yii::t('app', 'Тип плательщика'),
+            'id'                    => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'            => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'            => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'            => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'            => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'name'                  => \skeeks\cms\shop\Module::t('app', 'The profile name'),
+            'cms_user_id'           => \skeeks\cms\shop\Module::t('app', 'User site'),
+            'shop_person_type_id'   => \skeeks\cms\shop\Module::t('app', 'Type payer'),
         ];
     }
 

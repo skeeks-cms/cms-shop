@@ -80,13 +80,13 @@ class ShopFuser extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'user_id' => Yii::t('app', 'User'),
-            'additional' => Yii::t('app', 'Additional'),
-            'person_type_id' => Yii::t('app', 'Person Type ID'),
-            'site_id' => Yii::t('app', 'Site ID'),
-            'delivery_code' => Yii::t('app', 'Delivery Code'),
-            'buyer_id' => Yii::t('app', 'Buyer ID'),
-            'pay_system_id' => Yii::t('app', 'Платежная система'),
+            'user_id'           => \skeeks\cms\shop\Module::t('app', 'User'),
+            'additional'        => \skeeks\cms\shop\Module::t('app', 'Additional'),
+            'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'Person Type ID'),
+            'site_id'           => \skeeks\cms\shop\Module::t('app', 'Site ID'),
+            'delivery_code'     => \skeeks\cms\shop\Module::t('app', 'Delivery Code'),
+            'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Buyer ID'),
+            'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Payment system'),
         ]);
     }
 

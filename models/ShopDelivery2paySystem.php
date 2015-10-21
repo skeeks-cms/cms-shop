@@ -46,13 +46,13 @@ class ShopDelivery2paySystem extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'pay_system_id' => Yii::t('app', 'Pay System ID'),
-            'delivery_id' => Yii::t('app', 'Delivery ID'),
+            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'pay_system_id' => \skeeks\cms\shop\Module::t('app', 'Pay System ID'),
+            'delivery_id'   => \skeeks\cms\shop\Module::t('app', 'Delivery ID'),
         ];
     }
 

@@ -63,21 +63,21 @@ class ShopAffiliatePlan extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'site_code' => Yii::t('app', 'Site'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'active' => Yii::t('app', 'Active'),
-            'base_rate' => Yii::t('app', 'Комиссия аффилиата'),
-            'base_rate_type' => Yii::t('app', 'Base Rate Type'),
-            'base_rate_currency_code' => Yii::t('app', 'Base Rate Currency Code'),
-            'min_pay' => Yii::t('app', 'Min Pay'),
-            'min_plan_value' => Yii::t('app', 'План действует при продаже не менее (шт.)'),
-            'value_currency_code' => Yii::t('app', 'Value Currency Code'),
+            'id'                        => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'                => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'                => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'                => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'                => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'site_code'                 => \skeeks\cms\shop\Module::t('app', 'Site'),
+            'name'                      => \skeeks\cms\shop\Module::t('app', 'Name'),
+            'description'               => \skeeks\cms\shop\Module::t('app', 'Description'),
+            'active'                    => \skeeks\cms\shop\Module::t('app', 'Active'),
+            'base_rate'                 => \skeeks\cms\shop\Module::t('app', 'Commission affiliate'),
+            'base_rate_type'            => \skeeks\cms\shop\Module::t('app', 'Base Rate Type'),
+            'base_rate_currency_code'   => \skeeks\cms\shop\Module::t('app', 'Base Rate Currency Code'),
+            'min_pay'                   => \skeeks\cms\shop\Module::t('app', 'Min Pay'),
+            'min_plan_value'            => \skeeks\cms\shop\Module::t('app', 'Plan of action on the sale of at least (pcs.)'),
+            'value_currency_code'       => \skeeks\cms\shop\Module::t('app', 'Value Currency Code'),
         ];
     }
 
