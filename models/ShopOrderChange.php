@@ -41,22 +41,22 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     static public function types()
     {
         return [
-            self::ORDER_ADDED               => 'Создание заказа',
-            self::ORDER_CANCELED            => 'Отмена заказа',
-            self::ORDER_STATUS_CHANGED      => 'Изменение статуса заказа',
-            self::ORDER_ALLOW_PAYMENT       => 'Оплата разрешена',
-            self::ORDER_ALLOW_DELIVERY      => 'Доставка разрешена',
+            self::ORDER_ADDED               => \skeeks\cms\shop\Module::t('app', 'Create Order'),
+            self::ORDER_CANCELED            => \skeeks\cms\shop\Module::t('app', 'Cancellations'),
+            self::ORDER_STATUS_CHANGED      => \skeeks\cms\shop\Module::t('app', 'Changing status'),
+            self::ORDER_ALLOW_PAYMENT       => \skeeks\cms\shop\Module::t('app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY      => \skeeks\cms\shop\Module::t('app', 'Shipping is permitted'),
         ];
     }
 
     static public function typeMessages()
     {
         return [
-            self::ORDER_ADDED               => 'Заказ создан',
+            self::ORDER_ADDED               => \skeeks\cms\shop\Module::t('app', 'The order created'),
             self::ORDER_CANCELED            => 'Заказ отменен. Причина: "{reason_canceled}"',
             self::ORDER_STATUS_CHANGED      => 'Статус изменен на: "{status}"',
-            self::ORDER_ALLOW_PAYMENT       => 'Оплата разрешена',
-            self::ORDER_ALLOW_DELIVERY      => 'Доставка разрешена',
+            self::ORDER_ALLOW_PAYMENT       => \skeeks\cms\shop\Module::t('app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY      => \skeeks\cms\shop\Module::t('app', 'Shipping is permitted'),
         ];
     }
 
