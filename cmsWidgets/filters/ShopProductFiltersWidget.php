@@ -74,14 +74,18 @@ class ShopProductFiltersWidget extends WidgetRenderable
             $this->searchModel = new \skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel();
         }
 
-        if (!$this->searchRelatedPropertiesModel)
+        if (!$this->searchRelatedPropertiesModel && $this->cmsContent)
         {
             $this->searchRelatedPropertiesModel = new SearchRelatedPropertiesModel();
             $this->searchRelatedPropertiesModel->initCmsContent($this->cmsContent);
         }
 
         $this->searchModel->load(\Yii::$app->request->get());
-        $this->searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+
+        if ($this->searchRelatedPropertiesModel)
+        {
+            $this->searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+        }
     }
 
 
@@ -135,6 +139,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     public function search(ActiveDataProvider $activeDataProvider)
     {
         $this->searchModel->search($activeDataProvider);
-        $this->searchRelatedPropertiesModel->search($activeDataProvider);
+
+
+        if ($this->searchRelatedPropertiesModel)
+        {
+            $this->searchRelatedPropertiesModel->search($activeDataProvider);
+        }
     }
 }

@@ -39,7 +39,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'sort'              => [
                 'defaultOrder' =>
                 [
-                    'priority' => SORT_DESC
+                    'priority' => SORT_ASC
                 ]
             ],
 

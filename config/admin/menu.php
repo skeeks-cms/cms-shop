@@ -125,7 +125,7 @@ return [
 
                 'items' => [
 
-                    [
+                    /*[
                         "label"     => \skeeks\cms\shop\Module::t('app', 'Rules for the basket'),
                         'items' =>
                         [
@@ -140,7 +140,7 @@ return [
                             ]
 
                         ]
-                    ],
+                    ],*/
 
                     [
                         "label"     => \skeeks\cms\shop\Module::t('app', 'Discount goods'),
@@ -151,10 +151,10 @@ return [
                                 "url"       => ["shop/admin-discount"],
                             ],
 
-                            [
+                            /*[
                                 "label"     => \skeeks\cms\shop\Module::t('app', 'Coupons discount goods'),
                                 "url"       => ["shop/admin-cupon"],
-                            ]
+                            ]*/
 
                         ]
                     ],

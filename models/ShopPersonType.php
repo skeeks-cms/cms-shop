@@ -202,7 +202,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getShopPersonTypeProperties()
     {
-        return $this->hasMany(ShopPersonTypeProperty::className(), ['shop_person_type_id' => 'id'])->orderBy(['priority' => SORT_DESC]);
+        return $this->hasMany(ShopPersonTypeProperty::className(), ['shop_person_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 
 
