@@ -24,7 +24,7 @@ function shopProductsMenu()
         return $result;
     }
 
-    if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority DESC")->andWhere([
+    if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
         'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id')
     ])->all())
     {
