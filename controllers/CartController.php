@@ -317,7 +317,7 @@ class CartController extends Controller
 
                         if (!$order->isNewRecord)
                         {
-                            $rr->message = \skeeks\cms\shop\Module::t('app', 'The order created successfully');
+                            $rr->message = \skeeks\cms\shop\Module::t('app', 'The order #{order_id} created successfully', ['order_id' => $order->id]);
                             $rr->success = true;
                             $rr->redirect = Url::to(['/shop/order/view', 'id' => $order->id]);
                             $rr->data = [
