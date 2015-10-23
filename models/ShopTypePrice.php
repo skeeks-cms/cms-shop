@@ -102,11 +102,11 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code' => Yii::t('app', 'Code'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'priority' => Yii::t('app', 'Priority'),
-            'def' => Yii::t('app', 'Default'),
+            'code'          => \skeeks\cms\shop\Module::t('app', 'Code'),
+            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
+            'description'   => \skeeks\cms\shop\Module::t('app', 'Description'),
+            'priority'      => \skeeks\cms\shop\Module::t('app', 'Priority'),
+            'def'           => \skeeks\cms\shop\Module::t('app', 'Default'),
         ]);
     }
 

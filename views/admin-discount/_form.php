@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
     <?= $form->fieldCheckboxBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
@@ -36,15 +36,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Условия'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Conditions')); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Ограничения'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Limitations')); ?>
 
     <?= $form->field($model, 'typePrices')->checkboxList(\yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
-    ))->hint('если ничего не выделено, то подразумеваются все'); ?>
+    ))->hint(\skeeks\cms\shop\Module::t('app', 'if nothing is selected, it means all')); ?>
 
 
      <? \yii\bootstrap\Alert::begin([
@@ -57,14 +57,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
         <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
             'permissionName'            => $model->permissionName,
-            'permissionDescription'     => "Группы пользователей, которые могут воспользоваться скидкой: '{$model->name}'",
-            'label'                     => 'Группы пользователей, которые могут воспользоваться скидкой',
+            'permissionDescription'     => \skeeks\cms\shop\Module::t('app', 'Groups of users who can benefit from discounted rates').": '{$model->name}'",
+            'label'                     => \skeeks\cms\shop\Module::t('app', 'Groups of users who can benefit from discounted rates'),
         ]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet('Купоны'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Coupons')); ?>
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->buttonsCreateOrUpdate($model); ?>

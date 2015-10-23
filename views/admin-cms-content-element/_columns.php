@@ -74,7 +74,7 @@ return [
 
         },
         'format' => 'raw',
-        'label' => 'Дополнительные разделы',
+        'label' => \skeeks\cms\shop\Module::t('app', 'Advanced Topics'),
     ],
 
     [
@@ -84,7 +84,7 @@ return [
 
 
     [
-        'label' => 'Базовая цена',
+        'label' => \skeeks\cms\shop\Module::t('app', 'Base price'),
         'class' => \yii\grid\DataColumn::className(),
         'value' => function(\skeeks\cms\models\CmsContentElement $model)
         {
@@ -105,7 +105,7 @@ return [
 
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
                 'target' => '_blank',
-                'title' => 'Посмотреть на сайте (Откроется в новом окне)',
+                'title' => \skeeks\cms\shop\Module::t('app', 'View online (opens new window)'),
                 'data-pjax' => '0',
                 'class' => 'btn btn-default btn-sm'
             ]);

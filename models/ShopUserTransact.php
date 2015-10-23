@@ -58,18 +58,18 @@ class ShopUserTransact extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'cms_user_id' => Yii::t('app', 'Cms User ID'),
-            'shop_order_id' => Yii::t('app', 'Shop Order ID'),
-            'amount' => Yii::t('app', 'Amount'),
-            'currency_code' => Yii::t('app', 'Currency Code'),
-            'debit' => Yii::t('app', 'Debit'),
-            'description' => Yii::t('app', 'Description'),
-            'notes' => Yii::t('app', 'Notes'),
+            'id'                => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'        => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'        => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'        => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'        => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'cms_user_id'       => \skeeks\cms\shop\Module::t('app', 'Cms User ID'),
+            'shop_order_id'     => \skeeks\cms\shop\Module::t('app', 'Shop Order ID'),
+            'amount'            => \skeeks\cms\shop\Module::t('app', 'Amount'),
+            'currency_code'     => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
+            'debit'             => \skeeks\cms\shop\Module::t('app', 'Debit'),
+            'description'       => \skeeks\cms\shop\Module::t('app', 'Description'),
+            'notes'             => \skeeks\cms\shop\Module::t('app', 'Notes'),
         ];
     }
 

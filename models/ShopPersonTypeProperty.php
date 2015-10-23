@@ -119,13 +119,13 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
             'smart_filtrable'           => \skeeks\cms\shop\Module::t('app', 'Smart Filtrable'),
             'shop_person_type_id'       => \skeeks\cms\shop\Module::t('app', 'Shop Person Type ID'),
             'is_order_location_delivery' => \skeeks\cms\shop\Module::t('app', 'The value of the properties will be used as the location of the buyer to calculate the cost of delivery (only for type LOCATION)'),
-            'is_order_location_tax'     => \skeeks\cms\shop\Module::t('app', 'Значение свойства будет использовано как местоположение покупателя для расчета налогов (только для свойств типа LOCATION)'),
-            'is_order_postcode'         => \skeeks\cms\shop\Module::t('app', 'Значение свойства будет использовано как почтовый индекс покупателя для расчета стоимости доставки'),
-            'is_user_email'             => \skeeks\cms\shop\Module::t('app', 'Значение свойства будет использовано как E-Mail при регистрации нового пользователя'),
-            'is_user_phone'             => \skeeks\cms\shop\Module::t('app', 'Значение свойства будет использовано как Телефон при регистрации нового пользователя'),
-            'is_user_username'          => \skeeks\cms\shop\Module::t('app', 'Значение свойства будет использовано как Логин при регистрации нового пользователя'),
-            'is_user_name'              => \skeeks\cms\shop\Module::t('app', 'Значение свойства будет использовано как Имя при регистрации нового пользователя'),
-            'is_buyer_name'             => \skeeks\cms\shop\Module::t('app', 'Значение свойства будет использовано как Имя профиля покупателя'),
+            'is_order_location_tax'     => \skeeks\cms\shop\Module::t('app', 'The value of the properties will be used as the location of the buyer to calculate the tax (only for type LOCATION)'),
+            'is_order_postcode'         => \skeeks\cms\shop\Module::t('app', 'The value of the properties will be used as the postcode for the buyer to calculate the cost of delivery'),
+            'is_user_email'             => \skeeks\cms\shop\Module::t('app', 'The value of the properties will be used as the E-Mail with the new user registration'),
+            'is_user_phone'             => \skeeks\cms\shop\Module::t('app', 'The value of the properties will be used as a phone when registering a new user'),
+            'is_user_username'          => \skeeks\cms\shop\Module::t('app', 'The value of the properties will be used as the login when registering a new user'),
+            'is_user_name'              => \skeeks\cms\shop\Module::t('app', 'The property value is used as a name when registering a new user'),
+            'is_buyer_name'             => \skeeks\cms\shop\Module::t('app', 'The value of the properties will be used as the name of the buyer profile'),
         ]);
     }
 

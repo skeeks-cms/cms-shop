@@ -112,11 +112,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?= $form->fieldSetEnd(); ?>
-<?= $form->fieldSet('Платежные системы'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Payment systems')); ?>
 
     <?= $form->field($model, 'shopPaySystems')->checkboxList(\yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopPaySystem::find()->active()->all(), 'id', 'name'
-    ))->hint('если ничего не выделено, то подразумеваются все'); ?>
+    ))->hint(\skeeks\cms\shop\Module::t('app', 'if nothing is selected, it means all')); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
