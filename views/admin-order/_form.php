@@ -14,7 +14,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Общая информация'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'General information')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => 'Заказ'
@@ -26,25 +26,25 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label' => 'Номер заказа',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Number of order'),
                     'format' => 'raw',
                     'value' => $model->id,
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Создан',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Created At'),
                     'format' => 'raw',
                     'value' => \Yii::$app->formatter->asDatetime($model->created_at),
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Последнее изменение',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Last modified'),
                     'format' => 'raw',
                     'value' => \Yii::$app->formatter->asDatetime($model->updated_at),
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Статус',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Status'),
                     'format' => 'raw',
                     'value' => "<p>" . $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
                                     \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
@@ -52,7 +52,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Отменен',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Canceled'),
                     'format' => 'raw',
                     'value' => "<p>" . $form->fieldRadioListBoolean($model, 'canceled')->label(false) . "</p><p>" .
                             $form->field($model, 'reason_canceled')->textarea(['rows' => 5])
@@ -60,7 +60,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Дата изменения статуса',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Date of status change'),
                     'format' => 'raw',
                     'value' => \Yii::$app->formatter->asDatetime($model->status_at),
                 ],
@@ -69,7 +69,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ])?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Покупатель'
+        'content' => \skeeks\cms\shop\Module::t('app', 'Buyer')
     ])?>
 
         <?= \yii\widgets\DetailView::widget([
@@ -78,19 +78,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label'     => 'Пользователь',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'User'),
                     'format'    => 'raw',
                     'value'     => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->user]))->run()
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Тип плательщика',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Type payer'),
                     'format' => 'raw',
                     'value' => $model->personType->name,
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Профиль покупателя',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Profile of buyer'),
                     'format' => 'raw',
                     'value' => Html::a($model->buyer->name . " [{$model->buyer->id}]", \skeeks\cms\helpers\UrlHelper::construct(['/shop/admin-buyer/update', 'pk' => $model->buyer->id ])->enableAdmin(), [
                         'data-pjax' => 0
@@ -102,7 +102,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ])?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Данные покупателя'
+        'content' => \skeeks\cms\shop\Module::t('app', 'Customer data')
     ])?>
         <?= \yii\widgets\DetailView::widget([
             'model' => $model->buyer->relatedPropertiesModel,
@@ -113,7 +113,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Оплата'
+        'content' => \skeeks\cms\shop\Module::t('app', 'Payment order')
     ])?>
         <?= \yii\widgets\DetailView::widget([
             'model' => $model,
@@ -121,25 +121,25 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label'     => 'Способ оплаты',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'Payment method'),
                     'format'    => 'raw',
                     'value'     => $model->paySystem->name,
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Дата',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Date'),
                     'format' => 'raw',
                     'value' => \Yii::$app->formatter->asDatetime($model->payed_at),
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Оплачен',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Payed'),
                     'format' => 'raw',
                     'value' => $model->payed,
                 ],
 
                 [                      // the owner name of the model
-                    'label' => 'Разрешить оплату',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Allow payment'),
                     'format' => 'raw',
                     'value' => $form->fieldRadioListBoolean($model, 'allow_payment')->label(false),
                 ],
@@ -149,7 +149,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ])?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Доставка'
+        'content' => \skeeks\cms\shop\Module::t('app', 'Shipping')
     ])?>
 
         <?= \yii\widgets\DetailView::widget([
@@ -158,7 +158,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label'     => 'Служба доставки',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'Delivery service'),
                     'format'    => 'raw',
                     'value'     => $model->delivery->id,
                 ],
@@ -181,18 +181,18 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label'     => 'Комментарий',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'Comment'),
                     'format'    => 'raw',
                     'value'     => $form->field($model, 'comments')->textarea([
                         'rows' => 5
-                    ])->hint('Внутренний комментарий, клиент (покупатель) не видит')->label(false),
+                    ])->hint(\skeeks\cms\shop\Module::t('app', 'Internal comment, the customer (buyer) does not see'))->label(false),
                 ],
             ]
         ])?>
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Состав заказа'
+        'content' => \skeeks\cms\shop\Module::t('app', 'The composition of the order')
     ])?>
 
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
@@ -252,14 +252,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'label' => 'Цена',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
                     'attribute' => 'price',
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
                         if ($shopBasket->discount_value)
                         {
-                            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', "Скидка: " . $shopBasket->discount_value);
+                            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \skeeks\cms\shop\Module::t('app', 'Discount').": " . $shopBasket->discount_value);
                         } else
                         {
                             return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
@@ -269,7 +269,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 ],
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'label' => 'Сумма',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Sum'),
                     'attribute' => 'price',
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
@@ -300,37 +300,37 @@ CSS
                     "options" => ['class' => 'sx-result-table table detail-view'],
                     'attributes' => [
                         [
-                            'label' => 'Общая стоимость товаров',
+                            'label' => \skeeks\cms\shop\Module::t('app', 'The total value of the goods'),
                             'value' => \Yii::$app->money->intlFormatter()->format($model->moneyOriginal),
                         ],
 
                         [
-                            'label' => 'Скидка, наценка',
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Discount, margin'),
                             'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDiscount),
                         ],
 
                         [
-                            'label' => 'Доставка',
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Delivery service'),
                             'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDelivery),
                         ],
 
                         [
-                            'label' => 'Налог',
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Taxe'),
                             'value' => \Yii::$app->money->intlFormatter()->format($model->moneyVat),
                         ],
 
                         [
-                            'label' => 'Вес',
-                            'value' => $model->weight . " г.",
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Weight'),
+                            'value' => $model->weight . " ".\skeeks\cms\shop\Module::t('app', 'g.'),
                         ],
 
                         [
-                            'label' => 'Уже оплачено',
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Already paid'),
                             'value' => \Yii::$app->money->intlFormatter()->format($model->moneySummPaid),
                         ],
 
                         [
-                            'label' => 'Итого',
+                            'label' => \skeeks\cms\shop\Module::t('app', 'In total'),
                             'format' => 'raw',
                             'value' => Html::tag('b', \Yii::$app->money->intlFormatter()->format($model->money)),
                         ]
@@ -346,7 +346,7 @@ CSS
 
 
 
-<?= $form->fieldSet('История изменений'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'History of changes')); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
             'dataProvider' => new \yii\data\ArrayDataProvider([
@@ -361,7 +361,7 @@ CSS
 
                 [
                     'class'     => \yii\grid\DataColumn::className(),
-                    'label'     => 'Пользователь',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'User'),
                     'format'    => 'raw',
                     'value'     => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
                     {
@@ -372,7 +372,7 @@ CSS
                 [
                     'class' => \yii\grid\DataColumn::className(),
                     'attribute' => 'type',
-                    'label' => 'Операция',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Transaction'),
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
                     {
@@ -382,7 +382,7 @@ CSS
                 [
                     'class' => \yii\grid\DataColumn::className(),
                     'attribute' => 'type',
-                    'label' => 'Описание',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Description'),
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
                     {
