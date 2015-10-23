@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
@@ -28,7 +28,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <div class="row">
         <div class="col-md-6">
             <?= $form->fieldSelect($model, 'component', [
-                'Базовые платежные системы'          =>
+                \skeeks\cms\shop\Module::t('app', 'Basic payment systems')          =>
                 [
                     \skeeks\cms\shop\paySystems\RobocassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobocassaPaySystem())->descriptor->name
                 ],
@@ -42,7 +42,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 \skeeks\cms\widgets\formInputs\componentSettings\ComponentSettingsWidget::className(),
                 [
                     'componentSelectId' => Html::getInputId($model, "component"),
-                    'buttonText'        => "Настройки обработчика",
+                    'buttonText'        => \skeeks\cms\shop\Module::t('app', 'Settings handler'),
                     'buttonClasses'     => "sx-btn-edit btn btn-default"
                 ]
             ); ?>
