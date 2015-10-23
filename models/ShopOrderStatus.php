@@ -90,11 +90,11 @@ class ShopOrderStatus extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code' => Yii::t('app', 'Код'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Описание'),
-            'priority' => Yii::t('app', 'Priority'),
-            'color' => Yii::t('app', 'Color'),
+            'code'          => \skeeks\cms\shop\Module::t('app', 'Code'),
+            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
+            'description'   => \skeeks\cms\shop\Module::t('app', 'Description'),
+            'priority'      => \skeeks\cms\shop\Module::t('app', 'Priority'),
+            'color'         => \skeeks\cms\shop\Module::t('app', 'Color'),
         ]);
     }
 
@@ -120,7 +120,7 @@ class ShopOrderStatus extends Core
     {
         if(!preg_match('/^[A-Z]$/', $this->$attribute))
         {
-            $this->addError($attribute, 'Используйте только заглавные буквы латинского алфавита.');
+            $this->addError($attribute, \skeeks\cms\shop\Module::t('app', 'Use only uppercase letters of the Latin alphabet.'));
         }
     }
 

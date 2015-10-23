@@ -79,7 +79,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
         {
             if (!static::find()->active()->andWhere(['!=', 'id', $this->id])->count())
             {
-                throw new Exception("Необходим хотя бы один активный типа плательщика");
+                throw new Exception("Requires at least one active payer type");
             }
         }
     }
@@ -142,7 +142,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
     {
         if($this->$attribute == Cms::BOOL_N && !static::find()->active()->andWhere(['!=', 'id', $this->id])->count())
         {
-            $this->addError($attribute, 'Необходимо оставить на сайте хотя бы один активный тип плательщика');
+            $this->addError($attribute, 'It is necessary at least  to leave one active payer type in the site');
         }
     }
 
@@ -152,10 +152,10 @@ class ShopPersonType extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name' => Yii::t('app', 'Name'),
-            'priority' => Yii::t('app', 'Priority'),
-            'active' => Yii::t('app', 'Active'),
-            'siteCodes' => Yii::t('app', 'Сайты'),
+            'name'      => \skeeks\cms\shop\Module::t('app', 'Name'),
+            'priority'  => \skeeks\cms\shop\Module::t('app', 'Priority'),
+            'active'    => \skeeks\cms\shop\Module::t('app', 'Active'),
+            'siteCodes' => \skeeks\cms\shop\Module::t('app', 'Sites'),
         ]);
     }
 
