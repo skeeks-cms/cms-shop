@@ -59,15 +59,15 @@ class ShopTax extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'code' => Yii::t('app', 'Code'),
-            'site_code' => Yii::t('app', 'Site'),
+            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
+            'description'   => \skeeks\cms\shop\Module::t('app', 'Description'),
+            'code'          => \skeeks\cms\shop\Module::t('app', 'Code'),
+            'site_code'     => \skeeks\cms\shop\Module::t('app', 'Site'),
         ]);
     }
 

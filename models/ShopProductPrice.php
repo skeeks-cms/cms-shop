@@ -59,18 +59,18 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'product_id' => Yii::t('app', 'Product ID'),
-            'type_price_id' => Yii::t('app', 'Type Price ID'),
-            'price' => Yii::t('app', 'Price'),
-            'currency_code' => Yii::t('app', 'Currency Code'),
-            'quantity_from' => Yii::t('app', 'Quantity From'),
-            'quantity_to' => Yii::t('app', 'Quantity To'),
-            'tmp_id' => Yii::t('app', 'Tmp ID'),
+            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'product_id'    => \skeeks\cms\shop\Module::t('app', 'Product ID'),
+            'type_price_id' => \skeeks\cms\shop\Module::t('app', 'Type Price ID'),
+            'price'         => \skeeks\cms\shop\Module::t('app', 'Price'),
+            'currency_code' => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
+            'quantity_from' => \skeeks\cms\shop\Module::t('app', 'Quantity From'),
+            'quantity_to'   => \skeeks\cms\shop\Module::t('app', 'Quantity To'),
+            'tmp_id'        => \skeeks\cms\shop\Module::t('app', 'Tmp ID'),
         ];
     }
 

@@ -26,25 +26,25 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label' => 'Пользователь сайта',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'User site'),
                     'format' => 'raw',
                     'value' => ($model->avatarSrc ? Html::img($model->avatarSrc) . " " : "") . $model->username,
                 ],
 
                 'email',
                 [                      // the owner name of the model
-                    'label' => 'Дата регистрации',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Date of registration'),
                     'format' => 'raw',
                     'value' =>\Yii::$app->formatter->asDatetime($model->created_at),
                 ],
 
                 [                      // the owner name of the model
-                  'label' => 'Дата последноего входа',
+                  'label' => \skeeks\cms\shop\Module::t('app', 'Date of last login'),
                   'format' => 'raw',
                   'value' => \Yii::$app->formatter->asDatetime($model->logged_at),
                 ],
                 [                      // the owner name of the model
-                  'label' => 'Группы пользователя',
+                  'label' => \skeeks\cms\shop\Module::t('app', 'User groups'),
                   'value' => '',
                 ],
             ]
@@ -69,19 +69,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'attributes'    =>
             [
                 [                      // the owner name of the model
-                    'label'     => 'Количество заказов (оплаченные/все)',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'Orders (paid / total)'),
                     'format'    => 'raw',
                     'value'     => \yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed') . "/" . \yii\helpers\ArrayHelper::getValue($userStatistics, 'total'),
                 ],
 
                 [                      // the owner name of the model
-                    'label'     => 'Оплаченных заказов на сумму',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'Paid orders worth'),
                     'format'    => 'raw',
                     'value'     => "",
                 ],
 
                 [                      // the owner name of the model
-                    'label'     => 'Средняя стоимость оплаченных заказа',
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'The average price paid orders'),
                     'format'    => 'raw',
                     'value'     => "",
                 ],
@@ -181,7 +181,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 'class'         => \yii\grid\DataColumn::className(),
                 'format'        => 'raw',
                 'attribute'     => 'price',
-                'label'         => 'Сумма',
+                'label'         => \skeeks\cms\shop\Module::t('app', 'Sum'),
                 'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
                 {
                     return \Yii::$app->money->intlFormatter()->format($model->money);
@@ -192,7 +192,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 'class'         => \yii\grid\DataColumn::className(),
                 'attribute'     => 'site_id',
                 'format'        => 'raw',
-                'label'         => 'Сайт',
+                'label'         => \skeeks\cms\shop\Module::t('app', 'Site'),
                 'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
                 {
                     return $model->site->name . " [{$model->site->code}]";
@@ -212,12 +212,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     $fuser = \skeeks\cms\shop\models\ShopFuser::find()->where(['user_id' => $model->id])->one();
 ?>
 
-<?= $form->fieldSet('Корзина (' . \skeeks\cms\shop\models\ShopBasket::find()->where([
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Basket').' (' . \skeeks\cms\shop\models\ShopBasket::find()->where([
                 'fuser_id' => $fuser->id
             ])->count() . ")"); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'В текущий момент в коризине у пользователя'
+        'content' => \skeeks\cms\shop\Module::t('app', 'At the moment the user in a basket')
     ]); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
@@ -240,7 +240,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
             [
                 'class' => \yii\grid\DataColumn::className(),
-                'label' => 'Цена позиции',
+                'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
                 'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                 {
                     return \Yii::$app->money->intlFormatter()->format($shopBasket->money);
@@ -263,7 +263,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet("Просмотренные товары (" . \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Viewed products')." (" . \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
                 'shop_fuser_id' => $fuser->id
             ])->count() .  ")"); ?>
 
@@ -277,12 +277,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         [
             [
                 'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
-                'label' => "Дата просмотра",
+                'label' => \skeeks\cms\shop\Module::t('app', 'Date views'),
             ],
 
             [
                 'class' => \yii\grid\DataColumn::className(),
-                'label' => "Товар",
+                'label' => \skeeks\cms\shop\Module::t('app', 'Good'),
                 'value' => function(\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct)
                 {
                     if ($shopViewedProduct->shopProduct)

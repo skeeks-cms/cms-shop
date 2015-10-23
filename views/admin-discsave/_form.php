@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Накопительная программа'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Cumulative program')); ?>
 
     <?= $form->fieldCheckboxBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
@@ -25,18 +25,18 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Валюта сумм оплаченных заказов и скидок'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Currency amount paid orders and discounts')); ?>
     <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
         \skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'
     )); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Ограничения'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Limitations')); ?>
 
     <?= $form->field($model, 'typePrices')->checkboxList(\yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
-    ))->hint('если ничего не выделено, то подразумеваются все'); ?>
+    ))->hint(\skeeks\cms\shop\Module::t('app', 'if nothing is selected, it means all')); ?>
 
 
      <? \yii\bootstrap\Alert::begin([
@@ -49,8 +49,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
         <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
             'permissionName'            => $model->permissionName,
-            'permissionDescription'     => "Группы пользователей, которые могут воспользоваться скидкой: '{$model->name}'",
-            'label'                     => 'Группы пользователей, которые могут воспользоваться скидкой',
+            'permissionDescription'     => \skeeks\cms\shop\Module::t('app', 'Groups of users who can benefit from discounted rates').": '{$model->name}'",
+            'label'                     => \skeeks\cms\shop\Module::t('app', 'Groups of users who can benefit from discounted rates'),
         ]); ?>
 
 <?= $form->fieldSetEnd(); ?>

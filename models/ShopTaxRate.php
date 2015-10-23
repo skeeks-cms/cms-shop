@@ -68,19 +68,19 @@ class ShopTaxRate extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'tax_id' => Yii::t('app', 'Налог'),
-            'person_type_id' => Yii::t('app', 'Плательщик'),
-            'value' => Yii::t('app', 'Value'),
-            'currency' => Yii::t('app', 'Currency'),
-            'is_percent' => Yii::t('app', 'Is Percent'),
-            'is_in_price' => Yii::t('app', 'Входит в цену'),
-            'priority' => Yii::t('app', 'Порядок применения'),
-            'active' => Yii::t('app', 'Active'),
+            'id'                => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'        => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'        => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'        => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'        => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'tax_id'            => \skeeks\cms\shop\Module::t('app', 'Income tax'),
+            'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'Payer'),
+            'value'             => \skeeks\cms\shop\Module::t('app', 'Value'),
+            'currency'          => \skeeks\cms\shop\Module::t('app', 'Currency'),
+            'is_percent'        => \skeeks\cms\shop\Module::t('app', 'Is Percent'),
+            'is_in_price'       => \skeeks\cms\shop\Module::t('app', 'Included in the price'),
+            'priority'          => \skeeks\cms\shop\Module::t('app', 'The order of application'),
+            'active'            => \skeeks\cms\shop\Module::t('app', 'Active'),
         ]);
     }
 

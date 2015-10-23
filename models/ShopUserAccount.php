@@ -59,17 +59,17 @@ class ShopUserAccount extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'user_id' => Yii::t('app', 'User'),
-            'current_budget' => Yii::t('app', 'Сумма на счете'),
-            'currency_code' => Yii::t('app', 'Currency Code'),
-            'locked' => Yii::t('app', 'Заблокирован'),
-            'locked_at' => Yii::t('app', 'Locked At'),
-            'notes' => Yii::t('app', 'Заметки'),
+            'id'                => \skeeks\cms\shop\Module::t('app', 'ID'),
+            'created_by'        => \skeeks\cms\shop\Module::t('app', 'Created By'),
+            'updated_by'        => \skeeks\cms\shop\Module::t('app', 'Updated By'),
+            'created_at'        => \skeeks\cms\shop\Module::t('app', 'Created At'),
+            'updated_at'        => \skeeks\cms\shop\Module::t('app', 'Updated At'),
+            'user_id'           => \skeeks\cms\shop\Module::t('app', 'User'),
+            'current_budget'    => \skeeks\cms\shop\Module::t('app', 'The amount in the account'),
+            'currency_code'     => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
+            'locked'            => \skeeks\cms\shop\Module::t('app', 'Locked'),
+            'locked_at'         => \skeeks\cms\shop\Module::t('app', 'Locked At'),
+            'notes'             => \skeeks\cms\shop\Module::t('app', 'Notes'),
         ];
     }
 

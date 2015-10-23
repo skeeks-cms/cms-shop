@@ -57,7 +57,7 @@ class RobocassaPaySystem extends PaySystemHandlerComponent
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'baseUrl'                           => 'Путь на api сервиса robocassa',
+            'baseUrl'                           => \skeeks\cms\shop\Module::t('app', 'Road to the api service robocassa'),
             'sMerchantLogin'                    => 'sMerchantLogin',
             'sMerchantPass1'                    => 'sMerchantPass1',
             'sMerchantPass2'                    => 'sMerchantPass2',
@@ -86,7 +86,7 @@ class RobocassaPaySystem extends PaySystemHandlerComponent
      */
     public function paymentResponse(ShopOrder $shopOrder)
     {
-        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id, 'Оплата заказа', null, $shopOrder->user->email);
+        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id, \skeeks\cms\shop\Module::t('app', 'Payment order'), null, $shopOrder->user->email);
     }
 
 }
