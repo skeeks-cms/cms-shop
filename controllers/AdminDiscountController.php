@@ -64,6 +64,14 @@ class AdminDiscountController extends AdminModelEditorController
                     {
                         $activeDataProvider->query->andWhere(['type' => ShopDiscount::TYPE_DEFAULT]);
                     },
+                    "gridConfig" =>
+                    [
+                        'settingsData' =>
+                        [
+                            'order' => SORT_ASC,
+                            'orderBy' => "priority",
+                        ]
+                    ],
                     "columns"               => [
                         'id',
 
@@ -108,7 +116,9 @@ class AdminDiscountController extends AdminModelEditorController
 
                         [
                             'class' => UpdatedAtColumn::className()
-                        ]
+                        ],
+
+                        'priority'
                     ],
                 ],
 

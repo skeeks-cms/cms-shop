@@ -57,6 +57,15 @@ class AdminStoreController extends AdminModelEditorController
             [
                 'index' =>
                 [
+                    "gridConfig" =>
+                    [
+                        'settingsData' =>
+                        [
+                            'order' => SORT_ASC,
+                            'orderBy' => "priority",
+                        ]
+                    ],
+
                     "columns"               => [
                         'id',
                         'priority',

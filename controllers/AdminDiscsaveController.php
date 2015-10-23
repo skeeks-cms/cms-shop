@@ -65,6 +65,15 @@ class AdminDiscsaveController extends AdminModelEditorController
                         $activeDataProvider->query->andWhere(['type' => ShopDiscount::TYPE_DISCOUNT_SAVE]);
 
                     },
+                    "gridConfig" =>
+                    [
+                        'settingsData' =>
+                        [
+                            'order' => SORT_ASC,
+                            'orderBy' => "priority",
+                        ]
+                    ],
+
                     "columns"               => [
                         'id',
 
@@ -84,7 +93,9 @@ class AdminDiscsaveController extends AdminModelEditorController
 
                         [
                             'class' => UpdatedAtColumn::className()
-                        ]
+                        ],
+
+                        'priority',
                     ],
                 ],
 

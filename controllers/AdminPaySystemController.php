@@ -46,6 +46,15 @@ class AdminPaySystemController extends AdminModelEditorController
             [
                 'index' =>
                 [
+                    "gridConfig" =>
+                    [
+                        'settingsData' =>
+                        [
+                            'order' => SORT_ASC,
+                            'orderBy' => "priority",
+                        ]
+                    ],
+
                     "columns"      => [
                         'name',
                         'priority',
