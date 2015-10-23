@@ -127,7 +127,7 @@ class AdminOrderController extends AdminModelEditorController
 HTML;
 
                                     }
-                                    return implode('<hr />', $result);
+                                    return implode('<hr style="margin: 0px;"/>', $result);
                                 }
                             },
                         ],
