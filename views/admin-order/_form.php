@@ -160,7 +160,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 [                      // the owner name of the model
                     'label'     => \skeeks\cms\shop\Module::t('app', 'Delivery service'),
                     'format'    => 'raw',
-                    'value'     => $model->delivery->id,
+                    'value'     => $model->delivery->name,
                 ],
 
 

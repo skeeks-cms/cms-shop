@@ -405,6 +405,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->pay_system_id   = $shopFuser->paySystem->id;
         $order->tax_value       = $shopFuser->moneyVat->getValue();
         $order->discount_value  = $shopFuser->moneyDiscount->getValue();
+        $order->delivery_id     = $shopFuser->delivery_id;
 
         if ($order->save())
         {

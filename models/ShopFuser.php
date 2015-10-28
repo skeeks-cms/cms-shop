@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property User           $user
  * @property ShopBasket[]   $shopBaskets
+ * @property ShopDelivery   $delivery
  * @property ShopBuyer      $buyer
  * @property ShopPaySystem $paySystem
  *
@@ -41,7 +42,7 @@ use yii\helpers\ArrayHelper;
  * @property string $additional
  * @property integer $person_type_id
  * @property integer $site_id
- * @property string $delivery_code
+ * @property integer $delivery_id
  * @property integer $buyer_id
  * @property integer $pay_system_id
  *
@@ -84,7 +85,7 @@ class ShopFuser extends Core
             'additional'        => \skeeks\cms\shop\Module::t('app', 'Additional'),
             'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'Person Type ID'),
             'site_id'           => \skeeks\cms\shop\Module::t('app', 'Site ID'),
-            'delivery_code'     => \skeeks\cms\shop\Module::t('app', 'Delivery Code'),
+            'delivery_id'       => \skeeks\cms\shop\Module::t('app', 'Delivery'),
             'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Buyer ID'),
             'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Payment system'),
         ]);
@@ -107,7 +108,7 @@ class ShopFuser extends Core
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'user_id', 'person_type_id', 'site_id'], 'integer'],
             [['additional'], 'string'],
-            [['delivery_code'], 'string', 'max' => 50],
+            [['delivery_id'], 'integer'],
             [['user_id'], 'unique'],
             [['buyer_id'], 'integer'],
             [['pay_system_id'], 'integer'],
@@ -166,6 +167,14 @@ class ShopFuser extends Core
         return $this->hasMany(ShopBasket::className(), ['fuser_id' => 'id']);
     }
 
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDelivery()
+    {
+        return $this->hasOne(ShopDelivery::className(), ['id' => 'delivery_id']);
+    }
 
     /**
      *
@@ -379,7 +388,6 @@ class ShopFuser extends Core
     {
         return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
     }
-
 
 
     /**

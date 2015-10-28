@@ -162,7 +162,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
     }
 
     /**
-     * Итоговая стоимость доставки
+     * РС‚РѕРіРѕРІР°СЏ СЃС‚РѕРёРјРѕСЃС‚СЊ РґРѕСЃС‚Р°РІРєРё
      *
      * @return Money
      */

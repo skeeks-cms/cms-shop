@@ -13,6 +13,4 @@ use skeeks\cms\base\Component;
  * @package skeeks\cms\shop\components
  */
 class PaySystemHandlerComponent extends Component
-{
-
-}
+{}
