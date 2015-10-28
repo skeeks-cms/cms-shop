@@ -407,6 +407,12 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->discount_value  = $shopFuser->moneyDiscount->getValue();
         $order->delivery_id     = $shopFuser->delivery_id;
 
+        if ($shopFuser->delivery)
+        {
+            $order->price_delivery  = $shopFuser->delivery->money->getAmount() / $shopFuser->delivery->money->getCurrency()->getSubUnit();
+        }
+
+
         if ($order->save())
         {
             foreach ($shopFuser->shopBaskets as $basket)

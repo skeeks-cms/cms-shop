@@ -255,6 +255,11 @@ class ShopFuser extends Core
             $money = $money->add($shopBasket->money->multiply($shopBasket->quantity));
         }
 
+        if ($this->moneyDelivery)
+        {
+            $money = $money->add($this->moneyDelivery);
+        }
+
         return $money;
     }
 
@@ -334,8 +339,7 @@ class ShopFuser extends Core
      */
     public function getMoneyDelivery()
     {
-        $money = \Yii::$app->money->newMoney();
-        return $money;
+        return $this->delivery->money;
     }
 
 

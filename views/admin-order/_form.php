@@ -135,7 +135,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 [                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Payed'),
                     'format' => 'raw',
-                    'value' => $model->payed,
+                    'value' => \Yii::$app->formatter->asBoolean( ($model->payed == \skeeks\cms\components\Cms::BOOL_Y))
                 ],
 
                 [                      // the owner name of the model
@@ -320,7 +320,7 @@ CSS
                         ],
 
                         [
-                            'label' => \skeeks\cms\shop\Module::t('app', 'Weight'),
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Weight (gramm)'),
                             'value' => $model->weight . " ".\skeeks\cms\shop\Module::t('app', 'g.'),
                         ],
 
