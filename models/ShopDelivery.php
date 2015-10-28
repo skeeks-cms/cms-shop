@@ -2,10 +2,12 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\modules\cms\money\Money;
 use Yii;
 
 /**
@@ -33,6 +35,7 @@ use Yii;
  * @property integer $logo_id
  * @property string $store
  *
+ * @property Money $money
  * @property CmsSite $site
  * @property Currency $currency
  * @property CmsStorageFile $logo
@@ -57,13 +60,16 @@ class ShopDelivery extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'site_id', 'period_from', 'period_to', 'weight_from', 'weight_to', 'priority', 'logo_id'], 'integer'],
-            [['site_id', 'price', 'currency_code', 'name'], 'required'],
+            [['name'], 'required'],
             [['order_price_from', 'order_price_to', 'price'], 'number'],
             [['description', 'store', 'name'], 'string'],
             [['period_type', 'active'], 'string', 'max' => 1],
             [['priority'], 'default', 'value' =>  1],
             [['order_currency_code', 'currency_code'], 'string', 'max' => 3],
-            ['shopPaySystems', 'safe']
+            ['shopPaySystems', 'safe'],
+            [['price'], 'default', 'value' =>  0],
+            [['active'], 'default', 'value' => Cms::BOOL_Y],
+            [['currency_code'], 'default', 'value' =>  Yii::$app->money->currencyCode],
         ];
     }
 
@@ -153,6 +159,16 @@ class ShopDelivery extends \skeeks\cms\models\Core
     public function getShopDelivery2paySystems()
     {
         return $this->hasMany(ShopDelivery2paySystem::className(), ['delivery_id' => 'id']);
+    }
+
+    /**
+     * Итоговая стоимость доставки
+     *
+     * @return Money
+     */
+    public function getMoney()
+    {
+        return Money::fromString($this->price, $this->currency_code);
     }
 
     /**

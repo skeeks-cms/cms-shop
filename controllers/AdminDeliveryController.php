@@ -74,7 +74,16 @@ class AdminDeliveryController extends AdminModelEditorController
                                 return implode(", ", ArrayHelper::map($model->shopPaySystems, 'id', 'name'));
                             }
                         ],
-
+                        [
+                            'class'         => DataColumn::className(),
+                            'attribute'     => "price",
+                            'format'     => 'raw',
+                            'filter'        => false,
+                            'value'         => function(ShopDelivery $model)
+                            {
+                                return \Yii::$app->money->intlFormatter()->format($model->money);
+                            }
+                        ],
                         [
                             'class'         => BooleanColumn::className(),
                             'attribute'     => "active"
