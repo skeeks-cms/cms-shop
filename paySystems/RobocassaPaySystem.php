@@ -29,7 +29,7 @@ class RobocassaPaySystem extends PaySystemHandlerComponent
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Робокасса',
+            'name'          =>  \skeeks\cms\shop\Module::t('app', 'Robokassa'),
         ]);
     }
 
