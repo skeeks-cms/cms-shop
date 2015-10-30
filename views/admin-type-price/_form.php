@@ -14,7 +14,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
     <?= $form->fieldRadioListBoolean($model, 'def'); ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => 32]); ?>
@@ -24,7 +24,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <? if (!$model->isNewRecord) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => "Доступность цены"
+            'content' => \skeeks\cms\shop\Module::t('app', 'Affordable prices')
         ])?>
 
             <? \yii\bootstrap\Alert::begin([
@@ -32,19 +32,19 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                   'class' => 'alert-warning',
               ],
             ]); ?>
-            <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
+            <?= \skeeks\cms\shop\Module::t('app', '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
             <? \yii\bootstrap\Alert::end()?>
 
             <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
                 'permissionName'            => $model->viewPermissionName,
-                'permissionDescription'     => "Права на просмотр цен: '{$model->name}'",
-                'label'                     => 'Группы пользователей, имеющие права на просмотр этого типа цен',
+                'permissionDescription'     => \skeeks\cms\shop\Module::t('app', 'Rights to see the prices')." '{$model->name}'",
+                'label'                     => \skeeks\cms\shop\Module::t('app', 'User Groups that have permission to view this type of price'),
             ]); ?>
 
             <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
                 'permissionName'            => $model->buyPermissionName,
-                'permissionDescription'     => "Права на покупку по цене: '{$model->name}'",
-                'label'                     => 'Группы пользователей, имеющие права на покупку по этому типу цен',
+                'permissionDescription'     => \skeeks\cms\shop\Module::t('app', 'The right to buy at a price').": '{$model->name}'",
+                'label'                     => \skeeks\cms\shop\Module::t('app', 'Group of users who have the right to purchase on this type of price'),
             ]); ?>
     <? else : ?>
         <? \yii\bootstrap\Alert::begin([
@@ -52,7 +52,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
               'class' => 'alert-info',
           ],
         ]); ?>
-            После сохранения можно будет настроить, кому доступен данный тип цен
+        <?= \skeeks\cms\shop\Module::t('app', 'After saving can be set up to whom this type available price'); ?>
+
         <? \yii\bootstrap\Alert::end()?>
 
     <? endif; ?>

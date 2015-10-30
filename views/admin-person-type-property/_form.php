@@ -11,7 +11,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основные настройки') ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main settings')) ?>
 
     <?= $form->fieldRadioListBoolean($model, 'active') ?>
     <?= $form->fieldRadioListBoolean($model, 'is_required') ?>
@@ -23,7 +23,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <? else: ?>
 
-    <?= $form->field($model, 'shop_person_type_id')->label('Тип плательщика')->widget(
+    <?= $form->field($model, 'shop_person_type_id')->label(\skeeks\cms\shop\Module::t('app', 'Type payer'))->widget(
         \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
             'items' => \yii\helpers\ArrayHelper::map(
                  \skeeks\cms\models\CmsTreeType::find()->active()->all(),
@@ -37,10 +37,10 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <? endif; ?>
 
     <?= $form->fieldSelect($model, 'component', [
-        'Базовые типы'          => \Yii::$app->cms->basePropertyTypes(),
-        'Пользовательские типы' => \Yii::$app->cms->userPropertyTypes(),
+        \skeeks\cms\shop\Module::t('app', 'Basic types')          => \Yii::$app->cms->basePropertyTypes(),
+        \skeeks\cms\shop\Module::t('app', 'Custom types')         => \Yii::$app->cms->userPropertyTypes(),
     ])
-        ->label("Тип свойства")
+        ->label(\skeeks\cms\shop\Module::t('app', 'Type of property'))
         ;
     ?>
     <?= $form->field($model, 'component_settings')->label(false)->widget(
@@ -55,7 +55,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Дополнительно') ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Additionally')) ?>
     <?= $form->field($model, 'hint')->textInput() ?>
     <?= $form->fieldInputInt($model, 'priority') ?>
 
@@ -67,11 +67,11 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 <?= $form->fieldSetEnd(); ?>
 
 <? if (!$model->isNewRecord) : ?>
-<?= $form->fieldSet('Значения для списка') ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Values for the list')) ?>
 
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => "Значения для списка",
-        'hint'              => "Вы можете привязать к элементу несколько свойст, и задать им значение",
+        'label'             => \skeeks\cms\shop\Module::t('app', 'Values for the list'),
+        'hint'              => \skeeks\cms\shop\Module::t('app', 'You can snap to the element number of properties, and set the value to them'),
         'parentModel'       => $model,
         'relation'          => [
             'property_id' => 'id'

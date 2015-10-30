@@ -44,7 +44,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
               'class' => 'alert-warning',
           ],
         ]); ?>
-        <b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.
+
+       <?=  \skeeks\cms\shop\Module::t('app', '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
+
         <? \yii\bootstrap\Alert::end()?>
 
         <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([

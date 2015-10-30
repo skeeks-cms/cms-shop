@@ -16,7 +16,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Цены'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Prices')); ?>
 
     <?= $form->fieldSelect($model, 'vat_id', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
@@ -25,7 +25,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldRadioListBoolean($model, 'vat_included'); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => 'Основные цены'
+            'content' => \skeeks\cms\shop\Module::t('app', 'Main prices')
         ])?>
 
 
@@ -43,18 +43,18 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($model, 'baseProductPriceValue')->textInput()->label("Базовая цена (Тип цены \"{$model->baseProductPrice->typePrice->name}\")"); ?>
+            <?= $form->field($model, 'baseProductPriceValue')->textInput()->label(\skeeks\cms\shop\Module::t('app', 'Base price')." (".\skeeks\cms\shop\Module::t('app', 'Price type')." \"{$model->baseProductPrice->typePrice->name}\")"); ?>
         </div>
         <div class="col-md-2">
             <?= $form->fieldSelect($model, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
                 \Yii::$app->money->activeCurrencies, 'code', 'code'
-            ))->label('Валюта базовой цены'); ?>
+            ))->label(\skeeks\cms\shop\Module::t('app', 'Currency base price')); ?>
         </div>
     </div>
 
     <? if ($productPrices) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => 'Дополнительные цены'
+            'content' => \skeeks\cms\shop\Module::t('app', 'Additional costs')
         ])?>
 
         <? foreach ($productPrices as $productPrice) : ?>
@@ -91,7 +91,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Количество и учет'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'The number and account')); ?>
 
     <?= $form->field($model, 'quantity')->textInput(); ?>
     <?= $form->field($model, 'quantity_reserved')->textInput(); ?>
@@ -105,7 +105,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Вес и размеры'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Weight and size')); ?>
 
     <?= $form->fieldInputInt($model, 'weight'); ?>
     <?= $form->fieldInputInt($model, 'length'); ?>
@@ -114,7 +114,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet('Параметры'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Options')); ?>
     <?= $form->fieldRadioListBoolean($model, 'quantity_trace'); ?>
     <?= $form->fieldRadioListBoolean($model, 'can_buy_zero'); ?>
     <?= $form->fieldRadioListBoolean($model, 'negative_amount_trace'); ?>

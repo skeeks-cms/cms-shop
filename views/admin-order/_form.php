@@ -17,7 +17,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'General information')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Заказ'
+        'content' => \skeeks\cms\shop\Module::t('app', 'Order')
+
     ])?>
 
         <?= \yii\widgets\DetailView::widget([

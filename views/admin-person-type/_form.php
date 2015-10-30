@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main settings')); ?>
 
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
@@ -29,8 +29,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <? if (!$model->isNewRecord) : ?>
     <?= $form->fieldSet('Свойства') ?>
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-            'label'             => "Свойства плательщика",
-            'hint'              => "У каждого плательщика, можно задать свой набор свойств, которые он будет задавать при оформлении заказа.",
+            'label'             => \skeeks\cms\shop\Module::t('app', 'Properties payer'),
+            'hint'              => \skeeks\cms\shop\Module::t('app', 'Each payer may have its own set of properties that it will ask when ordering.'),
             'parentModel'       => $model,
             'relation'          => [
                 'shop_person_type_id' => 'id'

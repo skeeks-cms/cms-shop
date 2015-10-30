@@ -14,7 +14,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Общая информация'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => 'Общая информация'

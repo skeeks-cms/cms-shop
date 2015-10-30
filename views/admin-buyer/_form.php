@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet('Основное'); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
     <?= $form->fieldSelect($model, 'cms_user_id', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsUser::find()->all(), 'id', 'displayName'
