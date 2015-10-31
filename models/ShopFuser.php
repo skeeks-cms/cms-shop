@@ -339,7 +339,12 @@ class ShopFuser extends Core
      */
     public function getMoneyDelivery()
     {
-        return $this->delivery->money;
+        if ($this->delivery)
+        {
+            return $this->delivery->money;
+        }
+
+        return \Yii::$app->money->newMoney();
     }
 
 
