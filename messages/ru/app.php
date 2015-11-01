@@ -323,4 +323,5 @@ return
     'You can snap to the element
      number of properties, and set the value to them'           => 'Вы можете привязать к элементу ряда свойств, и установите значение с ними',
     'Your basket is empty'                                      => 'Ваша корзина пуста',
+    'Reports on orders'                                         => 'Отчеты по заказам',
 ];
