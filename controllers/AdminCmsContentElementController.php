@@ -93,7 +93,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-tree-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => "Основной раздел",
+                    "name"              => \skeeks\cms\shop\Module::t('app', 'The main section'),
                     "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
                     "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTree'],
                 ],
@@ -101,7 +101,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-trees-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => "Дополнительные разделы",
+                    "name"              => \skeeks\cms\shop\Module::t('app', 'Related topics'),
                     "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-trees-form",
                     "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTrees'],
                 ],
