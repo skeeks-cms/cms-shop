@@ -19,8 +19,7 @@ return
     'Affiliates'                                                => 'Аффилиаты',
     'Affiliate who helped your registration'                    => 'Аффилиат, через которого зарегистрировался',
     'Affordable prices'                                         => 'Доступные цены',
-    'After saving can be set up
-     to whom this type available price'                         => 'После сохранения можно будет настроить, кому доступен данный тип цен',
+    'After saving can be set up to whom this type available price'                         => 'После сохранения можно будет настроить, кому доступен данный тип цен',
     'Allow negative quantity'                                   => 'Разрешить отрицательное количество товара',
     'Allow subscription if product is absent'                   => 'Разрешить подписку при отсутствии товара',
     'Allow payment'                                             => 'Разрешить оплату',
@@ -97,8 +96,7 @@ return
     'Discount Type'                                             => 'Тип скидки',
     'Do not create a user profile.'                             => 'Не создан профиль пользователя.',
     'Does not matter'                                           => 'Не важно',
-    'Each payer may have its own set
-     of properties that it will ask when ordering.'             => 'У каждого плательщика, можно задать свой набор свойств, которые он будет задавать при оформлении заказа.',
+    'Each payer may have its own set of properties that it will ask when ordering.'             => 'У каждого плательщика, можно задать свой набор свойств, которые он будет задавать при оформлении заказа.',
     'Elements'                                                  => 'Элементы',
     'Email of sales department'                                 => 'Email отдела продаж.',
     'Export to Yandex.Products'                                 => 'Экспортировать в Яндекс.Товары',
@@ -117,8 +115,7 @@ return
     'Gps S'                                                     => 'GPS долгота',
     'g.'                                                        => 'г.',
     'Groups of users who can benefit from discounted rates'     => 'Группы пользователей, которые могут воспользоваться скидкой',
-    'Group of users who have the right
-     to purchase on this type of price'                         => 'Группы пользователей, имеющие права на покупку по этому типу цен',
+    'Group of users who have the right to purchase on this type of price'                         => 'Группы пользователей, имеющие права на покупку по этому типу цен',
     'Handler'                                                   => 'Обработчик',
     'Height (mm)'                                               => 'Высота (мм)',
     'History of changes'                                        => 'История изменений',
@@ -142,8 +139,7 @@ return
     'Item added to cart'                                        => 'Позиция добавлена в корзину',
     'Items Number'                                              => 'Номер позиции',
     'Items Sum'                                                 => 'Количество товаров',
-    'It is necessary at least to
-    leave one active payer type in the site '                   => 'Необходимо оставить на сайте хотя бы один активный тип плательщика',
+    'It is necessary at least to leave one active payer type in the site '                   => 'Необходимо оставить на сайте хотя бы один активный тип плательщика',
     'Last Calculate At'                                         => 'Последний расчет был',
     'Last modified'                                             => 'Последнее изменение',
     'Length (mm)'                                               => 'Длина (мм)',
@@ -218,15 +214,16 @@ return
     'Requires at least one active payer type'                   => 'Требуется по крайней мере, один активный тип плательщика',
     'Reserved quantity'                                         => 'Зарезервированное количество',
     'Road to the api service robokassa'                         => 'Путь на api сервиса robocassa',
-    'Rights to see the prices'                                 => 'Права на просмотр цен',
+    'Rights to see the prices'                                  => 'Права на просмотр цен',
     'Robokassa'                                                 => 'Робокасса',
     'Rules for the basket'                                      => 'Правила работы с корзиной',
     'Saved'                                                     => 'Сохранено',
-    'Settings'                                                  => 'Настройки',
-    'Secure plan'                                               => 'Фиксировать план',
-    'Settings handler'                                          => 'Настройки обработчика',
     'Schedule'                                                  => 'График работы',
+    'Secure plan'                                               => 'Фиксировать план',
+    'Send'                                                      => 'Отправить',
     'Set the price for the goods'                               => 'Установите цену на товар',
+    'Settings'                                                  => 'Настройки',
+    'Settings handler'                                          => 'Настройки обработчика',
     'Shipping Center'                                           => 'Для отгрузки',
     'Shipping'                                                  => 'Доставка',
     'Shipping is permitted'                                     => 'Доставка разрешена',
@@ -253,8 +250,7 @@ return
     'The data for the buyer are not saved.'                     => 'Данные покупателя не сохранены.',
     'The details of the order, you can track on the page'       => 'Подробные данные по заказу, вы можете отслеживать на странице',
     'The details of the order you can view in'                  => 'Подробные данные по заказу вы можете посмотреть в',
-    'The maximum amount of discount (in currency of discount;
-     0 - the discount is not limited to)'                       => 'Максимальная сумма скидки (в валюте скидки; 0 - скидка не ограничена)',
+    'The maximum amount of discount (in currency of discount ; 0 - the discount is not limited to)'                       => 'Максимальная сумма скидки (в валюте скидки; 0 - скидка не ограничена)',
     'The number and account'                                    => 'Количество и учет',
     'The order #{order_id} created successfully'                => 'Заказ #{order_id} успешно создан',
     'The order of application'                                  => 'Порядок применения',
@@ -262,26 +258,16 @@ return
     'The profile name'                                          => 'Название профиля',
     'The right to buy at a price'                               => 'Права на покупку по цене',
     'The status of your order in site'                          => 'Статус вашего заказа на сайте',
-    'The combination of Person Type ID and Site Code
-     has already been taken.'                                   => 'Сочетание ID пользователя и код сайта уже были приняты.',
-    'The value of the properties will be used as
-     the location of the buyer to calculate the tax
-      (only for type LOCATION)'                                 => 'Значение свойства будет использовано как местоположение покупателя для расчета налогов (только для свойств типа LOCATION)',
+    'The combination of Person Type ID and Site Code has already been taken.'                                   => 'Сочетание ID пользователя и код сайта уже были приняты.',
+    'The value of the properties will be used as the location of the buyer to calculate the tax (only for type LOCATION)'                                 => 'Значение свойства будет использовано как местоположение покупателя для расчета налогов (только для свойств типа LOCATION)',
     'The value of the properties will be used as the location
-     of the buyer to calculate the cost of delivery
-     (only for type LOCATION)'                                  => 'Значение свойства будет использовано как местоположение покупателя для расчета стоимости доставки (только для свойств типа LOCATION)',
-    'The value of the properties will be used as the postcode
-     for the buyer to calculate the cost of delivery'           => 'Значение свойства будет использовано как почтовый индекс покупателя для расчета стоимости доставки',
-    'The value of the properties will be used as the E-Mail
-     with the new user registration'                            => 'Значение свойства будет использовано как E-Mail при регистрации нового пользователя',
-    'The value of the properties will be used as a phone
-     when registering a new user'                               => 'Значение свойства будет использовано как Телефон при регистрации нового пользователя.',
-    'The value of the properties will be used as the login
-     when registering a new user'                               => 'Значение свойства будет использовано как Логин при регистрации нового пользователя',
-    'The property value is used as a name when registering
-     a new user'                                                => 'Значение свойства будет использовано как Имя при регистрации нового пользователя',
-    'The value of the properties will be used
-     as the name of the buyer profile'                          => 'Значение свойства будет использовано как Имя профиля покупателя',
+     of the buyer to calculate the cost of delivery (only for type LOCATION)'                                  => 'Значение свойства будет использовано как местоположение покупателя для расчета стоимости доставки (только для свойств типа LOCATION)',
+    'The value of the properties will be used as the postcode for the buyer to calculate the cost of delivery'           => 'Значение свойства будет использовано как почтовый индекс покупателя для расчета стоимости доставки',
+    'The value of the properties will be used as the E-Mail with the new user registration'                            => 'Значение свойства будет использовано как E-Mail при регистрации нового пользователя',
+    'The value of the properties will be used as a phone when registering a new user'                               => 'Значение свойства будет использовано как Телефон при регистрации нового пользователя.',
+    'The value of the properties will be used as the login when registering a new user'                               => 'Значение свойства будет использовано как Логин при регистрации нового пользователя',
+    'The property value is used as a name when registering a new user'                                                => 'Значение свойства будет использовано как Имя при регистрации нового пользователя',
+    'The value of the properties will be used as the name of the buyer profile'                          => 'Значение свойства будет использовано как Имя профиля покупателя',
     'The total value of the goods'                              => 'Общая стоимость товаров',
     'This payer is disabled or deleted. Refresh the page.'      => 'Данный плательщик отключен или удален. Обновите страницу.',
     'This product is not found, it may be removed.'             => 'Товар не найден, возможно его только что удалили.',
@@ -307,8 +293,7 @@ return
     'Use only uppercase letters of the Latin alphabet.'         => 'Использовать только заглавные буквы латинского алфавита.',
     'User'                                                      => 'Пользователь',
     'User groups'                                               => 'Группы пользователя',
-    'User Groups that have permission
-     to view this type of price'                                => 'Группы пользователей, имеющие права на просмотр этого типа цен',
+    'User Groups that have permission to view this type of price'                                => 'Группы пользователей, имеющие права на просмотр этого типа цен',
     'User site'                                                 => 'Пользователь сайта',
     'VAT included in the price'                                 => 'НДС включен в цену',
     'VAT rate'                                                  => 'Ставка НДС',
@@ -316,12 +301,10 @@ return
     'Values for the list'                                       => 'Значения для списка',
     'View online (opens new window)'                            => 'Посмотреть на сайте (Откроется в новом окне)',
     'Viewed products'                                           => 'Просмотренные товары',
-    '<b> Warning! </b> Permissions are stored in real time.
-    Thus, these settings are independent of site or user.'      => '<b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.',
+    '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'      => '<b>Внимание!</b> Права доступа сохраняются в режиме реального времени. Так же эти настройки не зависят от сайта или пользователя.',
     'With photo'                                                => 'С фото',
     'Without photo'                                             => 'Без фото',
-    'You can snap to the element
-     number of properties, and set the value to them'           => 'Вы можете привязать к элементу ряда свойств, и установите значение с ними',
+    'You can snap to the element number of properties, and set the value to them'           => 'Вы можете привязать к элементу ряда свойств, и установите значение с ними',
     'Your basket is empty'                                      => 'Ваша корзина пуста',
     'Reports on orders'                                         => 'Отчеты по заказам',
 ];
