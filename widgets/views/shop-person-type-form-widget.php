@@ -53,7 +53,7 @@ JS
     <? endforeach; ?>
 <? endif; ?>
 
-<?= \yii\helpers\Html::submitButton("" . \Yii::t('app', "Отправить"), [
+<?= \yii\helpers\Html::submitButton("" . \skeeks\cms\shop\Module::t('app', 'Send'), [
     'class' => "btn btn-primary",
 ]); ?>
 
