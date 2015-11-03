@@ -181,6 +181,7 @@ return
     'Payment method'                                            => 'Способ оплаты',
     'Payment order'                                             => 'Оплата заказа',
     'Payment systems'                                           => 'Платежные системы',
+    'Payment system'                                            => 'Платежная система',
     'Pending Sum'                                               => 'В ожидании',
     'Period From'                                               => 'Срок доставки от',
     'Period Type'                                               => 'Период',
