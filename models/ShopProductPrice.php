@@ -159,6 +159,6 @@ class ShopProductPrice extends \skeeks\cms\models\Core
      */
     public function getShopProductPriceChanges()
     {
-        return $this->hasMany(ShopProductPriceChange::className(), ['shop_product_price_id' => 'id']);
+        return $this->hasMany(ShopProductPriceChange::className(), ['shop_product_price_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
 }

@@ -50,6 +50,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 \Yii::$app->money->activeCurrencies, 'code', 'code'
             ))->label(\skeeks\cms\shop\Module::t('app', 'Currency base price')); ?>
         </div>
+
+        <div class="col-md-2">
+            <label>&nbsp;</label>
+            <p>
+                <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
+                    'productPrice' => $model->baseProductPrice
+                ])?>
+            </p>
+        </div>
     </div>
 
     <? if ($productPrices) : ?>
@@ -81,7 +90,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
                 <div class="col-md-2">
                     <label>&nbsp;</label>
-                    <p><a href="#">История изменения</a></p>
+                    <p>
+                        <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
+                            'productPrice' => $productPrice
+                        ])?>
+                    </p>
                 </div>
             </div>
 
