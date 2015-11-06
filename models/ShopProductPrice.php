@@ -26,6 +26,7 @@ use Yii;
  * @property ShopProduct $product
  * @property ShopTypePrice $typePrice
  * @property Money $money
+ * @property ShopProductPriceChange[] $shopProductPriceChanges
  */
 class ShopProductPrice extends \skeeks\cms\models\Core
 {
@@ -40,6 +41,53 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterInstertCallback"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "afterUpdateCallback"]);
+    }
+
+    public function afterInstertCallback()
+    {
+        $shopProductPriceChange                 = new ShopProductPriceChange();
+
+        $shopProductPriceChange->price          = $this->price;
+        $shopProductPriceChange->currency_code  = $this->currency_code;
+        $shopProductPriceChange->quantity_from  = $this->quantity_from;
+        $shopProductPriceChange->quantity_to    = $this->quantity_to;
+
+        if ($shopProductPriceChange->save())
+        {
+            $shopProductPriceChange->link('shopProductPrice', $this);
+        }
+    }
+
+    public function afterUpdateCallback()
+    {
+        if ($this->isAttributeChanged('price') || $this->isAttributeChanged('currency_code') || $this->isAttributeChanged('quantity_from') || $this->isAttributeChanged('quantity_to'))
+        {
+            $shopProductPriceChange                 = new ShopProductPriceChange();
+
+            $shopProductPriceChange->price          = $this->price;
+            $shopProductPriceChange->currency_code  = $this->currency_code;
+            $shopProductPriceChange->quantity_from  = $this->quantity_from;
+            $shopProductPriceChange->quantity_to    = $this->quantity_to;
+
+            if ($shopProductPriceChange->save())
+            {
+                $shopProductPriceChange->link('shopProductPrice', $this);
+            }
+        }
+
+    }
+
+
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -49,7 +97,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             [['currency_code'], 'string', 'max' => 3],
             [['tmp_id'], 'string', 'max' => 40],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
-            [['price'], 'default', 'value' => 0],
+            [['price'], 'default', 'value' => 0.00],
         ];
     }
 
@@ -104,5 +152,13 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function getMoney()
     {
         return Money::fromString($this->price, $this->currency_code);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductPriceChanges()
+    {
+        return $this->hasMany(ShopProductPriceChange::className(), ['shop_product_price_id' => 'id']);
     }
 }

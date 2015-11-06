@@ -78,6 +78,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                         )
                     ])?>
                 </div>
+
+                <div class="col-md-2">
+                    <label>&nbsp;</label>
+                    <p><a href="#">История изменения</a></p>
+                </div>
             </div>
 
         <? endforeach; ?>

@@ -94,8 +94,9 @@ class ShopComponent extends Component
                             'shop' =>
                                 [
                                     'class'         => AdminContentElementShopAction::className(),
-                                    'name'          => 'Для магазина',
+                                    'name'          => 'Цены и наличие (Магазин)',
                                     'priority'      => 1000,
+                                    "icon"          => "glyphicon glyphicon-shopping-cart",
                                 ],
                         ]);
                     }
