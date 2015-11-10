@@ -111,6 +111,19 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public $content;
 
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        if ($this->content)
+        {
+            return $this->content->adminPermissionName;
+        }
+
+        return parent::getPermissionName();
+    }
+
     public function beforeAction($action)
     {
         if ($content_id = \Yii::$app->request->get('content_id'))
