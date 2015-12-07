@@ -55,6 +55,9 @@ use yii\helpers\ArrayHelper;
  * @property ShopProductPrice[] $shopProductPrices
  * @property ShopViewedProduct[] $shopViewedProducts
  *
+ * @property string   $baseProductPriceValue
+ * @property string   $baseProductPriceCurrency
+ *
  * @property ShopProductPrice   $baseProductPrice
  * @property ShopProductPrice   $minProductPrice
  * @property ShopProductPrice[]   $viewProductPrices
@@ -89,6 +92,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             ]);
 
             $self->save();
+            $self->refresh();
         }
 
         static::$instances[$cmsContentElement->id] = $self;
@@ -115,7 +119,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue)
         {
-            $baseProductPrice = $this->baseProductPrice;
+            $baseProductPrice = $this->getBaseProductPrice()->one();
             if (!$baseProductPrice)
             {
                 $baseProductPrice                   = new ShopProductPrice([
