@@ -17,7 +17,7 @@ use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\Tree;
 use skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel;
-use skeeks\cms\shop\cmsWidgets\filters\models\SearchRelatedPropertiesModel;
+use skeeks\cms\models\searchs\SearchRelatedPropertiesModel;
 use skeeks\cms\shop\models\ShopTypePrice;
 use yii\base\DynamicModel;
 use yii\data\ActiveDataProvider;
