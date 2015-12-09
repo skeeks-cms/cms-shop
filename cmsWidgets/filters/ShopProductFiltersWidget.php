@@ -43,6 +43,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     public $type_price_id               = "";
 
     /**
+     * @var array (Массив ids записей, для показа только нужных фильтров)
+     */
+    public $elementIds          = [];
+
+    /**
      * @var \skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel
      */
     public $searchModel                 = null;
