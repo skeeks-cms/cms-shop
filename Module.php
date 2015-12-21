@@ -33,7 +33,7 @@ class Module extends \skeeks\cms\base\Module
                 'fileMap' => [
                     'skeeks/shop/app' => 'app.php',
                 ],
-                'on missingTranslation' => ['skeeks\cms\components\TranslationEventHandler', 'handleMissingTranslation']
+                'on missingTranslation' => \Yii::$app->i18n->missingTranslationHandler
             ];
 
             self::$isRegisteredTranslations = true;
