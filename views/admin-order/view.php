@@ -347,5 +347,55 @@ CSS
 
 
 
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'History of changes')); ?>
+
+        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+            'dataProvider' => new \yii\data\ArrayDataProvider([
+                'models' => $model->shopOrderChanges
+            ]),
+
+            'columns' =>
+            [
+                [
+                    'class' => \skeeks\cms\grid\UpdatedAtColumn::className()
+                ],
+
+                [
+                    'class'     => \yii\grid\DataColumn::className(),
+                    'label'     => \skeeks\cms\shop\Module::t('app', 'User'),
+                    'format'    => 'raw',
+                    'value'     => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
+                    {
+                        return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrderChange->createdBy]))->run();
+                    }
+                ],
+
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'attribute' => 'type',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Transaction'),
+                    'format' => 'raw',
+                    'value' => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
+                    {
+                        return \skeeks\cms\shop\models\ShopOrderChange::types()[$shopOrderChange->type];
+                    }
+                ],
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'attribute' => 'type',
+                    'label' => \skeeks\cms\shop\Module::t('app', 'Description'),
+                    'format' => 'raw',
+                    'value' => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
+                    {
+                        return $shopOrderChange->description;
+                    }
+                ],
+
+
+            ]
+        ]); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>

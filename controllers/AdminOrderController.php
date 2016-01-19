@@ -17,6 +17,8 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopAffiliate;
@@ -93,11 +95,24 @@ class AdminOrderController extends AdminModelEditorController
                         ],*/
 
                         [
-                            'class'     => BooleanColumn::className(),
+                            'class'         => BooleanColumn::className(),
                             'attribute'     => 'payed',
-                            'format'     => 'raw',
+                            'format'        => 'raw',
                         ],
 
+                        [
+                            'class'         => DataColumn::className(),
+                            'attribute'     => "canceled",
+                            'format'        => "raw",
+                            'filter'        => [
+                                'Y' => \Yii::t('app', 'Yes'),
+                                'N' => \Yii::t('app', 'No'),
+                            ],
+                            'value'         => function(ShopOrder $shopOrder)
+                            {
+                               return $shopOrder->canceled == "Y" ? \Yii::t('app', 'Yes') : \Yii::t('app', 'No');
+                            },
+                        ],
                         [
                             'class'         => DataColumn::className(),
                             'attribute'     => "user_id",
@@ -162,8 +177,24 @@ HTML;
                     ],
                 ],
 
+                "view" =>
+                [
+                    'class'         => AdminOneModelEditAction::className(),
+                    "name"         => \Yii::t('app',"Информация"),
+                    "icon"          => "glyphicon glyphicon-eye-open",
+                    "priority"      => 5,
+                    "callback"      => [$this, 'view'],
+                ],
+
             ]
         );
+    }
+
+    public function view()
+    {
+        return $this->render($this->action->id, [
+            'model' => $this->model
+        ]);
     }
 
 }

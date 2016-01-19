@@ -44,6 +44,7 @@ return
     'Cancellations'                                             => 'Отмена заказа',
     'Canceled'                                                  => 'Отменен',
     'Changing status'                                           => 'Изменение статуса заказа',
+    'Status'                                                    => 'Статус',
     'changed to'                                                => 'изменен на',
     'Check the correctness of the prices'                       => 'Проверьте правильность заполнения цен',
     'Check the correctness of filling the form fields'          => 'Проверьте правильность заполнения полей формы',
