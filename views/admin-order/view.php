@@ -145,6 +145,15 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                     'value' => $form->fieldRadioListBoolean($model, 'allow_payment')->label(false),
                 ],
 
+                [                      // the owner name of the model
+                    'label' => "",
+                    'format' => 'raw',
+                    'value' => $this->render('_payment', [
+                        'model' => $model
+                    ])
+
+                ],
+
 
             ]
         ])?>

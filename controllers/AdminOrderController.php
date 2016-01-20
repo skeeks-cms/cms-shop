@@ -61,6 +61,10 @@ class AdminOrderController extends AdminModelEditorController
                 'index' =>
                 [
                     "columns"               => [
+                        [
+                            'class'     => CreatedAtColumn::className(),
+                        ],
+
                         'id',
 
                         [
@@ -163,17 +167,13 @@ HTML;
                             'filter'        => ArrayHelper::map(CmsSite::find()->active()->all(), 'id', 'name'),
                             'attribute'     => 'site_id',
                             'format'        => 'raw',
+                            'visible'       => false,
                             'label'         => \skeeks\cms\shop\Module::t('app', 'Site'),
                             'value'         => function(ShopOrder $model)
                             {
                                 return $model->site->name . " [{$model->site->code}]";
                             },
                         ],
-
-                        [
-                            'class'     => CreatedAtColumn::className(),
-                        ],
-
                     ],
                 ],
 
@@ -196,5 +196,6 @@ HTML;
             'model' => $this->model
         ]);
     }
+
 
 }
