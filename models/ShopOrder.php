@@ -291,6 +291,39 @@ class ShopOrder extends \skeeks\cms\models\Core
         ];
     }
 
+
+    /**
+     * Процесс оплаты заказа
+     *
+     * @return $this
+     */
+    public function processNotePayment()
+    {
+        $transaction = new ShopUserTransact();
+        $transaction->cms_user_id           = $this->user_id;
+        $transaction->shop_order_id         = $this->id;
+        $transaction->amount                = $this->money->getAmount();
+        $transaction->currency_code         = $this->money->getCurrency()->getCurrencyCode();
+        $transaction->debit                 = "Y";
+        $transaction->description           = ShopUserTransact::OUT_CHARGE_OFF;
+        $transaction->save();
+
+
+        $transaction = new ShopUserTransact();
+        $transaction->cms_user_id           = $this->user_id;
+        $transaction->shop_order_id         = $this->id;
+        $transaction->amount                = $this->money->getAmount();
+        $transaction->currency_code         = $this->money->getCurrency()->getCurrencyCode();
+        $transaction->debit                 = "N";
+        $transaction->description           = ShopUserTransact::ORDER_PAY;
+        $transaction->save();
+
+        $this->payed = "Y";
+        $this->save();
+
+        return $this;
+    }
+
     /**
      * Валидация причины отмены
      *

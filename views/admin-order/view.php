@@ -356,6 +356,46 @@ CSS
 
 
 
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Транзакции по заказу')); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+    'dataProvider' => new \yii\data\ArrayDataProvider([
+        'models' => $model->shopUserTransacts
+    ]),
+
+    'columns' =>
+    [
+        [
+            'class' => \skeeks\cms\grid\CreatedAtColumn::className()
+        ],
+
+        [
+            'class'     => \yii\grid\DataColumn::className(),
+            'label'     => \skeeks\cms\shop\Module::t('app', 'User'),
+            'format'    => 'raw',
+            'value'     => function(\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact)
+            {
+                return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopUserTransact->cmsUser]))->run();
+            }
+        ],
+
+        [
+            'class' => \yii\grid\DataColumn::className(),
+            'attribute' => 'type',
+            'label' => \skeeks\cms\shop\Module::t('app', 'Сумма'),
+            'format' => 'raw',
+            'value' => function(\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact)
+            {
+                return $shopUserTransact->amount;
+            }
+        ],
+
+        'description'
+    ]
+]); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'History of changes')); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
@@ -408,3 +448,43 @@ CSS
 
 <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
+
+
+<div style="display: none;">
+    <div id="sx-payment-container" style="min-width: 500px;">
+        <h2>Оплата заказа:</h2><hr />
+        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/pay-validate', 'pk' => $model->id])->enableAdmin()->toString(),
+            'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/pay', 'pk' => $model->id])->enableAdmin()->toString(),
+
+            'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax)
+                {
+                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                        'blockerSelector' : '#' + jForm.attr('id'),
+                        'enableBlocker' : true,
+                    });
+
+                    handler.bind('success', function(response)
+                    {
+                        window.location.reload();
+                    });
+                }
+JS
+    ),
+
+        ]); ?>
+
+            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
+            )); ?>
+
+            <?= $form->field($model, 'pay_voucher_num'); ?>
+            <?= $form->field($model, 'pay_voucher_at'); ?>
+
+            <button class="btn btn-primary">Сохранить</button>
+
+        <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+    </div>
+</div>

@@ -33,23 +33,6 @@ use yii\helpers\Html;
 <? else : ?>
     <a href="#sx-payment-container" class="btn btn-primary sx-fancybox">Оплатить<a>
 
-    <div style="display: none;">
-        <div id="sx-payment-container" style="min-width: 500px;">
-            <h2>Оплата заказа:</h2><hr />
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin(); ?>
 
-                <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
-                )); ?>
-
-                <?= $form->field($model, 'pay_voucher_num'); ?>
-                <?= $form->field($model, 'pay_voucher_at'); ?>
-
-                <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-    </div>
 <? endif; ?>
 

@@ -12,6 +12,7 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\CreatedAtColumn;
 use skeeks\cms\grid\SiteColumn;
 use skeeks\cms\grid\UserColumnData;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
@@ -197,5 +198,36 @@ HTML;
         ]);
     }
 
+    /**
+     * @return array
+     */
+    public function actionPayValidate()
+    {
+        $rr = new RequestResponse();
+        return $rr->ajaxValidateForm($this->model);
+    }
 
+    /**
+     * @return array
+     */
+    public function actionPay()
+    {
+        $rr = new RequestResponse();
+
+        /**
+         * @var $model ShopOrder;
+         */
+        $model = $this->model;
+        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        {
+            $rr->success = true;
+
+            if ($model->payed != "Y")
+            {
+                $model->processNotePayment();
+            }
+
+            return $rr;
+        }
+    }
 }

@@ -28,6 +28,8 @@ use Yii;
  */
 class ShopUserTransact extends \skeeks\cms\models\Core
 {
+    const ORDER_PAY         = "ORDER_PAY";
+    const OUT_CHARGE_OFF    = "OUT_CHARGE_OFF";
     /**
      * @inheritdoc
      */
