@@ -12,27 +12,8 @@ use yii\helpers\Html;
 ?>
 
 <? if ($model->payed == 'Y') : ?>
-    <a href="#sx-payment-container" class="btn btn-primary sx-fancybox">Изменить<a>
-
-    <div style="display: none;">
-        <div id="sx-payment-container" style="min-width: 500px;">
-
-
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin(); ?>
-
-                <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
-                )); ?>
-
-
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-    </div>
+    <a href="#sx-payment-container-close" class="btn btn-primary sx-fancybox">Изменить<a>
 <? else : ?>
     <a href="#sx-payment-container" class="btn btn-primary sx-fancybox">Оплатить<a>
-
-
 <? endif; ?>
 

@@ -144,8 +144,14 @@ class ShopOrder extends \skeeks\cms\models\Core
 
     public function beforeUpdateCallback($e)
     {
+        if ($this->isAttributeChanged('canceled'))
+        {
+            $this->canceled_at = \Yii::$app->formatter->asTimestamp(time());
+        }
+
         if ($this->isAttributeChanged('status_code'))
         {
+            $this->status_at = \Yii::$app->formatter->asTimestamp(time());
 
             ( new ShopOrderChange([
                 'type'          => ShopOrderChange::ORDER_STATUS_CHANGED,

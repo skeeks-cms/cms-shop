@@ -210,6 +210,15 @@ HTML;
     /**
      * @return array
      */
+    public function actionValidate()
+    {
+        $rr = new RequestResponse();
+        return $rr->ajaxValidateForm($this->model);
+    }
+
+    /**
+     * @return array
+     */
     public function actionPay()
     {
         $rr = new RequestResponse();
@@ -227,6 +236,24 @@ HTML;
                 $model->processNotePayment();
             }
 
+            return $rr;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function actionSave()
+    {
+        $rr = new RequestResponse();
+
+        /**
+         * @var $model ShopOrder;
+         */
+        $model = $this->model;
+        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        {
+            $rr->success = true;
             return $rr;
         }
     }

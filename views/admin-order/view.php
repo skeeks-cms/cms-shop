@@ -10,6 +10,26 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
+
+$this->registerCss(<<<CSS
+.sx-status
+{
+    color: {$model->status->color};
+}
+.sx-dashed
+{
+
+    border-bottom: dashed 1px;
+}
+
+.sx-dashed:hover
+{
+    text-decoration: none;
+}
+CSS
+);
+
+$statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -47,24 +67,27 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 [                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Status'),
                     'format' => 'raw',
-                    'value' => "<p>" . $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                                    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
-                                ))->label(false) . "</p>"
+                    'value' => <<<HTML
+
+                    <a href="#sx-status-change" class="sx-status sx-dashed sx-fancybox">{$model->status->name}</a>
+                    <small>({$statusDate})</small>
+HTML
+
                 ],
 
                 [                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Canceled'),
                     'format' => 'raw',
-                    'value' => "<p>" . $form->fieldRadioListBoolean($model, 'canceled')->label(false) . "</p><p>" .
-                            $form->field($model, 'reason_canceled')->textarea(['rows' => 5])
-                        . "</p>",
+                    'value' => $this->render('_close-order', [
+                        'model' => $model
+                    ]),
                 ],
 
-                [                      // the owner name of the model
+                /*[                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Date of status change'),
                     'format' => 'raw',
                     'value' => \Yii::$app->formatter->asDatetime($model->status_at),
-                ],
+                ],*/
 
             ]
         ])?>
@@ -446,12 +469,12 @@ CSS
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?/*= $form->buttonsCreateOrUpdate($model); */?>
 <?php ActiveForm::end(); ?>
 
 
 <div style="display: none;">
-    <div id="sx-payment-container" style="min-width: 500px;">
+    <div id="sx-payment-container" style="min-width: 500px; max-width: 500px;">
         <h2>Оплата заказа:</h2><hr />
         <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
             'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/pay-validate', 'pk' => $model->id])->enableAdmin()->toString(),
@@ -480,7 +503,124 @@ JS
             )); ?>
 
             <?= $form->field($model, 'pay_voucher_num'); ?>
-            <?= $form->field($model, 'pay_voucher_at'); ?>
+            <?= $form->field($model, 'pay_voucher_at')->widget(
+                \kartik\datecontrol\DateControl::classname(), [
+                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+            ]); ?>
+
+            <button class="btn btn-primary">Сохранить</button>
+
+        <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+    </div>
+
+
+    <div id="sx-payment-container-close" style="min-width: 500px; max-width: 500px;">
+        <h2>Изменение данных по оплате:</h2><hr />
+        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/pay-validate', 'pk' => $model->id])->enableAdmin()->toString(),
+            'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/pay', 'pk' => $model->id])->enableAdmin()->toString(),
+
+            'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax)
+                {
+                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                        'blockerSelector' : '#' + jForm.attr('id'),
+                        'enableBlocker' : true,
+                    });
+
+                    handler.bind('success', function(response)
+                    {
+                        window.location.reload();
+                    });
+                }
+JS
+    ),
+
+        ]); ?>
+
+            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
+            )); ?>
+
+            <?= $form->field($model, 'pay_voucher_num'); ?>
+            <?= $form->field($model, 'pay_voucher_at')->widget(
+                \kartik\datecontrol\DateControl::classname(), [
+                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+            ]); ?>
+
+            <p>
+                <?= Html::checkbox('payment-close', false, ['label' => 'Отменить оплату']); ?>
+            </p>
+            <p>
+                <?= Html::checkbox('payment-close-on-client', false, ['label' => 'Вернуть средства на внутренний счет']); ?>
+            </p>
+            <button class="btn btn-primary">Сохранить</button>
+
+        <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+    </div>
+
+    <div id="sx-status-change" style="min-width: 500px; max-width: 500px;">
+        <h2>Изменение статуса:</h2><hr />
+        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/validate', 'pk' => $model->id])->enableAdmin()->toString(),
+            'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
+
+            'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax)
+                {
+                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                        'blockerSelector' : '#' + jForm.attr('id'),
+                        'enableBlocker' : true,
+                    });
+
+                    handler.bind('success', function(response)
+                    {
+                        window.location.reload();
+                    });
+                }
+JS
+    ),
+
+        ]); ?>
+
+            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
+            )); ?>
+
+            <button class="btn btn-primary">Сохранить</button>
+
+        <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+    </div>
+
+    <div id="sx-close-order" style="min-width: 500px; max-width: 500px;">
+        <h2>Отмена заказа:</h2><hr />
+        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/validate', 'pk' => $model->id])->enableAdmin()->toString(),
+            'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
+
+            'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax)
+                {
+                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                        'blockerSelector' : '#' + jForm.attr('id'),
+                        'enableBlocker' : true,
+                    });
+
+                    handler.bind('success', function(response)
+                    {
+                        window.location.reload();
+                    });
+                }
+JS
+    ),
+
+        ]); ?>
+
+            <?= $form->fieldRadioListBoolean($model, 'canceled'); ?>
+            <?= $form->field($model, 'reason_canceled')->textarea(['rows' => 5]) ?>
 
             <button class="btn btn-primary">Сохранить</button>
 
