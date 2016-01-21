@@ -26,6 +26,13 @@ $this->registerCss(<<<CSS
 {
     text-decoration: none;
 }
+
+
+
+.datetimepicker
+{
+    z-index: 100000 !important;
+}
 CSS
 );
 
@@ -151,12 +158,6 @@ HTML
                 ],
 
                 [                      // the owner name of the model
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Date'),
-                    'format' => 'raw',
-                    'value' => \Yii::$app->formatter->asDatetime($model->payed_at),
-                ],
-
-                [                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Payed'),
                     'format' => 'raw',
                     'value' => \Yii::$app->formatter->asBoolean( ($model->payed == \skeeks\cms\components\Cms::BOOL_Y))
@@ -165,7 +166,9 @@ HTML
                 [                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Allow payment'),
                     'format' => 'raw',
-                    'value' => $form->fieldRadioListBoolean($model, 'allow_payment')->label(false),
+                    'value' => $this->render('_payment-allow', [
+                        'model' => $model
+                    ]),
                 ],
 
                 [                      // the owner name of the model
@@ -176,8 +179,6 @@ HTML
                     ])
 
                 ],
-
-
             ]
         ])?>
 
@@ -621,6 +622,38 @@ JS
 
             <?= $form->fieldRadioListBoolean($model, 'canceled'); ?>
             <?= $form->field($model, 'reason_canceled')->textarea(['rows' => 5]) ?>
+
+            <button class="btn btn-primary">Сохранить</button>
+
+        <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+    </div>
+
+    <div id="sx-allow-payment" style="min-width: 500px; max-width: 500px;">
+        <h2>Разрешение оплаты:</h2><hr />
+        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/validate', 'pk' => $model->id])->enableAdmin()->toString(),
+            'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
+
+            'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax)
+                {
+                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                        'blockerSelector' : '#' + jForm.attr('id'),
+                        'enableBlocker' : true,
+                    });
+
+                    handler.bind('success', function(response)
+                    {
+                        window.location.reload();
+                    });
+                }
+JS
+    ),
+
+        ]); ?>
+
+            <?= $form->fieldRadioListBoolean($model, 'allow_payment'); ?>
 
             <button class="btn btn-primary">Сохранить</button>
 

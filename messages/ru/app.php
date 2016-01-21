@@ -313,4 +313,5 @@ return
     'Reports on orders'                                         => 'Отчеты по заказам',
     'Pay Voucher Num'                                           => 'Номер документа',
     'Pay Voucher At'                                            => 'Дата документа',
+    'Allow Payment'                                             => 'Разрешить оплату',
 ];

@@ -10,6 +10,20 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsUser */
+
+
+
+$result = [];
+
+if ($roles = \Yii::$app->authManager->getRolesByUser($model->id))
+{
+    foreach ($roles as $role)
+    {
+        $result[] = $role->description . " ({$role->name})";
+    }
+}
+
+$roles = implode(', ', $result);
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -45,7 +59,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 ],
                 [                      // the owner name of the model
                   'label' => \skeeks\cms\shop\Module::t('app', 'User groups'),
-                  'value' => '',
+                  'value' => $roles,
                 ],
             ]
         ])?>
