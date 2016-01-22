@@ -149,6 +149,11 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->canceled_at = \Yii::$app->formatter->asTimestamp(time());
         }
 
+        if ($this->isAttributeChanged('payed'))
+        {
+            $this->payed_at = \Yii::$app->formatter->asTimestamp(time());
+        }
+
         if ($this->isAttributeChanged('status_code'))
         {
             $this->status_at = \Yii::$app->formatter->asTimestamp(time());
@@ -308,7 +313,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction = new ShopUserTransact();
         $transaction->cms_user_id           = $this->user_id;
         $transaction->shop_order_id         = $this->id;
-        $transaction->amount                = $this->money->getAmount();
+        $transaction->amount                = $this->money->getAmount() / $this->money->getCurrency()->getSubUnit();
         $transaction->currency_code         = $this->money->getCurrency()->getCurrencyCode();
         $transaction->debit                 = "Y";
         $transaction->description           = ShopUserTransact::OUT_CHARGE_OFF;
@@ -318,13 +323,25 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction = new ShopUserTransact();
         $transaction->cms_user_id           = $this->user_id;
         $transaction->shop_order_id         = $this->id;
-        $transaction->amount                = $this->money->getAmount();
+        $transaction->amount                = $this->money->getAmount() / $this->money->getCurrency()->getSubUnit();
         $transaction->currency_code         = $this->money->getCurrency()->getCurrencyCode();
         $transaction->debit                 = "N";
         $transaction->description           = ShopUserTransact::ORDER_PAY;
         $transaction->save();
 
         $this->payed = "Y";
+        $this->save();
+
+        return $this;
+    }
+
+    /**
+     * Отмена оплаты заказа
+     * @return $this
+     */
+    public function processCloseNotePayment()
+    {
+        $this->payed = "N";
         $this->save();
 
         return $this;
@@ -589,7 +606,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getShopUserTransacts()
     {
-        return $this->hasMany(ShopUserTransact::className(), ['shop_order_id' => 'id']);
+        return $this->hasMany(ShopUserTransact::className(), ['shop_order_id' => 'id'])->orderBy(['id' => SORT_DESC]);
     }
 
 

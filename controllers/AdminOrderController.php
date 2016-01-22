@@ -57,8 +57,11 @@ class AdminOrderController extends AdminModelEditorController
      */
     public function actions()
     {
+        $view = $this->view;
+
         return ArrayHelper::merge(parent::actions(),
             [
+
                 'index' =>
                 [
                     "columns"               => [
@@ -113,10 +116,31 @@ class AdminOrderController extends AdminModelEditorController
                                 'Y' => \Yii::t('app', 'Yes'),
                                 'N' => \Yii::t('app', 'No'),
                             ],
-                            'value'         => function(ShopOrder $shopOrder)
+
+                            'value' => function(ShopOrder $shopOrder, $key, $index) use ($view)
                             {
-                               return $shopOrder->canceled == "Y" ? \Yii::t('app', 'Yes') : \Yii::t('app', 'No');
-                            },
+                                $reuslt = "<div>";
+                                if ($shopOrder->canceled == "Y")
+                                {
+                                    $view->registerJs(<<<JS
+$('tr[data-key={$key}]').addClass('sx-tr-red');
+JS
+);
+
+                                    $view->registerCss(<<<CSS
+tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
+{
+    background: #FFECEC !important;
+}
+CSS
+);
+                                    $reuslt = "<div style='color: red;'>";
+                                }
+
+                                $reuslt .=  $shopOrder->canceled == "Y" ? \Yii::t('app', 'Yes') : \Yii::t('app', 'No');
+                                $reuslt .= "</div>";
+                                return $reuslt;
+                            }
                         ],
                         [
                             'class'         => DataColumn::className(),
@@ -234,6 +258,12 @@ HTML;
             if ($model->payed != "Y")
             {
                 $model->processNotePayment();
+            } else
+            {
+                if (\Yii::$app->request->post('payment-close') == 1)
+                {
+                    $model->processCloseNotePayment();
+                }
             }
 
             return $rr;

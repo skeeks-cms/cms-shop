@@ -69,6 +69,26 @@ $roles = implode(', ', $result);
     ])?>
 
         <?
+
+            $money = \Yii::$app->money->newMoney();
+
+            $payedOrders = \skeeks\cms\shop\models\ShopOrder::find()->where([
+                'user_id'   => $model->id,
+                'payed'     => \skeeks\cms\components\Cms::BOOL_Y
+            ])->all();
+
+            if ($payedOrders)
+            {
+                foreach ($payedOrders as $shopOrder)
+                {
+                    /**
+                     * @var $shopOrder \skeeks\cms\shop\models\ShopOrder
+                     */
+                    $money = $money->add($shopOrder->money);
+                }
+            }
+
+
             $userStatistics = [
                 'total'         => \skeeks\cms\shop\models\ShopOrder::find()->where(['user_id' => $model->id])->count(),
                 'totalPayed'         => \skeeks\cms\shop\models\ShopOrder::find()->where([
@@ -76,6 +96,16 @@ $roles = implode(', ', $result);
                     'payed'     => \skeeks\cms\components\Cms::BOOL_Y
                 ])->count(),
             ];
+
+
+            $average = "-";
+            if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed'))
+            {
+                $average = \Yii::$app->money->intlFormatter()->format($money->multiply(
+                    (1/\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed'))
+                ));
+            }
+
         ?>
         <?= \yii\widgets\DetailView::widget([
             'model'         => $userStatistics,
@@ -91,13 +121,13 @@ $roles = implode(', ', $result);
                 [                      // the owner name of the model
                     'label'     => \skeeks\cms\shop\Module::t('app', 'Paid orders worth'),
                     'format'    => 'raw',
-                    'value'     => "",
+                    'value'     => \Yii::$app->money->intlFormatter()->format($money),
                 ],
 
                 [                      // the owner name of the model
                     'label'     => \skeeks\cms\shop\Module::t('app', 'The average price paid orders'),
                     'format'    => 'raw',
-                    'value'     => "",
+                    'value'     => $average
                 ],
 
             ]

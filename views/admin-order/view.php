@@ -36,10 +36,54 @@ $this->registerCss(<<<CSS
 CSS
 );
 
+
+$this->registerJs(<<<JS
+(function(sx, $, _)
+{
+    sx.classes.OrderCallback = sx.classes.Component.extend({
+
+        construct: function (jForm, ajaxQuery, opts)
+        {
+            var self = this;
+            opts = opts || {};
+
+            this._jForm     = jForm;
+            this._ajaxQuery = ajaxQuery;
+
+            this.applyParentMethod(sx.classes.Component, 'construct', [opts]); // TODO: make a workaround for magic parent calling
+        },
+
+        _init: function()
+        {
+            var jForm   = this._jForm;
+            var ajax    = this._ajaxQuery;
+
+            var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
+                'blockerSelector' : '#' + jForm.attr('id'),
+                'enableBlocker' : true,
+            });
+
+            handler.bind('success', function(response)
+            {
+                $.pjax.reload('#sx-pjax-order-wrapper', {});
+                $.fancybox.close();
+            });
+        }
+    });
+
+})(sx, sx.$, sx._);
+JS
+);
+
 $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = ActiveForm::begin([
+    'pjaxOptions' =>
+    [
+        'id' => 'sx-pjax-order-wrapper'
+    ]
+]); ?>
 
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'General information')); ?>
 
@@ -160,7 +204,9 @@ HTML
                 [                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Payed'),
                     'format' => 'raw',
-                    'value' => \Yii::$app->formatter->asBoolean( ($model->payed == \skeeks\cms\components\Cms::BOOL_Y))
+                    'value' => $this->render("_payed", [
+                        'model' => $model
+                    ])
                 ],
 
                 [                      // the owner name of the model
@@ -201,7 +247,9 @@ HTML
                 [                      // the owner name of the model
                     'label' => 'Разрешить доставку',
                     'format' => 'raw',
-                    'value' => $form->fieldRadioListBoolean($model, 'allow_delivery')->label(false),
+                    'value' => $this->render('_delivery-allow', [
+                        'model' => $model
+                    ]),
                 ],
             ]
         ])?>
@@ -217,9 +265,10 @@ HTML
                 [                      // the owner name of the model
                     'label'     => \skeeks\cms\shop\Module::t('app', 'Comment'),
                     'format'    => 'raw',
-                    'value'     => $form->field($model, 'comments')->textarea([
-                        'rows' => 5
-                    ])->hint(\skeeks\cms\shop\Module::t('app', 'Internal comment, the customer (buyer) does not see'))->label(false),
+                    'value'     => $this->render('_comment', [
+                        'model' => $model
+                    ])
+
                 ],
             ]
         ])?>
@@ -410,11 +459,11 @@ CSS
             'format' => 'raw',
             'value' => function(\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact)
             {
-                return $shopUserTransact->amount;
+                return ($shopUserTransact->debit == "Y" ? "+" : "-") . \Yii::$app->money->intlFormatter()->format($shopUserTransact->money);
             }
         ],
 
-        'description'
+        'descriptionText'
     ]
 ]); ?>
 
@@ -482,18 +531,9 @@ CSS
             'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/pay', 'pk' => $model->id])->enableAdmin()->toString(),
 
             'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax)
-                {
-                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                        'blockerSelector' : '#' + jForm.attr('id'),
-                        'enableBlocker' : true,
-                    });
-
-                    handler.bind('success', function(response)
-                    {
-                        window.location.reload();
-                    });
-                }
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
 JS
     ),
 
@@ -523,18 +563,9 @@ JS
             'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/pay', 'pk' => $model->id])->enableAdmin()->toString(),
 
             'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax)
-                {
-                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                        'blockerSelector' : '#' + jForm.attr('id'),
-                        'enableBlocker' : true,
-                    });
-
-                    handler.bind('success', function(response)
-                    {
-                        window.location.reload();
-                    });
-                }
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
 JS
     ),
 
@@ -569,18 +600,9 @@ JS
             'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
 
             'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax)
-                {
-                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                        'blockerSelector' : '#' + jForm.attr('id'),
-                        'enableBlocker' : true,
-                    });
-
-                    handler.bind('success', function(response)
-                    {
-                        window.location.reload();
-                    });
-                }
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
 JS
     ),
 
@@ -603,18 +625,9 @@ JS
             'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
 
             'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax)
-                {
-                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                        'blockerSelector' : '#' + jForm.attr('id'),
-                        'enableBlocker' : true,
-                    });
-
-                    handler.bind('success', function(response)
-                    {
-                        window.location.reload();
-                    });
-                }
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
 JS
     ),
 
@@ -636,24 +649,65 @@ JS
             'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
 
             'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax)
-                {
-                    var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
-                        'blockerSelector' : '#' + jForm.attr('id'),
-                        'enableBlocker' : true,
-                    });
-
-                    handler.bind('success', function(response)
-                    {
-                        window.location.reload();
-                    });
-                }
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
 JS
     ),
 
         ]); ?>
 
             <?= $form->fieldRadioListBoolean($model, 'allow_payment'); ?>
+
+            <button class="btn btn-primary">Сохранить</button>
+
+        <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+    </div>
+
+    <div id="sx-allow-delivery" style="min-width: 500px; max-width: 500px;">
+        <h2>Доставка:</h2><hr />
+        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/validate', 'pk' => $model->id])->enableAdmin()->toString(),
+            'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
+
+            'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
+JS
+    ),
+
+        ]); ?>
+
+            <?= $form->fieldRadioListBoolean($model, 'allow_delivery'); ?>
+
+            <button class="btn btn-primary">Сохранить</button>
+
+        <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+    </div>
+
+
+    <div id="sx-comment" style="min-width: 500px; max-width: 500px;">
+        <h2>Комментарий:</h2><hr />
+        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/validate', 'pk' => $model->id])->enableAdmin()->toString(),
+            'action'            => \skeeks\cms\helpers\UrlHelper::construct(['shop/admin-order/save', 'pk' => $model->id])->enableAdmin()->toString(),
+
+            'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
+JS
+    ),
+
+        ]); ?>
+
+            <?= $form->field($model, 'comments')->textarea([
+                    'rows' => 5
+                ])->hint(\skeeks\cms\shop\Module::t('app', 'Internal comment, the customer (buyer) does not see'));
+             ?>
 
             <button class="btn btn-primary">Сохранить</button>
 

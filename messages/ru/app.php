@@ -314,4 +314,6 @@ return
     'Pay Voucher Num'                                           => 'Номер документа',
     'Pay Voucher At'                                            => 'Дата документа',
     'Allow Payment'                                             => 'Разрешить оплату',
+    'Allow Delivery'                                            => 'Разрешить доставку',
+    'Comments'                                                  => 'Комментарий',
 ];

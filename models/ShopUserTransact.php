@@ -3,8 +3,11 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\shop\Module;
 use skeeks\modules\cms\money\models\Currency;
+use skeeks\modules\cms\money\Money;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_user_transact}}".
@@ -25,11 +28,23 @@ use Yii;
  * @property Currency $currency
  * @property CmsUser $cmsUser
  * @property ShopOrder $shopOrder
+ *
+ * @property string descriptionText
+ * @property Money $money
  */
 class ShopUserTransact extends \skeeks\cms\models\Core
 {
     const ORDER_PAY         = "ORDER_PAY";
     const OUT_CHARGE_OFF    = "OUT_CHARGE_OFF";
+
+    static public function descriptions()
+    {
+        return [
+            self::ORDER_PAY => Module::t('app', 'Оплата заказа'),
+            self::OUT_CHARGE_OFF => Module::t('app', 'Внесение денег'),
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -72,6 +87,7 @@ class ShopUserTransact extends \skeeks\cms\models\Core
             'debit'             => \skeeks\cms\shop\Module::t('app', 'Debit'),
             'description'       => \skeeks\cms\shop\Module::t('app', 'Description'),
             'notes'             => \skeeks\cms\shop\Module::t('app', 'Notes'),
+            'descriptionText'   => \skeeks\cms\shop\Module::t('app', 'Description'),
         ];
     }
 
@@ -100,4 +116,23 @@ class ShopUserTransact extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopOrder::className(), ['id' => 'shop_order_id']);
     }
+
+    /**
+     * Итоговая стоимость заказа
+     *
+     * @return Money
+     */
+    public function getMoney()
+    {
+        return Money::fromString($this->amount, $this->currency_code);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescriptionText()
+    {
+        return (string) ArrayHelper::getValue(self::descriptions(), $this->description);
+    }
+
 }
