@@ -439,7 +439,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'version'               => \skeeks\cms\shop\Module::t('app', 'Version'),
             'external_order'        => \skeeks\cms\shop\Module::t('app', 'External Order'),
             'buyer_id'              => \skeeks\cms\shop\Module::t('app', 'Profile of buyer'),
-            'allow_payment'              => \skeeks\cms\shop\Module::t('app', 'Allow Payment'),
+            'allow_payment'         => \skeeks\cms\shop\Module::t('app', 'Allow Payment'),
         ];
     }
 
