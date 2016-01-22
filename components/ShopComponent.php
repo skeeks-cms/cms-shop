@@ -29,6 +29,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopTypePrice[] $shopTypePrices
  *
  * @property ShopFuser $shopFuser
+ * @property ShopFuser $adminShopFuser
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -267,5 +268,25 @@ class ShopComponent extends Component
     {
         $this->_shopFuser = $shopFuser;
         return $this;
+    }
+
+
+    /**
+     * @return null|ShopFuser
+     */
+    public function getAdminShopFuser()
+    {
+        if (!$shopAdminFuserId = \Yii::$app->session->get('shopAdminFuserId'))
+        {
+            $shopFuser = new \skeeks\cms\shop\models\ShopFuser();
+            $shopFuser->save();
+
+            \Yii::$app->session->set('shopAdminFuserId', $shopFuser->id);
+            $shopAdminFuserId = $shopFuser->id;
+        }
+
+        $shopFuser = \skeeks\cms\shop\models\ShopFuser::findOne($shopAdminFuserId);
+
+        return $shopFuser;
     }
 }
