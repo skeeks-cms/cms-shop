@@ -115,7 +115,7 @@ class m151001_191201_create_table__shop_discount extends Migration
 
         $this->addForeignKey(
             'shop_discount__site_id', "{{%shop_discount}}",
-            'site_id', '{{%cms_site}}', 'code', 'SET NULL', 'SET NULL'
+            'site_id', '{{%cms_site}}', 'id', 'SET NULL', 'SET NULL'
         );
     }
 
