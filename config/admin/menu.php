@@ -198,8 +198,8 @@ return [
                     ],
 
                     [
-                        "label"     => \skeeks\cms\shop\Module::t('app', 'Goods'),
-                        "url"       => ["shop/admin-store"],
+                        "label"     => \skeeks\cms\shop\Module::t('app', 'Reports on products'),
+                        "url"       => ["shop/admin-report-product"],
                     ],
 
                 ],

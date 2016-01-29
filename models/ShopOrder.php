@@ -109,6 +109,9 @@ use yii\behaviors\TimestampBehavior;
  * @property Money $moneyOriginal
  * @property Money $moneySummPaid
  * @property Money $moneyDelivery
+ *
+ * @property Money $basketsMoney
+ *
  * @property int $weight
  */
 class ShopOrder extends \skeeks\cms\models\Core
@@ -610,6 +613,23 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
 
+    /**
+     *
+     * Цена всех позиций в заказе, динамически рассчитанная
+     *
+     * @return Money
+     */
+    public function getBasketsMoney()
+    {
+        $money = Money::fromString("", $this->currency_code);
+
+        foreach ($this->shopBaskets as $shopBasket)
+        {
+            $money = $money->add($shopBasket->money->multiply($shopBasket->quantity));
+        }
+
+        return $money;
+    }
 
     /**
      * Итоговая стоимость заказа
@@ -687,5 +707,21 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         return $result;
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function recalculate()
+    {
+        $money = $this->basketsMoney;
+        if ($this->moneyDelivery)
+        {
+            $money = $money->add($this->moneyDelivery);
+        }
+
+        $this->price = $money->getAmount() / $money->getCurrency()->getSubUnit();
+        return $this;
     }
 }

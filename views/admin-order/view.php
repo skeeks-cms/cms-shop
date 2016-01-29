@@ -278,7 +278,104 @@ HTML
         'content' => \skeeks\cms\shop\Module::t('app', 'The composition of the order')
     ])?>
 
-        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+
+
+        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+            'label'             => "",
+            'parentModel'       => $model,
+            'relation'          => [
+                'order_id'      => 'id',
+            ],
+
+            /*'sort'              => [
+                'defaultOrder' =>
+                [
+                    'priority' => 'published_at'
+                ]
+            ],*/
+
+            'controllerRoute'   => 'shop/admin-basket',
+            'gridViewOptions'   => [
+                'columns' => [
+                    /*[
+                        'class' => \yii\grid\SerialColumn::className()
+                    ],*/
+
+                    [
+                        'class'     => \yii\grid\DataColumn::className(),
+                        'attribute' => 'name',
+                        'format'    => 'raw',
+                        'value'     => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                        {
+                            $widget = new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
+                                'image' => $shopBasket->product->cmsContentElement->image
+                            ]);
+                            return $widget->run();
+                        }
+                    ],
+                    [
+                        'class' => \yii\grid\DataColumn::className(),
+                        'attribute' => 'name',
+                        'format' => 'raw',
+                        'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                        {
+                            if ($shopBasket->product)
+                            {
+                                return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
+                                    'target' => '_blank',
+                                    'titla' => "Смотреть на сайте",
+                                    'data-pjax' => 0
+                                ]);
+                            } else
+                            {
+                                return $shopBasket->name;
+                            }
+
+                        }
+                    ],
+
+                    [
+                        'class' => \yii\grid\DataColumn::className(),
+                        'attribute' => 'quantity',
+                        'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                        {
+                            return $shopBasket->quantity . " " . $shopBasket->measure_name;
+                        }
+                    ],
+
+                    [
+                        'class' => \yii\grid\DataColumn::className(),
+                        'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
+                        'attribute' => 'price',
+                        'format' => 'raw',
+                        'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                        {
+                            if ($shopBasket->discount_value)
+                            {
+                                return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \skeeks\cms\shop\Module::t('app', 'Discount').": " . $shopBasket->discount_value);
+                            } else
+                            {
+                                return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
+                            }
+
+                        }
+                    ],
+                    [
+                        'class' => \yii\grid\DataColumn::className(),
+                        'label' => \skeeks\cms\shop\Module::t('app', 'Sum'),
+                        'attribute' => 'price',
+                        'format' => 'raw',
+                        'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                        {
+                            return \Yii::$app->money->intlFormatter()->format($shopBasket->money->multiply($shopBasket->quantity));
+                        }
+                    ],
+                ]
+            ],
+        ]); ?>
+
+
+        <?/*= \skeeks\cms\modules\admin\widgets\GridView::widget([
             'dataProvider' => new \yii\data\ArrayDataProvider([
                 'models' => $model->shopBaskets
             ]),
@@ -361,7 +458,7 @@ HTML
                     }
                 ],
             ]
-        ]); ?>
+        ]); */?>
 
         <div class="row">
             <div class="col-md-8"></div>
@@ -384,7 +481,7 @@ CSS
                     'attributes' => [
                         [
                             'label' => \skeeks\cms\shop\Module::t('app', 'The total value of the goods'),
-                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyOriginal),
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->basketsMoney),
                         ],
 
                         [

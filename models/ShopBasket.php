@@ -104,6 +104,19 @@ class ShopBasket extends \skeeks\cms\models\Core
 
         //$this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
         $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+
+        $this->on(self::EVENT_AFTER_INSERT,     [$this, "afterSaveCallback"]);
+        $this->on(self::EVENT_AFTER_UPDATE,     [$this, "afterSaveCallback"]);
+        $this->on(self::EVENT_AFTER_DELETE,     [$this, "afterSaveCallback"]);
+    }
+
+    public function afterSaveCallback($event)
+    {
+        //Эта позиция привязана к заказу, после ее обновления нужно обновить заказ целиком
+        if ($this->order)
+        {
+            $this->order->recalculate()->save();
+        }
     }
 
     /**
@@ -128,7 +141,7 @@ class ShopBasket extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'fuser_id', 'order_id', 'product_id', 'product_price_id', 'type', 'set_parent_id', 'measure_code'], 'integer'],
-            [['fuser_id', 'currency_code', 'name'], 'required'],
+            [['name'], 'required'],
             [['price', 'weight', 'quantity', 'discount_price', 'vat_rate', 'reserve_quantity'], 'number'],
             [['currency_code'], 'string', 'max' => 3],
             [['site_id'], 'integer'],
@@ -138,6 +151,7 @@ class ShopBasket extends \skeeks\cms\models\Core
             [['discount_value', 'discount_coupon'], 'string', 'max' => 32],
             [['measure_name'], 'string', 'max' => 50],
 
+            [['quantity'], 'default', 'value' => 1],
             [['site_id'], 'default', 'value' => \Yii::$app->cms->site->id],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
             [['price'], 'default', 'value' => 0]
@@ -157,7 +171,7 @@ class ShopBasket extends \skeeks\cms\models\Core
             'updated_at'            => \skeeks\cms\shop\Module::t('app', 'Updated At'),
             'fuser_id'              => \skeeks\cms\shop\Module::t('app', 'Fuser ID'),
             'order_id'              => \skeeks\cms\shop\Module::t('app', 'Order ID'),
-            'product_id'            => \skeeks\cms\shop\Module::t('app', 'Product ID'),
+            'product_id'            => \skeeks\cms\shop\Module::t('app', 'Product'),
             'product_price_id'      => \skeeks\cms\shop\Module::t('app', 'Product Price ID'),
             'price'                 => \skeeks\cms\shop\Module::t('app', 'Price'),
             'currency_code'         => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
