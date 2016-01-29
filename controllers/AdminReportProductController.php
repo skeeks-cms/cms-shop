@@ -18,6 +18,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\shop\models\search\AdminReportProductSearch;
 use skeeks\cms\shop\models\ShopAffiliate;
 use skeeks\cms\shop\models\ShopAffiliatePlan;
 use skeeks\cms\shop\models\ShopContent;
@@ -43,6 +44,12 @@ class AdminReportProductController extends AdminController
 
     public function actionIndex()
     {
-        return $this->render($this->action->id);
+        $search         = new AdminReportProductSearch();
+        $dataProvider   = $search->search(\Yii::$app->request->get());
+
+        return $this->render($this->action->id, [
+            'search'        => $search,
+            'dataProvider'  => $dataProvider,
+        ]);
     }
 }

@@ -6,95 +6,31 @@
  * @date 01.11.2015
  */
 /* @var $this yii\web\View */
-
-$query = (new \yii\db\Query())->from('shop_basket b')->select([
-    '*',
-    "count(*) as total",
-    "sum(quantity) as total_quantity",
-    "sum(price) as sum_price",
-
-    "(SELECT sum(quantity) FROM shop_basket WHERE product_id = b.product_id AND order_id != '') as total_in_orders",
-    "(SELECT sum(quantity) FROM shop_basket as inBasket LEFT JOIN shop_order as o on o.id = inBasket.order_id WHERE inBasket.product_id = b.product_id AND inBasket.order_id != '' AND o.payed = 'Y' ) as total_in_payed_orders",
-
-    "(SELECT count(*) FROM shop_basket WHERE product_id = b.product_id AND order_id != '' ) as total_orders",
-
-    "(SELECT count(*) FROM shop_basket as inBasket LEFT JOIN shop_order as o on o.id = inBasket.order_id WHERE inBasket.product_id = b.product_id AND inBasket.order_id != '' AND o.payed = 'Y' ) as total_payed_orders",
-
-    "(SELECT sum(quantity) FROM shop_basket WHERE product_id = b.product_id AND fuser_id != '') as total_in_carts",
-])
-    ->where([
-        "!=", "product_id", ""
-    ])
-    //->andHaving([">", "total_payed_orders", "0"])
-    ->groupBy('product_id')
-//echo $query->createCommand()->sql;die;
-
+/* @var $search \skeeks\cms\shop\models\search\AdminReportProductSearch */
+/* @var $dataProvider \yii\data\ActiveDataProvider */
 ?>
 
-<?
-$columns =
-[
-    [
-        'attribute' => 'name',
-        'label' => 'Название',
-    ],
-
-    [
-        'attribute' => 'total_quantity',
-        'label' => 'Общее количество',
-    ],
-/*
-    [
-        'attribute' => 'total',
-        'label' => 'Количество корзин',
-    ],*/
-
-    [
-        'attribute' => 'total_in_orders',
-        'label' => 'Общее количество в заказах',
-    ],
-
-    [
-        'attribute' => 'total_orders',
-        'label' => 'Количество заказов',
-    ],
+<? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
+    'method' => 'get',
+    'enableAjaxValidation' => false,
+    'usePjax' => false
+]); ?>
+    <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'displayFormat' => 'php:d-M-Y H:i:s',
+        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+    ]); ?>
 
 
-    [
-        'attribute' => 'total_in_payed_orders',
-        'label' => 'Общее количество в оплаченных заказов',
-    ],
-
-
-
-    [
-        'attribute' => 'total_payed_orders',
-        'label' => 'Количество оплаченных заказов',
-    ],
-
-
-    [
-        'attribute' => 'total_in_carts',
-        'label' => 'Общее количество в корзинах',
-    ],
-
-    'sum_price',
-];
-
-?>
+    <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::classname(), [
+        //'displayFormat' => 'php:d-M-Y H:i:s',
+        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+    ]); ?>
+    <button class="btn btn-default" type="submit">Применить</button>
+<? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-    'dataProvider' => new \yii\data\ActiveDataProvider([
-        'query' => $query,
-        'sort'              => [
-            'attributes' => array_keys( \yii\helpers\ArrayHelper::map($columns, 'attribute', 'attribute') ),
-            'defaultOrder' =>
-            [
-                'total_in_payed_orders' => SORT_DESC
-            ]
-        ],
-    ]),
-
-    'columns' => $columns,
+    'dataProvider' => $dataProvider,
+    'filterModel' => $search,
+    'columns' => $search->getColumns(),
 ]); ?>
 
