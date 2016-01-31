@@ -15,17 +15,35 @@
     'enableAjaxValidation' => false,
     'usePjax' => false
 ]); ?>
-    <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::classname(), [
-        //'displayFormat' => 'php:d-M-Y H:i:s',
-        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-    ]); ?>
+    <div class="row">
+        <div class="col-md-3">
+            <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::classname(), [
+                //'displayFormat' => 'php:d-M-Y H:i:s',
+                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+            ]); ?>
+        </div>
+        <div class="col-md-3">
+            <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::classname(), [
+            //'displayFormat' => 'php:d-M-Y H:i:s',
+            'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+        ]); ?>
+        </div>
+        <div class="col-md-3">
+            <label class="control-label" for="adminreportproductsearch-to" style="width: 100%;">&nbsp;</label>
+            <?= $form->field($search, 'onlyPayed')->checkbox(); ?>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group field-adminreportproductsearch-to">
+                <label class="control-label" for="adminreportproductsearch-to" style="width: 100%;">&nbsp;</label>
+                <button class="btn btn-default" type="submit">Применить</button>
+            </div>
+        </div>
+    </div>
 
 
-    <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::classname(), [
-        //'displayFormat' => 'php:d-M-Y H:i:s',
-        'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-    ]); ?>
-    <button class="btn btn-default" type="submit">Применить</button>
+
+
+
 <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([

@@ -15,6 +15,8 @@ class AdminReportProductSearch extends Model
     public $from;
     public $to;
 
+    public $onlyPayed;
+
     /**
      * @inheritdoc
      */
@@ -22,6 +24,7 @@ class AdminReportProductSearch extends Model
     {
         return [
             [['from', 'to'], 'safe'],
+            [['onlyPayed'], 'safe'],
         ];
     }
 
@@ -29,7 +32,8 @@ class AdminReportProductSearch extends Model
     {
         return [
             'from' => 'От',
-            'to'    => 'До'
+            'to'    => 'До',
+            'onlyPayed'    => 'Только оплаченные заказы'
         ];
     }
 
@@ -80,7 +84,11 @@ class AdminReportProductSearch extends Model
                 'label' => 'Общее количество в корзинах',
             ],
 
-            'sum_price',
+
+            [
+                'attribute' => 'sum_in_payed_orders',
+                'label' => 'Цена в оплаченных заказах',
+            ],
         ];
     }
 
@@ -90,7 +98,7 @@ class AdminReportProductSearch extends Model
      */
     public function search($params = [])
     {
-        $query = (new \yii\db\Query())->from('shop_basket b')->groupBy('b.product_id')->select(['*']);
+        $query = (new \yii\db\Query())->from('shop_basket b')->groupBy('b.product_id')->select(['b.name']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -109,7 +117,6 @@ class AdminReportProductSearch extends Model
             $query->addSelect([
                 "count(*) as total",
                 "sum(quantity) as total_quantity",
-                "sum(price) as sum_price",
             ]);
 
             $query->where([
@@ -120,6 +127,7 @@ class AdminReportProductSearch extends Model
 
             $total_in_orders        = "SELECT sum(quantity) FROM shop_basket WHERE product_id = b.product_id AND order_id != ''";
             $total_in_payed_orders  = "SELECT sum(quantity) FROM shop_basket as inBasket LEFT JOIN shop_order as o on o.id = inBasket.order_id WHERE inBasket.product_id = b.product_id AND inBasket.order_id != '' AND o.payed = 'Y'";
+            $sum_in_payed_orders    = "SELECT sum(inBasket.price) FROM shop_basket as inBasket LEFT JOIN shop_order as o on o.id = inBasket.order_id WHERE inBasket.product_id = b.product_id AND inBasket.order_id != '' AND o.payed = 'Y'";
             $total_orders           = "SELECT count(*) FROM shop_basket WHERE product_id = b.product_id AND order_id != ''";
             $total_payed_orders     = "SELECT count(*) FROM shop_basket as inBasket LEFT JOIN shop_order as o on o.id = inBasket.order_id WHERE inBasket.product_id = b.product_id AND inBasket.order_id != '' AND o.payed = 'Y'";
             $total_in_carts         = "SELECT sum(quantity) FROM shop_basket WHERE product_id = b.product_id AND fuser_id != ''";
@@ -129,6 +137,7 @@ class AdminReportProductSearch extends Model
                 $query->andWhere(['>=', 'b.updated_at', (int) $this->from]);
                 $total_in_orders = $total_in_orders . " AND updated_at >= " . (int) $this->from;
                 $total_in_payed_orders = $total_in_payed_orders . " AND inBasket.updated_at >= " . (int) $this->from;
+                $sum_in_payed_orders = $sum_in_payed_orders . " AND inBasket.updated_at >= " . (int) $this->from;
                 $total_orders = $total_orders . " AND shop_basket.updated_at >= " . (int) $this->from;
                 $total_payed_orders = $total_payed_orders . " AND inBasket.updated_at >= " . (int) $this->from;
                 $total_in_carts = $total_in_carts . " AND shop_basket.updated_at >= " . (int) $this->from;
@@ -138,6 +147,7 @@ class AdminReportProductSearch extends Model
                 $query->andWhere(['<=', 'b.updated_at', (int) $this->to]);
                 $total_in_orders = $total_in_orders . " AND updated_at <= " . (int) $this->to;
                 $total_in_payed_orders = $total_in_payed_orders . " AND inBasket.updated_at <= " . (int) $this->to;
+                $sum_in_payed_orders = $sum_in_payed_orders . " AND inBasket.updated_at <= " . (int) $this->to;
                 $total_orders = $total_orders . " AND shop_basket.updated_at <= " . (int) $this->to;
                 $total_payed_orders = $total_payed_orders . " AND inBasket.updated_at <= " . (int) $this->to;
                 $total_in_carts = $total_in_carts . " AND shop_basket.updated_at <= " . (int) $this->to;
@@ -149,8 +159,14 @@ class AdminReportProductSearch extends Model
                 "({$total_orders}) as total_orders",
                 "({$total_payed_orders}) as total_payed_orders",
                 "({$total_in_carts}) as total_in_carts",
+                "({$sum_in_payed_orders}) as sum_in_payed_orders",
             ]);
 
+            if ($this->onlyPayed)
+            {
+                 $query->leftJoin('shop_order as ord', 'ord.id = b.order_id');
+                 $query->andWhere(['ord.payed' => 'Y']);
+            }
             return $dataProvider;
 
         } else
@@ -158,10 +174,10 @@ class AdminReportProductSearch extends Model
             $query->addSelect([
                 "count(*) as total",
                 "sum(quantity) as total_quantity",
-                "sum(price) as sum_price",
 
                 "(SELECT sum(quantity) FROM shop_basket WHERE product_id = b.product_id AND order_id != '') as total_in_orders",
                 "(SELECT sum(quantity) FROM shop_basket as inBasket LEFT JOIN shop_order as o on o.id = inBasket.order_id WHERE inBasket.product_id = b.product_id AND inBasket.order_id != '' AND o.payed = 'Y' ) as total_in_payed_orders",
+                "(SELECT sum(inBasket.price) FROM shop_basket as inBasket LEFT JOIN shop_order as o on o.id = inBasket.order_id WHERE inBasket.product_id = b.product_id AND inBasket.order_id != '' AND o.payed = 'Y' ) as sum_in_payed_orders",
 
                 "(SELECT count(*) FROM shop_basket WHERE product_id = b.product_id AND order_id != '' ) as total_orders",
 
