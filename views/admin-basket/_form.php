@@ -15,6 +15,7 @@ if (\Yii::$app->request->get('order_id') && $model->isNewRecord)
 {
     $model->order_id = \Yii::$app->request->get('order_id');
 }
+
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -64,3 +65,22 @@ if (\Yii::$app->request->get('order_id') && $model->isNewRecord)
 
     <?= $form->buttonsCreateOrUpdate($model); ?>
 <?php ActiveForm::end(); ?>
+
+<?
+
+
+$this->registerJs(<<<JS
+_.each(sx.components, function(Component, key)
+{
+    if (Component instanceof sx.classes.SelectCmsElement)
+    {
+        Component.bind('change', function(e, data)
+        {
+            $('#shopbasket-name').val(data.name);
+            $('#shopbasket-quantity').val(1);
+        });
+    }
+});
+JS
+);
+?>
