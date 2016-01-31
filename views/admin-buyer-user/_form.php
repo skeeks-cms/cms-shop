@@ -278,28 +278,74 @@ $roles = implode(', ', $result);
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'attribute' => 'name'
-            ],
-
-            [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
-                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                'class'     => \yii\grid\DataColumn::className(),
+                'format'    => 'raw',
+                'value'     => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                 {
-                    return \Yii::$app->money->intlFormatter()->format($shopBasket->money);
+                    $widget = new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
+                        'image' => $shopBasket->product->cmsContentElement->image
+                    ]);
+                    return $widget->run();
                 }
             ],
 
             [
                 'class' => \yii\grid\DataColumn::className(),
-                'attribute' => 'quantity'
+                'attribute' => 'name',
+                'format' => 'raw',
+                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                {
+                    if ($shopBasket->product)
+                    {
+                        return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
+                            'target' => '_blank',
+                            'titla' => "Смотреть на сайте",
+                            'data-pjax' => 0
+                        ]);
+                    } else
+                    {
+                        return $shopBasket->name;
+                    }
+
+                }
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
-                'attribute' => 'site_id'
-            ]
+                'class' => \yii\grid\DataColumn::className(),
+                'attribute' => 'quantity',
+                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                {
+                    return $shopBasket->quantity . " " . $shopBasket->measure_name;
+                }
+            ],
+
+            [
+                'class' => \yii\grid\DataColumn::className(),
+                'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
+                'attribute' => 'price',
+                'format' => 'raw',
+                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                {
+                    if ($shopBasket->discount_value)
+                    {
+                        return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \skeeks\cms\shop\Module::t('app', 'Discount').": " . $shopBasket->discount_value);
+                    } else
+                    {
+                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
+                    }
+
+                }
+            ],
+            [
+                'class' => \yii\grid\DataColumn::className(),
+                'label' => \skeeks\cms\shop\Module::t('app', 'Sum'),
+                'attribute' => 'price',
+                'format' => 'raw',
+                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
+                {
+                    return \Yii::$app->money->intlFormatter()->format($shopBasket->money->multiply($shopBasket->quantity));
+                }
+            ],
 
         ]
     ]); ?>
@@ -315,7 +361,7 @@ $roles = implode(', ', $result);
         'dataProvider' => new \yii\data\ActiveDataProvider([
             'query' => \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
                 'shop_fuser_id' => $fuser->id
-            ])
+            ])->orderBy(['created_at' => SORT_DESC])
         ]),
         'columns' =>
         [
@@ -326,12 +372,17 @@ $roles = implode(', ', $result);
 
             [
                 'class' => \yii\grid\DataColumn::className(),
+                'format' => 'raw',
                 'label' => \skeeks\cms\shop\Module::t('app', 'Good'),
                 'value' => function(\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct)
                 {
                     if ($shopViewedProduct->shopProduct)
                     {
-                        return $shopViewedProduct->shopProduct->cmsContentElement->name;
+                        return Html::a($shopViewedProduct->shopProduct->cmsContentElement->name, $shopViewedProduct->shopProduct->cmsContentElement->url, [
+                            'target' => '_blank',
+                            'titla' => "Смотреть на сайте",
+                            'data-pjax' => 0
+                        ]);
                     }
 
                     return null;

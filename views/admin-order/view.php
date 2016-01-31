@@ -303,7 +303,6 @@ HTML
 
                     [
                         'class'     => \yii\grid\DataColumn::className(),
-                        'attribute' => 'name',
                         'format'    => 'raw',
                         'value'     => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                         {
