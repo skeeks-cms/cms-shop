@@ -202,14 +202,14 @@ HTML;
                     ],
                 ],
 
-                "view" =>
+                /*"view" =>
                 [
                     'class'         => AdminOneModelEditAction::className(),
                     "name"         => \Yii::t('app',"Информация"),
                     "icon"          => "glyphicon glyphicon-eye-open",
                     "priority"      => 5,
                     "callback"      => [$this, 'view'],
-                ],
+                ],*/
 
             ]
         );
