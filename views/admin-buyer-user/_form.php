@@ -261,23 +261,38 @@ CSS
 
             [
                 'class'         => \yii\grid\DataColumn::className(),
+                'filter'        => false,
+                'format'        => 'raw',
+                'label'         => \skeeks\cms\shop\Module::t('app', 'Good'),
+                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
+                {
+                    if ($model->shopBaskets)
+                    {
+                        $result = [];
+                        foreach ($model->shopBaskets as $shopBasket)
+                        {
+                            $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
+                            $result[] = Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
+                                    'target' => '_blank',
+                                    'data-pjax' => '0'
+                                ]) . <<<HTML
+    — $shopBasket->quantity $shopBasket->measure_name
+HTML;
+
+                        }
+                        return implode('<hr style="margin: 0px;"/>', $result);
+                    }
+                },
+            ],
+
+            [
+                'class'         => \yii\grid\DataColumn::className(),
                 'format'        => 'raw',
                 'attribute'     => 'price',
                 'label'         => \skeeks\cms\shop\Module::t('app', 'Sum'),
                 'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
                 {
                     return \Yii::$app->money->intlFormatter()->format($model->money);
-                },
-            ],
-
-            [
-                'class'         => \yii\grid\DataColumn::className(),
-                'attribute'     => 'site_id',
-                'format'        => 'raw',
-                'label'         => \skeeks\cms\shop\Module::t('app', 'Site'),
-                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
-                {
-                    return $model->site->name . " [{$model->site->code}]";
                 },
             ],
 
