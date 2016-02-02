@@ -14,6 +14,33 @@ $shopFuser = \Yii::$app->shop->adminShopFuser;
 //\Yii::$app->shop->setShopFuser($shopFuser);
 //$shopFuser->user_id = \Yii::$app->user->id;
 
+
+
+$this->registerJs(<<<JS
+(function(sx, $, _)
+{
+    sx.classes.CreateOrder = sx.classes.Component.extend({
+
+        _init: function()
+        {
+
+        },
+
+        _onDomReady: function()
+        {
+            this.jQueryUser = $("#shopfuser-user_id");
+            this.jQueryUser.on('change', function()
+            {
+
+            });
+        },
+    });
+
+
+})(sx, sx.$, sx._);
+JS
+);
+
 ?>
 
 
@@ -32,7 +59,12 @@ $shopFuser = \Yii::$app->shop->adminShopFuser;
     <? endif; ?>
 
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'pjaxOptions' =>
+        [
+            'id' => 'sx-pjax-order-wrapper'
+        ]
+    ]); ?>
 
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
