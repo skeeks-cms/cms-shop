@@ -27,7 +27,10 @@ if (\Yii::$app->request->get('order_id') && $model->isNewRecord)
 <? endif; ?>
 
         <?= $form->field($model, 'product_id')->widget(
-            \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className()
+            \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className(),
+            [
+                'baseRoute' => '/shop/tools/select-cms-element'
+            ]
         ); ?>
 
         <?= $form->field($model, 'name'); ?>
@@ -53,7 +56,10 @@ if (\Yii::$app->request->get('order_id') && $model->isNewRecord)
             </div>
 
             <div class="col-md-2">
-                <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'));?>
+                <?= $form->field($model, 'currency_code')->listBox(
+                    \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code')
+                    ,['size' => 1]
+                );?>
             </div>
 
             <div class="col-md-3">
@@ -76,8 +82,13 @@ _.each(sx.components, function(Component, key)
     {
         Component.bind('change', function(e, data)
         {
+            console.log(data);
             $('#shopbasket-name').val(data.name);
             $('#shopbasket-quantity').val(1);
+            $('#shopbasket-price').val(data.basePrice.price);
+            $('#shopbasket-currency_code').val(data.basePrice.currency_code);
+            $('#shopbasket-notes').val(data.basePriceType.name);
+            $('#shopbasket-measure_name').val(data.measure.symbol_rus);
         });
     }
 });
