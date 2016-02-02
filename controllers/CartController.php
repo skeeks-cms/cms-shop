@@ -445,12 +445,16 @@ class CartController extends Controller
 
                             $newUser             = new SignupForm();
                             $newUser->scenario   = SignupForm::SCENARION_ONLYEMAIL;
-
                             $newUser->email      = $userEmail;
 
                             if (!$user = $newUser->signup())
                             {
                                 throw new Exception(\skeeks\cms\shop\Module::t('app', 'Do not create a user profile.'));
+                            }
+
+                            if ($userName)
+                            {
+                                $user->name      = $userName;
                             }
 
                             //Авторизация пользователя
