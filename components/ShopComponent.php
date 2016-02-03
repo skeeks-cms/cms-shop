@@ -11,6 +11,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\kladr\models\KladrLocation;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
@@ -268,25 +269,5 @@ class ShopComponent extends Component
     {
         $this->_shopFuser = $shopFuser;
         return $this;
-    }
-
-
-    /**
-     * @return null|ShopFuser
-     */
-    public function getAdminShopFuser()
-    {
-        if (!$shopAdminFuserId = \Yii::$app->session->get('shopAdminFuserId'))
-        {
-            $shopFuser = new \skeeks\cms\shop\models\ShopFuser();
-            $shopFuser->save();
-
-            \Yii::$app->session->set('shopAdminFuserId', $shopFuser->id);
-            $shopAdminFuserId = $shopFuser->id;
-        }
-
-        $shopFuser = \skeeks\cms\shop\models\ShopFuser::findOne($shopAdminFuserId);
-
-        return $shopFuser;
     }
 }

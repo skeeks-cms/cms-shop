@@ -8,6 +8,7 @@
 namespace skeeks\cms\shop\models;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\Core;
 use skeeks\cms\models\User;
 use skeeks\modules\cms\money\Money;
@@ -81,13 +82,13 @@ class ShopFuser extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'user_id'           => \skeeks\cms\shop\Module::t('app', 'User'),
+            'user_id'           => \skeeks\cms\shop\Module::t('app', 'Пользователь сайта'),
             'additional'        => \skeeks\cms\shop\Module::t('app', 'Additional'),
-            'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'Person Type ID'),
+            'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'Тип покупателя'),
             'site_id'           => \skeeks\cms\shop\Module::t('app', 'Site ID'),
-            'delivery_id'       => \skeeks\cms\shop\Module::t('app', 'Delivery'),
-            'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Buyer ID'),
-            'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Payment system'),
+            'delivery_id'       => \skeeks\cms\shop\Module::t('app', 'Служба доставки'),
+            'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Профиль покупателя'),
+            'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Платежная система'),
         ]);
     }
 
@@ -133,6 +134,25 @@ class ShopFuser extends Core
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
+
+    /**
+     * @param CmsUser $cmsUser
+     * @return array|null|\yii\db\ActiveRecord|static
+     */
+    static public function getInstanceByUser(CmsUser $cmsUser)
+    {
+        $shopFuser = static::find()->where(['user_id' => $cmsUser->id])->one();
+
+        if (!$shopFuser)
+        {
+            $shopFuser = new static();
+            $shopFuser->user_id = $cmsUser->id;
+
+            $shopFuser->save();
+        }
+
+        return $shopFuser;
+    }
 
     /**
      * @return \yii\db\ActiveQuery

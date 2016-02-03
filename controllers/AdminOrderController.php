@@ -17,6 +17,9 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsUser;
+use skeeks\cms\modules\admin\actions\AdminAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
@@ -24,8 +27,10 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopAffiliate;
 use skeeks\cms\shop\models\ShopAffiliatePlan;
+use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopExtra;
+use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
@@ -61,6 +66,19 @@ class AdminOrderController extends AdminModelEditorController
 
         return ArrayHelper::merge(parent::actions(),
             [
+
+                'create' =>
+                [
+                    'visible'         => false,
+                ],
+
+                'create-order' =>
+                [
+                    'class'         => AdminAction::className(),
+                    'name'          => \Yii::t('app','Добавить заказ'),
+                    "icon"          => "glyphicon glyphicon-plus",
+                    "callback"      => [$this, 'createOrder'],
+                ],
 
                 'index' =>
                 [
@@ -292,4 +310,109 @@ HTML;
             return $rr;
         }
     }
+
+
+
+
+    /**
+     * @return array
+     */
+    public function actionCreateOrderFuserSave()
+    {
+        $rr = new RequestResponse();
+
+        $model = \Yii::$app->shop->adminShopFuser;
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save())
+        {
+            $rr->success = true;
+            return $rr;
+        } else
+        {
+            $rr->success = false;
+            print_r($model->getErrors());die;
+            $rr->message = implode(',', $model->getFirstError());
+            return $rr;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function actionCreateOrderBuyerSave()
+    {
+        $rr = new RequestResponse();
+
+        if ($id = \Yii::$app->request->get('shopFuserId'))
+        {
+            $shopFuser = ShopFuser::findOne($id);
+        }
+
+
+        $buyerId  = \Yii::$app->request->post('buyer');
+        $buyer = null;
+
+        if (strpos($buyerId, '-') === false)
+        {
+            /**
+             * @var $buyer ShopBuyer
+             * @var $shopPersonType ShopPersonType
+             */
+            $buyer = ShopBuyer::findOne($buyerId);
+        } else
+        {
+            $shopPersonTypeId = explode("-", $buyerId);
+            $shopPersonTypeId = $shopPersonTypeId[1];
+
+            $shopPersonType = ShopPersonType::findOne($shopPersonTypeId);
+
+        }
+
+        if ($buyer)
+        {
+            $shopFuser->buyer_id = $buyer->id;
+            $shopFuser->person_type_id = $buyer->shopPersonType->id;
+        } else if ($shopPersonType)
+        {
+            $shopFuser->person_type_id = $shopPersonType->id;
+            $shopFuser->buyer_id = null;
+        }
+
+        if ($shopFuser->save())
+        {
+            $rr->success = true;
+            return $rr;
+        } else
+        {
+            $rr->success = false;
+            print_r($model->getErrors());die;
+            $rr->message = implode(',', $model->getFirstError());
+            return $rr;
+        }
+    }
+
+
+    public function createOrder()
+    {
+        $cmsUser = null;
+        if ($userId = \Yii::$app->request->get('cmsUserId'))
+        {
+            $cmsUser = CmsUser::findOne($userId);
+        }
+
+        if ($cmsUser)
+        {
+            $shopFuser = ShopFuser::getInstanceByUser($cmsUser);
+
+            return $this->render($this->action->id, [
+                'cmsUser'   => $cmsUser,
+                'shopFuser' => $shopFuser
+            ]);
+        } else
+        {
+            return $this->render($this->action->id . "-select-user");
+        }
+
+    }
+
 }
