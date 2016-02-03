@@ -137,6 +137,17 @@ JS
             ?>
 
 
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \skeeks\cms\shop\Module::t('app', 'Shipping')
+    ])?>
+
+            <?=
+                $form->fieldSelect($shopFuser, 'delivery_id', \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'
+                ));
+            ?>
+
+
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -240,6 +251,67 @@ JS
 
 
 
+        <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+                    <div class="sx-result">
+                <?
+
+                $model = $shopFuser;
+
+                $this->registerCss(<<<CSS
+.sx-result
+{
+    background-color: #ecf2d3;
+}
+CSS
+);
+                ?>
+                <?=
+                \yii\widgets\DetailView::widget([
+                    'model' => $model,
+                    "template" => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
+                    "options" => ['class' => 'sx-result-table table detail-view'],
+                    'attributes' => [
+                        [
+                            'label' => \skeeks\cms\shop\Module::t('app', 'The total value of the goods'),
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->money),
+                        ],
+
+                        [
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Discount, margin'),
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDiscount),
+                        ],
+
+                        [
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Delivery service'),
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDelivery),
+                        ],
+
+                        [
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Taxe'),
+                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyVat),
+                        ],
+
+                        [
+                            'label' => \skeeks\cms\shop\Module::t('app', 'Weight (gramm)'),
+                            'value' => $model->weight . " ".\skeeks\cms\shop\Module::t('app', 'g.'),
+                        ],
+
+                        [
+                            'label' => \skeeks\cms\shop\Module::t('app', 'In total'),
+                            'format' => 'raw',
+                            'value' => Html::tag('b', \Yii::$app->money->intlFormatter()->format($model->money)),
+                        ]
+                    ]
+                ])
+                ?>
+                    </div>
+            </div>
+        </div>
+
+
+
     <?= $form->buttonsCreateOrUpdate($shopFuser); ?>
 
 
@@ -266,10 +338,27 @@ $this->registerJs(<<<JS
             var self = this;
 
             this.jQueryUser         = $("#shopfuser-user_id");
+            this.jQueryPaySystem   = $("#shopfuser-pay_system_id");
             this.jQueryPersonType   = $("#shoporder-person_type_id");
+            this.jQueryDelivery   = $("#shopfuser-delivery_id");
             this.jQueryForm         = $("#sx-create-order");
 
-            this.jQueryUser.on('change', function()
+            this.jQueryPaySystem.on('change', function()
+            {
+                var ajax = self.getAjaxQuery();
+                ajax.setData(self.jQueryForm.serializeArray());
+
+                var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajax);
+
+                ajaxHandler.bind('success', function()
+                {
+                    sx.CreateOrder.reload();
+                });
+
+                ajax.execute();
+            });
+
+            this.jQueryDelivery.on('change', function()
             {
                 var ajax = self.getAjaxQuery();
                 ajax.setData(self.jQueryForm.serializeArray());

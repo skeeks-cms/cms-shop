@@ -321,7 +321,11 @@ HTML;
     {
         $rr = new RequestResponse();
 
-        $model = \Yii::$app->shop->adminShopFuser;
+        $model = null;
+        if ($id = \Yii::$app->request->get('shopFuserId'))
+        {
+            $model = ShopFuser::findOne($id);
+        }
 
         if ($model->load(\Yii::$app->request->post()) && $model->save())
         {
@@ -403,6 +407,66 @@ HTML;
         if ($cmsUser)
         {
             $shopFuser = ShopFuser::getInstanceByUser($cmsUser);
+
+            $model = $shopFuser;
+
+
+
+            $rr = new RequestResponse();
+
+            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
+            {
+                return $rr->ajaxValidateForm($model);
+            }
+
+            if ($rr->isRequestPjaxPost())
+            {
+                if ($model->load(\Yii::$app->request->post()) && $model->save())
+                {
+
+                    $model->scenario = ShopFuser::SCENARIO_CREATE_ORDER;
+
+                    if ($model->validate())
+                    {
+                        $order = ShopOrder::createOrderByFuser($model);
+
+                        if (!$order->isNewRecord)
+                        {
+                            \Yii::$app->getSession()->setFlash('success',
+                                \skeeks\cms\shop\Module::t('app', 'The order #{order_id} created successfully', ['order_id' => $order->id])
+                            );
+
+                            if (\Yii::$app->request->post('submit-btn') == 'apply')
+                            {
+                                return $this->redirect(
+                                    UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                                        ->addData([$this->requestPkParamName => $order->id])
+                                        ->toString()
+                                );
+                            } else
+                            {
+                                return $this->redirect(
+                                    $this->indexUrl
+                                );
+                            }
+
+
+                        } else
+                        {
+                            throw new Exception(\skeeks\cms\shop\Module::t('app', 'Incorrect data of the new order').": " . array_shift($order->getFirstErrors()));
+                        }
+
+                    } else
+                    {
+                        throw new Exception(\skeeks\cms\shop\Module::t('app', 'Not enogh data for ordering').": " . array_shift($fuser->getFirstErrors()));
+                    }
+                } else
+                {
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                }
+            }
+
+
 
             return $this->render($this->action->id, [
                 'cmsUser'   => $cmsUser,

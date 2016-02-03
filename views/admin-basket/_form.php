@@ -16,6 +16,11 @@ if (\Yii::$app->request->get('order_id') && $model->isNewRecord)
     $model->order_id = \Yii::$app->request->get('order_id');
 }
 
+if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord)
+{
+    $model->fuser_id = \Yii::$app->request->get('fuser_id');
+}
+
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -24,6 +29,7 @@ if (\Yii::$app->request->get('order_id') && $model->isNewRecord)
 
 <? if ($model->isNewRecord) : ?>
     <?= $form->field($model, 'order_id')->hiddenInput()->label(false); ?>
+    <?= $form->field($model, 'fuser_id')->hiddenInput()->label(false); ?>
 <? endif; ?>
 
         <?= $form->field($model, 'product_id')->widget(

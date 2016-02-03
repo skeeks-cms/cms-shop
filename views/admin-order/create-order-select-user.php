@@ -33,6 +33,9 @@ CSS
 <h1 style="text-align: center;">Новый заказ для покупателя: <a href="#" class="sx-change-user">выбрать</a> или <a href="#">создать</a></h1>
 <hr />
 
+<div style="text-align: center">
+    <a href="#" class="btn btn-lg btn-primary sx-btn-for-me" data-me="<?= \Yii::$app->user->identity->id; ?>">Создать для меня</a>
+</div>
 <div style="display: none;">
     <?= \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
         'id'        => 'cmsUserId',
@@ -42,7 +45,7 @@ CSS
 
 <?
 $this->registerJs(<<<JS
-$('#cmsUserId').on('change', function()
+$("#cmsUserId [name=cmsUserId]").on('change', function()
 {
     $("#sx-change-user").submit();
 });
@@ -50,6 +53,12 @@ $('#cmsUserId').on('change', function()
 $('.sx-change-user').on('click', function()
 {
     $(".sx-btn-create").click();
+});
+
+$('.sx-btn-for-me').on('click', function()
+{
+    $("#cmsUserId [name=cmsUserId]").val($(this).data('me'));
+    $("#sx-change-user").submit();
 });
 JS
 )
