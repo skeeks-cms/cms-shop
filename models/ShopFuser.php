@@ -92,6 +92,22 @@ class ShopFuser extends Core
         ]);
     }
 
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'beforeSaveCallback']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'beforeSaveCallback']);
+    }
+
+    public function beforeSaveCallback()
+    {
+        if ($this->buyer)
+        {
+            $this->person_type_id = $this->buyer->shopPersonType->id;
+        }
+    }
+
     const SCENARIO_CREATE_ORDER = 'scentarioCreateOrder';
 
     public function scenarios()
@@ -113,6 +129,10 @@ class ShopFuser extends Core
             [['user_id'], 'unique'],
             [['buyer_id'], 'integer'],
             [['pay_system_id'], 'integer'],
+            [['person_type_id'], 'default', 'value' => function(ShopFuser $model)
+            {
+                return $model->buyer->shopPersonType->id;
+            }],
             [['pay_system_id', 'buyer_id', 'site_id', 'person_type_id', 'user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
 
         ]);
