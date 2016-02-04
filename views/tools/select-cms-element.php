@@ -61,10 +61,7 @@ JS
 
 <?
 
-$contentIds = \yii\helpers\ArrayHelper::map(
-    \skeeks\cms\shop\models\ShopContent::find()->all(),
-    'content_id', 'content_id'
-);
+$contentIds = \yii\helpers\ArrayHelper::map(\Yii::$app->shop->shopContents, 'id', 'id');
 $content_id = \Yii::$app->request->get('content_id');
 
 ?>
@@ -84,11 +81,12 @@ $content_id = \Yii::$app->request->get('content_id');
     ]);
 
 
-    $dataProvider->query->andWhere(['content_id' => $contentIds]);
 
     $search         = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsContentElement::className());
     $dataProvider   = $search->search(\Yii::$app->request->queryParams);
     $searchModel    = $search->loadedModel;
+
+    $dataProvider->query->andWhere(['content_id' => $contentIds]);
 
 
     $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);

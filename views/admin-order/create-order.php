@@ -22,6 +22,10 @@ h1 a:hover
     border-bottom: 1px dashed;
     text-decoration: none;
 }
+#sx-change-user
+{
+    margin-bottom: 10px;
+}
 CSS
 );
 \Yii::$app->shop->setShopFuser($shopFuser);
@@ -72,7 +76,8 @@ JS
         'content' => \skeeks\cms\shop\Module::t('app', 'Buyer')
     ])?>
 
-            <?= \skeeks\widget\chosen\Chosen::widget([
+
+            <?/*= \skeeks\widget\chosen\Chosen::widget([
                 'name'          => 'select-person-type',
                 'id'            => 'select-person-type',
                 'items'         => $shopFuser->getBuyersList(),
@@ -81,7 +86,26 @@ JS
                 ),
                 'placeholder'   => 'Выберите профиль покупателя',
                 'allowDeselect' => false,
-            ]); ?>
+            ]); */?>
+
+            <?=
+                $form->field($shopFuser, 'buyer_id')->widget(
+                    \skeeks\cms\widgets\formInputs\EditedSelect::className(),
+                    [
+                        'items' => \yii\helpers\ArrayHelper::map(
+                            $shopFuser->shopBuyers, 'id', 'name'
+                        ),
+
+                        'controllerRoute'   => '/shop/admin-buyer',
+                        'additionalData'    => [
+                            'cms_user_id' => $shopFuser->user->id
+                        ],
+                        'updateAction'      => 'related-properties',
+                        'allowDeselect'     => false
+                    ]
+                );
+            ?>
+
 
     <? if ($shopFuser->buyer) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -115,14 +139,18 @@ JS
                 'attributes' => array_keys($shopFuser->buyer->relatedPropertiesModel->attributeValues())
             ])?>
 
-    <? elseif ($shopFuser->personType) : ?>
-        <? $buyer = $shopFuser->personType->createModelShopBuyer(); ?>
+    <?/* elseif ($shopFuser->personType) : */?>
 
-        <? if ($properties = $buyer->relatedProperties) : ?>
-            <? foreach ($properties as $property) : ?>
-                <?= $property->renderActiveForm($form, $buyer); ?>
-            <? endforeach; ?>
-        <? endif; ?>
+        <?/* $buyer = $shopFuser->personType->createModelShopBuyer(); */?><!--
+
+        <?/* if ($properties = $buyer->relatedProperties) : */?>
+            <?/* foreach ($properties as $property) : */?>
+                <?/*= $property->renderActiveForm($form, $buyer); */?>
+            <?/* endforeach; */?>
+        --><?/* endif; */?>
+    <? else : ?>
+        Пользователь еще ничего не покупал на сайте. Для него необходимо завести и выбрать данные для профиля покупателя.
+        <hr />
     <? endif; ?>
 
 
@@ -323,9 +351,6 @@ CSS
             '/shop/admin-order/create-order-fuser-save', 'shopFuserId' => $shopFuser->id
         ])->enableAdmin()->toString(),
 
-        'backendBuyerSave' => \skeeks\cms\helpers\UrlHelper::construct([
-            '/shop/admin-order/create-order-buyer-save', 'shopFuserId' => $shopFuser->id
-        ])->enableAdmin()->toString()
     ]);
 
 $this->registerJs(<<<JS
@@ -338,6 +363,7 @@ $this->registerJs(<<<JS
             var self = this;
 
             this.jQueryUser         = $("#shopfuser-user_id");
+            this.jQueryBuyer         = $("#shopfuser-buyer_id");
             this.jQueryPaySystem   = $("#shopfuser-pay_system_id");
             this.jQueryPersonType   = $("#shoporder-person_type_id");
             this.jQueryDelivery   = $("#shopfuser-delivery_id");
@@ -349,6 +375,7 @@ $this->registerJs(<<<JS
                 ajax.setData(self.jQueryForm.serializeArray());
 
                 var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajax);
+                new sx.classes.AjaxHandlerNoLoader(ajax);
 
                 ajaxHandler.bind('success', function()
                 {
@@ -364,6 +391,7 @@ $this->registerJs(<<<JS
                 ajax.setData(self.jQueryForm.serializeArray());
 
                 var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajax);
+                new sx.classes.AjaxHandlerNoLoader(ajax);
 
                 ajaxHandler.bind('success', function()
                 {
@@ -373,26 +401,22 @@ $this->registerJs(<<<JS
                 ajax.execute();
             });
 
-
-
-            $('#select-person-type').on("change", function()
+            this.jQueryBuyer.on('change', function()
             {
-                var ajax = sx.ajax.preparePostQuery(self.get('backendBuyerSave'));
-
-                ajax.setData({
-                    'buyer' : $(this).val()
-                });
+                var ajax = self.getAjaxQuery();
+                ajax.setData(self.jQueryForm.serializeArray());
 
                 var ajaxHandler = new sx.classes.AjaxHandlerStandartRespose(ajax);
+                new sx.classes.AjaxHandlerNoLoader(ajax);
 
                 ajaxHandler.bind('success', function()
                 {
-                    self.reload();
+                    sx.CreateOrder.reload();
                 });
 
                 ajax.execute();
-
             });
+
         },
 
         /**

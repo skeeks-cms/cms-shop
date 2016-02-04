@@ -39,7 +39,7 @@ return [
         },
         'format' => 'raw',
         'attribute' => 'content_id',
-        'filter' => \skeeks\cms\models\CmsContent::getDataForSelect()
+        'filter' => \Yii::$app->shop->getArrayForSelectElement()
     ],
 
 

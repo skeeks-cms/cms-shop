@@ -415,6 +415,14 @@ class ShopFuser extends Core
      */
     public function getPaySystems()
     {
+        if (!$this->personType)
+        {
+            $query = ShopPaySystem::find()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
+            $query->multiple = true;
+
+            return $query;
+        }
+
         return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
     }
 

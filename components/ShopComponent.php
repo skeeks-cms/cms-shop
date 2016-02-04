@@ -10,6 +10,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\kladr\models\KladrLocation;
+use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
@@ -31,6 +32,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property ShopFuser $shopFuser
  * @property ShopFuser $adminShopFuser
+ *
+ * @property CmsContent $shopContents
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -269,5 +272,54 @@ class ShopComponent extends Component
     {
         $this->_shopFuser = $shopFuser;
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function getShopContents()
+    {
+        $query = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
+            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id')
+        ]);
+
+        $query->multiple = true;
+        return $query->all();
+    }
+
+    /**
+     * @return array
+     */
+    public function getArrayForSelectElement()
+    {
+
+        if (!$data = CmsContent::getDataForSelect()) {
+            return [];
+        }
+
+        $ids = ArrayHelper::map($this->shopContents, 'id', 'id');
+
+        $result = [];
+        foreach ($data as $typeKey => $type)
+        {
+            if ($type)
+            {
+                $contents = [];
+                foreach ($type as $key => $value)
+                {
+                    if (in_array($key, $ids))
+                    {
+                        $contents[$key] = $value;
+                    }
+                }
+
+                if ($contents)
+                {
+                    $result[$typeKey] = $contents;
+                }
+            }
+        }
+
+        return $result;
     }
 }
