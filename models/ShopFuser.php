@@ -133,7 +133,7 @@ class ShopFuser extends Core
             {
                 return $model->buyer->shopPersonType->id;
             }],
-            [['pay_system_id', 'buyer_id', 'site_id', 'person_type_id', 'user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
+            [['pay_system_id', 'buyer_id', 'site_id', 'user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
 
         ]);
     }
