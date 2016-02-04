@@ -66,12 +66,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     },
                 ],
 
-                'settings' =>
+                /*'settings' =>
                 [
                     'class'         => AdminModelEditorAction::className(),
                     'name'          => \skeeks\cms\shop\Module::t('app', 'Settings'),
                     "icon"          => "glyphicon glyphicon-cog",
-                ],
+                ],*/
 
                 "activate-multi" =>
                 [
