@@ -443,6 +443,10 @@ class ShopOrder extends \skeeks\cms\models\Core
             'external_order'        => \skeeks\cms\shop\Module::t('app', 'External Order'),
             'buyer_id'              => \skeeks\cms\shop\Module::t('app', 'Profile of buyer'),
             'allow_payment'         => \skeeks\cms\shop\Module::t('app', 'Allow Payment'),
+
+            'delivery_id'       => \skeeks\cms\shop\Module::t('app', 'Служба доставки'),
+            'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Профиль покупателя'),
+            'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Платежная система'),
         ];
     }
 
@@ -709,6 +713,16 @@ class ShopOrder extends \skeeks\cms\models\Core
         return $result;
     }
 
+
+    /**
+     * Доступные платежные системы
+     *
+     * @return ShopPaySystem[]
+     */
+    public function getPaySystems()
+    {
+        return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
+    }
 
     /**
      * @return $this

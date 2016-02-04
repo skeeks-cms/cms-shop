@@ -12,10 +12,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
 
 $this->registerCss(<<<CSS
-.sx-status
-{
-    color: {$model->status->color};
-}
+
 .sx-dashed
 {
 
@@ -26,8 +23,6 @@ $this->registerCss(<<<CSS
 {
     text-decoration: none;
 }
-
-
 
 .datetimepicker
 {
@@ -78,6 +73,8 @@ JS
 $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 ?>
 
+<h1 style="text-align: center;">Просмотр заказа ID (<?= $model->id ?>), № <?= $model->id ?>, создан <?= \Yii::$app->formatter->asDatetime($model->created_at); ?></h1>
+
 <?php $form = ActiveForm::begin([
     'pjaxOptions' =>
     [
@@ -97,7 +94,7 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
             'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
             'attributes' =>
             [
-                [                      // the owner name of the model
+                /*[                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Number of order'),
                     'format' => 'raw',
                     'value' => $model->id,
@@ -107,7 +104,7 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
                     'label' => \skeeks\cms\shop\Module::t('app', 'Created At'),
                     'format' => 'raw',
                     'value' => \Yii::$app->formatter->asDatetime($model->created_at),
-                ],
+                ],*/
 
                 [                      // the owner name of the model
                     'label' => \skeeks\cms\shop\Module::t('app', 'Last modified'),
@@ -120,7 +117,7 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
                     'format' => 'raw',
                     'value' => <<<HTML
 
-                    <a href="#sx-status-change" class="sx-status sx-dashed sx-fancybox">{$model->status->name}</a>
+                    <a href="#sx-status-change" class="sx-dashed sx-fancybox" style="color: {$model->status->color}">{$model->status->name}</a>
                     <small>({$statusDate})</small>
 HTML
 
@@ -397,91 +394,6 @@ HTML
             ],
         ]); ?>
 
-
-        <?/*= \skeeks\cms\modules\admin\widgets\GridView::widget([
-            'dataProvider' => new \yii\data\ArrayDataProvider([
-                'models' => $model->shopBaskets
-            ]),
-
-            'layout' => "{items}\n{pager}",
-
-            'columns' =>
-            [
-                [
-                    'class' => \yii\grid\SerialColumn::className()
-                ],
-
-                [
-                    'class'     => \yii\grid\DataColumn::className(),
-                    'attribute' => 'name',
-                    'format'    => 'raw',
-                    'value'     => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                    {
-                        $widget = new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-                            'image' => $shopBasket->product->cmsContentElement->image
-                        ]);
-                        return $widget->run();
-                    }
-                ],
-                [
-                    'class' => \yii\grid\DataColumn::className(),
-                    'attribute' => 'name',
-                    'format' => 'raw',
-                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                    {
-                        if ($shopBasket->product)
-                        {
-                            return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
-                                'target' => '_blank',
-                                'titla' => "Смотреть на сайте",
-                                'data-pjax' => 0
-                            ]);
-                        } else
-                        {
-                            return $shopBasket->name;
-                        }
-
-                    }
-                ],
-
-                [
-                    'class' => \yii\grid\DataColumn::className(),
-                    'attribute' => 'quantity',
-                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                    {
-                        return $shopBasket->quantity . " " . $shopBasket->measure_name;
-                    }
-                ],
-
-                [
-                    'class' => \yii\grid\DataColumn::className(),
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
-                    'attribute' => 'price',
-                    'format' => 'raw',
-                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                    {
-                        if ($shopBasket->discount_value)
-                        {
-                            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \skeeks\cms\shop\Module::t('app', 'Discount').": " . $shopBasket->discount_value);
-                        } else
-                        {
-                            return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
-                        }
-
-                    }
-                ],
-                [
-                    'class' => \yii\grid\DataColumn::className(),
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Sum'),
-                    'attribute' => 'price',
-                    'format' => 'raw',
-                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                    {
-                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money->multiply($shopBasket->quantity));
-                    }
-                ],
-            ]
-        ]); */?>
 
         <div class="row">
             <div class="col-md-8"></div>
@@ -830,6 +742,12 @@ JS
 
         ]); ?>
 
+            <?=
+                $form->fieldSelect($model, 'pay_system_id', \yii\helpers\ArrayHelper::map(
+                    $model->paySystems, 'id', 'name'
+                ));
+            ?>
+
             <?= $form->fieldRadioListBoolean($model, 'allow_payment'); ?>
 
             <button class="btn btn-primary">Сохранить</button>
@@ -852,6 +770,12 @@ JS
     ),
 
         ]); ?>
+
+            <?=
+                $form->fieldSelect($model, 'delivery_id', \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'
+                ));
+            ?>
 
             <?= $form->fieldRadioListBoolean($model, 'allow_delivery'); ?>
 

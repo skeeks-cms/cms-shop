@@ -26,6 +26,7 @@ if ($roles = \Yii::$app->authManager->getRolesByUser($model->id))
 $roles = implode(', ', $result);
 ?>
 
+
 <?php $form = ActiveForm::begin(); ?>
 
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
@@ -139,40 +140,56 @@ $roles = implode(', ', $result);
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet("Профили покупателя"); ?>
+<?= $form->fieldSet("Профили покупателя (" . \skeeks\cms\shop\models\ShopBuyer::find()->where([
+                'cms_user_id' => $model->id
+            ])->count() .  ")"); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => 'Все профили покупателя'
     ])?>
 
-        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-            'dataProvider' => new \yii\data\ActiveDataProvider([
-                'query' => \skeeks\cms\shop\models\ShopBuyer::find()->where([
-                    'cms_user_id' => $model->id
-                ])
-            ]),
-            'columns' =>
-            [
-                'id',
-                'name',
-
-                [
-                    'class'         => \yii\grid\DataColumn::className(),
-                    'attribute'     => 'shop_person_type_id',
-                    'format'        => 'raw',
-                    'value'         => function(\skeeks\cms\shop\models\ShopBuyer $model)
-                    {
-                        return $model->shopPersonType->name;
-                    }
+        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                'label'             => "",
+                'parentModel'       => $model,
+                'relation'          => [
+                    'cms_user_id'      => 'id',
                 ],
 
-                [
-                    'class'         => \skeeks\cms\grid\DateTimeColumnData::className(),
-                    'attribute'     => 'created_at',
+                'sort'              => [
+                    'defaultOrder' =>
+                    [
+                        'updated_at' => SORT_DESC
+                    ]
                 ],
 
-            ]
-        ]); ?>
+                'controllerRoute'   => 'shop/admin-buyer',
+                'gridViewOptions'   =>
+                [
+                    'columns' =>
+                    [
+                        'id',
+                        'name',
+
+                        [
+                            'class'         => \yii\grid\DataColumn::className(),
+                            'attribute'     => 'shop_person_type_id',
+                            'format'        => 'raw',
+                            'value'         => function(\skeeks\cms\shop\models\ShopBuyer $model)
+                            {
+                                return $model->shopPersonType->name;
+                            }
+                        ],
+
+                        [
+                            'class'         => \skeeks\cms\grid\DateTimeColumnData::className(),
+                            'attribute'     => 'created_at',
+                        ],
+
+                    ]
+                ]
+        ]);
+        ?>
+
 
 <?= $form->fieldSetEnd(); ?>
 
@@ -191,8 +208,17 @@ $view = $this;
         'dataProvider' => new \yii\data\ActiveDataProvider([
             'query' => \skeeks\cms\shop\models\ShopOrder::find()->where([
                 'user_id' => $model->id
-            ])
+            ]),
+
+            'sort' =>
+            [
+                'defaultOrder' =>
+                [
+                    'created_at' => SORT_DESC
+                ]
+            ],
         ]),
+
         'columns' =>
         [
             'id',
@@ -445,5 +471,8 @@ HTML;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<div style="text-align: center; margin-top: 15px;">
+    <a data-pjax="0" href="<?= \skeeks\cms\helpers\UrlHelper::construct(['/shop/admin-order/create-order', 'cmsUserId' => $model->id])->enableAdmin()->toString()?>" class="btn btn-primary">Создать заказ</a>
+</div>
+
 <?php ActiveForm::end(); ?>
