@@ -32,12 +32,14 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord)
     <?= $form->field($model, 'fuser_id')->hiddenInput()->label(false); ?>
 <? endif; ?>
 
-        <?= $form->field($model, 'product_id')->widget(
-            \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className(),
-            [
-                'baseRoute' => '/shop/tools/select-cms-element'
-            ]
-        ); ?>
+        <div style="display: none;">
+            <?= $form->field($model, 'product_id')->widget(
+                \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className(),
+                [
+                    'baseRoute' => '/shop/tools/select-cms-element'
+                ]
+            ); ?>
+        </div>
 
         <?= $form->field($model, 'name'); ?>
 
@@ -88,7 +90,6 @@ _.each(sx.components, function(Component, key)
     {
         Component.bind('change', function(e, data)
         {
-            console.log(data);
             $('#shopbasket-name').val(data.name);
             $('#shopbasket-quantity').val(1);
             $('#shopbasket-price').val(data.basePrice.price);

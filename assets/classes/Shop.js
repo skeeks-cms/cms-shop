@@ -70,6 +70,15 @@
 
             //TODO: реализовать
             data = data || {};
+            quantity = quantity || 0;
+
+            product_id  = Number(product_id);
+            quantity    = Number(quantity);
+
+            if (quantity <= 0)
+            {
+                quantity = 1;
+            }
 
             this.trigger('beforeAddProduct', {
                 'product_id'    : product_id,
@@ -79,8 +88,8 @@
             var ajax = this.ajaxQuery().setUrl(this.get('backend-add-product'));
 
             ajax.setData({
-                'product_id'    : Number(product_id),
-                'quantity'      : Number(quantity),
+                'product_id'    : product_id,
+                'quantity'      : quantity,
             });
 
             ajax.onSuccess(function(e, data)

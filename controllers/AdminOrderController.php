@@ -27,6 +27,7 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopAffiliate;
 use skeeks\cms\shop\models\ShopAffiliatePlan;
+use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopExtra;
@@ -34,6 +35,7 @@ use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
+use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopTax;
 use skeeks\cms\shop\models\ShopVat;
 use yii\base\Exception;
@@ -339,6 +341,139 @@ HTML;
             print_r($model->getErrors());die;
             $rr->message = implode(',', $model->getFirstError());
             return $rr;
+        }
+    }
+
+
+    /**
+     * @return array
+     */
+    public function actionCreateOrderAddProduct()
+    {
+        $rr = new RequestResponse();
+
+        $shopFuser = null;
+        if ($id = \Yii::$app->request->get('shopFuserId'))
+        {
+            $shopFuser = ShopFuser::findOne($id);
+        }
+
+
+        if ($rr->isRequestAjaxPost())
+        {
+            $product_id         = \Yii::$app->request->post('product_id');
+            $quantity           = \Yii::$app->request->post('quantity');
+
+            /**
+             * @var ShopProduct $product
+             */
+            $product = ShopProduct::find()->where(['id' => $product_id])->one();
+
+            if (!$product)
+            {
+                $rr->message = \skeeks\cms\shop\Module::t('app', 'This product is not found, it may be removed.');
+                return (array) $rr;
+            }
+
+            $shopBasket = ShopBasket::find()->where([
+                'fuser_id'      => $shopFuser->id,
+                'product_id'    => $product_id,
+                'order_id'      => null,
+            ])->one();
+
+            if (!$shopBasket)
+            {
+                $shopBasket = new ShopBasket([
+                    'fuser_id'          => $shopFuser->id,
+                    'product_id'        => $product->id,
+                    'quantity'          => 0,
+                ]);
+            }
+
+            $shopBasket->quantity                   = $shopBasket->quantity + $quantity;
+
+
+            if (!$shopBasket->recalculate()->save())
+            {
+                $rr->success = false;
+                $rr->message = \skeeks\cms\shop\Module::t('app', 'Failed to add item to cart');
+            } else
+            {
+                $rr->success = true;
+                $rr->message = \skeeks\cms\shop\Module::t('app', 'Item added to cart');
+            }
+
+            $shopFuser->link('site', \Yii::$app->cms->site);
+            $rr->data = $shopFuser->toArray([], $shopFuser->extraFields());
+            return (array) $rr;
+        } else
+        {
+            return $this->goBack();
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function actionUpdateOrderAddProduct()
+    {
+        $rr = new RequestResponse();
+
+        if ($this->model)
+        {
+            $model = $this->model;
+        }
+
+
+        if ($rr->isRequestAjaxPost())
+        {
+            $product_id         = \Yii::$app->request->post('product_id');
+            $quantity           = \Yii::$app->request->post('quantity');
+
+            /**
+             * @var ShopProduct $product
+             */
+            $product = ShopProduct::find()->where(['id' => $product_id])->one();
+
+            if (!$product)
+            {
+                $rr->message = \skeeks\cms\shop\Module::t('app', 'This product is not found, it may be removed.');
+                return (array) $rr;
+            }
+
+            $shopBasket = ShopBasket::find()->where([
+                'order_id'      => $model->id,
+                'product_id'    => $product_id,
+                'fuser_id'      => null,
+            ])->one();
+
+            if (!$shopBasket)
+            {
+                $shopBasket = new ShopBasket([
+                    'order_id'          => $model->id,
+                    'product_id'        => $product->id,
+                    'quantity'          => 0,
+                ]);
+            }
+
+            $shopBasket->quantity                   = $shopBasket->quantity + $quantity;
+
+
+            if (!$shopBasket->recalculate()->save())
+            {
+                $rr->success = false;
+                $rr->message = \skeeks\cms\shop\Module::t('app', 'Failed to add item to cart');
+            } else
+            {
+                $rr->success = true;
+                $rr->message = \skeeks\cms\shop\Module::t('app', 'Item added to cart');
+            }
+
+            $rr->data = $model->toArray([], $model->extraFields());
+            return (array) $rr;
+        } else
+        {
+            return $this->goBack();
         }
     }
 

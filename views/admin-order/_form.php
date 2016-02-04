@@ -280,6 +280,23 @@ HTML
 
 
 
+<?
+
+$json = \yii\helpers\Json::encode([
+    'createUrl' => \skeeks\cms\helpers\UrlHelper::construct('/shop/admin-basket/create', [
+                    'order_id'      => $model->id,
+                ])
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                ->enableAdmin()->toString()
+]);
+
+$onclick = new \yii\web\JsExpression(<<<JS
+    new sx.classes.AddPosition({$json}).open(); return true;
+JS
+);
+?>
+
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => "",
             'parentModel'       => $model,
@@ -287,15 +304,22 @@ HTML
                 'order_id'      => 'id',
             ],
 
-            /*'sort'              => [
+            'sort'              => [
                 'defaultOrder' =>
                 [
-                    'priority' => 'published_at'
+                    'updated_at' => SORT_DESC
                 ]
-            ],*/
+            ],
 
             'controllerRoute'   => 'shop/admin-basket',
             'gridViewOptions'   => [
+                'enabledPjax' => false,
+            'beforeTableLeft' => <<<HTML
+            <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>Добавить товар</a>
+            <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i>Добавить позицию</a>
+HTML
+        ,
+
                 'columns' => [
                     /*[
                         'class' => \yii\grid\SerialColumn::className()
@@ -520,6 +544,59 @@ CSS
             </div>
         </div>
 
+
+
+<?
+
+\skeeks\cms\shop\assets\ShopAsset::register($this);
+
+    $shopJson = \yii\helpers\Json::encode([
+
+        'backend-add-product' => \skeeks\cms\helpers\UrlHelper::construct([
+            '/shop/admin-order/update-order-add-product', 'pk' => $model->id
+        ])->enableAdmin()->toString(),
+
+    ]);
+
+
+$this->registerJs(<<<JS
+
+    sx.classes.SelectProduct = sx.classes.Component.extend({
+
+        open: function()
+        {
+            $('#sx-add-product .sx-btn-create').click()
+            return this;
+        }
+    });
+
+    sx.classes.AdminShop = sx.classes.shop.App.extend({});
+    sx.AdminShop = new sx.classes.AdminShop({$shopJson});
+    sx.AdminShop.bind('addProduct', function()
+    {
+        $.pjax.reload('#sx-pjax-order-wrapper');
+    });
+
+
+    sx.classes.AddPosition = sx.classes.Component.extend({
+
+        open: function()
+        {
+            var self = this;
+            var window = new sx.classes.Window(this.get('createUrl'));
+            window.bind("close", function()
+            {
+                $.pjax.reload('#sx-pjax-order-wrapper');
+            });
+
+            window.open();
+        }
+    });
+
+JS
+);
+
+?>
 
 <?= $form->fieldSetEnd(); ?>
 
@@ -811,3 +888,43 @@ JS
 
     </div>
 </div>
+
+
+
+
+
+<div style="display: none;">
+    <?=
+        \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::widget([
+            'baseRoute'     => '/shop/tools/select-cms-element',
+            'name'          => 'sx-add-product',
+            'id'            => 'sx-add-product',
+            'closeWindow'   => false,
+        ]);
+    ?>
+</div>
+
+<?
+
+$this->registerJs(<<<JS
+(function(sx, $, _)
+{
+    _.each(sx.components, function(Component, key)
+    {
+        if (Component instanceof sx.classes.SelectCmsElement)
+        {
+            Component.bind('change', function(e, data)
+            {
+                sx.AdminShop.addProduct(data.id);
+            });
+
+            Component.unbind('change', function(e, data)
+            {
+                sx.AdminShop.addProduct(data.id);
+            });
+        }
+    });
+})(sx, sx.$, sx._);
+JS
+);
+?>

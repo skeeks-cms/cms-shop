@@ -54,7 +54,7 @@ $('#cmsUserId').on('change', function()
 
 $('.sx-change-user').on('click', function()
 {
-    $(".sx-btn-create").click();
+    $("#cmsUserId .sx-btn-create").click();
 });
 JS
 )
@@ -184,6 +184,22 @@ JS
 
 
 
+<?
+
+$json = \yii\helpers\Json::encode([
+    'createUrl' => \skeeks\cms\helpers\UrlHelper::construct('/shop/admin-basket/create', [
+                    'fuser_id'      => $shopFuser->id,
+                ])
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
+                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
+                ->enableAdmin()->toString()
+]);
+
+$onclick = new \yii\web\JsExpression(<<<JS
+    new sx.classes.AddPosition({$json}).open(); return true;
+JS
+);
+?>
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
         'label'             => "",
         'parentModel'       => $shopFuser,
@@ -191,15 +207,22 @@ JS
             'fuser_id'      => 'id',
         ],
 
-        /*'sort'              => [
+        'sort'              => [
             'defaultOrder' =>
             [
-                'priority' => 'published_at'
+                'updated_at' => SORT_DESC
             ]
-        ],*/
+        ],
 
         'controllerRoute'   => 'shop/admin-basket',
         'gridViewOptions'   => [
+            'enabledPjax' => false,
+            'beforeTableLeft' => <<<HTML
+    <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>Добавить товар</a>
+    <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i>Добавить позицию</a>
+HTML
+,
+
             'columns' => [
                 /*[
                     'class' => \yii\grid\SerialColumn::className()
@@ -343,12 +366,22 @@ CSS
     <?= $form->buttonsCreateOrUpdate($shopFuser); ?>
 
 
+
     <?
+\skeeks\cms\shop\assets\ShopAsset::register($this);
 
     $clientData = \yii\helpers\Json::encode([
 
         'backendFuserSave' => \skeeks\cms\helpers\UrlHelper::construct([
             '/shop/admin-order/create-order-fuser-save', 'shopFuserId' => $shopFuser->id
+        ])->enableAdmin()->toString(),
+
+    ]);
+
+    $shopJson = \yii\helpers\Json::encode([
+
+        'backend-add-product' => \skeeks\cms\helpers\UrlHelper::construct([
+            '/shop/admin-order/create-order-add-product', 'shopFuserId' => $shopFuser->id
         ])->enableAdmin()->toString(),
 
     ]);
@@ -436,9 +469,81 @@ $this->registerJs(<<<JS
 
     sx.CreateOrder = new sx.classes.CreateOrder({$clientData});
 
+    sx.classes.SelectProduct = sx.classes.Component.extend({
+
+        open: function()
+        {
+            $('#sx-add-product .sx-btn-create').click()
+            return this;
+        }
+    });
+
+    sx.classes.AdminShop = sx.classes.shop.App.extend({});
+    sx.AdminShop = new sx.classes.AdminShop({$shopJson});
+    sx.AdminShop.bind('addProduct', function()
+    {
+        sx.CreateOrder.reload();
+    });
+
+
+    sx.classes.AddPosition = sx.classes.Component.extend({
+
+        open: function()
+        {
+            var self = this;
+            var window = new sx.classes.Window(this.get('createUrl'));
+            window.bind("close", function()
+            {
+                sx.CreateOrder.reload();
+            });
+
+            window.open();
+        }
+    });
+
+
 })(sx, sx.$, sx._);
 JS
 );
 
     ?>
+
+
+
 <?php ActiveForm::end(); ?>
+
+<div style="display: none;">
+    <?=
+        \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::widget([
+            'baseRoute'     => '/shop/tools/select-cms-element',
+            'name'          => 'sx-add-product',
+            'id'            => 'sx-add-product',
+            'closeWindow'   => false,
+        ]);
+    ?>
+</div>
+
+<?
+
+$this->registerJs(<<<JS
+(function(sx, $, _)
+{
+    _.each(sx.components, function(Component, key)
+    {
+        if (Component instanceof sx.classes.SelectCmsElement)
+        {
+            Component.bind('change', function(e, data)
+            {
+                sx.AdminShop.addProduct(data.id);
+            });
+
+            Component.unbind('change', function(e, data)
+            {
+                sx.AdminShop.addProduct(data.id);
+            });
+        }
+    });
+})(sx, sx.$, sx._);
+JS
+);
+?>
