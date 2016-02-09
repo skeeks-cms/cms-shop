@@ -70,6 +70,7 @@ use yii\helpers\Json;
  * @property ShopProduct $product
  * @property ShopProductPrice $productPrice
  * @property CmsSite $site
+ * @property ShopBasketProps[] $shopBasketProps
  *
  * @property Money $money
  * @property Money $moneyOriginal
@@ -217,6 +218,13 @@ class ShopBasket extends \skeeks\cms\models\Core
         return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopBasketProps()
+    {
+        return $this->hasMany(ShopBasketProps::className(), ['shop_basket_id' => 'id']);
+    }
 
     /**
      * @return \yii\db\ActiveQuery

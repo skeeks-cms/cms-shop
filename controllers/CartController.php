@@ -102,6 +102,14 @@ class CartController extends Controller
                 return (array) $rr;
             }
 
+            if ($product->measure_ratio > 1)
+            {
+                if ( $quantity % $product->measure_ratio != 0)
+                {
+                    $quantity = $product->measure_ratio;
+                }
+            }
+
             $shopBasket = ShopBasket::find()->where([
                 'fuser_id'      => \Yii::$app->shop->shopFuser->id,
                 'product_id'    => $product_id,
@@ -198,13 +206,26 @@ class CartController extends Controller
         if ($rr->isRequestAjaxPost())
         {
             $basket_id  = (int) \Yii::$app->request->post('basket_id');
-            $quantity   = (int) \Yii::$app->request->post('quantity');
+            $quantity   = (float) \Yii::$app->request->post('quantity');
 
+            /**
+             * @var $shopBasket ShopBasket
+             */
             $shopBasket = ShopBasket::find()->where(['id' => $basket_id ])->one();
             if ($shopBasket)
             {
                 if ($quantity > 0)
                 {
+                    $product = $shopBasket->product;
+
+                    if ($product->measure_ratio > 1)
+                    {
+                        if ( $quantity % $product->measure_ratio != 0)
+                        {
+                            $quantity = $product->measure_ratio;
+                        }
+                    }
+
                     $shopBasket->quantity = $quantity;
                     if ($shopBasket->recalculate()->save())
                     {

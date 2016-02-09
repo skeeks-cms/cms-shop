@@ -170,6 +170,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['weight', 'width', 'length', 'height', 'purchasing_price'], 'default', 'value' => 0],
             [['subscribe'], 'default', 'value' => Cms::BOOL_Y],
             [['measure_ratio'], 'default', 'value' => 1],
+            [['measure_ratio'], 'number', 'min' => 0.0001, 'max' => 9999999],
             [['purchasing_currency'], 'default', 'value' => Yii::$app->money->currencyCode],
 
             [['baseProductPriceValue'], 'number'],
