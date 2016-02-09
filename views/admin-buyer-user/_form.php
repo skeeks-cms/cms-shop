@@ -350,50 +350,19 @@ HTML;
         'columns' =>
         [
             [
-                'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
-                'attribute' => 'created_at'
+                'class' => \skeeks\cms\grid\CreatedAtColumn::className()
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
-                'format'    => 'raw',
-                'value'     => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                {
-                    $widget = new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-                        'image' => $shopBasket->product->cmsContentElement->image
-                    ]);
-                    return $widget->run();
-                }
+                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::className(),
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'attribute' => 'name',
-                'format' => 'raw',
-                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                {
-                    if ($shopBasket->product)
-                    {
-                        return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
-                            'target' => '_blank',
-                            'titla' => "Смотреть на сайте",
-                            'data-pjax' => 0
-                        ]);
-                    } else
-                    {
-                        return $shopBasket->name;
-                    }
-
-                }
+                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::className(),
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'attribute' => 'quantity',
-                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                {
-                    return $shopBasket->quantity . " " . $shopBasket->measure_name;
-                }
+                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::className(),
             ],
 
             [
@@ -413,15 +382,9 @@ HTML;
 
                 }
             ],
+
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \skeeks\cms\shop\Module::t('app', 'Sum'),
-                'attribute' => 'price',
-                'format' => 'raw',
-                'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                {
-                    return \Yii::$app->money->intlFormatter()->format($shopBasket->money->multiply($shopBasket->quantity));
-                }
+                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className()
             ],
 
         ]
