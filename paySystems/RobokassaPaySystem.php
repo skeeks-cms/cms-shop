@@ -12,10 +12,10 @@ use yii\base\Component;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class RobocassaPaySystem
+ * Class RobokassaPaySystem
  * @package skeeks\cms\shop\paySystems
  */
-class RobocassaPaySystem extends PaySystemHandlerComponent
+class RobokassaPaySystem extends PaySystemHandlerComponent
 {
     public $baseUrl         = 'http://test.robokassa.ru/Index.aspx'; //https://auth.robokassa.ru/Merchant/Index.aspx
     public $sMerchantLogin  = '';
@@ -65,16 +65,16 @@ class RobocassaPaySystem extends PaySystemHandlerComponent
     }
 
     /**
-     * @return \robokassa\Merchant
+     * @return \skeeks\cms\shop\paySystems\robokassa\Merchant
      * @throws \yii\base\InvalidConfigException
      */
     public function getMerchant()
     {
         /**
-         * @var \robokassa\Merchant $merchant
+         * @var \skeeks\cms\shop\paySystems\robokassa\Merchant $merchant
          */
         $merchant = \Yii::createObject(ArrayHelper::merge($this->toArray(['baseUrl', 'sMerchantLogin', 'sMerchantPass1', 'sMerchantPass2']), [
-            'class' => '\robokassa\Merchant',
+            'class' => '\skeeks\cms\shop\paySystems\robokassa\Merchant',
         ]));
 
         return $merchant;
