@@ -239,23 +239,8 @@ HTML
                 ],
 
                 [
-                    'class' => \yii\grid\DataColumn::className(),
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
-                    'attribute' => 'price',
-                    'format' => 'raw',
-                    'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
-                    {
-                        if ($shopBasket->discount_value)
-                        {
-                            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \skeeks\cms\shop\Module::t('app', 'Discount').": " . $shopBasket->discount_value);
-                        } else
-                        {
-                            return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
-                        }
-
-                    }
+                    'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::className(),
                 ],
-
 
                 [
                     'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className()

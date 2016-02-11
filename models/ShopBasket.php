@@ -384,16 +384,19 @@ class ShopBasket extends \skeeks\cms\models\Core
 
         if ($shopDiscounts)
         {
+            $discountNames = [];
+            $discountPercent = 0;
+
             foreach ($shopDiscounts as $shopDiscount)
             {
                 if (\Yii::$app->user->can($shopDiscount->permissionName))
                 {
-                    $this->discount_name    = $shopDiscount->name;
+                    $discountNames[] = $shopDiscount->name;
 
                     if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P)
                     {
                         $percent = $shopDiscount->value / 100;
-                        $this->discount_value = \Yii::$app->formatter->asPercent($percent);
+                        $discountPercent = $discountPercent + $percent;
 
                         $discountPrice          = $price * $percent;
                         $this->price            = $this->price - $discountPrice;
@@ -407,6 +410,9 @@ class ShopBasket extends \skeeks\cms\models\Core
                     }
                 }
             }
+
+            $this->discount_name = implode(" + ", $discountNames);
+            $this->discount_value = \Yii::$app->formatter->asPercent($discountPercent);
         }
 
 
