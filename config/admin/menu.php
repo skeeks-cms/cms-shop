@@ -52,6 +52,7 @@ return [
     [
         'label' => \skeeks\cms\shop\Module::t('app', 'Shop'),
         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+        'priority'  => 250,
 
         'items' =>
         [
