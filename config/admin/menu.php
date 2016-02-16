@@ -51,7 +51,7 @@ return [
     'shop' =>
     [
         'label' => \skeeks\cms\shop\Module::t('app', 'Shop'),
-        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
+        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
 
         'items' =>
         [
