@@ -9,6 +9,15 @@ return [
 
     'components' =>
     [
+        'admin' => [
+            'dashboards'         => [
+                'Shop' =>
+                [
+                    'skeeks\cms\shop\dashboards\ReportOrderDashboard'
+                ]
+            ],
+        ],
+
         'shop' => [
             'class'         => 'skeeks\cms\shop\components\ShopComponent',
         ],
