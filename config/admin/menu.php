@@ -36,7 +36,7 @@ function shopProductsMenu()
             $itemData = [
                 'label'     => $content->name,
                 "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
-                'url'   => ["shop/admin-cms-content-element/index", "content_id" => $content->id],
+                'url'   => ["shop/admin-cms-content-element", "content_id" => $content->id],
             ];
 
             $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);

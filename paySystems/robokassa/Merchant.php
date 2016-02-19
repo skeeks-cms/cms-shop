@@ -22,6 +22,7 @@ class Merchant extends Object
         if (!empty($shp)) {
             $signature .= ':' . $this->implodeShp($shp);
         }
+
         $sSignatureValue = md5($signature);
 
         $data = [
