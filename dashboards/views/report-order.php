@@ -11,8 +11,24 @@
 $search         = new \skeeks\cms\shop\models\search\AdminReportOrderSearch();
 $dataProvider   = $search->search(\Yii::$app->request->get());
 
+$this->registerCss(<<<CSS
+.sx-report-order .sx-table-additional
+{
+    padding: 0 15px;
+}
+
+.sx-report-order .sx-form-filters
+{
+    padding: 10px 15px;
+}
+CSS
+)
+
 ?>
 <? \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+
+
+<div class="sx-report-order">
 
 <? $form = \yii\bootstrap\ActiveForm::begin([
     'method' => 'get',
@@ -22,7 +38,7 @@ $dataProvider   = $search->search(\Yii::$app->request->get());
     ],
     'enableAjaxValidation' => false,
 ]); ?>
-    <div class="row">
+    <div class="row sx-form-filters">
         <div class="col-md-3">
             <?= $form->field($search, 'groupType')->listBox(\skeeks\cms\shop\models\search\AdminReportOrderSearch::getGroupTypes(), [
                 'size' => 1
@@ -61,4 +77,5 @@ $dataProvider   = $search->search(\Yii::$app->request->get());
     'columns' => $search->getColumns(),
 ]); ?>
 
+</div>
 <? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
