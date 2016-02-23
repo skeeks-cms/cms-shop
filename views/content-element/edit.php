@@ -16,7 +16,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Prices')); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Setting prices')); ?>
 
     <?= $form->fieldSelect($model, 'vat_id', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'

@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
@@ -21,6 +22,9 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopProductPrice;
+use skeeks\cms\shop\models\ShopTypePrice;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
@@ -128,6 +132,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
             unset($actions['related-properties']);
         }
 
+        if (isset($actions['shop']))
+        {
+            unset($actions['shop']);
+        }
+
         return $actions;
     }
 
@@ -140,6 +149,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $modelClassName = $this->modelClassName;
         $model          = new $modelClassName();
 
+
         if ($content_id = \Yii::$app->request->get("content_id"))
         {
             $contentModel       = \skeeks\cms\models\CmsContent::findOne($content_id);
@@ -147,6 +157,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
         $relatedModel = $model->relatedPropertiesModel;
+        $shopProduct = new ShopProduct();
 
         $rr = new RequestResponse();
 
@@ -154,9 +165,10 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
+            $shopProduct->load(\Yii::$app->request->post());
 
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel
+                $model, $relatedModel, $shopProduct
             ]);
         }
 
@@ -165,9 +177,13 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
+            $shopProduct->load(\Yii::$app->request->post());
 
             if ($model->save() && $relatedModel->save())
             {
+                $shopProduct->id = $model->id;
+                $shopProduct->save();
+
                 \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
@@ -190,9 +206,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
             }
         }
 
-        return $this->render('@skeeks/cms/views/admin-cms-content-element/_form', [
+        return $this->render('_form', [
             'model'           => $model,
-            'relatedModel'    => $relatedModel
+            'relatedModel'    => $relatedModel,
+            'shopProduct'     => $shopProduct,
+            'productPrices'   => $productPrices
         ]);
     }
 
@@ -201,8 +219,47 @@ class AdminCmsContentElementController extends AdminModelEditorController
         /**
          * @var $model CmsContentElement
          */
-        $model = $this->model;
-        $relatedModel = $model->relatedPropertiesModel;
+        $model                              = $this->model;
+        $relatedModel                       = $model->relatedPropertiesModel;
+        $shopProduct                        = ShopProduct::find()->where(['id' => $model->id])->one();
+
+        $productPrices = [];
+        if (!$shopProduct)
+        {
+            $shopProduct = new ShopProduct([
+                'id' => $model->id
+            ]);
+        } else
+        {
+            if ($typePrices = ShopTypePrice::find()->where(['!=', 'def', Cms::BOOL_Y])->all())
+            {
+                foreach ($typePrices as $typePrice)
+                {
+                    $productPrice = ShopProductPrice::find()->where([
+                        'product_id'    => $shopProduct->id,
+                        'type_price_id' => $typePrice->id
+                    ])->one();
+
+                    if (!$productPrice)
+                    {
+                        $productPrice = new ShopProductPrice([
+                            'product_id'    => $shopProduct->id,
+                            'type_price_id' => $typePrice->id
+                        ]);
+                    }
+
+                    if ($post = \Yii::$app->request->post())
+                    {
+                        $data = ArrayHelper::getValue($post, 'prices.' . $typePrice->id);
+                        $productPrice->load($data, "");
+                    }
+
+                    $productPrices[] = $productPrice;
+                }
+            }
+        }
+
+
 
         $rr = new RequestResponse();
 
@@ -210,8 +267,10 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
+            $shopProduct->load(\Yii::$app->request->post());
+
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel
+                $model, $relatedModel, $shopProduct
             ]);
         }
 
@@ -219,8 +278,24 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
+            $shopProduct->load(\Yii::$app->request->post());
 
-            if ($model->save() && $relatedModel->save())
+            /**
+             * @var $productPrice ShopProductPrice
+             */
+            foreach ($productPrices as $productPrice)
+            {
+                if ($productPrice->save())
+                {
+
+                } else
+                {
+                    //\Yii::$app->getSession()->setFlash('error', \skeeks\cms\shop\Module::t('app', 'Check the correctness of the prices'));
+                }
+
+            }
+
+            if ($model->save() && $relatedModel->save() && $shopProduct->save())
             {
                 \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
 
@@ -252,9 +327,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
             }
         }
 
-        return $this->render('@skeeks/cms/views/admin-cms-content-element/_form', [
+        return $this->render('_form', [
             'model'           => $model,
-            'relatedModel'    => $relatedModel
+            'relatedModel'    => $relatedModel,
+            'shopProduct'     => $shopProduct,
+            'productPrices'   => $productPrices
         ]);
     }
 

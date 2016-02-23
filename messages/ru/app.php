@@ -319,4 +319,6 @@ return
     'Comments'                                                  => 'Комментарий',
     'Product'                                                   => 'Товар',
     'Measure Name'                                              => 'Единица измерения',
+    'Prices and availability'                                   => 'Цены и наличие',
+    'Setting prices'                                            => 'Настройка цены',
 ];
