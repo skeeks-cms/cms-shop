@@ -422,7 +422,7 @@ class CartController extends Controller
                         $modelBuyerName = [];
 
                         //Проверка свойств
-                        foreach ($validateModel->attributeValues() as $code => $value)
+                        foreach ($validateModel->toArray($validateModel->attributes()) as $code => $value)
                         {
                             /**
                              * @var $property ShopPersonTypeProperty

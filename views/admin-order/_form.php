@@ -179,7 +179,9 @@ HTML
         <?= \yii\widgets\DetailView::widget([
             'model' => $model->buyer->relatedPropertiesModel,
             'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-            'attributes' => array_keys($model->buyer->relatedPropertiesModel->attributeValues())
+            'attributes' => array_keys($model->buyer->relatedPropertiesModel->toArray(
+                $model->buyer->relatedPropertiesModel->attributes()
+            ))
 
         ])?>
 

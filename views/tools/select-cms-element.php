@@ -133,7 +133,7 @@ $content_id = \Yii::$app->request->get('content_id');
          */
         if ($model->relatedPropertiesModel)
         {
-            foreach ($model->relatedPropertiesModel->attributeValues() as $name => $value) {
+            foreach ($model->relatedPropertiesModel->toArray($model->relatedPropertiesModel->attributes()) as $name => $value) {
 
                 $property = $model->relatedPropertiesModel->getRelatedProperty($name);
                 $filter = '';

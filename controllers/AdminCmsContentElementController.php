@@ -69,6 +69,9 @@ class AdminCmsContentElementController extends AdminModelEditorController
                         $query->with('image');
                         $query->with('cmsTree');
                         $query->with('cmsContentElementTrees');
+                        $query->with('cmsContent');
+                        $query->with('relatedProperties');
+                        $query->with('relatedElementProperties');
                         $query->with('cmsContentElementTrees.tree');
                     },
                 ],

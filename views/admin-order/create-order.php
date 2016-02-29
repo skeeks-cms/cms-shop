@@ -136,7 +136,7 @@ JS
             <?= \yii\widgets\DetailView::widget([
                 'model' => $shopFuser->buyer->relatedPropertiesModel,
                 'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-                'attributes' => array_keys($shopFuser->buyer->relatedPropertiesModel->attributeValues())
+                'attributes' => $shopFuser->buyer->relatedPropertiesModel->attributes()
             ])?>
 
     <?/* elseif ($shopFuser->personType) : */?>

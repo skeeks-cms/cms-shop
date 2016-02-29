@@ -130,6 +130,14 @@ class ShopComponent extends Component
 
 
     /**
+     * @var ShopTypePrice
+     */
+    protected $_baseTypePrice;
+    /**
+     * @var array
+     */
+    protected $_shopTypePrices = [];
+    /**
      *
      * Тип цены по умолчанию
      *
@@ -137,7 +145,12 @@ class ShopComponent extends Component
      */
     public function getBaseTypePrice()
     {
-        return ShopTypePrice::find()->def()->one();
+        if (!$this->_baseTypePrice)
+        {
+            $this->_baseTypePrice = ShopTypePrice::find()->def()->one();
+        }
+
+        return $this->_baseTypePrice;
     }
 
 
@@ -155,7 +168,12 @@ class ShopComponent extends Component
      */
     public function getShopTypePrices()
     {
-        return ShopTypePrice::find()->all();
+        if (!$this->_shopTypePrices)
+        {
+            $this->_shopTypePrices = ShopTypePrice::find()->all();
+        }
+
+        return $this->_shopTypePrices;
     }
 
 
