@@ -7,10 +7,19 @@
  */
 namespace skeeks\cms\shop\components;
 use skeeks\cms\base\Component;
+use skeeks\cms\base\ConfigFormInterface;
+use skeeks\cms\traits\HasComponentDescriptorTrait;
+use yii\base\Model;
+use yii\widgets\ActiveForm;
 
 /**
  * Class PaySystemHandlerComponent
  * @package skeeks\cms\shop\components
  */
-class PaySystemHandlerComponent extends Component
-{}
+class PaySystemHandlerComponent extends Model implements ConfigFormInterface
+{
+    use HasComponentDescriptorTrait;
+
+    public function renderConfigForm(ActiveForm $activeForm)
+    {}
+}

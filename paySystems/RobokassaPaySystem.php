@@ -10,6 +10,7 @@ use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * Class RobokassaPaySystem
@@ -31,16 +32,6 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
         return array_merge(parent::descriptorConfig(), [
             'name'          =>  \skeeks\cms\shop\Module::t('app', 'Robokassa'),
         ]);
-    }
-
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
-    {
-        return __DIR__ . '/forms/robocassa.php';
     }
 
     public function rules()
@@ -89,4 +80,11 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
         return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id, \skeeks\cms\shop\Module::t('app', 'Payment order'), null, $shopOrder->user->email);
     }
 
+    public function renderConfigForm(ActiveForm $activeForm)
+    {
+        echo $activeForm->field($this, 'baseUrl')->textInput();
+        echo $activeForm->field($this, 'sMerchantLogin')->textInput();
+        echo $activeForm->field($this, 'sMerchantPass1')->textInput();
+        echo $activeForm->field($this, 'sMerchantPass2')->textInput();
+    }
 }
