@@ -94,7 +94,7 @@ class ShopComponent extends Component
                  */
                 $model = $e->controller->model;
 
-                if ($model->content_id)
+                if ($model && $model->content_id)
                 {
                     if ( ShopContent::find()->where(['content_id' => $model->content_id])->exists() )
                     {
