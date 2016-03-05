@@ -8,7 +8,6 @@
 /* @var $this yii\web\View */
 /* @var $contentType \skeeks\cms\models\CmsContentType */
 /* @var $model \skeeks\cms\shop\cmsWidgets\filters\ShopProductFiltersWidget */
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 $result = [];
 if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
@@ -19,43 +18,40 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
     }
 }
 ?>
-<?php $form = ActiveForm::begin(); ?>
-    <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Showing')); ?>
-        <?= $form->field($model, 'viewFile')->textInput(); ?>
-    <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Showing')); ?>
+    <?= $form->field($model, 'viewFile')->textInput(); ?>
+<?= $form->fieldSetEnd(); ?>
 
-    <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Data source')); ?>
-        <?= $form->fieldSelect($model, 'content_id', $result); ?>
+<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Data source')); ?>
+    <?= $form->fieldSelect($model, 'content_id', $result); ?>
 
-        <?/*= $form->fieldSelectMulti($model, 'searchModelAttributes', [
-            'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
-            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
-        ]); */?>
+    <?/*= $form->fieldSelectMulti($model, 'searchModelAttributes', [
+        'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
+        'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
+    ]); */?>
 
-        <?= $form->field($model, 'searchModelAttributes')->dropDownList([
-            'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
-            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
-        ], [
-    'multiple' => true,
-    'size' => 4
+    <?= $form->field($model, 'searchModelAttributes')->dropDownList([
+        'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
+        'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
+    ], [
+'multiple' => true,
+'size' => 4
 ]); ?>
 
-        <? if ($model->cmsContent) : ?>
-            <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
-        <? else: ?>
-            Дополнительные свойства появятся после сохранения настроек
-        <? endif; ?>
+    <? if ($model->cmsContent) : ?>
+        <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
+    <? else: ?>
+        Дополнительные свойства появятся после сохранения настроек
+    <? endif; ?>
 
 
-        <?= $form->fieldSelect($model, 'type_price_id', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
-        ), [
-            'allowDeselect' => true
-        ]); ?>
+    <?= $form->fieldSelect($model, 'type_price_id', \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
+    ), [
+        'allowDeselect' => true
+    ]); ?>
 
-    <?= $form->fieldSetEnd(); ?>
+<?= $form->fieldSetEnd(); ?>
 
 
 
-<?= $form->buttonsStandart($model) ?>
-<?php ActiveForm::end(); ?>

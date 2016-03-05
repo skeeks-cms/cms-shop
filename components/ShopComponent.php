@@ -24,6 +24,7 @@ use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
+use yii\widgets\ActiveForm;
 
 /**
  * @property ShopTypePrice $baseTypePrice
@@ -68,15 +69,17 @@ class ShopComponent extends Component
         ]);
     }
 
-    /**
-     * Файл с формой настроек, по умолчанию
-     *
-     * @return string
-     */
-    public function getConfigFormFile()
+
+    public function renderConfigForm(ActiveForm $form)
     {
-        return __DIR__ . '/shop/_form.php';
+        echo $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main'));
+
+            echo $form->field($model, 'email')->textInput()->hint(\skeeks\cms\shop\Module::t('app', 'Email of sales department'));
+            echo $form->fieldRadioListBoolean($model, 'payAfterConfirmation');
+
+        echo $form->fieldSetEnd();
     }
+
 
     public function init()
     {

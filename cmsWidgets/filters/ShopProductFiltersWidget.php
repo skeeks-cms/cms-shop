@@ -25,6 +25,7 @@ use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 /**
  * @property ShopTypePrice      $typePrice;
@@ -116,6 +117,14 @@ class ShopProductFiltersWidget extends WidgetRenderable
             [['realatedProperties'], 'safe'],
             [['type_price_id'], 'integer'],
         ]);
+    }
+
+    public function renderConfigForm(ActiveForm $form)
+    {
+        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
+            'form'  => $form,
+            'model' => $this
+        ], $this);
     }
 
     /**
