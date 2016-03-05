@@ -74,8 +74,8 @@ class ShopComponent extends Component
     {
         echo $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main'));
 
-            echo $form->field($model, 'email')->textInput()->hint(\skeeks\cms\shop\Module::t('app', 'Email of sales department'));
-            echo $form->fieldRadioListBoolean($model, 'payAfterConfirmation');
+            echo $form->field($this, 'email')->textInput()->hint(\skeeks\cms\shop\Module::t('app', 'Email of sales department'));
+            echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
 
         echo $form->fieldSetEnd();
     }
