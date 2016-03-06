@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContent;
 use Yii;
 
@@ -28,6 +29,21 @@ use Yii;
  */
 class ShopContent extends \skeeks\cms\models\Core
 {
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_AFTER_INSERT, [$this, '_updateCmsContent']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, '_updateCmsContent']);
+    }
+
+    public function _updateCmsContent($e)
+    {
+        $this->content->visible = Cms::BOOL_N;
+        $this->content->save();
+    }
+
+
     /**
      * @inheritdoc
      */

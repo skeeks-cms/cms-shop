@@ -22,6 +22,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -44,7 +45,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $this->name                     = \skeeks\cms\shop\Module::t('app', 'Elements');
         $this->modelShowAttribute       = "name";
-        $this->modelClassName           = CmsContentElement::className();
+        $this->modelClassName           = ShopCmsContentElement::className();
 
         parent::init();
     }

@@ -9,6 +9,7 @@ namespace skeeks\cms\shop\components;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\controllers\AdminCmsContentElementController;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\kladr\models\KladrLocation;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
@@ -22,6 +23,7 @@ use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
+use yii\base\Application;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -98,7 +100,28 @@ class ShopComponent extends Component
                 {
                     if ( ShopContent::find()->where(['content_id' => $model->content_id])->exists() )
                     {
-                        $e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
+                        \Yii::$app->on(Application::EVENT_BEFORE_ACTION, function(\yii\base\ActionEvent $e)
+                        {
+                            if (\Yii::$app->controller->uniqueId != 'shop/admin-cms-content-element')
+                            {
+                                $data = ArrayHelper::merge(['/shop/admin-cms-content-element/' . \Yii::$app->controller->action->id], \Yii::$app->request->get());
+                                \Yii::$app->controller->redirect(UrlHelper::construct($data)->enableAdmin()->toString());
+                            }
+                        });
+
+                        /*if ($e->controller->uniqueId != 'shop/admin-cms-content-element')
+                        {
+                            echo $e->controller->uniqueId;
+                            var_dump( $e->controller->action );
+                            die;
+
+                            $data = ArrayHelper::merge(['/shop/admin-cms-content-element/update'], \Yii::$app->request->get());
+                            $e->controller->redirect(UrlHelper::construct($data)->enableAdmin()->toString());
+                        }*/
+
+
+
+                        /*$e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
                             'shop' =>
                                 [
                                     'class'         => AdminContentElementShopAction::className(),
@@ -106,7 +129,7 @@ class ShopComponent extends Component
                                     'priority'      => 1000,
                                     "icon"          => "glyphicon glyphicon-shopping-cart",
                                 ],
-                        ]);
+                        ]);*/
                     }
                 }
 
