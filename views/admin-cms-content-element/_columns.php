@@ -4,8 +4,12 @@
  * @link http://skeeks.com/
  * @copyright 2010 SkeekS (СкикС)
  * @date 18.06.2015
+ * @var $model \skeeks\cms\shop\models\ShopCmsContentElement
  */
-return [
+
+$columns = [
+
+
     [
         'class' => \skeeks\cms\grid\ImageColumn2::className(),
     ],
@@ -113,7 +117,36 @@ return [
         },
         'format' => 'raw'
     ]
-]
+];
+
+$typeColumn = //TODO: показывать только для контента с предложениями
+[
+    'class'     => \yii\grid\DataColumn::className(),
+    'label'     => 'Тип товара',
+    'value'     => function(\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement)
+    {
+        if ($shopCmsContentElement->shopProduct)
+        {
+            return \yii\helpers\ArrayHelper::getValue(\skeeks\cms\shop\models\ShopProduct::possibleProductTypes(), $shopCmsContentElement->shopProduct->product_type);
+        }
+    }
+];
+if ($model->cmsContent)
+{
+    /**
+     * @var $shopContent \skeeks\cms\shop\models\ShopContent
+     */
+    $shopContent = \skeeks\cms\shop\models\ShopContent::findOne(['content_id' => $model->cmsContent->id]);
+    if ($shopContent)
+    {
+        if ($shopContent->childrenContent)
+        {
+            $columns = \yii\helpers\ArrayHelper::merge([$typeColumn], $columns);
+        }
+    }
+
+}
+return $columns;
 ?>
 
 

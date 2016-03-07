@@ -23,9 +23,11 @@ use Yii;
  * @property string $yandex_export
  * @property string $subscription
  * @property integer $vat_id
+ * @property integer $children_content_id
  *
  * @property CmsContent $content
  * @property ShopVat $vat
+ * @property CmsContent $childrenContent
  */
 class ShopContent extends \skeeks\cms\models\Core
 {
@@ -58,10 +60,10 @@ class ShopContent extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'content_id', 'vat_id'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'content_id', 'vat_id', 'children_content_id'], 'integer'],
             [['content_id'], 'required'],
             [['content_id'], 'unique'],
-            [['yandex_export', 'subscription'], 'string', 'max' => 1]
+            [['yandex_export', 'subscription'], 'string', 'max' => 1],
         ];
     }
 
@@ -80,7 +82,16 @@ class ShopContent extends \skeeks\cms\models\Core
             'yandex_export' => \skeeks\cms\shop\Module::t('app', 'Export to Yandex.Products'),
             'subscription'  => \skeeks\cms\shop\Module::t('app', 'Subscription'),
             'vat_id'        => \skeeks\cms\shop\Module::t('app', 'Vat ID'),
+            'children_content_id' => \skeeks\cms\shop\Module::t('app', 'Trade offers'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildrenContent()
+    {
+        return $this->hasOne(CmsContent::className(), ['id' => 'children_content_id']);
     }
 
     /**

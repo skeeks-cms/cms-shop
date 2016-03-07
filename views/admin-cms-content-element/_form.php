@@ -24,6 +24,12 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
  if ($model->isNewRecord)
  {
+     if ($content_id = \Yii::$app->request->get("content_id"))
+     {
+         $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id);
+         $model->content_id = $content_id;
+     }
+
      if ($tree_id = \Yii::$app->request->get("tree_id"))
      {
          $model->tree_id = $tree_id;
@@ -33,19 +39,28 @@ use skeeks\cms\modules\admin\widgets\Pjax;
      {
          $model->parent_content_element_id = $parent_content_element_id;
      }
+
+     if ($contentModel->parent_content_id)
+     {
+         $model->name = $model->parentContentElement->name;
+     }
+ } else
+ {
+     $contentModel = $model->cmsContent;
  }
+
+/**
+ * @var $shopContent \skeeks\cms\shop\models\ShopContent
+ */
+$shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
 
 <? if ($model->isNewRecord) : ?>
     <? if ($content_id = \Yii::$app->request->get("content_id")) : ?>
-        <? $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id); ?>
-        <? $model->content_id = $content_id; ?>
         <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
     <? endif; ?>
-<? else : ?>
-    <? $contentModel = $model->cmsContent; ?>
 <? endif; ?>
 
 <? if ($contentModel && $contentModel->parentContent) : ?>
@@ -205,124 +220,196 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Prices and availability')); ?>
+    <? if ($shopContent->childrenContent) : ?>
+        <?
+        $id = Html::getInputId($shopProduct, 'product_type');
+        $this->registerJs(<<<JS
+function initProductType(jQuery)
+{
+    if (jQuery.val() == 'offers')
+    {
+        $('#sx-shop-product-tradeOffers').show();
+        $('#sx-shop-product-simple').hide();
+    } else
+    {
+        $('#sx-shop-product-simple').show();
+        $('#sx-shop-product-tradeOffers').hide();
+    }
+}
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \skeeks\cms\shop\Module::t('app', 'Setting prices')
-    ]); ?>
-
-    <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
-        \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
-    )); ?>
-
-    <?= $form->fieldRadioListBoolean($shopProduct, 'vat_included'); ?>
-
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \skeeks\cms\shop\Module::t('app', 'Main prices')
-        ])?>
-
-    <div class="row">
-        <div class="col-md-3">
-            <?= $form->field($shopProduct, 'purchasing_price')->textInput(); ?>
-        </div>
-        <div class="col-md-2">
-            <?= $form->fieldSelect($shopProduct, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
-                \Yii::$app->money->activeCurrencies, 'code', 'code'
-            )); ?>
-        </div>
-    </div>
-
-
-    <div class="row">
-        <div class="col-md-3">
-            <?= $form->field($shopProduct, 'baseProductPriceValue')->textInput()->label(\skeeks\cms\shop\Module::t('app', 'Base price')." (".\skeeks\cms\shop\Module::t('app', 'Price type')." \"{$shopProduct->baseProductPrice->typePrice->name}\")"); ?>
-        </div>
-        <div class="col-md-2">
-            <?= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
-                \Yii::$app->money->activeCurrencies, 'code', 'code'
-            ))->label(\skeeks\cms\shop\Module::t('app', 'Currency base price')); ?>
-        </div>
-
-        <div class="col-md-2">
-            <label>&nbsp;</label>
-            <p>
-                <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
-                    'productPrice' => $shopProduct->baseProductPrice
-                ])?>
-            </p>
-        </div>
-    </div>
-
-    <? if ($productPrices) : ?>
-        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \skeeks\cms\shop\Module::t('app', 'Additional costs')
-        ])?>
-
-        <? foreach ($productPrices as $productPrice) : ?>
-
-            <div class="row">
-                <div class="col-md-3">
-                    <label><?= $productPrice->typePrice->name; ?></label>
-                    <?= Html::textInput("prices[" . $productPrice->typePrice->id . "][price]", $productPrice->price, [
-                        'class' => 'form-control'
-                    ]); ?>
-                </div>
-                <div class="col-md-2">
-                    <label>Валюта</label>
-
-                    <?= \skeeks\widget\chosen\Chosen::widget([
-                        'name' => "prices[" . $productPrice->typePrice->id . "][currency_code]",
-                        'value' => $productPrice->currency_code,
-                        'allowDeselect' => false,
-                        'items' => \yii\helpers\ArrayHelper::map(
-                            \Yii::$app->money->activeCurrencies, 'code', 'code'
-                        )
-                    ])?>
-                </div>
-
-                <div class="col-md-2">
-                    <label>&nbsp;</label>
-                    <p>
-                        <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
-                            'productPrice' => $productPrice
-                        ])?>
-                    </p>
-                </div>
-            </div>
-
-        <? endforeach; ?>
-
+$('#{$id}').on("change", function()
+{
+    initProductType($(this));
+});
+initProductType($('#{$id}'));
+JS
+)
+        ?>
+        <?= $form->fieldSelect($shopProduct, 'product_type', \skeeks\cms\shop\models\ShopProduct::possibleProductTypes()); ?>
     <? endif; ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \skeeks\cms\shop\Module::t('app', 'The number and account')
-    ]); ?>
+    <div id="sx-shop-product-simple">
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \skeeks\cms\shop\Module::t('app', 'Setting prices')
+        ]); ?>
 
-        <?= $form->field($shopProduct, 'quantity')->textInput(); ?>
-        <?= $form->field($shopProduct, 'quantity_reserved')->textInput(); ?>
-
-        <?= $form->fieldSelect($shopProduct, 'measure_id', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\measure\models\Measure::find()->all(), 'id', 'name'
+        <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
+            \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
         )); ?>
 
-        <?= $form->field($shopProduct, 'measure_ratio')->textInput(); ?>
+        <?= $form->fieldRadioListBoolean($shopProduct, 'vat_included'); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \skeeks\cms\shop\Module::t('app', 'Weight and size')
-    ]); ?>
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                'content' => \skeeks\cms\shop\Module::t('app', 'Main prices')
+            ])?>
 
-        <?= $form->fieldInputInt($shopProduct, 'weight'); ?>
-        <?= $form->fieldInputInt($shopProduct, 'length'); ?>
-        <?= $form->fieldInputInt($shopProduct, 'width'); ?>
-        <?= $form->fieldInputInt($shopProduct, 'height'); ?>
+        <div class="row">
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'purchasing_price')->textInput(); ?>
+            </div>
+            <div class="col-md-2">
+                <?= $form->fieldSelect($shopProduct, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
+                    \Yii::$app->money->activeCurrencies, 'code', 'code'
+                )); ?>
+            </div>
+        </div>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \skeeks\cms\shop\Module::t('app', 'Options')
-    ]); ?>
 
-        <?= $form->fieldRadioListBoolean($shopProduct, 'quantity_trace'); ?>
-        <?= $form->fieldRadioListBoolean($shopProduct, 'can_buy_zero'); ?>
-        <?= $form->fieldRadioListBoolean($shopProduct, 'negative_amount_trace'); ?>
-        <?= $form->fieldRadioListBoolean($shopProduct, 'subscribe'); ?>
+        <div class="row">
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
+                    ->label(\skeeks\cms\shop\Module::t('app', 'Base price')." (".\skeeks\cms\shop\Module::t('app', 'Price type')." «{$baseProductPrice->typePrice->name}»)"); ?>
+            </div>
+            <div class="col-md-2">
+                <?= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
+                    \Yii::$app->money->activeCurrencies, 'code', 'code'
+                ))->label(\skeeks\cms\shop\Module::t('app', 'Currency base price')); ?>
+            </div>
+
+            <div class="col-md-2">
+                <label>&nbsp;</label>
+                <p>
+                    <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
+                        'productPrice' => $shopProduct->baseProductPrice
+                    ])?>
+                </p>
+            </div>
+        </div>
+
+        <? if ($productPrices) : ?>
+            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                'content' => \skeeks\cms\shop\Module::t('app', 'Additional costs')
+            ])?>
+
+            <? foreach ($productPrices as $productPrice) : ?>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <label><?= $productPrice->typePrice->name; ?></label>
+                        <?= Html::textInput("prices[" . $productPrice->typePrice->id . "][price]", $productPrice->price, [
+                            'class' => 'form-control'
+                        ]); ?>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Валюта</label>
+
+                        <?= \skeeks\widget\chosen\Chosen::widget([
+                            'name' => "prices[" . $productPrice->typePrice->id . "][currency_code]",
+                            'value' => $productPrice->currency_code,
+                            'allowDeselect' => false,
+                            'items' => \yii\helpers\ArrayHelper::map(
+                                \Yii::$app->money->activeCurrencies, 'code', 'code'
+                            )
+                        ])?>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>&nbsp;</label>
+                        <p>
+                            <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
+                                'productPrice' => $productPrice
+                            ])?>
+                        </p>
+                    </div>
+                </div>
+
+            <? endforeach; ?>
+
+        <? endif; ?>
+
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \skeeks\cms\shop\Module::t('app', 'The number and account')
+        ]); ?>
+
+            <?= $form->field($shopProduct, 'quantity')->textInput(); ?>
+            <?= $form->field($shopProduct, 'quantity_reserved')->textInput(); ?>
+
+            <?= $form->fieldSelect($shopProduct, 'measure_id', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\measure\models\Measure::find()->all(), 'id', 'name'
+            )); ?>
+
+            <?= $form->field($shopProduct, 'measure_ratio')->textInput(); ?>
+
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \skeeks\cms\shop\Module::t('app', 'Weight and size')
+        ]); ?>
+
+            <?= $form->fieldInputInt($shopProduct, 'weight'); ?>
+            <?= $form->fieldInputInt($shopProduct, 'length'); ?>
+            <?= $form->fieldInputInt($shopProduct, 'width'); ?>
+            <?= $form->fieldInputInt($shopProduct, 'height'); ?>
+
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \skeeks\cms\shop\Module::t('app', 'Options')
+        ]); ?>
+
+            <?= $form->fieldRadioListBoolean($shopProduct, 'quantity_trace'); ?>
+            <?= $form->fieldRadioListBoolean($shopProduct, 'can_buy_zero'); ?>
+            <?= $form->fieldRadioListBoolean($shopProduct, 'negative_amount_trace'); ?>
+            <?= $form->fieldRadioListBoolean($shopProduct, 'subscribe'); ?>
+        </div>
+
+<? if ($shopContent->childrenContent) : ?>
+    <div id="sx-shop-product-tradeOffers">
+
+        <? if ($model->isNewRecord) : ?>
+
+            <?= \yii\bootstrap\Alert::widget([
+                'options' =>
+                [
+                    'class' => 'alert-warning'
+                ],
+                'body' => \Yii::t('app', 'Management will be available after saving')
+            ]); ?>
+        <? else:  ?>
+
+            <? $columnsFile = \Yii::getAlias('@skeeks/cms/shop/views/admin-cms-content-element/_columns.php'); ?>
+            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                'label'             => $shopContent->childrenContent->name,
+                'parentModel'       => $model,
+                'relation'          => [
+                    'content_id'                    => $shopContent->childrenContent->id,
+                    'parent_content_element_id'     => $model->id
+                ],
+
+                'sort'              => [
+                    'defaultOrder' =>
+                    [
+                        'priority' => 'published_at'
+                    ]
+                ],
+
+                'controllerRoute'   => 'shop/admin-cms-content-element',
+                'gridViewOptions'   => [
+                    'columns' => (array) include $columnsFile
+                ],
+            ]); ?>
+
+        <? endif; ?>
+
+    </div>
+<? endif; ?>
+
 
 <?= $form->fieldSetEnd() ?>
 
@@ -343,47 +430,60 @@ use skeeks\cms\modules\admin\widgets\Pjax;
             ]); ?>
         <?= $form->fieldSetEnd() ?>
     <? endif; ?>
-
-    <? if ($model->cmsContent->childrenContents) : ?>
-
-        <?
-        $columnsFile = \Yii::getAlias('@skeeks/cms/shop/views/admin-cms-content-element/_columns.php');
-        /**
-         * @var $content \skeeks\cms\models\CmsContent
-         */
-        ?>
-        <? foreach($model->cmsContent->childrenContents as $childContent) : ?>
-            <?= $form->fieldSet($childContent->name); ?>
-
-
-
-                <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                    'label'             => $childContent->name,
-                    'parentModel'       => $model,
-                    'relation'          => [
-                        'content_id'                    => $childContent->id,
-                        'parent_content_element_id'     => $model->id
-                    ],
-
-                    'sort'              => [
-                        'defaultOrder' =>
-                        [
-                            'priority' => 'published_at'
-                        ]
-                    ],
-
-                    'controllerRoute'   => 'shop/admin-cms-content-element',
-                    'gridViewOptions'   => [
-                        'columns' => (array) include $columnsFile
-                    ],
-                ]); ?>
-
-
-            <?= $form->fieldSetEnd() ?>
-        <? endforeach; ?>
-    <? endif; ?>
-
 <? endif; ?>
+
+
+<? if ($childContents = $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->one() ) : ?>
+
+    <?
+    $columnsFile = \Yii::getAlias('@skeeks/cms/shop/views/admin-cms-content-element/_columns.php');
+    /**
+     * @var $content \skeeks\cms\models\CmsContent
+     */
+    ?>
+    <? foreach($childContents as $childContent) : ?>
+        <?= $form->fieldSet($childContent->name); ?>
+
+        <? if ($model->isNewRecord) : ?>
+
+            <?= \yii\bootstrap\Alert::widget([
+                'options' =>
+                [
+                    'class' => 'alert-warning'
+                ],
+                'body' => \Yii::t('app', 'Management will be available after saving')
+            ]); ?>
+        <? else:  ?>
+
+            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                'label'             => $childContent->name,
+                'parentModel'       => $model,
+                'relation'          => [
+                    'content_id'                    => $childContent->id,
+                    'parent_content_element_id'     => $model->id
+                ],
+
+                'sort'              => [
+                    'defaultOrder' =>
+                    [
+                        'priority' => 'published_at'
+                    ]
+                ],
+
+                'controllerRoute'   => 'shop/admin-cms-content-element',
+                'gridViewOptions'   => [
+                    'columns' => (array) include $columnsFile
+                ],
+            ]); ?>
+
+        <? endif; ?>
+
+
+
+        <?= $form->fieldSetEnd() ?>
+    <? endforeach; ?>
+<? endif; ?>
+
 
 
 

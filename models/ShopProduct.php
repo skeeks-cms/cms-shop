@@ -46,6 +46,7 @@ use yii\helpers\ArrayHelper;
  * @property double $length
  * @property double $height
  * @property string $subscribe
+ * @property string $product_type
  *
  * @property Measure            $measure
  * @property CmsContentElement  $cmsContentElement
@@ -64,12 +65,26 @@ use yii\helpers\ArrayHelper;
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
+    const TYPE_SIMPLE = 'simple';
+    const TYPE_OFFERS = 'offers';
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
         return '{{%shop_product}}';
+    }
+
+    /**
+     * @return array
+     */
+    static public function possibleProductTypes()
+    {
+        return [
+            static::TYPE_SIMPLE => 'Простой',
+            static::TYPE_OFFERS => 'С предложениями',
+        ];
     }
 
     static public $instances = [];
@@ -181,6 +196,9 @@ class ShopProduct extends \skeeks\cms\models\Core
             {
                 return (int) Measure::find()->def()->one()->id;
             }],
+
+            [['product_type'], 'string', 'max' => 10],
+            [['product_type'], 'default', 'value' => static::TYPE_SIMPLE],
         ];
     }
 
@@ -219,6 +237,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'length'                    => \skeeks\cms\shop\Module::t('app', 'Length (mm)'),
             'height'                    => \skeeks\cms\shop\Module::t('app', 'Height (mm)'),
             'subscribe'                 => \skeeks\cms\shop\Module::t('app', 'Allow subscription without explanation'),
+            'product_type'              => \skeeks\cms\shop\Module::t('app', 'Product type'),
         ];
     }
 
@@ -317,7 +336,6 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasOne(ShopProductPrice::className(), [
             'product_id' => 'id'
         ])->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id]);
-        //return $this->getShopProductPrices()->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id])->one();
     }
 
     /**

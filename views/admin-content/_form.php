@@ -9,15 +9,27 @@ use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
+/* @var $model \skeeks\cms\shop\models\ShopContent */
+$cofing = [];
+
+if (!$model->isNewRecord)
+{
+    $cofing = ['disabled' => 'disabled'];
+}
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
 
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
-    <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
+    <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect(), $cofing); ?>
 
-    <?= $form->fieldRadioListBoolean($model, 'yandex_export'); ?>
+    <? if (!$model->isNewRecord) : ?>
+        <?= $form->fieldSelect($model, 'children_content_id', \yii\helpers\ArrayHelper::map(
+            $model->content->childrenContents, 'id', 'name'
+        )); ?>
+    <? endif; ?>
+    <?/*= $form->fieldRadioListBoolean($model, 'yandex_export'); */?>
 
 <?= $form->fieldSetEnd(); ?>
 

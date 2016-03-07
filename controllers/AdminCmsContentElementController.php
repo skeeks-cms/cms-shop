@@ -163,6 +163,13 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $relatedModel = $model->relatedPropertiesModel;
         $shopProduct = new ShopProduct();
 
+        $baseProductPrice = new ShopProductPrice([
+            'type_price_id' => \Yii::$app->shop->baseTypePrice->id,
+            'currency_code' => \Yii::$app->money->currencyCode
+        ]);
+
+        $shopProduct->baseProductPriceCurrency = \Yii::$app->money->currencyCode;
+
         $rr = new RequestResponse();
 
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
@@ -211,10 +218,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model'           => $model,
-            'relatedModel'    => $relatedModel,
-            'shopProduct'     => $shopProduct,
-            'productPrices'   => $productPrices
+            'model'             => $model,
+            'relatedModel'      => $relatedModel,
+            'shopProduct'       => $shopProduct,
+            'productPrices'     => $productPrices,
+            'baseProductPrice'  => $baseProductPrice
         ]);
     }
 
@@ -294,7 +302,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 } else
                 {
-                    //\Yii::$app->getSession()->setFlash('error', \skeeks\cms\shop\Module::t('app', 'Check the correctness of the prices'));
+                    \Yii::$app->getSession()->setFlash('error', \skeeks\cms\shop\Module::t('app', 'Check the correctness of the prices'));
                 }
 
             }
@@ -335,7 +343,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
             'model'           => $model,
             'relatedModel'    => $relatedModel,
             'shopProduct'     => $shopProduct,
-            'productPrices'   => $productPrices
+            'productPrices'   => $productPrices,
+            'baseProductPrice'  => $shopProduct->baseProductPrice
         ]);
     }
 

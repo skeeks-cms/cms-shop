@@ -321,4 +321,6 @@ return
     'Measure Name'                                              => 'Единица измерения',
     'Prices and availability'                                   => 'Цены и наличие',
     'Setting prices'                                            => 'Настройка цены',
+    'Trade offers'                                              => 'Торговые предложения',
+    'Product type'                                              => 'Тип товара',
 ];
