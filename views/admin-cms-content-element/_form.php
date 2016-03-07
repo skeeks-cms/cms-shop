@@ -72,6 +72,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     </div>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
     <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('app',"This parameter affects the address of the page")); ?>
+    <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <? if ($contentModel->parent_content_id) : ?>
 
@@ -94,6 +95,109 @@ use skeeks\cms\modules\admin\widgets\Pjax;
         <?/*= \Yii::t('app','Additional properties are not set')*/?>
     <? endif; ?>
 <?= $form->fieldSetEnd()?>
+
+
+
+
+
+
+
+
+
+
+
+<?= $form->fieldSet(\Yii::t('app','Announcement')); ?>
+    <?= $form->field($model, 'image_id')->widget(
+        \skeeks\cms\widgets\formInputs\StorageImage::className()
+    ); ?>
+
+    <?= $form->field($model, 'description_short')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'modelAttributeSaveType' => 'description_short_type',
+        ]);
+    ?>
+
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet(\Yii::t('app','In detal')); ?>
+
+    <?= $form->field($model, 'image_full_id')->widget(
+        \skeeks\cms\widgets\formInputs\StorageImage::className()
+    ); ?>
+
+    <?= $form->field($model, 'description_full')->widget(
+        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+        [
+            'modelAttributeSaveType' => 'description_full_type',
+        ]);
+    ?>
+
+<?= $form->fieldSetEnd() ?>
+
+<?= $form->fieldSet(\Yii::t('app','Sections')); ?>
+
+
+    <? if ($contentModel->root_tree_id) : ?>
+
+        <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
+            <?= $form->fieldSelect($model, 'tree_id', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name'), [
+                    'allowDeselect' => true
+                ]
+            );
+            ?>
+        <? endif; ?>
+
+        <?= $form->fieldSelectMulti($model, 'treeIds', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name')
+            );
+        ?>
+
+    <? else : ?>
+        <?
+            $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_COMBO;
+            if ($contentModel->is_allow_change_tree != \skeeks\cms\components\Cms::BOOL_Y)
+            {
+                $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI;
+            }
+        ?>
+        <?= $form->field($model, 'treeIds')->label(\Yii::t('app','Sections of the site'))->widget(
+            \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+            [
+                "attributeMulti" => "treeIds",
+                "mode" => $mode
+            ])->hint(\Yii::t('app','Specify sections of the site, which would like to see this publication'));
+        ?>
+    <? endif; ?>
+
+
+
+<?= $form->fieldSetEnd()?>
+
+
+
+<?= $form->fieldSet(\Yii::t('app','SEO')); ?>
+    <?= $form->field($model, 'meta_title')->textarea(); ?>
+    <?= $form->field($model, 'meta_description')->textarea(); ?>
+    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
+<?= $form->fieldSetEnd() ?>
+
+
+<?= $form->fieldSet(\Yii::t('app','Images/Files')); ?>
+
+    <?= $form->field($model, 'images')->widget(
+        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    ); ?>
+
+    <?= $form->field($model, 'files')->widget(
+        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    ); ?>
+
+<?= $form->fieldSetEnd()?>
+
+
+
 
 
 
@@ -225,114 +329,10 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 
-<?= $form->fieldSet(\Yii::t('app','Announcement')); ?>
-    <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\widgets\formInputs\StorageImage::className()
-    ); ?>
-
-    <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
-        [
-            'modelAttributeSaveType' => 'description_short_type',
-        ]);
-    ?>
-
-<?= $form->fieldSetEnd() ?>
-
-<?= $form->fieldSet(\Yii::t('app','In detal')); ?>
-
-    <?= $form->field($model, 'image_full_id')->widget(
-        \skeeks\cms\widgets\formInputs\StorageImage::className()
-    ); ?>
-
-    <?= $form->field($model, 'description_full')->widget(
-        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
-        [
-            'modelAttributeSaveType' => 'description_full_type',
-        ]);
-    ?>
-
-<?= $form->fieldSetEnd() ?>
-
-<?= $form->fieldSet(\Yii::t('app','Sections')); ?>
-
-
-    <? if ($contentModel->root_tree_id) : ?>
-
-        <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
-            <?= $form->fieldSelect($model, 'tree_id', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name'), [
-                    'allowDeselect' => true
-                ]
-            );
-            ?>
-        <? endif; ?>
-
-        <?= $form->fieldSelectMulti($model, 'treeIds', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name')
-            );
-        ?>
-
-    <? else : ?>
-        <?
-            $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_COMBO;
-            if ($contentModel->is_allow_change_tree != \skeeks\cms\components\Cms::BOOL_Y)
-            {
-                $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI;
-            }
-        ?>
-        <?= $form->field($model, 'treeIds')->label(\Yii::t('app','Sections of the site'))->widget(
-            \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
-            [
-                "attributeMulti" => "treeIds",
-                "mode" => $mode
-            ])->hint(\Yii::t('app','Specify sections of the site, which would like to see this publication'));
-        ?>
-    <? endif; ?>
-
-
-
-<?= $form->fieldSetEnd()?>
-
-
-
-<?= $form->fieldSet(\Yii::t('app','SEO')); ?>
-    <?= $form->field($model, 'meta_title')->textarea(); ?>
-    <?= $form->field($model, 'meta_description')->textarea(); ?>
-    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
-<?= $form->fieldSetEnd() ?>
-
-
-<?= $form->fieldSet(\Yii::t('app','Images')); ?>
-
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
-    ); ?>
-
-<?= $form->fieldSetEnd()?>
-
-
-<?= $form->fieldSet(\Yii::t('app','Files')); ?>
-
-    <?= $form->field($model, 'files')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
-    ); ?>
-
-<?= $form->fieldSetEnd()?>
-
-
-
-
-
-
-
-
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSet(\Yii::t('app','Additionally')); ?>
-        <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
-        <?= $form->fieldInputInt($model, 'priority'); ?>
-
-    <?= $form->fieldSetEnd() ?>
+    <?/*= $form->fieldSet(\Yii::t('app','Additionally')); */?><!--
+        <?/*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */?>
+    --><?/*= $form->fieldSetEnd() */?>
 
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('app','Access')); ?>
@@ -347,7 +347,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
     <? if ($model->cmsContent->childrenContents) : ?>
 
         <?
-        $columnsFile = \Yii::getAlias('@skeeks/cms/views/admin-cms-content-element/_columns.php');
+        $columnsFile = \Yii::getAlias('@skeeks/cms/shop/views/admin-cms-content-element/_columns.php');
         /**
          * @var $content \skeeks\cms\models\CmsContent
          */
@@ -372,7 +372,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
                         ]
                     ],
 
-                    'controllerRoute'   => 'cms/admin-cms-content-element',
+                    'controllerRoute'   => 'shop/admin-cms-content-element',
                     'gridViewOptions'   => [
                         'columns' => (array) include $columnsFile
                     ],
