@@ -100,6 +100,15 @@ class ShopProduct extends \skeeks\cms\models\Core
             return $self;
         }
 
+        /**
+         * @version SkeekS CMS > 2.6.0
+         */
+        if ($cmsContentElement instanceof \skeeks\cms\shop\models\ShopCmsContentElement)
+        {
+            static::$instances[$cmsContentElement->id] = $cmsContentElement->shopProduct;
+            return $cmsContentElement->shopProduct;
+        }
+
         if (!$self = static::find()->where(['id' => $cmsContentElement->id])->one())
         {
             $self = new static([

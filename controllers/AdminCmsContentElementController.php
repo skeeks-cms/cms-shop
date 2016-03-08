@@ -74,6 +74,10 @@ class AdminCmsContentElementController extends AdminModelEditorController
                         $query->with('relatedProperties');
                         $query->with('relatedElementProperties');
                         $query->with('cmsContentElementTrees.tree');
+
+                        $query->with('shopProduct');
+                        $query->with('shopProduct.baseProductPrice');
+                        //$query->with('shopProduct.minProductPrice');
                     },
                 ],
 

@@ -14,6 +14,11 @@ use skeeks\cms\models\CmsContentElement;
  * @property ShopProduct $shopProduct
  * @property ShopViewedProduct[] $shopViewedProducts
  *
+ * @property ShopCmsContentElement $parentContentElement
+ * @property ShopCmsContentElement[] $childrenContentElements
+ *
+ * @property ShopCmsContentElement[] $tradeOffers
+ *
  * Class ShopCmsContentElement
  * @package skeeks\cms\shop\models
  */
@@ -33,5 +38,13 @@ class ShopCmsContentElement extends CmsContentElement
     public function getShopViewedProducts()
     {
         return $this->hasMany(ShopViewedProduct::className(), ['shop_product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTradeOffers()
+    {
+        return $this->hasMany(static::className(), ['parent_content_element_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 }
