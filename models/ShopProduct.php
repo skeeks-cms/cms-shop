@@ -48,8 +48,8 @@ use yii\helpers\ArrayHelper;
  * @property string $subscribe
  * @property string $product_type
  *
- * @property Measure            $measure
- * @property CmsContentElement  $cmsContentElement
+ * @property Measure                $measure
+ * @property ShopCmsContentElement  $cmsContentElement
  * @property ShopTypePrice      $trialPrice
  * @property ShopVat            $vat
  * @property Currency           $purchasingCurrency
@@ -286,7 +286,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getCmsContentElement()
     {
-        return $this->hasOne(CmsContentElement::className(), ['id' => 'id']);
+        return $this->hasOne(ShopCmsContentElement::className(), ['id' => 'id']);
     }
 
 
@@ -447,4 +447,21 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this;
     }
 
+
+    /**
+     * Товар с предложениями?
+     * @return bool
+     */
+    public function isTradeOffers()
+    {
+        return (bool) ($this->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTradeOffers()
+    {
+        return $this->hasMany(ShopCmsContentElement::className(), ['parent_content_element_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
 }

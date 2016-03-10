@@ -11,6 +11,8 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\StorageFile;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\catalog\models\Product;
 use skeeks\modules\cms\money\Currency;
 use skeeks\modules\cms\money\Money;
@@ -63,6 +65,10 @@ use yii\helpers\Json;
  * @property string $measure_name
  * @property integer $measure_code
  * @property string $recommendation
+ *
+ *
+ * @property StorageFile $image
+ * @property string $url
  *
  * @property Currency $currency
  * @property ShopFuser $fuser
@@ -315,7 +321,10 @@ class ShopBasket extends \skeeks\cms\models\Core
             return $this;
         }
 
+
         $product = $this->product;
+        $parentElement = $product->cmsContentElement->parentContentElement;
+
 
         $productPrice                     = $product->minProductPrice;
         $productPriceMoney                = $productPrice->money->convertToCurrency(\Yii::$app->money->getCurrencyObject());
@@ -325,10 +334,9 @@ class ShopBasket extends \skeeks\cms\models\Core
         $this->product_price_id           = $productPrice->id;
         $this->notes                      = $productPrice->typePrice->name;
 
-        $this->detail_page_url            = $product->cmsContentElement->url;
-        $this->name                       = $product->cmsContentElement->name;
+        $this->name                       = $parentElement ? $parentElement->name : $product->cmsContentElement->name;
         $this->weight                     = $product->weight;
-        $this->site_id                    = \Yii::$app->cms->site->id;
+        $this->site_id                    = \Yii::$app->cms->site->id; //TODO: неправильно
 
 
         $this->dimensions       = Json::encode([
@@ -415,6 +423,30 @@ class ShopBasket extends \skeeks\cms\models\Core
             $this->discount_value = \Yii::$app->formatter->asPercent($discountPercent);
         }
 
+        //Если это предложение, нужно добавить свойства
+        if ($parentElement && !$this->isNewRecord)
+        {
+            if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray())
+            {
+                foreach ($properties as $code => $value)
+                {
+                    if (!$this->getShopBasketProps()->andWhere(['code' => $code])->count() && $value)
+                    {
+                        $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
+
+                        $basketProperty = new ShopBasketProps();
+                        $basketProperty->shop_basket_id     = $this->id;
+                        $basketProperty->code               = $code;
+                        $basketProperty->value              = $product->cmsContentElement->relatedPropertiesModel->getSmartAttribute($code);
+                        $basketProperty->name               = $property->name;
+
+                        $basketProperty->save();
+                    }
+                }
+            }
+
+        }
+
 
         return $this;
     }
@@ -437,4 +469,43 @@ class ShopBasket extends \skeeks\cms\models\Core
         return Money::fromString((string) $calculateValue, $this->currency_code);
     }
 
+
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        if ($this->product)
+        {
+            //Это предложение у него есть родительский элемент
+            if ($parent = $this->product->cmsContentElement->parentContentElement)
+            {
+                return $parent->url;
+            } else
+            {
+                return $this->product->cmsContentElement->url;
+            }
+        }
+
+        return $this->detail_page_url;
+    }
+
+    /**
+     * @return null|\skeeks\cms\models\CmsStorageFile
+     */
+    public function getImage()
+    {
+        if ($this->product)
+        {
+            //Это предложение у него есть родительский элемент
+            if ($parent = $this->product->cmsContentElement->parentContentElement) {
+                return $parent->image;
+            } else {
+                return $this->product->cmsContentElement->image;
+            }
+        }
+
+        return null;
+    }
 }

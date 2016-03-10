@@ -77,6 +77,10 @@ class CartController extends Controller
         return $this->render($this->action->id);
     }
 
+
+
+
+
     /**
      * Добавление продукта в корзину.
      *

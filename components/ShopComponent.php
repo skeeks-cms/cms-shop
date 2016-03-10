@@ -109,27 +109,6 @@ class ShopComponent extends Component
                             }
                         });
 
-                        /*if ($e->controller->uniqueId != 'shop/admin-cms-content-element')
-                        {
-                            echo $e->controller->uniqueId;
-                            var_dump( $e->controller->action );
-                            die;
-
-                            $data = ArrayHelper::merge(['/shop/admin-cms-content-element/update'], \Yii::$app->request->get());
-                            $e->controller->redirect(UrlHelper::construct($data)->enableAdmin()->toString());
-                        }*/
-
-
-
-                        /*$e->controller->eventActions = ArrayHelper::merge($e->controller->eventActions, [
-                            'shop' =>
-                                [
-                                    'class'         => AdminContentElementShopAction::className(),
-                                    'name'          => 'Цены и наличие (Магазин)',
-                                    'priority'      => 1000,
-                                    "icon"          => "glyphicon glyphicon-shopping-cart",
-                                ],
-                        ]);*/
                     }
                 }
 

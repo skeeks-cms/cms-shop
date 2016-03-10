@@ -29,7 +29,7 @@ class BasketImageGridColumn extends DataColumn
     protected function renderDataCellContent($model, $key, $index)
     {
         $widget = new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-            'image' => $model->product->cmsContentElement->image
+            'image' => $model->image
         ]);
 
         return $widget->run();

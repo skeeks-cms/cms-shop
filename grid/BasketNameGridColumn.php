@@ -9,6 +9,7 @@ namespace skeeks\cms\shop\grid;
 
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\shop\models\ShopBasket;
 use yii\grid\DataColumn;
 use yii\helpers\Html;
 
@@ -22,7 +23,7 @@ class BasketNameGridColumn extends DataColumn
     public $format      = "raw";
 
     /**
-     * @param mixed $model
+     * @param ShopBasket $model
      * @param mixed $key
      * @param int $index
      * @return string
@@ -31,20 +32,33 @@ class BasketNameGridColumn extends DataColumn
     {
 
 
-        if ($model->product)
+        if ($model->url)
         {
-            $content = Html::a($model->name, $model->product->cmsContentElement->url, [
+            $content = Html::a($model->name, $model->url, [
                 'target' => '_blank',
                 'title' => "Смотреть на сайте (откроется в новом окне)",
                 'data-pjax' => 0
             ]);
 
-            if ($model->product->measure_ratio != 1)
+            if ($model->product && $model->product->measure_ratio != 1)
             {
                 $content .= <<<HTML
 <p><small>Товар продается по: {$model->product->measure_ratio} {$model->product->measure->symbol_rus}</small></p>
 HTML;
             }
+
+            if ($model->product && $model->shopBasketProps)
+            {
+                $content .= "<p>";
+                foreach ($model->shopBasketProps as $prop)
+                {
+                    $content .= <<<HTML
+<small>{$prop->name}: {$prop->value}</small><br />
+HTML;
+                }
+                $content .= "</p>";
+            }
+
             return $content;
         } else
         {

@@ -59,17 +59,19 @@
         },
 
         /**
+         *
          * Добавление продукта в корзину
+         *
          * @param product_id
          * @param quantity
-         * @param data
+         * @param additional
          */
-        addProduct: function(product_id, quantity, data)
+        addProduct: function(product_id, quantity, additional)
         {
             var self = this;
 
             //TODO: реализовать
-            data = data || {};
+            additional = additional || {};
             quantity = quantity || 0;
 
             product_id  = Number(product_id);
@@ -90,6 +92,7 @@
             ajax.setData({
                 'product_id'    : product_id,
                 'quantity'      : quantity,
+                'additional'    : additional,
             });
 
             ajax.onSuccess(function(e, data)
@@ -134,12 +137,12 @@
             ajax.execute();
         },
 
-        updateBasket: function(basket_id, quantity, data)
+        updateBasket: function(basket_id, quantity, additional)
         {
             var self = this;
 
             //TODO
-            data = data || {};
+            additional = additional || {};
 
             this.trigger('beforeUpdateBasket', {
                 'basket_id'     : basket_id,
@@ -149,8 +152,9 @@
             var ajax = this.ajaxQuery().setUrl(this.get('backend-update-basket'));
 
             ajax.setData({
-                'basket_id' : Number(basket_id),
-                'quantity'  : Number(quantity),
+                'basket_id'     : Number(basket_id),
+                'quantity'      : Number(quantity),
+                'additional'    : additional,
             });
 
             ajax.onSuccess(function(e, data)
