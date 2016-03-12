@@ -97,21 +97,65 @@ JS
 
                     <?
                         $propertyType = $property->createPropertyType();
-                        $options = \skeeks\cms\models\CmsContentElement::find()->active()->andWhere([
-                            'content_id' => $propertyType->content_id
-                        ])->all();
+
+                        if ($widget->elementIds)
+                        {
+                            $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                                ->select(['value_enum'])
+                                ->indexBy('value_enum')
+                                ->andWhere(['element_id' => $widget->elementIds])
+                                ->andWhere(['property_id' => $property->id])
+                                ->asArray()
+                                ->all()
+                            ;
+
+                            $availables = array_keys($availables);
+                        }
+
+                        $options = \skeeks\cms\models\CmsContentElement::find()
+                            ->active()
+                            ->andWhere(['content_id' => $propertyType->content_id]);
+                            if ($widget->elementIds)
+                            {
+                                $options->andWhere(['id' => $availables]);
+                            }
+
+                        $options = $options->select(['id', 'name'])->asArray()->all();
 
                         $options = \yii\helpers\ArrayHelper::map(
                             $options, 'id', 'name'
                         );
 
                     ?>
-                    <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList($options); ?>
+                    <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList($options, ['class' => 'sx-filters-checkbox-options']); ?>
 
                 <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
+
+                    <?
+                        $options = $property->getEnums()->select(['id', 'value']);
+
+                        if ($widget->elementIds)
+                        {
+                            $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                                ->select(['value_enum'])
+                                ->indexBy('value_enum')
+                                ->andWhere(['element_id' => $widget->elementIds])
+                                ->andWhere(['property_id' => $property->id])
+                                ->asArray()
+                                ->all()
+                            ;
+
+                            $availables = array_keys($availables);
+                            $options->andWhere(['id' => $availables]);
+                        }
+
+                        $options = $options->asArray()->all();
+                    ?>
+
                     <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(\yii\helpers\ArrayHelper::map(
-                        $property->enums, 'id', 'value'
-                    )); ?>
+                        $options, 'id', 'value'
+                    ), ['class' => 'sx-filters-checkbox-options']); ?>
+
                 <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
                     <?/*= $form->field($widget->searchRelatedPropertiesModel, $property->code)->textInput(); */?>
 
