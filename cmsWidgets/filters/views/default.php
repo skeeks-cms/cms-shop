@@ -176,7 +176,24 @@ JS
 
                 <? else : ?>
 
-                    <?/*= $property->property_type; */?>
+                    <? $propertiesValues = \skeeks\cms\models\CmsContentElementProperty::find()->select(['value'])->where([
+                        'property_id' => $property->id,
+                        'element_id'  => $widget->elementIds
+                    ])->all(); ?>
+
+                    <? if ($propertiesValues) : ?>
+                        <div class="row">
+                            <div class="col-md-12">
+
+                            <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->dropDownList(
+                                \yii\helpers\ArrayHelper::merge(['' => ''], \yii\helpers\ArrayHelper::map(
+                                    $propertiesValues, 'value', 'value'
+                                )))
+                            ; ?>
+
+                            </div>
+                        </div>
+                    <? endif; ?>
                 <? endif; ?>
 
             <? endif; ?>
