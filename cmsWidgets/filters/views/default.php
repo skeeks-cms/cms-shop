@@ -53,6 +53,40 @@ JS
     <? if ($widget->searchModel) : ?>
 
         <? if ($widget->typePrice) : ?>
+
+            <?
+
+            if ($widget->elementIds && !$widget->searchModel->price_from)
+            {
+                $minPrice = \skeeks\cms\shop\models\ShopProductPrice::find()
+                    ->select(['price'])
+                    ->indexBy('price')
+                    ->andWhere(['product_id' => $widget->elementIds])
+                    ->andWhere(['type_price_id' => $widget->typePrice->id])
+                    ->orderBy(['price' => SORT_ASC])
+                    ->asArray()
+                    ->one()
+                ;
+
+                $widget->searchModel->price_from = $minPrice['price'];
+            }
+
+            if ($widget->elementIds && !$widget->searchModel->price_to)
+            {
+                $maxPrice = \skeeks\cms\shop\models\ShopProductPrice::find()
+                    ->select(['price'])
+                    ->indexBy('price')
+                    ->andWhere(['product_id' => $widget->elementIds])
+                    ->andWhere(['type_price_id' => $widget->typePrice->id])
+                    ->orderBy(['price' => SORT_DESC])
+                    ->asArray()
+                    ->one()
+                ;
+
+                $widget->searchModel->price_to = $maxPrice['price'];
+            }
+
+            ?>
             <?= $form->field($widget->searchModel, "type_price_id")->hiddenInput([
                 'value' => $widget->typePrice->id
             ])->label(false); ?>
