@@ -5,6 +5,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\modules\cms\money\Money;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_product_price}}".
@@ -47,6 +48,61 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
         $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterInstertCallback"]);
         $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "afterUpdateCallback"]);
+
+        $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterSaveEvent"]);
+
+    }
+
+
+    public function afterSaveEvent()
+    {
+        //Обновление цены у родительского элемента если она есть
+        if ($this->product->cmsContentElement->parent_content_element_id)
+        {
+            $parentProduct = $this->product->cmsContentElement->parentContentElement->shopProduct;
+            if ($parentProduct)
+            {
+                $minPriceValue = $this->price;
+                $minPriceCurrency = $this->currency_code;
+                //У родительского элемента уже есть предложения
+                if ($offers = $parentProduct->tradeOffers)
+                {
+                    //Все цены оферов этого типа
+                    $minPrice = ShopProductPrice::find()
+                        ->where([
+                            'product_id' => ArrayHelper::map($offers, 'id', 'id')
+                        ])
+                        ->andWhere([
+                            'type_price_id' => $this->type_price_id
+                        ])
+                        ->orderBy(['price' => SORT_ASC])->one();
+
+                    if ($minPrice)
+                    {
+                        $minPriceValue = $minPrice->price;
+                        $minPriceCurrency = $minPrice->currency_code;
+                    }
+
+                }
+
+
+                $query = $parentProduct->getShopProductPrices()->andWhere([
+                    'type_price_id' => $this->type_price_id
+                ]);
+                /**
+                 * @var $price self
+                 */
+                if ($price = $query->one())
+                {
+                    $price->price = $minPriceValue;
+                    $price->currency_code = $minPriceCurrency;
+                    $price->save();
+                }
+
+            }
+
+        }
     }
 
     public function afterInstertCallback()

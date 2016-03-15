@@ -199,6 +199,10 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 $shopProduct->id = $model->id;
                 $shopProduct->save();
 
+                $shopProduct->getBaseProductPriceValue()
+
+                $baseProductPrice = $shopProduct->baseProductPrice;
+
                 \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')

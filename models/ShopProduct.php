@@ -62,6 +62,8 @@ use yii\helpers\ArrayHelper;
  * @property ShopProductPrice   $baseProductPrice
  * @property ShopProductPrice   $minProductPrice
  * @property ShopProductPrice[]   $viewProductPrices
+ *
+ * @property ShopCmsContentElement   $tradeOffers
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -132,15 +134,84 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         parent::init();
 
+        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+
         $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterSaveEvent"]);
         $this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterSaveEvent"]);
+
+        $this->on(self::EVENT_AFTER_INSERT,    [$this, "_updateParentAfterInsert"]);
+        $this->on(self::EVENT_AFTER_DELETE,    [$this, "_checkDeleteEvent"]);
     }
 
     /**
      * @param $event
      */
+    public function _checkDeleteEvent($event)
+    {
+        //Если есть родительский элемент
+        if ($this->cmsContentElement->parent_content_element_id)
+        {
+            $parentProduct = $this->cmsContentElement->parentContentElement->shopProduct;
+
+            if ($parentProduct->getTradeOffers()->andWhere(['!=', 'id', $this->id])->all())
+            {
+                $parentProduct->product_type = self::TYPE_OFFERS;
+            } else
+            {
+                $parentProduct->product_type = self::TYPE_SIMPLE;
+            }
+
+            $parentProduct->save();
+        }
+    }
+    /**
+     * @param $event
+     */
+    public function _updateParentAfterInsert($event)
+    {
+        //Если есть родительский элемент
+        if ($this->cmsContentElement->parent_content_element_id)
+        {
+            $parentProduct = $this->cmsContentElement->parentContentElement->shopProduct;
+            $parentProduct->setAttribute('product_type', self::TYPE_OFFERS);
+            $parentProduct->save();
+        }
+    }
+
+
+    /**
+     * @param $event
+     */
+    public function beforeSaveEvent($event)
+    {
+        //Проверка измененного типа
+        if ($this->isAttributeChanged('product_type'))
+        {
+            //Выставили что у него есть предложения
+            if ($this->product_type == self::TYPE_OFFERS)
+            {
+                if (!$this->getTradeOffers()->all())
+                {
+                    $this->product_type = self::TYPE_SIMPLE;
+                }
+            } else if ($this->product_type == self::TYPE_SIMPLE) //Если указали что товар простой, значит у него не должно быть предложений
+            {
+                if ($this->getTradeOffers()->all())
+                {
+                    $this->product_type = self::TYPE_OFFERS;
+                }
+            }
+        }
+
+        \Yii::error('this', 'app');
+    }
+    /**
+     * @param $event
+     */
     public function afterSaveEvent($event)
     {
+        //Prices update
         if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue)
         {
             $baseProductPrice = $this->getBaseProductPrice()->one();
@@ -177,6 +248,8 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $baseProductPrice->save();
             }
         }
+
+
     }
 
     /**
@@ -412,7 +485,15 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getBaseProductPriceValue()
     {
-        return $this->baseProductPrice->price;
+        if ($this->_baseProductPriceValue)
+        {
+            return $this->_baseProductPriceValue;
+        } else
+        {
+            $this->_baseProductPriceValue = $this->baseProductPrice->price;
+        }
+
+        return $this->_baseProductPriceValue;
     }
 
     /**
@@ -422,7 +503,15 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getBaseProductPriceCurrency()
     {
-        return $this->baseProductPrice->currency_code;
+        if ($this->_baseProductPriceCurrency)
+        {
+            return $this->_baseProductPriceCurrency;
+        } else
+        {
+            $this->_baseProductPriceCurrency = $this->baseProductPrice->currency_code;
+        }
+
+        return $this->_baseProductPriceCurrency;
     }
 
 

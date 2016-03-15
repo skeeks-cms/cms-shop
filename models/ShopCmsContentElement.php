@@ -24,6 +24,30 @@ use skeeks\cms\models\CmsContentElement;
  */
 class ShopCmsContentElement extends CmsContentElement
 {
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_BEFORE_DELETE,    [$this, "_deleteShops"]);
+    }
+
+    //Удалить все что связано с элементом
+    public function _deleteShops()
+    {
+        $this->shopProduct->delete();
+        if ($this->tradeOffers)
+        {
+            foreach ($this->tradeOffers as $tradeOffer)
+            {
+                $tradeOffer->delete();
+            }
+        }
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
