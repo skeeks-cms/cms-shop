@@ -208,6 +208,9 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['product_type'], 'string', 'max' => 10],
             [['product_type'], 'default', 'value' => static::TYPE_SIMPLE],
+
+            [['quantity'], 'default', 'value' => 1],
+            [['quantity_reserved'], 'default', 'value' => 0],
         ];
     }
 

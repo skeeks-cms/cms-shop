@@ -138,6 +138,8 @@ class CartController extends Controller
                 $rr->message = \skeeks\cms\shop\Module::t('app', 'Failed to add item to cart');
             } else
             {
+                $shopBasket->recalculate()->save();
+
                 $rr->success = true;
                 $rr->message = \skeeks\cms\shop\Module::t('app', 'Item added to cart');
             }
