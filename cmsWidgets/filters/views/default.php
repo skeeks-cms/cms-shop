@@ -90,16 +90,18 @@ JS
             <?= $form->field($widget->searchModel, "type_price_id")->hiddenInput([
                 'value' => $widget->typePrice->id
             ])->label(false); ?>
-            <div class="row">
-                <div class="col-md-6">
-                    <?= $form->field($widget->searchModel, "price_from")->textInput([
-                        'placeholder' => \Yii::$app->money->currencyCode
-                    ]); ?>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($widget->searchModel, "price_to")->textInput([
-                        'placeholder' => \Yii::$app->money->currencyCode
-                    ]); ?>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <?= $form->field($widget->searchModel, "price_from")->textInput([
+                            'placeholder' => \Yii::$app->money->currencyCode
+                        ]); ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?= $form->field($widget->searchModel, "price_to")->textInput([
+                            'placeholder' => \Yii::$app->money->currencyCode
+                        ]); ?>
+                    </div>
                 </div>
             </div>
 
