@@ -63,8 +63,8 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             $parentProduct = $this->product->cmsContentElement->parentContentElement->shopProduct;
             if ($parentProduct)
             {
-                $minPriceValue = $this->price;
-                $minPriceCurrency = $this->currency_code;
+                $minPriceValue      = $this->price;
+                $minPriceCurrency   = $this->currency_code;
                 //У родительского элемента уже есть предложения
                 if ($offers = $parentProduct->tradeOffers)
                 {

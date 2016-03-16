@@ -156,17 +156,14 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
     <? if ($contentModel->root_tree_id) : ?>
 
         <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
-            <?= $form->fieldSelect($model, 'tree_id', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name'), [
+            <?= $form->fieldSelect($model, 'tree_id', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions($contentModel->root_tree_id), [
                     'allowDeselect' => true
                 ]
             );
             ?>
         <? endif; ?>
 
-        <?= $form->fieldSelectMulti($model, 'treeIds', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\helpers\TreeOptions::findOne($contentModel->root_tree_id)->getMultiOptions(), 'id', 'name')
-            );
+        <?= $form->fieldSelectMulti($model, 'treeIds', \skeeks\cms\helpers\TreeOptions::getAllMultiOptions($contentModel->root_tree_id) );
         ?>
 
     <? else : ?>

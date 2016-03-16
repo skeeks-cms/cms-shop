@@ -134,56 +134,20 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "_beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_beforeSaveEvent"]);
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterSaveEvent"]);
-        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_INSERT,    [$this, "_afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "_afterSaveEvent"]);
 
         $this->on(self::EVENT_AFTER_INSERT,    [$this, "_updateParentAfterInsert"]);
-        $this->on(self::EVENT_AFTER_DELETE,    [$this, "_checkDeleteEvent"]);
     }
 
     /**
+     * Перед сохранением модели, всегда следим за типом товара
      * @param $event
      */
-    public function _checkDeleteEvent($event)
-    {
-        //Если есть родительский элемент
-        if ($this->cmsContentElement->parent_content_element_id)
-        {
-            $parentProduct = $this->cmsContentElement->parentContentElement->shopProduct;
-
-            if ($parentProduct->getTradeOffers()->andWhere(['!=', 'id', $this->id])->all())
-            {
-                $parentProduct->product_type = self::TYPE_OFFERS;
-            } else
-            {
-                $parentProduct->product_type = self::TYPE_SIMPLE;
-            }
-
-            $parentProduct->save();
-        }
-    }
-    /**
-     * @param $event
-     */
-    public function _updateParentAfterInsert($event)
-    {
-        //Если есть родительский элемент
-        if ($this->cmsContentElement->parent_content_element_id)
-        {
-            $parentProduct = $this->cmsContentElement->parentContentElement->shopProduct;
-            $parentProduct->setAttribute('product_type', self::TYPE_OFFERS);
-            $parentProduct->save();
-        }
-    }
-
-
-    /**
-     * @param $event
-     */
-    public function beforeSaveEvent($event)
+    public function _beforeSaveEvent($event)
     {
         //Проверка измененного типа
         if ($this->isAttributeChanged('product_type'))
@@ -203,13 +167,13 @@ class ShopProduct extends \skeeks\cms\models\Core
                 }
             }
         }
-
-        \Yii::error('this', 'app');
     }
+
     /**
+     * После сохранения следим за ценами создаем если нет
      * @param $event
      */
-    public function afterSaveEvent($event)
+    public function _afterSaveEvent($event)
     {
         //Prices update
         if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue)
@@ -248,9 +212,28 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $baseProductPrice->save();
             }
         }
-
-
     }
+
+
+    /**
+     * Если втавленный элемент является дочерним для другого то родительскому нужно изменить тип
+     * @param $event
+     */
+    public function _updateParentAfterInsert($event)
+    {
+        //Если есть родительский элемент
+        if ($this->cmsContentElement->parent_content_element_id)
+        {
+            $parentProduct = $this->cmsContentElement->parentContentElement->shopProduct;
+            $parentProduct->setAttribute('product_type', self::TYPE_OFFERS);
+            $parentProduct->save();
+        }
+    }
+
+
+
+
+
 
     /**
      * @inheritdoc
@@ -555,5 +538,15 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getTradeOffers()
     {
         return $this->hasMany(ShopCmsContentElement::className(), ['parent_content_element_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductOffers()
+    {
+       /* return $this->hasMany(static::className(), ['parent_content_element_id' => 'id'])
+            ->via('cmsContentElement')
+            ->orderBy(['priority' => SORT_ASC]);*/
     }
 }

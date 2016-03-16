@@ -33,12 +33,17 @@ class ShopCmsContentElement extends CmsContentElement
         parent::init();
 
         $this->on(self::EVENT_BEFORE_DELETE,    [$this, "_deleteShops"]);
+        $this->on(self::EVENT_AFTER_DELETE,     [$this, "_updateParentAfterDelete"]);
     }
 
     //Удалить все что связано с элементом
     public function _deleteShops()
     {
-        $this->shopProduct->delete();
+        if ($this->shopProduct)
+        {
+            $this->shopProduct->delete();
+        }
+
         if ($this->tradeOffers)
         {
             foreach ($this->tradeOffers as $tradeOffer)
@@ -47,6 +52,42 @@ class ShopCmsContentElement extends CmsContentElement
             }
         }
     }
+
+    /**
+     * Проверка родителя если он есть, и изменение его типа если нужно после удаления текущего
+     * @param $event
+     */
+    public function _updateParentAfterDelete($event)
+    {
+        //Если есть родительский элемент
+        if ($this->parent_content_element_id)
+        {
+            if ($offers = $this->parentContentElement->getTradeOffers()->all())
+            {
+                /**
+                 * Если есть оферы, берем одного из них и обновляем цены, это повлечет за собой обновление цены у продукта
+                 * @var $offer ShopCmsContentElement
+                 */
+                $offer = array_shift($offers);
+
+                if ($offer->shopProduct && $offer->shopProduct->shopProductPrices)
+                {
+                    foreach ($offer->shopProduct->shopProductPrices as $shopPrice)
+                    {
+                        $shopPrice->save();
+                    }
+                }
+
+                $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_OFFERS;
+            } else
+            {
+                $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_SIMPLE;
+            }
+
+            $this->parentContentElement->shopProduct->save();
+        }
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
