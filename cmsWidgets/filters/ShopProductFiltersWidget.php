@@ -14,6 +14,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementTree;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\searchs\SearchChildrenRelatedPropertiesModel;
 use skeeks\cms\models\Tree;
@@ -206,5 +207,198 @@ class ShopProductFiltersWidget extends WidgetRenderable
         {
             $this->searchOfferRelatedPropertiesModel->search($activeDataProvider);
         }
+    }
+
+    /**
+     * @return \skeeks\cms\shop\models\ShopProductPrice
+     */
+    public function getMinPrice()
+    {
+        $minPrice = null;
+
+        if ($this->elementIds && $this->typePrice) {
+            $minPrice = \skeeks\cms\shop\models\ShopProductPrice::find()
+                ->andWhere(['product_id' => $this->elementIds])
+                ->andWhere(['type_price_id' => $this->typePrice->id])
+                ->orderBy(['price' => SORT_ASC])
+                ->one();
+        }
+
+        return $minPrice;
+    }
+
+    /**
+     * @return \skeeks\cms\shop\models\ShopProductPrice
+     */
+    public function getMaxPrice()
+    {
+        $maxPrice = null;
+
+        if ($this->elementIds && $this->typePrice) {
+            $maxPrice = \skeeks\cms\shop\models\ShopProductPrice::find()
+                ->andWhere(['product_id' => $this->elementIds])
+                ->andWhere(['type_price_id' => $this->typePrice->id])
+                ->orderBy(['price' => SORT_DESC])
+                ->one();
+        }
+
+        return $maxPrice;
+    }
+
+    protected function _run()
+    {
+
+        if ($this->elementIds && !$this->searchModel->price_from && $this->typePrice)
+        {
+            $this->searchModel->price_from = $this->minPrice->price;
+        }
+
+        if ($this->elementIds && !$this->searchModel->price_to && $this->typePrice)
+        {
+            $this->searchModel->price_to = $this->maxPrice->price;
+        }
+
+        return parent::_run();
+    }
+
+
+    /**
+     *
+     * Получение доступных опций для свойства
+     * @param CmsContentProperty $property
+     * @return $this|array|\yii\db\ActiveRecord[]
+     */
+    public function getRelatedPropertyOptions($property)
+    {
+        $options = [];
+
+        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
+        {
+            $propertyType = $property->createPropertyType();
+
+            if ($this->elementIds)
+            {
+                $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                    ->select(['value_enum'])
+                    ->indexBy('value_enum')
+                    ->andWhere(['element_id' => $this->elementIds])
+                    ->andWhere(['property_id' => $property->id])
+                    ->asArray()
+                    ->all()
+                ;
+
+                $availables = array_keys($availables);
+            }
+
+            $options = \skeeks\cms\models\CmsContentElement::find()
+                ->active()
+                ->andWhere(['content_id' => $propertyType->content_id]);
+                if ($this->elementIds)
+                {
+                    $options->andWhere(['id' => $availables]);
+                }
+
+            $options = $options->select(['id', 'name'])->asArray()->all();
+
+            $options = \yii\helpers\ArrayHelper::map(
+                $options, 'id', 'name'
+            );
+
+        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
+        {
+            $options = $property->getEnums()->select(['id', 'value']);
+
+            if ($this->elementIds)
+            {
+                $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                    ->select(['value_enum'])
+                    ->indexBy('value_enum')
+                    ->andWhere(['element_id' => $this->elementIds])
+                    ->andWhere(['property_id' => $property->id])
+                    ->asArray()
+                    ->all()
+                ;
+
+                $availables = array_keys($availables);
+                $options->andWhere(['id' => $availables]);
+            }
+
+            $options = $options->asArray()->all();
+
+            $options = \yii\helpers\ArrayHelper::map(
+                $options, 'id', 'value'
+            );
+        }
+
+        return $options;
+    }
+
+
+    /**
+     *
+     * Получение доступных опций для свойства
+     * @param CmsContentProperty $property
+     * @return $this|array|\yii\db\ActiveRecord[]
+     */
+    public function getOfferRelatedPropertyOptions($property)
+    {
+        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
+        {
+            $propertyType = $property->createPropertyType();
+
+            if ($this->childrenElementIds)
+            {
+                $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                    ->select(['value_enum'])
+                    ->indexBy('value_enum')
+                    ->andWhere(['element_id' => $this->childrenElementIds])
+                    ->andWhere(['property_id' => $property->id])
+                    ->asArray()
+                    ->all()
+                ;
+
+                $availables = array_keys($availables);
+            }
+
+            $options = \skeeks\cms\models\CmsContentElement::find()
+                ->active()
+                ->andWhere(['content_id' => $propertyType->content_id]);
+                if ($this->childrenElementIds)
+                {
+                    $options->andWhere(['id' => $availables]);
+                }
+
+            $options = $options->select(['id', 'name'])->asArray()->all();
+
+            $options = \yii\helpers\ArrayHelper::map(
+                $options, 'id', 'name'
+            );
+        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
+        {
+            $options = $property->getEnums()->select(['id', 'value']);
+
+            if ($this->childrenElementIds)
+            {
+                $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                    ->select(['value_enum'])
+                    ->indexBy('value_enum')
+                    ->andWhere(['element_id' => $this->childrenElementIds])
+                    ->andWhere(['property_id' => $property->id])
+                    ->asArray()
+                    ->all()
+                ;
+
+                $availables = array_keys($availables);
+                $options->andWhere(['id' => $availables]);
+            }
+
+            $options = $options->asArray()->all();
+
+            $options = \yii\helpers\ArrayHelper::map(
+                $options, 'id', 'value'
+            );
+        }
+
+        return $options;
     }
 }
