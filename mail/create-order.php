@@ -16,6 +16,10 @@ $order->refresh();
     К оплате: <b><?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?></b>
 <?= Html::endTag('p'); ?>
 
+<hr />
+<?= Html::beginTag('h2'); ?>
+    Заказ:
+<?= Html::endTag('h2'); ?>
 <?= Html::beginTag('p'); ?>
     <?=
         \yii\grid\GridView::widget([
@@ -34,10 +38,10 @@ $order->refresh();
                     'format'    => 'raw',
                     'value'     => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
-                        $widget = new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-                            'image' => $shopBasket->product->cmsContentElement->image
-                        ]);
-                        return $widget->run();
+                        if ($shopBasket->image)
+                        {
+                            return Html::img($shopBasket->image->absoluteSrc, ['width' => 80]);
+                        }
                     }
                 ],
                 [
@@ -46,9 +50,9 @@ $order->refresh();
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
-                        if ($shopBasket->product)
+                        if ($shopBasket->url)
                         {
-                            return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
+                            return Html::a($shopBasket->name, $shopBasket->url, [
                                 'target' => '_blank',
                                 'titla' => "Смотреть на сайте",
                                 'data-pjax' => 0
@@ -101,6 +105,16 @@ $order->refresh();
         ])
     ?>
 <?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('h2'); ?>
+    Покупатель:
+<?= Html::endTag('h2'); ?>
+<?=
+    \yii\widgets\DetailView::widget([
+        'model'         => $order->buyer->relatedPropertiesModel,
+        'attributes'    => $order->buyer->relatedPropertiesModel->attributes()
+    ]);
+?>
 
 <?= Html::beginTag('p'); ?>
     <?= \skeeks\cms\shop\Module::t('app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
