@@ -28,6 +28,7 @@ use Yii;
  * @property CmsContent $content
  * @property ShopVat $vat
  * @property CmsContent $childrenContent
+ * @property CmsContent $offerContent
  */
 class ShopContent extends \skeeks\cms\models\Core
 {
@@ -84,6 +85,14 @@ class ShopContent extends \skeeks\cms\models\Core
             'vat_id'        => \skeeks\cms\shop\Module::t('app', 'Vat ID'),
             'children_content_id' => \skeeks\cms\shop\Module::t('app', 'Trade offers'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOfferContent()
+    {
+        return $this->hasOne(CmsContent::className(), ['id' => 'children_content_id']);
     }
 
     /**

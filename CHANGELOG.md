@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha4.pre
 -----------------
+  * Smart filters
   * Quantity by default
   * Разработка торговых предложений
   * Добавлены типы товаров

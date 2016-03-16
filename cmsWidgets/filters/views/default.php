@@ -238,6 +238,122 @@ JS
 
 
 
+    <? if ($properties = $widget->searchOfferRelatedPropertiesModel->properties) : ?>
+
+        <? foreach ($properties as $property) : ?>
+            <? if (in_array($property->code, $widget->offerRelatedProperties)) : ?>
+
+                <? if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) : ?>
+
+                    <?
+                        $propertyType = $property->createPropertyType();
+
+                        if ($widget->childrenElementIds)
+                        {
+                            $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                                ->select(['value_enum'])
+                                ->indexBy('value_enum')
+                                ->andWhere(['element_id' => $widget->childrenElementIds])
+                                ->andWhere(['property_id' => $property->id])
+                                ->asArray()
+                                ->all()
+                            ;
+
+                            $availables = array_keys($availables);
+                        }
+
+                        $options = \skeeks\cms\models\CmsContentElement::find()
+                            ->active()
+                            ->andWhere(['content_id' => $propertyType->content_id]);
+                            if ($widget->childrenElementIds)
+                            {
+                                $options->andWhere(['id' => $availables]);
+                            }
+
+                        $options = $options->select(['id', 'name'])->asArray()->all();
+
+                        $options = \yii\helpers\ArrayHelper::map(
+                            $options, 'id', 'name'
+                        );
+
+                    ?>
+                    <?= $form->field($widget->searchOfferRelatedPropertiesModel, $property->code)->checkboxList($options, ['class' => 'sx-filters-checkbox-options']); ?>
+
+                <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
+
+                    <?
+                        $options = $property->getEnums()->select(['id', 'value']);
+
+                        if ($widget->childrenElementIds)
+                        {
+                            $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                                ->select(['value_enum'])
+                                ->indexBy('value_enum')
+                                ->andWhere(['element_id' => $widget->childrenElementIds])
+                                ->andWhere(['property_id' => $property->id])
+                                ->asArray()
+                                ->all()
+                            ;
+
+                            $availables = array_keys($availables);
+                            $options->andWhere(['id' => $availables]);
+                        }
+
+                        $options = $options->asArray()->all();
+                    ?>
+
+                    <?= $form->field($widget->searchOfferRelatedPropertiesModel, $property->code)->checkboxList(\yii\helpers\ArrayHelper::map(
+                        $options, 'id', 'value'
+                    ), ['class' => 'sx-filters-checkbox-options']); ?>
+
+                <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
+                    <?/*= $form->field($widget->searchRelatedPropertiesModel, $property->code)->textInput(); */?>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?= $form->field($widget->searchOfferRelatedPropertiesModel, $widget->searchOfferRelatedPropertiesModel->getAttributeNameRangeFrom($property->code) )->textInput([
+                                'placeholder' => 'от'
+                            ])->label(
+                                $property->name . ""
+                            ); ?>
+                        </div>
+                        <div class="col-md-6">
+                            <?= $form->field($widget->searchOfferRelatedPropertiesModel, $widget->searchOfferRelatedPropertiesModel->getAttributeNameRangeTo($property->code) )->textInput([
+                                'placeholder' => 'до'
+                            ])->label("&nbsp;"); ?>
+                        </div>
+                    </div>
+
+                <? else : ?>
+
+                    <? $propertiesValues = \skeeks\cms\models\CmsContentElementProperty::find()->select(['value'])->where([
+                        'property_id' => $property->id,
+                        'element_id'  => $widget->elementIds
+                    ])->all(); ?>
+
+                    <? if ($propertiesValues) : ?>
+                        <div class="row">
+                            <div class="col-md-12">
+
+                            <?= $form->field($widget->searchOfferRelatedPropertiesModel, $property->code)->dropDownList(
+                                \yii\helpers\ArrayHelper::merge(['' => ''], \yii\helpers\ArrayHelper::map(
+                                    $propertiesValues, 'value', 'value'
+                                )))
+                            ; ?>
+
+                            </div>
+                        </div>
+                    <? endif; ?>
+                <? endif; ?>
+
+            <? endif; ?>
+
+
+        <? endforeach; ?>
+    <? endif; ?>
+
+
+
     <button class="btn btn-primary"><?=\skeeks\cms\shop\Module::t('app', 'Apply');?></button>
 
 <? \skeeks\cms\base\widgets\ActiveForm::end(); ?>

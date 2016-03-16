@@ -40,6 +40,11 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
 
     <? if ($model->cmsContent) : ?>
         <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
+
+        <? if ($model->shopContent) : ?>
+            <?= $form->fieldSelectMulti($model, 'offerRelatedProperties', \yii\helpers\ArrayHelper::map($model->shopContent->offerContent->cmsContentProperties, 'code', 'name')); ?>
+        <? endif ; ?>
+
     <? else: ?>
         Дополнительные свойства появятся после сохранения настроек
     <? endif; ?>
