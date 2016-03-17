@@ -199,7 +199,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 $shopProduct->id = $model->id;
                 $shopProduct->save();
 
-                $shopProduct->getBaseProductPriceValue()
+                $shopProduct->getBaseProductPriceValue();
 
                 $baseProductPrice = $shopProduct->baseProductPrice;
 
