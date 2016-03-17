@@ -52,6 +52,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     public $type_price_id               = "";
 
     /**
+     * @var bool Учитывать только доступные фильтры для текущей выборки
+     */
+    public $onlyExistsFilters           = false;
+
+    /**
      * @var array (Массив ids записей, для показа только нужных фильтров)
      */
     public $elementIds          = [];
@@ -192,24 +197,6 @@ class ShopProductFiltersWidget extends WidgetRenderable
     }
 
     /**
-     * @param ActiveDataProvider $activeDataProvider
-     */
-    public function search(ActiveDataProvider $activeDataProvider)
-    {
-        $this->searchModel->search($activeDataProvider);
-
-        if ($this->searchRelatedPropertiesModel)
-        {
-            $this->searchRelatedPropertiesModel->search($activeDataProvider);
-        }
-
-        if ($this->searchOfferRelatedPropertiesModel)
-        {
-            $this->searchOfferRelatedPropertiesModel->search($activeDataProvider);
-        }
-    }
-
-    /**
      * @return \skeeks\cms\shop\models\ShopProductPrice
      */
     public function getMinPrice()
@@ -243,6 +230,35 @@ class ShopProductFiltersWidget extends WidgetRenderable
         }
 
         return $maxPrice;
+    }
+
+    /**
+     * @param ActiveDataProvider $activeDataProvider
+     */
+    public function search(ActiveDataProvider $activeDataProvider)
+    {
+        if ($this->onlyExistsFilters)
+        {
+            /**
+             * @var $query \yii\db\ActiveQuery
+             */
+            $query  = clone $activeDataProvider->query;
+            $ids    = $query->select(['cms_content_element.id as mainId'])->indexBy('mainId')->asArray()->all();
+
+            $this->elementIds = array_keys($ids);
+        }
+
+        $this->searchModel->search($activeDataProvider);
+
+        if ($this->searchRelatedPropertiesModel)
+        {
+            $this->searchRelatedPropertiesModel->search($activeDataProvider);
+        }
+
+        if ($this->searchOfferRelatedPropertiesModel)
+        {
+            $this->searchOfferRelatedPropertiesModel->search($activeDataProvider);
+        }
     }
 
     protected function _run()
