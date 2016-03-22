@@ -8,12 +8,17 @@
 return [
 
     'components' =>
-    [],
+    [
+        'shop' => [
+            'class'         => 'skeeks\cms\shop\components\ShopComponent',
+        ],
+    ],
 
     'modules' =>
     [
         'shop' => [
-            'class'         => 'skeeks\cms\shop\Module',
+            'class'                 => 'skeeks\cms\shop\Module',
+            'controllerNamespace'   => 'skeeks\cms\shop\console\controllers'
         ]
     ]
 ];

@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha4.pre
 -----------------
+  * Added agent removing empty crates
   * Smart filters
   * Quantity by default
   * Разработка торговых предложений

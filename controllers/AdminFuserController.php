@@ -27,6 +27,7 @@ use skeeks\cms\shop\models\ShopTax;
 use skeeks\cms\shop\models\ShopVat;
 use skeeks\cms\shop\widgets\AdminBuyerUserWidget;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -53,7 +54,7 @@ class AdminFuserController extends AdminModelEditorController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
+        $actions = ArrayHelper::merge(parent::actions(),
             [
                 'index' =>
                 [
@@ -71,6 +72,20 @@ class AdminFuserController extends AdminModelEditorController
                         $query->with('buyer');
                         $query->with('shopBaskets');
                         $query->with('shopBaskets.product');
+
+                        $query->joinWith('shopBaskets as sb');
+                        $query->andWhere(
+                            [
+                                'or',
+                                ['>=', 'sb.id', 0],
+                                ['>=', 'shop_fuser.user_id', 0],
+                                ['>=', 'shop_fuser.person_type_id', 0],
+                                ['>=', 'shop_fuser.buyer_id', 0]
+                            ]
+                        );
+
+                        //$query->orderBy(['sb.updated_at' => SORT_DESC]);
+                        $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
                     },
 
 
@@ -155,7 +170,7 @@ class AdminFuserController extends AdminModelEditorController
 HTML;
 
                                     }
-                                    return implode('<hr />', $result);
+                                    return implode('<hr style="margin: 0px;"/>', $result);
                                 }
                             },
                         ],
@@ -165,6 +180,7 @@ HTML;
                             'filter'        => ArrayHelper::map(CmsSite::find()->active()->all(), 'id', 'name'),
                             'attribute'     => 'site_id',
                             'format'        => 'raw',
+                            'visible'        => false,
                             'label'         => \skeeks\cms\shop\Module::t('app', 'Site'),
                             'value'         => function(ShopFuser $model)
                             {
@@ -178,7 +194,13 @@ HTML;
                     ],
                 ]
             ]
+
         );
+
+        unset($actions['create']);
+        unset($actions['update']);
+
+        return $actions;
     }
 
 }

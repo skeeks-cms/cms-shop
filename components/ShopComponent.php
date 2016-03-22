@@ -11,6 +11,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\kladr\models\KladrLocation;
+use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsUser;
@@ -24,6 +25,7 @@ use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
 use yii\base\Application;
+use yii\base\Event;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -114,6 +116,28 @@ class ShopComponent extends Component
 
             }
         });
+
+
+
+        if (\Yii::$app instanceof \yii\console\Application)
+        {
+            \Yii::$app->on(Cms::EVENT_AFTER_UPDATE, function(Event $e)
+            {
+
+                //Вставка агентов
+                if (!CmsAgent::find()->where(['name' => 'shop/agents/delete-empty-carts'])->one())
+                {
+                    ( new CmsAgent([
+                        'name'              => 'shop/agents/delete-empty-carts',
+                        'description'       => 'Удаление пустых корзин',
+                        'agent_interval'    => 3600*6, //раз в 6
+                        'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*6,
+                        'is_period'         => Cms::BOOL_N
+                    ]) )->save();
+                }
+
+            });
+        }
     }
 
 

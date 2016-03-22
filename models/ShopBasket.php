@@ -382,7 +382,6 @@ class ShopBasket extends \skeeks\cms\models\Core
                 'shop_discount2type_price.type_price_id' => $this->productPrice->typePrice->id,
              ])
              ->all();
-             //->createCommand()->rawSql;
 
 
         $price = $this->price;

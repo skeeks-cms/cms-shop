@@ -56,10 +56,6 @@ class AdminViewedProductController extends AdminModelEditorController
                     'visible' => false
                 ],
 
-                'system' =>
-                [
-                    'visible' => false
-                ],
 
                 'index' =>
                 [
