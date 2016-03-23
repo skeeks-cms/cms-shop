@@ -402,14 +402,13 @@ HTML;
                 'label' => \skeeks\cms\shop\Module::t('app', 'Good'),
                 'value' => function(\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct)
                 {
-                    if ($shopViewedProduct->shopProduct)
-                    {
-                        return Html::a($shopViewedProduct->shopProduct->cmsContentElement->name, $shopViewedProduct->shopProduct->cmsContentElement->url, [
-                            'target' => '_blank',
-                            'titla' => "Смотреть на сайте",
-                            'data-pjax' => 0
-                        ]);
-                    }
+                    return (new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
+                        'image' => $shopViewedProduct->shopProduct->cmsContentElement->image,
+                        'maxWidth' => "25px"
+                    ]))->run() . " " . Html::a($shopViewedProduct->shopProduct->cmsContentElement->name, $shopViewedProduct->shopProduct->cmsContentElement->url, [
+                        'target' => "_blank",
+                        'data-pjax' => 0,
+                    ] );
 
                     return null;
                 },

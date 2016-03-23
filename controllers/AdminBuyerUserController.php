@@ -45,4 +45,15 @@ class AdminBuyerUserController extends AdminModelEditorController
 
         parent::init();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        $actions = parent::actions();
+        unset($actions['create']);
+
+        return $actions;
+    }
 }
