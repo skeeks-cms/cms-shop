@@ -221,6 +221,12 @@ $view = $this;
 
         'columns' =>
         [
+            [
+                'class' => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'controller' => \Yii::$app->createController('/shop/admin-order')[0],
+            ],
+
+
             'id',
 
             [
@@ -349,6 +355,7 @@ HTML;
         ]),
         'columns' =>
         [
+
             [
                 'class' => \skeeks\cms\grid\CreatedAtColumn::className()
             ],
@@ -391,6 +398,11 @@ HTML;
         ]),
         'columns' =>
         [
+            [
+                'class' => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'controller' => \Yii::$app->createController('/shop/admin-viewed-product')[0],
+            ],
+
             [
                 'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
                 'label' => \skeeks\cms\shop\Module::t('app', 'Date views'),

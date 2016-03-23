@@ -40,7 +40,7 @@ class AdminBuyerUserController extends AdminModelEditorController
     public function init()
     {
         $this->name                     = \skeeks\cms\shop\Module::t('app', 'Buyers');
-        $this->modelShowAttribute       = "name";
+        $this->modelShowAttribute       = "displayName";
         $this->modelClassName           = CmsUser::className();
 
         parent::init();
@@ -53,6 +53,11 @@ class AdminBuyerUserController extends AdminModelEditorController
     {
         $actions = parent::actions();
         unset($actions['create']);
+        unset($actions['delete']);
+        if (isset($actions['related-properties']))
+        {
+            unset($actions['related-properties']);
+        }
 
         return $actions;
     }

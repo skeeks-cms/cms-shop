@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha4.pre
 -----------------
+  * Admin update
   * Added agent removing empty crates
   * Smart filters
   * Quantity by default
