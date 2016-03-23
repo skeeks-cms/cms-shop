@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha4.pre
+1.0.0-alpha4
 -----------------
   * Admin update
   * Added agent removing empty crates
