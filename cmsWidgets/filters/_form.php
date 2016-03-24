@@ -41,7 +41,7 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
     <? if ($model->cmsContent) : ?>
         <?= $form->fieldSelectMulti($model, 'realatedProperties', \yii\helpers\ArrayHelper::map($model->cmsContent->cmsContentProperties, 'code', 'name')); ?>
 
-        <? if ($model->shopContent) : ?>
+        <? if ($model->shopContent && $model->shopContent->offerContent) : ?>
             <?= $form->fieldSelectMulti($model, 'offerRelatedProperties', \yii\helpers\ArrayHelper::map($model->shopContent->offerContent->cmsContentProperties, 'code', 'name')); ?>
         <? endif ; ?>
 
