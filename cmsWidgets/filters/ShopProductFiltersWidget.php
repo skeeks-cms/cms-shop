@@ -279,6 +279,39 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
 
     /**
+     * @param $property
+     * @return bool
+     */
+    public function isShowRelatedProperty($property)
+    {
+        if (!in_array($property->code, $this->realatedProperties))
+        {
+            return false;
+        }
+
+        if ($this->onlyExistsFilters === false)
+        {
+            return true;
+        }
+
+        if (in_array($property->property_type, [\skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT, \skeeks\cms\relatedProperties\PropertyType::CODE_LIST]))
+        {
+            $options = $this->getRelatedPropertyOptions($property);
+            if (count($options) > 1)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected $_relatedOptions = [];
+
+    /**
      *
      * Получение доступных опций для свойства
      * @param CmsContentProperty $property
@@ -287,6 +320,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     public function getRelatedPropertyOptions($property)
     {
         $options = [];
+
+        if (isset($this->_relatedOptions[$property->code]))
+        {
+            return $this->_relatedOptions[$property->code];
+        }
 
         if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
         {
@@ -346,9 +384,74 @@ class ShopProductFiltersWidget extends WidgetRenderable
             );
         }
 
+        $this->_relatedOptions[$property->code] = $options;
+
         return $options;
     }
 
+
+
+
+
+
+    /**
+     * @param $property
+     * @return bool
+     */
+    public function isShowOfferProperty($property)
+    {
+        if (!in_array($property->code, $this->offerRelatedProperties))
+        {
+            return false;
+        }
+
+        if ($this->onlyExistsFilters === false)
+        {
+            return true;
+        }
+
+        if (in_array($property->property_type, [\skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT, \skeeks\cms\relatedProperties\PropertyType::CODE_LIST]))
+        {
+            $options = $this->getOfferRelatedPropertyOptions($property);
+            if (count($options) > 1)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $property
+     * @return bool
+     */
+    public function isShowPriceFilter()
+    {
+        if (!$this->typePrice)
+        {
+            return false;
+        }
+
+        if ($this->onlyExistsFilters === false)
+        {
+            return true;
+        }
+
+        if ($this->searchModel->price_from == $this->searchModel->price_to)
+        {
+            return false;
+        }
+
+
+
+        return true;
+    }
+
+    protected $_offerOptions = [];
 
     /**
      *
@@ -358,6 +461,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function getOfferRelatedPropertyOptions($property)
     {
+        if (isset($this->_offerOptions[$property->code]))
+        {
+            return $this->_offerOptions[$property->code];
+        }
+
         if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
         {
             $propertyType = $property->createPropertyType();
@@ -414,6 +522,8 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 $options, 'id', 'value'
             );
         }
+
+        $this->_offerOptions[$property->code] = $options;
 
         return $options;
     }

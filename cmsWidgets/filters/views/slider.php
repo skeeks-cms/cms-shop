@@ -49,7 +49,7 @@ JS
 
     <? if ($widget->searchModel) : ?>
 
-        <? if ($widget->typePrice) : ?>
+        <? if ($widget->isShowPriceFilter()) : ?>
 
             <?= $form->field($widget->searchModel, "type_price_id", [
                 'options' =>
@@ -128,17 +128,13 @@ JS
     <? if ($properties = $widget->searchRelatedPropertiesModel->properties) : ?>
 
         <? foreach ($properties as $property) : ?>
-            <? if (in_array($property->code, $widget->realatedProperties)) : ?>
+            <? if ($widget->isShowRelatedProperty($property)) : ?>
 
                 <? if (in_array($property->property_type, [\skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT, \skeeks\cms\relatedProperties\PropertyType::CODE_LIST]) ) : ?>
-                    <? $options = $widget->getRelatedPropertyOptions($property); ?>
 
-                    <? if ($widget->elementIds && count($options) > 1) : ?>
                         <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(
-                            $options
+                            $widget->getRelatedPropertyOptions($property)
                             , ['class' => 'sx-filters-checkbox-options']); ?>
-                    <? endif; ?>
-
 
                 <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
                     <div class="form-group">
@@ -191,17 +187,14 @@ JS
     <? if ($properties = $widget->searchOfferRelatedPropertiesModel->properties) : ?>
 
         <? foreach ($properties as $property) : ?>
-            <? if (in_array($property->code, $widget->offerRelatedProperties)) : ?>
+            <? if ($widget->isShowOfferProperty($property)) : ?>
 
                 <? if (in_array($property->property_type, [\skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT, \skeeks\cms\relatedProperties\PropertyType::CODE_LIST] )) : ?>
 
-                    <? $options = $widget->getOfferRelatedPropertyOptions($property); ?>
-                    <? if ($widget->elementIds && count($options) > 1) : ?>
                         <?= $form->field($widget->searchOfferRelatedPropertiesModel, $property->code)
                             ->checkboxList(
-                                $options
+                                $widget->getOfferRelatedPropertyOptions($property)
                                 , ['class' => 'sx-filters-checkbox-options']); ?>
-                    <? endif; ?>
 
 
                 <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
