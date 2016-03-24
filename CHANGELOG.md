@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha5.pre
+-----------------
+  * Update filters
+
 1.0.0-alpha4
 -----------------
   * Admin update
