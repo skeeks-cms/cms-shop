@@ -447,7 +447,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             }
 
             $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-            $searchRelatedPropertiesModel->initCmsContent($model->cmsContent);
+            $searchRelatedPropertiesModel->initCmsContent($cmsContent);
             $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
             if ($dataProvider)
             {

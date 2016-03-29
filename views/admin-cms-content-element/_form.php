@@ -429,50 +429,46 @@ JS
 <? endif; ?>
 
 
-<? if ($childContents = $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->one() ) : ?>
+<? if ($childContents = $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->all() ) : ?>
 
-    <?
-    $columnsFile = \Yii::getAlias('@skeeks/cms/shop/views/admin-cms-content-element/_columns.php');
-    /**
-     * @var $content \skeeks\cms\models\CmsContent
-     */
-    ?>
+
     <? foreach($childContents as $childContent) : ?>
         <?= $form->fieldSet($childContent->name); ?>
 
-        <? if ($model->isNewRecord) : ?>
+            <? if ($model->isNewRecord) : ?>
 
-            <?= \yii\bootstrap\Alert::widget([
-                'options' =>
-                [
-                    'class' => 'alert-warning'
-                ],
-                'body' => \Yii::t('app', 'Management will be available after saving')
-            ]); ?>
-        <? else:  ?>
-
-            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                'label'             => $childContent->name,
-                'parentModel'       => $model,
-                'relation'          => [
-                    'content_id'                    => $childContent->id,
-                    'parent_content_element_id'     => $model->id
-                ],
-
-                'sort'              => [
-                    'defaultOrder' =>
+                <?= \yii\bootstrap\Alert::widget([
+                    'options' =>
                     [
-                        'priority' => 'published_at'
-                    ]
-                ],
+                        'class' => 'alert-warning'
+                    ],
+                    'body' => \Yii::t('app', 'Management will be available after saving')
+                ]); ?>
+            <? else:  ?>
 
-                'controllerRoute'   => 'shop/admin-cms-content-element',
-                'gridViewOptions'   => [
-                    'columns' => (array) include $columnsFile
-                ],
-            ]); ?>
+                <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                    'label'             => $childContent->name,
+                    'namespace'         => md5($model->className() . $childContent->id),
+                    'parentModel'       => $model,
+                    'relation'          => [
+                        'content_id'                    => $childContent->id,
+                        'parent_content_element_id'     => $model->id
+                    ],
 
-        <? endif; ?>
+                    'sort'              => [
+                        'defaultOrder' =>
+                        [
+                            'priority' => 'published_at'
+                        ]
+                    ],
+
+                    'controllerRoute'   => 'shop/admin-cms-content-element',
+                    'gridViewOptions'   => [
+                        'columns' => (array) \skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($childContent)
+                    ],
+                ]); ?>
+
+            <? endif; ?>
 
 
 
