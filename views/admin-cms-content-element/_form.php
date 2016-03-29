@@ -380,7 +380,6 @@ JS
             ]); ?>
         <? else:  ?>
 
-            <? $columnsFile = \Yii::getAlias('@skeeks/cms/shop/views/admin-cms-content-element/_columns.php'); ?>
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                 'label'             => $shopContent->childrenContent->name,
                 'parentModel'       => $model,
@@ -398,7 +397,7 @@ JS
 
                 'controllerRoute'   => 'shop/admin-cms-content-element',
                 'gridViewOptions'   => [
-                    'columns' => (array) include $columnsFile
+                    'columns' => (array) \skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($shopContent->childrenContent)
                 ],
             ]); ?>
 

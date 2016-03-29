@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha5.pre
 -----------------
+  * Update admin products grids
   * Update filters
 
 1.0.0-alpha4
