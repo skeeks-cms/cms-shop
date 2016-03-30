@@ -20,9 +20,6 @@ if ($content_id = \Yii::$app->request->get('content_id'))
      */
     $cmsContent = \skeeks\cms\models\CmsContent::findOne($content_id);
 }
-
-
-$autoColumns = [];
 $columns = \skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider);
 
 ?>

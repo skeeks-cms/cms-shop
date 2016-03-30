@@ -464,7 +464,7 @@ JS
 
                     'controllerRoute'   => 'shop/admin-cms-content-element',
                     'gridViewOptions'   => [
-                        'columns' => (array) \skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($childContent)
+                        'columns' => (array) \skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent)
                     ],
                 ]); ?>
 
