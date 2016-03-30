@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha5.pre
+1.0.0-alpha5
 -----------------
   * Update admin products grids
   * Update filters
