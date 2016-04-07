@@ -109,10 +109,24 @@ class OrderController extends Controller
          * @var $shopOrder ShopOrder
          */
         $shopOrder = ShopOrder::findOne(\Yii::$app->request->get('id'));
-
         //TODO: проверки
 
         return $shopOrder->paySystem->paySystemHandler->paymentResponse($shopOrder);
 
     }
+
+    public function actionPayPal()
+    {
+        return $this->render($this->action->id, [
+            'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))
+        ]);
+    }
+
+    public function actionPayPalNotify()
+    {
+        \Yii::error(serialize(\Yii::$app->request->get()), 'paypal');
+        \Yii::error(serialize(\Yii::$app->request->post()), 'paypal');
+        return "";
+    }
+
 }

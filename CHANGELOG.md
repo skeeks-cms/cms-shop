@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha6.pre
+-----------------
+  * PayPal
+
 1.0.0-alpha5
 -----------------
   * Update admin products grids

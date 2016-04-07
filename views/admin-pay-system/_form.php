@@ -30,7 +30,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             <?= $form->fieldSelect($model, 'component', [
                 \skeeks\cms\shop\Module::t('app', 'Basic payment systems')          =>
                 [
-                    \skeeks\cms\shop\paySystems\RobokassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobokassaPaySystem())->descriptor->name
+                    \skeeks\cms\shop\paySystems\RobokassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobokassaPaySystem())->descriptor->name,
+                    \skeeks\cms\shop\paySystems\PayPalPaySystem::className() => (new \skeeks\cms\shop\paySystems\PayPalPaySystem())->descriptor->name
                 ],
             ], [
                 'allowDeselect' => true
