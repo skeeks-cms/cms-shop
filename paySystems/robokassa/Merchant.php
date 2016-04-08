@@ -12,6 +12,8 @@ class Merchant extends Object
     public $sMerchantPass1;
     public $sMerchantPass2;
 
+    public $isLive = true;
+
     public $baseUrl = 'https://auth.robokassa.ru/Merchant/Index.aspx';
 
     public function payment($nOutSum, $nInvId, $sInvDesc = null, $sIncCurrLabel=null, $sEmail = null, $sCulture = null, $shp = [])
@@ -33,8 +35,13 @@ class Merchant extends Object
             'SignatureValue' => $sSignatureValue,
             'IncCurrLabel' => $sIncCurrLabel,
             'Email' => $sEmail,
-            'Culture' => $sCulture,
+            'Culture' => $sCulture
         ];
+
+        if (!$this->isLive)
+        {
+            $data['isTest'] = 1;
+        }
 
         $url .= '?' . http_build_query($data);
 
@@ -42,7 +49,7 @@ class Merchant extends Object
             $url .= '&' . $query;
         }
 
-        Yii::$app->user->setReturnUrl(Yii::$app->request->getUrl());
+        \Yii::$app->user->setReturnUrl(Yii::$app->request->getUrl());
         return Yii::$app->response->redirect($url);
     }
 

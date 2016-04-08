@@ -13,12 +13,13 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
+ * @property string $baseUrl
  * Class RobokassaPaySystem
  * @package skeeks\cms\shop\paySystems
  */
 class RobokassaPaySystem extends PaySystemHandlerComponent
 {
-    public $baseUrl         = 'http://test.robokassa.ru/Index.aspx'; //https://auth.robokassa.ru/Merchant/Index.aspx
+    public $isLive          = true; //https://auth.robokassa.ru/Merchant/Index.aspx
     public $sMerchantLogin  = '';
     public $sMerchantPass1  = '';
     public $sMerchantPass2  = '';
@@ -34,24 +35,35 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
         ]);
     }
 
+    public function getBaseUrl()
+    {
+        return "https://auth.robokassa.ru/Merchant/Index.aspx";
+    }
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['baseUrl'], 'string'],
-            [['baseUrl'], 'url'],
             [['sMerchantLogin'], 'string'],
             [['sMerchantPass1'], 'string'],
             [['sMerchantPass2'], 'string'],
+            [['isLive'], 'boolean'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'baseUrl'                           => \skeeks\cms\shop\Module::t('app', 'Road to the api service robocassa'),
+            'isLive'                            => 'Is live',
             'sMerchantLogin'                    => 'sMerchantLogin',
             'sMerchantPass1'                    => 'sMerchantPass1',
             'sMerchantPass2'                    => 'sMerchantPass2',
+        ]);
+    }
+
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'isLive' => 'If is live used: https://auth.robokassa.ru/Merchant/Index.aspx else http://test.robokassa.ru/Index.aspx',
         ]);
     }
 
@@ -64,8 +76,10 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
         /**
          * @var \skeeks\cms\shop\paySystems\robokassa\Merchant $merchant
          */
-        $merchant = \Yii::createObject(ArrayHelper::merge($this->toArray(['baseUrl', 'sMerchantLogin', 'sMerchantPass1', 'sMerchantPass2']), [
+        $merchant = \Yii::createObject(ArrayHelper::merge($this->toArray(['sMerchantLogin', 'sMerchantPass1', 'sMerchantPass2']), [
             'class' => '\skeeks\cms\shop\paySystems\robokassa\Merchant',
+            'baseUrl' => $this->baseUrl,
+            'isLive' => (bool) $this->isLive,
         ]));
 
         return $merchant;
@@ -82,7 +96,7 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
 
     public function renderConfigForm(ActiveForm $activeForm)
     {
-        echo $activeForm->field($this, 'baseUrl')->textInput();
+        echo $activeForm->field($this, 'isLive')->checkbox();
         echo $activeForm->field($this, 'sMerchantLogin')->textInput();
         echo $activeForm->field($this, 'sMerchantPass1')->textInput();
         echo $activeForm->field($this, 'sMerchantPass2')->textInput();

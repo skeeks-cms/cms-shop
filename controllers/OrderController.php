@@ -81,6 +81,16 @@ class OrderController extends Controller
         ]);
     }
 
+    public function beforeAction($action)
+    {
+        if ($action->id == 'view')
+        {
+            $this->enableCsrfValidation = false;
+        }
+
+        return parent::beforeAction($action);
+    }
+
     /**
      * @return string
      */
@@ -120,13 +130,6 @@ class OrderController extends Controller
         return $this->render($this->action->id, [
             'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))
         ]);
-    }
-
-    public function actionPayPalNotify()
-    {
-        \Yii::error(serialize(\Yii::$app->request->get()), 'paypal');
-        \Yii::error(serialize(\Yii::$app->request->post()), 'paypal');
-        return "";
     }
 
 }

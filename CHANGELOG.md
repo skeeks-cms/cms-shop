@@ -3,7 +3,8 @@ Changelog
 
 1.0.0-alpha6.pre
 -----------------
-  * PayPal
+  * Rewrite robokassa
+  * Added payPal
 
 1.0.0-alpha5
 -----------------

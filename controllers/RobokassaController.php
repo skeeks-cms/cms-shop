@@ -55,16 +55,17 @@ class RobokassaController extends Controller
 
     public function actionSuccess()
     {
+        RobokassaPaySystem::logInfo('success request');
 
         if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId'], $_REQUEST['SignatureValue']))
         {
+            RobokassaPaySystem::logError('Not found params');
             throw new BadRequestHttpException('Not found params');
         }
 
         $order = $this->loadModel($_REQUEST['InvId']);
         $merchant = $this->getMerchant($order);
         $shp = $this->getShp();
-
 
         if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'], $merchant->sMerchantPass1, $shp)) {
 
@@ -73,14 +74,18 @@ class RobokassaController extends Controller
             return $this->redirect(Url::to(['/shop/order/view', 'id' => $order->id]));
         }
 
+        RobokassaPaySystem::logError('bad signature');
         throw new BadRequestHttpException('bad signature');
     }
 
 
     public function actionResult()
     {
+        RobokassaPaySystem::logInfo('result request');
+
         if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId'], $_REQUEST['SignatureValue']))
         {
+            RobokassaPaySystem::logError('Not found params');
             throw new BadRequestHttpException('Not found params');
         }
 
@@ -90,8 +95,7 @@ class RobokassaController extends Controller
 
         if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'], $merchant->sMerchantPass2, $shp)) {
 
-
-
+            RobokassaPaySystem::logInfo('result signature OK');
             if ($order->payed != "Y")
             {
                 $order->processNotePayment();
@@ -104,13 +108,18 @@ class RobokassaController extends Controller
             return 'Ok';
         }
 
+        RobokassaPaySystem::logError('bad signature');
+
         throw new BadRequestHttpException;
     }
 
     public function actionFail()
     {
+        RobokassaPaySystem::logInfo('fail request');
+
         if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId']))
         {
+            RobokassaPaySystem::logError('Not found params');
             throw new BadRequestHttpException;
         }
 
@@ -190,6 +199,7 @@ class RobokassaController extends Controller
         $paySystemHandler = $order->paySystem->paySystemHandler;
         if (!$paySystemHandler || !$paySystemHandler instanceof RobokassaPaySystem)
         {
+            RobokassaPaySystem::logError('Not found pay system');
             throw new BadRequestHttpException('Not found pay system');
         }
 
@@ -197,6 +207,7 @@ class RobokassaController extends Controller
 
         if (!$merchant instanceof Merchant)
         {
+            RobokassaPaySystem::logError('Not found merchant');
             throw new BadRequestHttpException('Not found merchant');
         }
 

@@ -22,4 +22,14 @@ class PaySystemHandlerComponent extends Model implements ConfigFormInterface
 
     public function renderConfigForm(ActiveForm $activeForm)
     {}
+
+    static public function logError($message, $group = "")
+    {
+        \Yii::error($message, static::className() . "::" . $group);
+    }
+
+    static public function logInfo($message, $group = "")
+    {
+        \Yii::info($message, static::className() . "::" . $group);
+    }
 }
