@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha6.pre
+1.0.0-alpha6
 -----------------
   * Rewrite robokassa
   * Added payPal
