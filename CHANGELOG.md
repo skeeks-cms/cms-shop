@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha7.pre
+-----------------
+ * Fixed bugs
+
 1.0.0-alpha6
 -----------------
   * Rewrite robokassa

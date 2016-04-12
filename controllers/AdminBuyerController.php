@@ -14,6 +14,7 @@ use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
+use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopBuyer;
@@ -67,7 +68,14 @@ class AdminBuyerController extends AdminModelEditorController
                         ]
 
                     ],
-                ]
+                ],
+
+                'related-properties' =>
+                [
+                    'class'         => AdminOneModelRelatedPropertiesAction::className(),
+                    'name'          => \Yii::t('app', 'Additional properties'),
+                    "icon"          => "glyphicon glyphicon-plus-sign",
+                ],
             ]
         );
     }
