@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha7.pre
 -----------------
+ * Configurated translations by default
  * Fixed bugs
 
 1.0.0-alpha6

@@ -22,6 +22,20 @@ return [
             'class'         => 'skeeks\cms\shop\components\ShopComponent',
         ],
 
+        'i18n' => [
+            'translations'  =>
+            [
+                'skeeks/shop/app' =>
+                [
+                    'class'             => 'yii\i18n\PhpMessageSource',
+                    'basePath'          => '@skeeks/cms/shop/messages',
+                    'fileMap' => [
+                        'skeeks/shop/app' => 'app.php',
+                    ],
+                ]
+            ],
+        ],
+
         'urlManager' => [
             'rules' => [
                 '~shop-cart'                             => 'shop/cart',

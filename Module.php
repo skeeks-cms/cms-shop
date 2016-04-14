@@ -26,15 +26,17 @@ class Module extends \skeeks\cms\base\Module
     {
         if (self::$isRegisteredTranslations === false)
         {
-            \Yii::$app->i18n->translations['skeeks/shop/app'] = [
-                'class' => 'yii\i18n\PhpMessageSource',
-                'sourceLanguage' => 'en-US',
-                'basePath' => '@skeeks/cms/shop/messages',
-                'fileMap' => [
-                    'skeeks/shop/app' => 'app.php',
-                ],
-                'on missingTranslation' => \Yii::$app->i18n->missingTranslationHandler
-            ];
+            if (!isset(\Yii::$app->i18n->translations['skeeks/shop/app']))
+            {
+                \Yii::$app->i18n->translations['skeeks/shop/app'] = [
+                    'class'             => 'yii\i18n\PhpMessageSource',
+                    'sourceLanguage'    => 'en-US',
+                    'basePath'          => '@skeeks/cms/shop/messages',
+                    'fileMap' => [
+                        'skeeks/shop/app' => 'app.php',
+                    ],
+                ];
+            }
 
             self::$isRegisteredTranslations = true;
         }
