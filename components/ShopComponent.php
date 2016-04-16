@@ -89,36 +89,6 @@ class ShopComponent extends Component
     {
         parent::init();
 
-        \Yii::$app->on(AdminController::EVENT_INIT, function (AdminInitEvent $e) {
-
-            if ($e->controller instanceof AdminCmsContentElementController || $e->controller instanceof \skeeks\cms\shop\controllers\AdminCmsContentElementController)
-            {
-                /**
-                 * @var $model CmsContentElement
-                 */
-                $model = $e->controller->model;
-
-                if ($model && $model->content_id)
-                {
-                    if ( ShopContent::find()->where(['content_id' => $model->content_id])->exists() )
-                    {
-                        \Yii::$app->on(Application::EVENT_BEFORE_ACTION, function(\yii\base\ActionEvent $e)
-                        {
-                            if (\Yii::$app->controller->uniqueId != 'shop/admin-cms-content-element')
-                            {
-                                $data = ArrayHelper::merge(['/shop/admin-cms-content-element/' . \Yii::$app->controller->action->id], \Yii::$app->request->get());
-                                \Yii::$app->controller->redirect(UrlHelper::construct($data)->enableAdmin()->toString());
-                            }
-                        });
-
-                    }
-                }
-
-            }
-        });
-
-
-
         if (\Yii::$app instanceof \yii\console\Application)
         {
             \Yii::$app->on(Cms::EVENT_AFTER_UPDATE, function(Event $e)

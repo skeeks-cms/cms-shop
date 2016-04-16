@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha7.pre
 -----------------
+ * Removed admin event
  * Configurated translations by default
  * Fixed bugs
 
