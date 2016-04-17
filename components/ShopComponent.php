@@ -84,33 +84,6 @@ class ShopComponent extends Component
         echo $form->fieldSetEnd();
     }
 
-
-    public function init()
-    {
-        parent::init();
-
-        if (\Yii::$app instanceof \yii\console\Application)
-        {
-            \Yii::$app->on(Cms::EVENT_AFTER_UPDATE, function(Event $e)
-            {
-
-                //Вставка агентов
-                if (!CmsAgent::find()->where(['name' => 'shop/agents/delete-empty-carts'])->one())
-                {
-                    ( new CmsAgent([
-                        'name'              => 'shop/agents/delete-empty-carts',
-                        'description'       => 'Удаление пустых корзин',
-                        'agent_interval'    => 3600*6, //раз в 6
-                        'next_exec_at'      => \Yii::$app->formatter->asTimestamp(time()) + 3600*6,
-                        'is_period'         => Cms::BOOL_N
-                    ]) )->save();
-                }
-
-            });
-        }
-    }
-
-
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
