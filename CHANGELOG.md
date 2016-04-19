@@ -3,7 +3,7 @@ Changelog
 
 1.0.0-alpha7.pre
 -----------------
- * Rewrite agents
+ * Removed skeeks/cms/base/Module
  * Changed admin menu
  * Removed admin event
  * Configurated translations by default
