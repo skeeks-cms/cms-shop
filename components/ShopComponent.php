@@ -17,7 +17,6 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
-use skeeks\cms\modules\admin\controllers\events\AdminInitEvent;
 use skeeks\cms\reviews2\actions\AdminOneModelMessagesAction;
 use skeeks\cms\shop\actions\AdminContentElementShopAction;
 use skeeks\cms\shop\models\ShopContent;
