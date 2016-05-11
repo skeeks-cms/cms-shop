@@ -1,7 +1,11 @@
 Changelog
 ==============
 
-1.0.0-alpha7.pre
+1.0.0-alpha8
+-----------------
+ * Fixed price sales saving suggestions
+
+1.0.0-alpha7
 -----------------
  * Removed skeeks/cms/base/Module
  * Changed admin menu

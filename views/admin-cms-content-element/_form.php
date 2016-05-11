@@ -227,10 +227,14 @@ function initProductType(jQuery)
     {
         $('#sx-shop-product-tradeOffers').show();
         $('#sx-shop-product-simple').hide();
+
+        $('input', $('#sx-shop-product-simple')).attr('disabled', 'disabled');
     } else
     {
         $('#sx-shop-product-simple').show();
         $('#sx-shop-product-tradeOffers').hide();
+
+        $('input', $('#sx-shop-product-simple')).removeAttr('disabled');
     }
 }
 
