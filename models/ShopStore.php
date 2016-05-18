@@ -4,6 +4,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\kladr\models\KladrLocation;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\StorageFile;
 use Yii;
@@ -45,6 +46,20 @@ class ShopStore extends \skeeks\cms\models\Core
     public static function tableName()
     {
         return '{{%shop_store}}';
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            HasStorageFile::className() =>
+            [
+                'class'     => HasStorageFile::className(),
+                'fields'    => ['image_id']
+            ],
+        ]);
     }
 
     /**

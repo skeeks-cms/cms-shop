@@ -46,6 +46,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $delivery_id
  * @property integer $buyer_id
  * @property integer $pay_system_id
+ * @property integer $store_id
  *
  * @property Money $money
  * @property Money $moneyOriginal
@@ -56,6 +57,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property ShopTypePrice $buyTypePrices
  * @property ShopTypePrice $viewTypePrices
+ * @property ShopStore $store
  *
  */
 class ShopFuser extends Core
@@ -89,6 +91,7 @@ class ShopFuser extends Core
             'delivery_id'       => \skeeks\cms\shop\Module::t('app', 'Служба доставки'),
             'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Профиль покупателя'),
             'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Платежная система'),
+            'store_id'          => \skeeks\cms\shop\Module::t('app', 'Склад/Магазин'),
         ]);
     }
 
@@ -123,7 +126,7 @@ class ShopFuser extends Core
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'user_id', 'person_type_id', 'site_id'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'user_id', 'person_type_id', 'site_id', 'store_id'], 'integer'],
             [['additional'], 'string'],
             [['delivery_id'], 'integer'],
             [['user_id'], 'unique'],
@@ -233,6 +236,14 @@ class ShopFuser extends Core
         return $this->hasOne(ShopPaySystem::className(), ['id' => 'pay_system_id']);
     }
 
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStore()
+    {
+        return $this->hasOne(ShopStore::className(), ['id' => 'store_id']);
+    }
 
 
     /**

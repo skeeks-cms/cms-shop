@@ -19,6 +19,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->fieldRadioListBoolean($model, 'issuing_center'); ?>
     <?= $form->fieldRadioListBoolean($model, 'shipping_center'); ?>
 
+
+    <?= $form->field($model, 'image_id')->widget(
+        \skeeks\cms\widgets\formInputs\StorageImage::className()
+    ); ?>
+
+
     <?= $form->fieldSelect($model, 'site_code', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsSite::find()->all(), 'code', 'name'
     )); ?>

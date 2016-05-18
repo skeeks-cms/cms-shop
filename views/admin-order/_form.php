@@ -250,6 +250,12 @@ HTML
                         'model' => $model
                     ]),
                 ],
+
+                [                      // the owner name of the model
+                    'label' => 'Склад',
+                    'format' => 'raw',
+                    'value' => $model->store->name,
+                ],
             ]
         ])?>
 

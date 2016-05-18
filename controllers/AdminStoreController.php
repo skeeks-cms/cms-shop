@@ -68,6 +68,9 @@ class AdminStoreController extends AdminModelEditorController
 
                     "columns"               => [
                         'id',
+                        [
+                            'class' => \skeeks\cms\grid\ImageColumn2::className()
+                        ],
                         'priority',
                         'name',
 

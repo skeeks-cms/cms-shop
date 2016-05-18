@@ -1,6 +1,11 @@
 Changelog
 ==============
 
+1.0.0-alpha9
+-----------------
+ * Added feature to cart id Store
+ * Added store image
+
 1.0.0-alpha8
 -----------------
  * Fixed price sales saving suggestions

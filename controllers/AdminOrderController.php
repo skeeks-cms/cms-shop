@@ -36,6 +36,7 @@ use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopTax;
 use skeeks\cms\shop\models\ShopVat;
 use yii\base\Exception;
@@ -224,6 +225,18 @@ HTML;
                             'value'         => function(ShopOrder $model)
                             {
                                 return $model->site->name . " [{$model->site->code}]";
+                            },
+                        ],
+
+                        [
+                            'filter'        => ArrayHelper::map(ShopStore::find()->active()->all(), 'id', 'name'),
+                            'attribute'     => 'store_id',
+                            'format'        => 'raw',
+                            'visible'       => false,
+                            'label'         => \skeeks\cms\shop\Module::t('app', 'Store'),
+                            'value'         => function(ShopOrder $model)
+                            {
+                                return $model->store->name;
                             },
                         ],
                     ],
