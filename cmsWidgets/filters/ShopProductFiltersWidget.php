@@ -81,7 +81,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => 'Фильтры',
+            'name'          => \Yii::t('skeeks/shop/app', 'Filters'),
         ]);
     }
 
@@ -123,11 +123,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
         [
-            'content_id'                => \skeeks\cms\shop\Module::t('app', 'Content'),
-            'searchModelAttributes'     => \skeeks\cms\shop\Module::t('app', 'Fields'),
-            'realatedProperties'        => \skeeks\cms\shop\Module::t('app', 'Properties'),
-            'offerRelatedProperties'    => \skeeks\cms\shop\Module::t('app', 'Offer properties'),
-            'type_price_id'             => \skeeks\cms\shop\Module::t('app', 'Types of prices'),
+            'content_id'                => \Yii::t('app', 'Content'),
+            'searchModelAttributes'     => \Yii::t('app', 'Fields'),
+            'realatedProperties'        => \Yii::t('app', 'Properties'),
+            'offerRelatedProperties'    => \Yii::t('app', 'Offer properties'),
+            'type_price_id'             => \Yii::t('app', 'Types of prices'),
         ]);
     }
 

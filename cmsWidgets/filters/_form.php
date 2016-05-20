@@ -18,21 +18,21 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all())
     }
 }
 ?>
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Showing')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Showing')); ?>
     <?= $form->field($model, 'viewFile')->textInput(); ?>
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Data source')); ?>
+<?= $form->fieldSet(\Yii::t('app', 'Data source')); ?>
     <?= $form->fieldSelect($model, 'content_id', $result); ?>
 
     <?/*= $form->fieldSelectMulti($model, 'searchModelAttributes', [
-        'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
-        'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
+        'image' => \Yii::t('skeeks/shop/app', 'Filter by photo'),
+        'hasQuantity' => \Yii::t('skeeks/shop/app', 'Filter by availability')
     ]); */?>
 
     <?= $form->field($model, 'searchModelAttributes')->dropDownList([
-        'image' => \skeeks\cms\shop\Module::t('app', 'Filter by photo'),
-        'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'Filter by availability')
+        'image' => \Yii::t('skeeks/shop/app', 'Filter by photo'),
+        'hasQuantity' => \Yii::t('skeeks/shop/app', 'Filter by availability')
     ], [
 'multiple' => true,
 'size' => 4

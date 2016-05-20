@@ -36,7 +36,7 @@ class AdminUserAccountController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Account_customer');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Account_customer');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopUserAccount::className();
 

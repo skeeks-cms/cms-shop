@@ -29,7 +29,7 @@ class AdminBasketController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = 'Позиции корзины';
+        $this->name                     = \Yii::t('skeeks/shop/app','Cart items');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopBasket::className();
 
@@ -81,7 +81,7 @@ class AdminBasketController extends AdminModelEditorController
                                 {
                                     return Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, [
                                         'target' => '_blank',
-                                        'titla' => "Смотреть на сайте",
+                                        'titla' => \Yii::t('skeeks/shop/app','Watch Online'),
                                         'data-pjax' => 0
                                     ]);
                                 } else
@@ -103,14 +103,14 @@ class AdminBasketController extends AdminModelEditorController
 
                         [
                             'class' => \yii\grid\DataColumn::className(),
-                            'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
+                            'label' => \Yii::t('skeeks/shop/app', 'Price'),
                             'attribute' => 'price',
                             'format' => 'raw',
                             'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                             {
                                 if ($shopBasket->discount_value)
                                 {
-                                    return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \skeeks\cms\shop\Module::t('app', 'Discount').": " . $shopBasket->discount_value);
+                                    return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \Yii::t('skeeks/shop/app', 'Discount').": " . $shopBasket->discount_value);
                                 } else
                                 {
                                     return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
@@ -120,7 +120,7 @@ class AdminBasketController extends AdminModelEditorController
                         ],
                         [
                             'class' => \yii\grid\DataColumn::className(),
-                            'label' => \skeeks\cms\shop\Module::t('app', 'Sum'),
+                            'label' => \Yii::t('skeeks/shop/app', 'Sum'),
                             'attribute' => 'price',
                             'format' => 'raw',
                             'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)

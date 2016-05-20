@@ -27,7 +27,7 @@ class ReportOrderDashboard extends AdminDashboardWidgetRenderable
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \skeeks\cms\shop\Module::t('app', 'Reports on orders')
+            'name' => \Yii::t('skeeks/shop/app', 'Reports on orders')
         ]);
     }
 
@@ -40,7 +40,7 @@ class ReportOrderDashboard extends AdminDashboardWidgetRenderable
 
         if (!$this->name)
         {
-            $this->name = \skeeks\cms\shop\Module::t('app', 'Reports on orders');
+            $this->name = \Yii::t('skeeks/shop/app', 'Reports on orders');
         }
     }
 
@@ -57,7 +57,7 @@ class ReportOrderDashboard extends AdminDashboardWidgetRenderable
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'name'                           => \Yii::t('app', 'Name'),
+            'name'                           => \Yii::t('skeeks/shop/app', 'Name'),
         ]);
     }
 

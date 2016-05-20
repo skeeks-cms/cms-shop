@@ -45,7 +45,7 @@ class RobokassaController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             /** @var \robokassa\Merchant $merchant
             $merchant = Yii::$app->get('robokassa');
-            return $merchant->payment($model->sum, $model->id,  \skeeks\cms\shop\Module::t('app', 'Refill'), null, Yii::$app->user->identity->email);
+            return $merchant->payment($model->sum, $model->id,  \Yii::t('skeeks/shop/app', 'Refill'), null, Yii::$app->user->identity->email);
         } else {
             return $this->render('invoice', [
                 'model' => $model,

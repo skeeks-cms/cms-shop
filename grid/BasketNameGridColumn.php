@@ -36,7 +36,7 @@ class BasketNameGridColumn extends DataColumn
         {
             $content = Html::a($model->name, $model->url, [
                 'target' => '_blank',
-                'title' => "Смотреть на сайте (откроется в новом окне)",
+                'title' => \Yii::t('skeeks/shop/app','Watch Online (opens new window)'),
                 'data-pjax' => 0
             ]);
 

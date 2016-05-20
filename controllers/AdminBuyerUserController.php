@@ -39,7 +39,7 @@ class AdminBuyerUserController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Buyers');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Buyers');
         $this->modelShowAttribute       = "displayName";
         $this->modelClassName           = CmsUser::className();
 

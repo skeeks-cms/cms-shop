@@ -8,11 +8,11 @@ $order->refresh();
 ?>
 
 <?= Html::beginTag('h1'); ?>
-    <?= \skeeks\cms\shop\Module::t('app', 'New order'); ?> #<?= $order->id; ?> <?= \skeeks\cms\shop\Module::t('app', 'in site'); ?> <?= \Yii::$app->cms->appName ?>
+    <?= \Yii::t('skeeks/shop/app', 'New order'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app', 'in site'); ?> <?= \Yii::$app->cms->appName ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>
-    <?= \skeeks\cms\shop\Module::t('app', 'The order #{order_id} created successfully', ['order_id' => $order->id]); ?>.<br>
+    <?= \Yii::t('skeeks/shop/app', 'The order #{order_id} created successfully', ['order_id' => $order->id]); ?>.<br>
     К оплате: <b><?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?></b>
 <?= Html::endTag('p'); ?>
 
@@ -76,14 +76,14 @@ $order->refresh();
 
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Price'),
+                    'label' => \Yii::t('skeeks/shop/app', 'Price'),
                     'attribute' => 'price',
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
                     {
                         if ($shopBasket->discount_value)
                         {
-                            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \skeeks\cms\shop\Module::t('app', 'Discount').": " . $shopBasket->discount_value);
+                            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />". Html::tag('small', $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', \Yii::t('skeeks/shop/app', 'Discount').": " . $shopBasket->discount_value);
                         } else
                         {
                             return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small', $shopBasket->notes);
@@ -93,7 +93,7 @@ $order->refresh();
                 ],
                 [
                     'class' => \yii\grid\DataColumn::className(),
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Sum'),
+                    'label' => \Yii::t('skeeks/shop/app', 'Sum'),
                     'attribute' => 'price',
                     'format' => 'raw',
                     'value' => function(\skeeks\cms\shop\models\ShopBasket $shopBasket)
@@ -117,5 +117,5 @@ $order->refresh();
 ?>
 
 <?= Html::beginTag('p'); ?>
-    <?= \skeeks\cms\shop\Module::t('app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
+    <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
 <?= Html::endTag('p'); ?>
