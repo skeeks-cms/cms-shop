@@ -35,36 +35,17 @@ $columns = \skeeks\cms\shop\controllers\AdminCmsContentElementController::getCol
         $filter->load(\Yii::$app->request->get());
 ?>
 
-<? $form = \skeeks\cms\modules\admin\widgets\AdminFiltersForm::begin(); ?>
+<? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin(); ?>
 
 
-    <?= $form->field($searchModel, 'name'); ?>
+    <?= $form->field($searchModel, 'name')->setVisible(); ?>
     <?= $form->field($searchModel, 'created_by')->widget(\skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()); ?>
     <?= $form->field($searchModel, 'updated_by')->widget(\skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()); ?>
     <?= $form->field($searchModel, 'active')->listBox(\Yii::$app->cms->booleanFormat(), [
         'size' => 1
     ]); ?>
-    <?/*= $form->field($filter, 'tree')->listBox(\skeeks\cms\helpers\TreeOptions::getAllMultiOptions(), [
-        'size' => 1
-    ])->label('Раздел'); */?>
-    <div class="form-group">
-        <div class="col-sm-12">
-            <hr style="margin-top: 5px; margin-bottom: 15px;"/>
-            <button type="submit" class="btn btn-default pull-left">
-                <i class="glyphicon glyphicon-search"></i> Найти
-            </button>
 
 
-            <a class="btn btn-default btn-sm pull-right" href="#" style="margin-left: 10px;">
-                <i class="glyphicon glyphicon-plus"></i>
-            </a>
-
-            <a class="btn btn-default btn-sm pull-right" href="#">
-                <i class="glyphicon glyphicon-cog"></i>
-            </a>
-
-        </div>
-    </div>
 <? $form::end(); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
