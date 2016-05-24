@@ -84,14 +84,14 @@ class ShopFuser extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'user_id'           => \skeeks\cms\shop\Module::t('app', 'Пользователь сайта'),
-            'additional'        => \skeeks\cms\shop\Module::t('app', 'Additional'),
-            'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'Тип покупателя'),
-            'site_id'           => \skeeks\cms\shop\Module::t('app', 'Site ID'),
-            'delivery_id'       => \skeeks\cms\shop\Module::t('app', 'Служба доставки'),
-            'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Профиль покупателя'),
-            'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Платежная система'),
-            'store_id'          => \skeeks\cms\shop\Module::t('app', 'Склад/Магазин'),
+            'user_id'           => \Yii::t('skeeks/shop/app', 'User site'),
+            'additional'        => \Yii::t('skeeks/shop/app', 'Additional'),
+            'person_type_id'    => \Yii::t('skeeks/shop/app', 'Type of buyer'),
+            'site_id'           => \Yii::t('skeeks/shop/app', 'Site ID'),
+            'delivery_id'       => \Yii::t('skeeks/shop/app', 'Delivery service'),
+            'buyer_id'          => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'pay_system_id'     => \Yii::t('skeeks/shop/app', 'Payment system'),
+            'store_id'          => \Yii::t('skeeks/shop/app', 'Warehouse/Store'),
         ]);
     }
 
@@ -425,7 +425,7 @@ class ShopFuser extends Core
             foreach (\Yii::$app->shop->shopPersonTypes as $shopPersonType)
             {
                 $result[$shopPersonType->name] = [
-                    'shopPersonType-' . $shopPersonType->id => " + Новый профиль ({$shopPersonType->name})"
+                    'shopPersonType-' . $shopPersonType->id => " + " .\Yii::t('skeeks/shop/app', 'New profile'). " ({$shopPersonType->name})"
                 ];
 
                 if ($existsBuyers = $this->getShopBuyers()->andWhere(['shop_person_type_id' => $shopPersonType->id])->all())

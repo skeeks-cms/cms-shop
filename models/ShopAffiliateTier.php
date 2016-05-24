@@ -53,17 +53,17 @@ class ShopAffiliateTier extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'site_code'     => \skeeks\cms\shop\Module::t('app', 'Site'),
-            'rate1'         => \skeeks\cms\shop\Module::t('app', 'Commission affiliate Level 1'),
-            'rate2'         => \skeeks\cms\shop\Module::t('app', 'Commission affiliate Level 2'),
-            'rate3'         => \skeeks\cms\shop\Module::t('app', 'Commission affiliate Level 3'),
-            'rate4'         => \skeeks\cms\shop\Module::t('app', 'Commission affiliate Level 4'),
-            'rate5'         => \skeeks\cms\shop\Module::t('app', 'Commission affiliate Level 5'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'site_code'     => \Yii::t('skeeks/shop/app', 'Site'),
+            'rate1'         => \Yii::t('skeeks/shop/app', 'Commission affiliate Level 1'),
+            'rate2'         => \Yii::t('skeeks/shop/app', 'Commission affiliate Level 2'),
+            'rate3'         => \Yii::t('skeeks/shop/app', 'Commission affiliate Level 3'),
+            'rate4'         => \Yii::t('skeeks/shop/app', 'Commission affiliate Level 4'),
+            'rate5'         => \Yii::t('skeeks/shop/app', 'Commission affiliate Level 5'),
         ];
     }
 

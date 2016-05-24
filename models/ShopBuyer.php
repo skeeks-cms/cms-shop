@@ -73,14 +73,14 @@ class ShopBuyer extends RelatedElementModel
     public function attributeLabels()
     {
         return [
-            'id'                    => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'            => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'            => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'            => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'            => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'name'                  => \skeeks\cms\shop\Module::t('app', 'The profile name'),
-            'cms_user_id'           => \skeeks\cms\shop\Module::t('app', 'User site'),
-            'shop_person_type_id'   => \skeeks\cms\shop\Module::t('app', 'Type payer'),
+            'id'                    => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'            => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'            => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name'                  => \Yii::t('skeeks/shop/app', 'The profile name'),
+            'cms_user_id'           => \Yii::t('skeeks/shop/app', 'User site'),
+            'shop_person_type_id'   => \Yii::t('skeeks/shop/app', 'Type payer'),
         ];
     }
 

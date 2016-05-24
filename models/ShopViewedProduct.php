@@ -53,16 +53,16 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'        => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'        => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'        => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'        => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'shop_fuser_id'     => \skeeks\cms\shop\Module::t('app', 'Shop Fuser ID'),
-            'shop_product_id'   => \skeeks\cms\shop\Module::t('app', 'Shop Product ID'),
-            'site_id'           => \skeeks\cms\shop\Module::t('app', 'Site ID'),
-            'name'              => \skeeks\cms\shop\Module::t('app', 'Name'),
-            'url'               => \skeeks\cms\shop\Module::t('app', 'Url'),
+            'id'                => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'        => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'        => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'        => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'        => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'shop_fuser_id'     => \Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
+            'shop_product_id'   => \Yii::t('skeeks/shop/app', 'Shop Product ID'),
+            'site_id'           => \Yii::t('skeeks/shop/app', 'Site ID'),
+            'name'              => \Yii::t('skeeks/shop/app', 'Name'),
+            'url'               => \Yii::t('skeeks/shop/app', 'Url'),
         ];
     }
 

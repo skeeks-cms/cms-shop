@@ -20,7 +20,7 @@ if (!$model->isNewRecord)
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
     <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect(), $cofing); ?>
 

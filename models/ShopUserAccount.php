@@ -59,17 +59,17 @@ class ShopUserAccount extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'        => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'        => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'        => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'        => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'user_id'           => \skeeks\cms\shop\Module::t('app', 'User'),
-            'current_budget'    => \skeeks\cms\shop\Module::t('app', 'The amount in the account'),
-            'currency_code'     => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
-            'locked'            => \skeeks\cms\shop\Module::t('app', 'Locked'),
-            'locked_at'         => \skeeks\cms\shop\Module::t('app', 'Locked At'),
-            'notes'             => \skeeks\cms\shop\Module::t('app', 'Notes'),
+            'id'                => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'        => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'        => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'        => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'        => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'user_id'           => \Yii::t('skeeks/shop/app', 'User'),
+            'current_budget'    => \Yii::t('skeeks/shop/app', 'The amount in the account'),
+            'currency_code'     => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'locked'            => \Yii::t('skeeks/shop/app', 'Locked'),
+            'locked_at'         => \Yii::t('skeeks/shop/app', 'Locked At'),
+            'notes'             => \Yii::t('skeeks/shop/app', 'Notes'),
         ];
     }
 

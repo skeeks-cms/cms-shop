@@ -142,7 +142,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
     {
         if($this->$attribute == Cms::BOOL_N && !static::find()->active()->andWhere(['!=', 'id', $this->id])->count())
         {
-            $this->addError($attribute, 'It is necessary at least  to leave one active payer type in the site');
+            $this->addError($attribute, \Yii::t('skeeks/shop/app', 'It is necessary at least to leave one active payer type in the site'));
         }
     }
 
@@ -152,10 +152,10 @@ class ShopPersonType extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name'      => \skeeks\cms\shop\Module::t('app', 'Name'),
-            'priority'  => \skeeks\cms\shop\Module::t('app', 'Priority'),
-            'active'    => \skeeks\cms\shop\Module::t('app', 'Active'),
-            'siteCodes' => \skeeks\cms\shop\Module::t('app', 'Sites'),
+            'name'      => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority'  => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active'    => \Yii::t('skeeks/shop/app', 'Active'),
+            'siteCodes' => \Yii::t('skeeks/shop/app', 'Sites'),
         ]);
     }
 

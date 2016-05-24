@@ -55,16 +55,16 @@ class ShopPersonTypePropertyEnum extends RelatedPropertyEnumModel
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::rules(), [
-            'id'            => \skeeks\cms\shop\Module::t('app', 'Person type ID'),
-            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'property_id'   => \skeeks\cms\shop\Module::t('app', 'Property ID'),
-            'value'         => \skeeks\cms\shop\Module::t('app', 'Value'),
-            'def'           => \skeeks\cms\shop\Module::t('app', 'Def'),
-            'code'          => \skeeks\cms\shop\Module::t('app', 'Code'),
-            'priority'      => \skeeks\cms\shop\Module::t('app', 'Priority'),
+            'id'            => \Yii::t('skeeks/shop/app', 'Person type ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'property_id'   => \Yii::t('skeeks/shop/app', 'Property ID'),
+            'value'         => \Yii::t('skeeks/shop/app', 'Value'),
+            'def'           => \Yii::t('skeeks/shop/app', 'Def'),
+            'code'          => \Yii::t('skeeks/shop/app', 'Code'),
+            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
         ]);
     }
 

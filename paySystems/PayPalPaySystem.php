@@ -38,7 +38,7 @@ class PayPalPaySystem extends PaySystemHandlerComponent
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          =>  \skeeks\cms\shop\Module::t('app', 'PayPal'),
+            'name'          =>  \Yii::t('skeeks/shop/app', 'PayPal'),
         ]);
     }
 
@@ -53,8 +53,8 @@ class PayPalPaySystem extends PaySystemHandlerComponent
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'receiverEmail'                     => 'PayPal account email',
-            'isLive'                            => 'Is live',
+            'receiverEmail'                     => \Yii::t('skeeks/shop/app', 'PayPal account email'),
+            'isLive'                            => \Yii::t('skeeks/shop/app', 'Is live'),
         ]);
     }
 

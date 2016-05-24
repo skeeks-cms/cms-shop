@@ -181,7 +181,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                     ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': Изменение статуса заказа #' . $this->id)
+                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Change order status'). ' #' . $this->id)
                     ->send();
             }
         }
@@ -204,7 +204,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                     ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': Разрешение оплаты по заказу #' . $this->id)
+                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
                     ->send();
             }
         }
@@ -227,7 +227,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                     ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': Разрешение доставки по заказу #' . $this->id)
+                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
                     ->send();
             }
         }
@@ -253,7 +253,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                     ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': Отмена заказа #' . $this->id)
+                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Cancellations'). ' #' . $this->id)
                     ->send();
             }
         }
@@ -359,7 +359,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         if ($this->canceled == Cms::BOOL_Y && !$this->reason_canceled)
         {
-            $this->addError($attribute, 'Укажите причину отмены');
+            $this->addError($attribute, \Yii::t('skeeks/shop/app','Enter the reason for cancellation'));
         }
     }
 
@@ -370,83 +370,83 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                    => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'            => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'            => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'            => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'            => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'site_id'               => \skeeks\cms\shop\Module::t('app', 'Site'),
-            'person_type_id'        => \skeeks\cms\shop\Module::t('app', 'Person Type ID'),
-            'payed'                 => \skeeks\cms\shop\Module::t('app', 'Оплачен'),
-            'payed_at'              => \skeeks\cms\shop\Module::t('app', 'Payed At'),
-            'emp_payed_id'          => \skeeks\cms\shop\Module::t('app', 'Emp Payed ID'),
-            'canceled'              => \skeeks\cms\shop\Module::t('app', 'Canceled'),
-            'canceled_at'           => \skeeks\cms\shop\Module::t('app', 'Canceled At'),
-            'emp_canceled_id'       => \skeeks\cms\shop\Module::t('app', 'Emp Canceled ID'),
-            'reason_canceled'       => \skeeks\cms\shop\Module::t('app', 'Reason of cancellation'),
-            'status_code'           => \skeeks\cms\shop\Module::t('app', 'Status'),
-            'status_at'             => \skeeks\cms\shop\Module::t('app', 'Status At'),
-            'emp_status_id'         => \skeeks\cms\shop\Module::t('app', 'Emp Status ID'),
-            'price_delivery'        => \skeeks\cms\shop\Module::t('app', 'Price Delivery'),
-            'allow_delivery'        => \skeeks\cms\shop\Module::t('app', 'Allow Delivery'),
-            'allow_delivery_at'     => \skeeks\cms\shop\Module::t('app', 'Allow Delivery At'),
-            'emp_allow_delivery_id' => \skeeks\cms\shop\Module::t('app', 'Emp Allow Delivery ID'),
-            'price'                 => \skeeks\cms\shop\Module::t('app', 'Price'),
-            'currency_code'         => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
-            'discount_value'        => \skeeks\cms\shop\Module::t('app', 'Discount Value'),
-            'user_id'               => \skeeks\cms\shop\Module::t('app', 'User site'),
-            'pay_system_id'         => \skeeks\cms\shop\Module::t('app', 'Pay System ID'),
-            'delivery_id'           => \skeeks\cms\shop\Module::t('app', 'Delivery'),
-            'user_description'      => \skeeks\cms\shop\Module::t('app', 'User Description'),
-            'additional_info'       => \skeeks\cms\shop\Module::t('app', 'Additional Info'),
-            'ps_status'             => \skeeks\cms\shop\Module::t('app', 'Ps Status'),
-            'ps_status_code'        => \skeeks\cms\shop\Module::t('app', 'Ps Status Code'),
-            'ps_status_description' => \skeeks\cms\shop\Module::t('app', 'Ps Status Description'),
-            'ps_status_message'     => \skeeks\cms\shop\Module::t('app', 'Ps Status Message'),
-            'ps_sum'                => \skeeks\cms\shop\Module::t('app', 'Ps Sum'),
-            'ps_currency_code'      => \skeeks\cms\shop\Module::t('app', 'Ps Currency Code'),
-            'ps_response_at'        => \skeeks\cms\shop\Module::t('app', 'Ps Response At'),
-            'comments'              => \skeeks\cms\shop\Module::t('app', 'Comments'),
-            'tax_value'             => \skeeks\cms\shop\Module::t('app', 'Tax Value'),
-            'stat_gid'              => \skeeks\cms\shop\Module::t('app', 'Stat Gid'),
-            'sum_paid'              => \skeeks\cms\shop\Module::t('app', 'Sum Paid'),
-            'recuring_id'           => \skeeks\cms\shop\Module::t('app', 'Recuring ID'),
-            'pay_voucher_num'       => \skeeks\cms\shop\Module::t('app', 'Pay Voucher Num'),
-            'pay_voucher_at'        => \skeeks\cms\shop\Module::t('app', 'Pay Voucher At'),
-            'locked_by'             => \skeeks\cms\shop\Module::t('app', 'Locked By'),
-            'locked_at'             => \skeeks\cms\shop\Module::t('app', 'Locked At'),
-            'recount_flag'          => \skeeks\cms\shop\Module::t('app', 'Recount Flag'),
-            'affiliate_id'          => \skeeks\cms\shop\Module::t('app', 'Affiliate ID'),
-            'delivery_doc_num'      => \skeeks\cms\shop\Module::t('app', 'Delivery Doc Num'),
-            'delivery_doc_at'       => \skeeks\cms\shop\Module::t('app', 'Delivery Doc At'),
-            'update_1c'             => \skeeks\cms\shop\Module::t('app', 'Update 1c'),
-            'deducted'              => \skeeks\cms\shop\Module::t('app', 'Deducted'),
-            'deducted_at'           => \skeeks\cms\shop\Module::t('app', 'Deducted At'),
-            'emp_deducted_id'       => \skeeks\cms\shop\Module::t('app', 'Emp Deducted ID'),
-            'reason_undo_deducted'  => \skeeks\cms\shop\Module::t('app', 'Reason Undo Deducted'),
-            'marked'                => \skeeks\cms\shop\Module::t('app', 'Marked'),
-            'marked_at'             => \skeeks\cms\shop\Module::t('app', 'Marked At'),
-            'emp_marked_id'         => \skeeks\cms\shop\Module::t('app', 'Emp Marked ID'),
-            'reason_marked'         => \skeeks\cms\shop\Module::t('app', 'Reason Marked'),
-            'reserved'              => \skeeks\cms\shop\Module::t('app', 'Reserved'),
-            'store_id'              => \skeeks\cms\shop\Module::t('app', 'Store ID'),
-            'order_topic'           => \skeeks\cms\shop\Module::t('app', 'Order Topic'),
-            'responsible_id'        => \skeeks\cms\shop\Module::t('app', 'Responsible ID'),
-            'pay_before_at'         => \skeeks\cms\shop\Module::t('app', 'Pay Before At'),
-            'account_id'            => \skeeks\cms\shop\Module::t('app', 'Account ID'),
-            'bill_at'               => \skeeks\cms\shop\Module::t('app', 'Bill At'),
-            'tracking_number'       => \skeeks\cms\shop\Module::t('app', 'Tracking Number'),
-            'xml_id'                => \skeeks\cms\shop\Module::t('app', 'Xml ID'),
-            'id_1c'                 => \skeeks\cms\shop\Module::t('app', 'Id 1c'),
-            'version_1c'            => \skeeks\cms\shop\Module::t('app', 'Version 1c'),
-            'version'               => \skeeks\cms\shop\Module::t('app', 'Version'),
-            'external_order'        => \skeeks\cms\shop\Module::t('app', 'External Order'),
-            'buyer_id'              => \skeeks\cms\shop\Module::t('app', 'Profile of buyer'),
-            'allow_payment'         => \skeeks\cms\shop\Module::t('app', 'Allow Payment'),
+            'id'                    => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'            => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'            => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'site_id'               => \Yii::t('skeeks/shop/app', 'Site'),
+            'person_type_id'        => \Yii::t('skeeks/shop/app', 'Person Type ID'),
+            'payed'                 => \Yii::t('skeeks/shop/app', 'Оплачен'),
+            'payed_at'              => \Yii::t('skeeks/shop/app', 'Payed At'),
+            'emp_payed_id'          => \Yii::t('skeeks/shop/app', 'Emp Payed ID'),
+            'canceled'              => \Yii::t('skeeks/shop/app', 'Canceled'),
+            'canceled_at'           => \Yii::t('skeeks/shop/app', 'Canceled At'),
+            'emp_canceled_id'       => \Yii::t('skeeks/shop/app', 'Emp Canceled ID'),
+            'reason_canceled'       => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
+            'status_code'           => \Yii::t('skeeks/shop/app', 'Status'),
+            'status_at'             => \Yii::t('skeeks/shop/app', 'Status At'),
+            'emp_status_id'         => \Yii::t('skeeks/shop/app', 'Emp Status ID'),
+            'price_delivery'        => \Yii::t('skeeks/shop/app', 'Price Delivery'),
+            'allow_delivery'        => \Yii::t('skeeks/shop/app', 'Allow Delivery'),
+            'allow_delivery_at'     => \Yii::t('skeeks/shop/app', 'Allow Delivery At'),
+            'emp_allow_delivery_id' => \Yii::t('skeeks/shop/app', 'Emp Allow Delivery ID'),
+            'price'                 => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code'         => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'discount_value'        => \Yii::t('skeeks/shop/app', 'Discount Value'),
+            'user_id'               => \Yii::t('skeeks/shop/app', 'User site'),
+            'pay_system_id'         => \Yii::t('skeeks/shop/app', 'Pay System ID'),
+            'delivery_id'           => \Yii::t('skeeks/shop/app', 'Delivery'),
+            'user_description'      => \Yii::t('skeeks/shop/app', 'User Description'),
+            'additional_info'       => \Yii::t('skeeks/shop/app', 'Additional Info'),
+            'ps_status'             => \Yii::t('skeeks/shop/app', 'Ps Status'),
+            'ps_status_code'        => \Yii::t('skeeks/shop/app', 'Ps Status Code'),
+            'ps_status_description' => \Yii::t('skeeks/shop/app', 'Ps Status Description'),
+            'ps_status_message'     => \Yii::t('skeeks/shop/app', 'Ps Status Message'),
+            'ps_sum'                => \Yii::t('skeeks/shop/app', 'Ps Sum'),
+            'ps_currency_code'      => \Yii::t('skeeks/shop/app', 'Ps Currency Code'),
+            'ps_response_at'        => \Yii::t('skeeks/shop/app', 'Ps Response At'),
+            'comments'              => \Yii::t('skeeks/shop/app', 'Comments'),
+            'tax_value'             => \Yii::t('skeeks/shop/app', 'Tax Value'),
+            'stat_gid'              => \Yii::t('skeeks/shop/app', 'Stat Gid'),
+            'sum_paid'              => \Yii::t('skeeks/shop/app', 'Sum Paid'),
+            'recuring_id'           => \Yii::t('skeeks/shop/app', 'Recuring ID'),
+            'pay_voucher_num'       => \Yii::t('skeeks/shop/app', 'Pay Voucher Num'),
+            'pay_voucher_at'        => \Yii::t('skeeks/shop/app', 'Pay Voucher At'),
+            'locked_by'             => \Yii::t('skeeks/shop/app', 'Locked By'),
+            'locked_at'             => \Yii::t('skeeks/shop/app', 'Locked At'),
+            'recount_flag'          => \Yii::t('skeeks/shop/app', 'Recount Flag'),
+            'affiliate_id'          => \Yii::t('skeeks/shop/app', 'Affiliate ID'),
+            'delivery_doc_num'      => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
+            'delivery_doc_at'       => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
+            'update_1c'             => \Yii::t('skeeks/shop/app', 'Update 1c'),
+            'deducted'              => \Yii::t('skeeks/shop/app', 'Deducted'),
+            'deducted_at'           => \Yii::t('skeeks/shop/app', 'Deducted At'),
+            'emp_deducted_id'       => \Yii::t('skeeks/shop/app', 'Emp Deducted ID'),
+            'reason_undo_deducted'  => \Yii::t('skeeks/shop/app', 'Reason Undo Deducted'),
+            'marked'                => \Yii::t('skeeks/shop/app', 'Marked'),
+            'marked_at'             => \Yii::t('skeeks/shop/app', 'Marked At'),
+            'emp_marked_id'         => \Yii::t('skeeks/shop/app', 'Emp Marked ID'),
+            'reason_marked'         => \Yii::t('skeeks/shop/app', 'Reason Marked'),
+            'reserved'              => \Yii::t('skeeks/shop/app', 'Reserved'),
+            'store_id'              => \Yii::t('skeeks/shop/app', 'Store ID'),
+            'order_topic'           => \Yii::t('skeeks/shop/app', 'Order Topic'),
+            'responsible_id'        => \Yii::t('skeeks/shop/app', 'Responsible ID'),
+            'pay_before_at'         => \Yii::t('skeeks/shop/app', 'Pay Before At'),
+            'account_id'            => \Yii::t('skeeks/shop/app', 'Account ID'),
+            'bill_at'               => \Yii::t('skeeks/shop/app', 'Bill At'),
+            'tracking_number'       => \Yii::t('skeeks/shop/app', 'Tracking Number'),
+            'xml_id'                => \Yii::t('skeeks/shop/app', 'Xml ID'),
+            'id_1c'                 => \Yii::t('skeeks/shop/app', 'Id 1c'),
+            'version_1c'            => \Yii::t('skeeks/shop/app', 'Version 1c'),
+            'version'               => \Yii::t('skeeks/shop/app', 'Version'),
+            'external_order'        => \Yii::t('skeeks/shop/app', 'External Order'),
+            'buyer_id'              => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'allow_payment'         => \Yii::t('skeeks/shop/app', 'Allow Payment'),
 
-            'delivery_id'       => \skeeks\cms\shop\Module::t('app', 'Служба доставки'),
-            'buyer_id'          => \skeeks\cms\shop\Module::t('app', 'Профиль покупателя'),
-            'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'Платежная система'),
+            'delivery_id'       => \Yii::t('skeeks/shop/app', 'Delivery service'),
+            'buyer_id'          => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'pay_system_id'     => \Yii::t('skeeks/shop/app', 'Payment system'),
         ];
     }
 
@@ -496,7 +496,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
                     ->setTo($order->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': Новый заказ #' . $order->id)
+                    ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app', 'New order') .' #' . $order->id)
                     ->send();
             }
         }

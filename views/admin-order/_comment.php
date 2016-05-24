@@ -12,5 +12,5 @@ use yii\helpers\Html;
 ?>
 
 <p><?= $model->comments; ?></p>
-<a href="#sx-comment" class="btn btn-default btn-xs sx-fancybox">Изменить<a>
+<a href="#sx-comment" class="btn btn-default btn-xs sx-fancybox"><?=\Yii::t('skeeks/shop/app','Change')?><a>
 

@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
     <?= $form->field($model, 'name')->textInput(); ?>
 
@@ -112,11 +112,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?= $form->fieldSetEnd(); ?>
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Payment systems')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Payment systems')); ?>
 
     <?= $form->field($model, 'shopPaySystems')->checkboxList(\yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopPaySystem::find()->active()->all(), 'id', 'name'
-    ))->hint(\skeeks\cms\shop\Module::t('app', 'if nothing is selected, it means all')); ?>
+    ))->hint(\Yii::t('skeeks/shop/app', 'if nothing is selected, it means all')); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

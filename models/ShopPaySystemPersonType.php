@@ -46,8 +46,8 @@ class ShopPaySystemPersonType extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'pay_system_id'     => \skeeks\cms\shop\Module::t('app', 'ID pay system'),
-            'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'ID of person'),
+            'pay_system_id'     => \Yii::t('skeeks/shop/app', 'ID pay system'),
+            'person_type_id'    => \Yii::t('skeeks/shop/app', 'ID of person'),
         ];
     }
 

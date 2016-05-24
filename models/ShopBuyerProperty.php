@@ -54,17 +54,17 @@ class ShopBuyerProperty extends RelatedElementPropertyModel
     public function attributeLabels()
     {
         return [
-            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'property_id'   => \skeeks\cms\shop\Module::t('app', 'Property ID'),
-            'element_id'    => \skeeks\cms\shop\Module::t('app', 'Element ID'),
-            'value'         => \skeeks\cms\shop\Module::t('app', 'Value'),
-            'value_enum'    => \skeeks\cms\shop\Module::t('app', 'Value Enum'),
-            'value_num'     => \skeeks\cms\shop\Module::t('app', 'Value Num'),
-            'description'   => \skeeks\cms\shop\Module::t('app', 'Description'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'property_id'   => \Yii::t('skeeks/shop/app', 'Property ID'),
+            'element_id'    => \Yii::t('skeeks/shop/app', 'Element ID'),
+            'value'         => \Yii::t('skeeks/shop/app', 'Value'),
+            'value_enum'    => \Yii::t('skeeks/shop/app', 'Value Enum'),
+            'value_num'     => \Yii::t('skeeks/shop/app', 'Value Num'),
+            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
         ];
     }
 
