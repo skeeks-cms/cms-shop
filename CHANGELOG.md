@@ -1,14 +1,12 @@
 Changelog
 ==============
 
-1.0.0-alpha10
------------------
- * Implementing filters
-
 1.0.0-alpha9
 -----------------
  * Added feature to cart id Store
  * Added store image
+ * Implementing filters
+ * Finalization of internationalization
 
 1.0.0-alpha8
 -----------------
