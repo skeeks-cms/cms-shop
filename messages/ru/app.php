@@ -370,4 +370,10 @@ return
     'Setting prices'                                            => 'Настройка цены',
     'Trade offers'                                              => 'Торговые предложения',
     'Product type'                                              => 'Тип товара',
+    "Announcement"                                              => "Анонс",
+    "In detal"                                                  => "Подробно",
+    "Sections of the site"                                      => "Разделы сайта",
+    "Sections"                                                  => "Разделы",
+    "Section"                                                   => "Раздел",
+    "Images/Files"                                              => "Изображения/Файлы",
 ];

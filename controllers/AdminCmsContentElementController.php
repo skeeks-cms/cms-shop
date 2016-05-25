@@ -22,6 +22,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\shop\models\searchs\ShopCmsContentElementSearch;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
@@ -59,6 +60,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
             [
                 'index' =>
                 [
+                    "modelSearchClassName" => ShopCmsContentElementSearch::className(),
+
                     "dataProviderCallback" => function(ActiveDataProvider $dataProvider)
                     {
                         $query = $dataProvider->query;
@@ -157,6 +160,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $modelClassName = $this->modelClassName;
         $model          = new $modelClassName();
 
+        $model->loadDefaultValues();
 
         if ($content_id = \Yii::$app->request->get("content_id"))
         {
@@ -166,6 +170,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         $relatedModel = $model->relatedPropertiesModel;
         $shopProduct = new ShopProduct();
+
+        $shopProduct->loadDefaultValues();
 
         $baseProductPrice = new ShopProductPrice([
             'type_price_id' => \Yii::$app->shop->baseTypePrice->id,

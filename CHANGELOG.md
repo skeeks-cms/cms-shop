@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha10
+-----------------
+ * Loading forms with default values
+
 1.0.0-alpha9
 -----------------
  * Added feature to cart id Store
