@@ -25,7 +25,7 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord)
 
 <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
+    <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
 <? if ($model->isNewRecord) : ?>
     <?= $form->field($model, 'order_id')->hiddenInput()->label(false); ?>

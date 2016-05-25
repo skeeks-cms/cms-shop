@@ -50,7 +50,7 @@ class ShopOrderStatus extends Core
     {
         if ($this->isProtected())
         {
-            throw new UserException('Нельзя удалять этот статус');
+            throw new UserException(\Yii::t('skeeks/shop/app', 'You can not remove this status'));
         }
     }
 
@@ -90,11 +90,11 @@ class ShopOrderStatus extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code'          => \skeeks\cms\shop\Module::t('app', 'Code'),
-            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
-            'description'   => \skeeks\cms\shop\Module::t('app', 'Description'),
-            'priority'      => \skeeks\cms\shop\Module::t('app', 'Priority'),
-            'color'         => \skeeks\cms\shop\Module::t('app', 'Color'),
+            'code'          => \Yii::t('skeeks/shop/app', 'Code'),
+            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
+            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
+            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
+            'color'         => \Yii::t('skeeks/shop/app', 'Color'),
         ]);
     }
 
@@ -120,7 +120,7 @@ class ShopOrderStatus extends Core
     {
         if(!preg_match('/^[A-Z]$/', $this->$attribute))
         {
-            $this->addError($attribute, \skeeks\cms\shop\Module::t('app', 'Use only uppercase letters of the Latin alphabet.'));
+            $this->addError($attribute, \Yii::t('skeeks/shop/app', 'Use only uppercase letters of the Latin alphabet.'));
         }
     }
 

@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
     <?= $form->fieldSelect($model, 'site_code', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\models\CmsSite::find()->all(), 'code', 'name'

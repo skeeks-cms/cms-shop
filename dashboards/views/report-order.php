@@ -60,7 +60,7 @@ CSS
         <div class="col-md-3">
             <div class="form-group field-adminreportproductsearch-to">
                 <label class="control-label" for="adminreportproductsearch-to" style="width: 100%;">&nbsp;</label>
-                <button class="btn btn-default" type="submit">Применить</button>
+                <button class="btn btn-default" type="submit"><?=\Yii::t('skeeks/shop/app','Apply');?></button>
             </div>
         </div>
     </div>

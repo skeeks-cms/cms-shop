@@ -68,16 +68,16 @@ class ShopComponent extends Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          =>  \skeeks\cms\shop\Module::t('app', 'Shop'),
+            'name'          =>  \Yii::t('skeeks/shop/app', 'Shop'),
         ]);
     }
 
 
     public function renderConfigForm(ActiveForm $form)
     {
-        echo $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main'));
+        echo $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main'));
 
-            echo $form->field($this, 'email')->textInput()->hint(\skeeks\cms\shop\Module::t('app', 'Email of sales department'));
+            echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
             echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
 
         echo $form->fieldSetEnd();
@@ -95,7 +95,7 @@ class ShopComponent extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'email'                 => 'Email',
-            'payAfterConfirmation'  => \skeeks\cms\shop\Module::t('app', 'Include payment orders only after the manager approval')
+            'payAfterConfirmation'  => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval')
         ]);
     }
 

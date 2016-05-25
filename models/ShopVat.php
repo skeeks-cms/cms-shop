@@ -57,15 +57,15 @@ class ShopVat extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
-            'priority'      => \skeeks\cms\shop\Module::t('app', 'Priority'),
-            'active'        => \skeeks\cms\shop\Module::t('app', 'Active'),
-            'rate'          => \skeeks\cms\shop\Module::t('app', 'Bet'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active'        => \Yii::t('skeeks/shop/app', 'Active'),
+            'rate'          => \Yii::t('skeeks/shop/app', 'Bet'),
         ]);
     }
 }

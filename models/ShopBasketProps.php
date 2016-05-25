@@ -49,16 +49,16 @@ class ShopBasketProps extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'shop_basket_id' => Yii::t('app', 'Shop Basket ID'),
-            'name' => Yii::t('app', 'Name'),
-            'value' => Yii::t('app', 'Value'),
-            'code' => Yii::t('app', 'Code'),
-            'priority' => Yii::t('app', 'Priority'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'shop_basket_id' => \Yii::t('skeeks/shop/app', 'Shop Basket ID'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'value' => \Yii::t('skeeks/shop/app', 'Value'),
+            'code' => \Yii::t('skeeks/shop/app', 'Code'),
+            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
         ];
     }
 

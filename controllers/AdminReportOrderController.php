@@ -38,7 +38,7 @@ class AdminReportOrderController extends AdminController
 {
     public function init()
     {
-        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Reports on orders');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Reports on orders');
         parent::init();
     }
 

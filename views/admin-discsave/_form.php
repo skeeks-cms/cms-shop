@@ -13,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?php $form = ActiveForm::begin(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Cumulative program')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Cumulative program')); ?>
 
     <?= $form->fieldCheckboxBoolean($model, 'active'); ?>
     <?= $form->field($model, 'name')->textInput(); ?>
@@ -25,18 +25,18 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Currency amount paid orders and discounts')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Currency amount paid orders and discounts')); ?>
     <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
         \skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'
     )); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Limitations')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Limitations')); ?>
 
     <?= $form->field($model, 'typePrices')->checkboxList(\yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
-    ))->hint(\skeeks\cms\shop\Module::t('app', 'if nothing is selected, it means all')); ?>
+    ))->hint(\Yii::t('skeeks/shop/app', 'if nothing is selected, it means all')); ?>
 
 
      <? \yii\bootstrap\Alert::begin([
@@ -45,14 +45,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
           ],
         ]); ?>
 
-       <?=  \skeeks\cms\shop\Module::t('app', '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
+       <?=  \Yii::t('skeeks/shop/app', '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
 
         <? \yii\bootstrap\Alert::end()?>
 
         <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
             'permissionName'            => $model->permissionName,
-            'permissionDescription'     => \skeeks\cms\shop\Module::t('app', 'Groups of users who can benefit from discounted rates').": '{$model->name}'",
-            'label'                     => \skeeks\cms\shop\Module::t('app', 'Groups of users who can benefit from discounted rates'),
+            'permissionDescription'     => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates').": '{$model->name}'",
+            'label'                     => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
         ]); ?>
 
 <?= $form->fieldSetEnd(); ?>

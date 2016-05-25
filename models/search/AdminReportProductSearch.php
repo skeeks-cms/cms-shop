@@ -31,9 +31,9 @@ class AdminReportProductSearch extends Model
     public function attributeLabels()
     {
         return [
-            'from' => 'От',
-            'to'    => 'До',
-            'onlyPayed'    => 'Только оплаченные заказы'
+            'from'  => \Yii::t('skeeks/shop/app', 'From'),
+            'to'    => \Yii::t('skeeks/shop/app', 'To'),
+            'onlyPayed'    => \Yii::t('skeeks/shop/app', 'Only prepaid orders')
         ];
     }
 
@@ -42,52 +42,52 @@ class AdminReportProductSearch extends Model
         return [
             [
                 'attribute' => 'name',
-                'label' => 'Название',
+                'label' => \Yii::t('skeeks/shop/app', 'Name'),
             ],
 
             [
                 'attribute' => 'total_quantity',
-                'label' => 'Общее количество',
+                'label' => \Yii::t('skeeks/shop/app', 'Total'),
             ],
         /*
             [
                 'attribute' => 'total',
-                'label' => 'Количество корзин',
+                'label' => \Yii::t('skeeks/shop/app', 'Number of baskets'),
             ],*/
 
             [
                 'attribute' => 'total_in_orders',
-                'label' => 'Общее количество в заказах',
+                'label' => \Yii::t('skeeks/shop/app', 'The total number of orders'),
             ],
 
             [
                 'attribute' => 'total_orders',
-                'label' => 'Количество заказов',
+                'label' => \Yii::t('skeeks/shop/app', 'Number of orders'),
             ],
 
 
             [
                 'attribute' => 'total_in_payed_orders',
-                'label' => 'Общее количество в оплаченных заказов',
+                'label' => \Yii::t('skeeks/shop/app', 'Total summ of prepaid orders'),
             ],
 
 
 
             [
                 'attribute' => 'total_payed_orders',
-                'label' => 'Количество оплаченных заказов',
+                'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
             ],
 
 
             [
                 'attribute' => 'total_in_carts',
-                'label' => 'Общее количество в корзинах',
+                'label' => \Yii::t('skeeks/shop/app', 'Total in baskets'),
             ],
 
 
             [
                 'attribute' => 'sum_in_payed_orders',
-                'label' => 'Цена в оплаченных заказах',
+                'label' => \Yii::t('skeeks/shop/app', 'Price of the prepaid orders'),
             ],
         ];
     }

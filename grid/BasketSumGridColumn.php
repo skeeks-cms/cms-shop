@@ -31,7 +31,7 @@ class BasketSumGridColumn extends DataColumn
     {
         if (!$this->label)
         {
-            $this->label = \skeeks\cms\shop\Module::t('app', 'Sum');
+            $this->label = \Yii::t('skeeks/shop/app', 'Sum');
         }
 
         return \Yii::$app->money->intlFormatter()->format($model->money->multiply($model->quantity));

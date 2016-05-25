@@ -53,13 +53,13 @@ class ShopExtra extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
-            'value'         => \skeeks\cms\shop\Module::t('app', 'Value'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
+            'value'         => \Yii::t('skeeks/shop/app', 'Value'),
         ]);
     }
 }

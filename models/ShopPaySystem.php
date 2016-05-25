@@ -126,12 +126,12 @@ class ShopPaySystem extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
-            'priority'      => \skeeks\cms\shop\Module::t('app', 'Priority'),
-            'active'        => \skeeks\cms\shop\Module::t('app', 'Active'),
-            'description'   => \skeeks\cms\shop\Module::t('app', 'Description'),
-            'personTypeIds' => \skeeks\cms\shop\Module::t('app', 'Payers'),
-            'component'     => \skeeks\cms\shop\Module::t('app', 'Handler'),
+            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active'        => \Yii::t('skeeks/shop/app', 'Active'),
+            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
+            'personTypeIds' => \Yii::t('skeeks/shop/app', 'Payers'),
+            'component'     => \Yii::t('skeeks/shop/app', 'Handler'),
         ]);
     }
 

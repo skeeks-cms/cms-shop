@@ -41,22 +41,22 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     static public function types()
     {
         return [
-            self::ORDER_ADDED               => \skeeks\cms\shop\Module::t('app', 'Create Order'),
-            self::ORDER_CANCELED            => \skeeks\cms\shop\Module::t('app', 'Cancellations'),
-            self::ORDER_STATUS_CHANGED      => \skeeks\cms\shop\Module::t('app', 'Changing status'),
-            self::ORDER_ALLOW_PAYMENT       => \skeeks\cms\shop\Module::t('app', 'Payment agreement'),
-            self::ORDER_ALLOW_DELIVERY      => \skeeks\cms\shop\Module::t('app', 'Shipping is permitted'),
+            self::ORDER_ADDED               => \Yii::t('skeeks/shop/app', 'Create Order'),
+            self::ORDER_CANCELED            => \Yii::t('skeeks/shop/app', 'Cancellations'),
+            self::ORDER_STATUS_CHANGED      => \Yii::t('skeeks/shop/app', 'Changing status'),
+            self::ORDER_ALLOW_PAYMENT       => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY      => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
         ];
     }
 
     static public function typeMessages()
     {
         return [
-            self::ORDER_ADDED               => \skeeks\cms\shop\Module::t('app', 'The order created'),
-            self::ORDER_CANCELED            => 'Заказ отменен. Причина: "{reason_canceled}"',
-            self::ORDER_STATUS_CHANGED      => 'Статус изменен на: "{status}"',
-            self::ORDER_ALLOW_PAYMENT       => \skeeks\cms\shop\Module::t('app', 'Payment agreement'),
-            self::ORDER_ALLOW_DELIVERY      => \skeeks\cms\shop\Module::t('app', 'Shipping is permitted'),
+            self::ORDER_ADDED               => \Yii::t('skeeks/shop/app', 'The order created'),
+            self::ORDER_CANCELED            => \Yii::t('skeeks/shop/app', 'Order cancelled. The reason: "{reason canceled}"'),
+            self::ORDER_STATUS_CHANGED      => \Yii::t('skeeks/shop/app', 'Status changed to: "{status}"'),
+            self::ORDER_ALLOW_PAYMENT       => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY      => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
         ];
     }
 
@@ -66,7 +66,7 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     public function getDescription()
     {
         $message = ArrayHelper::getValue(self::typeMessages(), $this->type);
-        return \Yii::t('app', $message, $this->data);
+        return \Yii::t('skeeks/shop/app', $message, $this->data);
     }
 
     /**
@@ -111,14 +111,14 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'shop_order_id' => Yii::t('app', 'Shop Order ID'),
-            'type' => Yii::t('app', 'Type'),
-            'data' => Yii::t('app', 'Data'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'shop_order_id' => \Yii::t('skeeks/shop/app', 'Shop Order ID'),
+            'type' => \Yii::t('skeeks/shop/app', 'Type'),
+            'data' => \Yii::t('skeeks/shop/app', 'Data'),
         ];
     }
 

@@ -59,15 +59,15 @@ class ShopTax extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'name'          => \skeeks\cms\shop\Module::t('app', 'Name'),
-            'description'   => \skeeks\cms\shop\Module::t('app', 'Description'),
-            'code'          => \skeeks\cms\shop\Module::t('app', 'Code'),
-            'site_code'     => \skeeks\cms\shop\Module::t('app', 'Site'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
+            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
+            'code'          => \Yii::t('skeeks/shop/app', 'Code'),
+            'site_code'     => \Yii::t('skeeks/shop/app', 'Site'),
         ]);
     }
 

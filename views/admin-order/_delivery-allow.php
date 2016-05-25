@@ -12,8 +12,8 @@ use yii\helpers\Html;
 ?>
 
 <? if ($model->allow_delivery == 'Y') : ?>
-    <a href="#sx-allow-delivery" class="sx-dashed sx-fancybox">Да<a>
+    <a href="#sx-allow-delivery" class="sx-dashed sx-fancybox"><?=\Yii::t('skeeks/shop/app','Yes')?><a>
 <? else : ?>
-    <a href="#sx-allow-delivery" class="sx-dashed sx-fancybox">Нет<a>
+    <a href="#sx-allow-delivery" class="sx-dashed sx-fancybox"><?=\Yii::t('skeeks/shop/app','No')?><a>
 <? endif; ?>
 

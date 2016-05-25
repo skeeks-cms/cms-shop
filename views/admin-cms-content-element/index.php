@@ -68,7 +68,7 @@ $columns = \skeeks\cms\shop\controllers\AdminCmsContentElementController::getCol
         'class' => 'alert-info',
     ],
 ]); ?>
-    Изменить свойства и права доступа к информационному блоку вы можете в <?= \yii\helpers\Html::a('Настройках контента', \skeeks\cms\helpers\UrlHelper::construct([
+    <?= \Yii::t('skeeks/shop/app','Change the properties and rights of access to information block you can'); ?> <?= \yii\helpers\Html::a(\Yii::t('skeeks/shop/app','Content Settings'), \skeeks\cms\helpers\UrlHelper::construct([
         '/cms/admin-cms-content/update', 'pk' => $content_id
     ])->enableAdmin()->toString()); ?>.
 <? \yii\bootstrap\Alert::end(); ?>

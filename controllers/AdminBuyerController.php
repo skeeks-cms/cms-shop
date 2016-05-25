@@ -35,7 +35,7 @@ class AdminBuyerController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Buyers');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Buyers');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopBuyer::className();
 
@@ -73,7 +73,7 @@ class AdminBuyerController extends AdminModelEditorController
                 'related-properties' =>
                 [
                     'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                    'name'          => \Yii::t('app', 'Additional properties'),
+                    'name'          => \Yii::t('skeeks/shop/app', 'Additional properties'),
                     "icon"          => "glyphicon glyphicon-plus-sign",
                 ],
             ]

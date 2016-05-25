@@ -54,16 +54,16 @@ class ShopProductPriceChange extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'created_by' => Yii::t('app', 'Created By'),
-            'updated_by' => Yii::t('app', 'Updated By'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
-            'shop_product_price_id' => Yii::t('app', 'Shop Product Price ID'),
-            'price' => Yii::t('app', 'Price'),
-            'currency_code' => Yii::t('app', 'Currency Code'),
-            'quantity_from' => Yii::t('app', 'Quantity From'),
-            'quantity_to' => Yii::t('app', 'Quantity To'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'shop_product_price_id' => \Yii::t('skeeks/shop/app', 'Shop Product Price ID'),
+            'price' => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'quantity_from' => \Yii::t('skeeks/shop/app', 'Quantity From'),
+            'quantity_to' => \Yii::t('skeeks/shop/app', 'Quantity To'),
         ];
     }
 

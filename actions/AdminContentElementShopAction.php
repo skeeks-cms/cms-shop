@@ -89,7 +89,7 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
                 } else
                 {
-                    \Yii::$app->getSession()->setFlash('error', \skeeks\cms\shop\Module::t('app', 'Check the correctness of the prices'));
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
                 }
 
             }
@@ -112,7 +112,7 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', \skeeks\cms\shop\Module::t('app', 'Failed to save'));
+                \Yii::$app->getSession()->setFlash('error',\Yii::t('skeeks/shop/app', 'Failed to save'));
             }
         }
 

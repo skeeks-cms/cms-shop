@@ -31,7 +31,7 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          =>  \skeeks\cms\shop\Module::t('app', 'Robokassa'),
+            'name'          =>  \Yii::t('skeeks/shop/app', 'Robokassa'),
         ]);
     }
 
@@ -91,7 +91,7 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
      */
     public function paymentResponse(ShopOrder $shopOrder)
     {
-        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id, \skeeks\cms\shop\Module::t('app', 'Payment order'), null, $shopOrder->user->email);
+        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id, \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopOrder->user->email);
     }
 
     public function renderConfigForm(ActiveForm $activeForm)

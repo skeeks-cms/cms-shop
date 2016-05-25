@@ -32,18 +32,18 @@ class AdminReportOrderSearch extends Model
     public function attributeLabels()
     {
         return [
-            'from' => 'От',
-            'to'    => 'До',
-            'groupType'    => 'Группировать'
+            'from'  => \Yii::t('skeeks/shop/app', 'From'),
+            'to'    => \Yii::t('skeeks/shop/app', 'To'),
+            'groupType'    => \Yii::t('skeeks/shop/app', 'Group by')
         ];
     }
 
     static public function getGroupTypes()
     {
         return [
-            'd' => 'Дням',
-            'm' => 'Месяцам',
-            'Y' => 'Годам',
+            'd' => \Yii::t('skeeks/shop/app', 'days'),
+            'm' => \Yii::t('skeeks/shop/app', 'months'),
+            'Y' => \Yii::t('skeeks/shop/app', 'years'),
         ];
     }
 
@@ -53,32 +53,32 @@ class AdminReportOrderSearch extends Model
         [
             [
                 'attribute' => 'groupType',
-                'label' => 'Дата',
+                'label' => \Yii::t('skeeks/shop/app', 'Date'),
                 'filter' => false,
             ],
             [
                 'attribute' => 'total_orders',
-                'label' => 'Общее количество',
+                'label' => \Yii::t('skeeks/shop/app', 'Total'),
             ],
             [
                 'attribute' => 'total_payed',
-                'label' => 'Кол-во оплаченных',
+                'label' => \Yii::t('skeeks/shop/app', 'Number of paid'),
             ],
             [
                 'attribute' => 'total_canceled',
-                'label' => 'Кол-во отмененных',
+                'label' => \Yii::t('skeeks/shop/app', 'Number of canceled'),
             ],
             [
                 'attribute' => 'sum_price',
-                'label' => 'Стоимость',
+                'label' => \Yii::t('skeeks/shop/app', 'Cost of'),
             ],
             [
                 'attribute' => 'sum_payed',
-                'label' => 'Стоимость оплаченных',
+                'label' => \Yii::t('skeeks/shop/app', 'Cost of paid'),
             ],
             [
                 'attribute' => 'sum_canceled',
-                'label' => 'Стоимость отмененных',
+                'label' => \Yii::t('skeeks/shop/app', 'Cost of canceled'),
             ],
         ];
     }

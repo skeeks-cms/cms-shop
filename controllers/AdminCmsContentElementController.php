@@ -43,7 +43,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Elements');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Elements');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopCmsContentElement::className();
 
@@ -96,14 +96,14 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 /*'settings' =>
                 [
                     'class'         => AdminModelEditorAction::className(),
-                    'name'          => \skeeks\cms\shop\Module::t('app', 'Settings'),
+                    'name'          => \Yii::t('skeeks/shop/app', 'Settings'),
                     "icon"          => "glyphicon glyphicon-cog",
                 ],*/
 
                 "activate-multi" =>
                 [
                     'class' => AdminMultiModelEditAction::className(),
-                    "name" => \skeeks\cms\shop\Module::t('app', 'Activate'),
+                    "name"  => \Yii::t('skeeks/shop/app', 'Activate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiActivate'],
                 ],
@@ -111,7 +111,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "inActivate-multi" =>
                 [
                     'class' => AdminMultiModelEditAction::className(),
-                    "name" => \skeeks\cms\shop\Module::t('app', 'Deactivate'),
+                    "name"  => \Yii::t('skeeks/shop/app', 'Deactivate'),
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
                 ],
@@ -120,7 +120,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-tree-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => \skeeks\cms\shop\Module::t('app', 'The main section'),
+                    "name"              => \Yii::t('skeeks/shop/app', 'The main section'),
                     "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
                     "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTree'],
                 ],
@@ -128,7 +128,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 "change-trees-multi" =>
                 [
                     'class'             => AdminMultiDialogModelEditAction::className(),
-                    "name"              => \skeeks\cms\shop\Module::t('app', 'Related topics'),
+                    "name"              => \Yii::t('skeeks/shop/app', 'Related topics'),
                     "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-trees-form",
                     "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTrees'],
                 ],
@@ -203,7 +203,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 $baseProductPrice = $shopProduct->baseProductPrice;
 
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -221,7 +221,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             } else
             {
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save'));
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app','Could not save'));
             }
         }
 
@@ -310,14 +310,14 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 } else
                 {
-                    \Yii::$app->getSession()->setFlash('error', \skeeks\cms\shop\Module::t('app', 'Check the correctness of the prices'));
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
                 }
 
             }
 
             if ($model->save() && $relatedModel->save() && $shopProduct->save())
             {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
 
                 if (\Yii::$app->request->post('submit-btn') == 'apply')
                 {
@@ -343,7 +343,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     }
                 }
 
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('app','Could not save') . $errors);
+                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app','Could not save') . $errors);
             }
         }
 
@@ -602,7 +602,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 },
                 'format' => 'raw',
-                'label' => \skeeks\cms\shop\Module::t('app', 'Advanced Topics'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Advanced Topics'),
             ],
 
             [
@@ -612,7 +612,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
 
             [
-                'label' => \skeeks\cms\shop\Module::t('app', 'Base price'),
+                'label' => \Yii::t('skeeks/shop/app', 'Base price'),
                 'class' => \yii\grid\DataColumn::className(),
                 'value' => function(\skeeks\cms\models\CmsContentElement $model)
                 {
@@ -633,7 +633,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
                         'target' => '_blank',
-                        'title' => \skeeks\cms\shop\Module::t('app', 'View online (opens new window)'),
+                        'title'  => \Yii::t('skeeks/shop/app', 'View online (opens new window)'),
                         'data-pjax' => '0',
                         'class' => 'btn btn-default btn-sm'
                     ]);

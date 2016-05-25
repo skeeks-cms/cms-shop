@@ -68,19 +68,19 @@ class ShopTaxRate extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'                => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'        => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'        => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'        => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'        => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'tax_id'            => \skeeks\cms\shop\Module::t('app', 'Income tax'),
-            'person_type_id'    => \skeeks\cms\shop\Module::t('app', 'Payer'),
-            'value'             => \skeeks\cms\shop\Module::t('app', 'Value'),
-            'currency'          => \skeeks\cms\shop\Module::t('app', 'Currency'),
-            'is_percent'        => \skeeks\cms\shop\Module::t('app', 'Is Percent'),
-            'is_in_price'       => \skeeks\cms\shop\Module::t('app', 'Included in the price'),
-            'priority'          => \skeeks\cms\shop\Module::t('app', 'The order of application'),
-            'active'            => \skeeks\cms\shop\Module::t('app', 'Active'),
+            'id'                => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'        => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'        => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'        => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'        => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'tax_id'            => \Yii::t('skeeks/shop/app', 'Income tax'),
+            'person_type_id'    => \Yii::t('skeeks/shop/app', 'Payer'),
+            'value'             => \Yii::t('skeeks/shop/app', 'Value'),
+            'currency'          => \Yii::t('skeeks/shop/app', 'Currency'),
+            'is_percent'        => \Yii::t('skeeks/shop/app', 'Is Percent'),
+            'is_in_price'       => \Yii::t('skeeks/shop/app', 'Included in the price'),
+            'priority'          => \Yii::t('skeeks/shop/app', 'The order of application'),
+            'active'            => \Yii::t('skeeks/shop/app', 'Active'),
         ]);
     }
 

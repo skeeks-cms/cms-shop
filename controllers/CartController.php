@@ -56,7 +56,7 @@ class CartController extends Controller
      */
     public function actionCart()
     {
-        $this->view->title = \skeeks\cms\shop\Module::t('app', 'Basket').' | '.\skeeks\cms\shop\Module::t('app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Basket').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
 
@@ -65,7 +65,7 @@ class CartController extends Controller
      */
     public function actionCheckout()
     {
-        $this->view->title = \skeeks\cms\shop\Module::t('app', 'Checkout').' | '.\skeeks\cms\shop\Module::t('app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Checkout').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
     /**
@@ -73,7 +73,7 @@ class CartController extends Controller
      */
     public function actionPayment()
     {
-        $this->view->title = \skeeks\cms\shop\Module::t('app', 'Choose payment method').' | '.\skeeks\cms\shop\Module::t('app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Choose payment method').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
 
@@ -102,7 +102,7 @@ class CartController extends Controller
 
             if (!$product)
             {
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'This product is not found, it may be removed.');
+                $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
                 return (array) $rr;
             }
 
@@ -135,13 +135,13 @@ class CartController extends Controller
             if (!$shopBasket->recalculate()->save())
             {
                 $rr->success = false;
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'Failed to add item to cart');
+                $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
             } else
             {
                 $shopBasket->recalculate()->save();
 
                 $rr->success = true;
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'Item added to cart');
+                $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
             \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
@@ -168,7 +168,7 @@ class CartController extends Controller
                 if ($shopBasket->delete())
                 {
                     $rr->success = true;
-                    $rr->message = \skeeks\cms\shop\Module::t('app', 'Position successfully removed');
+                    $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
                 }
             }
 
@@ -236,7 +236,7 @@ class CartController extends Controller
                     if ($shopBasket->recalculate()->save())
                     {
                         $rr->success = true;
-                        $rr->message = \skeeks\cms\shop\Module::t('app', 'Postion successfully updated');
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
                     }
 
                 } else
@@ -244,7 +244,7 @@ class CartController extends Controller
                     if ($shopBasket->delete())
                     {
                         $rr->success = true;
-                        $rr->message = \skeeks\cms\shop\Module::t('app', 'Position successfully removed');
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
                     }
                 }
 
@@ -328,7 +328,7 @@ class CartController extends Controller
 
                 if (!$fuser->shopBaskets)
                 {
-                    throw new Exception(\skeeks\cms\shop\Module::t('app', 'Your basket is empty'));
+                    throw new Exception(\Yii::t('skeeks/shop/app', 'Your basket is empty'));
                 }
 
                 if ($fuser->load(\Yii::$app->request->post()) && $fuser->save())
@@ -344,7 +344,7 @@ class CartController extends Controller
 
                         if (!$order->isNewRecord)
                         {
-                            $rr->message = \skeeks\cms\shop\Module::t('app', 'The order #{order_id} created successfully', ['order_id' => $order->id]);
+                            $rr->message = \Yii::t('skeeks/shop/app', 'The order #{order_id} created successfully', ['order_id' => $order->id]);
                             $rr->success = true;
                             $rr->redirect = Url::to(['/shop/order/view', 'id' => $order->id]);
                             $rr->data = [
@@ -357,17 +357,17 @@ class CartController extends Controller
 
                         } else
                         {
-                            throw new Exception(\skeeks\cms\shop\Module::t('app', 'Incorrect data of the new order').": " . array_shift($order->getFirstErrors()));
+                            throw new Exception(\Yii::t('skeeks/shop/app', 'Incorrect data of the new order').": " . array_shift($order->getFirstErrors()));
                         }
 
                     } else
                     {
-                        throw new Exception(\skeeks\cms\shop\Module::t('app', 'Not enogh data for ordering').": " . array_shift($fuser->getFirstErrors()));
+                        throw new Exception(\Yii::t('skeeks/shop/app', 'Not enogh data for ordering').": " . array_shift($fuser->getFirstErrors()));
                     }
 
                 } else
                 {
-                    throw new Exception(\skeeks\cms\shop\Module::t('app', 'Not enogh data for ordering').": " . array_shift($fuser->getFirstErrors()));
+                    throw new Exception(\Yii::t('skeeks/shop/app', 'Not enogh data for ordering').": " . array_shift($fuser->getFirstErrors()));
                 }
 
             } catch (Exception $e)
@@ -413,7 +413,7 @@ class CartController extends Controller
                     $shopPersonType = ShopPersonType::find()->active()->andWhere(['id' => $shop_person_type_id])->one();
                     if (!$shopPersonType)
                     {
-                        throw new Exception(\skeeks\cms\shop\Module::t('app', 'This payer is disabled or deleted. Refresh the page.'));
+                        throw new Exception(\Yii::t('skeeks/shop/app', 'This payer is disabled or deleted. Refresh the page.'));
                     }
 
                     if (!$modelBuyer)
@@ -466,7 +466,7 @@ class CartController extends Controller
 
                             if (!$userEmail)
                             {
-                                throw new Exception(\skeeks\cms\shop\Module::t('app', 'Unknown email address user'));
+                                throw new Exception(\Yii::t('skeeks/shop/app', 'Unknown email address user'));
                             }
 
 
@@ -476,7 +476,7 @@ class CartController extends Controller
 
                             if (!$user = $newUser->signup())
                             {
-                                throw new Exception(\skeeks\cms\shop\Module::t('app', 'Do not create a user profile.'));
+                                throw new Exception(\Yii::t('skeeks/shop/app', 'Do not create a user profile.'));
                             }
 
                             if ($userName)
@@ -496,7 +496,7 @@ class CartController extends Controller
 
                         if (!$modelBuyer->save())
                         {
-                            throw new Exception(\skeeks\cms\shop\Module::t('app', 'The data for the buyer are not saved.'));
+                            throw new Exception(\Yii::t('skeeks/shop/app', 'The data for the buyer are not saved.'));
                         }
 
                         $validateModel->save();
@@ -507,11 +507,11 @@ class CartController extends Controller
                         \Yii::$app->shop->shopFuser->save();
 
                         $rr->success = true;
-                        $rr->message = \skeeks\cms\shop\Module::t('app', 'Successfully sent');
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Successfully sent');
 
                     } else
                     {
-                        throw new Exception(\skeeks\cms\shop\Module::t('app', 'Check the correctness of filling the form fields'));
+                        throw new Exception(\Yii::t('skeeks/shop/app', 'Check the correctness of filling the form fields'));
                     }
 
 
@@ -546,7 +546,7 @@ class CartController extends Controller
                 $shopPersonType = ShopPersonType::find()->active()->andWhere(['id' => $shop_person_type_id])->one();
                 if (!$shopPersonType)
                 {
-                    $rr->message = \skeeks\cms\shop\Module::t('app', 'This payer is disabled or deleted. Refresh the page.');
+                    $rr->message = \Yii::t('skeeks/shop/app', 'This payer is disabled or deleted. Refresh the page.');
                     $rr->success = false;
                     return $rr;
                 }

@@ -55,7 +55,7 @@ class AdminOrderController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \skeeks\cms\shop\Module::t('app', 'Orders');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'Orders');
         $this->modelShowAttribute       = "id";
         $this->modelClassName           = ShopOrder::className();
 
@@ -80,7 +80,7 @@ class AdminOrderController extends AdminModelEditorController
                 'create-order' =>
                 [
                     'class'         => AdminAction::className(),
-                    'name'          => \Yii::t('app','Добавить заказ'),
+                    'name'          => \Yii::t('skeeks/shop/app','Place your order'),
                     "icon"          => "glyphicon glyphicon-plus",
                     "callback"      => [$this, 'createOrder'],
                 ],
@@ -136,8 +136,8 @@ class AdminOrderController extends AdminModelEditorController
                             'attribute'     => "canceled",
                             'format'        => "raw",
                             'filter'        => [
-                                'Y' => \Yii::t('app', 'Yes'),
-                                'N' => \Yii::t('app', 'No'),
+                                'Y' => \Yii::t('skeeks/shop/app', 'Yes'),
+                                'N' => \Yii::t('skeeks/shop/app', 'No'),
                             ],
 
                             'value' => function(ShopOrder $shopOrder, $key, $index) use ($view)
@@ -160,7 +160,7 @@ CSS
                                     $reuslt = "<div style='color: red;'>";
                                 }
 
-                                $reuslt .=  $shopOrder->canceled == "Y" ? \Yii::t('app', 'Yes') : \Yii::t('app', 'No');
+                                $reuslt .=  $shopOrder->canceled == "Y" ? \Yii::t('skeeks/shop/app', 'Yes') : \Yii::t('skeeks/shop/app', 'No');
                                 $reuslt .= "</div>";
                                 return $reuslt;
                             }
@@ -170,7 +170,7 @@ CSS
                         [
                             'class'         => DataColumn::className(),
                             'attribute'     => "user_id",
-                            'label'         => \skeeks\cms\shop\Module::t('app', 'Buyer'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Buyer'),
                             'format'        => "raw",
                             'value'         => function(ShopOrder $shopOrder)
                             {
@@ -182,7 +182,7 @@ CSS
                             'class'         => DataColumn::className(),
                             'filter'        => false,
                             'format'        => 'raw',
-                            'label'         => \skeeks\cms\shop\Module::t('app', 'Good'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Good'),
                             'value'         => function(ShopOrder $model)
                             {
                                 if ($model->shopBaskets)
@@ -208,7 +208,7 @@ HTML;
                             'class'         => DataColumn::className(),
                             'format'        => 'raw',
                             'attribute'     => 'price',
-                            'label'         => \skeeks\cms\shop\Module::t('app', 'Sum'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Sum'),
                             'value'         => function(ShopOrder $model)
                             {
                                 return \Yii::$app->money->intlFormatter()->format($model->money);
@@ -221,7 +221,7 @@ HTML;
                             'attribute'     => 'site_id',
                             'format'        => 'raw',
                             'visible'       => false,
-                            'label'         => \skeeks\cms\shop\Module::t('app', 'Site'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Site'),
                             'value'         => function(ShopOrder $model)
                             {
                                 return $model->site->name . " [{$model->site->code}]";
@@ -233,7 +233,7 @@ HTML;
                             'attribute'     => 'store_id',
                             'format'        => 'raw',
                             'visible'       => false,
-                            'label'         => \skeeks\cms\shop\Module::t('app', 'Store'),
+                            'label'         => \Yii::t('skeeks/shop/app', 'Store'),
                             'value'         => function(ShopOrder $model)
                             {
                                 return $model->store->name;
@@ -245,7 +245,7 @@ HTML;
                 /*"view" =>
                 [
                     'class'         => AdminOneModelEditAction::className(),
-                    "name"         => \Yii::t('app',"Информация"),
+                    "name"         => \Yii::t('skeeks/shop/app',"Информация"),
                     "icon"          => "glyphicon glyphicon-eye-open",
                     "priority"      => 5,
                     "callback"      => [$this, 'view'],
@@ -384,7 +384,7 @@ HTML;
 
             if (!$product)
             {
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'This product is not found, it may be removed.');
+                $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
                 return (array) $rr;
             }
 
@@ -409,11 +409,11 @@ HTML;
             if (!$shopBasket->recalculate()->save())
             {
                 $rr->success = false;
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'Failed to add item to cart');
+                $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
             } else
             {
                 $rr->success = true;
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'Item added to cart');
+                $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
             $shopFuser->link('site', \Yii::$app->cms->site);
@@ -450,7 +450,7 @@ HTML;
 
             if (!$product)
             {
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'This product is not found, it may be removed.');
+                $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
                 return (array) $rr;
             }
 
@@ -475,11 +475,11 @@ HTML;
             if (!$shopBasket->recalculate()->save())
             {
                 $rr->success = false;
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'Failed to add item to cart');
+                $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
             } else
             {
                 $rr->success = true;
-                $rr->message = \skeeks\cms\shop\Module::t('app', 'Item added to cart');
+                $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
             $rr->data = $model->toArray([], $model->extraFields());
@@ -532,7 +532,7 @@ HTML;
                             if (!$order->isNewRecord)
                             {
                                 \Yii::$app->getSession()->setFlash('success',
-                                    \skeeks\cms\shop\Module::t('app', 'The order #{order_id} created successfully', ['order_id' => $order->id])
+                                    \Yii::t('skeeks/shop/app', 'The order #{order_id} created successfully', ['order_id' => $order->id])
                                 );
 
                                 if (\Yii::$app->request->post('submit-btn') == 'apply')
@@ -552,16 +552,16 @@ HTML;
 
                             } else
                             {
-                                throw new Exception(\skeeks\cms\shop\Module::t('app', 'Incorrect data of the new order').": " . array_shift($order->getFirstErrors()));
+                                throw new Exception(\Yii::t('skeeks/shop/app', 'Incorrect data of the new order').": " . array_shift($order->getFirstErrors()));
                             }
 
                         } else
                         {
-                            throw new Exception(\skeeks\cms\shop\Module::t('app', 'Not enogh data for ordering').": " . array_shift($model->getFirstErrors()));
+                            throw new Exception(\Yii::t('skeeks/shop/app', 'Not enogh data for ordering').": " . array_shift($model->getFirstErrors()));
                         }
                     } else
                     {
-                        throw new Exception(\Yii::t('app','Could not save'));
+                        throw new Exception(\Yii::t('skeeks/shop/app','Could not save'));
                     }
                 } catch(\Exception $e)
                 {

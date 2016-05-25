@@ -163,18 +163,18 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \skeeks\cms\shop\Module::t('app', 'ID'),
-            'created_by'    => \skeeks\cms\shop\Module::t('app', 'Created By'),
-            'updated_by'    => \skeeks\cms\shop\Module::t('app', 'Updated By'),
-            'created_at'    => \skeeks\cms\shop\Module::t('app', 'Created At'),
-            'updated_at'    => \skeeks\cms\shop\Module::t('app', 'Updated At'),
-            'product_id'    => \skeeks\cms\shop\Module::t('app', 'Product ID'),
-            'type_price_id' => \skeeks\cms\shop\Module::t('app', 'Type Price ID'),
-            'price'         => \skeeks\cms\shop\Module::t('app', 'Price'),
-            'currency_code' => \skeeks\cms\shop\Module::t('app', 'Currency Code'),
-            'quantity_from' => \skeeks\cms\shop\Module::t('app', 'Quantity From'),
-            'quantity_to'   => \skeeks\cms\shop\Module::t('app', 'Quantity To'),
-            'tmp_id'        => \skeeks\cms\shop\Module::t('app', 'Tmp ID'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'product_id'    => \Yii::t('skeeks/shop/app', 'Product ID'),
+            'type_price_id' => \Yii::t('skeeks/shop/app', 'Type Price ID'),
+            'price'         => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'quantity_from' => \Yii::t('skeeks/shop/app', 'Quantity From'),
+            'quantity_to'   => \Yii::t('skeeks/shop/app', 'Quantity To'),
+            'tmp_id'        => \Yii::t('skeeks/shop/app', 'Tmp ID'),
         ];
     }
 

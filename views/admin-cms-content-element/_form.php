@@ -67,7 +67,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
     <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
 <? endif; ?>
 
-<?= $form->fieldSet(\Yii::t('app','Main')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Main')); ?>
 
 
     <?= $form->fieldRadioListBoolean($model, 'active'); ?>
@@ -86,7 +86,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
         </div>
     </div>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('app',"This parameter affects the address of the page")); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/shop/app',"This parameter affects the address of the page")); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <? if ($contentModel->parent_content_id) : ?>
@@ -98,7 +98,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
     <? if ($model->relatedProperties) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('app', 'Additional properties')
+            'content' => \Yii::t('skeeks/shop/app', 'Additional properties')
         ]); ?>
         <? if ($properties = $model->relatedProperties) : ?>
             <? foreach ($properties as $property) : ?>
@@ -107,7 +107,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
         <? endif; ?>
 
     <? else : ?>
-        <?/*= \Yii::t('app','Additional properties are not set')*/?>
+        <?/*= \Yii::t('skeeks/shop/app','Additional properties are not set')*/?>
     <? endif; ?>
 <?= $form->fieldSetEnd()?>
 
@@ -121,7 +121,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 
 
-<?= $form->fieldSet(\Yii::t('app','Announcement')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Announcement')); ?>
     <?= $form->field($model, 'image_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
     ); ?>
@@ -135,7 +135,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet(\Yii::t('app','In detal')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app','In detal')); ?>
 
     <?= $form->field($model, 'image_full_id')->widget(
         \skeeks\cms\widgets\formInputs\StorageImage::className()
@@ -150,7 +150,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 <?= $form->fieldSetEnd() ?>
 
-<?= $form->fieldSet(\Yii::t('app','Sections')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Sections')); ?>
 
 
     <? if ($contentModel->root_tree_id) : ?>
@@ -174,12 +174,12 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
                 $mode = \skeeks\cms\widgets\formInputs\selectTree\SelectTree::MOD_MULTI;
             }
         ?>
-        <?= $form->field($model, 'treeIds')->label(\Yii::t('app','Sections of the site'))->widget(
+        <?= $form->field($model, 'treeIds')->label(\Yii::t('skeeks/shop/app','Sections of the site'))->widget(
             \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
             [
                 "attributeMulti" => "treeIds",
                 "mode" => $mode
-            ])->hint(\Yii::t('app','Specify sections of the site, which would like to see this publication'));
+            ])->hint(\Yii::t('skeeks/shop/app','Specify sections of the site, which would like to see this publication'));
         ?>
     <? endif; ?>
 
@@ -189,14 +189,14 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 
 
-<?= $form->fieldSet(\Yii::t('app','SEO')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app','SEO')); ?>
     <?= $form->field($model, 'meta_title')->textarea(); ?>
     <?= $form->field($model, 'meta_description')->textarea(); ?>
     <?= $form->field($model, 'meta_keywords')->textarea(); ?>
 <?= $form->fieldSetEnd() ?>
 
 
-<?= $form->fieldSet(\Yii::t('app','Images/Files')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Images/Files')); ?>
 
     <?= $form->field($model, 'images')->widget(
         \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
@@ -216,7 +216,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 
 
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Prices and availability')); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Prices and availability')); ?>
     <? if ($shopContent->childrenContent) : ?>
         <?
         $id = Html::getInputId($shopProduct, 'product_type');
@@ -251,7 +251,7 @@ JS
 
     <div id="sx-shop-product-simple">
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \skeeks\cms\shop\Module::t('app', 'Setting prices')
+            'content' => \Yii::t('skeeks/shop/app', 'Setting prices')
         ]); ?>
 
         <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
@@ -261,7 +261,7 @@ JS
         <?= $form->fieldRadioListBoolean($shopProduct, 'vat_included'); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                'content' => \skeeks\cms\shop\Module::t('app', 'Main prices')
+                'content' => \Yii::t('skeeks/shop/app', 'Main prices')
             ])?>
 
         <div class="row">
@@ -279,12 +279,12 @@ JS
         <div class="row">
             <div class="col-md-3">
                 <?= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
-                    ->label(\skeeks\cms\shop\Module::t('app', 'Base price')." (".\skeeks\cms\shop\Module::t('app', 'Price type')." «{$baseProductPrice->typePrice->name}»)"); ?>
+                    ->label(\Yii::t('skeeks/shop/app', 'Base price')." (".\Yii::t('skeeks/shop/app', 'Price type')." «{$baseProductPrice->typePrice->name}»)"); ?>
             </div>
             <div class="col-md-2">
                 <?= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
                     \Yii::$app->money->activeCurrencies, 'code', 'code'
-                ))->label(\skeeks\cms\shop\Module::t('app', 'Currency base price')); ?>
+                ))->label(\Yii::t('skeeks/shop/app', 'Currency base price')); ?>
             </div>
 
             <div class="col-md-2">
@@ -299,7 +299,7 @@ JS
 
         <? if ($productPrices) : ?>
             <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                'content' => \skeeks\cms\shop\Module::t('app', 'Additional costs')
+                'content' => \Yii::t('skeeks/shop/app', 'Additional costs')
             ])?>
 
             <? foreach ($productPrices as $productPrice) : ?>
@@ -339,7 +339,7 @@ JS
         <? endif; ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \skeeks\cms\shop\Module::t('app', 'The number and account')
+            'content' => \Yii::t('skeeks/shop/app', 'The number and account')
         ]); ?>
 
             <?= $form->field($shopProduct, 'quantity')->textInput(); ?>
@@ -352,7 +352,7 @@ JS
             <?= $form->field($shopProduct, 'measure_ratio')->textInput(); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \skeeks\cms\shop\Module::t('app', 'Weight and size')
+            'content' => \Yii::t('skeeks/shop/app', 'Weight and size')
         ]); ?>
 
             <?= $form->fieldInputInt($shopProduct, 'weight'); ?>
@@ -361,7 +361,7 @@ JS
             <?= $form->fieldInputInt($shopProduct, 'height'); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \skeeks\cms\shop\Module::t('app', 'Options')
+            'content' => \Yii::t('skeeks/shop/app', 'Options')
         ]); ?>
 
             <?= $form->fieldRadioListBoolean($shopProduct, 'quantity_trace'); ?>
@@ -380,7 +380,7 @@ JS
                 [
                     'class' => 'alert-warning'
                 ],
-                'body' => \Yii::t('app', 'Management will be available after saving')
+                'body' => \Yii::t('skeeks/shop/app', 'Management will be available after saving')
             ]); ?>
         <? else:  ?>
 
@@ -417,16 +417,16 @@ JS
 
 
 <? if (!$model->isNewRecord) : ?>
-    <?/*= $form->fieldSet(\Yii::t('app','Additionally')); */?><!--
+    <?/*= $form->fieldSet(\Yii::t('skeeks/shop/app','Additionally')); */?><!--
         <?/*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */?>
     --><?/*= $form->fieldSetEnd() */?>
 
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
-        <?= $form->fieldSet(\Yii::t('app','Access')); ?>
+        <?= $form->fieldSet(\Yii::t('skeeks/shop/app','Access')); ?>
             <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
                 'permissionName'                => $model->permissionName,
-                'permissionDescription'         => 'Доступ к этому элементу: ' . $model->name,
-                'label'                         => 'Доступ к этому элементу',
+                'permissionDescription'         => \Yii::t('skeeks/shop/app','Access to this member') . ': ' . $model->name,
+                'label'                         => \Yii::t('skeeks/shop/app','Access to this member'),
             ]); ?>
         <?= $form->fieldSetEnd() ?>
     <? endif; ?>
@@ -446,7 +446,7 @@ JS
                     [
                         'class' => 'alert-warning'
                     ],
-                    'body' => \Yii::t('app', 'Management will be available after saving')
+                    'body' => \Yii::t('skeeks/shop/app', 'Management will be available after saving')
                 ]); ?>
             <? else:  ?>
 
