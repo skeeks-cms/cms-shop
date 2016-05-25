@@ -219,6 +219,7 @@ return
     'Plan of action on the sale of at least (pcs.)'             => 'План комиссии',
     'Plans of Commission'                                       => 'Планы комиссий',
     'Plans affiliate commissions'                               => 'Планы партнерской комиссии',
+    'Place your order'                                          => 'Добавить заказ',
     'Plain'                                                     => 'Простой',
     'Position successfully removed'                             => 'Позиция успешно удалена',
     'Postion successfully updated'                              => 'Позиция успешно обновлена',

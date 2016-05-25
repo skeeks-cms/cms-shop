@@ -80,7 +80,7 @@ class AdminOrderController extends AdminModelEditorController
                 'create-order' =>
                 [
                     'class'         => AdminAction::className(),
-                    'name'          => \Yii::t('skeeks/shop/app','Добавить заказ'),
+                    'name'          => \Yii::t('skeeks/shop/app','Place your order'),
                     "icon"          => "glyphicon glyphicon-plus",
                     "callback"      => [$this, 'createOrder'],
                 ],
