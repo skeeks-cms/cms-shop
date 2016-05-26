@@ -376,4 +376,5 @@ return
     "Sections"                                                  => "Разделы",
     "Section"                                                   => "Раздел",
     "Images/Files"                                              => "Изображения/Файлы",
+    "Content Settings"                                          => "Настройки контента",
 ];
