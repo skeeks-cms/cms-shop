@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha11
+-----------------
+ * Revision filters
+
 1.0.0-alpha10
 -----------------
  * Revision filters

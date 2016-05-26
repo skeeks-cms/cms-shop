@@ -74,6 +74,22 @@
         $searchRelatedPropertiesModel->initProperties($cmsContent->cmsContentProperties);
         $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
     ?>
-    <?= $form->relatedFields($searchModel, $searchRelatedPropertiesModel); ?>
+    <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
+
+
+    <?
+        if ($shopContent = \skeeks\cms\shop\models\ShopContent::findOne(['content_id' => $content_id]))
+        {
+            if ($offerContent = $shopContent->offerContent)
+            {
+                $searchOfferRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchChildrenRelatedPropertiesModel();
+                $searchOfferRelatedPropertiesModel->initCmsContent($offerContent);
+                $searchOfferRelatedPropertiesModel->load(\Yii::$app->request->get());
+                $searchOfferRelatedPropertiesModel->search($dataProvider);
+
+                echo $form->relatedFields($searchOfferRelatedPropertiesModel);
+            }
+        };
+    ?>
 
 <? $form::end(); ?>
