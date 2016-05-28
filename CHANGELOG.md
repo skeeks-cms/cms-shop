@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha11.pre
+1.0.0-alpha11
 -----------------
  * Revision filters
 
