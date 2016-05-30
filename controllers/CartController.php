@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\SignupForm;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopBuyer;
@@ -469,6 +470,13 @@ class CartController extends Controller
                                 throw new Exception(\Yii::t('skeeks/shop/app', 'Unknown email address user'));
                             }
 
+                            if ($userEmail)
+                            {
+                                if ($userExist = CmsUser::find()->where(['email' => $userEmail])->one())
+                                {
+                                    throw new Exception(\Yii::t('skeeks/shop/app', 'In our database, there are already a user with this email. Login to your account, or enter a different email address.'));
+                                }
+                            }
 
                             $newUser             = new SignupForm();
                             $newUser->scenario   = SignupForm::SCENARION_ONLYEMAIL;

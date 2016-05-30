@@ -377,4 +377,5 @@ return
     "Section"                                                   => "Раздел",
     "Images/Files"                                              => "Изображения/Файлы",
     "Content Settings"                                          => "Настройки контента",
+    "In our database, there are already a user with this email. Login to your account, or enter a different email address."                                          => "В нашей базе, уже есть пользователь с таким email. Авторизуйтесь на сайте, или укажите другой email адрес.",
 ];
