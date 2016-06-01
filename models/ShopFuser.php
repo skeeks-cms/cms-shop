@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\models;
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\Core;
@@ -57,7 +58,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property ShopTypePrice $buyTypePrices
  * @property ShopTypePrice $viewTypePrices
- * @property ShopStore $store
+ * @property CmsContentElement $store
  *
  */
 class ShopFuser extends Core
@@ -242,7 +243,7 @@ class ShopFuser extends Core
      */
     public function getStore()
     {
-        return $this->hasOne(ShopStore::className(), ['id' => 'store_id']);
+        return $this->hasOne(CmsContentElement::className(), ['id' => 'store_id']);
     }
 
 

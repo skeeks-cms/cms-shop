@@ -229,7 +229,7 @@ HTML;
                         ],
 
                         [
-                            'filter'        => ArrayHelper::map(ShopStore::find()->active()->all(), 'id', 'name'),
+                            'filter'        => ArrayHelper::map(\Yii::$app->shop->stores, 'id', 'name'),
                             'attribute'     => 'store_id',
                             'format'        => 'raw',
                             'visible'       => false,

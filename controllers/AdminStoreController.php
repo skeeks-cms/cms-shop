@@ -8,6 +8,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\controllers\AdminCmsContentElementController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\CreatedAtColumn;
 use skeeks\cms\grid\SiteColumn;
@@ -16,6 +17,7 @@ use skeeks\cms\grid\UpdatedByColumn;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
@@ -35,7 +37,7 @@ use yii\helpers\ArrayHelper;
  * Class AdminStoreController
  * @package skeeks\cms\shop\controllers
  */
-class AdminStoreController extends AdminModelEditorController
+class AdminStoreController extends AdminCmsContentElementController
 {
     use AdminModelEditorStandartControllerTrait;
 
@@ -43,63 +45,8 @@ class AdminStoreController extends AdminModelEditorController
     {
         $this->name                     = \Yii::t('skeeks/shop/app', 'Stocks');
         $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopStore::className();
+        $this->modelClassName           = CmsContentElement::className();
 
         parent::init();
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns"               => [
-                        'id',
-                        [
-                            'class' => \skeeks\cms\grid\ImageColumn2::className()
-                        ],
-                        'priority',
-                        'name',
-
-
-                        [
-                            'attribute'     => 'active',
-                            'class'         => BooleanColumn::className(),
-                        ],
-
-                        'address',
-                        'phone',
-                        'description',
-
-                        [
-                            'class' => UpdatedAtColumn::className()
-                        ],
-                        [
-                            'class' => UpdatedByColumn::className()
-                        ],
-
-                        [
-                            'attribute' => 'site_code',
-                            'class'     => SiteColumn::className(),
-                        ],
-                    ],
-                ],
-
-            ]
-        );
-    }
-
 }

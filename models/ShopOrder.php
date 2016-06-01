@@ -3,6 +3,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\modules\cms\money\Currency;
@@ -88,7 +89,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $external_order
  *
  * @property ShopBasket[] $shopBaskets
- * @property ShopStore $store
+ * @property CmsContentElement $store
  * @property ShopAffiliate $affiliate
  * @property Currency $currency
  * @property CmsUser $lockedBy
@@ -509,7 +510,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getStore()
     {
-        return $this->hasOne(ShopStore::className(), ['id' => 'store_id']);
+        return $this->hasOne(CmsContentElement::className(), ['id' => 'store_id']);
     }
 
 

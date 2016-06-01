@@ -38,6 +38,8 @@ use yii\widgets\ActiveForm;
  * @property ShopFuser $adminShopFuser
  *
  * @property CmsContent $shopContents
+ * @property CmsContent $storeContent
+ * @property CmsContent $stores
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -61,6 +63,12 @@ class ShopComponent extends Component
      */
     public $payAfterConfirmation = Cms::BOOL_N;
 
+
+    /**
+     * @var Контент который будет использоваться в качестве складов
+     */
+    public $storeCmsContentId;
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -79,6 +87,7 @@ class ShopComponent extends Component
 
             echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
             echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
+            echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '], CmsContent::getDataForSelect()), ['size' => 1]);
 
         echo $form->fieldSetEnd();
     }
@@ -88,6 +97,7 @@ class ShopComponent extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['email'], 'string'],
             [['payAfterConfirmation'], 'string'],
+            [['storeCmsContentId'], 'integer'],
         ]);
     }
 
@@ -95,7 +105,8 @@ class ShopComponent extends Component
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'email'                 => 'Email',
-            'payAfterConfirmation'  => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval')
+            'payAfterConfirmation'  => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval'),
+            'storeCmsContentId'  => \Yii::t('skeeks/shop/app', 'Content storage')
         ]);
     }
 
@@ -310,5 +321,32 @@ class ShopComponent extends Component
         }
 
         return $result;
+    }
+
+
+    /**
+     * @return CmsContent
+     */
+    public function getStoreContent()
+    {
+        if (!$contentId = (int)$this->storeCmsContentId)
+        {
+            return null;
+        }
+
+        return CmsContent::findOne($contentId);
+    }
+
+    /**
+     * @return array
+     */
+    public function getStores()
+    {
+        if ($this->storeContent)
+        {
+            return $this->storeContent->getCmsContentElements()->all();
+        }
+
+        return [];
     }
 }

@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha12
+-----------------
+ * Rewritten functional warehouses
+
 1.0.0-alpha11
 -----------------
  * Revision filters
