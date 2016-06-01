@@ -1,9 +1,13 @@
 Changelog
 ==============
 
-1.0.0-alpha12
+1.0.0-alpha13
 -----------------
  * Rewritten functional warehouses
+
+1.0.0-alpha12
+-----------------
+ * Fixed bugs
 
 1.0.0-alpha11
 -----------------
