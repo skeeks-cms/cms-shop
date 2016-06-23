@@ -21,6 +21,10 @@ $this->registerJs(<<<JS
         {
             var self = this;
             this.JqueryForm = $("#sx-filters-form");
+            if ($(".form-group", this.JqueryForm).length > 0)
+            {
+                $("button", self.JqueryForm).fadeIn();
+            }
 
             $("input, checkbox, select", this.JqueryForm).on("change", function()
             {
@@ -248,6 +252,6 @@ JS
 
 
 
-    <button class="btn btn-primary"><?=\skeeks\cms\shop\Module::t('app', 'Apply');?></button>
+    <button class="btn btn-primary" style="display: none;"><?=\skeeks\cms\shop\Module::t('app', 'Apply');?></button>
 
 <? \skeeks\cms\base\widgets\ActiveForm::end(); ?>

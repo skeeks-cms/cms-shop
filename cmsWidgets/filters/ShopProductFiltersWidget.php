@@ -330,6 +330,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
         {
             $propertyType = $property->createPropertyType();
 
+            $availables = [];
             if ($this->elementIds)
             {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
@@ -342,6 +343,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 ;
 
                 $availables = array_keys($availables);
+            }
+
+            if ($this->onlyExistsFilters && !$availables)
+            {
+                return [];
             }
 
             $options = \skeeks\cms\models\CmsContentElement::find()
@@ -362,6 +368,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
         {
             $options = $property->getEnums()->select(['id', 'value']);
 
+            $availables = [];
             if ($this->elementIds)
             {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
@@ -375,6 +382,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
                 $availables = array_keys($availables);
                 $options->andWhere(['id' => $availables]);
+            }
+
+            if ($this->onlyExistsFilters && !$availables)
+            {
+                return [];
             }
 
             $options = $options->asArray()->all();
@@ -470,6 +482,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
         {
             $propertyType = $property->createPropertyType();
 
+            $availables = [];
             if ($this->childrenElementIds)
             {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
@@ -482,6 +495,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 ;
 
                 $availables = array_keys($availables);
+            }
+
+            if ($this->onlyExistsFilters && !$availables)
+            {
+                return [];
             }
 
             $options = \skeeks\cms\models\CmsContentElement::find()
@@ -501,6 +519,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
         {
             $options = $property->getEnums()->select(['id', 'value']);
 
+            $availables = [];
             if ($this->childrenElementIds)
             {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
@@ -514,6 +533,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
                 $availables = array_keys($availables);
                 $options->andWhere(['id' => $availables]);
+            }
+
+            if ($this->onlyExistsFilters && !$availables)
+            {
+                return [];
             }
 
             $options = $options->asArray()->all();

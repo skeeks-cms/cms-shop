@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha14
+-----------------
+ * Refinement filters
+
 1.0.0-alpha13
 -----------------
  * Rewritten functional warehouses
