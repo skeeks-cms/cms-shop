@@ -243,7 +243,8 @@ class ShopProductFiltersWidget extends WidgetRenderable
              * @var $query \yii\db\ActiveQuery
              */
             $query  = clone $activeDataProvider->query;
-            $ids    = $query->select(['cms_content_element.id as mainId'])->indexBy('mainId')->asArray()->all();
+            //TODO::notice errors
+            $ids    = $query->select(['*', 'cms_content_element.id as mainId'])->indexBy('mainId')->asArray()->all();
 
             $this->elementIds = array_keys($ids);
         }
