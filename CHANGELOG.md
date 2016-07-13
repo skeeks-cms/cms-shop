@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha15.pre
+-----------------
+ * Fixed notices
+
 1.0.0-alpha14
 -----------------
  * Refinement filters

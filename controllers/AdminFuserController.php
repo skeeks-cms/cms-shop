@@ -97,7 +97,7 @@ class AdminFuserController extends AdminModelEditorController
                         [
                             'class'         => DataColumn::className(),
                             'filter'        => false,
-                            'format'        => raw,
+                            'format'        => 'raw',
                             'label'         => \Yii::t('skeeks/shop/app', 'User'),
                             'value'         => function(ShopFuser $model)
                             {
@@ -128,7 +128,7 @@ class AdminFuserController extends AdminModelEditorController
                             'label'         => \Yii::t('skeeks/shop/app', 'Profile type'),
                             'value'         => function(ShopFuser $model)
                             {
-                                return $model->personType->name;
+                                return $model->personType ? $model->personType->name : "";
                             },
                         ],
 

@@ -135,7 +135,7 @@ class ShopFuser extends Core
             [['pay_system_id'], 'integer'],
             [['person_type_id'], 'default', 'value' => function(ShopFuser $model)
             {
-                return $model->buyer->shopPersonType->id;
+                return ($model->buyer && $model->buyer->shopPersonType) ? $model->buyer->shopPersonType->id : null;
             }],
             [['pay_system_id', 'buyer_id', 'site_id', 'user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
 
