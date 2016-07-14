@@ -492,7 +492,7 @@ class ShopFuser extends Core
 
         foreach (\Yii::$app->shop->shopTypePrices as $typePrice)
         {
-            if (\Yii::$app->authManager->checkAccess($this->user->id, $typePrice->buyPermissionName))
+            if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null, $typePrice->buyPermissionName))
             {
                 $result[$typePrice->id] = $typePrice;
             }

@@ -165,7 +165,7 @@ class AdminFuserController extends AdminModelEditorController
                                     foreach ($model->shopBaskets as $shopBasket)
                                     {
                                         $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
-                                        $result[] = Html::a($shopBasket->name, $shopBasket->product->cmsContentElement->url, ['target' => '_blank']) . <<<HTML
+                                        $result[] = Html::a($shopBasket->name, $shopBasket->product ? $shopBasket->product->cmsContentElement->url : '#', ['target' => '_blank']) . <<<HTML
  ($shopBasket->quantity $shopBasket->measure_name) — {$money}
 HTML;
 
