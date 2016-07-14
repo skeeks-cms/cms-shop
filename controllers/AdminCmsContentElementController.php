@@ -157,6 +157,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public function create(AdminAction $adminAction)
     {
+        $productPrices = [];
+
         $modelClassName = $this->modelClassName;
         $model          = new $modelClassName();
 

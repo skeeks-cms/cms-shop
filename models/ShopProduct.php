@@ -473,7 +473,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             return $this->_baseProductPriceValue;
         } else
         {
-            $this->_baseProductPriceValue = $this->baseProductPrice->price;
+            $this->_baseProductPriceValue = $this->baseProductPrice ? $this->baseProductPrice->price : null;
         }
 
         return $this->_baseProductPriceValue;
