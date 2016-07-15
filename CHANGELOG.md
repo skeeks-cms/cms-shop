@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha15.pre
 -----------------
+ * Fixed sort grid
  * Updated js
  * Fixed notices
 
