@@ -217,6 +217,14 @@
 
             ajax.execute();
         },
+
+        /**
+         * @returns {Number|number}
+         */
+        getCountShopBaskets: function()
+        {
+            return Number(this.get('cartData').countShopBaskets);
+        }
     });
 
     sx.classes.shop.App = sx.classes.shop._App.extend({});
