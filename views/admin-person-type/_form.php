@@ -36,21 +36,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 'shop_person_type_id' => 'id'
             ],
 
-            'sort'              => [
-                'defaultOrder' =>
-                [
-                    'priority' => SORT_ASC
-                ]
-            ],
-
-            'dataProviderCallback' => function($dataProvider)
-            {
-                /**
-                 * @var \yii\data\BaseDataProvider $dataProvider
-                */
-                $dataProvider->getPagination()->defaultPageSize   = 5000;
-            },
-
             'controllerRoute'   => 'shop/admin-person-type-property',
             'gridViewOptions'   => [
                 'sortable' => true,
