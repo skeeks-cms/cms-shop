@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha15.pre
+1.0.0-alpha15
 -----------------
  * Fixed sort grid
  * Updated js
