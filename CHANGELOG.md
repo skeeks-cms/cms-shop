@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha16.pre
+-----------------
+ * Related properties
+
 1.0.0-alpha15
 -----------------
  * Fixed sort grid
