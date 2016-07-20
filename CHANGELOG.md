@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha17.pre
+-----------------
+ * Min and Max quantity shop
+
 1.0.0-alpha16
 -----------------
  * Related properties

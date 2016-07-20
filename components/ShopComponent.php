@@ -56,6 +56,18 @@ class ShopComponent extends Component
      */
     public $email = "";
 
+    /**
+     * Максимальное допустимое количество товаров
+     * @var float
+     */
+    public $maxQuantity = 999999;
+
+    /**
+     * Минимально допустимое количество товаров
+     * @var float
+     */
+    public $minQuantity = 0.01;
+
 
     /**
      * Оплата заказов онлайн системами, только после проверки менеджером
