@@ -36,39 +36,6 @@ class ShopBuyerProperty extends RelatedElementPropertyModel
     }
 
     /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'property_id', 'element_id', 'value_enum'], 'integer'],
-            [['value'], 'required'],
-            [['value_num'], 'number'],
-            [['value', 'description'], 'string', 'max' => 255]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'property_id'   => \Yii::t('skeeks/shop/app', 'Property ID'),
-            'element_id'    => \Yii::t('skeeks/shop/app', 'Element ID'),
-            'value'         => \Yii::t('skeeks/shop/app', 'Value'),
-            'value_enum'    => \Yii::t('skeeks/shop/app', 'Value Enum'),
-            'value_num'     => \Yii::t('skeeks/shop/app', 'Value Num'),
-            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
-        ];
-    }
-
-    /**
      * @return \yii\db\ActiveQuery
      */
     public function getProperty()
