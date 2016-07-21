@@ -461,13 +461,13 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order = new static();
 
         $order->site_id         = $shopFuser->site->id;
-        $order->person_type_id  = $shopFuser->personType->id;
-        $order->buyer_id        = $shopFuser->buyer->id;
-        $order->user_id         = $shopFuser->user->id;
+        $order->person_type_id  = $shopFuser->person_type_id;
+        $order->buyer_id        = $shopFuser->buyer_id;
+        $order->user_id         = $shopFuser->user_id;
 
         $order->price           = $shopFuser->money->getAmount() / $shopFuser->money->getCurrency()->getSubUnit();
         $order->currency_code   = $shopFuser->money->getCurrency()->getCurrencyCode();
-        $order->pay_system_id   = $shopFuser->paySystem->id;
+        $order->pay_system_id   = $shopFuser->paySystem ? $shopFuser->paySystem->id : null;
         $order->tax_value       = $shopFuser->moneyVat->getValue();
         $order->discount_value  = $shopFuser->moneyDiscount->getValue();
         $order->delivery_id     = $shopFuser->delivery_id;

@@ -239,7 +239,7 @@ HTML
                 [                      // the owner name of the model
                     'label'     => \Yii::t('skeeks/shop/app', 'Delivery service'),
                     'format'    => 'raw',
-                    'value'     => $model->delivery->name,
+                    'value'     => $model->delivery ? $model->delivery->name : "",
                 ],
 
 
@@ -254,7 +254,7 @@ HTML
                 [                      // the owner name of the model
                     'label' => 'Склад',
                     'format' => 'raw',
-                    'value' => $model->store->name,
+                    'value' => $model->store ? $model->store->name : "",
                 ],
             ]
         ])?>
