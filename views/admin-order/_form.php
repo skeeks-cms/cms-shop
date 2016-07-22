@@ -529,6 +529,11 @@ JS
                     'format'    => 'raw',
                     'value'     => function(\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange)
                     {
+                        if (!$shopOrderChange->createdBy)
+                        {
+                            return ' - ';
+                        }
+
                         return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrderChange->createdBy]))->run();
                     }
                 ],

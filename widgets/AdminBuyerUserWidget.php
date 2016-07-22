@@ -29,7 +29,7 @@ class AdminBuyerUserWidget extends Widget
     public function run()
     {
         return (new AdminImagePreviewWidget([
-            'image' => $this->user->image,
+            'image' => $this->user ? $this->user->image : null,
             'maxWidth' => "25px"
         ]))->run() . " " . Html::a($this->user->displayName, \skeeks\cms\helpers\UrlHelper::construct(['/shop/admin-buyer-user/update', 'pk' => $this->user->id ])->enableAdmin(), [
             'data-pjax' => 0

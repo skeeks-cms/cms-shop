@@ -6,6 +6,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\shop\Module;
 use skeeks\modules\cms\money\Currency;
 use skeeks\modules\cms\money\Money;
 use Yii;
@@ -175,15 +176,23 @@ class ShopOrder extends \skeeks\cms\models\Core
             //Письмо тому кто заказывает
             if ($this->user->email)
             {
-                \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                try
+                {
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-                \Yii::$app->mailer->compose('order-status-change', [
-                    'order'  => $this
-                ])
-                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                    ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Change order status'). ' #' . $this->id)
-                    ->send();
+                    \Yii::$app->mailer->compose('order-status-change', [
+                        'order'  => $this
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setTo($this->user->email)
+                        ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Change order status'). ' #' . $this->id)
+                        ->send();
+
+                } catch (\Exception $e)
+                {
+                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                }
+
             }
         }
 
@@ -198,15 +207,23 @@ class ShopOrder extends \skeeks\cms\models\Core
             //Письмо тому кто заказывает
             if ($this->user->email)
             {
-                \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                try
+                {
 
-                \Yii::$app->mailer->compose('order-allow-payment', [
-                    'order'  => $this
-                ])
-                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                    ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
-                    ->send();
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                    \Yii::$app->mailer->compose('order-allow-payment', [
+                        'order'  => $this
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setTo($this->user->email)
+                        ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
+                        ->send();
+
+                } catch (\Exception $e)
+                {
+                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                }
             }
         }
 
@@ -221,15 +238,23 @@ class ShopOrder extends \skeeks\cms\models\Core
             //Письмо тому кто заказывает
             if ($this->user->email)
             {
-                \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                try
+                {
 
-                \Yii::$app->mailer->compose('order-allow-delivery', [
-                    'order'  => $this
-                ])
-                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                    ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
-                    ->send();
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                    \Yii::$app->mailer->compose('order-allow-delivery', [
+                        'order'  => $this
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setTo($this->user->email)
+                        ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
+                        ->send();
+
+                } catch (\Exception $e)
+                {
+                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                }
             }
         }
 
@@ -247,15 +272,22 @@ class ShopOrder extends \skeeks\cms\models\Core
             //Письмо тому кто заказывает
             if ($this->user->email)
             {
-                \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                try
+                {
 
-                \Yii::$app->mailer->compose('order-canceled', [
-                    'order'  => $this
-                ])
-                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                    ->setTo($this->user->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Cancellations'). ' #' . $this->id)
-                    ->send();
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                    \Yii::$app->mailer->compose('order-canceled', [
+                        'order'  => $this
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setTo($this->user->email)
+                        ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Cancellations'). ' #' . $this->id)
+                        ->send();
+                } catch (\Exception $e)
+                {
+                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                }
             }
         }
     }
@@ -284,8 +316,9 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['pay_voucher_num', 'delivery_doc_num'], 'string', 'max' => 20],
             [['tracking_number'], 'string', 'max' => 100],
 
-            [['payed', 'canceled', 'status_code', 'allow_delivery', 'update_1c', 'deducted', 'marked', 'reserved', 'external_order'], 'default', 'value' => Cms::BOOL_N],
+            [['payed', 'canceled', 'allow_delivery', 'update_1c', 'deducted', 'marked', 'reserved', 'external_order'], 'default', 'value' => Cms::BOOL_N],
             [['recount_flag'], 'default', 'value' => Cms::BOOL_Y],
+            [['status_code'], 'default', 'value' => ShopOrderStatus::STATUS_CODE_START],
             [['status_at'], 'default', 'value' => \Yii::$app->formatter->asTimestamp(time())],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
             [['site_id'], 'default', 'value' => \Yii::$app->cms->site->id],

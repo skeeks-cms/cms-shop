@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha17.pre
 -----------------
+ * Fixed mailer
  * Fixed small bugs
  * Min and Max quantity shop
 
