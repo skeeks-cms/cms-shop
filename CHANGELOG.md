@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha17.pre
+1.0.0-alpha17
 -----------------
  * Fixed mailer
  * Fixed small bugs
