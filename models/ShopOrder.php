@@ -489,7 +489,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      * @param ShopFuser $shopFuser
      * @return static
      */
-    static public function createOrderByFuser(ShopFuser $shopFuser)
+    static public function createByFuser(ShopFuser $shopFuser)
     {
         $order = new static();
 
@@ -500,7 +500,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         $order->price           = $shopFuser->money->getAmount() / $shopFuser->money->getCurrency()->getSubUnit();
         $order->currency_code   = $shopFuser->money->getCurrency()->getCurrencyCode();
-        $order->pay_system_id   = $shopFuser->paySystem ? $shopFuser->paySystem->id : null;
+        $order->pay_system_id   = $shopFuser->paySystem->id;
         $order->tax_value       = $shopFuser->moneyVat->getValue();
         $order->discount_value  = $shopFuser->moneyDiscount->getValue();
         $order->delivery_id     = $shopFuser->delivery_id;
@@ -511,6 +511,16 @@ class ShopOrder extends \skeeks\cms\models\Core
             $order->price_delivery  = $shopFuser->delivery->money->getAmount() / $shopFuser->delivery->money->getCurrency()->getSubUnit();
         }
 
+        return $order;
+    }
+
+    /**
+     * @param ShopFuser $shopFuser
+     * @return static
+     */
+    static public function createOrderByFuser(ShopFuser $shopFuser, $isNotify = true)
+    {
+        $order = static::createByFuser($shopFuser);
 
         if ($order->save())
         {
@@ -521,7 +531,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             }
 
             //Письмо тому кто заказывает
-            if ($order->user->email)
+            if ($order->user->email && $isNotify)
             {
                 \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
