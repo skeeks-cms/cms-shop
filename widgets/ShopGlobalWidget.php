@@ -52,7 +52,7 @@ class ShopGlobalWidget extends Widget
         {
             ShopAsset::register($this->getView());
             $options = (array) $this->clientOptions;
-            $options['cartData'] = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            $options['cartData'] = \Yii::$app->shop->shopFuser->jsonSerialize();
 
             $options = Json::encode($options);
 

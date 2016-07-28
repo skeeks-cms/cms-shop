@@ -146,7 +146,7 @@ class CartController extends Controller
             }
 
             \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
             return (array) $rr;
         } else
         {
@@ -174,7 +174,7 @@ class CartController extends Controller
             }
 
             \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
             return (array) $rr;
         } else
         {
@@ -195,7 +195,7 @@ class CartController extends Controller
             }
 
             \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
             $rr->success = true;
             $rr->message = "";
 
@@ -252,7 +252,7 @@ class CartController extends Controller
             }
 
             \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
             return (array) $rr;
         } else
         {
@@ -303,7 +303,7 @@ class CartController extends Controller
             $rr->success = true;
 
 
-            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
             return (array) $rr;
         } else
         {
@@ -378,7 +378,7 @@ class CartController extends Controller
             }
 
 
-            $rr->data = \Yii::$app->shop->shopFuser->toArray([], \Yii::$app->shop->shopFuser->extraFields());
+            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
             return (array) $rr;
         } else
         {
