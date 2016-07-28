@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha18.pre
+1.0.0-alpha18
 -----------------
  * ShopFuser implements JsonSerializable
  * Create order change
