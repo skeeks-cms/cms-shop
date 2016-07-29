@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha19.pre
+-----------------
+ * Fixed small bugs
+
 1.0.0-alpha18
 -----------------
  * ShopFuser implements JsonSerializable
