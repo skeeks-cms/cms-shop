@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha19.pre
+1.0.0-alpha19
 -----------------
  * Fixed small bugs
 
