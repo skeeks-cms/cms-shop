@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha20.pre
+-----------------
+ * Fixed notices
+
 1.0.0-alpha19
 -----------------
  * Fixed small bugs

@@ -432,9 +432,9 @@ JS
     <? endif; ?>
 <? endif; ?>
 
+<? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->all() ) : ?>
 
-<? if ($childContents = $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->all() ) : ?>
-
+    <? $childContents = $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->all(); ?>
 
     <? foreach($childContents as $childContent) : ?>
         <?= $form->fieldSet($childContent->name); ?>
