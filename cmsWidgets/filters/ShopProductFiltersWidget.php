@@ -329,7 +329,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
         if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
         {
-            $propertyType = $property->createPropertyType();
+            $propertyType = $property->handler;
 
             $availables = [];
             if ($this->elementIds)
@@ -481,7 +481,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
         if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
         {
-            $propertyType = $property->createPropertyType();
+            $propertyType = $property->handler;
 
             $availables = [];
             if ($this->childrenElementIds)
