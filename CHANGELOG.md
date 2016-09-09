@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha20.pre
 -----------------
+ * Adapting to new additional properties
  * Fixed notices
 
 1.0.0-alpha19

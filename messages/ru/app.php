@@ -379,5 +379,6 @@ return
     "Content Settings"                                          => "Настройки контента",
     "In our database, there are already a user with this email. Login to your account, or enter a different email address."                                          => "В нашей базе, уже есть пользователь с таким email. Авторизуйтесь на сайте, или укажите другой email адрес.",
     "Content storage"                                           => "Контент склады",
+    "Is Required"                                               => "Обязательно",
     'Functional "warehouses" is not set in your store. Create new content, and specify it in the general settings of your store as a storage content.'                                           => 'В вашем магазине не настроен функционал "склады". Создайте новый контент, и укажите его в общих настройках вашего магазина в качестве складского контента.',
 ];
