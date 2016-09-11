@@ -67,7 +67,10 @@ JS
 
     <? if ($handler) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
-            <?= $handler->renderConfigForm($form); ?>
+        <? if($handler instanceof \skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList) : ?>
+            <? $handler->enumRoute = 'shop/admin-person-type-property-enum'; ?>
+        <? endif; ?>
+        <?= $handler->renderConfigForm($form); ?>
     <? endif; ?>
 
 
@@ -106,56 +109,6 @@ JS
 
 <?= $form->fieldSetEnd(); ?>
 
-<? if (!$model->isNewRecord) : ?>
-<?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Values for the list')) ?>
-
-    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label'             => \skeeks\cms\shop\Module::t('app', 'Values for the list'),
-        'hint'              => \skeeks\cms\shop\Module::t('app', 'You can snap to the element number of properties, and set the value to them'),
-        'parentModel'       => $model,
-        'relation'          => [
-            'property_id' => 'id'
-        ],
-        'controllerRoute'   => 'shop/admin-person-type-property-enum',
-        'gridViewOptions'   => [
-            'sortable' => true,
-            'columns' => [
-                /*'id',
-                'code',
-                'value',
-                'priority',
-                'def',*/
-                [
-                    'attribute'     => 'id',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'code',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'value',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'attribute'     => 'priority',
-                    'enableSorting' => false
-                ],
-
-                [
-                    'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                    'attribute'     => 'def',
-                    'enableSorting' => false
-                ],
-            ],
-        ],
-    ]); ?>
-
-<?= $form->fieldSetEnd(); ?>
-<? endif; ?>
 
 <?= $form->fieldSet('Связь с пользователем') ?>
 
