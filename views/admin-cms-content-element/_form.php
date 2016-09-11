@@ -86,7 +86,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
         </div>
     </div>
     <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/shop/app',"This parameter affects the address of the page")); ?>
+    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms',"This parameter affects the address of the page")); ?>
     <?= $form->fieldInputInt($model, 'priority'); ?>
 
     <? if ($contentModel->parent_content_id) : ?>
@@ -98,7 +98,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
     <? if ($model->relatedProperties) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('skeeks/shop/app', 'Additional properties')
+            'content' => \Yii::t('skeeks/cms', 'Additional properties')
         ]); ?>
         <? if ($properties = $model->relatedProperties) : ?>
             <? foreach ($properties as $property) : ?>

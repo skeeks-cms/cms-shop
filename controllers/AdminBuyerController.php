@@ -73,7 +73,7 @@ class AdminBuyerController extends AdminModelEditorController
                 'related-properties' =>
                 [
                     'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                    'name'          => \Yii::t('skeeks/shop/app', 'Additional properties'),
+                    'name'          => \Yii::t('skeeks/cms', 'Additional properties'),
                     "icon"          => "glyphicon glyphicon-plus-sign",
                 ],
             ]
