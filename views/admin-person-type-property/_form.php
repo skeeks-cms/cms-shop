@@ -82,10 +82,10 @@ JS
     <?= $form->fieldInputInt($model, 'priority') ?>
 
 
-    <?= $form->fieldRadioListBoolean($model, 'searchable') ?>
+    <?/*= $form->fieldRadioListBoolean($model, 'searchable') */?>
     <?= $form->fieldRadioListBoolean($model, 'filtrable') ?>
-    <?= $form->fieldRadioListBoolean($model, 'smart_filtrable') ?>
-    <?= $form->fieldRadioListBoolean($model, 'with_description') ?>
+    <?/*= $form->fieldRadioListBoolean($model, 'smart_filtrable') */?>
+    <?/*= $form->fieldRadioListBoolean($model, 'with_description') */?>
 
 
     <? if ($content_id = \Yii::$app->request->get('shop_person_type_id')) : ?>
@@ -94,18 +94,18 @@ JS
 
     <? else: ?>
 
-    <?= $form->field($model, 'shop_person_type_id')->label(\skeeks\cms\shop\Module::t('app', 'Type payer'))->widget(
-        \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
-            'items' => \yii\helpers\ArrayHelper::map(
-                 \skeeks\cms\models\CmsTreeType::find()->active()->all(),
-                 "id",
-                 "name"
-             ),
-            'controllerRoute' => 'shop/admin-shop-person-type',
-        ]);
-    ?>
+        <?= $form->field($model, 'shop_person_type_id')->label(\skeeks\cms\shop\Module::t('app', 'Type payer'))->widget(
+            \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
+                'items' => \yii\helpers\ArrayHelper::map(
+                     \skeeks\cms\shop\models\ShopPersonType::find()->all(),
+                     "id",
+                     "name"
+                 ),
+                'controllerRoute' => 'shop/admin-shop-person-type',
+            ]);
+        ?>
 
-<? endif; ?>
+    <? endif; ?>
 
 <?= $form->fieldSetEnd(); ?>
 
