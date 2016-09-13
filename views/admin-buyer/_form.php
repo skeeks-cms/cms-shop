@@ -14,7 +14,44 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = ActiveForm::begin([
+    'id'                                            => 'sx-dynamic-form',
+    'enableAjaxValidation'                          => false,
+]); ?>
+
+<? $this->registerJs(<<<JS
+
+(function(sx, $, _)
+{
+    sx.classes.DynamicForm = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            $("[data-form-reload=true]").on('change', function()
+            {
+                self.update();
+            });
+        },
+
+        update: function()
+        {
+            _.delay(function()
+            {
+                var jForm = $("#sx-dynamic-form");
+                jForm.append($('<input>', {'type': 'hidden', 'name' : 'sx-not-submit', 'value': 'true'}));
+                jForm.submit();
+            }, 200);
+        }
+    });
+
+    sx.DynamicForm = new sx.classes.DynamicForm();
+})(sx, sx.$, sx._);
+
+
+JS
+); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
@@ -33,11 +70,26 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         ); ?>
     <? endif; ?>
 
+    <?= $form->field($model, 'name')->textInput(); ?>
 
     <?= $form->fieldSelect($model, 'shop_person_type_id', \yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name'
     )); ?>
-    <?= $form->field($model, 'name')->textInput(); ?>
+
+    <? if ($model->relatedProperties) : ?>
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \Yii::t('skeeks/cms', 'Settings')
+        ]); ?>
+        <? if ($properties = $model->relatedProperties) : ?>
+            <? foreach ($properties as $property) : ?>
+                <?= $property->renderActiveForm($form, $model)?>
+            <? endforeach; ?>
+        <? endif; ?>
+
+    <? else : ?>
+        <?/*= \Yii::t('skeeks/cms','Additional properties are not set')*/?>
+    <? endif; ?>
+
 
 <?= $form->fieldSetEnd(); ?>
 

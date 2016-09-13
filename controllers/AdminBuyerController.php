@@ -11,6 +11,8 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\SiteColumn;
 use skeeks\cms\grid\UserColumnData;
+use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
@@ -32,6 +34,8 @@ use yii\helpers\ArrayHelper;
 class AdminBuyerController extends AdminModelEditorController
 {
     use AdminModelEditorStandartControllerTrait;
+
+    public $notSubmitParam = 'sx-not-submit';
 
     public function init()
     {
@@ -70,14 +74,134 @@ class AdminBuyerController extends AdminModelEditorController
                     ],
                 ],
 
-                'related-properties' =>
+                'create' =>
                 [
-                    'class'         => AdminOneModelRelatedPropertiesAction::className(),
-                    'name'          => \Yii::t('skeeks/cms', 'Additional properties'),
-                    "icon"          => "glyphicon glyphicon-plus-sign",
+                    'callback'         => [$this, 'create'],
+                ],
+
+                'update' =>
+                [
+                    'callback'         => [$this, 'update'],
                 ],
             ]
         );
     }
 
+    public function create()
+    {
+        $rr = new RequestResponse();
+
+        $modelClass = $this->modelClassName;
+        /**
+         * @var CmsContentProperty $model
+         */
+        $model = new $modelClass();
+        $model->loadDefaultValues();
+
+        if ($post = \Yii::$app->request->post())
+        {
+            $model->load($post);
+        }
+
+        $handler = $model->handler;
+
+        if ($handler)
+        {
+            if ($post = \Yii::$app->request->post())
+            {
+                $handler->load($post);
+            }
+        }
+
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
+            {
+                $model->component_settings = $handler->toArray();
+                $handler->load(\Yii::$app->request->post());
+
+                if ($model->load(\Yii::$app->request->post())
+                    && $model->validate() && $handler->validate())
+                {
+                    $model->save();
+
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+
+                    return $this->redirect(
+                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
+                            ->toString()
+                    );
+                } else
+                {
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
+                }
+            }
+        }
+
+        return $this->render('_form', [
+            'model'     => $model,
+            'handler'   => $handler,
+        ]);
+    }
+
+
+    public function update()
+    {
+        $rr = new RequestResponse();
+
+        $model = $this->model;
+
+        if ($post = \Yii::$app->request->post())
+        {
+            $model->load($post);
+        }
+
+        $handler = $model->handler;
+        if ($handler)
+        {
+            if ($post = \Yii::$app->request->post())
+            {
+                $handler->load($post);
+            }
+        }
+
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
+            {
+                if ($rr->isRequestPjaxPost())
+                {
+                    $model->component_settings = $handler->toArray();
+                    $handler->load(\Yii::$app->request->post());
+
+                    if ($model->load(\Yii::$app->request->post())
+                        && $model->validate() && $handler->validate())
+                    {
+                        $model->save();
+
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+
+                        if (\Yii::$app->request->post('submit-btn') == 'apply')
+                        {
+
+                        } else
+                        {
+                            return $this->redirect(
+                                $this->indexUrl
+                            );
+                        }
+
+                        $model->refresh();
+
+                    }
+                }
+            }
+        }
+
+        return $this->render('_form', [
+            'model'     => $model,
+            'handler'   => $handler,
+        ]);
+    }
 }
