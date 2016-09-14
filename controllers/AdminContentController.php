@@ -41,35 +41,4 @@ class AdminContentController extends AdminModelEditorController
         parent::init();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "columns"               => [
-                        [
-                            'filter' => false,
-                            'attribute' => 'content_id',
-                            'class' => DataColumn::className(),
-                            'value' => function(ShopContent $model)
-                            {
-                                return $model->content->name . " ({$model->content->contentType->name})";
-                            }
-                        ],
-
-                        [
-                            'attribute' => 'yandex_export',
-                            'class' => BooleanColumn::className(),
-                        ]
-                    ],
-                ],
-
-            ]
-        );
-    }
-
 }

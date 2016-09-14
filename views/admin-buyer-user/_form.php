@@ -140,12 +140,12 @@ $roles = implode(', ', $result);
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet("Профили покупателя (" . \skeeks\cms\shop\models\ShopBuyer::find()->where([
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Profiles buyer') . " (" . \skeeks\cms\shop\models\ShopBuyer::find()->where([
                 'cms_user_id' => $model->id
             ])->count() .  ")"); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Все профили покупателя'
+        'content' => \Yii::t('skeeks/shop/app', 'All of the buyer profile')
     ])?>
 
         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
@@ -196,12 +196,12 @@ $roles = implode(', ', $result);
 <?
 $view = $this;
 ?>
-<?= $form->fieldSet("Заказы (" . \skeeks\cms\shop\models\ShopOrder::find()->where([
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Orders') . " (" . \skeeks\cms\shop\models\ShopOrder::find()->where([
                 'user_id' => $model->id
             ])->count() .  ")"); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Последние заказы'
+        'content' => \Yii::t('skeeks/shop/app', 'All customer orders')
     ])?>
 
     <?= \skeeks\cms\modules\admin\widgets\GridView::widget([

@@ -103,7 +103,7 @@ class AdminBuyerController extends AdminModelEditorController
             $model->load($post);
         }
 
-        $handler = $model->handler;
+        $handler = $model->relatedPropertiesModel;
 
         if ($handler)
         {
@@ -117,13 +117,13 @@ class AdminBuyerController extends AdminModelEditorController
         {
             if (!\Yii::$app->request->post($this->notSubmitParam))
             {
-                $model->component_settings = $handler->toArray();
                 $handler->load(\Yii::$app->request->post());
 
                 if ($model->load(\Yii::$app->request->post())
                     && $model->validate() && $handler->validate())
                 {
                     $model->save();
+                    $handler->save();
 
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 
@@ -149,7 +149,9 @@ class AdminBuyerController extends AdminModelEditorController
     public function update()
     {
         $rr = new RequestResponse();
-
+        /**
+         * @var $model ShopBuyer
+         */
         $model = $this->model;
 
         if ($post = \Yii::$app->request->post())
@@ -157,7 +159,7 @@ class AdminBuyerController extends AdminModelEditorController
             $model->load($post);
         }
 
-        $handler = $model->handler;
+        $handler = $model->relatedPropertiesModel;
         if ($handler)
         {
             if ($post = \Yii::$app->request->post())
@@ -172,13 +174,13 @@ class AdminBuyerController extends AdminModelEditorController
             {
                 if ($rr->isRequestPjaxPost())
                 {
-                    $model->component_settings = $handler->toArray();
                     $handler->load(\Yii::$app->request->post());
 
                     if ($model->load(\Yii::$app->request->post())
                         && $model->validate() && $handler->validate())
                     {
                         $model->save();
+                        $handler->save();
 
                         \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
 

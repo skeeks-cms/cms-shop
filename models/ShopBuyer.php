@@ -80,7 +80,7 @@ class ShopBuyer extends RelatedElementModel
             'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
             'name'                  => \Yii::t('skeeks/shop/app', 'The profile name'),
             'cms_user_id'           => \Yii::t('skeeks/shop/app', 'User site'),
-            'shop_person_type_id'   => \Yii::t('skeeks/shop/app', 'Type payer'),
+            'shop_person_type_id'   => \Yii::t('skeeks/shop/app', 'Profile type'),
         ];
     }
 
@@ -141,6 +141,8 @@ class ShopBuyer extends RelatedElementModel
      */
     public function getRelatedProperties()
     {
-        return $this->shopPersonType->getShopPersonTypeProperties();
+        //return $this->shopPersonType->getShopPersonTypeProperties();
+        return $this->hasMany(ShopPersonTypeProperty::className(), ['shop_person_type_id' => 'id'])
+                    ->via('shopPersonType')->orderBy(['priority' => SORT_ASC]);
     }
 }

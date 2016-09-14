@@ -19,12 +19,27 @@
         'class' => 'alert-info'
     ]
 ]); ?>
-Добавте и настройте в эту таблицу типы контентов, которые разрешено продавать на этом сайте.
+<?= \Yii::t('skeeks/shop/app', 'In this section, you can customize what content you can sell on your site.');?>
 <? \yii\bootstrap\Alert::end(); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
     'dataProvider'      => $dataProvider,
     'filterModel'       => $searchModel,
     'adminController'   => $controller,
-    'columns'           => $columns,
+    'columns'           => [
+        [
+            'filter' => false,
+            'attribute' => 'content_id',
+            'class' => \yii\grid\DataColumn::className(),
+            'value' => function(\skeeks\cms\shop\models\ShopContent $model)
+            {
+                return $model->content->name . " ({$model->content->contentType->name})";
+            }
+        ],
+
+        /*[
+            'attribute' => 'yandex_export',
+            'class' => BooleanColumn::className(),
+        ]*/
+    ],
 ]); ?>

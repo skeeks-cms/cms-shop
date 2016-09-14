@@ -17,6 +17,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?php $form = ActiveForm::begin([
     'id'                                            => 'sx-dynamic-form',
     'enableAjaxValidation'                          => false,
+    'enableClientValidation'                          => false,
 ]); ?>
 
 <? $this->registerJs(<<<JS
@@ -32,6 +33,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             $("[data-form-reload=true]").on('change', function()
             {
                 self.update();
+                return false;
             });
         },
 
@@ -72,9 +74,12 @@ JS
 
     <?= $form->field($model, 'name')->textInput(); ?>
 
-    <?= $form->fieldSelect($model, 'shop_person_type_id', \yii\helpers\ArrayHelper::map(
+    <?= $form->field($model, 'shop_person_type_id')->listBox(\yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name'
-    )); ?>
+    ), [
+        'size' => 1,
+        'data-form-reload' => 'true',
+    ]); ?>
 
     <? if ($model->relatedProperties) : ?>
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -82,7 +87,7 @@ JS
         ]); ?>
         <? if ($properties = $model->relatedProperties) : ?>
             <? foreach ($properties as $property) : ?>
-                <?= $property->renderActiveForm($form, $model)?>
+                <?= $property->renderActiveForm($form)?>
             <? endforeach; ?>
         <? endif; ?>
 

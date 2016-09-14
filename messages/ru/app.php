@@ -195,6 +195,7 @@ return
     'Order price from'                                          => 'Стоимость заказа. От',
     'Order price to'                                            => 'Стоимость заказа. Дт',
     'Order statuses'                                            => 'Статусы заказов',
+    'Types of profiles'                                         => 'Типы профилей',
     'Order'                                                     => 'Заказ',
     'Orders'                                                    => 'Заказы',
     'Orders (paid / total)'                                     => 'Количество заказов (оплаченные/все)',
@@ -380,5 +381,10 @@ return
     "In our database, there are already a user with this email. Login to your account, or enter a different email address."                                          => "В нашей базе, уже есть пользователь с таким email. Авторизуйтесь на сайте, или укажите другой email адрес.",
     "Content storage"                                           => "Контент склады",
     "Is Required"                                               => "Обязательно",
+    "Profile type"                                              => "Тип профиля",
+    "Profiles buyer"                                            => "Профили покупателя",
+    "All of the buyer profile"                                  => "Все профили покупателя",
+    "All customer orders"                                       => "Все заказы покупателя",
     'Functional "warehouses" is not set in your store. Create new content, and specify it in the general settings of your store as a storage content.'                                           => 'В вашем магазине не настроен функционал "склады". Создайте новый контент, и укажите его в общих настройках вашего магазина в качестве складского контента.',
+    'In this section, you can customize what content you can sell on your site.'  => 'В этом разделе вы можете настроить какой контент можно продавать на вашем сайте.',
 ];

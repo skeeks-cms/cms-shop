@@ -230,7 +230,7 @@ return [
                     ],
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Updates'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Order statuses'),
                         "url"       => ["shop/admin-order-status"],
                     ],
 
@@ -240,7 +240,7 @@ return [
                     ],
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Types of payers'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Types of profiles'),
                         "url"       => ["shop/admin-person-type"],
                     ],
 
