@@ -74,9 +74,9 @@ JS
 
     <?= $form->field($model, 'name')->textInput(); ?>
 
-    <?= $form->field($model, 'shop_person_type_id')->listBox(\yii\helpers\ArrayHelper::map(
+    <?= $form->field($model, 'shop_person_type_id')->listBox(\yii\helpers\ArrayHelper::merge(['' => ' — '], \yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name'
-    ), [
+    )), [
         'size' => 1,
         'data-form-reload' => 'true',
     ]); ?>

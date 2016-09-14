@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha20.pre
+1.0.0-alpha20
 -----------------
  * Adapting to new additional properties
  * Fixed notices
