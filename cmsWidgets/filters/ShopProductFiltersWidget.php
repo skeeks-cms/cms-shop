@@ -310,6 +310,59 @@ class ShopProductFiltersWidget extends WidgetRenderable
         return true;
     }
 
+    /**
+     * @param $property
+     *
+     * @return null
+     */
+    public function getMaxValue($property)
+    {
+        $value = [];
+
+        if ($this->elementIds)
+        {
+            $value = \skeeks\cms\models\CmsContentElementProperty::find()
+                ->select(['value_enum'])
+                ->andWhere(['element_id' => $this->elementIds])
+                ->andWhere(['property_id' => $property->id])
+                ->asArray()
+                ->orderBy(['value_enum' => SORT_DESC])
+                ->limit(1)
+                ->one()
+            ;
+
+            return (float) $value['value_enum'];
+        }
+
+        return null;
+    }
+    /**
+     * @param $property
+     *
+     * @return null
+     */
+    public function getMinValue($property)
+    {
+        $value = [];
+
+        if ($this->elementIds)
+        {
+            $value = \skeeks\cms\models\CmsContentElementProperty::find()
+                ->select(['value_enum'])
+                ->andWhere(['element_id' => $this->elementIds])
+                ->andWhere(['property_id' => $property->id])
+                ->asArray()
+                ->orderBy(['value_enum' => SORT_ASC])
+                ->limit(1)
+                ->one()
+            ;
+
+            return (float) $value['value_enum'];
+        }
+
+        return null;
+    }
+
     protected $_relatedOptions = [];
 
     /**

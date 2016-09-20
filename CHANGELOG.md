@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha21.pre
+-----------------
+ * Filters update
+
 1.0.0-alpha20
 -----------------
  * Adapting to new additional properties
