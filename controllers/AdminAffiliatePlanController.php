@@ -42,35 +42,4 @@ class AdminAffiliatePlanController extends AdminModelEditorController
         parent::init();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "columns"               => [
-                        'id',
-
-                        [
-                            'attribute' => 'site_code',
-                            'class'     => SiteColumn::className(),
-                        ],
-
-                        [
-                            'attribute'     => 'active',
-                            'class'         => BooleanColumn::className(),
-                        ],
-
-                        'name',
-                        'base_rate'
-                    ],
-                ],
-
-            ]
-        );
-    }
-
 }

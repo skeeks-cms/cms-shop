@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha21.pre
 -----------------
+ * Fixed #35 [https://github.com/skeeks-cms/cms/issues/35] (Errors in JavaScript code in the behavior of the widget in the admin table)
  * Filters update
 
 1.0.0-alpha20

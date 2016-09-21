@@ -35,47 +35,4 @@ class AdminPersonTypeController extends AdminModelEditorController
 
         parent::init();
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns"      => [
-                        'name',
-                        'priority',
-
-                        [
-                            'class'         => DataColumn::className(),
-                            'attribute'     => "siteCodes",
-                            'filter'        => false,
-                            'value'         => function(ShopPersonType $model)
-                            {
-                                return implode(", ", $model->siteCodes);
-                            }
-                        ],
-
-                        [
-                            'class'         => BooleanColumn::className(),
-                            'attribute'     => "active"
-                        ]
-                    ],
-                ]
-            ]
-        );
-    }
-
 }

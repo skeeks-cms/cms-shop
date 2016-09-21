@@ -34,46 +34,4 @@ class AdminOrderStatusController extends AdminModelEditorController
 
         parent::init();
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns"      => [
-                        'code',
-                        [
-                            'class'     => DataColumn::className(),
-                            'attribute'     => 'name',
-                            'format'     => 'raw',
-                            'value'     => function(ShopOrderStatus $model)
-                            {
-                                return Html::label($model->name, null, [
-                                    'style' => "background: {$model->color}",
-                                    'class' => "label"
-                                ]);
-                            }
-                        ],
-
-                        'description',
-                        'priority',
-                    ],
-                ]
-            ]
-        );
-    }
-
 }

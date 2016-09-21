@@ -30,44 +30,11 @@ class AdminVatController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'VAT_rates');
+        $this->name                     = \Yii::t('skeeks/shop/app', 'VAT rates');
         $this->modelShowAttribute       = "name";
         $this->modelClassName           = ShopVat::className();
 
         parent::init();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns"      => [
-                        'name',
-                        'priority',
-                        'rate',
-
-                        [
-                            'class'         => BooleanColumn::className(),
-                            'attribute'     => "active"
-                        ]
-                    ],
-                ]
-            ]
-        );
     }
 
 }

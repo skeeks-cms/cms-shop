@@ -41,29 +41,6 @@ class AdminTypePriceController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
-                [
-                    "gridConfig" =>
-                    [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
-
-                    "columns"      => [
-                        'code',
-                        'name',
-                        'priority',
-
-                        [
-                            'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                            'attribute'     => "def"
-                        ],
-                    ],
-                ],
-
                 "def-multi" =>
                 [
                     'class'             => AdminMultiModelEditAction::className(),

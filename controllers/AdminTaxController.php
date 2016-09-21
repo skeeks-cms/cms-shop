@@ -38,28 +38,4 @@ class AdminTaxController extends AdminModelEditorController
 
         parent::init();
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "columns"      => [
-                        'name',
-                        'code',
-
-                        [
-                            'class'         => SiteColumn::className(),
-                            'attribute'     => "site_code"
-                        ]
-                    ],
-                ]
-            ]
-        );
-    }
-
 }

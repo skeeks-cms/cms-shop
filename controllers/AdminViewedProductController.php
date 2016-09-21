@@ -59,48 +59,6 @@ class AdminViewedProductController extends AdminModelEditorController
                     'visible' => false
                 ],
 
-
-                'index' =>
-                [
-                    "columns"      => [
-                        [
-                            'class' => CreatedAtColumn::className(),
-                            'label' => \Yii::t('skeeks/shop/app', 'Date views'),
-                        ],
-                        [
-                            'class' => DataColumn::className(),
-                            'format' => 'raw',
-                            'label' => \Yii::t('skeeks/shop/app', 'User'),
-                            'value' => function(ShopViewedProduct $shopViewedProduct)
-                            {
-                                return $shopViewedProduct->shopFuser->user ? ( new AdminBuyerUserWidget(['user' => $shopViewedProduct->shopFuser->user]) )->run() : \Yii::t('skeeks/shop/app', 'Not authorized');
-                            },
-                        ],
-
-                        [
-                            'class' => DataColumn::className(),
-                            'format' => 'raw',
-                            'label' => \Yii::t('skeeks/shop/app', 'Good'),
-                            'value' => function(ShopViewedProduct $shopViewedProduct)
-                            {
-                                if ($shopViewedProduct->shopProduct)
-                                {
-
-                                    return (new AdminImagePreviewWidget([
-                                        'image' => $shopViewedProduct->shopProduct->cmsContentElement->image,
-                                        'maxWidth' => "25px"
-                                    ]))->run() . " " . Html::a($shopViewedProduct->shopProduct->cmsContentElement->name, $shopViewedProduct->shopProduct->cmsContentElement->url, [
-                                        'target' => "_blank",
-                                        'data-pjax' => 0,
-                                    ] );
-                                }
-
-                                return null;
-                            },
-                        ],
-
-                    ],
-                ]
             ]
         );
     }

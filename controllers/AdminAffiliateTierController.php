@@ -46,31 +46,4 @@ class AdminAffiliateTierController extends AdminModelEditorController
         parent::init();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'index' =>
-                [
-                    "columns"               => [
-                        [
-                            'attribute' => 'site_code',
-                            'class'     => SiteColumn::className(),
-                        ],
-
-                        'rate1',
-                        'rate2',
-                        'rate3',
-                        'rate4',
-                        'rate5',
-                    ],
-                ],
-
-            ]
-        );
-    }
-
 }
