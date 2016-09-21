@@ -30,6 +30,7 @@ use yii\helpers\StringHelper;
  * @property ShopPersonType[] $personTypes
  *
  * @property PaySystemHandlerComponent $paySystemHandler
+ * @property PaySystemHandlerComponent $handler
  */
 class ShopPaySystem extends Core
 {
@@ -109,7 +110,7 @@ class ShopPaySystem extends Core
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
             [['name'], 'required'],
-            [['description', 'componentSettingsString'], 'string'],
+            [['description'], 'string'],
             [['component_settings'], 'safe'],
             [['name', 'component'], 'string', 'max' => 255],
             [['active'], 'string', 'max' => 1],
@@ -135,24 +136,6 @@ class ShopPaySystem extends Core
         ]);
     }
 
-
-    protected $_componentSettingsString = "";
-    /**
-     * @return string
-     */
-    public function getComponentSettingsString()
-    {
-        return \skeeks\cms\helpers\StringHelper::base64EncodeUrl(serialize((array) $this->component_settings));
-    }
-    /**
-     * @param $value
-     * @return $this
-     */
-    public function setComponentSettingsString($value)
-    {
-        $this->component_settings = unserialize(\skeeks\cms\helpers\StringHelper::base64DecodeUrl($value));
-        return $this;
-    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -200,15 +183,45 @@ class ShopPaySystem extends Core
      */
     public function getPaySystemHandler()
     {
+        return $this->handler;
+    }
+
+
+    protected $_handler = null;
+
+    /**
+     * @return PaySystemHandlerComponent
+     * @throws \skeeks\cms\import\InvalidParamException
+     */
+    public function getHandler()
+    {
+        if ($this->_handler !== null)
+        {
+            return $this->_handler;
+        }
+
         if ($this->component)
         {
-            /**
-             * @var $component Component
-             */
-            $component = \Yii::createObject($this->component);
-            $component->load($this->component_settings, "");
+            try
+            {
+                /**
+                 * @var $component PropertyType
+                 */
+                /*$foundComponent = \Yii::$app->cms->getRelatedHandler($this->component);
+                //TODO:: Подумать! Нужно чтобы создавался новый экземляр класса потому что в него передается property объект. В то же время хотелось бы чтобы объект handler собирался согласно настройкам конфига.
+                $component = clone $foundComponent;*/
 
-            return $component;
+                $component = \Yii::createObject($this->component);
+                $component->load($this->component_settings, "");
+
+                $this->_handler = $component;
+                return $this->_handler;
+            } catch (\Exception $e)
+            {
+                \Yii::error("Related property handler not found '{$this->component}'", self::className());
+                return null;
+            }
+
         }
 
         return null;
