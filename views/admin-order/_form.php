@@ -73,7 +73,7 @@ JS
 $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 ?>
 
-<h1 style="text-align: center;">Просмотр заказа ID (<?= $model->id ?>), № <?= $model->id ?>, создан <?= \Yii::$app->formatter->asDatetime($model->created_at); ?></h1>
+<h1 style="text-align: center;">Просмотр заказа № <?= $model->id ?>, от <?= \Yii::$app->formatter->asDatetime($model->created_at); ?></h1>
 
 <?php $form = ActiveForm::begin([
     'pjaxOptions' =>
