@@ -31,6 +31,8 @@ use yii\helpers\ArrayHelper;
  * @property CmsSite $site
  *
  * @property int $countShopBaskets
+ * @property float $quantity
+ *
  * @property ShopBuyer[] $shopBuyers
  * @property ShopPaySystem[] $paySystems
  *
@@ -147,6 +149,7 @@ class ShopFuser extends Core implements \JsonSerializable
         return [
             'countShopBaskets',
             'shopBaskets',
+            'quantity',
         ];
     }
 
@@ -309,6 +312,23 @@ class ShopFuser extends Core implements \JsonSerializable
     public function getCountShopBaskets()
     {
         return count($this->shopBaskets);
+    }
+
+    /**
+     * @return float
+     */
+    public function getQuantity()
+    {
+        $result = 0;
+
+        if ($this->shopBaskets)
+        {
+            foreach ($this->shopBaskets as $shopBasket)
+            {
+                $result = $shopBasket->quantity + $result;
+            }
+        }
+        return (float) $result;
     }
 
     /**

@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha22.pre
+-----------------
+ * Shop quantity
+
 1.0.0-alpha21
 -----------------
  * Standard interface for configuration management processors of payment systems
