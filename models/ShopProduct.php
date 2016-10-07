@@ -491,7 +491,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             return $this->_baseProductPriceCurrency;
         } else
         {
-            $this->_baseProductPriceCurrency = $this->baseProductPrice->currency_code;
+            $this->_baseProductPriceCurrency = $this->baseProductPrice ? $this->baseProductPrice->currency_code : \Yii::$app->money->currencyCode;
         }
 
         return $this->_baseProductPriceCurrency;

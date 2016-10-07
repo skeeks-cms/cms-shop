@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha22.pre
 -----------------
+ * Fixed bug when editing products
  * Shop quantity
 
 1.0.0-alpha21

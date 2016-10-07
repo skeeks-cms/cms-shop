@@ -252,11 +252,16 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $shopProduct                        = ShopProduct::find()->where(['id' => $model->id])->one();
 
         $productPrices = [];
+
         if (!$shopProduct)
         {
+
             $shopProduct = new ShopProduct([
                 'id' => $model->id
             ]);
+
+            $shopProduct->save();
+
         } else
         {
             if ($typePrices = ShopTypePrice::find()->where(['!=', 'def', Cms::BOOL_Y])->all())
@@ -355,12 +360,26 @@ class AdminCmsContentElementController extends AdminModelEditorController
             }
         }
 
+
+        if (!$shopProduct->baseProductPrice)
+        {
+            $baseProductPrice = new ShopProductPrice([
+                'type_price_id' => \Yii::$app->shop->baseTypePrice->id,
+                'currency_code' => \Yii::$app->money->currencyCode,
+                'product_id'    => $model->id,
+            ]);
+
+            $baseProductPrice->save();
+        }
+
+
+
         return $this->render('_form', [
             'model'           => $model,
             'relatedModel'    => $relatedModel,
             'shopProduct'     => $shopProduct,
             'productPrices'   => $productPrices,
-            'baseProductPrice'  => $shopProduct->baseProductPrice
+            'baseProductPrice'  => $shopProduct->getBaseProductPrice()->one()
         ]);
     }
 
