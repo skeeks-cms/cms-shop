@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha23.pre
 -----------------
+ * Removing the old price changes
  * Off unnecessary update prices
 
 1.0.0-alpha22
