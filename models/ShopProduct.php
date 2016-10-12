@@ -178,7 +178,11 @@ class ShopProduct extends \skeeks\cms\models\Core
         //Prices update
         if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue)
         {
+            /**
+             * @var $baseProductPrice ShopProductPrice
+             */
             $baseProductPrice = $this->getBaseProductPrice()->one();
+
             if (!$baseProductPrice)
             {
                 $baseProductPrice                   = new ShopProductPrice([
@@ -187,19 +191,40 @@ class ShopProduct extends \skeeks\cms\models\Core
 
                 $baseProductPrice->type_price_id    = \Yii::$app->shop->baseTypePrice->id;
 
-            }
+                if ($this->_baseProductPriceValue)
+                {
+                    $baseProductPrice->price            = $this->_baseProductPriceValue;
+                }
 
-            if ($this->_baseProductPriceValue)
+                if ($this->_baseProductPriceCurrency)
+                {
+                    $baseProductPrice->currency_code            = $this->_baseProductPriceCurrency;
+                }
+
+                $baseProductPrice->save();
+            } else
             {
-                $baseProductPrice->price            = $this->_baseProductPriceValue;
+                $isChanged = false;
+                //Установка и сохранение только если что то изменилось
+                if ($this->_baseProductPriceValue && $this->_baseProductPriceValue != $baseProductPrice->price)
+                {
+                    $baseProductPrice->price            = $this->_baseProductPriceValue;
+                    $isChanged = true;
+                }
+
+                if ($this->_baseProductPriceCurrency && $this->_baseProductPriceCurrency != $baseProductPrice->currency_code)
+                {
+                    $baseProductPrice->currency_code            = $this->_baseProductPriceCurrency;
+                    $isChanged = true;
+                }
+
+                if ($isChanged)
+                {
+                    $baseProductPrice->save();
+                }
             }
 
-            if ($this->_baseProductPriceCurrency)
-            {
-                $baseProductPrice->currency_code            = $this->_baseProductPriceCurrency;
-            }
 
-            $baseProductPrice->save();
         } else
         {
             if (!$this->baseProductPrice)
