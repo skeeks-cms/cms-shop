@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha23.pre
+1.0.0-alpha23
 -----------------
  * Removing the old price changes
  * Off unnecessary update prices
