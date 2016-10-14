@@ -41,6 +41,8 @@ use yii\widgets\ActiveForm;
  * @property CmsContent $storeContent
  * @property CmsContent $stores
  *
+ * @property array  $notifyEmails
+ *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
  */
@@ -81,6 +83,10 @@ class ShopComponent extends Component
      */
     public $storeCmsContentId;
 
+
+    public $notify_emails;
+
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -97,9 +103,13 @@ class ShopComponent extends Component
     {
         echo $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main'));
 
-            echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
+            //echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
+
+            echo $form->field($this, 'notify_emails')->textarea(['rows' => 3]);
+
             echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
             echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '], CmsContent::getDataForSelect()), ['size' => 1]);
+
 
         echo $form->fieldSetEnd();
     }
@@ -110,17 +120,27 @@ class ShopComponent extends Component
             [['email'], 'string'],
             [['payAfterConfirmation'], 'string'],
             [['storeCmsContentId'], 'integer'],
+            ['notify_emails', 'string'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'email'                 => 'Email',
-            'payAfterConfirmation'  => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval'),
-            'storeCmsContentId'  => \Yii::t('skeeks/shop/app', 'Content storage')
+            'email'                         => 'Email',
+            'payAfterConfirmation'          => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval'),
+            'storeCmsContentId'             => \Yii::t('skeeks/shop/app', 'Content storage'),
+            'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
         ]);
     }
+
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'notify_emails'             => \Yii::t('skeeks/shop/app', 'Enter email addresses, separated by commas, they will come on new orders information'),
+        ]);
+    }
+
 
 
     /**
@@ -360,5 +380,25 @@ class ShopComponent extends Component
         }
 
         return [];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getNotifyEmails()
+    {
+        $emailsAll = [];
+        if ($this->notify_emails)
+        {
+            $emails = explode(",", $this->notify_emails);
+
+            foreach ($emails as $email)
+            {
+                $emailsAll[] = trim($email);
+            }
+        }
+
+        return $emailsAll;
     }
 }

@@ -530,6 +530,23 @@ class ShopOrder extends \skeeks\cms\models\Core
                 $basket->link('order', $order);
             }
 
+            //Notify admins
+            if (\Yii::$app->shop->notifyEmails)
+            {
+                foreach (\Yii::$app->shop->notifyEmails as $email)
+                {
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                    \Yii::$app->mailer->compose('create-order', [
+                        'order'  => $order
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setTo($order->user->email)
+                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app', 'New order') .' #' . $order->id)
+                        ->send();
+                }
+            }
+
             //Письмо тому кто заказывает
             if ($order->user->email && $isNotify)
             {

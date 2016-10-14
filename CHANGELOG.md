@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha24.pre
+-----------------
+ * Added notify emails
+
 1.0.0-alpha23
 -----------------
  * Removing the old price changes
