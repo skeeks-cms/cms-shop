@@ -28,8 +28,8 @@ if ($filter->id)
 
     <?= $form->field($searchModel, 'name')->setVisible(); ?>
 
-    <?= $form->field($searchModel, 'status_code')->listBox(\yii\helpers\ArrayHelper::merge([
+    <?/*= $form->field($searchModel, 'status_code')->listBox(\yii\helpers\ArrayHelper::merge([
         '' => null,
-    ], \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name')), ['size' => 1]); ?>
+    ], \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name')), ['size' => 1]); */?>
 
 <? $form::end(); ?>

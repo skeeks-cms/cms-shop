@@ -14,6 +14,7 @@ use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\cms\shop\models\ShopPersonTypeProperty;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * Class AdminPersonTypePropertyController
@@ -97,6 +98,7 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
                     );
                 } else
                 {
+                    \Yii::error(Json::encode($model->errors), self::className());
                     \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
                 }
             }

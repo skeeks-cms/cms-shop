@@ -79,7 +79,7 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'multiple_cnt', 'version', 'shop_person_type_id'], 'integer'],
             [['name', 'shop_person_type_id'], 'required'],
-            [['component_settings'], 'string'],
+            [['component_settings'], 'safe'],
             [['name', 'component', 'hint'], 'string', 'max' => 255],
             [['is_order_location_delivery', 'is_order_location_tax', 'is_order_postcode', 'is_user_email', 'is_user_phone', 'is_user_username', 'is_user_name', 'is_buyer_name'], 'string', 'max' => 1],
             [['is_order_location_delivery', 'is_order_location_tax', 'is_order_postcode', 'is_user_email', 'is_user_phone', 'is_user_username', 'is_user_name', 'is_buyer_name'], 'default', 'value' => Cms::BOOL_N],

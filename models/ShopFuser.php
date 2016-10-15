@@ -81,6 +81,27 @@ class ShopFuser extends Core implements \JsonSerializable
         return ArrayHelper::merge(parent::behaviors(), []);
     }
 
+    public function loadDefaultValues($skipIfSet = true)
+    {
+        parent::loadDefaultValues($skipIfSet);
+
+        if (!$this->site_id)
+        {
+            $this->site_id = \Yii::$app->cms->site->id;
+        }
+
+        if (!$this->delivery_id)
+        {
+            //$this->delivery_id = \Yii::$app->cms->site->id;
+        }
+
+        if (!$this->person_type_id && \Yii::$app->shop->shopPersonTypes)
+        {
+            $shopPersonType = \Yii::$app->shop->shopPersonTypes[0];
+            $this->person_type_id = $shopPersonType->id;
+        }
+    }
+
     /**
      * @inheritdoc
      */
