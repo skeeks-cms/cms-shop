@@ -106,9 +106,9 @@ JS
 
                 } else
                 {
-                    print_r($this->shopFuser->errors);
-                    print_r($this->shopBuyer->errors);
-                    print_r($this->shopBuyer->relatedPropertiesModel->errors);
+                    /*print_r($this->shopFuser->firstErrors);
+                    print_r($this->shopBuyer->firstErrors);
+                    print_r($this->shopBuyer->relatedPropertiesModel->firstErrors);*/
                 }
             }
         }

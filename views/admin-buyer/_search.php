@@ -28,4 +28,16 @@ if ($filter->id)
 
     <?= $form->field($filter, 'id')->setVisible(); ?>
 
+    <?
+        /**
+         * @var $searchModel \skeeks\cms\models\CmsUser
+         */
+        $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
+        $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::className();
+        $searchRelatedPropertiesModel->initProperties($searchModel->relatedProperties);
+        $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+        $searchRelatedPropertiesModel->search($dataProvider, $searchModel::tableName());
+    ?>
+    <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
+
 <? $form::end(); ?>

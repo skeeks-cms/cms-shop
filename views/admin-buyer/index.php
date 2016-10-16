@@ -12,6 +12,8 @@
 
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
+
+
     <?php echo $this->render('_search', [
         'searchModel'   => $searchModel,
         'dataProvider'  => $dataProvider

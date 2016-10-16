@@ -63,12 +63,18 @@ $shopFuser  = $widget->shopFuser;
 JS
 ); ?>
 
-            <?= $form->field($shopFuser, 'person_type_id')->radioList(
-                \yii\helpers\ArrayHelper::map(\Yii::$app->shop->shopPersonTypes, 'id', 'name'),
-                [
-                    'data-form-reload' => 'true'
-                ]
-            )->label(false); ?>
+    <? if (count(\Yii::$app->shop->shopPersonTypes) <= 1) : ?>
+        <div style="display: none;">
+    <? endif; ?>
+        <?= $form->field($shopFuser, 'person_type_id')->radioList(
+            \yii\helpers\ArrayHelper::map(\Yii::$app->shop->shopPersonTypes, 'id', 'name'),
+            [
+                'data-form-reload' => 'true'
+            ]
+        )->label(false); ?>
+    <? if (count(\Yii::$app->shop->shopPersonTypes) <= 1) : ?>
+        </div>
+    <? endif; ?>
 
             <? foreach ($widget->shopBuyer->relatedProperties as $property) : ?>
                 <?= $property->renderActiveForm($form, $widget->shopBuyer)?>
@@ -83,7 +89,7 @@ JS
                 ); ?>
             <? endif; ?>
 
-            <?= $form->field($widget->shopFuser, 'delivery_id')->label('Способ оплаты')->radioList(
+            <?= $form->field($widget->shopFuser, 'delivery_id')->label('Способ доставки')->radioList(
                 \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'),
                 [
                     'data-form-reload' => 'true'

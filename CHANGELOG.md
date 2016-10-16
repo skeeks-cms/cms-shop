@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha24.pre
 -----------------
+ * Search for additional user properties
  * The possibility of buying without registration
  * Added notify emails
 
