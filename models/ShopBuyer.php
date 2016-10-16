@@ -62,8 +62,13 @@ class ShopBuyer extends RelatedElementModel
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_user_id', 'shop_person_type_id'], 'integer'],
-            [['name', 'cms_user_id', 'shop_person_type_id'], 'required'],
-            [['name'], 'string', 'max' => 255]
+            [['shop_person_type_id'], 'required'],
+            [['name'], 'string', 'max' => 255],
+            [['cms_user_id'], 'default', 'value' => null],
+            [['name'], 'default', 'value' => function(self $model)
+            {
+                return $this->shopPersonType->name;
+            }],
         ];
     }
 

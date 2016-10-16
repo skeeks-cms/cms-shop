@@ -53,27 +53,6 @@ class AdminBuyerController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
-                [
-                    "columns"      => [
-                        'name',
-                        [
-                            'class' => UserColumnData::className(),
-                            'attribute' => 'cms_user_id'
-                        ],
-
-                        [
-                            'class' => DataColumn::className(),
-                            'attribute' => 'shop_person_type_id',
-                            'value' => function(ShopBuyer $model)
-                            {
-                                return $model->shopPersonType->name;
-                            }
-                        ]
-
-                    ],
-                ],
-
                 'create' =>
                 [
                     'callback'         => [$this, 'create'],

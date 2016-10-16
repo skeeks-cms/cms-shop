@@ -387,6 +387,7 @@ return
     "All customer orders"                                       => "Все заказы покупателя",
     "Removing the old price changes"                            => "Удаление старых изменений цен",
     "Email notification address"                                => "Email адреса уведомлений",
+    "Regular customers"                                         => "Постоянные покупатели",
     "Enter email addresses, separated by commas, they will come on new orders information" => "Укажите email адреса через запятую, на них будет приходить информация о новых заказах",
     'Functional "warehouses" is not set in your store. Create new content, and specify it in the general settings of your store as a storage content.'                                           => 'В вашем магазине не настроен функционал "склады". Создайте новый контент, и укажите его в общих настройках вашего магазина в качестве складского контента.',
     'In this section, you can customize what content you can sell on your site.'  => 'В этом разделе вы можете настроить какой контент можно продавать на вашем сайте.',

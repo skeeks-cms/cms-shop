@@ -11,6 +11,8 @@ use skeeks\modules\cms\money\Currency;
 use skeeks\modules\cms\money\Money;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\Url;
+use yii\web\UrlManager;
 
 /**
  * This is the model class for table "{{%shop_order}}".
@@ -88,6 +90,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $version_1c
  * @property integer $version
  * @property string $external_order
+ * @property string $key
  *
  * @property ShopBasket[] $shopBaskets
  * @property CmsContentElement $store
@@ -104,6 +107,8 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property ShopOrderChange[] $shopOrderChanges
  * @property ShopUserTransact[] $shopUserTransacts
+ *
+ * @property string $publicUrl
  *
  * @property Money $money
  * @property Money $moneyVat
@@ -302,7 +307,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'person_type_id', 'payed_at', 'emp_payed_id', 'canceled_at', 'emp_canceled_id', 'status_at', 'emp_status_id', 'allow_delivery_at', 'emp_allow_delivery_id', 'user_id', 'pay_system_id', 'ps_response_at', 'recuring_id', 'pay_voucher_at', 'locked_by', 'locked_at', 'affiliate_id', 'delivery_doc_at', 'deducted_at', 'emp_deducted_id', 'marked_at', 'emp_marked_id', 'store_id', 'responsible_id', 'pay_before_at', 'account_id', 'bill_at', 'version'], 'integer'],
-            [['person_type_id', 'user_id'], 'required'],
+            [['person_type_id'], 'required'],
             [['price_delivery', 'price', 'discount_value', 'ps_sum', 'tax_value', 'sum_paid'], 'number'],
             [['comments'], 'string'],
             [['buyer_id'], 'integer'],
@@ -329,6 +334,9 @@ class ShopOrder extends \skeeks\cms\models\Core
             {
                 return (\Yii::$app->shop->payAfterConfirmation == Cms::BOOL_Y) ? Cms::BOOL_N: Cms::BOOL_Y;
             }],
+
+            [['key'], 'string'],
+            [['key'], 'default', 'value' => \Yii::$app->security->generateRandomString()],
 
             /*['reason_canceled', 'required', 'when' => function($model) {
                 return $model->canceled == Cms::BOOL_Y;
@@ -541,14 +549,14 @@ class ShopOrder extends \skeeks\cms\models\Core
                         'order'  => $order
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                        ->setTo($order->user->email)
+                        ->setTo($email)
                         ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app', 'New order') .' #' . $order->id)
                         ->send();
                 }
             }
 
             //Письмо тому кто заказывает
-            if ($order->user->email && $isNotify)
+            if ($order->user && $order->user->email && $isNotify)
             {
                 \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
@@ -799,5 +807,13 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         $this->price = $money->getAmount() / $money->getCurrency()->getSubUnit();
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPublicUrl()
+    {
+        return Url::to(['/shop/order/finish', 'key' => $this->key]);
     }
 }

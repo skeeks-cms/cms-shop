@@ -7,8 +7,9 @@
  */
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\shop\widgets\checkout\ShopNoAuthCheckoutWidget */
-$widget = $this->context;
-$shopFuser = $widget->shopFuser;
+$widget     = $this->context;
+$shopFuser  = $widget->shopFuser;
+
 ?>
 <?= \yii\helpers\Html::beginTag('div', $widget->options); ?>
     <? if ($widget->shopIsReady) : ?>
@@ -39,7 +40,6 @@ $shopFuser = $widget->shopFuser;
 
             $("[data-form-reload=true] input[type=radio]").on('change', function()
             {
-                console.log('111');
                 self.update();
             });
 
@@ -90,6 +90,12 @@ JS
                 ]
             ); ?>
 
+            <?=
+                \yii\helpers\Html::button('Отправить', [
+                    'class' => 'btn btn-primary',
+                    'type' => 'submit',
+                ])
+            ?>
         <? $form::end(); ?>
     <? else : ?>
         Магазин не настроен

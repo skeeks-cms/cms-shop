@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha24.pre
 -----------------
+ * The possibility of buying without registration
  * Added notify emails
 
 1.0.0-alpha23

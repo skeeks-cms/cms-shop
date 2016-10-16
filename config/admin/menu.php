@@ -94,8 +94,14 @@ return [
                     ],*/
 
                     [
-                        "label"     => \Yii::t('skeeks/shop/app', 'Buyers'),
+                        "label"     => \Yii::t('skeeks/shop/app', 'Regular customers'),
                         "url"       => ["shop/admin-buyer-user"],
+                        "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
+                    ],
+
+                    [
+                        "label"     => \Yii::t('skeeks/shop/app', 'Buyers'),
+                        "url"       => ["shop/admin-buyer"],
                         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
                     ],
 

@@ -28,6 +28,11 @@ class AdminBuyerUserWidget extends Widget
      */
     public function run()
     {
+        if (!$this->user)
+        {
+            return '-';
+        }
+
         return (new AdminImagePreviewWidget([
             'image' => $this->user ? $this->user->image : null,
             'maxWidth' => "25px"

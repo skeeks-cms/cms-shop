@@ -10,6 +10,8 @@ namespace skeeks\cms\shop\widgets\checkout;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopFuser;
+use skeeks\cms\shop\models\ShopOrder;
+use yii\base\Exception;
 use yii\base\Widget;
 
 /**
@@ -32,6 +34,11 @@ class ShopNoAuthCheckoutWidget extends Widget
      */
     public $shopFuser = null;
 
+    /**
+     * @var ShopBuyer
+     */
+    public $shopBuyer = null;
+
     public $shopErrors = [];
 
     public $notSubmitParam = 'sx-not-submit';
@@ -49,6 +56,7 @@ class ShopNoAuthCheckoutWidget extends Widget
     public function run()
     {
         $rr = new RequestResponse();
+        $errors = [];
 
         if ($post = \Yii::$app->request->post())
         {
@@ -56,12 +64,15 @@ class ShopNoAuthCheckoutWidget extends Widget
             $this->shopFuser->save();
         }
 
+        $this->shopBuyer = $this->shopFuser->personType->createModelShopBuyer();
+
         $shopBuyer = $this->shopBuyer;
         if ($shopBuyer)
         {
             if ($post = \Yii::$app->request->post())
             {
                 $this->shopBuyer->load($post);
+                $this->shopBuyer->relatedPropertiesModel->load($post);
             }
         }
 
@@ -69,21 +80,42 @@ class ShopNoAuthCheckoutWidget extends Widget
         {
             if (!\Yii::$app->request->post($this->notSubmitParam))
             {
+                if ($this->shopFuser->validate() && $this->shopBuyer->validate() && $this->shopBuyer->relatedPropertiesModel->validate())
+                {
+                    if ($this->shopBuyer->isNewRecord)
+                    {
+                        if (!$this->shopBuyer->save())
+                        {
+                            throw new Exception('Not save buyer');
+                        }
+                    }
 
+                    if (!$this->shopBuyer->relatedPropertiesModel->save())
+                    {
+                        throw new Exception('Not save buyer data');
+                    }
+
+                    $this->shopFuser->buyer_id = $this->shopBuyer->id;
+
+                    $newOrder = ShopOrder::createOrderByFuser($this->shopFuser);
+                    $orderUrl = $newOrder->publicUrl;
+                    $this->view->registerJs(<<<JS
+location.href='{$orderUrl}';
+JS
+);
+
+                } else
+                {
+                    print_r($this->shopFuser->errors);
+                    print_r($this->shopBuyer->errors);
+                    print_r($this->shopBuyer->relatedPropertiesModel->errors);
+                }
             }
         }
 
         return $this->render($this->viewFile);
     }
 
-    /**
-     * @return \skeeks\cms\shop\models\ShopBuyer
-     * @throws \skeeks\cms\shop\models\InvalidParamException
-     */
-    public function getShopBuyer()
-    {
-        return $this->shopFuser->personType->createModelShopBuyer();
-    }
 
     /**
      * @return bool

@@ -23,6 +23,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class CartController
@@ -111,6 +112,33 @@ class OrderController extends Controller
         return $this->render($this->action->id, [
             'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function actionFinish()
+    {
+        $this->view->title =  \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+
+        return $this->render($this->action->id, [
+            'model'     => ShopOrder::find()->andWhere(['key' => \Yii::$app->request->get('key')])->one()
+        ]);
+    }
+
+    public function actionFinishPay()
+    {
+        /**
+         * @var $shopOrder ShopOrder
+         */
+        $shopOrder = ShopOrder::find()->where(['key' => \Yii::$app->request->get('key')])->one();
+        if (!\Yii::$app->request->get('key') || !$shopOrder)
+        {
+            throw new NotFoundHttpException;
+        }
+
+        return $shopOrder->paySystem->paySystemHandler->paymentResponse($shopOrder);
+
     }
 
     public function actionPay()
