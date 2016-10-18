@@ -72,7 +72,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
      */
     public function paymentResponse(ShopOrder $shopOrder)
     {
-        return \Yii::$app->response->redirect(['shop/yandex-kassa/order-form', 'id' => $shopOrder->id]);;
+        return \Yii::$app->response->redirect(['shop/yandex-kassa/order-form', 'key' => $shopOrder->key]);;
     }
 
     public function renderConfigForm(ActiveForm $activeForm)

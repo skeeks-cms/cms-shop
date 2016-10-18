@@ -6,6 +6,8 @@
  * @date 21.09.2015
  */
 namespace skeeks\cms\shop\controllers;
+use skeeks\cms\shop\models\ShopOrder;
+use yii\base\Exception;
 use yii\web\Controller;
 
 /**
@@ -20,9 +22,30 @@ class YandexKassaController extends Controller
     public $enableCsrfValidation = false;
 
 
+    /**
+     * Payment form
+     *
+     * @throws Exception
+     */
+    public function actionOrderForm()
+    {
+        if (!$key = \Yii::$app->request->get('key'))
+        {
+            throw new Exception('Order not found');
+        }
+
+        if (!$order = ShopOrder::find()->where(['key' => $key])->one())
+        {
+            throw new Exception('Order not found');
+        }
+
+        return $this->render($this->action->id, [
+            'model' => $order
+        ]);
+    }
+
     public function actionCheck()
     {
-        if (\Yii::$app->)
     }
 
     public function actionPayment()
