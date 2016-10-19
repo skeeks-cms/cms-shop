@@ -19,7 +19,6 @@
     "require": {
         "skeeks/cms": "*",
         "skeeks/cms-module-money": "*",
-        "skeeks/cms-kladr": "*",
         "skeeks/cms-measure": "*"
     },
     "autoload": {
