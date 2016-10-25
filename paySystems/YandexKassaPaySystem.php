@@ -24,6 +24,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     public $shop_password;
     public $security_type   = 'MD5';
     public $shop_id;
+    public $scid;
 
     public function getBaseUrl()
     {
@@ -47,6 +48,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
             [['shop_password'], 'string'],
             [['security_type'], 'string'],
             [['shop_id'], 'string'],
+            [['scid'], 'string'],
         ]);
     }
 
@@ -78,8 +80,9 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     public function renderConfigForm(ActiveForm $activeForm)
     {
         echo $activeForm->field($this, 'isLive')->checkbox();
-        echo $activeForm->field($this, 'shop_password');
+        //echo $activeForm->field($this, 'shop_password');
         echo $activeForm->field($this, 'security_type');
         echo $activeForm->field($this, 'shop_id');
+        echo $activeForm->field($this, 'scid');
     }
 }

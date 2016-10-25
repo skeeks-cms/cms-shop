@@ -27,7 +27,7 @@ JS
         <!-- Обязательные поля -->
         <input name="shopId" value="<?php echo $yandexKassa->shop_id; ?>" type="hidden"/>
         <input name="shopArticleId" value="<?php echo $yandexKassa->shop_id; ?>" type="hidden"/>
-        <input name="scid" value="<?php echo $yandexKassa->shop_id; ?>" type="hidden"/>
+        <input name="scid" value="<?php echo $yandexKassa->scid; ?>" type="hidden"/>
         <input name="orderNumber" value="<?php echo $model->id; ?>" type="hidden"/>
         <input name="sum" value="<?= $money->getValue(); ?>" type="hidden">
         <input name="customerNumber" value="<?php echo $model->id; ?>" type="hidden"/>

@@ -44,11 +44,11 @@ class YandexKassaController extends Controller
         ]);
     }
 
-    public function actionCheck()
+    public function actionCheckOrder()
     {
     }
 
-    public function actionPayment()
+    public function actionPaymentAviso()
     {
 
     }
