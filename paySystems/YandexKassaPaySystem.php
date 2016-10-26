@@ -125,7 +125,7 @@ HTML
      */
     public function checkRequestMD5($request) {
 
-        return true;
+        //return true;
 
         $str = $request['action'] . ";" .
             $request['orderSumAmount'] . ";" . $request['orderSumCurrencyPaycash'] . ";" .
