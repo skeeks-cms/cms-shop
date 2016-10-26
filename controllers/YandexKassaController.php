@@ -7,8 +7,11 @@
  */
 namespace skeeks\cms\shop\controllers;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\paySystems\YandexKassaPaySystem;
 use yii\base\Exception;
+use yii\helpers\Json;
 use yii\web\Controller;
+use yii\web\Response;
 
 /**
  * Class YandexKassaController
@@ -46,65 +49,121 @@ class YandexKassaController extends Controller
 
     public function actionCheckOrder()
     {
-    }
+        \Yii::info("POST actionCheckOrder: " . Json::encode(\Yii::$app->request->post()), YandexKassaPaySystem::class);
 
-    public function actionPaymentAviso()
-    {
+        $request = \Yii::$app->request->post();
+        $this->layout = false;
 
-    }
-
-    protected function _checkRequest($request)
-    {
-        if (\Yii::$app == "MD5") {
-            $this->log("Request: " . print_r($request, true));
-            // If the MD5 checking fails, respond with "1" error code
-            if (!$this->checkMD5($request)) {
-                $response = $this->buildResponse($this->action, $request['invoiceId'], 1);
-                $this->sendResponse($response);
-            }
-        } else if ($this->settings->SECURITY_TYPE == "PKCS7") {
-            // Checking for a certificate sign. If the checking fails, respond with "200" error code.
-            if (($request = $this->verifySign()) == null) {
-                $response = $this->buildResponse($this->action, null, 200);
-                $this->sendResponse($response);
-            }
-            $this->log("Request: " . print_r($request, true));
+        if (!$request)
+        {
+            return [];
         }
+
+        try
+        {
+            $shopOrder = $this->getOrder();
+            /**
+             * @var $yandexKassa YandexKassaPaySystem
+             */
+            $yandexKassa = $shopOrder->paySystem->handler;
+            if (!$yandexKassa->checkRequest($request))
+            {
+                $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 1);
+                return $response;
+            }
+
+            /*if (\Yii::$app->request->post('Status') == "CONFIRMED")
+            {
+                \Yii::info("Успешный платеж", YandexKassaPaySystem::class);
+                $shopOrder->processNotePayment();
+            }*/
+
+        } catch (\Exception $e)
+        {
+            \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
+            $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 500, $e->getMessage());
+            return $response;
+        }
+
+        if ($request['orderSumAmount'] < 100) {
+            $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 100, "The amount should be more than 100 rubles.");
+        } else {
+            $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 0);
+        }
+
+        return $response;
     }
 
+
+    public function getOrder()
+    {
+        if (!\Yii::$app->request->post('orderNumber'))
+        {
+            throw new Exception('Некорректный запрос от банка. Не указан orderNumber.');
+        }
+
+        /**
+         * @var $shopOrder ShopOrder
+         */
+        if (!$shopOrder = ShopOrder::findOne(\Yii::$app->request->post('orderNumber')))
+        {
+            throw new Exception('Заказ не найден в базе.');
+        }
+
+        if ($shopOrder->id != \Yii::$app->request->post('orderNumber'))
+        {
+            throw new Exception('Не совпадает номер заказа.');
+        }
+
+        if ((float) $shopOrder->money->getValue() != (float) \Yii::$app->request->post('orderSumAmount'))
+        {
+            throw new Exception('Не совпадает сумма заказа.');
+        }
+
+        return $shopOrder;
+    }
 
     /**
-     * Building XML response.
-     * @param  string $functionName  "checkOrder" or "paymentAviso" string
-     * @param  string $invoiceId     transaction number
-     * @param  string $result_code   result code
-     * @param  string $message       error message. May be null.
-     * @return string                prepared XML response
+     * @return array|string
      */
-    private function buildResponse($functionName, $invoiceId, $result_code, $message = null) {
-        try {
-            $performedDatetime = self::formatDate(new \DateTime());
-            $response = '<?xml version="1.0" encoding="UTF-8"?><' . $functionName . 'Response performedDatetime="' . $performedDatetime .
-                '" code="' . $result_code . '" ' . ($message != null ? 'message="' . $message . '"' : "") . ' invoiceId="' . $invoiceId . '" shopId="' . $this->settings->SHOP_ID . '"/>';
-            return $response;
-        } catch (\Exception $e) {
-            $this->log($e);
-        }
-        return null;
-    }
-
-    protected function log($message)
+    public function actionPaymentAviso()
     {
-        \Yii::info($message, 'YandexKassa');
-    }
+        \Yii::info("POST actionPaymentAviso:" . Json::encode(\Yii::$app->request->post()), YandexKassaPaySystem::class);
 
-    public static function formatDate(\DateTime $date) {
-        $performedDatetime = $date->format("Y-m-d") . "T" . $date->format("H:i:s") . ".000" . $date->format("P");
-        return $performedDatetime;
-    }
 
-    public static function formatDateForMWS(\DateTime $date) {
-        $performedDatetime = $date->format("Y-m-d") . "T" . $date->format("H:i:s") . ".000Z";
-        return $performedDatetime;
+        $request = \Yii::$app->request->post();
+        $this->layout = false;
+
+        if (!$request)
+        {
+            return [];
+        }
+
+        try
+        {
+            $shopOrder = $this->getOrder();
+            /**
+             * @var $yandexKassa YandexKassaPaySystem
+             */
+            $yandexKassa = $shopOrder->paySystem->handler;
+            if (!$yandexKassa->checkRequest($request))
+            {
+                $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 1);
+                return $response;
+            }
+
+        } catch (\Exception $e)
+        {
+            \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
+            $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 500, $e->getMessage());
+            return $response;
+        }
+
+        \Yii::info("Успешный платеж", YandexKassaPaySystem::class);
+        $shopOrder->processNotePayment();
+
+        $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 0);
+
+        return $response;
     }
 }

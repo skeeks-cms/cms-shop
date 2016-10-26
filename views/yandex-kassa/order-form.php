@@ -26,7 +26,6 @@ JS
     <form action="<?php echo $yandexKassa->baseUrl; ?>" method="post" id="yandexKassa">
         <!-- Обязательные поля -->
         <input name="shopId" value="<?php echo $yandexKassa->shop_id; ?>" type="hidden"/>
-        <input name="shopArticleId" value="<?php echo $yandexKassa->shop_id; ?>" type="hidden"/>
         <input name="scid" value="<?php echo $yandexKassa->scid; ?>" type="hidden"/>
         <input name="orderNumber" value="<?php echo $model->id; ?>" type="hidden"/>
         <input name="sum" value="<?= $money->getValue(); ?>" type="hidden">
@@ -36,7 +35,7 @@ JS
         <input name="shopFailURL" value="<?php echo $returnUrl; ?>" type="hidden"/>
         <input name="shopDefaultUrl" value="<?php echo $returnUrl; ?>" type="hidden"/>
 
-        <input name="paymentType" value="AC" type="hidden"/>
+        <input name="paymentType" value="<?= $yandexKassa->payment_type; ?>" type="hidden"/>
         <input type="hidden" name="rebillingOn" value="true">
         <input type="submit" value="Заплатить"/>
     </form>

@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha24.pre
 -----------------
+ * Yandex kassa pay system
  * skeeks/cms-kladr removed
  * Tinkoff pay system
  * Search for additional user properties

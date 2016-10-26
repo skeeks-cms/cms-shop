@@ -812,8 +812,8 @@ class ShopOrder extends \skeeks\cms\models\Core
     /**
      * @return string
      */
-    public function getPublicUrl()
+    public function getPublicUrl($scheme = true)
     {
-        return Url::to(['/shop/order/finish', 'key' => $this->key]);
+        return Url::to(['/shop/order/finish', 'key' => $this->key], $scheme);
     }
 }
