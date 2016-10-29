@@ -250,15 +250,6 @@ JS
     <? endif; ?>
 
     <div id="sx-shop-product-simple">
-        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('skeeks/shop/app', 'Setting prices')
-        ]); ?>
-
-        <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
-        )); ?>
-
-        <?= $form->fieldRadioListBoolean($shopProduct, 'vat_included'); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
                 'content' => \Yii::t('skeeks/shop/app', 'Main prices')
@@ -298,9 +289,11 @@ JS
         </div>
 
         <? if ($productPrices) : ?>
-            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            <?/*= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
                 'content' => \Yii::t('skeeks/shop/app', 'Additional costs')
-            ])?>
+            ])*/?>
+
+            <hr />
 
             <? foreach ($productPrices as $productPrice) : ?>
 
@@ -342,23 +335,70 @@ JS
             'content' => \Yii::t('skeeks/shop/app', 'The number and account')
         ]); ?>
 
-            <?= $form->field($shopProduct, 'quantity')->textInput(); ?>
-            <?= $form->field($shopProduct, 'quantity_reserved')->textInput(); ?>
+        <div class="row">
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'quantity')->textInput(); ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'quantity_reserved')->textInput(); ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->fieldSelect($shopProduct, 'measure_id', \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\measure\models\Measure::find()->all(), 'id', 'name'
+                )); ?>
+            </div>
+            <div class="col-md-3">
+                    <?= $form->field($shopProduct, 'measure_ratio')->textInput(); ?>
+            </div>
+        </div>
 
-            <?= $form->fieldSelect($shopProduct, 'measure_id', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\measure\models\Measure::find()->all(), 'id', 'name'
-            )); ?>
-
-            <?= $form->field($shopProduct, 'measure_ratio')->textInput(); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => \Yii::t('skeeks/shop/app', 'Weight and size')
         ]); ?>
 
-            <?= $form->fieldInputInt($shopProduct, 'weight'); ?>
-            <?= $form->fieldInputInt($shopProduct, 'length'); ?>
-            <?= $form->fieldInputInt($shopProduct, 'width'); ?>
-            <?= $form->fieldInputInt($shopProduct, 'height'); ?>
+        <div class="row">
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'weight')->textInput([
+                    'type' => 'number'
+                ]); ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'length')->textInput([
+                    'type' => 'number'
+                ]); ?>
+
+            </div>
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'width')->textInput([
+                    'type' => 'number'
+                ]); ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->field($shopProduct, 'height')->textInput([
+                    'type' => 'number'
+                ]); ?>
+            </div>
+        </div>
+
+
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \Yii::t('skeeks/shop/app', 'Setting prices')
+        ]); ?>
+
+        <div class="row">
+            <div class="col-md-3">
+                <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
+                )); ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->fieldRadioListBoolean($shopProduct, 'vat_included'); ?>
+            </div>
+        </div>
+
+
+
 
         <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
             'content' => \Yii::t('skeeks/shop/app', 'Options')
