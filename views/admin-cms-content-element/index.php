@@ -44,7 +44,7 @@ $columns = \yii\helpers\ArrayHelper::merge($columns, [
         'attribute' => 'quantity',
         'value' => function(\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement)
         {
-            return $shopCmsContentElement->shopProduct->quantity;
+            return $shopCmsContentElement->shopProduct ? $shopCmsContentElement->shopProduct->quantity : " - ";
         },
     ]
 ])

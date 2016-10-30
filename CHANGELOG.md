@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha25.pre
+-----------------
+ * fix bugs
+
 1.0.0-alpha24
 -----------------
  * Quantity column
