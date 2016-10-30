@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha24.pre
+1.0.0-alpha24
 -----------------
  * Quantity column
  * Changing the data edit form
