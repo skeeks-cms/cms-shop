@@ -1,8 +1,9 @@
 Changelog
 ==============
 
-1.0.0-alpha25.pre
+1.0.0-alpha25
 -----------------
+ * Batch control properties
  * fix bugs
 
 1.0.0-alpha24
