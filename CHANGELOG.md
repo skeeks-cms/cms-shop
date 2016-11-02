@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha26.pre
+-----------------
+ * Unique price key
+
 1.0.0-alpha25
 -----------------
  * Batch control properties
