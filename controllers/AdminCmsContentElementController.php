@@ -585,7 +585,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 'value' => function(\skeeks\cms\models\CmsContentElement $model)
                 {
                     $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
-                    if ($shopProduct)
+                    if ($shopProduct && $shopProduct->baseProductPrice)
                     {
                         return \Yii::$app->money->intlFormatter()->format($shopProduct->baseProductPrice->money);
                     }

@@ -19,6 +19,7 @@ use skeeks\modules\cms\money\Money;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\Json;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "{{%shop_basket}}".
@@ -69,6 +70,7 @@ use yii\helpers\Json;
  *
  * @property StorageFile $image
  * @property string $url
+ * @property string $absoluteUrl
  *
  * @property Currency $currency
  * @property ShopFuser $fuser
@@ -489,6 +491,26 @@ class ShopBasket extends \skeeks\cms\models\Core
         }
 
         return $this->detail_page_url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAbsoluteUrl()
+    {
+        if ($this->product)
+        {
+            //Это предложение у него есть родительский элемент
+            if ($parent = $this->product->cmsContentElement->parentContentElement)
+            {
+                return $parent->absoluteUrl;
+            } else
+            {
+                return $this->product->cmsContentElement->absoluteUrl;
+            }
+        }
+
+        return Url::home() . $this->detail_page_url;
     }
 
     /**

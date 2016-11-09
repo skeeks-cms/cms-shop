@@ -100,6 +100,19 @@ class ShopFuser extends Core implements \JsonSerializable
             $shopPersonType = \Yii::$app->shop->shopPersonTypes[0];
             $this->person_type_id = $shopPersonType->id;
         }
+
+        if (!$this->pay_system_id && $this->paySystems)
+        {
+            $paySystem = $this->paySystems[0];
+            $this->pay_system_id = $paySystem->id;
+        }
+
+        $deliveries = \skeeks\cms\shop\models\ShopDelivery::find()->active()->all();
+        if (!$this->delivery_id && $deliveries)
+        {
+            $delivery = $deliveries[0];
+            $this->delivery_id = $delivery->id;
+        }
     }
 
     /**

@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha26.pre
 -----------------
+ * Update order widget
  * Unique price key
 
 1.0.0-alpha25

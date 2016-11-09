@@ -3,7 +3,7 @@ use skeeks\cms\mail\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $order \skeeks\cms\shop\models\ShopOrder */
-$url = \yii\helpers\Url::to(['/shop/order/view', 'id' => $order->id], true);
+$url = $order->getPublicUrl();
 $order->refresh();
 ?>
 
@@ -11,12 +11,8 @@ $order->refresh();
     <?= \Yii::t('skeeks/shop/app', 'New order'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app', 'in site'); ?> <?= \Yii::$app->cms->appName ?>
 <?= Html::endTag('h1'); ?>
 
-<?= Html::beginTag('p'); ?>
-    <?= \Yii::t('skeeks/shop/app', 'The order #{order_id} created successfully', ['order_id' => $order->id]); ?>.<br>
-    К оплате: <b><?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?></b>
-<?= Html::endTag('p'); ?>
+<?= Html::tag('hr'); ?>
 
-<hr />
 <?= Html::beginTag('h2'); ?>
     Заказ:
 <?= Html::endTag('h2'); ?>
@@ -52,7 +48,7 @@ $order->refresh();
                     {
                         if ($shopBasket->url)
                         {
-                            return Html::a($shopBasket->name, $shopBasket->url, [
+                            return Html::a($shopBasket->name, $shopBasket->absoluteUrl, [
                                 'target' => '_blank',
                                 'titla' => "Смотреть на сайте",
                                 'data-pjax' => 0
@@ -104,6 +100,16 @@ $order->refresh();
             ]
         ])
     ?>
+<?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('h2'); ?>
+    Итого:
+<?= Html::endTag('h2'); ?>
+
+<?= Html::beginTag('p'); ?>
+    Стоимость товаров: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->moneyOriginal)); ?><br />
+    Стоимость доставки: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->moneyDelivery)); ?><br />
+    К оплате: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('h2'); ?>
