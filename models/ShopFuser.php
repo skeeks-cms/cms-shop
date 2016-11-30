@@ -74,6 +74,24 @@ class ShopFuser extends Core implements \JsonSerializable
     }
 
     /**
+     * @param CmsUser $user
+     *
+     * @return ShopFuser
+     */
+    /*static public function getInstanceByUser(CmsUser $user)
+    {
+        $fuser = static::find()->where(['user_id' => $user->id])->one();
+        if (!$fuser)
+        {
+            $fuser = new static();
+            $fuser->user_id = $user->id;
+            $fuser->save();
+        }
+
+        return $fuser;
+    }*/
+
+    /**
      * @inheritdoc
      */
     public function behaviors()

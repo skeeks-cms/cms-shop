@@ -336,12 +336,17 @@ HTML;
 
 
 <?
-    $fuser = \skeeks\cms\shop\models\ShopFuser::find()->where(['user_id' => $model->id])->one();
+    $countBaskets = 0;
+    $fuser = \skeeks\cms\shop\models\ShopFuser::getInstanceByUser($model);
+    if ($fuser)
+    {
+        $countBaskets = \skeeks\cms\shop\models\ShopBasket::find()->where([
+            'fuser_id' => $fuser->id
+        ])->count();
+    }
 ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Basket').' (' . \skeeks\cms\shop\models\ShopBasket::find()->where([
-                'fuser_id' => $fuser->id
-            ])->count() . ")"); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Basket').' (' . $countBaskets . ")"); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('skeeks/shop/app', 'At the moment the user in a basket')
