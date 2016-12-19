@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha26.pre
 -----------------
+ * Updated form elements to bind to sections
  * Fixed bugs
  * Update order widget
  * Unique price key
