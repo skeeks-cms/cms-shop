@@ -67,155 +67,45 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
     <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
 <? endif; ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Main')); ?>
-
-
-    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
-    <div class="row">
-        <div class="col-md-3">
-            <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
-                //'displayFormat' => 'php:d-M-Y H:i:s',
-                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
-        </div>
-        <div class="col-md-3">
-            <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::classname(), [
-                //'displayFormat' => 'php:d-M-Y H:i:s',
-                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
-        </div>
-    </div>
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
-    <?= $form->field($model, 'code')->textInput(['maxlength' => 255])->hint(\Yii::t('skeeks/cms',"This parameter affects the address of the page")); ?>
-    <?= $form->fieldInputInt($model, 'priority'); ?>
-
-    <? if ($contentModel->parent_content_id) : ?>
-
-        <?= $form->field($model, 'parent_content_element_id')->widget(
-            \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className()
-        )->label($contentModel->parentContent->name_one) ?>
-    <? endif; ?>
-
-    <? if ($model->relatedProperties) : ?>
-        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('skeeks/cms', 'Additional properties')
-        ]); ?>
-        <? if ($properties = $model->relatedProperties) : ?>
-            <? foreach ($properties as $property) : ?>
-                <?= $property->renderActiveForm($form, $model)?>
-            <? endforeach; ?>
-        <? endif; ?>
-
-    <? else : ?>
-        <?/*= \Yii::t('skeeks/shop/app','Additional properties are not set')*/?>
-    <? endif; ?>
-<?= $form->fieldSetEnd()?>
 
 
 
 
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-main', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
 
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
 
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
 
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
 
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-seo', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
 
-
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Announcement')); ?>
-    <?= $form->field($model, 'image_id')->widget(
-        \skeeks\cms\widgets\formInputs\StorageImage::className()
-    ); ?>
-
-    <?= $form->field($model, 'description_short')->widget(
-        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
-        [
-            'modelAttributeSaveType' => 'description_short_type',
-        ]);
-    ?>
-
-<?= $form->fieldSetEnd() ?>
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app','In detal')); ?>
-
-    <?= $form->field($model, 'image_full_id')->widget(
-        \skeeks\cms\widgets\formInputs\StorageImage::className()
-    ); ?>
-
-    <?= $form->field($model, 'description_full')->widget(
-        \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
-        [
-            'modelAttributeSaveType' => 'description_full_type',
-        ]);
-    ?>
-
-<?= $form->fieldSetEnd() ?>
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Sections')); ?>
-
-    <? if ($contentModel->root_tree_id) : ?>
-        <? $rootTreeModels = \skeeks\cms\models\CmsTree::findAll($contentModel->root_tree_id); ?>
-    <? else : ?>
-        <? $rootTreeModels = \skeeks\cms\models\CmsTree::findRoots()->joinWith('cmsSiteRelation')->orderBy([\skeeks\cms\models\CmsSite::tableName() . ".priority" => SORT_ASC])->all(); ?>
-    <? endif; ?>
-
-    <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
-        <? if ($rootTreeModels) : ?>
-            <div class="row">
-                <div class="col-lg-8 col-md-12 col-sm-12">
-                    <?= $form->field($model, 'tree_id')->widget(
-                        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
-                        [
-                            'multiple' => false,
-                            'treeWidgetOptions' =>
-                            [
-                                'models' => $rootTreeModels
-                            ]
-                        ]
-                    ); ?>
-                </div>
-            </div>
-        <? endif; ?>
-    <? endif; ?>
-
-    <? if ($rootTreeModels) : ?>
-        <div class="row">
-            <div class="col-lg-8 col-md-12 col-sm-12">
-                <?= $form->field($model, 'treeIds')->widget(
-                    \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
-                    [
-                        'multiple' => true,
-                        'treeWidgetOptions' =>
-                        [
-                            'models' => $rootTreeModels
-                        ]
-                    ]
-                ); ?>
-            </div>
-        </div>
-    <? endif; ?>
-
-<?= $form->fieldSetEnd()?>
-
-
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app','SEO')); ?>
-    <?= $form->field($model, 'meta_title')->textarea(); ?>
-    <?= $form->field($model, 'meta_description')->textarea(); ?>
-    <?= $form->field($model, 'meta_keywords')->textarea(); ?>
-<?= $form->fieldSetEnd() ?>
-
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app','Images/Files')); ?>
-
-    <?= $form->field($model, 'images')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
-    ); ?>
-
-    <?= $form->field($model, 'files')->widget(
-        \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
-    ); ?>
-
-<?= $form->fieldSetEnd()?>
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
 
 
 
