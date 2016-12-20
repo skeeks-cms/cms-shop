@@ -163,10 +163,12 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function _logQuantityUpdate($event)
     {
         if (
-            $this->isAttributeChanged('quantity', false)
-            || $this->isAttributeChanged('quantity_reserved', false)
-            || $this->isAttributeChanged('measure_id', false)
-            || $this->isAttributeChanged('measure_ratio', false)
+            ($this->isAttributeChanged('quantity', false)
+                || $this->isAttributeChanged('quantity_reserved', false)
+                || $this->isAttributeChanged('measure_id', false)
+                || $this->isAttributeChanged('measure_ratio', false) )
+            ||
+            !$this->shopProductQuantityChanges
         )
         {
             $log                            = new ShopProductQuantityChange();
