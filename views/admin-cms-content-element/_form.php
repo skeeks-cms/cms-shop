@@ -221,7 +221,7 @@ JS
                         <p>
                             <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
                                 'productPrice' => $productPrice
-                            ])?>
+                            ]); ?>
                         </p>
                     </div>
                 </div>
@@ -249,6 +249,17 @@ JS
             <div class="col-md-3">
                     <?= $form->field($shopProduct, 'measure_ratio')->textInput(); ?>
             </div>
+
+            <? if ($shopProduct->shopProductQuantityChanges) : ?>
+                <div class="col-md-12" style="margin-bottom: 20px;">
+                    <div style="text-align: center;">
+                        <?= \skeeks\cms\shop\widgets\admin\PropductQuantityChangeAdminWidget::widget([
+                            'product' => $shopProduct
+                        ]); ?>
+                    </div>
+                </div>
+            <? endif; ?>
+
         </div>
 
 

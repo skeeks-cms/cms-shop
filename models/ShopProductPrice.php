@@ -57,7 +57,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
     public function afterSaveEvent()
     {
-        //Îáíîâëåíèå öåíû ó ðîäèòåëüñêîãî ýëåìåíòà åñëè îíà åñòü
+        //ÐžÐ±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ñ†ÐµÐ½Ñ‹ Ñƒ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ð³Ð¾ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° ÐµÑÐ»Ð¸ Ð¾Ð½Ð° ÐµÑÑ‚ÑŒ
         if ($this->product->cmsContentElement->parent_content_element_id)
         {
             $parentProduct = $this->product->cmsContentElement->parentContentElement->shopProduct;
@@ -65,10 +65,10 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             {
                 $minPriceValue      = $this->price;
                 $minPriceCurrency   = $this->currency_code;
-                //Ó ðîäèòåëüñêîãî ýëåìåíòà óæå åñòü ïðåäëîæåíèÿ
+                //Ð£ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ð³Ð¾ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ Ð¿Ñ€ÐµÐ´Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ
                 if ($offers = $parentProduct->tradeOffers)
                 {
-                    //Âñå öåíû îôåðîâ ýòîãî òèïà
+                    //Ð’ÑÐµ Ñ†ÐµÐ½Ñ‹ Ð¾Ñ„ÐµÑ€Ð¾Ð² ÑÑ‚Ð¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð°
                     $minPrice = ShopProductPrice::find()
                         ->where([
                             'product_id' => ArrayHelper::map($offers, 'id', 'id')

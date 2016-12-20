@@ -9,6 +9,7 @@ namespace skeeks\cms\shop\widgets\admin;
 use skeeks\cms\mail\helpers\Html;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget;
+use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use yii\base\Widget;
 
@@ -16,12 +17,12 @@ use yii\base\Widget;
  * Class AdminBuyerUserWidget
  * @package skeeks\cms\shop\widgets
  */
-class PropductPriceChangeAdminWidget extends Widget
+class PropductQuantityChangeAdminWidget extends Widget
 {
     /**
-     * @var ShopProductPrice
+     * @var ShopProduct
      */
-    public $productPrice = null;
+    public $product = null;
 
     /**
      * Подготовка данных для шаблона
@@ -29,7 +30,7 @@ class PropductPriceChangeAdminWidget extends Widget
      */
     public function run()
     {
-        return $this->render('product-price-change', [
+        return $this->render('product-quantity-change', [
             'widget' => $this
         ]);
     }

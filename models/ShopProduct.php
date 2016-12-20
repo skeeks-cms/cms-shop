@@ -62,6 +62,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopProductPrice   $baseProductPrice
  * @property ShopProductPrice   $minProductPrice
  * @property ShopProductPrice[]   $viewProductPrices
+ * @property ShopProductQuantityChange[] $shopProductQuantityChanges
  *
  * @property ShopCmsContentElement   $tradeOffers
  */
@@ -141,6 +142,43 @@ class ShopProduct extends \skeeks\cms\models\Core
         $this->on(self::EVENT_AFTER_UPDATE,    [$this, "_afterSaveEvent"]);
 
         $this->on(self::EVENT_AFTER_INSERT,    [$this, "_updateParentAfterInsert"]);
+
+        $this->on(self::EVENT_AFTER_INSERT,    [$this, "_logQuantityInsert"]);
+        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_logQuantityUpdate"]);
+    }
+
+    public function _logQuantityInsert($event)
+    {
+        $log                            = new ShopProductQuantityChange();
+
+        $log->shop_product_id           = $this->id;
+        $log->quantity                  = $this->quantity;
+        $log->quantity_reserved         = $this->quantity_reserved;
+        $log->measure_id                = $this->measure_id;
+        $log->measure_ratio             = $this->measure_ratio;
+
+        $log->save();
+    }
+
+    public function _logQuantityUpdate($event)
+    {
+        if (
+            $this->isAttributeChanged('quantity', false)
+            || $this->isAttributeChanged('quantity_reserved', false)
+            || $this->isAttributeChanged('measure_id', false)
+            || $this->isAttributeChanged('measure_ratio', false)
+        )
+        {
+            $log                            = new ShopProductQuantityChange();
+
+            $log->shop_product_id           = $this->id;
+            $log->quantity                  = $this->quantity;
+            $log->quantity_reserved         = $this->quantity_reserved;
+            $log->measure_id                = $this->measure_id;
+            $log->measure_ratio             = $this->measure_ratio;
+
+            $log->save();
+        }
     }
 
     /**
@@ -416,6 +454,13 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasMany(ShopViewedProduct::className(), ['shop_product_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductQuantityChanges()
+    {
+        return $this->hasMany(ShopProductQuantityChange::className(), ['shop_product_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
+    }
 
 
     /**

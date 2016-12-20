@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha26.pre
 -----------------
+ * History of the number of products
  * Completion form controls
  * Updated form elements to bind to sections
  * Fixed bugs
