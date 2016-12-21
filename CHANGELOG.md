@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha26.pre
 -----------------
+ * Fixed yandex robokassa
  * Notify goods receipt
  * History of the number of products
  * Completion form controls
