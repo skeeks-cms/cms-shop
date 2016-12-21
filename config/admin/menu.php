@@ -116,6 +116,11 @@ return [
                     ],
 
                     [
+                        "label"     => \Yii::t('skeeks/shop/app', 'Notify on receipt (Email)'),
+                        "url"       => ["shop/admin-quantity-notice-email"],
+                    ],
+
+                    [
                         "label"     => \Yii::t('skeeks/shop/app', 'Viewed products'),
                         "url"       => ["shop/admin-viewed-product"],
                     ]
