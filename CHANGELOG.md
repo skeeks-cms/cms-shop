@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha26.pre
+1.0.0-alpha26
 -----------------
  * Fixed yandex robokassa
  * Notify goods receipt
