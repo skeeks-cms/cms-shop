@@ -83,7 +83,9 @@ class ShopComponent extends Component
      */
     public $storeCmsContentId;
 
-
+    /**
+     * @var Кого уведомить о новых товарах
+     */
     public $notify_emails;
 
 
@@ -401,4 +403,5 @@ class ShopComponent extends Component
 
         return $emailsAll;
     }
+
 }

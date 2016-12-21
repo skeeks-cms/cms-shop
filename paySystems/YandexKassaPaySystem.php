@@ -33,7 +33,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
 
     public function getBaseUrl()
     {
-        return $this->isLive ? 'https://demomoney.yandex.ru/eshop.xml' : 'https://demomoney.yandex.ru/eshop.xml';
+        return $this->isLive ? 'https://money.yandex.ru/eshop.xml' : 'https://demomoney.yandex.ru/eshop.xml';
     }
     /**
      * Можно задать название и описание компонента
@@ -54,6 +54,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
             [['security_type'], 'string'],
             [['shop_id'], 'string'],
             [['scid'], 'string'],
+            [['isLive'], 'boolean'],
             [['payment_type'], 'string'],
         ]);
     }

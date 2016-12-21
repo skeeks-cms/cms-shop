@@ -409,4 +409,7 @@ return
     'The data at the request'                                   => 'Данные по заявке',
     'The request is made from the page'                         => 'Запрос произведен со страницы',
     'Customer name'                                             => 'Имя клиента',
+    'Incoming goods'                                            => 'Поступление товара',
+    "We've got the goods interesting you"                       => 'У нас появился интересующий Вас товар',
+    "Product name"                                              => 'Название товара',
 ];

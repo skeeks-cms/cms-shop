@@ -436,6 +436,70 @@ HTML;
 
 <?= $form->fieldSetEnd(); ?>
 
+
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Notify admission')." (" . \skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
+                'shop_fuser_id' => $fuser->id
+            ])->count() .  ")"); ?>
+
+    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+        'dataProvider' => new \yii\data\ActiveDataProvider([
+            'query' => \skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
+                'shop_fuser_id' => $fuser->id
+            ])->orderBy(['created_at' => SORT_DESC])
+        ]),
+        'columns'           =>
+        [
+            [
+                'class' => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'controller' => \Yii::$app->createController('/shop/admin-quantity-notice-email')[0],
+            ],
+
+            [
+                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+            ],
+
+            'email',
+
+            [
+                'class' => \yii\grid\DataColumn::className(),
+                'format' => 'raw',
+                'label' => \Yii::t('skeeks/shop/app', 'Good'),
+                'value' => function(\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail)
+                {
+                    if ($shopQuantityNoticeEmail->shopProduct)
+                    {
+                        return (new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
+                            'image' => $shopQuantityNoticeEmail->shopProduct->cmsContentElement->image,
+                            'maxWidth' => "25px"
+                        ]))->run() . " " . \yii\helpers\Html::a($shopQuantityNoticeEmail->shopProduct->cmsContentElement->name, $shopQuantityNoticeEmail->shopProduct->cmsContentElement->url, [
+                            'target' => "_blank",
+                            'data-pjax' => 0,
+                        ] ) . "<br /><small>" . \Yii::t('skeeks/shop/app', 'In stock') . ": " . $shopQuantityNoticeEmail->shopProduct->quantity . "</small>";
+                    }
+
+                    return null;
+                },
+            ],
+
+            'name',
+
+            [
+                'class' => \skeeks\cms\grid\BooleanColumn::class,
+                'attribute' => 'is_notified',
+                'trueValue' => true,
+                'falseValue' => false,
+            ],
+
+            [
+                'class' => \skeeks\cms\grid\DateTimeColumnData::class,
+                'attribute' => 'notified_at',
+            ],
+
+        ]
+    ]); ?>
+
+<?= $form->fieldSetEnd(); ?>
+
 <div style="text-align: center; margin-top: 15px;">
     <a data-pjax="0" href="<?= \skeeks\cms\helpers\UrlHelper::construct(['/shop/admin-order/create-order', 'cmsUserId' => $model->id])->enableAdmin()->toString()?>" class="btn btn-primary">Создать заказ</a>
 </div>

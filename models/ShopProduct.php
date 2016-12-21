@@ -63,6 +63,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopProductPrice   $minProductPrice
  * @property ShopProductPrice[]   $viewProductPrices
  * @property ShopProductQuantityChange[] $shopProductQuantityChanges
+ * @property ShopQuantityNoticeEmail[] $shopQuantityNoticeEmails
  *
  * @property ShopCmsContentElement   $tradeOffers
  */
@@ -462,6 +463,14 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getShopProductQuantityChanges()
     {
         return $this->hasMany(ShopProductQuantityChange::className(), ['shop_product_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopQuantityNoticeEmails()
+    {
+        return $this->hasMany(ShopQuantityNoticeEmail::className(), ['shop_product_id' => 'id']);
     }
 
 
