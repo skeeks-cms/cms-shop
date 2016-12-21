@@ -22,6 +22,7 @@ class NotifyProductEmailModalWidget extends Modal
     public $product_id      = null;
     public $form_options    = [];
     public $view_file       = '';
+    public $success_modal_id= '';
 
     /**
      * @var ActiveFormAjaxSubmit
@@ -46,6 +47,7 @@ class NotifyProductEmailModalWidget extends Modal
 
         parent::init();
 
+        $success_modal_id = $this->success_modal_id;
         $this->form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin(ArrayHelper::merge([
         'action'                    => \yii\helpers\Url::to('/shop/notify/add'),
         'validationUrl'             => \yii\helpers\Url::to('/shop/notify/add-validate'),
@@ -55,6 +57,8 @@ class NotifyProductEmailModalWidget extends Modal
         'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
             {
+                var success_modal = "{$success_modal_id}";
+
                 var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
                     'blockerSelector' : $('#' + jForm.attr('id')).closest('.modal-body'),
                     'enableBlocker' : true,
@@ -65,6 +69,15 @@ class NotifyProductEmailModalWidget extends Modal
                     _.delay(function()
                     {
                         $('div').modal('hide');
+
+                        _.delay(function()
+                        {
+                            if (success_modal)
+                            {
+                                $('#' + success_modal).modal('show');
+                            }
+                        }, 300);
+
                     }, 300);
                 });
 
@@ -99,8 +112,10 @@ JS
                 $formId = $this->id . "-form";
                 $this->footer = '
                     <button class="btn btn-primary" onclick="$(\'#' . $formId . '\').submit(); return false;">' . \Yii::t('skeeks/shop/app', 'Submit') . '</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">' . \Yii::t('skeeks/shop/app', 'Close') . '</button>
+
                 ';
+
+                /*<button type="button" class="btn btn-default" data-dismiss="modal">' . \Yii::t('skeeks/shop/app', 'Close') . '</button>*/
             }
 
             echo $this->render('notify-modal-email');
