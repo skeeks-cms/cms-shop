@@ -85,7 +85,8 @@ class YandexKassaController extends Controller
             return $response;
         }
 
-        if ($request['orderSumAmount'] < 100) {
+        if ($request['orderSumAmount'] < 1) {
+            \Yii::error("The amount should be more than 1 rubles.", YandexKassaPaySystem::class);
             $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 100, "The amount should be more than 100 rubles.");
         } else {
             $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 0);

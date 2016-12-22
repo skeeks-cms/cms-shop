@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha27.pre
+-----------------
+ * Fixed Yandex Kassa
+
 1.0.0-alpha26
 -----------------
  * Fixed yandex robokassa

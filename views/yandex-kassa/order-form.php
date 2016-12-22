@@ -31,8 +31,8 @@ JS
         <input name="sum" value="<?= $money->getValue(); ?>" type="hidden">
         <input name="customerNumber" value="<?php echo $model->id; ?>" type="hidden"/>
 
-        <input name="shopSuccessURL" value="<?php echo $returnUrl; ?>" type="hidden"/>
-        <input name="shopFailURL" value="<?php echo $returnUrl; ?>" type="hidden"/>
+        <input name="shopSuccessUrl" value="<?php echo $returnUrl; ?>" type="hidden"/>
+        <input name="shopFailUrl" value="<?php echo $returnUrl; ?>" type="hidden"/>
         <input name="shopDefaultUrl" value="<?php echo $returnUrl; ?>" type="hidden"/>
 
         <input name="paymentType" value="<?= $yandexKassa->payment_type; ?>" type="hidden"/>

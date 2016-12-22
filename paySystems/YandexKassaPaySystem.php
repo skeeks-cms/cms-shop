@@ -154,6 +154,7 @@ HTML
         {
             if ($this->checkRequestMD5($request))
             {
+                \Yii::info("checkRequest true", YandexKassaPaySystem::class);
                 return true;
             }
         } else if ($yandexKassa->security_type == YandexKassaPaySystem::SECURITY_PKCS7)
@@ -162,6 +163,7 @@ HTML
             \Yii::error('SECURITY_PKCS7 — todo:: not realized', YandexKassaPaySystem::class);
         }
 
+        \Yii::info("checkRequest true", YandexKassaPaySystem::class);
         return true;
     }
 
