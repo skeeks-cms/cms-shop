@@ -71,7 +71,7 @@
                 'label' => \Yii::t('skeeks/shop/app', 'User'),
                 'value' => function(\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail)
                 {
-                    return $shopQuantityNoticeEmail->shopFuser->user ? ( new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopQuantityNoticeEmail->shopFuser->user]) )->run() : \Yii::t('skeeks/shop/app', 'Not authorized');
+                    return ( $shopQuantityNoticeEmail->shopFuser && $shopQuantityNoticeEmail->shopFuser->user ? ( new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopQuantityNoticeEmail->shopFuser->user]) )->run() : \Yii::t('skeeks/shop/app', 'Not authorized') );
                 },
             ],
         ]

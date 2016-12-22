@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha27.pre
 -----------------
+ * Fixed quantity notify
  * Fixed Yandex Kassa
 
 1.0.0-alpha26
