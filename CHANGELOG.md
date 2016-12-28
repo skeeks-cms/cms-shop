@@ -3,7 +3,8 @@ Changelog
 
 1.0.0-alpha27.pre
 -----------------
- * deprecated
+ * ShopCartStepsWidget removed -> \skeeks\cms\shopCartStepsWidget\ShopCartStepsWidget
+ * Deprecated
  * Fixed quantity notify
  * Fixed Yandex Kassa
 
