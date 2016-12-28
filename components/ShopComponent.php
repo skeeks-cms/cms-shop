@@ -322,6 +322,7 @@ class ShopComponent extends Component
     }
 
     /**
+     * TODO: is @deprecated remove it!
      * @return array
      */
     public function getArrayForSelectElement()

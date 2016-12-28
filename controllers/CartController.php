@@ -69,15 +69,6 @@ class CartController extends Controller
         $this->view->title = \Yii::t('skeeks/shop/app', 'Checkout').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
-    /**
-     * @return string
-     */
-    public function actionPayment()
-    {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'Choose payment method').' | '.\Yii::t('skeeks/shop/app', 'Shop');
-        return $this->render($this->action->id);
-    }
-
 
 
 
@@ -572,5 +563,21 @@ class CartController extends Controller
                 return $rr->ajaxValidateForm($model);
             }
         }
+    }
+
+
+
+
+
+
+    /**
+     * TODO: @deprecated
+     *
+     * @return string
+     */
+    public function actionPayment()
+    {
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Choose payment method').' | '.\Yii::t('skeeks/shop/app', 'Shop');
+        return $this->render($this->action->id);
     }
 }

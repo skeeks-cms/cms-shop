@@ -46,7 +46,7 @@ $widget     = $this->context;
                     </a>
                     <a href="#" class="remove_item" data-toggle="tooltip" title=""
                        onclick="sx.Shop.removeBasket('<?= $shopBasket->id; ?>'); return false;"
-                       data-original-title="Удалить позицию"><i class="fa fa-times"></i></a>
+                       data-original-title="Удалить позицию"><i class="glyphicon glyphicon-remove"></i></a>
 
                     <div class="total_price">
                         <span><?= \Yii::$app->money->convertAndFormat($shopBasket->money->multiply($shopBasket->quantity)); ?></span>
@@ -153,9 +153,9 @@ $this->registerCss(<<<CSS
 	border:rgba(0,0,0,0.1) 1px solid;
 	padding-top:0;
 	margin-top:10px;
-	height:30px;
-	line-height:26px;
-	font-size:18px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 15px;
 	text-decoration:none;
 	color:rgba(0,0,0,0.5);
 	border-radius:3px;
