@@ -412,4 +412,9 @@ return
     'Incoming goods'                                            => 'Поступление товара',
     "We've got the goods interesting you"                       => 'У нас появился интересующий Вас товар',
     "Product name"                                              => 'Название товара',
+    "Discount coupons"                                          => 'Скидочные купоны',
+    "Coupon"                                                    => 'Купон',
+    "Active from"                                               => 'Активность от',
+    "Active to"                                                 => 'Активность до',
+    "Maximum number of performances"                            => 'Максимальное число использований',
 ];
