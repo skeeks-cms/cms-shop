@@ -46,6 +46,33 @@ function shopProductsMenu()
     return $result;
 };
 
+function shopPersonTypes()
+{
+    $result = [];
+
+    if ($personTypes = \skeeks\cms\shop\models\ShopPersonType::find()->all())
+    {
+        /**
+         * @var $personType \skeeks\cms\shop\models\ShopPersonType
+         */
+        foreach ($personTypes as $personType)
+        {
+            $itemData = [
+                'label'     => $personType->name,
+                'url'   => ["shop/admin-buyer", "person_type_id" => $personType->id],
+                'activeCallback' => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                {
+                    return (bool) (\Yii::$app->controller->uniqueId == 'shop/admin-buyer' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->url, 'person_type_id') == \Yii::$app->request->get('person_type_id'));
+                }
+            ];
+
+            $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItem($itemData);
+        }
+    }
+
+    return $result;
+};
+
 return [
 
     'shop' =>
@@ -101,8 +128,10 @@ return [
 
                     [
                         "label"     => \Yii::t('skeeks/shop/app', 'Buyers'),
-                        "url"       => ["shop/admin-buyer"],
+                        //"url"       => ["shop/admin-buyer"],
                         "img"       => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
+
+                        'items' => shopPersonTypes()
                     ],
 
                     [

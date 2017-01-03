@@ -24,20 +24,26 @@ if ($filter->id)
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
         'action' => '/' . \Yii::$app->request->pathInfo,
+        'namespace' => \Yii::$app->controller->uniqueId . ($shopPersonType ? "-{$shopPersonType->id}" : "")
     ]); ?>
 
     <?= $form->field($filter, 'id')->setVisible(); ?>
 
-    <?
-        /**
-         * @var $searchModel \skeeks\cms\models\CmsUser
-         */
-        $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-        $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::className();
-        $searchRelatedPropertiesModel->initProperties($searchModel->relatedProperties);
-        $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
-        $searchRelatedPropertiesModel->search($dataProvider, $searchModel::tableName());
-    ?>
-    <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
+    <? if ($shopPersonType) : ?>
+        <?= \yii\helpers\Html::hiddenInput('person_type_id', $shopPersonType->id) ?>
+
+        <?
+            $shopBuyer = new \skeeks\cms\shop\models\ShopBuyer();
+            $shopBuyer->shop_person_type_id = $shopPersonType->id;
+
+            $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
+            $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::className();
+            $searchRelatedPropertiesModel->initProperties($shopBuyer->relatedProperties);
+            $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+            $searchRelatedPropertiesModel->search($dataProvider, $shopBuyer::tableName());
+        ?>
+        <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
+    <? endif; ?>
+
 
 <? $form::end(); ?>

@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha27.pre
 -----------------
+ * Search and filtering the profiles of buyers
  * ShopNoAuthCheckoutWidget removed -> \skeeks\cms\shopCheckoutSimple\ShopCheckoutSimpleWidget
  * ShopCartStepsWidget removed -> \skeeks\cms\shopCartStepsWidget\ShopCartStepsWidget
  * Deprecated

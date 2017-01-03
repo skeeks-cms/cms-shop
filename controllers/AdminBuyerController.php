@@ -28,6 +28,8 @@ use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
 /**
+ * @property ShopPersonType $personType
+ *
  * Class AdminTaxController
  * @package skeeks\cms\shop\controllers
  */
@@ -44,6 +46,52 @@ class AdminBuyerController extends AdminModelEditorController
         $this->modelClassName           = ShopBuyer::className();
 
         parent::init();
+    }
+
+    /**
+     * @var ShopPersonType
+     */
+    protected $_personType = null;
+
+    public function getPersonType()
+    {
+        if ($this->_personType !== null)
+        {
+            return $this->_personType;
+        }
+
+        if ($person_type_id = \Yii::$app->request->get('person_type_id'))
+        {
+            $this->_personType = \skeeks\cms\shop\models\ShopPersonType::findOne($person_type_id);
+        }
+
+        return $this->_personType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPermissionName()
+    {
+        $permissionName = parent::getPermissionName();
+
+        if ($this->personType)
+        {
+            return $permissionName . "-" . $this->personType->id;
+        }
+
+        return $permissionName;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getIndexUrl()
+    {
+        return UrlHelper::construct($this->id . '/' . $this->action->id, [
+            'person_type_id' => \Yii::$app->request->get('person_type_id')
+        ])->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
     }
 
     /**
