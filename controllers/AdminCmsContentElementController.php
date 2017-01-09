@@ -539,7 +539,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     {
                         foreach ($model->cmsContentElementTrees as $contentElementTree)
                         {
-                            $site = $contentElementTree->tree->root->site;
+                            $site = $contentElementTree->tree->site;
                             $result[] = "<small><a href='{$contentElementTree->tree->url}' target='_blank' data-pjax='0'>[{$site->name}]/.../{$contentElementTree->tree->name}</a></small>";
 
                         }
