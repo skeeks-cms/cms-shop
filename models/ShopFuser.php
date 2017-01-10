@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\models;
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -50,13 +51,17 @@ use yii\helpers\ArrayHelper;
  * @property integer $buyer_id
  * @property integer $pay_system_id
  * @property integer $store_id
+ * @property array $discount_coupons
  *
  * @property Money $money
  * @property Money $moneyOriginal
  * @property Money $moneyVat
  * @property Money $moneyDiscount
  * @property Money $moneyDelivery
+ * @property ShopDiscountCoupon[] $discountCoupons
+ *
  * @property int $weight
+ * @property bool $isEmpty
  *
  * @property ShopTypePrice $buyTypePrices
  * @property ShopTypePrice $viewTypePrices
@@ -74,29 +79,17 @@ class ShopFuser extends Core implements \JsonSerializable
     }
 
     /**
-     * @param CmsUser $user
-     *
-     * @return ShopFuser
-     */
-    /*static public function getInstanceByUser(CmsUser $user)
-    {
-        $fuser = static::find()->where(['user_id' => $user->id])->one();
-        if (!$fuser)
-        {
-            $fuser = new static();
-            $fuser->user_id = $user->id;
-            $fuser->save();
-        }
-
-        return $fuser;
-    }*/
-
-    /**
      * @inheritdoc
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), []);
+        return ArrayHelper::merge(parent::behaviors(), [
+            Implode::class =>
+            [
+                'class' => Implode::class,
+                'fields' => ['discount_coupons']
+            ]
+        ]);
     }
 
     public function loadDefaultValues($skipIfSet = true)
@@ -147,6 +140,7 @@ class ShopFuser extends Core implements \JsonSerializable
             'buyer_id'          => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
             'pay_system_id'     => \Yii::t('skeeks/shop/app', 'Payment system'),
             'store_id'          => \Yii::t('skeeks/shop/app', 'Warehouse/Store'),
+            'discount_coupons'  => \Yii::t('skeeks/shop/app', 'Discount coupons'),
         ]);
     }
 
@@ -183,6 +177,7 @@ class ShopFuser extends Core implements \JsonSerializable
         return array_merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'user_id', 'person_type_id', 'site_id', 'store_id'], 'integer'],
             [['additional'], 'string'],
+            [['discount_coupons'], 'safe'],
             [['delivery_id'], 'integer'],
             [['user_id'], 'unique'],
             [['buyer_id'], 'integer'],
@@ -318,6 +313,19 @@ class ShopFuser extends Core implements \JsonSerializable
     public function getStore()
     {
         return $this->hasOne(CmsContentElement::className(), ['id' => 'store_id']);
+    }
+
+    /**
+     * @return ShopDiscountCoupon[]
+     */
+    public function getDiscountCoupons()
+    {
+        if (!$this->discount_coupons)
+        {
+            return [];
+        }
+
+        return ShopDiscountCoupon::find()->where(['id' => $this->discount_coupons])->all();
     }
 
 
@@ -500,6 +508,14 @@ class ShopFuser extends Core implements \JsonSerializable
     public function isEmpty()
     {
         return (bool) $this->countShopBaskets == 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsEmpty()
+    {
+        return $this->isEmpty();
     }
 
 
