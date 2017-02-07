@@ -389,6 +389,15 @@ class ShopBasket extends \skeeks\cms\models\Core
              ->all();
 
 
+        if ($this->fuser && $this->fuser->discountCoupons)
+        {
+            foreach ($this->fuser->discountCoupons as $discountCoupon)
+            {
+                $shopDiscounts[] = $discountCoupon->shopDiscount;
+            }
+        }
+
+
         $price = $this->price;
         $this->discount_price = 0;
         $this->discount_value = "";

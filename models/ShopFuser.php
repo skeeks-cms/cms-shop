@@ -608,4 +608,21 @@ class ShopFuser extends Core implements \JsonSerializable
         return $result;
     }
 
+
+    /**
+     * @return $this
+     */
+    public function recalculate()
+    {
+        if ($this->shopBaskets)
+        {
+            foreach ($this->shopBaskets as $shopBasket)
+            {
+                $shopBasket->recalculate()->save();
+            }
+        }
+
+        return $this;
+    }
+
 }

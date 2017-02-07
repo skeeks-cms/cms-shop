@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha27.pre
 -----------------
+ * Recalculate() cart
  * Removed \skeeks\cms\widgets\rbac\PermissionForRoles
  * Fixed bugs
  * Search and filtering the profiles of buyers
