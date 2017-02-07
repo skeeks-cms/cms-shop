@@ -57,7 +57,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
             'permissionName'            => $model->permissionName,
-            'defaultRoles'              => [],
+            'notClosedRoles'            => [],
             'permissionDescription'     => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates').": '{$model->name}'",
             'label'                     => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
         ]); ?>
