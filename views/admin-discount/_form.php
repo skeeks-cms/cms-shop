@@ -55,8 +55,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         <?=  \Yii::t('skeeks/shop/app', '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
         <? \yii\bootstrap\Alert::end()?>
 
-        <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+        <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
             'permissionName'            => $model->permissionName,
+            'defaultRoles'              => [],
             'permissionDescription'     => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates').": '{$model->name}'",
             'label'                     => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
         ]); ?>

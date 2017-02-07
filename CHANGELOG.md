@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha27.pre
 -----------------
+ * Removed \skeeks\cms\widgets\rbac\PermissionForRoles
  * Fixed bugs
  * Search and filtering the profiles of buyers
  * ShopNoAuthCheckoutWidget removed -> \skeeks\cms\shopCheckoutSimple\ShopCheckoutSimpleWidget
