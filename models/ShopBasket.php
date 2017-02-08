@@ -284,7 +284,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoney()
     {
-        return Money::fromString($this->price, $this->currency_code);
+        return Money::fromString((string) $this->price, $this->currency_code);
     }
 
     /**
@@ -306,7 +306,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyDiscount()
     {
-        return Money::fromString($this->discount_price, $this->currency_code);
+        return Money::fromString((string) $this->discount_price, $this->currency_code);
     }
 
 

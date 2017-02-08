@@ -417,4 +417,10 @@ return
     "Active from"                                               => 'Активность от',
     "Active to"                                                 => 'Активность до',
     "Maximum number of performances"                            => 'Максимальное число использований',
+
+
+
+    "Not set coupon code"                                       => 'Не указан код купона',
+    "Coupon does not exist or is not active"                    => 'Купон не существует или не активен',
+    "Coupon successfully installed"                             => 'Купон успешно установлен',
 ];
