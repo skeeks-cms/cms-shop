@@ -108,6 +108,7 @@ use yii\web\UrlManager;
  * @property ShopOrderChange[] $shopOrderChanges
  * @property ShopUserTransact[] $shopUserTransacts
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
+ * @property ShopDiscountCoupon[] $discountCoupons
  *
  * @property string $publicUrl
  *
@@ -703,6 +704,15 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getShopOrder2discountCoupons()
     {
         return $this->hasMany(ShopOrder2discountCoupon::className(), ['order_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDiscountCoupons()
+    {
+        return $this->hasMany(ShopDiscountCoupon::className(), ['id' => 'discount_coupon_id'])
+                ->via('shopOrder2discountCoupons');
     }
 
 

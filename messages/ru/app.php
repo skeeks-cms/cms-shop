@@ -99,6 +99,7 @@ return
     'days'                                                      => 'Дням',
     'Deactivate'                                                => 'Деактивировать',
     'Default'                                                   => 'По умолчанию',
+    'Delivery'                                                  => 'Доставка',
     'Delivery service'                                          => 'Служба доставки',
     'Delivery services'                                         => 'Службы доставки',
     'Deposit money'                                             => 'Внесение денег',

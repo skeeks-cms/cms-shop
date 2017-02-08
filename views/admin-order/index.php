@@ -111,6 +111,7 @@ CSS
                 'attribute'     => "user_id",
                 'label'         => \Yii::t('skeeks/shop/app', 'Buyer'),
                 'format'        => "raw",
+                'filter'        => false,
                 'value'         => function(\skeeks\cms\shop\models\ShopOrder $shopOrder)
                 {
                    return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrder->user]))->run();
@@ -134,7 +135,7 @@ CSS
                                     'target' => '_blank',
                                     'data-pjax' => '0'
                                 ]) . <<<HTML
-— $shopBasket->quantity $shopBasket->measure_name
+ — $shopBasket->quantity $shopBasket->measure_name
 HTML;
 
                         }
@@ -146,11 +147,62 @@ HTML;
             [
                 'class'         => \yii\grid\DataColumn::className(),
                 'format'        => 'raw',
+                'filter'        => false,
                 'attribute'     => 'price',
                 'label'         => \Yii::t('skeeks/shop/app', 'Sum'),
                 'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
                 {
-                    return \Yii::$app->money->intlFormatter()->format($model->money);
+                    $result = \Yii::$app->money->intlFormatter()->format($model->money);
+
+
+                    if ($model->moneyDiscount->getValue())
+                    {
+                        $result .= "<br /><small>" .  \Yii::t('skeeks/shop/app', 'Discount') . ":" . \Yii::$app->money->intlFormatter()->format($model->moneyDiscount)  . "</small>";
+                    }
+
+                    if ($model->moneyDelivery->getValue())
+                    {
+                        $result .= "<br /><small>" .  \Yii::t('skeeks/shop/app', 'Delivery') . ":" . \Yii::$app->money->intlFormatter()->format($model->moneyDelivery)  . "</small>";
+                    }
+
+                    return $result;
+                },
+            ],
+
+            [
+                'class'         => \yii\grid\DataColumn::className(),
+                'format'        => 'raw',
+                'filter'        => false,
+                'visible'        => false,
+                'attribute'     => 'discount_value',
+                'label'         => \Yii::t('skeeks/shop/app', 'Discount'),
+                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
+                {
+                    return \Yii::$app->money->intlFormatter()->format($model->moneyDiscount);
+                },
+            ],
+
+            [
+                'class'         => \yii\grid\DataColumn::className(),
+                'format'        => 'raw',
+                'filter'        => false,
+                //'visible'        => false,
+                'label'         => \Yii::t('skeeks/shop/app', 'Discount coupons'),
+                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
+                {
+                    $result = null;
+
+                    if ($model->discountCoupons)
+                    {
+                        foreach ($model->discountCoupons as $discountCoupon)
+                        {
+                            $result .= \yii\helpers\Html::a($discountCoupon->coupon, '#', [
+                                'title' => $discountCoupon->description . " " . $discountCoupon->shopDiscount->name
+                            ]);
+                        }
+                    }
+
+                    return $result;
                 },
             ],
 
