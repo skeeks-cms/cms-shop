@@ -26,6 +26,7 @@ use Yii;
  *
  * @property CmsUser $cmsUser
  * @property ShopDiscount $shopDiscount
+ * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
  */
 class ShopDiscountCoupon extends \skeeks\cms\models\Core
 {
@@ -99,6 +100,15 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
     public function getShopDiscount()
     {
         return $this->hasOne(ShopDiscount::className(), ['id' => 'shop_discount_id']);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrder2discountCoupons()
+    {
+        return $this->hasMany(ShopOrder2discountCoupon::className(), ['discount_coupon_id' => 'id']);
     }
 
 }

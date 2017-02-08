@@ -57,6 +57,10 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
                 'attribute'     => 'active',
                 'class'         => \skeeks\cms\grid\BooleanColumn::className(),
             ],
+            [
+                'attribute'     => 'last_discount',
+                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+            ],
 
             [
                 'attribute'     => 'active_from',
@@ -69,11 +73,13 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedByColumn::className()
+                'class' => \skeeks\cms\grid\UpdatedByColumn::className(),
+                'visible' => false
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className()
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
+                'visible' => false
             ],
 
             'priority'

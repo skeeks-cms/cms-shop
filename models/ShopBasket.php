@@ -389,6 +389,17 @@ class ShopBasket extends \skeeks\cms\models\Core
              ->all();
 
 
+        if ($shopDiscounts)
+        {
+            foreach ($shopDiscounts as $key => $shopDiscount)
+            {
+                if (!\Yii::$app->user->can($shopDiscount->permissionName))
+                {
+                    unset($shopDiscounts[$key]);
+                }
+            }
+        }
+
         if ($this->fuser && $this->fuser->discountCoupons)
         {
             foreach ($this->fuser->discountCoupons as $discountCoupon)
@@ -410,24 +421,21 @@ class ShopBasket extends \skeeks\cms\models\Core
 
             foreach ($shopDiscounts as $shopDiscount)
             {
-                if (\Yii::$app->user->can($shopDiscount->permissionName))
+                $discountNames[] = $shopDiscount->name;
+
+                if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P)
                 {
-                    $discountNames[] = $shopDiscount->name;
+                    $percent = $shopDiscount->value / 100;
+                    $discountPercent = $discountPercent + $percent;
 
-                    if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P)
+                    $discountPrice          = $price * $percent;
+                    $this->price            = $this->price - $discountPrice;
+                    $this->discount_price   = $this->discount_price + $discountPrice;
+
+                    //Нужно остановится и не применять другие скидки
+                    if ($shopDiscount->last_discount === Cms::BOOL_Y)
                     {
-                        $percent = $shopDiscount->value / 100;
-                        $discountPercent = $discountPercent + $percent;
-
-                        $discountPrice          = $price * $percent;
-                        $this->price            = $this->price - $discountPrice;
-                        $this->discount_price   = $this->discount_price + $discountPrice;
-
-                        //Нужно остановится и не применять другие скидки
-                        if ($shopDiscount->last_discount === Cms::BOOL_Y)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }

@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha27.pre
 -----------------
+ * Implementation of the coupon codes
  * Update js api
  * Recalculate() cart
  * Removed \skeeks\cms\widgets\rbac\PermissionForRoles

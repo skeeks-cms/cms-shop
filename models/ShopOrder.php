@@ -107,6 +107,7 @@ use yii\web\UrlManager;
  *
  * @property ShopOrderChange[] $shopOrderChanges
  * @property ShopUserTransact[] $shopUserTransacts
+ * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
  *
  * @property string $publicUrl
  *
@@ -538,6 +539,24 @@ class ShopOrder extends \skeeks\cms\models\Core
                 $basket->link('order', $order);
             }
 
+            if ($shopFuser->discountCoupons)
+            {
+                foreach ($shopFuser->discountCoupons as $discountCoupon)
+                {
+                    $shopOrder2discountCoupon = new ShopOrder2discountCoupon();
+                    $shopOrder2discountCoupon->order_id = $order->id;
+                    $shopOrder2discountCoupon->discount_coupon_id = $discountCoupon->id;
+
+                    if (!$shopOrder2discountCoupon->save())
+                    {
+                        print_r($shopOrder2discountCoupon->errors);die;
+                    }
+                }
+
+                $shopFuser->discount_coupons = [];
+                $shopFuser->save(false);
+            }
+
             //Notify admins
             if (\Yii::$app->shop->notifyEmails)
             {
@@ -677,6 +696,15 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopOrderChange::className(), ['shop_order_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrder2discountCoupons()
+    {
+        return $this->hasMany(ShopOrder2discountCoupon::className(), ['order_id' => 'id']);
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
