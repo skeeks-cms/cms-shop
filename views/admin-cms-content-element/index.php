@@ -13,7 +13,19 @@
 $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);
 
 $sortAttr = $dataProvider->getSort()->attributes;
-$dataProvider->query->joinWith('shopProduct as sp');
+$query = $dataProvider->query;
+
+$query->joinWith('shopProduct as sp');
+$query->with('image');
+$query->with('cmsTree');
+$query->with('cmsContentElementTrees');
+$query->with('cmsContent');
+$query->with('relatedProperties');
+$query->with('relatedElementProperties');
+$query->with('cmsContentElementTrees.tree');
+
+$query->with('shopProduct');
+$query->with('shopProduct.baseProductPrice');
 
 $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr, [
     'quantity' => [
@@ -47,7 +59,8 @@ $columns = \yii\helpers\ArrayHelper::merge($columns, [
             return $shopCmsContentElement->shopProduct ? $shopCmsContentElement->shopProduct->quantity : " - ";
         },
     ]
-])
+]);
+
 ?>
 
 <? $pjax = \yii\widgets\Pjax::begin(); ?>

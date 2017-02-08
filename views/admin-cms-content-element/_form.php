@@ -373,7 +373,7 @@ JS
 
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/shop/app','Access')); ?>
-            <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+            <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
                 'permissionName'                => $model->permissionName,
                 'permissionDescription'         => \Yii::t('skeeks/shop/app','Access to this member') . ': ' . $model->name,
                 'label'                         => \Yii::t('skeeks/shop/app','Access to this member'),

@@ -62,27 +62,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 'index' =>
                 [
                     "modelSearchClassName" => ShopCmsContentElementSearch::className(),
-
-                    "dataProviderCallback" => function(ActiveDataProvider $dataProvider)
-                    {
-                        $query = $dataProvider->query;
-                        /**
-                         * @var ActiveQuery $query
-                         */
-                        //$query->select(['app_company.*', 'count(`app_company_officer_user`.`id`) as countOfficer']);
-
-                        $query->with('image');
-                        $query->with('cmsTree');
-                        $query->with('cmsContentElementTrees');
-                        $query->with('cmsContent');
-                        $query->with('relatedProperties');
-                        $query->with('relatedElementProperties');
-                        $query->with('cmsContentElementTrees.tree');
-
-                        $query->with('shopProduct');
-                        $query->with('shopProduct.baseProductPrice');
-                        //$query->with('shopProduct.minProductPrice');
-                    },
                 ],
 
                 "create" =>
@@ -560,7 +539,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     {
                         foreach ($model->cmsContentElementTrees as $contentElementTree)
                         {
-                            $site = $contentElementTree->tree->root->site;
+                            $site = $contentElementTree->tree->site;
                             $result[] = "<small><a href='{$contentElementTree->tree->url}' target='_blank' data-pjax='0'>[{$site->name}]/.../{$contentElementTree->tree->name}</a></small>";
 
                         }

@@ -192,10 +192,10 @@ return [
                                 "url"       => ["shop/admin-discount"],
                             ],
 
-                            /*[
-                                "label"     => \Yii::t('skeeks/shop/app', 'Coupons discount goods'),
-                                "url"       => ["shop/admin-cupon"],
-                            ]*/
+                            [
+                                "label"     => \Yii::t('skeeks/shop/app', 'Discount coupons'),
+                                "url"       => ["shop/admin-discount-coupon"],
+                            ]
 
                         ]
                     ],

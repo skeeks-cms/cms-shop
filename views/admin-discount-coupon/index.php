@@ -8,7 +8,6 @@
 /* @var $this yii\web\View */
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::TYPE_DEFAULT]);
 ?>
 
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
@@ -23,20 +22,24 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
         'filterModel'       => $searchModel,
         'pjax'              => $pjax,
         'adminController'   => \Yii::$app->controller,
-        'settingsData' =>
-        [
-            'order' => SORT_ASC,
-            'orderBy' => "priority",
-        ],
 
         'columns'           =>
         [
             'id',
 
             [
-                'attribute' => 'name',
+                'attribute' => 'coupon',
             ],
 
+            [
+                'filter'        => (array) \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopDiscount::find()->all(), 'id', 'name'),
+                'attribute'     => 'shop_discount_id',
+                'value'         => function(\skeeks\cms\shop\models\ShopDiscountCoupon $shopDiscountCoupon)
+                {
+                    return $shopDiscountCoupon->shopDiscount->name;
+                },
+            ],
+/*
             [
                 'attribute'     => 'value',
                 'class'         => \yii\grid\DataColumn::className(),
@@ -51,14 +54,10 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
                         return \Yii::$app->money->intlFormatter()->format($money);
                     }
                 },
-            ],
+            ],*/
 
             [
-                'attribute'     => 'active',
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-            ],
-            [
-                'attribute'     => 'last_discount',
+                'attribute'     => 'is_active',
                 'class'         => \skeeks\cms\grid\BooleanColumn::className(),
             ],
 
@@ -73,16 +72,8 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedByColumn::className(),
-                'visible' => false
+                'class' => \skeeks\cms\grid\CreatedAtColumn::className()
             ],
-
-            [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
-                'visible' => false
-            ],
-
-            'priority'
         ]
     ]); ?>
 

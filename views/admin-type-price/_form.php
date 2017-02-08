@@ -35,13 +35,13 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             <?= \skeeks\cms\shop\Module::t('app', '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
             <? \yii\bootstrap\Alert::end()?>
 
-            <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+            <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
                 'permissionName'            => $model->viewPermissionName,
                 'permissionDescription'     => \skeeks\cms\shop\Module::t('app', 'Rights to see the prices')." '{$model->name}'",
                 'label'                     => \skeeks\cms\shop\Module::t('app', 'User Groups that have permission to view this type of price'),
             ]); ?>
 
-            <?= \skeeks\cms\widgets\rbac\PermissionForRoles::widget([
+            <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
                 'permissionName'            => $model->buyPermissionName,
                 'permissionDescription'     => \skeeks\cms\shop\Module::t('app', 'The right to buy at a price').": '{$model->name}'",
                 'label'                     => \skeeks\cms\shop\Module::t('app', 'Group of users who have the right to purchase on this type of price'),

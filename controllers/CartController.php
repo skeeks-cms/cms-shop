@@ -14,6 +14,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\forms\SignupForm;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopBuyer;
+use skeeks\cms\shop\models\ShopDiscountCoupon;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopPersonType;
@@ -44,8 +45,14 @@ class CartController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'shop-person-type-validate'  => ['post'],
-                    'shop-person-type-submit'    => ['post'],
+                    'add-product'               => ['post'],
+                    'remove-basket'             => ['post'],
+                    'clear'                     => ['post'],
+                    'update-basket'             => ['post'],
+                    'shop-person-type-validate' => ['post'],
+                    'shop-person-type-submit'   => ['post'],
+                    'remove-discount-coupon'    => ['post'],
+                    'add-discount-coupon'       => ['post'],
                 ],
             ],
         ]);
@@ -74,7 +81,7 @@ class CartController extends Controller
 
 
     /**
-     * Добавление продукта в корзину.
+     * Adding a product to the cart.
      *
      * @return array|\yii\web\Response
      */
@@ -145,7 +152,12 @@ class CartController extends Controller
         }
     }
 
-
+    /**
+     * Removing the basket position
+     *
+     * @return array|\yii\web\Response
+     * @throws \Exception
+     */
     public function actionRemoveBasket()
     {
         $rr = new RequestResponse();
@@ -173,7 +185,12 @@ class CartController extends Controller
         }
     }
 
-
+    /**
+     * Cleaning the entire basket
+     *
+     * @return array|\yii\web\Response
+     * @throws \Exception
+     */
     public function actionClear()
     {
         $rr = new RequestResponse();
@@ -197,6 +214,12 @@ class CartController extends Controller
         }
     }
 
+    /**
+     * Updating the positions of the basket, such as changing the number of
+     *
+     * @return array|\yii\web\Response
+     * @throws \Exception
+     */
     public function actionUpdateBasket()
     {
         $rr = new RequestResponse();
@@ -251,7 +274,123 @@ class CartController extends Controller
         }
     }
 
+    /**
+     * @return array|\yii\web\Response
+     */
+    public function actionRemoveDiscountCoupon()
+    {
+        $rr = new RequestResponse();
 
+        if ($rr->isRequestAjaxPost())
+        {
+            $couponId         = \Yii::$app->request->post('coupon_id');
+
+            try
+            {
+                if (!$couponId)
+                {
+                    throw new Exception(\Yii::t('skeeks/shop/app', 'Not set coupon code'));
+                }
+
+
+                $newValue = [];
+                $discount_coupons = \Yii::$app->shop->shopFuser->discount_coupons;
+                if ($discount_coupons)
+                {
+                    foreach ($discount_coupons as $id)
+                    {
+                        if ($id != $couponId)
+                        {
+                            $newValue[] = $id;
+                        }
+                    }
+                }
+                \Yii::$app->shop->shopFuser->discount_coupons = $newValue;
+                \Yii::$app->shop->shopFuser->save();
+                \Yii::$app->shop->shopFuser->recalculate()->save();
+
+                $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+                $rr->success = true;
+                $rr->message = \Yii::t('skeeks/shop/app', 'Your coupon was successfully deleted');
+
+            } catch (\Exception $e)
+            {
+                $rr->message = $e->getMessage();
+                return (array) $rr;
+            }
+
+            return (array) $rr;
+        } else
+        {
+            return $this->goBack();
+        }
+    }
+
+    /**
+     * Adding a product to the cart.
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionAddDiscountCoupon()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost())
+        {
+            $couponCode         = \Yii::$app->request->post('coupon_code');
+
+            try
+            {
+                if (!$couponCode)
+                {
+                    throw new Exception(\Yii::t('skeeks/shop/app', 'Not set coupon code'));
+                }
+
+                $applyShopDiscountCoupon = ShopDiscountCoupon::find()
+                        ->where(['coupon' => $couponCode])
+                        //->andWhere(['is_active' => 1])
+                        ->one();
+
+                if (!$applyShopDiscountCoupon) {
+                    throw new Exception(\Yii::t('skeeks/shop/app', 'Coupon does not exist or is not active'));
+                }
+
+                $discount_coupons = \Yii::$app->shop->shopFuser->discount_coupons;
+                $discount_coupons[] = $applyShopDiscountCoupon->id;
+                array_unique($discount_coupons);
+                \Yii::$app->shop->shopFuser->discount_coupons = $discount_coupons;
+                \Yii::$app->shop->shopFuser->save();
+                \Yii::$app->shop->shopFuser->recalculate()->save();
+
+                $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+                $rr->success = true;
+                $rr->message = \Yii::t('skeeks/shop/app', 'Coupon successfully installed');
+
+            } catch (\Exception $e)
+            {
+                $rr->message = $e->getMessage();
+                return (array) $rr;
+            }
+
+            return (array) $rr;
+        } else
+        {
+            return $this->goBack();
+        }
+    }
+
+
+
+
+
+
+
+
+    /**
+     * TODO: @deprecated
+     * Обнолвение данных покупателя
+     * @return array|\yii\web\Response
+     */
     public function actionUpdateBuyer()
     {
         $rr = new RequestResponse();
@@ -305,6 +444,8 @@ class CartController extends Controller
 
 
     /**
+     * TODO: @deprecated
+     *
      * Создание заказа
      * @return array|\yii\web\Response
      */
@@ -382,6 +523,8 @@ class CartController extends Controller
 
 
     /**
+     * TODO: @deprecated
+     *
      * Процесс отправки формы
      * @return array
      */
@@ -526,6 +669,8 @@ class CartController extends Controller
     }
 
     /**
+     * TODO: @deprecated
+     *
      * Валидация данных с формы
      * @return array
      */
