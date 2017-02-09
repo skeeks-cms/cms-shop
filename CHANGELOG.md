@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha27-2
+-----------------
+ * Admin view table
+
 1.0.0-alpha27
 -----------------
  * Implementation of the coupon codes
