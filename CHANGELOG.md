@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-1.0.0-alpha27.pre
+1.0.0-alpha27
 -----------------
  * Implementation of the coupon codes
  * Update js api
