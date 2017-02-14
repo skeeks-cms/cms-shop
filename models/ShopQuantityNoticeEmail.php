@@ -53,7 +53,7 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
             [['email'], 'email'],
             [['shop_fuser_id'], 'default', 'value' => function()
             {
-                return \Yii::$app->shop->shopFuser->id;
+                return \Yii::$app->shop->shopFuser ? \Yii::$app->shop->shopFuser->id : null;
             }],
         ]);
     }

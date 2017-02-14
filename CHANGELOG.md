@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+1.0.0-alpha28.pre
+-----------------
+ * Fixed notify emails
+
 1.0.0-alpha27-2
 -----------------
  * Admin view table

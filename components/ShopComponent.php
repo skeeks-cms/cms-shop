@@ -218,7 +218,7 @@ class ShopComponent extends Component
         }
 
         //Если пользователь гость
-        if (\Yii::$app->user->isGuest)
+        if (isset(\Yii::$app->user) && \Yii::$app->user && \Yii::$app->user->isGuest)
         {
             //Проверка сессии
             if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName))
@@ -242,6 +242,11 @@ class ShopComponent extends Component
             }
         } else
         {
+            if (\Yii::$app instanceof \yii\console\Application)
+            {
+                return null;
+            }
+
             $this->_shopFuser = ShopFuser::find()->where(['user_id' => \Yii::$app->user->identity->id])->one();
             //Если у авторизовнного пользоывателя уже есть пользователь корзины
             if ($this->_shopFuser)
