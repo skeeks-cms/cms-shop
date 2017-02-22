@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 
 /**
@@ -18,6 +19,7 @@ use skeeks\cms\models\CmsContentElement;
  * @property ShopCmsContentElement[] $childrenContentElements
  *
  * @property ShopCmsContentElement[] $tradeOffers
+ * @property ShopContent $shopContent
  *
  * Class ShopCmsContentElement
  * @package skeeks\cms\shop\models
@@ -108,8 +110,26 @@ class ShopCmsContentElement extends CmsContentElement
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getShopContent()
+    {
+        return $this->hasOne(ShopContent::className(), ['content_id' => 'content_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getTradeOffers()
     {
-        return $this->hasMany(static::className(), ['parent_content_element_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+        $childContentId = null;
+        if ($this->shopContent)
+        {
+            $childContentId = $this->shopContent->children_content_id;
+        }
+
+        return $this
+                ->hasMany(static::className(), ['parent_content_element_id' => 'id'])
+                ->andWhere(["content_id" => $childContentId])
+                ->orderBy(['priority' => SORT_ASC])
+            ;
     }
 }
