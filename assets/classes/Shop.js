@@ -354,14 +354,6 @@
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-clear-cart'));
 
-            additional = additional || {};
-
-            ajax.setData({
-                'basket_id'     : Number(basket_id),
-                'quantity'      : Number(quantity),
-                'additional'    : additional,
-            });
-
             ajax.onBeforeSend(function(e, data)
             {
                 self.trigger('beforeClearCart');

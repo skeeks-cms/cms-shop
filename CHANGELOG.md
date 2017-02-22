@@ -3,6 +3,7 @@ Changelog
 
 1.0.0-alpha28.pre
 -----------------
+ * Fixed js
  * Fixed notify emails
 
 1.0.0-alpha27-2
