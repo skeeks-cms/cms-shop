@@ -520,7 +520,6 @@ class ShopProduct extends \skeeks\cms\models\Core
             $shopFuser = \Yii::$app->shop->shopFuser;
         }
 
-
         return $this->hasOne(ShopProductPrice::className(), [
             'product_id' => 'id'
         ])
@@ -578,8 +577,6 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->_baseProductPriceCurrency;
     }
 
-
-
     private $_baseProductPriceValue     = null;
     private $_baseProductPriceCurrency  = null;
 
@@ -618,16 +615,19 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getTradeOffers()
     {
-        return $this->hasMany(ShopCmsContentElement::className(), ['parent_content_element_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+        $childContentId = null;
+        if ($this->cmsContentElement && $this->cmsContentElement->shopContent)
+        {
+            $childContentId = $this->cmsContentElement->shopContent->children_content_id;
+        }
+
+        return $this
+                ->hasMany(ShopCmsContentElement::className(), ['parent_content_element_id' => 'id'])
+                ->andWhere(["content_id" => $childContentId])
+                //->joinWith('cmsContentElement')
+                //->joinWith('cmsContentElement.cmsContent')
+                //->andWhere(["content.id" => $this->cmsContentElement->cmsContent->parent_content_id])
+                ->orderBy(['priority' => SORT_ASC]);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProductOffers()
-    {
-       /* return $this->hasMany(static::className(), ['parent_content_element_id' => 'id'])
-            ->via('cmsContentElement')
-            ->orderBy(['priority' => SORT_ASC]);*/
-    }
 }
