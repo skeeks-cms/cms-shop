@@ -148,6 +148,26 @@ HTML;
                 'class'         => \yii\grid\DataColumn::className(),
                 'format'        => 'raw',
                 'filter'        => false,
+                'visible'        => true,
+                'attribute'     => '',
+                'label'         => 'Смотреть',
+                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
+                {
+                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->publicUrl, [
+                        'target' => '_blank',
+                        'title' => \Yii::t('skeeks/cms','Watch to site (opens new window)'),
+                        'data-pjax' => '0',
+                        'class' => 'btn btn-default btn-sm'
+                    ]);
+                },
+            ],
+
+
+            [
+                'class'         => \yii\grid\DataColumn::className(),
+                'format'        => 'raw',
+                'filter'        => false,
+                'visible'        => false,
                 'attribute'     => 'price',
                 'label'         => \Yii::t('skeeks/shop/app', 'Sum'),
                 'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
@@ -169,11 +189,12 @@ HTML;
                 },
             ],
 
+
             [
                 'class'         => \yii\grid\DataColumn::className(),
                 'format'        => 'raw',
                 'filter'        => false,
-                'visible'        => false,
+                'visible'       => false,
                 'attribute'     => 'discount_value',
                 'label'         => \Yii::t('skeeks/shop/app', 'Discount'),
                 'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)

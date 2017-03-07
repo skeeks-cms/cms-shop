@@ -1,8 +1,9 @@
 Changelog
 ==============
 
-1.0.0-alpha28.pre
+1.0.0-alpha28
 -----------------
+ * Admin shop public order url
  * Fixed trade offers
  * Fixed js
  * Fixed notify emails
