@@ -35,11 +35,11 @@ function shopProductsMenu()
         {
             $itemData = [
                 'label'     => $content->name,
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+                "img"       => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
                 'url'   => ["shop/admin-cms-content-element", "content_id" => $content->id],
             ];
 
-            $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItemCmsConent($itemData);
+            $result[] = $itemData;
         }
     }
 
@@ -60,13 +60,13 @@ function shopPersonTypes()
             $itemData = [
                 'label'     => $personType->name,
                 'url'   => ["shop/admin-buyer", "person_type_id" => $personType->id],
-                'activeCallback' => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                'activeCallback' => function($adminMenuItem)
                 {
                     return (bool) (\Yii::$app->controller->uniqueId == 'shop/admin-buyer' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->url, 'person_type_id') == \Yii::$app->request->get('person_type_id'));
                 }
             ];
 
-            $result[] = new \skeeks\cms\modules\admin\helpers\AdminMenuItem($itemData);
+            $result[] = $itemData;
         }
     }
 
@@ -103,7 +103,7 @@ return [
             [
                 'priority'  => 0,
                 'label'     => \Yii::t('skeeks/shop/app', 'Goods'),
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/icon.article.png'],
+                "img"       => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
 
                 'items' => shopProductsMenu()
             ],
@@ -250,15 +250,15 @@ return [
 
             [
                 "label"     => \Yii::t('skeeks/shop/app', 'Settings'),
-                "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
+                "img"       => ['skeeks\cms\assets\CmsAsset', 'images/icons/settings.png'],
 
                 'items' =>
                 [
                     [
                         "label" => \Yii::t('skeeks/shop/app', 'Main settings'),
                         "url"   => ["cms/admin-settings", "component" => 'skeeks\cms\shop\components\ShopComponent'],
-                        "img"       => ['\skeeks\cms\modules\admin\assets\AdminAsset', 'images/icons/settings.png'],
-                        "activeCallback"       => function(\skeeks\cms\modules\admin\helpers\AdminMenuItem $adminMenuItem)
+                        "img"       => ['skeeks\cms\assets\CmsAsset', 'images/icons/settings.png'],
+                        "activeCallback"       => function($adminMenuItem)
                         {
                             return (bool) (\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
                         },
