@@ -9,6 +9,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\paySystems\YandexKassaPaySystem;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Response;
@@ -19,49 +20,30 @@ use yii\web\Response;
  */
 class YandexKassaController extends Controller
 {
-    /**
-     * @inheritdoc
-     */
-    public $enableCsrfValidation = false;
-
-
-    /**
-     * Payment form
-     *
-     * @throws Exception
-     */
-    public function actionOrderForm()
+    public function beforeAction($action)
     {
-        if (!$key = \Yii::$app->request->get('key'))
+        if (in_array($action->id, ['check-order', 'payment-aviso']))
         {
-            throw new Exception('Order not found');
+            $this->enableCsrfValidation = false;
+            \Yii::$app->response->setStatusCode(200);
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+            \Yii::$app->response->headers->set('Content-Type', 'application/xml; charset=utf-8');
+            $this->layout = false;
+
+            \Yii::info("{$action->id} URL: " . \Yii::$app->request->absoluteUrl, YandexKassaPaySystem::class);
         }
 
-        if (!$order = ShopOrder::find()->where(['key' => $key])->one())
-        {
-            throw new Exception('Order not found');
-        }
-
-        return $this->render($this->action->id, [
-            'model' => $order
-        ]);
+        return parent::beforeAction($action);
     }
 
     public function actionCheckOrder()
     {
-        \Yii::info("POST actionCheckOrder: " . Json::encode(\Yii::$app->request->post()), YandexKassaPaySystem::class);
-
-        $request = \Yii::$app->request->post();
-        $this->layout = false;
-
-        if (!$request)
-        {
-            return [];
-        }
+        $request = YandexKassaPaySystem::getRequest();
+        \Yii::info("{$action->id} REQUEST2: " . print_r($request, true), YandexKassaPaySystem::class);
 
         try
         {
-            $shopOrder = $this->getOrder();
+            $shopOrder = $this->getOrder($request);
             /**
              * @var $yandexKassa YandexKassaPaySystem
              */
@@ -92,36 +74,8 @@ class YandexKassaController extends Controller
             $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 0);
         }
 
+        \Yii::info("Response actionCheckOrder: " . $response, YandexKassaPaySystem::class);
         return $response;
-    }
-
-
-    public function getOrder()
-    {
-        if (!\Yii::$app->request->post('orderNumber'))
-        {
-            throw new Exception('Некорректный запрос от банка. Не указан orderNumber.');
-        }
-
-        /**
-         * @var $shopOrder ShopOrder
-         */
-        if (!$shopOrder = ShopOrder::findOne(\Yii::$app->request->post('orderNumber')))
-        {
-            throw new Exception('Заказ не найден в базе.');
-        }
-
-        if ($shopOrder->id != \Yii::$app->request->post('orderNumber'))
-        {
-            throw new Exception('Не совпадает номер заказа.');
-        }
-
-        if ((float) $shopOrder->money->getValue() != (float) \Yii::$app->request->post('orderSumAmount'))
-        {
-            throw new Exception('Не совпадает сумма заказа.');
-        }
-
-        return $shopOrder;
     }
 
     /**
@@ -129,20 +83,12 @@ class YandexKassaController extends Controller
      */
     public function actionPaymentAviso()
     {
-        \Yii::info("POST actionPaymentAviso:" . Json::encode(\Yii::$app->request->post()), YandexKassaPaySystem::class);
-
-
-        $request = \Yii::$app->request->post();
-        $this->layout = false;
-
-        if (!$request)
-        {
-            return [];
-        }
-
+        $request = YandexKassaPaySystem::getRequest();
+        \Yii::info("{$this->action->id} REQUEST2: " . print_r($request, true), YandexKassaPaySystem::class);
+        
         try
         {
-            $shopOrder = $this->getOrder();
+            $shopOrder = $this->getOrder($request);
             /**
              * @var $yandexKassa YandexKassaPaySystem
              */
@@ -165,6 +111,63 @@ class YandexKassaController extends Controller
 
         $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 0);
 
+        \Yii::info("Response actionCheckOrder: " . $response, YandexKassaPaySystem::class);
+
         return $response;
+    }
+
+
+    
+
+    
+    /**
+     * Payment form
+     *
+     * @throws Exception
+     */
+    public function actionOrderForm()
+    {
+        if (!$key = \Yii::$app->request->get('key'))
+        {
+            throw new Exception('Order not found');
+        }
+
+        if (!$order = ShopOrder::find()->where(['key' => $key])->one())
+        {
+            throw new Exception('Order not found');
+        }
+
+        return $this->render($this->action->id, [
+            'model' => $order
+        ]);
+    }
+
+    
+    public function getOrder($request)
+    {
+        if (!$orderNumber = ArrayHelper::getValue($request, 'orderNumber'))
+        {
+            throw new Exception('Некорректный запрос от банка. Не указан orderNumber.');
+        }
+
+        /**
+         * @var $shopOrder ShopOrder
+         */
+        if (!$shopOrder = ShopOrder::findOne($orderNumber))
+        {
+            throw new Exception('Заказ не найден в базе.');
+        }
+
+        if ($shopOrder->id != $orderNumber)
+        {
+            throw new Exception('Не совпадает номер заказа.');
+        }
+
+        if ((float) $shopOrder->money->getValue() != (float) ArrayHelper::getValue($request, 'orderSumAmount'))
+        {
+            throw new Exception('Не совпадает сумма заказа.');
+        }
+
+        return $shopOrder;
     }
 }

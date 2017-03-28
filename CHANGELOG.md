@@ -1,8 +1,9 @@
 Changelog
 ==============
 
-1.0.0-alpha28
+1.0.0-alpha28.pre
 -----------------
+ * Updated yandex kassa
  * Admin shop public order url
  * Fixed trade offers
  * Fixed js
