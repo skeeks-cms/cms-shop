@@ -20,7 +20,11 @@ $order->refresh();
     <?=
         \yii\grid\GridView::widget([
             'dataProvider'    => new \yii\data\ArrayDataProvider([
-                'allModels' => $order->shopBaskets
+                'allModels' => $order->shopBaskets,
+                'pagination' => [
+                    'pageSize' => 200,
+                    'pageSizeLimit' => [1, 200],
+                ],
             ]),
             'layout' => "{items}",
             'columns'   =>
@@ -107,7 +111,7 @@ $order->refresh();
 <?= Html::endTag('h2'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Стоимость товаров: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->moneyOriginal)); ?><br />
+    Стоимость товаров: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->basketsMoney)); ?><br />
     Стоимость доставки: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->moneyDelivery)); ?><br />
     К оплате: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?>
 <?= Html::endTag('p'); ?>

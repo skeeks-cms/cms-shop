@@ -5,6 +5,8 @@ Changelog
 1.0.0-alpha28.pre
 -----------------
  * Updated yandex kassa
+ * Fixed order email total items
+ * Add migration kladr
  * Admin shop public order url
  * Fixed trade offers
  * Fixed js
