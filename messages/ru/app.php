@@ -9,6 +9,7 @@ return
 [
     'Access to this member'                                     => 'Доступ к этому элементу',
     'Account customer'                                          => 'Счета покупателей',
+    'Order successfully paid'                                   => 'Заказ успешно оплачен',
     'Accounts'                                                  => 'Счета',
     'Activate'                                                  => 'Активировать',
     'Active'                                                    => 'Активность',

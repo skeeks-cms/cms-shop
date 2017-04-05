@@ -4,6 +4,7 @@ Changelog
 
 1.0.0-alpha28.pre
 -----------------
+ * Notify emails
  * Updated yandex kassa
  * Fixed order email total items
  * Add migration kladr

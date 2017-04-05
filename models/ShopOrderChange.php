@@ -46,6 +46,7 @@ class ShopOrderChange extends \skeeks\cms\models\Core
             self::ORDER_STATUS_CHANGED      => \Yii::t('skeeks/shop/app', 'Changing status'),
             self::ORDER_ALLOW_PAYMENT       => \Yii::t('skeeks/shop/app', 'Payment agreement'),
             self::ORDER_ALLOW_DELIVERY      => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
+            self::ORDER_PAYED               => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
         ];
     }
 
@@ -57,6 +58,7 @@ class ShopOrderChange extends \skeeks\cms\models\Core
             self::ORDER_STATUS_CHANGED      => \Yii::t('skeeks/shop/app', 'Status changed to: "{status}"'),
             self::ORDER_ALLOW_PAYMENT       => \Yii::t('skeeks/shop/app', 'Payment agreement'),
             self::ORDER_ALLOW_DELIVERY      => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
+            self::ORDER_PAYED      => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
         ];
     }
 

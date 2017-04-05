@@ -92,6 +92,9 @@ use yii\web\UrlManager;
  * @property string $external_order
  * @property string $key
  *
+ *
+ * @property string $email read-only
+ *
  * @property ShopBasket[] $shopBaskets
  * @property CmsContentElement $store
  * @property ShopAffiliate $affiliate
@@ -181,7 +184,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
 
             //Письмо тому кто заказывает
-            if ($this->user->email)
+            if ($this->email)
             {
                 try
                 {
@@ -191,13 +194,52 @@ class ShopOrder extends \skeeks\cms\models\Core
                         'order'  => $this
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                        ->setTo($this->user->email)
+                        ->setTo($this->email)
                         ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Change order status'). ' #' . $this->id)
                         ->send();
 
                 } catch (\Exception $e)
                 {
                     \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                }
+
+            }
+        }
+
+        if ($this->isAttributeChanged('payed') && $this->payed == Cms::BOOL_Y)
+        {
+            ( new ShopOrderChange([
+                'type'          => ShopOrderChange::ORDER_PAYED,
+                'shop_order_id' => $this->id,
+            ]) )->save();
+
+
+            $emails = \Yii::$app->shop->notifyEmails;
+            if ($this->email)
+            {
+                $emails[] = $this->email;
+            }
+
+            if ($emails)
+            {
+                foreach ($emails as $email)
+                {
+                    try
+                    {
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                        \Yii::$app->mailer->compose('order-payed', [
+                            'order'  => $this
+                        ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                            ->setTo($email)
+                            ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app', 'Order successfully paid'). ' #' . $this->id)
+                            ->send();
+
+                    } catch (\Exception $e)
+                    {
+                        \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                    }
                 }
 
             }
@@ -212,7 +254,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
 
             //Письмо тому кто заказывает
-            if ($this->user->email)
+            if ($this->email)
             {
                 try
                 {
@@ -223,7 +265,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                         'order'  => $this
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                        ->setTo($this->user->email)
+                        ->setTo($this->email)
                         ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
                         ->send();
 
@@ -243,7 +285,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
 
             //Письмо тому кто заказывает
-            if ($this->user->email)
+            if ($this->email)
             {
                 try
                 {
@@ -254,7 +296,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                         'order'  => $this
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                        ->setTo($this->user->email)
+                        ->setTo($this->email)
                         ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Resolution of payment on request'). ' #' . $this->id)
                         ->send();
 
@@ -277,7 +319,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
 
             //Письмо тому кто заказывает
-            if ($this->user->email)
+            if ($this->email)
             {
                 try
                 {
@@ -288,7 +330,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                         'order'  => $this
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                        ->setTo($this->user->email)
+                        ->setTo($this->email)
                         ->setSubject(\Yii::$app->cms->appName . ': ' .\Yii::t('skeeks/shop/app','Cancellations'). ' #' . $this->id)
                         ->send();
                 } catch (\Exception $e)
@@ -576,7 +618,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             }
 
             //Письмо тому кто заказывает
-            if ($order->user && $order->user->email && $isNotify)
+            if ($order->email && $isNotify)
             {
                 \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
@@ -584,13 +626,43 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'order'  => $order
                 ])
                     ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                    ->setTo($order->user->email)
+                    ->setTo($order->email)
                     ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app', 'New order') .' #' . $order->id)
                     ->send();
             }
         }
 
         return $order;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getEmail()
+    {
+        if ($this->user && $this->user->email)
+        {
+            return $this->user->email;
+        }
+
+        if ($this->buyer)
+        {
+            if ($properties = $this->buyer->relatedPropertiesModel->properties)
+            {
+                /**
+                 * @var $property ShopBuyerProperty
+                 */
+                foreach ($properties as $property)
+                {
+                    if ($property->property && $property->property->is_user_email == "Y")
+                    {
+                        return (string) $property->value;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
