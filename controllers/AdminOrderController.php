@@ -74,7 +74,7 @@ class AdminOrderController extends AdminModelEditorController
 
                 'create' =>
                 [
-                    'visible'         => false,
+                    'isVisible'         => false,
                 ],
 
                 'create-order' =>
