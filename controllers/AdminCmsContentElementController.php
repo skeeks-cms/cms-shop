@@ -143,7 +143,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
 
 
-    public function create(AdminAction $adminAction)
+    public function create($adminAction)
     {
         $productPrices = [];
 
@@ -230,7 +230,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
         ]);
     }
 
-    public function update(AdminAction $adminAction)
+    public function update($adminAction)
     {
         /**
          * @var $model CmsContentElement
@@ -372,20 +372,52 @@ class AdminCmsContentElementController extends AdminModelEditorController
     }
 
 
-
-    public $content;
-
     /**
      * @return string
      */
     public function getPermissionName()
     {
+        $unique = parent::getPermissionName();
+
         if ($this->content)
         {
-            return $this->content->adminPermissionName;
+            $unique = $unique . "__" . $this->content->id;
         }
 
-        return parent::getPermissionName();
+        return $unique;
+    }
+
+    /**
+     * @var CmsContent
+     */
+    protected $_content = null;
+
+    /**
+     * @return CmsContent|static
+     */
+    public function getContent()
+    {
+        if ($this->_content !== null)
+        {
+            return $this->_content;
+        }
+
+        if ($content_id = \Yii::$app->request->get('content_id'))
+        {
+            $this->_content = CmsContent::findOne($content_id);
+        }
+
+        return $this->_content;
+    }
+
+    /**
+     * @param $content
+     * @return $this
+     */
+    public function setContent($content)
+    {
+        $this->_content = $content;
+        return $this;
     }
 
     public function beforeAction($action)
@@ -410,11 +442,51 @@ class AdminCmsContentElementController extends AdminModelEditorController
     /**
      * @return string
      */
-    public function getIndexUrl()
+    public function getUrl()
     {
-        return UrlHelper::construct($this->id . '/' . $this->action->id, [
-            'content_id' => \Yii::$app->request->get('content_id')
-        ])->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
+        $actions = $this->getActions();
+        $index = ArrayHelper::getValue($actions, 'index');
+        if ($index && $index instanceof IHasUrl)
+        {
+            return $index->url;
+        }
+
+        return '';
+    }
+
+
+
+    public function getActions()
+    {
+        /**
+         * @var AdminAction $action
+         */
+        $actions = parent::getActions();
+        if ($actions)
+        {
+            foreach ($actions as $action)
+            {
+                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+            }
+        }
+
+        return $actions;
+    }
+    public function getModelActions()
+    {
+        /**
+         * @var AdminAction $action
+         */
+        $actions = parent::getModelActions();
+        if ($actions)
+        {
+            foreach ($actions as $action)
+            {
+                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+            }
+        }
+
+        return $actions;
     }
 
 

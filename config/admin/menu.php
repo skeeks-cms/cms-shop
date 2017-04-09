@@ -37,6 +37,29 @@ function shopProductsMenu()
                 'label'     => $content->name,
                 "img"       => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
                 'url'   => ["shop/admin-cms-content-element", "content_id" => $content->id],
+                "activeCallback"       => function($adminMenuItem) use ($content)
+                {
+                    return (bool) ($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element');
+                },
+
+                "accessCallback"       => function($adminMenuItem) use ($content)
+                {
+                    $controller = \Yii::$app->createController('shop/admin-cms-content-element')[0];
+                    $controller->setContent($content);
+                    foreach ($controller->permissionNames as $permissionName => $permissionCode)
+                    {
+                        if ($permission = \Yii::$app->authManager->getPermission($permissionName))
+                        {
+                            if (!\Yii::$app->user->can($permission->name))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                },
+
             ];
 
             $result[] = $itemData;
@@ -60,9 +83,9 @@ function shopPersonTypes()
             $itemData = [
                 'label'     => $personType->name,
                 'url'   => ["shop/admin-buyer", "person_type_id" => $personType->id],
-                'activeCallback' => function($adminMenuItem)
+                'activeCallback' => function(\skeeks\cms\backend\BackendMenuItem $adminMenuItem)
                 {
-                    return (bool) (\Yii::$app->controller->uniqueId == 'shop/admin-buyer' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->url, 'person_type_id') == \Yii::$app->request->get('person_type_id'));
+                    return (bool) (\Yii::$app->controller->uniqueId == 'shop/admin-buyer' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData, 'person_type_id') == \Yii::$app->request->get('person_type_id'));
                 }
             ];
 
