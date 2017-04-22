@@ -22,7 +22,7 @@ use yii\widgets\ActiveForm;
  * Class AboutCmsDashboard
  * @package skeeks\cms\modules\admin\dashboards
  */
-class ReportOrderDashboard extends AdminDashboardWidgetRenderable
+class ReportOrderDashboard extends AdminDashboardWidget
 {
     static public function descriptorConfig()
     {
