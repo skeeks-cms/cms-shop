@@ -650,13 +650,17 @@ class ShopOrder extends \skeeks\cms\models\Core
             if ($properties = $this->buyer->relatedPropertiesModel->properties)
             {
                 /**
-                 * @var $property ShopBuyerProperty
+                 * @var $property ShopPersonTypeProperty
                  */
                 foreach ($properties as $property)
                 {
-                    if ($property->property && $property->property->is_user_email == "Y")
+                    if ($property->is_user_email == "Y")
                     {
-                        return (string) $property->value;
+                        $value = $this->buyer->relatedPropertiesModel->getAttribute($property->code);
+                        if ($value)
+                        {
+                            return (string) $value;
+                        }
                     }
                 }
             }
