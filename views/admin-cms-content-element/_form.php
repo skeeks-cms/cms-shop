@@ -10,6 +10,13 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 /* @var $shopProduct \skeeks\cms\shop\models\ShopProduct */
+
+/* @var $this yii\web\View */
+/* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
+/* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
+/* @var $model \skeeks\cms\models\CmsLang */
+$controller = $this->context;
+$action     = $controller->action;
 ?>
 
 <?/*= $this->render('@skeeks/cms/views/admin-cms-content-element/_form', [
@@ -55,7 +62,8 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
+<?php $form = $action->beginActiveForm(); ?>
+    <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
 
 <? if ($model->isNewRecord) : ?>
     <? if ($content_id = \Yii::$app->request->get("content_id")) : ?>
@@ -434,4 +442,6 @@ JS
 
 
 <?= $form->buttonsStandart($model); ?>
+
+    <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
 <?php ActiveForm::end(); ?>

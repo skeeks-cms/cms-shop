@@ -7,6 +7,7 @@
  */
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -72,7 +73,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "update" =>
                 [
-                    'class'         => AdminOneModelEditAction::className(),
+                    'class'         => BackendModelUpdateAction::className(),
                     "callback"      => [$this, 'update'],
                 ],
 

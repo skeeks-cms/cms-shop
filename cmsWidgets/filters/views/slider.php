@@ -129,7 +129,8 @@ JS
 
 
 
-    <? if ($properties = $widget->searchRelatedPropertiesModel->properties) : ?>
+    <? if ($widget->searchRelatedPropertiesModel) : ?>
+        <? if ($properties = $widget->searchRelatedPropertiesModel->properties) : ?>
 
         <? foreach ($properties as $property) : ?>
             <? if ($widget->isShowRelatedProperty($property)) : ?>
@@ -186,9 +187,10 @@ JS
         <? endforeach; ?>
     <? endif; ?>
 
+    <? endif; ?>
 
-
-    <? if ($properties = $widget->searchOfferRelatedPropertiesModel->properties) : ?>
+    <? if ($widget->searchOfferRelatedPropertiesModel) : ?>
+        <? if ($properties = $widget->searchOfferRelatedPropertiesModel->properties) : ?>
 
         <? foreach ($properties as $property) : ?>
             <? if ($widget->isShowOfferProperty($property)) : ?>
@@ -249,7 +251,7 @@ JS
 
         <? endforeach; ?>
     <? endif; ?>
-
+    <? endif; ?>
 
 
     <button class="btn btn-primary" style="display: none;"><?=\skeeks\cms\shop\Module::t('app', 'Apply');?></button>
