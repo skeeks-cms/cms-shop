@@ -59,7 +59,8 @@ class ShopProductFiltersWidget extends WidgetRenderable
     /**
      * @var array (Массив ids записей, для показа только нужных фильтров)
      */
-    public $elementIds          = [];
+    public $elementIds                  = [];
+    public $queryNeedElements           = null;
 
     /**
      *
@@ -244,7 +245,9 @@ class ShopProductFiltersWidget extends WidgetRenderable
              */
             $query  = clone $activeDataProvider->query;
             //TODO::notice errors
-            $ids    = $query->select(['cms_content_element.id as mainId'])->indexBy('mainId')->asArray()->all();
+            $query->select(['cms_content_element.id as mainId'])->indexBy('mainId');
+            $this->queryNeedElements = clone $query;
+            $ids    = $query->asArray()->all();
 
             $this->elementIds = array_keys($ids);
         }
