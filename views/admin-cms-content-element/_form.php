@@ -47,7 +47,7 @@ $action     = $controller->action;
          $model->parent_content_element_id = $parent_content_element_id;
      }
 
-     if ($contentModel->parent_content_id)
+     if ($contentModel->parent_content_id && $model->parentContentElement)
      {
          $model->name = $model->parentContentElement->name;
      }
