@@ -62,9 +62,49 @@ $action     = $controller->action;
 $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
 ?>
 
-<?php $form = $action->beginActiveForm(); ?>
-    <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
+<?php $form = $action->beginActiveForm([
+    'id'                                            => 'sx-dynamic-form',
+    'enableAjaxValidation'                          => false,
+    'enableClientValidation'                        => false,
+]); ?>
 
+<? $this->registerJs(<<<JS
+
+(function(sx, $, _)
+{
+    sx.classes.DynamicForm = sx.classes.Component.extend({
+
+        _onDomReady: function()
+        {
+            var self = this;
+
+            $("[data-form-reload=true]").on('change', function()
+            {
+                self.update();
+            });
+        },
+
+        update: function()
+        {
+            _.delay(function()
+            {
+                var jForm = $("#sx-dynamic-form");
+                jForm.append($('<input>', {'type': 'hidden', 'name' : 'sx-not-submit', 'value': 'true'}));
+                jForm.submit();
+            }, 200);
+        }
+    });
+
+    sx.DynamicForm = new sx.classes.DynamicForm();
+})(sx, sx.$, sx._);
+
+
+JS
+); ?>
+
+
+    <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
+<div style="display: none;">
 <? if ($model->isNewRecord) : ?>
     <? if ($content_id = \Yii::$app->request->get("content_id")) : ?>
         <?= $form->field($model, 'content_id')->hiddenInput(['value' => $content_id])->label(false); ?>
@@ -74,7 +114,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 <? if ($contentModel && $contentModel->parentContent) : ?>
     <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
 <? endif; ?>
-
+</div>
 
 
 

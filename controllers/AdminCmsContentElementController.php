@@ -43,6 +43,8 @@ use yii\helpers\ArrayHelper;
 class AdminCmsContentElementController extends AdminModelEditorController
 {
     use AdminModelEditorStandartControllerTrait;
+    
+    public $notSubmitParam = 'sx-not-submit';
 
     public function init()
     {
@@ -184,42 +186,50 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ]);
         }
 
-
-        if ($rr->isRequestPjaxPost())
+        if ($post = \Yii::$app->request->post())
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
+        }
 
-            if ($model->save() && $relatedModel->save())
+
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
             {
-                $shopProduct->id = $model->id;
-                $shopProduct->save();
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+                $shopProduct->load(\Yii::$app->request->post());
 
-                $shopProduct->getBaseProductPriceValue();
-
-                $baseProductPrice = $shopProduct->baseProductPrice;
-
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
+                if ($model->save() && $relatedModel->save())
                 {
-                    return $this->redirect(
-                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                            ->toString()
-                    );
-                } else
-                {
-                    return $this->redirect(
-                        $this->indexUrl
-                    );
-                }
+                    $shopProduct->id = $model->id;
+                    $shopProduct->save();
 
-            } else
-            {
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app','Could not save'));
+                    $shopProduct->getBaseProductPriceValue();
+
+                    $baseProductPrice = $shopProduct->baseProductPrice;
+
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
+
+                    if (\Yii::$app->request->post('submit-btn') == 'apply')
+                    {
+                        return $this->redirect(
+                            UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                                ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
+                                ->toString()
+                        );
+                    } else
+                    {
+                        return $this->redirect(
+                            $this->indexUrl
+                        );
+                    }
+
+                } 
             }
+
         }
 
         return $this->render('_form', [
@@ -296,57 +306,55 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ]);
         }
 
-        if ($rr->isRequestPjaxPost())
+        if ($post = \Yii::$app->request->post())
         {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
+        }
 
-            /**
-             * @var $productPrice ShopProductPrice
-             */
-            foreach ($productPrices as $productPrice)
+        if ($rr->isRequestPjaxPost())
+        {
+            if (!\Yii::$app->request->post($this->notSubmitParam))
             {
-                if ($productPrice->save())
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+                $shopProduct->load(\Yii::$app->request->post());
+
+                /**
+                 * @var $productPrice ShopProductPrice
+                 */
+                foreach ($productPrices as $productPrice)
                 {
-
-                } else
-                {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
-                }
-
-            }
-
-            if ($model->save() && $relatedModel->save() && $shopProduct->save())
-            {
-                \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
-
-                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                {
-
-                } else
-                {
-                    return $this->redirect(
-                        $this->indexUrl
-                    );
-                }
-
-                $model->refresh();
-
-            } else
-            {
-                $errors = [];
-
-                if ($model->getErrors())
-                {
-                    foreach ($model->getErrors() as $error)
+                    if ($productPrice->save())
                     {
-                        $errors[] = implode(', ', $error);
+
+                    } else
+                    {
+                        \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
                     }
+
                 }
 
-                \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app','Could not save') . $errors);
+                if ($model->save() && $relatedModel->save() && $shopProduct->save())
+                {
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
+
+                    if (\Yii::$app->request->post('submit-btn') == 'apply')
+                    {
+
+                    } else
+                    {
+                        return $this->redirect(
+                            $this->indexUrl
+                        );
+                    }
+
+                    $model->refresh();
+
+                } 
             }
+
         }
 
 
