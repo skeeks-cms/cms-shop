@@ -37,6 +37,8 @@ use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 
 /**
+ * @property CmsContent $content
+ *
  * Class AdminCmsContentTypeController
  * @package skeeks\cms\controllers
  */
@@ -411,6 +413,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
             return $this->_content;
         }
 
+        if ($this->model)
+        {
+            $this->_content = $this->model->cmsContent;
+        }
+
         if ($content_id = \Yii::$app->request->get('content_id'))
         {
             $this->_content = CmsContent::findOne($content_id);
@@ -463,8 +470,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
         return '';
     }
 
-
-
     public function getActions()
     {
         /**
@@ -475,12 +480,16 @@ class AdminCmsContentElementController extends AdminModelEditorController
         {
             foreach ($actions as $action)
             {
-                $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->model->cmsContent->id]);
+                if ($this->content)
+                {
+                    $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
+                }
             }
         }
 
         return $actions;
     }
+
     public function getModelActions()
     {
         /**
