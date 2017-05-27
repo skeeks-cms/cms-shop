@@ -11,6 +11,7 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
+use skeeks\cms\IHasUrl;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentType;
@@ -69,24 +70,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     "modelSearchClassName" => ShopCmsContentElementSearch::className(),
                 ],
 
-                "create" =>
-                [
-                    'class'         => AdminModelEditorCreateAction::className(),
-                    "callback"      => [$this, 'create'],
-                ],
-
-                "update" =>
-                [
-                    'class'         => BackendModelUpdateAction::className(),
-                    "callback"      => [$this, 'update'],
-                ],
-
-                /*'settings' =>
-                [
-                    'class'         => AdminModelEditorAction::className(),
-                    'name'          => \Yii::t('skeeks/shop/app', 'Settings'),
-                    "icon"          => "glyphicon glyphicon-cog",
-                ],*/
+                "create" => ["callback"      => [$this, 'create']],
+                "update" => ["callback"      => [$this, 'update']],
 
                 "activate-multi" =>
                 [
@@ -103,7 +88,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
                 ],
-
 
                 "change-tree-multi" =>
                 [
@@ -143,10 +127,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return $actions;
     }
-
-
-
-
 
     public function create($adminAction)
     {
@@ -225,7 +205,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     } else
                     {
                         return $this->redirect(
-                            $this->indexUrl
+                            $this->url
                         );
                     }
 
@@ -343,12 +323,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
 
                     if (\Yii::$app->request->post('submit-btn') == 'apply')
+                    {} else
                     {
 
-                    } else
-                    {
                         return $this->redirect(
-                            $this->indexUrl
+                            $this->url
                         );
                     }
 
@@ -467,7 +446,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             return $index->url;
         }
 
-        return '';
+        return parent::getUrl();
     }
 
     public function getActions()

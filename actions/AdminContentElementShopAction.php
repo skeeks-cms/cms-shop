@@ -104,7 +104,7 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
                 } else
                 {
                     return $this->controller->redirect(
-                        $this->controller->indexUrl
+                        $this->controller->url
                     );
                 }
 

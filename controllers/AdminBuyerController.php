@@ -87,7 +87,7 @@ class AdminBuyerController extends AdminModelEditorController
     /**
      * @return string
      */
-    public function getIndexUrl()
+    public function getUrl()
     {
         return UrlHelper::construct($this->id . '/' . $this->action->id, [
             'person_type_id' => \Yii::$app->request->get('person_type_id')
@@ -217,7 +217,7 @@ class AdminBuyerController extends AdminModelEditorController
                         } else
                         {
                             return $this->redirect(
-                                $this->indexUrl
+                                $this->url
                             );
                         }
 
