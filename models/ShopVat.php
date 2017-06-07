@@ -23,7 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property integer $priority
  * @property string $active
- * @property string $rate
+ * @property number $rate
  */
 class ShopVat extends Core
 {

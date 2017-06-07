@@ -349,7 +349,7 @@ class ShopBasket extends \skeeks\cms\models\Core
         ]);
 
         //Рассчет налогов
-        if ($product->vat)
+        if ($product->vat && (float) $product->vat->rate > 0)
         {
             $this->vat_rate         = $product->vat->rate;
 
