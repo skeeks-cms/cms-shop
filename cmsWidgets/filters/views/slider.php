@@ -144,17 +144,18 @@ JS
                 <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
                     <div class="form-group">
                         <div class="row">
+                            <div class="col-md-12">
+                                <label class="control-label"><?= $property->name; ?></label>
+                            </div>
                             <div class="col-md-6">
                                 <?= $form->field($widget->searchRelatedPropertiesModel, $widget->searchRelatedPropertiesModel->getAttributeNameRangeFrom($property->code) )->textInput([
                                     'placeholder' => 'от'
-                                ])->label(
-                                    $property->name . ""
-                                ); ?>
+                                ])->label(false); ?>
                             </div>
                             <div class="col-md-6">
                                 <?= $form->field($widget->searchRelatedPropertiesModel, $widget->searchRelatedPropertiesModel->getAttributeNameRangeTo($property->code) )->textInput([
                                     'placeholder' => 'до'
-                                ])->label("&nbsp;"); ?>
+                                ])->label(false); ?>
                             </div>
                         </div>
                     </div>
