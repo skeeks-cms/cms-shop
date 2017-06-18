@@ -2,7 +2,7 @@ Changelog
 ==============
 
 
-1.0.0-alpha28.pre
+2.0.0-alpha
 -----------------
  * Notify emails
  * Updated yandex kassa
