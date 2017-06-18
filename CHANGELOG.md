@@ -2,6 +2,10 @@ Changelog
 ==============
 
 
+2.0.0-alpha2
+-----------------
+ * fixed
+ 
 2.0.0-alpha
 -----------------
  * Notify emails

@@ -36,6 +36,7 @@ use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\ActionEvent;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
+use yii\web\Application;
 
 /**
  * @property CmsContent $content
@@ -397,8 +398,9 @@ class AdminCmsContentElementController extends AdminModelEditorController
             $this->_content = $this->model->cmsContent;
         }
 
-        if ($content_id = \Yii::$app->request->get('content_id'))
+        if (\Yii::$app instanceof Application && \Yii::$app->request->get('content_id'))
         {
+            $content_id = \Yii::$app->request->get('content_id');
             $this->_content = CmsContent::findOne($content_id);
         }
 
