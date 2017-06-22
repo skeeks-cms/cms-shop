@@ -140,6 +140,20 @@ JS
                         <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(
                             $widget->getRelatedPropertyOptions($property)
                             , ['class' => 'sx-filters-checkbox-options']); ?>
+                <? elseif (in_array($property->property_type, [\skeeks\cms\relatedProperties\PropertyType::CODE_BOOL]) ) : ?>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="control-label"><?= $property->name; ?></label>
+                            </div>
+                            <div class="col-md-12">
+                                <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkbox([
+                                    'label' => 'Да'
+                                ]); ?>
+                            </div>
+                        </div>
+                    </div>
 
                 <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
                     <div class="form-group">

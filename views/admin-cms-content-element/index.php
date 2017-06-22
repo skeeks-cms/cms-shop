@@ -12,6 +12,17 @@
 
 $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);
 
+$cmsContent = null;
+if ($content_id = \Yii::$app->request->get('content_id'))
+{
+    $dataProvider->query->andWhere(['content_id' => $content_id]);
+    /**
+     * @var $cmsContent \skeeks\cms\models\CmsContent
+     */
+    $cmsContent = \skeeks\cms\models\CmsContent::findOne($content_id);
+    $searchModel->content_id = $content_id;
+}
+
 $sortAttr = $dataProvider->getSort()->attributes;
 $query = $dataProvider->query;
 
@@ -20,8 +31,8 @@ $query->with('image');
 $query->with('cmsTree');
 $query->with('cmsContentElementTrees');
 $query->with('cmsContent');
-$query->with('relatedProperties');
-$query->with('relatedElementProperties');
+//$query->with('relatedProperties');
+//$query->with('relatedElementProperties');
 $query->with('cmsContentElementTrees.tree');
 
 $query->with('shopProduct');
@@ -36,16 +47,7 @@ $dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr
     ]
 ]);
 
-$cmsContent = null;
-if ($content_id = \Yii::$app->request->get('content_id'))
-{
-    $dataProvider->query->andWhere(['content_id' => $content_id]);
-    /**
-     * @var $cmsContent \skeeks\cms\models\CmsContent
-     */
-    $cmsContent = \skeeks\cms\models\CmsContent::findOne($content_id);
-    $searchModel->content_id = $content_id;
-}
+
 $columns = \skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider);
 
 $columns = \yii\helpers\ArrayHelper::merge($columns, [
