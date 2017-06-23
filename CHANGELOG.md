@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.0-alpha4.pre
+-----------------
+ * Change the form of editing elements
+ 
 2.0.0-alpha3
 -----------------
  * new rp bool

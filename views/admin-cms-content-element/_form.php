@@ -155,6 +155,12 @@ JS
         'model'             => $model,
     ]); ?>
 
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
+        'form'              => $form,
+        'contentModel'      => $contentModel,
+        'model'             => $model,
+    ]); ?>
+
 
 
 
