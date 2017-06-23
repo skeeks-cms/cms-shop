@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.0-alpha3.pre
+2.0.0-alpha3
 -----------------
  * new rp bool
  
