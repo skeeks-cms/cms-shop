@@ -3,7 +3,7 @@ Changelog
 
 2.0.0-alpha4.pre
 -----------------
- * new rp boolean value
+ * New rp boolean value
  * Change the form of editing elements
  
 2.0.0-alpha3
