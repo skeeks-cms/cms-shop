@@ -3,6 +3,7 @@ Changelog
 
 2.0.0-alpha4.pre
 -----------------
+ * New related value types
  * New rp boolean value
  * Change the form of editing elements
  
