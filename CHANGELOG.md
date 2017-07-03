@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.0-alpha5.pre
+-----------------
+ * Admin change
+ 
 2.0.0-alpha4
 -----------------
  * New related value types

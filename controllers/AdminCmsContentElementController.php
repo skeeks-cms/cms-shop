@@ -50,12 +50,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
     
     public $notSubmitParam = 'sx-not-submit';
 
+    protected $_modelClassName      = ShopCmsContentElement::class;
+    protected $_modelShowAttribute  = "name";
+
     public function init()
     {
         $this->name                     = \Yii::t('skeeks/shop/app', 'Elements');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopCmsContentElement::className();
-
         parent::init();
     }
 
