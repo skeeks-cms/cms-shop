@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.0-alpha4.pre
+2.0.0-alpha4
 -----------------
  * New related value types
  * New rp boolean value
