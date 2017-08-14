@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.0-alpha6.pre
+2.0.0-alpha6
 -----------------
  * mysq 5.7 migrate update
  
