@@ -78,7 +78,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 [
                     'class' => AdminMultiModelEditAction::className(),
                     "name"  => \Yii::t('skeeks/shop/app', 'Activate'),
-                    //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiActivate'],
                 ],
 
@@ -86,7 +85,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 [
                     'class' => AdminMultiModelEditAction::className(),
                     "name"  => \Yii::t('skeeks/shop/app', 'Deactivate'),
-                    //"icon"              => "glyphicon glyphicon-trash",
                     "eachCallback" => [$this, 'eachMultiInActivate'],
                 ],
 
@@ -596,7 +594,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
                 },
                 'format'    => 'raw',
-                'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
+                'filter'    => false,
+                //'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
                 'attribute' => 'tree_id'
             ],
 

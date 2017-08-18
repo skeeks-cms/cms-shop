@@ -288,12 +288,13 @@ HTML
 <?
 
 $json = \yii\helpers\Json::encode([
-    'createUrl' => \skeeks\cms\helpers\UrlHelper::construct('/shop/admin-basket/create', [
-                    'order_id'      => $model->id,
-                ])
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_EMPTY_LAYOUT, 'true')
-                ->setSystemParam(\skeeks\cms\modules\admin\Module::SYSTEM_QUERY_NO_ACTIONS_MODEL, 'true')
-                ->enableAdmin()->toString()
+    'createUrl' => \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/shop/admin-basket/create'])
+                    ->merge([
+                        'order_id'      => $model->id,
+                    ])
+                    ->enableEmptyLayout()
+                    ->enableNoActions()
+                    ->url
 ]);
 
 $onclick = new \yii\web\JsExpression(<<<JS

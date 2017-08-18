@@ -30,11 +30,18 @@
     ]); ?>
 
     <?= $form->field($searchModel, 'section')->widget(
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
+        [
+            'multiple' => false,
+        ]
+    ); ?>
+
+    <?/*= $form->field($searchModel, 'section')->widget(
         \skeeks\widget\chosen\Chosen::class,
         [
             'items' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions()
         ]
-    ); ?>
+    ); */?>
 
 
     <?= $form->field($searchModel, 'has_image')->checkbox(\Yii::$app->formatter->booleanFormat, false); ?>

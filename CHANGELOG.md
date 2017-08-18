@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.0-alpha7.pre
+-----------------
+ * Dialog select elements
+ 
 2.0.0-alpha6
 -----------------
  * mysq 5.7 migrate update
