@@ -9,7 +9,9 @@
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-
+?>
+<? $pjax = \yii\widgets\Pjax::begin(); ?>
+<?
 $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);
 
 $cmsContent = null;
@@ -65,7 +67,7 @@ $columns = \yii\helpers\ArrayHelper::merge($columns, [
 
 ?>
 
-<? $pjax = \yii\widgets\Pjax::begin(); ?>
+
 
     <?php echo $this->render('_search', [
         'searchModel' => $searchModel,
@@ -86,6 +88,7 @@ $columns = \yii\helpers\ArrayHelper::merge($columns, [
         ],
         'columns' => $columns
     ]); ?>
+
 
 <? $pjax::end() ?>
 
