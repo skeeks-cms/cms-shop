@@ -500,7 +500,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
             return [];
         }
 
-        $model = CmsContentElement::find()->where(['content_id' => $cmsContent->id])->one();
+        $model = null;
+        //$model = CmsContentElement::find()->where(['content_id' => $cmsContent->id])->limit(1)->one();
 
         if (!$model)
         {
@@ -511,7 +512,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         if (is_array($model) || is_object($model))
         {
-            foreach ($model as $name => $value) {
+            foreach ($model->toArray() as $name => $value) {
                 $autoColumns[] = [
                     'attribute' => $name,
                     'visible' => false,
