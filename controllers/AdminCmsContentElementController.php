@@ -34,6 +34,7 @@ use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\ActionEvent;
+use yii\caching\TagDependency;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
@@ -368,9 +369,9 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $unique = parent::getPermissionName();
 
-        if ($this->content)
+        if ($content = $this->content)
         {
-            $unique = $unique . "__" . $this->content->id;
+            $unique = $unique . "__" . $content->id;
         }
 
         return $unique;
@@ -386,20 +387,33 @@ class AdminCmsContentElementController extends AdminModelEditorController
      */
     public function getContent()
     {
-        if ($this->_content !== null)
+        if ($this->_content === null)
         {
-            return $this->_content;
-        }
+            if ($this->model)
+            {
+                $this->_content = $this->model->cmsContent;
+                return $this->_content;
+            }
 
-        if ($this->model)
-        {
-            $this->_content = $this->model->cmsContent;
-        }
+            if (\Yii::$app instanceof Application && \Yii::$app->request->get('content_id'))
+            {
+                $content_id = \Yii::$app->request->get('content_id');
 
-        if (\Yii::$app instanceof Application && \Yii::$app->request->get('content_id'))
-        {
-            $content_id = \Yii::$app->request->get('content_id');
-            $this->_content = CmsContent::findOne($content_id);
+                $dependency = new TagDependency([
+                    'tags'      =>
+                    [
+                        (new CmsContent())->getTableCacheTag(),
+                    ],
+                ]);
+
+                $this->_content = CmsContent::getDb()->cache(function ($db) use ($content_id) {
+                    return CmsContent::find()->where([
+                        "id"             => $content_id,
+                    ])->one();
+                }, null, $dependency);
+
+                return $this->_content;
+            }
         }
 
         return $this->_content;
