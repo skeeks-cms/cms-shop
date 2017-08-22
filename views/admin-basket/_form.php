@@ -34,9 +34,9 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord)
 
         <div style="display: none;">
             <?= $form->field($model, 'product_id')->widget(
-                \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::className(),
+                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
                 [
-                    'baseRoute' => '/shop/tools/select-cms-element'
+                    'dialogRoute' => ['/shop/admin-cms-content-element']
                 ]
             ); ?>
         </div>
@@ -86,7 +86,7 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord)
 $this->registerJs(<<<JS
 _.each(sx.components, function(Component, key)
 {
-    if (Component instanceof sx.classes.SelectCmsElement)
+    if (Component instanceof sx.classes.SelectModelDialog)
     {
         Component.bind('change', function(e, data)
         {

@@ -37,7 +37,7 @@ CSS
     <a href="#" class="btn btn-lg btn-primary sx-btn-for-me" data-me="<?= \Yii::$app->user->identity->id; ?>">Создать для меня</a>
 </div>
 <div style="display: none;">
-    <?= \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
+    <?= \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::widget([
         'id'        => 'cmsUserId',
         'name'      => 'cmsUserId',
     ]); ?>

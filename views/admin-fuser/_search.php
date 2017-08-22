@@ -26,6 +26,8 @@ if ($filter->id)
         'action' => '/' . \Yii::$app->request->pathInfo,
     ]); ?>
 
-    <?= $form->field($searchModel, 'user_id')->widget(\skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className())->setVisible(); ?>
+    <?= $form->field($searchModel, 'user_id')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
+    )->setVisible(); ?>
 
 <? $form::end(); ?>

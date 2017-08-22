@@ -39,7 +39,7 @@ CSS
 <h1 style="text-align: center;">Новый заказ для покупателя: <a href="#" class="sx-change-user"><?= $shopFuser->user->displayName; ?></a></h1>
 
 <div style="display: none;">
-    <?= \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::widget([
+    <?= \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::widget([
         'id'        => 'cmsUserId',
         'name'      => 'cmsUserId',
     ]); ?>
@@ -462,11 +462,11 @@ JS
 
 <div style="display: none;">
     <?=
-        \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::widget([
-            'baseRoute'     => '/shop/tools/select-cms-element',
+        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
+            'dialogRoute'     => ['/shop/admin-cms-content-element'],
             'name'          => 'sx-add-product',
             'id'            => 'sx-add-product',
-            'closeWindow'   => false,
+            'closeDialogAfterSelect'   => false,
         ]);
     ?>
 </div>
@@ -478,7 +478,7 @@ $this->registerJs(<<<JS
 {
     _.each(sx.components, function(Component, key)
     {
-        if (Component instanceof sx.classes.SelectCmsElement)
+        if (Component instanceof sx.classes.SelectModelDialog)
         {
             Component.bind('change', function(e, data)
             {

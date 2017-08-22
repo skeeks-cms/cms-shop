@@ -39,7 +39,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <?= $form->field($model, 'description')->textInput(); ?>
     <?= $form->field($model, 'max_use')->textInput(); ?>
     <?= $form->field($model, 'cms_user_id')->widget(
-        \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::class
+        \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
     ); ?>
 
 <?= $form->fieldSetEnd(); ?>

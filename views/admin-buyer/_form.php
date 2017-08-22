@@ -62,13 +62,13 @@ JS
         <? $model->cms_user_id = \Yii::$app->request->get('cms_user_id'); ?>
         <div style="display: none;">
             <?= $form->field($model, 'cms_user_id')->widget(
-                \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()
+                \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
             ); ?>
         </div>
 
     <? elseif ($model->isNewRecord) : ?>
         <?= $form->field($model, 'cms_user_id')->widget(
-            \skeeks\cms\modules\admin\widgets\formInputs\SelectModelDialogUserInput::className()
+            \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
         ); ?>
     <? endif; ?>
 

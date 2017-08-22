@@ -303,7 +303,10 @@ JS
 );
 ?>
 
-        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+        <?
+        $addItemText = \Yii::t('skeeks/shop/app', 'Add this item');
+        $addPosition = \Yii::t('skeeks/shop/app','Add position');
+        echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             'label'             => "",
             'parentModel'       => $model,
             'relation'          => [
@@ -321,8 +324,12 @@ JS
             'gridViewOptions'   => [
                 'enabledPjax' => false,
             'beforeTableLeft' => <<<HTML
-            <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i><?=\Yii::t('skeeks/shop/app','Add this item')?></a>
-            <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i><?=\Yii::t('skeeks/shop/app','Add position')?></a>
+            <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>
+                {$addItemText}
+            </a>
+            <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i>
+                {$addPosition}
+            </a>
 HTML
         ,
 
@@ -781,11 +788,11 @@ JS
 
 <div style="display: none;">
     <?=
-        \skeeks\cms\modules\admin\widgets\formInputs\CmsContentElementInput::widget([
-            'baseRoute'     => '/shop/tools/select-cms-element',
+        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
+            'dialogRoute'     => ['/shop/admin-cms-content-element'],
             'name'          => 'sx-add-product',
             'id'            => 'sx-add-product',
-            'closeWindow'   => false,
+            'closeDialogAfterSelect'   => false,
         ]);
     ?>
 </div>
@@ -797,7 +804,7 @@ $this->registerJs(<<<JS
 {
     _.each(sx.components, function(Component, key)
     {
-        if (Component instanceof sx.classes.SelectCmsElement)
+        if (Component instanceof sx.classes.SelectModelDialog)
         {
             Component.bind('change', function(e, data)
             {
