@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.0-alpha7.pre
+2.0.0-alpha7
 -----------------
  * Dialog select elements
  
