@@ -30,11 +30,14 @@
     ]); ?>
 
     <?= $form->field($searchModel, 'section')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class
+    ); ?>
+    <?/*= $form->field($searchModel, 'section')->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
         [
             'multiple' => false,
         ]
-    ); ?>
+    ); */?>
 
     <?/*= $form->field($searchModel, 'section')->widget(
         \skeeks\widget\chosen\Chosen::class,
