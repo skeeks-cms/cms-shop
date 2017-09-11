@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.0-alpha8
+-----------------
+ * Update
+ 
 2.0.0-alpha7
 -----------------
  * Dialog select elements
