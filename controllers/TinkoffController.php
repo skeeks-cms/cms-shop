@@ -10,6 +10,7 @@ use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Exception;
 use yii\helpers\Json;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class TinkoffController
@@ -43,6 +44,35 @@ class TinkoffController extends Controller
         ]);
     }
 
+
+    public function actionSuccess()
+    {
+        $orderId = \Yii::$app->request->get('OrderId');
+        if (!$orderId) {
+            throw new NotFoundHttpException('!!!');
+        }
+
+        if (!$shopOrder = ShopOrder::findOne($orderId)) {
+            throw new NotFoundHttpException('!!!');
+        }
+
+        return $this->redirect($shopOrder->getPublicUrl(\Yii::$app->request->get()));
+    }
+
+
+    public function actionFail()
+    {
+        $orderId = \Yii::$app->request->get('OrderId');
+        if (!$orderId) {
+            throw new NotFoundHttpException('!!!');
+        }
+
+        if (!$shopOrder = ShopOrder::findOne($orderId)) {
+            throw new NotFoundHttpException('!!!');
+        }
+
+        return $this->redirect($shopOrder->getPublicUrl(\Yii::$app->request->get()));
+    }
 
     public function actionNotify()
     {

@@ -11,6 +11,7 @@ use skeeks\modules\cms\money\Currency;
 use skeeks\modules\cms\money\Money;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\UrlManager;
 
@@ -926,8 +927,11 @@ class ShopOrder extends \skeeks\cms\models\Core
     /**
      * @return string
      */
-    public function getPublicUrl($scheme = true)
+    public function getPublicUrl($options = [], $scheme = true)
     {
-        return Url::to(['/shop/order/finish', 'key' => $this->key], $scheme);
+        return Url::to(ArrayHelper::merge(
+            ['/shop/order/finish', 'key' => $this->key],
+            $options
+        ), $scheme);
     }
 }
