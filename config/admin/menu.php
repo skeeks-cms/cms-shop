@@ -46,7 +46,7 @@ function shopProductsMenu()
                 {
                     $controller = \Yii::$app->createController('shop/admin-cms-content-element')[0];
                     $controller->setContent($content);
-                    foreach ([$controller->permissionName] as $permissionName => $permissionCode)
+                    foreach ([$controller->permissionName] as $permissionName)
                     {
                         if ($permission = \Yii::$app->authManager->getPermission($permissionName))
                         {
