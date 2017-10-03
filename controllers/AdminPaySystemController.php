@@ -124,11 +124,17 @@ class AdminPaySystemController extends AdminModelEditorController
         {
             if (!\Yii::$app->request->post($this->notSubmitParam))
             {
-                $model->component_settings = $handler->toArray();
-                $handler->load(\Yii::$app->request->post());
+                $handlerValid = true;
+                if ($handler) {
+                    $model->component_settings = $handler->toArray();
+                    $handler->load(\Yii::$app->request->post());
+
+                    $handlerValid = $handler->validate();
+                }
+                
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handler->validate())
+                    && $model->validate() && $handlerValid)
                 {
                     $model->save();
 
@@ -179,11 +185,16 @@ class AdminPaySystemController extends AdminModelEditorController
             {
                 if ($rr->isRequestPjaxPost())
                 {
-                    $model->component_settings = $handler->toArray();
-                    $handler->load(\Yii::$app->request->post());
-
+                    $handlerValid = true;
+                    if ($handler) {
+                        $model->component_settings = $handler->toArray();
+                        $handler->load(\Yii::$app->request->post());
+    
+                        $handlerValid = $handler->validate();
+                    }
+                    
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handler->validate())
+                        && $model->validate() && $handlerValid)
                     {
                         $model->save();
 
