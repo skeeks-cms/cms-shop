@@ -403,7 +403,7 @@ JS
                     ]
                 ],
 
-                'controllerRoute'   => 'shop/admin-cms-content-element',
+                'controllerRoute'   => '/shop/admin-cms-content-element',
                 'gridViewOptions'   => [
                     'columns' => (array) \skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($shopContent->childrenContent)
                 ],
@@ -437,7 +437,6 @@ JS
 <? endif; ?>
 
 <? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->all() ) : ?>
-
     <? $childContents = $model->cmsContent->getChildrenContents()->andWhere(['!=', 'id', $shopContent->childrenContent->id])->all(); ?>
 
     <? foreach($childContents as $childContent) : ?>
