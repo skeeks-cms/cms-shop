@@ -106,15 +106,6 @@ $order->refresh();
     ?>
 <?= Html::endTag('p'); ?>
 
-<?= Html::beginTag('h2'); ?>
-    Итого:
-<?= Html::endTag('h2'); ?>
-
-<?= Html::beginTag('p'); ?>
-    Стоимость товаров: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->basketsMoney)); ?><br />
-    Стоимость доставки: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->moneyDelivery)); ?><br />
-    К оплате: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?>
-<?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('h2'); ?>
     Покупатель:
@@ -125,6 +116,60 @@ $order->refresh();
         'attributes'    => $order->buyer->relatedPropertiesModel->attributes()
     ]);
 ?>
+
+<? if ($order->pay_system_id) : ?>
+    <?= Html::beginTag('h2'); ?>
+        Оплата:
+    <?= Html::endTag('h2'); ?>
+
+    <?=
+        \yii\widgets\DetailView::widget([
+            'model'         => $order,
+            'attributes'    => [
+                [
+                    'attribute' => 'pay_system_id',
+                    'value' => $order->paySystem->name
+                ],
+                [
+                    'attribute' => 'payed',
+                    'label' => 'Статус оплаты',
+                    'value' => $order->payed == 'Y' ? "оплачен" : "не оплачен"
+                ],
+            ]
+        ]);
+    ?>
+
+<? endif; ?>
+
+<? if ($order->delivery_id) : ?>
+    <?= Html::beginTag('h2'); ?>
+        Доставка:
+    <?= Html::endTag('h2'); ?>
+
+    <?=
+        \yii\widgets\DetailView::widget([
+            'model'         => $order,
+            'attributes'    => [
+                [
+                    'attribute' => 'delivery_id',
+                    'value' => $order->delivery->name
+                ],
+            ]
+        ]);
+    ?>
+
+<? endif; ?>
+
+
+<?= Html::beginTag('h2'); ?>
+    Итого:
+<?= Html::endTag('h2'); ?>
+
+<?= Html::beginTag('p'); ?>
+    Стоимость товаров: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->basketsMoney)); ?><br />
+    Стоимость доставки: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->moneyDelivery)); ?><br />
+    К оплате: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?>
+<?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>
     <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
