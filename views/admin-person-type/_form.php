@@ -36,7 +36,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 'shop_person_type_id' => 'id'
             ],
 
-            'controllerRoute'   => 'shop/admin-person-type-property',
+            'controllerRoute'   => '/shop/admin-person-type-property',
             'gridViewOptions'   => [
                 'sortable' => true,
                 'columns' => [
