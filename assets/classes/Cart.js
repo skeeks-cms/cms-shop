@@ -102,7 +102,6 @@
 
             _.delay(function()
             {
-                console.log(self.JWrapper().selector);
                 $.pjax.reload({container: self.JWrapper().selector});
             }, Number(this.get('delay', 0)) );
 
