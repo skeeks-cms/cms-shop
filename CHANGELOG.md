@@ -1,8 +1,9 @@
 Changelog
 ==============
 
-2.0.0-alpha14.pre
+2.0.1-alpha
 -----------------
+ * Using composer-config-plugin
  * Fixed admin
  
 2.0.0-alpha13

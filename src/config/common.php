@@ -32,8 +32,7 @@ return [
     'modules' =>
     [
         'shop' => [
-            'class'                 => 'skeeks\cms\shop\Module',
-            'controllerNamespace'   => 'skeeks\cms\shop\console\controllers'
+            'class'         => 'skeeks\cms\shop\Module',
         ]
     ]
 ];

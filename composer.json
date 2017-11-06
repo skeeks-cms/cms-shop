@@ -17,13 +17,26 @@
         }
     ],
     "require": {
-        "skeeks/cms": "*",
+        "skeeks/cms": "~4",
         "skeeks/cms-module-money": "^3",
         "skeeks/cms-measure": "^2"
     },
     "autoload": {
         "psr-4": {
-            "skeeks\\cms\\shop\\": ""
+            "skeeks\\cms\\shop\\": "src/"
+        }
+    },
+    "extra": {
+        "config-plugin": {
+            "common": "src/config/common.php",
+            "web": [
+                "$common",
+                "src/config/web.php"
+            ],
+            "console": [
+                "$common",
+                "src/config/console.php"
+            ]
         }
     }
 }
