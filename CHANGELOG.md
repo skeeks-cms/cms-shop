@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.0-alpha14.pre
+-----------------
+ * Fixed admin
+ 
 2.0.0-alpha13
 -----------------
  * Fixed

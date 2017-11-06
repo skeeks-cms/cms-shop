@@ -27,7 +27,20 @@
         'adminController'   => $controller,
         'pjax'              => $pjax,
         'columns' => [
-            'id',
+
+            [
+                'class'     => \yii\grid\DataColumn::className(),
+                'attribute'     => 'id',
+                'format'     => 'raw',
+                'value'     => function(\skeeks\cms\shop\models\ShopOrder $order)
+                {
+                    return \yii\helpers\Html::a($order->id, $order->publicUrl, [
+                        'data-pjax' => 0,
+                        'target' => '_blank'
+                    ]);
+                }
+            ],
+
 
             [
                 'class'     => \skeeks\cms\grid\CreatedAtColumn::className(),
