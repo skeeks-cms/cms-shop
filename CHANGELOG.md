@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1-alpha4
+-----------------
+ * Sorting by price fast
+ 
 2.0.1-alpha3
 -----------------
  * Sorting by price

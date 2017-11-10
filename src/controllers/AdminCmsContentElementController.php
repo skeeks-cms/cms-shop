@@ -37,6 +37,8 @@ use yii\base\ActionEvent;
 use yii\caching\TagDependency;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Exception;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 
@@ -750,8 +752,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
             foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
 
 
-                $pricesQuery = (new \yii\db\Query())->from(ShopProductPrice::tableName())->andWhere(['type_price_id' => $shopTypePrice->id]);
-                $activeQuery->leftJoin(["p{$shopTypePrice->id}" => $pricesQuery], "p{$shopTypePrice->id}.product_id = sp.id");
+                /*$pricesQuery = (new \yii\db\Query())->from(ShopProductPrice::tableName())->andWhere(['type_price_id' => $shopTypePrice->id]);
+                $activeQuery->leftJoin(["p{$shopTypePrice->id}" => $pricesQuery], "p{$shopTypePrice->id}.product_id = sp.id");*/
+                $activeQuery->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
+                    "p{$shopTypePrice->id}.product_id" => new Expression("sp.id"),
+                    "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id
+                ]);
 
                 $sorts['price.' . $shopTypePrice->id] = [
                     'asc' => ["p{$shopTypePrice->id}.price" => SORT_ASC],
