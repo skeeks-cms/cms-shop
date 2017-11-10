@@ -28,7 +28,8 @@ if ($content_id = \Yii::$app->request->get('content_id'))
 $sortAttr = $dataProvider->getSort()->attributes;
 $query = $dataProvider->query;
 
-$query->joinWith('shopProduct as sp');
+
+
 $query->with('image');
 $query->with('cmsTree');
 $query->with('cmsContentElementTrees');
@@ -40,14 +41,9 @@ $query->with('cmsContentElementTrees.tree');
 $query->with('shopProduct');
 $query->with('shopProduct.baseProductPrice');
 
-$dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr, [
-    'quantity' => [
-        'asc' => ['sp.quantity' => SORT_ASC],
-        'desc' => ['sp.quantity' => SORT_DESC],
-        'label' => \Yii::t('skeeks/shop/app', 'Available quantity'),
-        'default' => SORT_ASC
-    ]
-]);
+$dataProvider->getSort()->attributes = \yii\helpers\ArrayHelper::merge($sortAttr,
+    \skeeks\cms\shop\controllers\AdminCmsContentElementController::getSorts($query)
+);
 
 
 $columns = \skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($cmsContent, $dataProvider);

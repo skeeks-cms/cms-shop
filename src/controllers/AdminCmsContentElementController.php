@@ -36,6 +36,7 @@ use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\ActionEvent;
 use yii\caching\TagDependency;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 
@@ -643,9 +644,10 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ],
 
 
-            [
+            /*[
                 'label' => \Yii::t('skeeks/shop/app', 'Base price'),
                 'class' => \yii\grid\DataColumn::className(),
+                'attribute' => 'baseProductPrice',
                 'value' => function(\skeeks\cms\models\CmsContentElement $model)
                 {
                     $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
@@ -656,7 +658,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                     return null;
                 }
-            ],
+            ],*/
 
             [
                 'class'     => \yii\grid\DataColumn::className(),
@@ -674,6 +676,29 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 'format' => 'raw'
             ]
         ];
+
+        if (\Yii::$app->shop->shopTypePrices) {
+            foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+                $columns[] = [
+                    'label' => $shopTypePrice->name,
+                    'class' => \yii\grid\DataColumn::className(),
+                    'attribute' => 'price.' . $shopTypePrice->id,
+                    'value' => function(\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice)
+                    {
+                        $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
+                        if ($shopProduct)
+                        {
+                            if ($shopProductPrice = $shopProduct->getShopProductPrices()
+                                    ->andWhere(['type_price_id' => $shopTypePrice->id])->one()) {
+                                return \Yii::$app->money->intlFormatter()->format($shopProductPrice->money);
+                            }
+                        }
+
+                        return null;
+                    }
+                ];
+            }
+        }
 
         $typeColumn = //TODO: показывать только для контента с предложениями
         [
@@ -704,6 +729,40 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         }
         return $columns;
+    }
+
+
+    static public function getSorts(ActiveQuery $activeQuery)
+    {
+        $activeQuery->joinWith('shopProduct as sp');
+
+
+        $sorts = [
+            'quantity' => [
+                'asc' => ['sp.quantity' => SORT_ASC],
+                'desc' => ['sp.quantity' => SORT_DESC],
+                'label' => \Yii::t('skeeks/shop/app', 'Available quantity'),
+                'default' => SORT_ASC
+            ],
+        ];
+
+        if (\Yii::$app->shop->shopTypePrices) {
+            foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+
+
+                $pricesQuery = (new \yii\db\Query())->from(ShopProductPrice::tableName())->andWhere(['type_price_id' => $shopTypePrice->id]);
+                $activeQuery->leftJoin(["p{$shopTypePrice->id}" => $pricesQuery], "p{$shopTypePrice->id}.product_id = sp.id");
+
+                $sorts['price.' . $shopTypePrice->id] = [
+                    'asc' => ["p{$shopTypePrice->id}.price" => SORT_ASC],
+                    'desc' => ["p{$shopTypePrice->id}.price" => SORT_DESC],
+                    'label' => $shopTypePrice->name,
+                    'default' => SORT_ASC
+                ];
+            }
+        }
+
+        return $sorts;
     }
 
     /**

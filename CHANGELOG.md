@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1-alpha2
+-----------------
+ * Sorting by price
+ 
 2.0.1-alpha
 -----------------
  * Using composer-config-plugin
