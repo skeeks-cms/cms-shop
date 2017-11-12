@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1-alpha5
+-----------------
+ * Fixed filters
+ 
 2.0.1-alpha4
 -----------------
  * Sorting by price fast
