@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1-alpha6.pre
+-----------------
+ * Fixed filters
+ 
 2.0.1-alpha5
 -----------------
  * Fixed filters

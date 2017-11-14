@@ -451,6 +451,39 @@ class ShopProductFiltersWidget extends WidgetRenderable
             $options = \yii\helpers\ArrayHelper::map(
                 $options, 'id', 'value'
             );
+        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL)
+        {
+            $availables = [];
+            if ($this->elementIds)
+            {
+                $availables = \skeeks\cms\models\CmsContentElementProperty::find()
+                    ->select(['value_bool'])
+                    ->indexBy('value_bool')
+                    ->groupBy('value_bool')
+                    ->andWhere(['element_id' => $this->elementIds])
+                    ->andWhere(['property_id' => $property->id])
+                    ->asArray()
+                    ->all()
+                ;
+
+                $availables = array_keys($availables);
+            }
+
+            if ($this->onlyExistsFilters && !$availables)
+            {
+                return [];
+            }
+
+            $options = [];
+            foreach ($availables as $value) {
+                $labal = $value;
+                if ($value == 0) {
+                    $label = \Yii::t('skeeks/cms', 'No');
+                } else if ($value == 1) {
+                    $label = \Yii::t('skeeks/cms', 'Yes');
+                }
+                $options[$value] = $label;
+            }
         }
 
         $this->_relatedOptions[$property->code] = $options;
