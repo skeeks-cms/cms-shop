@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\Search;
 use skeeks\cms\models\searchs\SearchChildrenRelatedPropertiesModel;
 use skeeks\cms\models\Tree;
@@ -383,74 +384,80 @@ class ShopProductFiltersWidget extends WidgetRenderable
             return $this->_relatedOptions[$property->code];
         }
 
+        if ($this->onlyExistsFilters && !$this->elementIds)
+        {
+            return [];
+        }
+
         if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
         {
             $propertyType = $property->handler;
 
-            $availables = [];
-            if ($this->elementIds)
-            {
-                $availables = \skeeks\cms\models\CmsContentElementProperty::find()
-                    ->select(['value_enum'])
-                    ->indexBy('value_enum')
-                    ->andWhere(['element_id' => $this->elementIds])
-                    ->andWhere(['property_id' => $property->id])
-                    ->asArray()
-                    ->all()
-                ;
+            $options = \skeeks\cms\models\CmsContentElementProperty::find()->from([
+                            'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
+                        ])
+                        ->leftJoin(['e' => CmsContentElement::tableName()], 'e.id = map.value_enum')
+                        ->select(['e.id as key', 'e.name as value', 'map.value_enum'])
+                        ->indexBy('key')
+                        ->groupBy('key')
+                        ->andWhere(['map.element_id' => $this->elementIds])
+                        ->andWhere(['map.property_id' => $property->id])
+                        ->andWhere(['>', 'map.value_enum', 0])
+                        ->andWhere(['is not', 'map.value_enum', null])
+                        ->asArray()
+                        ->all();
 
-                $availables = array_keys($availables);
-            }
-
-            if ($this->onlyExistsFilters && !$availables)
+            if ($this->onlyExistsFilters && !$options)
             {
                 return [];
             }
 
-            $options = \skeeks\cms\models\CmsContentElement::find()
-                ->active()
-                ->andWhere(['content_id' => $propertyType->content_id]);
-                if ($this->elementIds)
-                {
-                    $options->andWhere(['id' => $availables]);
-                }
-
-            $options = $options->select(['id', 'name'])->asArray()->all();
-
             $options = \yii\helpers\ArrayHelper::map(
-                $options, 'id', 'name'
+                $options, 'key', 'value'
             );
 
         } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
         {
-            $options = $property->getEnums()->select(['id', 'value']);
 
-            $availables = [];
-            if ($this->elementIds)
-            {
-                $availables = \skeeks\cms\models\CmsContentElementProperty::find()
-                    ->select(['value_enum'])
-                    ->indexBy('value_enum')
-                    ->andWhere(['element_id' => $this->elementIds])
-                    ->andWhere(['property_id' => $property->id])
-                    ->asArray()
-                    ->all()
-                ;
+            $options = \skeeks\cms\models\CmsContentElementProperty::find()->from([
+                            'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
+                        ])
+                        ->leftJoin(['enum' => CmsContentPropertyEnum::tableName()], 'enum.id = map.value_enum')
+                        //->leftJoin(['p' => CmsContentProperty::tableName()], 'p.id = enum.property_id')
+                        ->select(['enum.id as key', 'enum.value as value', 'map.value_enum'])
+                        ->indexBy('key')
+                        ->groupBy('key')
+                        ->andWhere(['map.element_id' => $this->elementIds])
+                        ->andWhere(['map.property_id' => $property->id])
+                        ->andWhere(['>', 'map.value_enum', 0])
+                        ->andWhere(['is not', 'map.value_enum', null])
+                        ->asArray()
+                        ->all();
 
-                $availables = array_keys($availables);
-                $options->andWhere(['id' => $availables]);
-            }
 
-            if ($this->onlyExistsFilters && !$availables)
+            /*$options =
+                CmsContentPropertyEnum::find()
+                    ->andWhere([CmsContentPropertyEnum::tableName() . '.id' => $this->elementIds])
+                    ->joinWith('property as p')
+                    ->joinWith('property.elementProperties as map')
+                    ->andWhere(['p.id' => $property->id])
+                    ->andWhere(['is not', 'map.value_enum', null])
+                    ->select([
+                        CmsContentPropertyEnum::tableName() . '.id',
+                        CmsContentPropertyEnum::tableName() . '.value',
+                        CmsContentPropertyEnum::tableName() . '.property_id'
+                    ])
+            ;*/
+
+            if ($this->onlyExistsFilters && !$options)
             {
                 return [];
             }
 
-            $options = $options->asArray()->all();
-
             $options = \yii\helpers\ArrayHelper::map(
-                $options, 'id', 'value'
+                $options, 'key', 'value'
             );
+
         } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL)
         {
             $availables = [];
