@@ -112,18 +112,17 @@ class ShopBasket extends \skeeks\cms\models\Core
         parent::init();
 
         //$this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeSaveEvent"]);
 
-        $this->on(self::EVENT_AFTER_INSERT,     [$this, "afterSaveCallback"]);
-        $this->on(self::EVENT_AFTER_UPDATE,     [$this, "afterSaveCallback"]);
-        $this->on(self::EVENT_AFTER_DELETE,     [$this, "afterSaveCallback"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveCallback"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveCallback"]);
+        $this->on(self::EVENT_AFTER_DELETE, [$this, "afterSaveCallback"]);
     }
 
     public function afterSaveCallback($event)
     {
         //Эта позиция привязана к заказу, после ее обновления нужно обновить заказ целиком
-        if ($this->order)
-        {
+        if ($this->order) {
             $this->order->recalculate()->save();
         }
     }
@@ -133,8 +132,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function beforeSaveEvent($event)
     {
-        if ( $this->isAttributeChanged('price') )
-        {
+        if ($this->isAttributeChanged('price')) {
             /*if ( round($this->getAttribute('price'), 4) != round($this->getOldAttribute('price'), 4))
             {
                 throw new Exception("TODO: реализовать");
@@ -149,14 +147,48 @@ class ShopBasket extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'fuser_id', 'order_id', 'product_id', 'product_price_id', 'type', 'set_parent_id', 'measure_code'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'fuser_id',
+                    'order_id',
+                    'product_id',
+                    'product_price_id',
+                    'type',
+                    'set_parent_id',
+                    'measure_code'
+                ],
+                'integer'
+            ],
             [['name'], 'required'],
             [['price', 'weight', 'quantity', 'discount_price', 'vat_rate', 'reserve_quantity'], 'number'],
             [['quantity'], 'number', 'max' => \Yii::$app->shop->maxQuantity, 'min' => \Yii::$app->shop->minQuantity],
             [['currency_code'], 'string', 'max' => 3],
             [['site_id'], 'integer'],
-            [['delay', 'can_buy', 'subscribe', 'barcode_multi', 'reserved', 'deducted', 'custom_price'], 'string', 'max' => 1],
-            [['name', 'callback_func', 'notes', 'order_callback_func', 'detail_page_url', 'cancel_callback_func', 'pay_callback_func', 'discount_name', 'dimensions', 'recommendation'], 'string', 'max' => 255],
+            [
+                ['delay', 'can_buy', 'subscribe', 'barcode_multi', 'reserved', 'deducted', 'custom_price'],
+                'string',
+                'max' => 1
+            ],
+            [
+                [
+                    'name',
+                    'callback_func',
+                    'notes',
+                    'order_callback_func',
+                    'detail_page_url',
+                    'cancel_callback_func',
+                    'pay_callback_func',
+                    'discount_name',
+                    'dimensions',
+                    'recommendation'
+                ],
+                'string',
+                'max' => 255
+            ],
             [['catalog_xml_id', 'product_xml_id'], 'string', 'max' => 100],
             [['discount_value', 'discount_coupon'], 'string', 'max' => 32],
             [['measure_name'], 'string', 'max' => 50],
@@ -174,48 +206,48 @@ class ShopBasket extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                    => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'            => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'            => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'fuser_id'              => \Yii::t('skeeks/shop/app', 'Fuser ID'),
-            'order_id'              => \Yii::t('skeeks/shop/app', 'Order ID'),
-            'product_id'            => \Yii::t('skeeks/shop/app', 'Product'),
-            'product_price_id'      => \Yii::t('skeeks/shop/app', 'Product Price ID'),
-            'price'                 => \Yii::t('skeeks/shop/app', 'Price'),
-            'currency_code'         => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'weight'                => \Yii::t('skeeks/shop/app', 'Weight'),
-            'quantity'              => \Yii::t('skeeks/shop/app', 'Amount'),
-            'site_id'               => \Yii::t('skeeks/shop/app', 'Site'),
-            'delay'                 => \Yii::t('skeeks/shop/app', 'Delay'),
-            'name'                  => \Yii::t('skeeks/shop/app', 'Name'),
-            'can_buy'               => \Yii::t('skeeks/shop/app', 'Can Buy'),
-            'callback_func'         => \Yii::t('skeeks/shop/app', 'Callback Func'),
-            'notes'                 => \Yii::t('skeeks/shop/app', 'Notes'),
-            'order_callback_func'   => \Yii::t('skeeks/shop/app', 'Order Callback Func'),
-            'detail_page_url'       => \Yii::t('skeeks/shop/app', 'Detail Page Url'),
-            'discount_price'        => \Yii::t('skeeks/shop/app', 'Discount Price'),
-            'cancel_callback_func'  => \Yii::t('skeeks/shop/app', 'Cancel Callback Func'),
-            'pay_callback_func'     => \Yii::t('skeeks/shop/app', 'Pay Callback Func'),
-            'catalog_xml_id'        => \Yii::t('skeeks/shop/app', 'Catalog Xml ID'),
-            'product_xml_id'        => \Yii::t('skeeks/shop/app', 'Product Xml ID'),
-            'discount_name'         => \Yii::t('skeeks/shop/app', 'Discount Name'),
-            'discount_value'        => \Yii::t('skeeks/shop/app', 'Discount Value'),
-            'discount_coupon'       => \Yii::t('skeeks/shop/app', 'Discount Coupon'),
-            'vat_rate'              => \Yii::t('skeeks/shop/app', 'Vat Rate'),
-            'subscribe'             => \Yii::t('skeeks/shop/app', 'Subscribe'),
-            'barcode_multi'         => \Yii::t('skeeks/shop/app', 'Barcode Multi'),
-            'reserved'              => \Yii::t('skeeks/shop/app', 'Reserved'),
-            'reserve_quantity'      => \Yii::t('skeeks/shop/app', 'Reserve Quantity'),
-            'deducted'              => \Yii::t('skeeks/shop/app', 'Deducted'),
-            'custom_price'          => \Yii::t('skeeks/shop/app', 'Custom Price'),
-            'dimensions'            => \Yii::t('skeeks/shop/app', 'Dimensions'),
-            'type'                  => \Yii::t('skeeks/shop/app', 'Type'),
-            'set_parent_id'         => \Yii::t('skeeks/shop/app', 'Set Parent ID'),
-            'measure_name'          => \Yii::t('skeeks/shop/app', 'Measure Name'),
-            'measure_code'          => \Yii::t('skeeks/shop/app', 'Measure Code'),
-            'recommendation'        => \Yii::t('skeeks/shop/app', 'Recommendation'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'fuser_id' => \Yii::t('skeeks/shop/app', 'Fuser ID'),
+            'order_id' => \Yii::t('skeeks/shop/app', 'Order ID'),
+            'product_id' => \Yii::t('skeeks/shop/app', 'Product'),
+            'product_price_id' => \Yii::t('skeeks/shop/app', 'Product Price ID'),
+            'price' => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'weight' => \Yii::t('skeeks/shop/app', 'Weight'),
+            'quantity' => \Yii::t('skeeks/shop/app', 'Amount'),
+            'site_id' => \Yii::t('skeeks/shop/app', 'Site'),
+            'delay' => \Yii::t('skeeks/shop/app', 'Delay'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'can_buy' => \Yii::t('skeeks/shop/app', 'Can Buy'),
+            'callback_func' => \Yii::t('skeeks/shop/app', 'Callback Func'),
+            'notes' => \Yii::t('skeeks/shop/app', 'Notes'),
+            'order_callback_func' => \Yii::t('skeeks/shop/app', 'Order Callback Func'),
+            'detail_page_url' => \Yii::t('skeeks/shop/app', 'Detail Page Url'),
+            'discount_price' => \Yii::t('skeeks/shop/app', 'Discount Price'),
+            'cancel_callback_func' => \Yii::t('skeeks/shop/app', 'Cancel Callback Func'),
+            'pay_callback_func' => \Yii::t('skeeks/shop/app', 'Pay Callback Func'),
+            'catalog_xml_id' => \Yii::t('skeeks/shop/app', 'Catalog Xml ID'),
+            'product_xml_id' => \Yii::t('skeeks/shop/app', 'Product Xml ID'),
+            'discount_name' => \Yii::t('skeeks/shop/app', 'Discount Name'),
+            'discount_value' => \Yii::t('skeeks/shop/app', 'Discount Value'),
+            'discount_coupon' => \Yii::t('skeeks/shop/app', 'Discount Coupon'),
+            'vat_rate' => \Yii::t('skeeks/shop/app', 'Vat Rate'),
+            'subscribe' => \Yii::t('skeeks/shop/app', 'Subscribe'),
+            'barcode_multi' => \Yii::t('skeeks/shop/app', 'Barcode Multi'),
+            'reserved' => \Yii::t('skeeks/shop/app', 'Reserved'),
+            'reserve_quantity' => \Yii::t('skeeks/shop/app', 'Reserve Quantity'),
+            'deducted' => \Yii::t('skeeks/shop/app', 'Deducted'),
+            'custom_price' => \Yii::t('skeeks/shop/app', 'Custom Price'),
+            'dimensions' => \Yii::t('skeeks/shop/app', 'Dimensions'),
+            'type' => \Yii::t('skeeks/shop/app', 'Type'),
+            'set_parent_id' => \Yii::t('skeeks/shop/app', 'Set Parent ID'),
+            'measure_name' => \Yii::t('skeeks/shop/app', 'Measure Name'),
+            'measure_code' => \Yii::t('skeeks/shop/app', 'Measure Code'),
+            'recommendation' => \Yii::t('skeeks/shop/app', 'Recommendation'),
         ];
     }
 
@@ -276,7 +308,6 @@ class ShopBasket extends \skeeks\cms\models\Core
     }
 
 
-
     /**
      * Итоговая стоимость одной позиции  включая скидки и наценки
      *
@@ -284,7 +315,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoney()
     {
-        return Money::fromString((string) $this->price, $this->currency_code);
+        return Money::fromString((string)$this->price, $this->currency_code);
     }
 
     /**
@@ -295,9 +326,8 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyOriginal()
     {
-        return  Money::fromString((string) ($this->price + $this->discount_price), $this->currency_code);
+        return Money::fromString((string)($this->price + $this->discount_price), $this->currency_code);
     }
-
 
 
     /**
@@ -306,7 +336,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyDiscount()
     {
-        return Money::fromString((string) $this->discount_price, $this->currency_code);
+        return Money::fromString((string)$this->discount_price, $this->currency_code);
     }
 
 
@@ -319,8 +349,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function recalculate()
     {
-        if (!$this->product)
-        {
+        if (!$this->product) {
             return $this;
         }
 
@@ -329,81 +358,72 @@ class ShopBasket extends \skeeks\cms\models\Core
         $parentElement = $product->cmsContentElement->parentContentElement;
 
 
-        $productPrice                     = $product->minProductPrice;
-        $productPriceMoney                = $productPrice->money->convertToCurrency(\Yii::$app->money->getCurrencyObject());
+        $productPrice = $product->minProductPrice;
+        $productPriceMoney = $productPrice->money->convertToCurrency(\Yii::$app->money->getCurrencyObject());
 
-        $this->measure_name               = $product->measure->symbol_rus;
-        $this->measure_code               = $product->measure->code;
-        $this->product_price_id           = $productPrice->id;
-        $this->notes                      = $productPrice->typePrice->name;
+        $this->measure_name = $product->measure->symbol_rus;
+        $this->measure_code = $product->measure->code;
+        $this->product_price_id = $productPrice->id;
+        $this->notes = $productPrice->typePrice->name;
 
-        $this->name                       = $parentElement ? $parentElement->name : $product->cmsContentElement->name;
-        $this->weight                     = $product->weight;
-        $this->site_id                    = \Yii::$app->cms->site->id; //TODO: неправильно
+        $this->name = $parentElement ? $parentElement->name : $product->cmsContentElement->name;
+        $this->weight = $product->weight;
+        $this->site_id = \Yii::$app->cms->site->id; //TODO: неправильно
 
 
-        $this->dimensions       = Json::encode([
-            'height'    => $product->height,
-            'width'     => $product->width,
-            'length'    => $product->length,
+        $this->dimensions = Json::encode([
+            'height' => $product->height,
+            'width' => $product->width,
+            'length' => $product->length,
         ]);
 
         //Рассчет налогов
-        if ($product->vat && (float) $product->vat->rate > 0)
-        {
-            $this->vat_rate         = $product->vat->rate;
+        if ($product->vat && (float)$product->vat->rate > 0) {
+            $this->vat_rate = $product->vat->rate;
 
-            if ($product->vat_included == Cms::BOOL_Y)
-            {
-                $this->price            = $productPriceMoney->getValue();
-            } else
-            {
-                $this->price            = $productPriceMoney->getValue() * $this->vat_rate;
+            if ($product->vat_included == Cms::BOOL_Y) {
+                $this->price = $productPriceMoney->getValue();
+            } else {
+                $this->price = $productPriceMoney->getValue() * $this->vat_rate;
             }
 
-        } else
-        {
-            $this->price            = $productPriceMoney->getValue();
+        } else {
+            $this->price = $productPriceMoney->getValue();
         }
 
-        $this->currency_code    = $productPriceMoney->getCurrency()->getCurrencyCode();
+        $this->currency_code = $productPriceMoney->getCurrency()->getCurrencyCode();
 
 
         //Проверка скидок
         /**
          * @var ShopDiscount $shopDiscount
          */
-         $shopDiscounts = ShopDiscount::find()
-             ->active()
-             ->orderBy(['shop_discount.priority' => SORT_ASC])
-             ->leftJoin('shop_discount2type_price', '`shop_discount2type_price`.`discount_id` = `shop_discount`.`id`')
-             ->andWhere([
+        $shopDiscounts = ShopDiscount::find()
+            ->active()
+            ->orderBy(['shop_discount.priority' => SORT_ASC])
+            ->leftJoin('shop_discount2type_price', '`shop_discount2type_price`.`discount_id` = `shop_discount`.`id`')
+            ->andWhere([
                 'or',
                 ['shop_discount.site_id' => ""],
                 ['shop_discount.site_id' => null],
                 ['shop_discount.site_id' => \Yii::$app->cms->site->id]
-             ])
-             ->andWhere([
+            ])
+            ->andWhere([
                 'shop_discount2type_price.type_price_id' => $this->productPrice->typePrice->id,
-             ])
-             ->all();
+            ])
+            ->all();
 
 
-        if ($shopDiscounts)
-        {
-            foreach ($shopDiscounts as $key => $shopDiscount)
-            {
-                if (!\Yii::$app->user->can($shopDiscount->permissionName))
-                {
+        if ($shopDiscounts) {
+            foreach ($shopDiscounts as $key => $shopDiscount) {
+                if (!\Yii::$app->user->can($shopDiscount->permissionName)) {
                     unset($shopDiscounts[$key]);
                 }
             }
         }
 
-        if ($this->fuser && $this->fuser->discountCoupons)
-        {
-            foreach ($this->fuser->discountCoupons as $discountCoupon)
-            {
+        if ($this->fuser && $this->fuser->discountCoupons) {
+            foreach ($this->fuser->discountCoupons as $discountCoupon) {
                 $shopDiscounts[] = $discountCoupon->shopDiscount;
             }
         }
@@ -414,27 +434,23 @@ class ShopBasket extends \skeeks\cms\models\Core
         $this->discount_value = "";
         $this->discount_name = "";
 
-        if ($shopDiscounts)
-        {
+        if ($shopDiscounts) {
             $discountNames = [];
             $discountPercent = 0;
 
-            foreach ($shopDiscounts as $shopDiscount)
-            {
+            foreach ($shopDiscounts as $shopDiscount) {
                 $discountNames[] = $shopDiscount->name;
 
-                if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P)
-                {
+                if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
                     $percent = $shopDiscount->value / 100;
                     $discountPercent = $discountPercent + $percent;
 
-                    $discountPrice          = $price * $percent;
-                    $this->price            = $this->price - $discountPrice;
-                    $this->discount_price   = $this->discount_price + $discountPrice;
+                    $discountPrice = $price * $percent;
+                    $this->price = $this->price - $discountPrice;
+                    $this->discount_price = $this->discount_price + $discountPrice;
 
                     //Нужно остановится и не применять другие скидки
-                    if ($shopDiscount->last_discount === Cms::BOOL_Y)
-                    {
+                    if ($shopDiscount->last_discount === Cms::BOOL_Y) {
                         break;
                     }
                 }
@@ -445,21 +461,17 @@ class ShopBasket extends \skeeks\cms\models\Core
         }
 
         //Если это предложение, нужно добавить свойства
-        if ($parentElement && !$this->isNewRecord)
-        {
-            if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray())
-            {
-                foreach ($properties as $code => $value)
-                {
-                    if (!$this->getShopBasketProps()->andWhere(['code' => $code])->count() && $value)
-                    {
+        if ($parentElement && !$this->isNewRecord) {
+            if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray()) {
+                foreach ($properties as $code => $value) {
+                    if (!$this->getShopBasketProps()->andWhere(['code' => $code])->count() && $value) {
                         $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
 
                         $basketProperty = new ShopBasketProps();
-                        $basketProperty->shop_basket_id     = $this->id;
-                        $basketProperty->code               = $code;
-                        $basketProperty->value              = $product->cmsContentElement->relatedPropertiesModel->getSmartAttribute($code);
-                        $basketProperty->name               = $property->name;
+                        $basketProperty->shop_basket_id = $this->id;
+                        $basketProperty->code = $code;
+                        $basketProperty->value = $product->cmsContentElement->relatedPropertiesModel->getSmartAttribute($code);
+                        $basketProperty->name = $property->name;
 
                         $basketProperty->save();
                     }
@@ -479,17 +491,15 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyVat()
     {
-        if ((float) $this->vat_rate == 0)
-        {
+        if ((float)$this->vat_rate == 0) {
             return Money::fromString("0", $this->currency_code);
         }
 
-        $value          = $this->money->getValue();
+        $value = $this->money->getValue();
         $calculateValue = $value - ($value * 100 / 118);
 
-        return Money::fromString((string) $calculateValue, $this->currency_code);
+        return Money::fromString((string)$calculateValue, $this->currency_code);
     }
-
 
 
     /**
@@ -497,14 +507,11 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getUrl()
     {
-        if ($this->product)
-        {
+        if ($this->product) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->product->cmsContentElement->parentContentElement)
-            {
+            if ($parent = $this->product->cmsContentElement->parentContentElement) {
                 return $parent->url;
-            } else
-            {
+            } else {
                 return $this->product->cmsContentElement->url;
             }
         }
@@ -517,14 +524,11 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getAbsoluteUrl()
     {
-        if ($this->product)
-        {
+        if ($this->product) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->product->cmsContentElement->parentContentElement)
-            {
+            if ($parent = $this->product->cmsContentElement->parentContentElement) {
                 return $parent->absoluteUrl;
-            } else
-            {
+            } else {
                 return $this->product->cmsContentElement->absoluteUrl;
             }
         }
@@ -537,8 +541,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getImage()
     {
-        if ($this->product)
-        {
+        if ($this->product) {
             //Это предложение у него есть родительский элемент
             if ($parent = $this->product->cmsContentElement->parentContentElement) {
                 return $parent->image;

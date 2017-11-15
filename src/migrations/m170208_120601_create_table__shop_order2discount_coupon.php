@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -12,10 +13,9 @@ class m170208_120601_create_table__shop_order2discount_coupon extends Migration
 {
     public function safeUp()
     {
-        $tableName  = 'shop_order2discount_coupon';
+        $tableName = 'shop_order2discount_coupon';
         $tableExist = $this->db->getTableSchema($tableName, true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
         $tableOptions = null;
@@ -24,16 +24,16 @@ class m170208_120601_create_table__shop_order2discount_coupon extends Migration
         }
 
         $this->createTable($tableName, [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'discount_coupon_id'    => $this->integer()->notNull(),
-            'order_id'              => $this->integer(1)->notNull()->defaultValue(1),
+            'discount_coupon_id' => $this->integer()->notNull(),
+            'order_id' => $this->integer(1)->notNull()->defaultValue(1),
 
         ], $tableOptions);
 

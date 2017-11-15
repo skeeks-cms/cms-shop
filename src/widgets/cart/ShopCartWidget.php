@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 03.04.2015
  */
+
 namespace skeeks\cms\shop\widgets\cart;
+
 use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\shop\assets\ShopAsset;
@@ -55,8 +57,7 @@ class ShopCartWidget extends WidgetRenderable
      */
     public function run()
     {
-        if ($this->allowRegisterAsset)
-        {
+        if ($this->allowRegisterAsset) {
             ShopGlobalWidget::widget(['clientOptions' => $this->shopClientOptions]);
         }
 

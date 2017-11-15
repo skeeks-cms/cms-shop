@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150915_110801_create_table__shop_affiliate extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_affiliate}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,32 +24,32 @@ class m150915_110801_create_table__shop_affiliate extends Migration
         }
 
         $this->createTable("{{%shop_affiliate}}", [
-            'id'                        => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'site_code'                 => $this->string(15)->notNull(),
-            'user_id'                   => $this->integer()->notNull(),
-            'affiliate_id'              => $this->integer(),
-            'plan_id'                   => $this->integer()->notNull(),
+            'site_code' => $this->string(15)->notNull(),
+            'user_id' => $this->integer()->notNull(),
+            'affiliate_id' => $this->integer(),
+            'plan_id' => $this->integer()->notNull(),
 
-            'active'                    => $this->string(1)->notNull()->defaultValue("Y"),
+            'active' => $this->string(1)->notNull()->defaultValue("Y"),
 
-            'paid_sum'                  => $this->decimal(18,4)->notNull()->defaultValue(0),
-            'approved_sum'              => $this->decimal(18,4)->notNull()->defaultValue(0),
-            'pending_sum'               => $this->decimal(18,4)->notNull()->defaultValue(0),
+            'paid_sum' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'approved_sum' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'pending_sum' => $this->decimal(18, 4)->notNull()->defaultValue(0),
 
-            'items_number'              => $this->integer()->notNull()->defaultValue(0),
-            'items_sum'                 => $this->decimal(18,4)->notNull()->defaultValue(0),
+            'items_number' => $this->integer()->notNull()->defaultValue(0),
+            'items_sum' => $this->decimal(18, 4)->notNull()->defaultValue(0),
 
-            'last_calculate_at'         => $this->integer(),
-            'aff_site'                  => $this->string(255),
-            'aff_description'           => $this->text(),
-            'fix_plan'                  => $this->string(1)->notNull()->defaultValue('N'),
+            'last_calculate_at' => $this->integer(),
+            'aff_site' => $this->string(255),
+            'aff_description' => $this->text(),
+            'fix_plan' => $this->string(1)->notNull()->defaultValue('N'),
 
 
         ], $tableOptions);

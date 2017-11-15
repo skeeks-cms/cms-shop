@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150831_130601_create_table__shop_person_type_site extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_person_type_site}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -25,13 +25,14 @@ class m150831_130601_create_table__shop_person_type_site extends Migration
 
         $this->createTable("{{%shop_person_type_site}}", [
 
-            'person_type_id'        => $this->integer()->notNull(),
-            'site_code'             => "CHAR(15) NOT NULL",
+            'person_type_id' => $this->integer()->notNull(),
+            'site_code' => "CHAR(15) NOT NULL",
 
         ], $tableOptions);
 
 
-        $this->createIndex('site_code__person_type_id', '{{%shop_person_type_site}}', ['person_type_id', 'site_code'], true);
+        $this->createIndex('site_code__person_type_id', '{{%shop_person_type_site}}', ['person_type_id', 'site_code'],
+            true);
 
         $this->execute("ALTER TABLE {{%shop_person_type_site}} COMMENT = 'Связь плательщиков с сайтами';");
 
@@ -45,16 +46,14 @@ class m150831_130601_create_table__shop_person_type_site extends Migration
             'site_code', '{{%cms_site}}', 'code', 'CASCADE', 'CASCADE'
         );
 
-        $persons    = \skeeks\cms\shop\models\ShopPersonType::find()->all();
-        $site       = \skeeks\cms\models\CmsSite::find()->def()->one();
+        $persons = \skeeks\cms\shop\models\ShopPersonType::find()->all();
+        $site = \skeeks\cms\models\CmsSite::find()->def()->one();
 
-        if ($persons && $site)
-        {
-            foreach ($persons as $person)
-            {
+        if ($persons && $site) {
+            foreach ($persons as $person) {
                 $this->insert('{{%shop_person_type_site}}', [
-                    'person_type_id'            => $person->id,
-                    'site_code'                 => $site->code,
+                    'person_type_id' => $person->id,
+                    'site_code' => $site->code,
                 ]);
             }
         }

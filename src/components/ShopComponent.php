@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 10.09.2015
  */
+
 namespace skeeks\cms\shop\components;
+
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\controllers\AdminCmsContentElementController;
@@ -41,7 +43,7 @@ use yii\widgets\ActiveForm;
  * @property CmsContent $storeContent
  * @property CmsContent $stores
  *
- * @property array  $notifyEmails
+ * @property array $notifyEmails
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -96,7 +98,7 @@ class ShopComponent extends Component
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          =>  \Yii::t('skeeks/shop/app', 'Shop'),
+            'name' => \Yii::t('skeeks/shop/app', 'Shop'),
         ]);
     }
 
@@ -105,12 +107,13 @@ class ShopComponent extends Component
     {
         echo $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main'));
 
-            //echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
+        //echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
 
-            echo $form->field($this, 'notify_emails')->textarea(['rows' => 3]);
+        echo $form->field($this, 'notify_emails')->textarea(['rows' => 3]);
 
-            echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
-            echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '], CmsContent::getDataForSelect()), ['size' => 1]);
+        echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
+        echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '],
+            CmsContent::getDataForSelect()), ['size' => 1]);
 
 
         echo $form->fieldSetEnd();
@@ -129,20 +132,21 @@ class ShopComponent extends Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'email'                         => 'Email',
-            'payAfterConfirmation'          => \Yii::t('skeeks/shop/app', 'Include payment orders only after the manager approval'),
-            'storeCmsContentId'             => \Yii::t('skeeks/shop/app', 'Content storage'),
-            'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
+            'email' => 'Email',
+            'payAfterConfirmation' => \Yii::t('skeeks/shop/app',
+                'Include payment orders only after the manager approval'),
+            'storeCmsContentId' => \Yii::t('skeeks/shop/app', 'Content storage'),
+            'notify_emails' => \Yii::t('skeeks/shop/app', 'Email notification address'),
         ]);
     }
 
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'notify_emails'             => \Yii::t('skeeks/shop/app', 'Enter email addresses, separated by commas, they will come on new orders information'),
+            'notify_emails' => \Yii::t('skeeks/shop/app',
+                'Enter email addresses, separated by commas, they will come on new orders information'),
         ]);
     }
-
 
 
     /**
@@ -153,6 +157,7 @@ class ShopComponent extends Component
      * @var array
      */
     protected $_shopTypePrices = [];
+
     /**
      *
      * Тип цены по умолчанию
@@ -161,8 +166,7 @@ class ShopComponent extends Component
      */
     public function getBaseTypePrice()
     {
-        if (!$this->_baseTypePrice)
-        {
+        if (!$this->_baseTypePrice) {
             $this->_baseTypePrice = ShopTypePrice::find()->def()->one();
         }
 
@@ -184,15 +188,12 @@ class ShopComponent extends Component
      */
     public function getShopTypePrices()
     {
-        if (!$this->_shopTypePrices)
-        {
+        if (!$this->_shopTypePrices) {
             $this->_shopTypePrices = ShopTypePrice::find()->all();
         }
 
         return $this->_shopTypePrices;
     }
-
-
 
 
     /**
@@ -212,56 +213,46 @@ class ShopComponent extends Component
      */
     public function getShopFuser()
     {
-        if ($this->_shopFuser instanceof ShopFuser)
-        {
+        if ($this->_shopFuser instanceof ShopFuser) {
             return $this->_shopFuser;
         }
 
         //Если пользователь гость
-        if (isset(\Yii::$app->user) && \Yii::$app->user && \Yii::$app->user->isGuest)
-        {
+        if (isset(\Yii::$app->user) && \Yii::$app->user && \Yii::$app->user->isGuest) {
             //Проверка сессии
-            if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName))
-            {
-                $fuserId    = \Yii::$app->getSession()->get($this->sessionFuserName);
-                $shopFuser  = ShopFuser::find()->where(['id' => $fuserId])->one();
+            if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
+                $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
+                $shopFuser = ShopFuser::find()->where(['id' => $fuserId])->one();
                 //Поиск юзера
-                if ($shopFuser)
-                {
+                if ($shopFuser) {
                     $this->_shopFuser = $shopFuser;
                 }
             }
 
-            if (!$this->_shopFuser)
-            {
+            if (!$this->_shopFuser) {
                 $shopFuser = new ShopFuser();
                 $shopFuser->save();
 
                 \Yii::$app->getSession()->set($this->sessionFuserName, $shopFuser->id);
                 $this->_shopFuser = $shopFuser;
             }
-        } else
-        {
-            if (\Yii::$app instanceof \yii\console\Application)
-            {
+        } else {
+            if (\Yii::$app instanceof \yii\console\Application) {
                 return null;
             }
 
             $this->_shopFuser = ShopFuser::find()->where(['user_id' => \Yii::$app->user->identity->id])->one();
             //Если у авторизовнного пользоывателя уже есть пользователь корзины
-            if ($this->_shopFuser)
-            {
+            if ($this->_shopFuser) {
                 //Проверка сессии, а было ли чего то в корзине
-                if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName))
-                {
-                    $fuserId    = \Yii::$app->getSession()->get($this->sessionFuserName);
-                    $shopFuser  = ShopFuser::find()->where(['id' => $fuserId])->one();
+                if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
+                    $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
+                    $shopFuser = ShopFuser::find()->where(['id' => $fuserId])->one();
 
                     /**
                      * @var $shopFuser ShopFuser
                      */
-                    if ($shopFuser)
-                    {
+                    if ($shopFuser) {
                         $this->_shopFuser->addBaskets($shopFuser->shopBaskets);
                         $shopFuser->delete();
                     }
@@ -269,27 +260,23 @@ class ShopComponent extends Component
                     //Эти данные в сессии больше не нужны
                     \Yii::$app->getSession()->remove($this->sessionFuserName);
                 }
-            } else
-            {
+            } else {
                 //Проверка сессии, а было ли чего то в корзине
-                if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName))
-                {
-                    $fuserId    = \Yii::$app->getSession()->get($this->sessionFuserName);
-                    $shopFuser  = ShopFuser::find()->where(['id' => $fuserId])->one();
+                if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
+                    $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
+                    $shopFuser = ShopFuser::find()->where(['id' => $fuserId])->one();
                     //Поиск юзера
                     /**
                      * @var $shopFuser ShopFuser
                      */
-                    if ($shopFuser)
-                    {
+                    if ($shopFuser) {
                         $shopFuser->user_id = \Yii::$app->user->identity->id;
                         $shopFuser->save();
                     }
 
                     $this->_shopFuser = $shopFuser;
                     \Yii::$app->getSession()->remove($this->sessionFuserName);
-                } else
-                {
+                } else {
                     $shopFuser = new ShopFuser([
                         'user_id' => \Yii::$app->user->identity->id
                     ]);
@@ -319,7 +306,8 @@ class ShopComponent extends Component
     public function getShopContents()
     {
         $query = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
-            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id')
+            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id',
+                'content_id')
         ]);
 
         $query->multiple = true;
@@ -340,21 +328,16 @@ class ShopComponent extends Component
         $ids = ArrayHelper::map($this->shopContents, 'id', 'id');
 
         $result = [];
-        foreach ($data as $typeKey => $type)
-        {
-            if ($type)
-            {
+        foreach ($data as $typeKey => $type) {
+            if ($type) {
                 $contents = [];
-                foreach ($type as $key => $value)
-                {
-                    if (in_array($key, $ids))
-                    {
+                foreach ($type as $key => $value) {
+                    if (in_array($key, $ids)) {
                         $contents[$key] = $value;
                     }
                 }
 
-                if ($contents)
-                {
+                if ($contents) {
                     $result[$typeKey] = $contents;
                 }
             }
@@ -369,8 +352,7 @@ class ShopComponent extends Component
      */
     public function getStoreContent()
     {
-        if (!$contentId = (int)$this->storeCmsContentId)
-        {
+        if (!$contentId = (int)$this->storeCmsContentId) {
             return null;
         }
 
@@ -382,8 +364,7 @@ class ShopComponent extends Component
      */
     public function getStores()
     {
-        if ($this->storeContent)
-        {
+        if ($this->storeContent) {
             return $this->storeContent->getCmsContentElements()->all();
         }
 
@@ -397,12 +378,10 @@ class ShopComponent extends Component
     public function getNotifyEmails()
     {
         $emailsAll = [];
-        if ($this->notify_emails)
-        {
+        if ($this->notify_emails) {
             $emails = explode(",", $this->notify_emails);
 
-            foreach ($emails as $email)
-            {
+            foreach ($emails as $email) {
                 $emailsAll[] = trim($email);
             }
         }

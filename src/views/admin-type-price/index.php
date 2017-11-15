@@ -16,31 +16,31 @@
 ?>
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'adminController'   => $controller,
-        'pjax'              => $pjax,
-        'settingsData' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'adminController' => $controller,
+    'pjax' => $pjax,
+    'settingsData' =>
         [
-            'order'     => SORT_ASC,
-            'orderBy'   => "priority",
+            'order' => SORT_ASC,
+            'orderBy' => "priority",
         ],
-        'columns' => [
-            'code',
-            'name',
-            'priority',
+    'columns' => [
+        'code',
+        'name',
+        'priority',
 
-            [
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute'     => "def"
-            ],
+        [
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute' => "def"
         ],
-    ]); ?>
+    ],
+]); ?>
 
 <? $pjax::end(); ?>

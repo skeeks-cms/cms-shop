@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.09.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
@@ -61,7 +62,10 @@ class ShopContent extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'content_id', 'vat_id', 'children_content_id'], 'integer'],
+            [
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'content_id', 'vat_id', 'children_content_id'],
+                'integer'
+            ],
             [['content_id'], 'required'],
             [['content_id'], 'unique'],
             [['yandex_export', 'subscription'], 'string', 'max' => 1],
@@ -74,15 +78,15 @@ class ShopContent extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'content_id'    => \Yii::t('skeeks/shop/app', 'Content'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'content_id' => \Yii::t('skeeks/shop/app', 'Content'),
             'yandex_export' => \Yii::t('skeeks/shop/app', 'Export to Yandex.Products'),
-            'subscription'  => \Yii::t('skeeks/shop/app', 'Subscription'),
-            'vat_id'        => \Yii::t('skeeks/shop/app', 'Vat ID'),
+            'subscription' => \Yii::t('skeeks/shop/app', 'Subscription'),
+            'vat_id' => \Yii::t('skeeks/shop/app', 'Vat ID'),
             'children_content_id' => \Yii::t('skeeks/shop/app', 'Trade offers'),
         ];
     }

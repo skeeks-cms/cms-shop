@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.09.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
@@ -44,22 +45,19 @@ class OrderController extends Controller
                 'class' => CmsAccessControl::className(),
                 'only' => ['view', 'pay'],
                 'rules' => [
-                      // deny all POST request
-                      //
+                    // deny all POST request
+                    //
                     [
                         'allow' => true,
-                        'matchCallback' => function($rule, $action)
-                        {
+                        'matchCallback' => function ($rule, $action) {
                             $id = \Yii::$app->request->get('id');
                             $shopOrder = ShopOrder::findOne($id);
 
-                            if (\Yii::$app->user->isGuest)
-                            {
+                            if (\Yii::$app->user->isGuest) {
                                 return false;
                             }
 
-                            if ($shopOrder->user_id == \Yii::$app->user->identity->id)
-                            {
+                            if ($shopOrder->user_id == \Yii::$app->user->identity->id) {
                                 return true;
                             }
 
@@ -74,8 +72,8 @@ class OrderController extends Controller
                 'only' => ['list'],
                 'rules' => [
                     [
-                      'allow' => true,
-                      'roles' => ['@'],
+                        'allow' => true,
+                        'roles' => ['@'],
                     ],
                 ]
             ]
@@ -84,8 +82,7 @@ class OrderController extends Controller
 
     public function beforeAction($action)
     {
-        if ($action->id == 'view')
-        {
+        if ($action->id == 'view') {
             $this->enableCsrfValidation = false;
         }
 
@@ -97,7 +94,7 @@ class OrderController extends Controller
      */
     public function actionList()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'My orders').' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'My orders') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id);
     }
@@ -107,10 +104,10 @@ class OrderController extends Controller
      */
     public function actionView()
     {
-        $this->view->title =  \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id, [
-            'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))
+            'model' => ShopOrder::findOne(\Yii::$app->request->get('id'))
         ]);
     }
 
@@ -119,10 +116,10 @@ class OrderController extends Controller
      */
     public function actionFinish()
     {
-        $this->view->title =  \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id, [
-            'model'     => ShopOrder::find()->andWhere(['key' => \Yii::$app->request->get('key')])->one()
+            'model' => ShopOrder::find()->andWhere(['key' => \Yii::$app->request->get('key')])->one()
         ]);
     }
 
@@ -132,8 +129,7 @@ class OrderController extends Controller
          * @var $shopOrder ShopOrder
          */
         $shopOrder = ShopOrder::find()->where(['key' => \Yii::$app->request->get('key')])->one();
-        if (!\Yii::$app->request->get('key') || !$shopOrder)
-        {
+        if (!\Yii::$app->request->get('key') || !$shopOrder) {
             throw new NotFoundHttpException;
         }
 
@@ -156,7 +152,7 @@ class OrderController extends Controller
     public function actionPayPal()
     {
         return $this->render($this->action->id, [
-            'model'     => ShopOrder::findOne(\Yii::$app->request->get('id'))
+            'model' => ShopOrder::findOne(\Yii::$app->request->get('id'))
         ]);
     }
 

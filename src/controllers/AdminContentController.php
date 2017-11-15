@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -34,9 +35,9 @@ class AdminContentController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Content settings');
-        $this->modelShowAttribute       = "id";
-        $this->modelClassName           = ShopContent::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Content settings');
+        $this->modelShowAttribute = "id";
+        $this->modelClassName = ShopContent::className();
 
         parent::init();
     }

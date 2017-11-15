@@ -13,34 +13,34 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
 
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'pjax'              => $pjax,
-        'adminController'   => \Yii::$app->controller,
-        'settingsData' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'pjax' => $pjax,
+    'adminController' => \Yii::$app->controller,
+    'settingsData' =>
         [
             'order' => SORT_ASC,
             'orderBy' => "priority",
         ],
 
-        'columns'           =>
+    'columns' =>
         [
             'id',
 
             [
-                'attribute'     => 'name',
-                'label'         => \Yii::t('skeeks/shop/app', 'Name of the program'),
+                'attribute' => 'name',
+                'label' => \Yii::t('skeeks/shop/app', 'Name of the program'),
             ],
 
             [
-                'attribute'     => 'active',
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => 'active',
+                'class' => \skeeks\cms\grid\BooleanColumn::className(),
             ],
 
             [
@@ -53,6 +53,6 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
 
             'priority',
         ]
-    ]); ?>
+]); ?>
 
 <? $pjax::end(); ?>

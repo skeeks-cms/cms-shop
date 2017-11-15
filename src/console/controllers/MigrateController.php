@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.03.2016
  */
+
 namespace skeeks\cms\shop\console\controllers;
+
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopProductPriceChange;
@@ -31,19 +33,16 @@ class MigrateController extends Controller
         /**
          * @var ShopProductPrice $price
          */
-        foreach (ShopProductPrice::find()->each(1000) as $price)
-        {
+        foreach (ShopProductPrice::find()->each(1000) as $price) {
             $prices = ShopProductPrice::find()
-                    ->where(['type_price_id' => $price->type_price_id])
-                    ->andWhere(['product_id' => $price->product_id])
-                    ->andWhere(["!=", 'id', $price->id])->all();
+                ->where(['type_price_id' => $price->type_price_id])
+                ->andWhere(['product_id' => $price->product_id])
+                ->andWhere(["!=", 'id', $price->id])->all();
 
             $this->stdout("price: {$price->id}\n");
-            if (!$prices)
-            {
+            if (!$prices) {
                 continue;
-            } else
-            {
+            } else {
                 $total = count($prices);
 
                 $removePrices = ShopProductPrice::find()->where(['type_price_id' => $price->type_price_id])
@@ -54,8 +53,7 @@ class MigrateController extends Controller
                     ->all();
 
                 $forRemove = count($removePrices);
-                foreach ($removePrices as $price)
-                {
+                foreach ($removePrices as $price) {
                     $price->delete();
                 }
 

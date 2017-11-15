@@ -16,8 +16,15 @@ class Merchant extends Object
 
     public $baseUrl = 'https://auth.robokassa.ru/Merchant/Index.aspx';
 
-    public function payment($nOutSum, $nInvId, $sInvDesc = null, $sIncCurrLabel=null, $sEmail = null, $sCulture = null, $shp = [])
-    {
+    public function payment(
+        $nOutSum,
+        $nInvId,
+        $sInvDesc = null,
+        $sIncCurrLabel = null,
+        $sEmail = null,
+        $sCulture = null,
+        $shp = []
+    ) {
         $url = $this->baseUrl;
 
         $signature = "{$this->sMerchantLogin}:{$nOutSum}:{$nInvId}:{$this->sMerchantPass1}";
@@ -38,8 +45,7 @@ class Merchant extends Object
             'Culture' => $sCulture
         ];
 
-        if (!$this->isLive)
-        {
+        if (!$this->isLive) {
             $data['isTest'] = 1;
         }
 
@@ -56,14 +62,14 @@ class Merchant extends Object
     private function implodeShp($shp)
     {
         ksort($shp);
-        foreach($shp as $key => $value) {
+        foreach ($shp as $key => $value) {
             $shp[$key] = $key . '=' . $value;
         }
 
         return implode(':', $shp);
     }
 
-    public  function checkSignature($sSignatureValue, $nOutSum, $nInvId, $sMerchantPass, $shp)
+    public function checkSignature($sSignatureValue, $nOutSum, $nInvId, $sMerchantPass, $shp)
     {
         $signature = "{$nOutSum}:{$nInvId}:{$sMerchantPass}";
         if (!empty($shp)) {

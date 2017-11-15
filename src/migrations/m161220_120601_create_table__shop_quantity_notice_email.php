@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -12,10 +13,9 @@ class m161220_120601_create_table__shop_quantity_notice_email extends Migration
 {
     public function safeUp()
     {
-        $tableName  = 'shop_quantity_notice_email';
+        $tableName = 'shop_quantity_notice_email';
         $tableExist = $this->db->getTableSchema($tableName, true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
         $tableOptions = null;
@@ -24,23 +24,23 @@ class m161220_120601_create_table__shop_quantity_notice_email extends Migration
         }
 
         $this->createTable($tableName, [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'shop_product_id'       => $this->integer()->notNull(),
-            'email'                 => $this->string()->notNull(),
+            'shop_product_id' => $this->integer()->notNull(),
+            'email' => $this->string()->notNull(),
 
-            'name'                  => $this->string()->null(),
+            'name' => $this->string()->null(),
 
-            'is_notified'           => $this->integer()->notNull()->defaultValue(0),
-            'notified_at'           => $this->integer(),
+            'is_notified' => $this->integer()->notNull()->defaultValue(0),
+            'notified_at' => $this->integer(),
 
-            'shop_fuser_id'         => $this->integer(),
+            'shop_fuser_id' => $this->integer(),
 
         ], $tableOptions);
 

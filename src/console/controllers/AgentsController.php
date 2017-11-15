@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.03.2016
  */
+
 namespace skeeks\cms\shop\console\controllers;
+
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopProductPriceChange;
 use yii\console\Controller;
@@ -54,21 +56,21 @@ SQL
                     ;
 
         echo $query->createCommand()->sql;*/
-/*
-        $counter = 0;
-        $models = $query->all();
-        $allCount = count($models);
-        Console::startProgress(0, $allCount);
-
-        foreach ($query->each() as $model)
-        {
-            // $users is indexed by the "username" column
-            $counter ++;
-            $model->delete();
-            Console::updateProgress($counter, $allCount);
-        }
-
-        Console::endProgress();*/
+        /*
+                $counter = 0;
+                $models = $query->all();
+                $allCount = count($models);
+                Console::startProgress(0, $allCount);
+        
+                foreach ($query->each() as $model)
+                {
+                    // $users is indexed by the "username" column
+                    $counter ++;
+                    $model->delete();
+                    Console::updateProgress($counter, $allCount);
+                }
+        
+                Console::endProgress();*/
 
         $this->stdout("Removed empty baskets: " . $deleted . "\n");
         \Yii::info("Removed empty baskets: " . $deleted);

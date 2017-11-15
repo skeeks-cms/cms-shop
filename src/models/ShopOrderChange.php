@@ -22,43 +22,43 @@ use yii\helpers\ArrayHelper;
  */
 class ShopOrderChange extends \skeeks\cms\models\Core
 {
-    const ORDER_ADDED               = "ORDER_ADDED";
-    const ORDER_CANCELED            = "ORDER_CANCELED";
-    const ORDER_STATUS_CHANGED      = "ORDER_STATUS_CHANGED";
-    const ORDER_ALLOW_PAYMENT       = "ORDER_ALLOW_PAYMENT";
-    const ORDER_ALLOW_DELIVERY      = "ORDER_ALLOW_DELIVERY";
+    const ORDER_ADDED = "ORDER_ADDED";
+    const ORDER_CANCELED = "ORDER_CANCELED";
+    const ORDER_STATUS_CHANGED = "ORDER_STATUS_CHANGED";
+    const ORDER_ALLOW_PAYMENT = "ORDER_ALLOW_PAYMENT";
+    const ORDER_ALLOW_DELIVERY = "ORDER_ALLOW_DELIVERY";
 
-    const ORDER_PAYED               = "ORDER_PAYED";
-    const ORDER_PRICE_CHANGE        = "ORDER_PRICE_CHANGE";
+    const ORDER_PAYED = "ORDER_PAYED";
+    const ORDER_PRICE_CHANGE = "ORDER_PRICE_CHANGE";
 
 
-    const BASKET_ADDED              = "BASKET_ADDED";
-    const BASKET_REMOVED            = "BASKET_REMOVED";
-    const BASKET_PRICE_CHANGED      = "BASKET_PRICE_CHANGED";
-    const BASKET_QUANTITY_CHANGED   = "BASKET_QUANTITY_CHANGED";
+    const BASKET_ADDED = "BASKET_ADDED";
+    const BASKET_REMOVED = "BASKET_REMOVED";
+    const BASKET_PRICE_CHANGED = "BASKET_PRICE_CHANGED";
+    const BASKET_QUANTITY_CHANGED = "BASKET_QUANTITY_CHANGED";
 
 
     static public function types()
     {
         return [
-            self::ORDER_ADDED               => \Yii::t('skeeks/shop/app', 'Create Order'),
-            self::ORDER_CANCELED            => \Yii::t('skeeks/shop/app', 'Cancellations'),
-            self::ORDER_STATUS_CHANGED      => \Yii::t('skeeks/shop/app', 'Changing status'),
-            self::ORDER_ALLOW_PAYMENT       => \Yii::t('skeeks/shop/app', 'Payment agreement'),
-            self::ORDER_ALLOW_DELIVERY      => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
-            self::ORDER_PAYED               => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
+            self::ORDER_ADDED => \Yii::t('skeeks/shop/app', 'Create Order'),
+            self::ORDER_CANCELED => \Yii::t('skeeks/shop/app', 'Cancellations'),
+            self::ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Changing status'),
+            self::ORDER_ALLOW_PAYMENT => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
+            self::ORDER_PAYED => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
         ];
     }
 
     static public function typeMessages()
     {
         return [
-            self::ORDER_ADDED               => \Yii::t('skeeks/shop/app', 'The order created'),
-            self::ORDER_CANCELED            => \Yii::t('skeeks/shop/app', 'Order cancelled. The reason: "{reason canceled}"'),
-            self::ORDER_STATUS_CHANGED      => \Yii::t('skeeks/shop/app', 'Status changed to: "{status}"'),
-            self::ORDER_ALLOW_PAYMENT       => \Yii::t('skeeks/shop/app', 'Payment agreement'),
-            self::ORDER_ALLOW_DELIVERY      => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
-            self::ORDER_PAYED      => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
+            self::ORDER_ADDED => \Yii::t('skeeks/shop/app', 'The order created'),
+            self::ORDER_CANCELED => \Yii::t('skeeks/shop/app', 'Order cancelled. The reason: "{reason canceled}"'),
+            self::ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Status changed to: "{status}"'),
+            self::ORDER_ALLOW_PAYMENT => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
+            self::ORDER_PAYED => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
         ];
     }
 
@@ -84,12 +84,12 @@ class ShopOrderChange extends \skeeks\cms\models\Core
         return ArrayHelper::merge(parent::behaviors(), [
 
             Serialize::className() =>
-            [
-                'class' => Serialize::className(),
-                "fields" =>  [
-                    "data"
-                ]
-            ],
+                [
+                    'class' => Serialize::className(),
+                    "fields" => [
+                        "data"
+                    ]
+                ],
 
         ]);
     }

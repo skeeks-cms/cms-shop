@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 05.08.2015
  */
+
 namespace skeeks\cms\shop\grid;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -18,8 +19,8 @@ use yii\helpers\Html;
  */
 class BasketQuantityGridColumn extends DataColumn
 {
-    public $attribute   = "quantity";
-    public $format      = "raw";
+    public $attribute = "quantity";
+    public $format = "raw";
 
     /**
      * @param mixed $model

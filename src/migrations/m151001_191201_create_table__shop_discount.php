@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m151001_191201_create_table__shop_discount extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_discount}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,44 +24,44 @@ class m151001_191201_create_table__shop_discount extends Migration
         }
 
         $this->createTable("{{%shop_discount}}", [
-            'id'                        => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
 
-            'site_id'                   => $this->integer(),
-            'active'                    => $this->string(1)->notNull()->defaultValue('Y'),
-            'active_from'               => $this->integer(),
-            'active_to'                 => $this->integer(),
-            'renewal'                   => $this->string(1)->notNull()->defaultValue('N'),
-            'name'                      => $this->string(255)->notNull(),
-            'max_uses'                  => $this->integer()->notNull()->defaultValue(0),
-            'count_uses'                => $this->integer()->notNull()->defaultValue(0),
-            'coupon'                    => $this->string(20),
-            'max_discount'              => $this->decimal(18,4),
-            'value_type'                => $this->string(1)->notNull()->defaultValue('P'),
-            'value'                     => $this->decimal(18,4)->notNull()->defaultValue(0),
-            'currency_code'             => $this->string(3)->notNull(),
-            'min_order_sum'             => $this->decimal(18,4)->notNull()->defaultValue(0),
-            'notes'                     => $this->string(255),
-            'type'                      => $this->integer()->notNull()->defaultValue(0),
-            'xml_id'                    => $this->string(255),
-            'count_period'              => $this->string(1)->notNull()->defaultValue("U"),
-            'count_size'                => $this->integer()->notNull()->defaultValue(0),
-            'count_type'                => $this->string(1)->notNull()->defaultValue("Y"),
-            'count_from'                => $this->integer(),
-            'count_to'                  => $this->integer(),
-            'action_size'               => $this->integer()->notNull()->defaultValue(0),
-            'action_type'               => $this->string(1)->notNull()->defaultValue('Y'),
-            'priority'                  => $this->integer()->notNull()->defaultValue(1),
-            'last_discount'             => $this->string(1)->notNull()->defaultValue('Y'),
-            'conditions'                => $this->text(),
-            'unpack'                    => $this->text(),
-            'version'                   => $this->integer()->notNull()->defaultValue(1),
+            'site_id' => $this->integer(),
+            'active' => $this->string(1)->notNull()->defaultValue('Y'),
+            'active_from' => $this->integer(),
+            'active_to' => $this->integer(),
+            'renewal' => $this->string(1)->notNull()->defaultValue('N'),
+            'name' => $this->string(255)->notNull(),
+            'max_uses' => $this->integer()->notNull()->defaultValue(0),
+            'count_uses' => $this->integer()->notNull()->defaultValue(0),
+            'coupon' => $this->string(20),
+            'max_discount' => $this->decimal(18, 4),
+            'value_type' => $this->string(1)->notNull()->defaultValue('P'),
+            'value' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'currency_code' => $this->string(3)->notNull(),
+            'min_order_sum' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'notes' => $this->string(255),
+            'type' => $this->integer()->notNull()->defaultValue(0),
+            'xml_id' => $this->string(255),
+            'count_period' => $this->string(1)->notNull()->defaultValue("U"),
+            'count_size' => $this->integer()->notNull()->defaultValue(0),
+            'count_type' => $this->string(1)->notNull()->defaultValue("Y"),
+            'count_from' => $this->integer(),
+            'count_to' => $this->integer(),
+            'action_size' => $this->integer()->notNull()->defaultValue(0),
+            'action_type' => $this->string(1)->notNull()->defaultValue('Y'),
+            'priority' => $this->integer()->notNull()->defaultValue(1),
+            'last_discount' => $this->string(1)->notNull()->defaultValue('Y'),
+            'conditions' => $this->text(),
+            'unpack' => $this->text(),
+            'version' => $this->integer()->notNull()->defaultValue(1),
         ], $tableOptions);
 
 

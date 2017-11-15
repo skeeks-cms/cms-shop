@@ -10,8 +10,8 @@
 $widget = $this->context;
 ?>
 <?= $widget->form->field($widget->model, 'email')->textInput([
-    'type'          => 'email',
-    'placeholder'   => 'email',
+    'type' => 'email',
+    'placeholder' => 'email',
 ]); ?>
 <div style="display: none">
     <?= $widget->form->field($widget->model, 'shop_product_id'); ?>

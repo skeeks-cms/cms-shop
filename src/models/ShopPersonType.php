@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
@@ -29,8 +30,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property string[] $siteCodes
  *
- * @property ShopPersonTypeSite[]   $shopPersonTypeSites
- * @property CmsSite[]              $sites
+ * @property ShopPersonTypeSite[] $shopPersonTypeSites
+ * @property CmsSite[] $sites
  *
  * @property ShopBuyer[] $shopBuyers
  * @property ShopOrder[] $shopOrders
@@ -55,8 +56,6 @@ class ShopPersonType extends \skeeks\cms\models\Core
     protected $_siteCodes = [];
 
 
-
-
     /**
      * @inheritdoc
      */
@@ -64,10 +63,10 @@ class ShopPersonType extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterSaveEvent"]);
-        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveEvent"]);
 
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeSaveEvent"]);
     }
 
     /**
@@ -75,10 +74,8 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function beforeSaveEvent($event)
     {
-        if ($this->isAttributeChanged('active') && $this->active == Cms::BOOL_N)
-        {
-            if (!static::find()->active()->andWhere(['!=', 'id', $this->id])->count())
-            {
+        if ($this->isAttributeChanged('active') && $this->active == Cms::BOOL_N) {
+            if (!static::find()->active()->andWhere(['!=', 'id', $this->id])->count()) {
                 throw new Exception("Requires at least one active payer type");
             }
         }
@@ -89,29 +86,24 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function afterSaveEvent($event)
     {
-        if ($this->_siteCodes)
-        {
+        if ($this->_siteCodes) {
             //Для начала удаляем текущие связи
             $allSites = $this->getShopPersonTypeSites()->all();
-            if ($allSites)
-            {
-                foreach ($allSites as $siteRelation)
-                {
+            if ($allSites) {
+                foreach ($allSites as $siteRelation) {
                     $siteRelation->delete();
                 }
             }
 
             //добавляем новые
-            foreach ($this->_siteCodes as $code)
-            {
+            foreach ($this->_siteCodes as $code) {
                 $shopTypeSite = $this->getShopPersonTypeSites()->andWhere(['site_code' => $code])->one();
                 //Такой связи еще нет
-                if (!$shopTypeSite)
-                {
-                    $shopTypeSite                   = new ShopPersonTypeSite();
+                if (!$shopTypeSite) {
+                    $shopTypeSite = new ShopPersonTypeSite();
 
-                    $shopTypeSite->site_code        = $code;
-                    $shopTypeSite->person_type_id   = $this->id;
+                    $shopTypeSite->site_code = $code;
+                    $shopTypeSite->person_type_id = $this->id;
 
                     $shopTypeSite->save();
                 }
@@ -140,9 +132,9 @@ class ShopPersonType extends \skeeks\cms\models\Core
 
     public function validateActive($attribute)
     {
-        if($this->$attribute == Cms::BOOL_N && !static::find()->active()->andWhere(['!=', 'id', $this->id])->count())
-        {
-            $this->addError($attribute, \Yii::t('skeeks/shop/app', 'It is necessary at least to leave one active payer type in the site'));
+        if ($this->$attribute == Cms::BOOL_N && !static::find()->active()->andWhere(['!=', 'id', $this->id])->count()) {
+            $this->addError($attribute,
+                \Yii::t('skeeks/shop/app', 'It is necessary at least to leave one active payer type in the site'));
         }
     }
 
@@ -152,19 +144,15 @@ class ShopPersonType extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name'      => \Yii::t('skeeks/shop/app', 'Name'),
-            'priority'  => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active'    => \Yii::t('skeeks/shop/app', 'Active'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active' => \Yii::t('skeeks/shop/app', 'Active'),
             'siteCodes' => \Yii::t('skeeks/shop/app', 'Sites'),
         ]);
     }
 
 
-
-
-
-
-     /**
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopBuyers()
@@ -194,7 +182,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
     public function getPaySystems()
     {
         return $this->hasMany(ShopPaySystem::className(), ['id' => 'pay_system_id'])
-                ->viaTable('shop_pay_system_person_type', ['person_type_id' => 'id']);
+            ->viaTable('shop_pay_system_person_type', ['person_type_id' => 'id']);
     }
 
     /**
@@ -202,9 +190,9 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getShopPersonTypeProperties()
     {
-        return $this->hasMany(ShopPersonTypeProperty::className(), ['shop_person_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
+        return $this->hasMany(ShopPersonTypeProperty::className(),
+            ['shop_person_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
-
 
 
     /**
@@ -214,8 +202,6 @@ class ShopPersonType extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopTaxRate::className(), ['person_type_id' => 'id']);
     }
-
-
 
 
     /**
@@ -231,7 +217,8 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getSites()
     {
-        return $this->hasMany(CmsSite::className(), ['code' => 'site_code'])->viaTable('{{%shop_person_type_site}}', ['person_type_id' => 'id']);
+        return $this->hasMany(CmsSite::className(), ['code' => 'site_code'])->viaTable('{{%shop_person_type_site}}',
+            ['person_type_id' => 'id']);
     }
 
 
@@ -240,7 +227,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getSiteCodes()
     {
-        return (array) ArrayHelper::map($this->sites, 'code', 'code');
+        return (array)ArrayHelper::map($this->sites, 'code', 'code');
     }
 
 
@@ -255,20 +242,18 @@ class ShopPersonType extends \skeeks\cms\models\Core
     }
 
 
-
     /**
      * @return ShopBuyer
      * @throws InvalidParamException
      */
     public function createModelShopBuyer()
     {
-        if ($this->isNewRecord)
-        {
+        if ($this->isNewRecord) {
             throw new InvalidParamException;
         }
 
         return new ShopBuyer([
-            'shop_person_type_id' => (int) $this->id
+            'shop_person_type_id' => (int)$this->id
         ]);
     }
 

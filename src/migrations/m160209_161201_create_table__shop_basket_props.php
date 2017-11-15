@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m160209_161201_create_table__shop_basket_props extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_basket_props}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,20 +24,20 @@ class m160209_161201_create_table__shop_basket_props extends Migration
         }
 
         $this->createTable("{{%shop_basket_props}}", [
-            'id'                        => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'shop_basket_id'            => $this->integer()->notNull(),
+            'shop_basket_id' => $this->integer()->notNull(),
 
-            'name'                      => $this->string(255)->notNull(),
-            'value'                     => $this->string(255),
-            'code'                      => $this->string(255),
-            'priority'                  => $this->integer()->notNull()->defaultValue(100),
+            'name' => $this->string(255)->notNull(),
+            'value' => $this->string(255),
+            'code' => $this->string(255),
+            'priority' => $this->integer()->notNull()->defaultValue(100),
 
         ], $tableOptions);
 

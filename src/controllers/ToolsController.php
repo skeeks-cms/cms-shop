@@ -7,6 +7,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.04.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;

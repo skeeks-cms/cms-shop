@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150910_170601_create_table__kladr_location extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%kladr_location}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,29 +24,29 @@ class m150910_170601_create_table__kladr_location extends Migration
         }
 
         $this->createTable("{{%kladr_location}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'name'                  => $this->string(255)->notNull(),
-            'name_short'            => $this->string(255),
-            'name_full'             => $this->string(255),
+            'name' => $this->string(255)->notNull(),
+            'name_short' => $this->string(255),
+            'name_full' => $this->string(255),
 
-            'zip'                   => $this->string(20),
+            'zip' => $this->string(20),
 
-            'okato'                 => $this->string(20),
-            'type'                  => $this->string(10)->notNull(),
+            'okato' => $this->string(20),
+            'type' => $this->string(10)->notNull(),
 
-            'kladr_api_id'          => $this->string(20),
+            'kladr_api_id' => $this->string(20),
 
-            'active'                => $this->string(1)->notNull()->defaultValue("Y"),
+            'active' => $this->string(1)->notNull()->defaultValue("Y"),
 
-            'parent_id'             => $this->integer(),
-            'sort'                  => $this->integer(),
+            'parent_id' => $this->integer(),
+            'sort' => $this->integer(),
 
         ], $tableOptions);
 

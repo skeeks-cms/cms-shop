@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150901_160601_create_table__shop_tax extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_tax}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,19 +24,19 @@ class m150901_160601_create_table__shop_tax extends Migration
         }
 
         $this->createTable("{{%shop_tax}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'name'                  => $this->string(255)->notNull(),
-            'description'           => $this->text(),
-            'code'                  => $this->string(50)->notNull(),
+            'name' => $this->string(255)->notNull(),
+            'description' => $this->text(),
+            'code' => $this->string(50)->notNull(),
 
-            'site_code'             => $this->string(15),
+            'site_code' => $this->string(15),
 
         ], $tableOptions);
 
@@ -70,17 +70,16 @@ class m150901_160601_create_table__shop_tax extends Migration
 
 
         $site_code = null;
-        $site       = \skeeks\cms\models\CmsSite::find()->def()->one();
+        $site = \skeeks\cms\models\CmsSite::find()->def()->one();
 
-        if ($site)
-        {
+        if ($site) {
             $site_code = $site->code;
         }
 
         $this->insert('{{%shop_tax}}', [
-            'name'              => 'НДС',
-            'code'              => 'NDS',
-            'site_code'         => $site_code,
+            'name' => 'НДС',
+            'code' => 'NDS',
+            'site_code' => $site_code,
         ]);
 
     }

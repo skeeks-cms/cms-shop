@@ -12,12 +12,11 @@ $payLink = \yii\helpers\Url::to('shop/cart/payment');
 ?>
 
 
-
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-        'validationUrl'     => \skeeks\cms\helpers\UrlHelper::construct('shop/cart/shop-person-type-validate')->toString(),
-        'action'            => \skeeks\cms\helpers\UrlHelper::construct('shop/cart/shop-person-type-submit')->toString(),
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct('shop/cart/shop-person-type-validate')->toString(),
+    'action' => \skeeks\cms\helpers\UrlHelper::construct('shop/cart/shop-person-type-submit')->toString(),
 
-        'afterValidateCallback'                     => new \yii\web\JsExpression(<<<JS
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
             {
                 var handler = new sx.classes.AjaxHandlerStandartRespose(ajax, {
@@ -31,19 +30,18 @@ $payLink = \yii\helpers\Url::to('shop/cart/payment');
                 });
             }
 JS
-),
-    ]);
+    ),
+]);
 ?>
 
 <?
-    echo \yii\helpers\Html::hiddenInput("shop_person_type_id",   $widget->shopPersonType->id);
+echo \yii\helpers\Html::hiddenInput("shop_person_type_id", $widget->shopPersonType->id);
 ?>
 
 <?
-    if ($widget->shopBuyer && !$widget->shopBuyer->isNewRecord)
-    {
-        echo \yii\helpers\Html::hiddenInput("shop_buyer_id",   $widget->shopBuyer->id);
-    }
+if ($widget->shopBuyer && !$widget->shopBuyer->isNewRecord) {
+    echo \yii\helpers\Html::hiddenInput("shop_buyer_id", $widget->shopBuyer->id);
+}
 
 ?>
 

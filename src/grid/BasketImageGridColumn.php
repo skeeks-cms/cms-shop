@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 05.08.2015
  */
+
 namespace skeeks\cms\shop\grid;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -18,7 +19,7 @@ use yii\helpers\Html;
  */
 class BasketImageGridColumn extends DataColumn
 {
-    public $format      = "raw";
+    public $format = "raw";
 
     /**
      * @param \skeeks\cms\shop\models\ShopBasket $model

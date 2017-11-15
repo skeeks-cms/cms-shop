@@ -15,8 +15,7 @@
 $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);
 
 $cmsContent = null;
-if ($content_id = \Yii::$app->request->get('content_id'))
-{
+if ($content_id = \Yii::$app->request->get('content_id')) {
     $dataProvider->query->andWhere(['content_id' => $content_id]);
     /**
      * @var $cmsContent \skeeks\cms\models\CmsContent
@@ -27,7 +26,6 @@ if ($content_id = \Yii::$app->request->get('content_id'))
 
 $sortAttr = $dataProvider->getSort()->attributes;
 $query = $dataProvider->query;
-
 
 
 $query->with('image');
@@ -54,8 +52,7 @@ $columns = \yii\helpers\ArrayHelper::merge($columns, [
         'class' => \yii\grid\DataColumn::class,
         'visible' => false,
         'attribute' => 'quantity',
-        'value' => function(\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement)
-        {
+        'value' => function (\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement) {
             return $shopCmsContentElement->shopProduct ? $shopCmsContentElement->shopProduct->quantity : " - ";
         },
     ]
@@ -65,25 +62,25 @@ $columns = \yii\helpers\ArrayHelper::merge($columns, [
 
 
 
-    <?php echo $this->render('_search', [
-        'searchModel' => $searchModel,
-        'dataProvider' => $dataProvider,
-        'content_id' => $content_id,
-        'cmsContent' => $cmsContent,
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider,
+    'content_id' => $content_id,
+    'cmsContent' => $cmsContent,
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'autoColumns'       => false,
-        'pjax'              => $pjax,
-        'adminController'   => $controller,
-        'settingsData'  =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'autoColumns' => false,
+    'pjax' => $pjax,
+    'adminController' => $controller,
+    'settingsData' =>
         [
             'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
         ],
-        'columns' => $columns
-    ]); ?>
+    'columns' => $columns
+]); ?>
 
 
 <? $pjax::end() ?>
@@ -93,7 +90,10 @@ $columns = \yii\helpers\ArrayHelper::merge($columns, [
         'class' => 'alert-info',
     ],
 ]); ?>
-    <?= \Yii::t('skeeks/shop/app','Change the properties and rights of access to information block you can'); ?> <?= \yii\helpers\Html::a(\Yii::t('skeeks/shop/app','Content Settings'), \skeeks\cms\helpers\UrlHelper::construct([
-        '/cms/admin-cms-content/update', 'pk' => $content_id
-    ])->enableAdmin()->toString()); ?>.
+<?= \Yii::t('skeeks/shop/app',
+    'Change the properties and rights of access to information block you can'); ?> <?= \yii\helpers\Html::a(\Yii::t('skeeks/shop/app',
+    'Content Settings'), \skeeks\cms\helpers\UrlHelper::construct([
+    '/cms/admin-cms-content/update',
+    'pk' => $content_id
+])->enableAdmin()->toString()); ?>.
 <? \yii\bootstrap\Alert::end(); ?>

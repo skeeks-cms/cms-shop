@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 05.08.2015
  */
+
 namespace skeeks\cms\shop\grid;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -19,8 +20,8 @@ use yii\helpers\Html;
  */
 class BasketNameGridColumn extends DataColumn
 {
-    public $attribute   = "name";
-    public $format      = "raw";
+    public $attribute = "name";
+    public $format = "raw";
 
     /**
      * @param ShopBasket $model
@@ -32,26 +33,22 @@ class BasketNameGridColumn extends DataColumn
     {
 
 
-        if ($model->url)
-        {
+        if ($model->url) {
             $content = Html::a($model->name, $model->url, [
                 'target' => '_blank',
-                'title' => \Yii::t('skeeks/shop/app','Watch Online (opens new window)'),
+                'title' => \Yii::t('skeeks/shop/app', 'Watch Online (opens new window)'),
                 'data-pjax' => 0
             ]);
 
-            if ($model->product && $model->product->measure_ratio != 1)
-            {
+            if ($model->product && $model->product->measure_ratio != 1) {
                 $content .= <<<HTML
 <p><small>Товар продается по: {$model->product->measure_ratio} {$model->product->measure->symbol_rus}</small></p>
 HTML;
             }
 
-            if ($model->product && $model->shopBasketProps)
-            {
+            if ($model->product && $model->shopBasketProps) {
                 $content .= "<p>";
-                foreach ($model->shopBasketProps as $prop)
-                {
+                foreach ($model->shopBasketProps as $prop) {
                     $content .= <<<HTML
 <small>{$prop->name}: {$prop->value}</small><br />
 HTML;
@@ -60,8 +57,7 @@ HTML;
             }
 
             return $content;
-        } else
-        {
+        } else {
             return $model->name;
         }
 

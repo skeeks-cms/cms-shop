@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150915_111201_create_table__shop_store extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_store}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,35 +24,35 @@ class m150915_111201_create_table__shop_store extends Migration
         }
 
         $this->createTable("{{%shop_store}}", [
-            'id'                        => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'name'                      => $this->string(255)->notNull(),
+            'name' => $this->string(255)->notNull(),
 
-            'active'                    => $this->string(1)->notNull()->defaultValue("Y"),
-            'address'                   => $this->string(255)->notNull(),
-            'description'               => $this->text(),
-            'gps_n'                     => $this->string(15)->notNull()->defaultValue(0),
-            'gps_s'                     => $this->string(15)->notNull()->defaultValue(0),
+            'active' => $this->string(1)->notNull()->defaultValue("Y"),
+            'address' => $this->string(255)->notNull(),
+            'description' => $this->text(),
+            'gps_n' => $this->string(15)->notNull()->defaultValue(0),
+            'gps_s' => $this->string(15)->notNull()->defaultValue(0),
 
-            'image_id'                  => $this->integer(),
-            'location_id'               => $this->integer(),
+            'image_id' => $this->integer(),
+            'location_id' => $this->integer(),
 
-            'phone'                     => $this->string(255),
-            'schedule'                  => $this->string(255),
-            'xml_id'                    => $this->string(255),
-            'priority'                  => $this->integer()->notNull()->defaultValue(100),
-            'email'                     => $this->string(255),
+            'phone' => $this->string(255),
+            'schedule' => $this->string(255),
+            'xml_id' => $this->string(255),
+            'priority' => $this->integer()->notNull()->defaultValue(100),
+            'email' => $this->string(255),
 
-            'issuing_center'            => $this->string(1)->notNull()->defaultValue('Y'),
-            'shipping_center'           => $this->string(1)->notNull()->defaultValue('Y'),
+            'issuing_center' => $this->string(1)->notNull()->defaultValue('Y'),
+            'shipping_center' => $this->string(1)->notNull()->defaultValue('Y'),
 
-            'site_code'                 => $this->string(15),
+            'site_code' => $this->string(15),
 
 
         ], $tableOptions);

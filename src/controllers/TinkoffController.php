@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.09.2015
  */
+
 namespace skeeks\cms\shop\controllers;
+
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Exception;
 use yii\helpers\Json;
@@ -78,39 +80,32 @@ class TinkoffController extends Controller
     {
         \Yii::info("POST: " . Json::encode(\Yii::$app->request->post()), self::className());
 
-        try
-        {
-            if (!\Yii::$app->request->post('OrderId'))
-            {
+        try {
+            if (!\Yii::$app->request->post('OrderId')) {
                 throw new Exception('Некорректны запрос от банка.');
             }
 
             /**
              * @var $shopOrder ShopOrder
              */
-            if (!$shopOrder = ShopOrder::findOne(\Yii::$app->request->post('OrderId')))
-            {
+            if (!$shopOrder = ShopOrder::findOne(\Yii::$app->request->post('OrderId'))) {
                 throw new Exception('Заказ не найден в базе.');
             }
 
-            if ($shopOrder->id != \Yii::$app->request->post('OrderId'))
-            {
+            if ($shopOrder->id != \Yii::$app->request->post('OrderId')) {
                 throw new Exception('Не совпадает номер заказа.');
             }
 
-            if ($shopOrder->money->getAmount() != \Yii::$app->request->post('Amount'))
-            {
+            if ($shopOrder->money->getAmount() != \Yii::$app->request->post('Amount')) {
                 throw new Exception('Не совпадает сумма заказа.');
             }
 
-            if (\Yii::$app->request->post('Status') == "CONFIRMED")
-            {
+            if (\Yii::$app->request->post('Status') == "CONFIRMED") {
                 \Yii::info("Успешный платеж", self::className());
                 $shopOrder->processNotePayment();
             }
 
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             \Yii::error($e->getMessage(), self::className());
         }
 

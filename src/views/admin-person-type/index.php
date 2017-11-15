@@ -16,49 +16,46 @@
 ?>
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'adminController'   => $controller,
-        'pjax'              => $pjax,
-        'settingsData' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'adminController' => $controller,
+    'pjax' => $pjax,
+    'settingsData' =>
         [
-            'order'     => SORT_ASC,
-            'orderBy'   => "priority",
+            'order' => SORT_ASC,
+            'orderBy' => "priority",
         ],
-        'columns' => [
-            'name',
-            'priority',
+    'columns' => [
+        'name',
+        'priority',
 
-            [
-                'class'         => \yii\grid\DataColumn::className(),
-                'attribute'     => "siteCodes",
-                'filter'        => false,
-                'value'         => function(\skeeks\cms\shop\models\ShopPersonType $model)
-                {
-                    $result = [];
-                    if ($model->sites)
-                    {
-                        foreach ($model->sites as $site)
-                        {
-                            $result[] = "$site->name [$site->code]";
-                        }
+        [
+            'class' => \yii\grid\DataColumn::className(),
+            'attribute' => "siteCodes",
+            'filter' => false,
+            'value' => function (\skeeks\cms\shop\models\ShopPersonType $model) {
+                $result = [];
+                if ($model->sites) {
+                    foreach ($model->sites as $site) {
+                        $result[] = "$site->name [$site->code]";
                     }
-
-                    return implode(", ", $result);
                 }
-            ],
 
-            [
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute'     => "active"
-            ]
+                return implode(", ", $result);
+            }
         ],
-    ]); ?>
+
+        [
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute' => "active"
+        ]
+    ],
+]); ?>
 
 <? $pjax::end(); ?>

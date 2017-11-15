@@ -34,8 +34,8 @@ use yii\helpers\ArrayHelper;
  */
 class ShopUserTransact extends \skeeks\cms\models\Core
 {
-    const ORDER_PAY         = "ORDER_PAY";
-    const OUT_CHARGE_OFF    = "OUT_CHARGE_OFF";
+    const ORDER_PAY = "ORDER_PAY";
+    const OUT_CHARGE_OFF = "OUT_CHARGE_OFF";
 
     static public function descriptions()
     {
@@ -75,19 +75,19 @@ class ShopUserTransact extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'        => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'        => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'        => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'        => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'cms_user_id'       => \Yii::t('skeeks/shop/app', 'Cms User ID'),
-            'shop_order_id'     => \Yii::t('skeeks/shop/app', 'Shop Order ID'),
-            'amount'            => \Yii::t('skeeks/shop/app', 'Amount'),
-            'currency_code'     => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'debit'             => \Yii::t('skeeks/shop/app', 'Debit'),
-            'description'       => \Yii::t('skeeks/shop/app', 'Description'),
-            'notes'             => \Yii::t('skeeks/shop/app', 'Notes'),
-            'descriptionText'   => \Yii::t('skeeks/shop/app', 'Description'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'cms_user_id' => \Yii::t('skeeks/shop/app', 'Cms User ID'),
+            'shop_order_id' => \Yii::t('skeeks/shop/app', 'Shop Order ID'),
+            'amount' => \Yii::t('skeeks/shop/app', 'Amount'),
+            'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'debit' => \Yii::t('skeeks/shop/app', 'Debit'),
+            'description' => \Yii::t('skeeks/shop/app', 'Description'),
+            'notes' => \Yii::t('skeeks/shop/app', 'Notes'),
+            'descriptionText' => \Yii::t('skeeks/shop/app', 'Description'),
         ];
     }
 
@@ -98,7 +98,6 @@ class ShopUserTransact extends \skeeks\cms\models\Core
     {
         return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
     }
-
 
 
     /**
@@ -132,7 +131,7 @@ class ShopUserTransact extends \skeeks\cms\models\Core
      */
     public function getDescriptionText()
     {
-        return (string) ArrayHelper::getValue(self::descriptions(), $this->description);
+        return (string)ArrayHelper::getValue(self::descriptions(), $this->description);
     }
 
 }

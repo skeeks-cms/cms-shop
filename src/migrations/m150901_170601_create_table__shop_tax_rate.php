@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150901_170601_create_table__shop_tax_rate extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_tax_rate}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,25 +24,25 @@ class m150901_170601_create_table__shop_tax_rate extends Migration
         }
 
         $this->createTable("{{%shop_tax_rate}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'tax_id'                => $this->integer()->notNull(),
-            'person_type_id'        => $this->integer()->notNull(),
+            'tax_id' => $this->integer()->notNull(),
+            'person_type_id' => $this->integer()->notNull(),
 
-            'value'                 => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'value' => $this->decimal(18, 4)->notNull()->defaultValue(0),
 
-            'currency'              => $this->string(3),
-            'is_percent'            => $this->string(1)->notNull()->defaultValue('Y'),
-            'is_in_price'           => $this->string(1)->notNull()->defaultValue('N'),
-            'priority'              => $this->integer(1)->notNull()->defaultValue(100),
+            'currency' => $this->string(3),
+            'is_percent' => $this->string(1)->notNull()->defaultValue('Y'),
+            'is_in_price' => $this->string(1)->notNull()->defaultValue('N'),
+            'priority' => $this->integer(1)->notNull()->defaultValue(100),
 
-            'active'                => $this->string(1)->notNull()->defaultValue("Y"),
+            'active' => $this->string(1)->notNull()->defaultValue("Y"),
 
         ], $tableOptions);
 

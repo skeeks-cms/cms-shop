@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 15.05.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
@@ -51,15 +52,15 @@ use yii\web\Application;
 class AdminCmsContentElementController extends AdminModelEditorController
 {
     use AdminModelEditorStandartControllerTrait;
-    
+
     public $notSubmitParam = 'sx-not-submit';
 
-    protected $_modelClassName      = ShopCmsContentElement::class;
-    protected $_modelShowAttribute  = "name";
+    protected $_modelClassName = ShopCmsContentElement::class;
+    protected $_modelShowAttribute = "name";
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Elements');
+        $this->name = \Yii::t('skeeks/shop/app', 'Elements');
         parent::init();
     }
 
@@ -71,60 +72,67 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $actions = ArrayHelper::merge(parent::actions(),
             [
                 'index' =>
-                [
-                    "modelSearchClassName" => ShopCmsContentElementSearch::className(),
-                ],
+                    [
+                        "modelSearchClassName" => ShopCmsContentElementSearch::className(),
+                    ],
 
-                "create" => ["callback"      => [$this, 'create']],
-                "update" => ["callback"      => [$this, 'update']],
+                "create" => ["callback" => [$this, 'create']],
+                "update" => ["callback" => [$this, 'update']],
 
                 "activate-multi" =>
-                [
-                    'class' => AdminMultiModelEditAction::className(),
-                    "name"  => \Yii::t('skeeks/shop/app', 'Activate'),
-                    "eachCallback" => [$this, 'eachMultiActivate'],
-                ],
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => \Yii::t('skeeks/shop/app', 'Activate'),
+                        "eachCallback" => [$this, 'eachMultiActivate'],
+                    ],
 
                 "inActivate-multi" =>
-                [
-                    'class' => AdminMultiModelEditAction::className(),
-                    "name"  => \Yii::t('skeeks/shop/app', 'Deactivate'),
-                    "eachCallback" => [$this, 'eachMultiInActivate'],
-                ],
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => \Yii::t('skeeks/shop/app', 'Deactivate'),
+                        "eachCallback" => [$this, 'eachMultiInActivate'],
+                    ],
 
                 "change-tree-multi" =>
-                [
-                    'class'             => AdminMultiDialogModelEditAction::class,
-                    "name"              => \Yii::t('skeeks/shop/app', 'The main section'),
-                    "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
-                    "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTree'],
-                ],
+                    [
+                        'class' => AdminMultiDialogModelEditAction::class,
+                        "name" => \Yii::t('skeeks/shop/app', 'The main section'),
+                        "viewDialog" => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
+                        "eachCallback" => [
+                            \Yii::$app->createController('/cms/admin-cms-content-element')[0],
+                            'eachMultiChangeTree'
+                        ],
+                    ],
 
                 "change-trees-multi" =>
-                [
-                    'class'             => AdminMultiDialogModelEditAction::class,
-                    "name"              => \Yii::t('skeeks/shop/app', 'Related topics'),
-                    "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/change-trees-form",
-                    "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachMultiChangeTrees'],
-                ],
+                    [
+                        'class' => AdminMultiDialogModelEditAction::class,
+                        "name" => \Yii::t('skeeks/shop/app', 'Related topics'),
+                        "viewDialog" => "@skeeks/cms/views/admin-cms-content-element/change-trees-form",
+                        "eachCallback" => [
+                            \Yii::$app->createController('/cms/admin-cms-content-element')[0],
+                            'eachMultiChangeTrees'
+                        ],
+                    ],
 
                 "rp" =>
-                [
-                    'class'             => AdminMultiDialogModelEditAction::class,
-                    "name"              => \Yii::t('skeeks/shop/app', 'Properties'),
-                    "viewDialog"        => "@skeeks/cms/views/admin-cms-content-element/multi-rp",
-                    "eachCallback"      => [\Yii::$app->createController('/cms/admin-cms-content-element')[0], 'eachRelatedProperties'],
-                ],
+                    [
+                        'class' => AdminMultiDialogModelEditAction::class,
+                        "name" => \Yii::t('skeeks/shop/app', 'Properties'),
+                        "viewDialog" => "@skeeks/cms/views/admin-cms-content-element/multi-rp",
+                        "eachCallback" => [
+                            \Yii::$app->createController('/cms/admin-cms-content-element')[0],
+                            'eachRelatedProperties'
+                        ],
+                    ],
             ]
         );
 
-        if (isset($actions['related-properties']))
-        {
+        if (isset($actions['related-properties'])) {
             unset($actions['related-properties']);
         }
 
-        if (isset($actions['shop']))
-        {
+        if (isset($actions['shop'])) {
             unset($actions['shop']);
         }
 
@@ -136,14 +144,13 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $productPrices = [];
 
         $modelClassName = $this->modelClassName;
-        $model          = new $modelClassName();
+        $model = new $modelClassName();
 
         $model->loadDefaultValues();
 
-        if ($content_id = \Yii::$app->request->get("content_id"))
-        {
-            $contentModel       = \skeeks\cms\models\CmsContent::findOne($content_id);
-            $model->content_id  = $content_id;
+        if ($content_id = \Yii::$app->request->get("content_id")) {
+            $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id);
+            $model->content_id = $content_id;
         }
 
         $relatedModel = $model->relatedPropertiesModel;
@@ -160,35 +167,32 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
 
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel, $shopProduct
+                $model,
+                $relatedModel,
+                $shopProduct
             ]);
         }
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
         }
 
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
                 $shopProduct->load(\Yii::$app->request->post());
 
-                if ($model->save() && $relatedModel->save())
-                {
+                if ($model->save() && $relatedModel->save()) {
                     $shopProduct->id = $model->id;
                     $shopProduct->save();
 
@@ -196,33 +200,31 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                     $baseProductPrice = $shopProduct->baseProductPrice;
 
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
-                    if (\Yii::$app->request->post('submit-btn') == 'apply')
-                    {
+                    if (\Yii::$app->request->post('submit-btn') == 'apply') {
                         return $this->redirect(
                             UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
                                 ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
                                 ->toString()
                         );
-                    } else
-                    {
+                    } else {
                         return $this->redirect(
                             $this->url
                         );
                     }
 
-                } 
+                }
             }
 
         }
 
         return $this->render('_form', [
-            'model'             => $model,
-            'relatedModel'      => $relatedModel,
-            'shopProduct'       => $shopProduct,
-            'productPrices'     => $productPrices,
-            'baseProductPrice'  => $baseProductPrice
+            'model' => $model,
+            'relatedModel' => $relatedModel,
+            'shopProduct' => $shopProduct,
+            'productPrices' => $productPrices,
+            'baseProductPrice' => $baseProductPrice
         ]);
     }
 
@@ -231,14 +233,13 @@ class AdminCmsContentElementController extends AdminModelEditorController
         /**
          * @var $model CmsContentElement
          */
-        $model                              = $this->model;
-        $relatedModel                       = $model->relatedPropertiesModel;
-        $shopProduct                        = ShopProduct::find()->where(['id' => $model->id])->one();
+        $model = $this->model;
+        $relatedModel = $model->relatedPropertiesModel;
+        $shopProduct = ShopProduct::find()->where(['id' => $model->id])->one();
 
         $productPrices = [];
 
-        if (!$shopProduct)
-        {
+        if (!$shopProduct) {
 
             $shopProduct = new ShopProduct([
                 'id' => $model->id
@@ -246,27 +247,22 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             $shopProduct->save();
 
-        } else
-        {
-            if ($typePrices = ShopTypePrice::find()->where(['!=', 'def', Cms::BOOL_Y])->all())
-            {
-                foreach ($typePrices as $typePrice)
-                {
+        } else {
+            if ($typePrices = ShopTypePrice::find()->where(['!=', 'def', Cms::BOOL_Y])->all()) {
+                foreach ($typePrices as $typePrice) {
                     $productPrice = ShopProductPrice::find()->where([
-                        'product_id'    => $shopProduct->id,
+                        'product_id' => $shopProduct->id,
                         'type_price_id' => $typePrice->id
                     ])->one();
 
-                    if (!$productPrice)
-                    {
+                    if (!$productPrice) {
                         $productPrice = new ShopProductPrice([
-                            'product_id'    => $shopProduct->id,
+                            'product_id' => $shopProduct->id,
                             'type_price_id' => $typePrice->id
                         ]);
                     }
 
-                    if ($post = \Yii::$app->request->post())
-                    {
+                    if ($post = \Yii::$app->request->post()) {
                         $data = ArrayHelper::getValue($post, 'prices.' . $typePrice->id);
                         $productPrice->load($data, "");
                     }
@@ -277,31 +273,28 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
 
-
         $rr = new RequestResponse();
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-        {
+        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
 
             return \yii\widgets\ActiveForm::validateMultiple([
-                $model, $relatedModel, $shopProduct
+                $model,
+                $relatedModel,
+                $shopProduct
             ]);
         }
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
                 $shopProduct->load(\Yii::$app->request->post());
@@ -309,25 +302,21 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 /**
                  * @var $productPrice ShopProductPrice
                  */
-                foreach ($productPrices as $productPrice)
-                {
-                    if ($productPrice->save())
-                    {
+                foreach ($productPrices as $productPrice) {
+                    if ($productPrice->save()) {
 
-                    } else
-                    {
-                        \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
+                    } else {
+                        \Yii::$app->getSession()->setFlash('error',
+                            \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
                     }
 
                 }
 
-                if ($model->save() && $relatedModel->save() && $shopProduct->save())
-                {
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app','Saved'));
+                if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
-                    if (\Yii::$app->request->post('submit-btn') == 'apply')
-                    {} else
-                    {
+                    if (\Yii::$app->request->post('submit-btn') == 'apply') {
+                    } else {
 
                         return $this->redirect(
                             $this->url
@@ -336,31 +325,29 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                     $model->refresh();
 
-                } 
+                }
             }
 
         }
 
 
-        if (!$shopProduct->baseProductPrice)
-        {
+        if (!$shopProduct->baseProductPrice) {
             $baseProductPrice = new ShopProductPrice([
                 'type_price_id' => \Yii::$app->shop->baseTypePrice->id,
                 'currency_code' => \Yii::$app->money->currencyCode,
-                'product_id'    => $model->id,
+                'product_id' => $model->id,
             ]);
 
             $baseProductPrice->save();
         }
 
 
-
         return $this->render('_form', [
-            'model'           => $model,
-            'relatedModel'    => $relatedModel,
-            'shopProduct'     => $shopProduct,
-            'productPrices'   => $productPrices,
-            'baseProductPrice'  => $shopProduct->getBaseProductPrice()->one()
+            'model' => $model,
+            'relatedModel' => $relatedModel,
+            'shopProduct' => $shopProduct,
+            'productPrices' => $productPrices,
+            'baseProductPrice' => $shopProduct->getBaseProductPrice()->one()
         ]);
     }
 
@@ -372,8 +359,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $unique = parent::getPermissionName();
 
-        if ($content = $this->content)
-        {
+        if ($content = $this->content) {
             $unique = $unique . "__" . $content->id;
         }
 
@@ -390,28 +376,25 @@ class AdminCmsContentElementController extends AdminModelEditorController
      */
     public function getContent()
     {
-        if ($this->_content === null)
-        {
-            if ($this->model)
-            {
+        if ($this->_content === null) {
+            if ($this->model) {
                 $this->_content = $this->model->cmsContent;
                 return $this->_content;
             }
 
-            if (\Yii::$app instanceof Application && \Yii::$app->request->get('content_id'))
-            {
+            if (\Yii::$app instanceof Application && \Yii::$app->request->get('content_id')) {
                 $content_id = \Yii::$app->request->get('content_id');
 
                 $dependency = new TagDependency([
-                    'tags'      =>
-                    [
-                        (new CmsContent())->getTableCacheTag(),
-                    ],
+                    'tags' =>
+                        [
+                            (new CmsContent())->getTableCacheTag(),
+                        ],
                 ]);
 
                 $this->_content = CmsContent::getDb()->cache(function ($db) use ($content_id) {
                     return CmsContent::find()->where([
-                        "id"             => $content_id,
+                        "id" => $content_id,
                     ])->one();
                 }, null, $dependency);
 
@@ -434,15 +417,12 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
     public function beforeAction($action)
     {
-        if ($content_id = \Yii::$app->request->get('content_id'))
-        {
+        if ($content_id = \Yii::$app->request->get('content_id')) {
             $this->content = CmsContent::findOne($content_id);
         }
 
-        if ($this->content)
-        {
-            if ($this->content->name_meny)
-            {
+        if ($this->content) {
+            if ($this->content->name_meny) {
                 $this->name = $this->content->name_meny;
             }
         }
@@ -458,8 +438,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $actions = $this->getActions();
         $index = ArrayHelper::getValue($actions, 'index');
-        if ($index && $index instanceof IHasUrl)
-        {
+        if ($index && $index instanceof IHasUrl) {
             return $index->url;
         }
 
@@ -472,12 +451,9 @@ class AdminCmsContentElementController extends AdminModelEditorController
          * @var AdminAction $action
          */
         $actions = parent::getActions();
-        if ($actions)
-        {
-            foreach ($actions as $action)
-            {
-                if ($this->content)
-                {
+        if ($actions) {
+            foreach ($actions as $action) {
+                if ($this->content) {
                     $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->content->id]);
                 }
             }
@@ -492,10 +468,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
          * @var AdminAction $action
          */
         $actions = parent::getModelActions();
-        if ($actions)
-        {
-            foreach ($actions as $action)
-            {
+        if ($actions) {
+            foreach ($actions as $action) {
                 $action->url = ArrayHelper::merge($action->urlData, ['content_id' => $this->model->cmsContent->id]);
             }
         }
@@ -512,36 +486,30 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $autoColumns = [];
 
-        if (!$cmsContent)
-        {
+        if (!$cmsContent) {
             return [];
         }
 
         $model = null;
         //$model = CmsContentElement::find()->where(['content_id' => $cmsContent->id])->limit(1)->one();
 
-        if (!$model)
-        {
+        if (!$model) {
             $model = new CmsContentElement([
                 'content_id' => $cmsContent->id
             ]);
         }
 
-        if (is_array($model) || is_object($model))
-        {
+        if (is_array($model) || is_object($model)) {
             foreach ($model->toArray() as $name => $value) {
                 $autoColumns[] = [
                     'attribute' => $name,
                     'visible' => false,
                     'format' => 'raw',
                     'class' => \yii\grid\DataColumn::className(),
-                    'value' => function($model, $key, $index) use ($name)
-                    {
-                        if (is_array($model->{$name}))
-                        {
+                    'value' => function ($model, $key, $index) use ($name) {
+                        if (is_array($model->{$name})) {
                             return implode(",", $model->{$name});
-                        } else
-                        {
+                        } else {
                             return $model->{$name};
                         }
                     },
@@ -551,17 +519,17 @@ class AdminCmsContentElementController extends AdminModelEditorController
             $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
             $searchRelatedPropertiesModel->initProperties($cmsContent->cmsContentProperties);
             $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
-            if ($dataProvider)
-            {
+            if ($dataProvider) {
                 $searchRelatedPropertiesModel->search($dataProvider);
             }
 
             /**
              * @var $model \skeeks\cms\models\CmsContentElement
              */
-            if ($model->relatedPropertiesModel)
-            {
-                $autoColumns = ArrayHelper::merge($autoColumns, GridViewStandart::getColumnsByRelatedPropertiesModel($model->relatedPropertiesModel, $searchRelatedPropertiesModel));
+            if ($model->relatedPropertiesModel) {
+                $autoColumns = ArrayHelper::merge($autoColumns,
+                    GridViewStandart::getColumnsByRelatedPropertiesModel($model->relatedPropertiesModel,
+                        $searchRelatedPropertiesModel));
             }
         }
 
@@ -585,48 +553,39 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
-                'value'     => function(\skeeks\cms\models\CmsContentElement $model)
-                {
-                    if (!$model->cmsTree)
-                    {
+                'class' => \yii\grid\DataColumn::className(),
+                'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+                    if (!$model->cmsTree) {
                         return null;
                     }
 
                     $path = [];
 
-                    if ($model->cmsTree->parents)
-                    {
-                        foreach ($model->cmsTree->parents as $parent)
-                        {
-                            if ($parent->isRoot())
-                            {
-                                $path[] =  "[" . $parent->site->name . "] " . $parent->name;
-                            } else
-                            {
-                                $path[] =  $parent->name;
+                    if ($model->cmsTree->parents) {
+                        foreach ($model->cmsTree->parents as $parent) {
+                            if ($parent->isRoot()) {
+                                $path[] = "[" . $parent->site->name . "] " . $parent->name;
+                            } else {
+                                $path[] = $parent->name;
                             }
                         }
                     }
                     $path = implode(" / ", $path);
                     return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
                 },
-                'format'    => 'raw',
-                'filter'    => false,
+                'format' => 'raw',
+                'filter' => false,
                 //'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
                 'attribute' => 'tree_id'
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
-                'value'     => function(\skeeks\cms\models\CmsContentElement $model)
-                {
+                'class' => \yii\grid\DataColumn::className(),
+                'value' => function (\skeeks\cms\models\CmsContentElement $model) {
                     $result = [];
 
-                    if ($model->cmsContentElementTrees)
-                    {
-                        foreach ($model->cmsContentElementTrees as $contentElementTree)
-                        {
+                    if ($model->cmsContentElementTrees) {
+                        foreach ($model->cmsContentElementTrees as $contentElementTree) {
                             $site = $contentElementTree->tree->site;
                             $result[] = "<small><a href='{$contentElementTree->tree->url}' target='_blank' data-pjax='0'>[{$site->name}]/.../{$contentElementTree->tree->name}</a></small>";
 
@@ -637,7 +596,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 },
                 'format' => 'raw',
-                'label'  => \Yii::t('skeeks/shop/app', 'Advanced Topics'),
+                'label' => \Yii::t('skeeks/shop/app', 'Advanced Topics'),
             ],
 
             [
@@ -663,16 +622,16 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ],*/
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
-                'value'     => function(\skeeks\cms\models\CmsContentElement $model)
-                {
+                'class' => \yii\grid\DataColumn::className(),
+                'value' => function (\skeeks\cms\models\CmsContentElement $model) {
 
-                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
-                        'target' => '_blank',
-                        'title'  => \Yii::t('skeeks/shop/app', 'View online (opens new window)'),
-                        'data-pjax' => '0',
-                        'class' => 'btn btn-default btn-sm'
-                    ]);
+                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl,
+                        [
+                            'target' => '_blank',
+                            'title' => \Yii::t('skeeks/shop/app', 'View online (opens new window)'),
+                            'data-pjax' => '0',
+                            'class' => 'btn btn-default btn-sm'
+                        ]);
 
                 },
                 'format' => 'raw'
@@ -685,13 +644,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'label' => $shopTypePrice->name,
                     'class' => \yii\grid\DataColumn::className(),
                     'attribute' => 'price.' . $shopTypePrice->id,
-                    'value' => function(\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice)
-                    {
+                    'value' => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
-                        if ($shopProduct)
-                        {
+                        if ($shopProduct) {
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
-                                    ->andWhere(['type_price_id' => $shopTypePrice->id])->one()) {
+                                ->andWhere(['type_price_id' => $shopTypePrice->id])->one()) {
                                 return \Yii::$app->money->intlFormatter()->format($shopProductPrice->money);
                             }
                         }
@@ -703,28 +660,24 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
         $typeColumn = //TODO: показывать только для контента с предложениями
-        [
-            'class'     => \yii\grid\DataColumn::className(),
-            'label'     => 'Тип товара',
-            'value'     => function(\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement)
-            {
-                if ($shopCmsContentElement->shopProduct)
-                {
-                    return \yii\helpers\ArrayHelper::getValue(\skeeks\cms\shop\models\ShopProduct::possibleProductTypes(), $shopCmsContentElement->shopProduct->product_type);
+            [
+                'class' => \yii\grid\DataColumn::className(),
+                'label' => 'Тип товара',
+                'value' => function (\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement) {
+                    if ($shopCmsContentElement->shopProduct) {
+                        return \yii\helpers\ArrayHelper::getValue(\skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
+                            $shopCmsContentElement->shopProduct->product_type);
+                    }
                 }
-            }
-        ];
+            ];
 
-        if ($cmsContent)
-        {
+        if ($cmsContent) {
             /**
              * @var $shopContent \skeeks\cms\shop\models\ShopContent
              */
             $shopContent = \skeeks\cms\shop\models\ShopContent::findOne(['content_id' => $cmsContent->id]);
-            if ($shopContent)
-            {
-                if ($shopContent->childrenContent)
-                {
+            if ($shopContent) {
+                if ($shopContent->childrenContent) {
                     $columns = \yii\helpers\ArrayHelper::merge([$typeColumn], $columns);
                 }
             }

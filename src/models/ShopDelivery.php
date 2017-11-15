@@ -59,17 +59,32 @@ class ShopDelivery extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'site_id', 'period_from', 'period_to', 'weight_from', 'weight_to', 'priority', 'logo_id'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'site_id',
+                    'period_from',
+                    'period_to',
+                    'weight_from',
+                    'weight_to',
+                    'priority',
+                    'logo_id'
+                ],
+                'integer'
+            ],
             [['name'], 'required'],
             [['order_price_from', 'order_price_to', 'price'], 'number'],
             [['description', 'store', 'name'], 'string'],
             [['period_type', 'active'], 'string', 'max' => 1],
-            [['priority'], 'default', 'value' =>  1],
+            [['priority'], 'default', 'value' => 1],
             [['order_currency_code', 'currency_code'], 'string', 'max' => 3],
             ['shopPaySystems', 'safe'],
-            [['price'], 'default', 'value' =>  0],
+            [['price'], 'default', 'value' => 0],
             [['active'], 'default', 'value' => Cms::BOOL_Y],
-            [['currency_code'], 'default', 'value' =>  Yii::$app->money->currencyCode],
+            [['currency_code'], 'default', 'value' => Yii::$app->money->currencyCode],
         ];
     }
 
@@ -79,29 +94,29 @@ class ShopDelivery extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                    => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'            => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'            => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'site_id'               => \Yii::t('skeeks/shop/app', 'Site'),
-            'name'                  => \Yii::t('skeeks/shop/app', 'Name'),
-            'period_from'           => \Yii::t('skeeks/shop/app', 'Period From'),
-            'period_to'             => \Yii::t('skeeks/shop/app', 'Period To'),
-            'period_type'           => \Yii::t('skeeks/shop/app', 'Period Type'),
-            'weight_from'           => \Yii::t('skeeks/shop/app', 'Weight From'),
-            'weight_to'             => \Yii::t('skeeks/shop/app', 'Weight To'),
-            'order_price_from'      => \Yii::t('skeeks/shop/app', 'Order price from'),
-            'order_price_to'        => \Yii::t('skeeks/shop/app', 'Order price to'),
-            'order_currency_code'   => \Yii::t('skeeks/shop/app', 'Order currency code'),
-            'active'                => \Yii::t('skeeks/shop/app', 'Active'),
-            'price'                 => \Yii::t('skeeks/shop/app', 'Price'),
-            'currency_code'         => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'priority'              => \Yii::t('skeeks/shop/app', 'Priority'),
-            'description'           => \Yii::t('skeeks/shop/app', 'Description'),
-            'logo_id'               => \Yii::t('skeeks/shop/app', 'Logo ID'),
-            'store'                 => \Yii::t('skeeks/shop/app', 'Store'),
-            'shopPaySystems'        => \Yii::t('skeeks/shop/app', 'Payment systems'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'site_id' => \Yii::t('skeeks/shop/app', 'Site'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'period_from' => \Yii::t('skeeks/shop/app', 'Period From'),
+            'period_to' => \Yii::t('skeeks/shop/app', 'Period To'),
+            'period_type' => \Yii::t('skeeks/shop/app', 'Period Type'),
+            'weight_from' => \Yii::t('skeeks/shop/app', 'Weight From'),
+            'weight_to' => \Yii::t('skeeks/shop/app', 'Weight To'),
+            'order_price_from' => \Yii::t('skeeks/shop/app', 'Order price from'),
+            'order_price_to' => \Yii::t('skeeks/shop/app', 'Order price to'),
+            'order_currency_code' => \Yii::t('skeeks/shop/app', 'Order currency code'),
+            'active' => \Yii::t('skeeks/shop/app', 'Active'),
+            'price' => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
+            'description' => \Yii::t('skeeks/shop/app', 'Description'),
+            'logo_id' => \Yii::t('skeeks/shop/app', 'Logo ID'),
+            'store' => \Yii::t('skeeks/shop/app', 'Store'),
+            'shopPaySystems' => \Yii::t('skeeks/shop/app', 'Payment systems'),
         ];
     }
 
@@ -113,10 +128,10 @@ class ShopDelivery extends \skeeks\cms\models\Core
         return array_merge(parent::behaviors(), [
             \skeeks\cms\behaviors\RelationalBehavior::className(),
             HasStorageFile::className() =>
-            [
-                'class'     => HasStorageFile::className(),
-                'fields'    => ['logo_id']
-            ]
+                [
+                    'class' => HasStorageFile::className(),
+                    'fields' => ['logo_id']
+                ]
         ]);
     }
 

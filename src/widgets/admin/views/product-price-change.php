@@ -9,54 +9,55 @@
 /* @var $widget \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget */
 ?>
 <? if ($widget->productPrice && $widget->productPrice->shopProductPriceChanges) : ?>
-    <a href="#" data-toggle="modal" data-target="#sx-price-change-<?= $widget->id; ?>" class="btn btn-default"><i class="glyphicon glyphicon-eye-open"></i>
+    <a href="#" data-toggle="modal" data-target="#sx-price-change-<?= $widget->id; ?>" class="btn btn-default"><i
+                class="glyphicon glyphicon-eye-open"></i>
         <?= \Yii::t('skeeks/shop/app', 'Changelog'); ?></a>
 
-<? $createModal = \yii\bootstrap\Modal::begin([
-    'id'        => 'sx-price-change-' . $widget->id,
-    'size'      => \yii\bootstrap\Modal::SIZE_LARGE,
-    'header'    => '<b>' . \Yii::t('skeeks/shop/app', 'The history of price changes') . ": " . ( ($widget->productPrice && $widget->productPrice->typePrice) ? $widget->productPrice->typePrice->name : "Базовая цена")  . '</b>',
-    'footer'    => '
+    <? $createModal = \yii\bootstrap\Modal::begin([
+        'id' => 'sx-price-change-' . $widget->id,
+        'size' => \yii\bootstrap\Modal::SIZE_LARGE,
+        'header' => '<b>' . \Yii::t('skeeks/shop/app',
+                'The history of price changes') . ": " . (($widget->productPrice && $widget->productPrice->typePrice) ? $widget->productPrice->typePrice->name : "Базовая цена") . '</b>',
+        'footer' => '
         <button type="button" class="btn btn-default" data-dismiss="modal">' . \Yii::t('skeeks/admin', 'Close') . '</button>
     ',
-]); ?>
-        <?
-        \skeeks\cms\widgets\Pjax::begin([
-            'enablePushState' => false,
-        ]);
-        ?>
-            <?= \yii\grid\GridView::widget([
-                'dataProvider' => new \yii\data\ActiveDataProvider([
-                    'query' => $widget->productPrice->getShopProductPriceChanges(),
-                    'pagination' => [
-                      'pageSize' => 10,
-                      'pageParam' => 'page-' . $widget->id,
-                    ],
-                ]),
-                'columns' =>
+    ]); ?>
+    <?
+    \skeeks\cms\widgets\Pjax::begin([
+        'enablePushState' => false,
+    ]);
+    ?>
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => new \yii\data\ActiveDataProvider([
+            'query' => $widget->productPrice->getShopProductPriceChanges(),
+            'pagination' => [
+                'pageSize' => 10,
+                'pageParam' => 'page-' . $widget->id,
+            ],
+        ]),
+        'columns' =>
+            [
                 [
-                    [
-                        'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
-                        'label' => \Yii::t('skeeks/shop/app', 'Date and time changes')
-                    ],
+                    'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                    'label' => \Yii::t('skeeks/shop/app', 'Date and time changes')
+                ],
 
-                    [
-                        'class' => \yii\grid\DataColumn::className(),
-                        'label' => \Yii::t('skeeks/shop/app', 'Price'),
-                        'value' => function(\skeeks\cms\shop\models\ShopProductPriceChange $model)
-                        {
-                            return \Yii::$app->money->intlFormatter()->format($model->money);
-                        }
-                    ],
+                [
+                    'class' => \yii\grid\DataColumn::className(),
+                    'label' => \Yii::t('skeeks/shop/app', 'Price'),
+                    'value' => function (\skeeks\cms\shop\models\ShopProductPriceChange $model) {
+                        return \Yii::$app->money->intlFormatter()->format($model->money);
+                    }
+                ],
 
-                    [
-                        'class' => \skeeks\cms\grid\CreatedByColumn::className()
-                    ],
-                ]
-            ]); ?>
+                [
+                    'class' => \skeeks\cms\grid\CreatedByColumn::className()
+                ],
+            ]
+    ]); ?>
 
-        <?
-        \skeeks\cms\widgets\Pjax::end();
-        ?>
-    <? \yii\bootstrap\Modal::end();?>
+    <?
+    \skeeks\cms\widgets\Pjax::end();
+    ?>
+    <? \yii\bootstrap\Modal::end(); ?>
 <? endif; ?>

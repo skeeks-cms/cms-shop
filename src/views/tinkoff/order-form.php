@@ -23,8 +23,7 @@ $payData = [
 ];
 
 $data = [];
-if ($model->user)
-{
+if ($model->user) {
     $data[] = 'Email=' . $model->user->email;
     $data[] = 'Phone=' . $model->user->phone;
     $data[] = 'Name=' . $model->user->displayName;

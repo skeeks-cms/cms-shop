@@ -12,21 +12,21 @@
 
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'pjax'              => $pjax,
-        'adminController'   => \Yii::$app->controller,
-        'columns'           =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'pjax' => $pjax,
+    'adminController' => \Yii::$app->controller,
+    'columns' =>
         [
             'name',
             'value',
         ]
-    ]); ?>
+]); ?>
 
 <? $pjax::end(); ?>

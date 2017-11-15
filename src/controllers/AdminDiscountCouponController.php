@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -45,9 +46,9 @@ class AdminDiscountCouponController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Discount coupons');
-        $this->modelShowAttribute       = "id";
-        $this->modelClassName           = ShopDiscountCoupon::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Discount coupons');
+        $this->modelShowAttribute = "id";
+        $this->modelClassName = ShopDiscountCoupon::className();
 
         parent::init();
     }

@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.03.2016
  */
+
 namespace skeeks\cms\shop\console\controllers;
+
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopProduct;
@@ -34,11 +36,9 @@ class NotifyController extends Controller
         $countEmails = ShopQuantityNoticeEmail::find()
             ->andWhere(['is_notified' => 0])
             ->orderBy(['created_at' => SORT_ASC])
-            ->count()
-        ;
+            ->count();
 
-        if (!$countEmails)
-        {
+        if (!$countEmails) {
             $this->stdout("Уведомить некого\n", Console::BOLD);
             return;
         }
@@ -49,8 +49,7 @@ class NotifyController extends Controller
         $shopQuantityNoticeEmail = ShopQuantityNoticeEmail::find()
             ->andWhere(['is_notified' => 0])
             ->orderBy(['created_at' => SORT_ASC])
-            ->one()
-        ;
+            ->one();
 
         $this->stdout("\tСамый старый запрос на уведомление: " . \Yii::$app->formatter->asDatetime($shopQuantityNoticeEmail->created_at) . "\n");
 
@@ -61,11 +60,9 @@ class NotifyController extends Controller
             ->groupBy('shop_product_id')
             ->indexBy('shop_product_id')
             ->asArray()
-            ->all()
-        ;
+            ->all();
 
-        if (!$productIds)
-        {
+        if (!$productIds) {
             $this->stdout("\tТоваров не найдено\n");
         }
         $this->stdout("\tНужно проверить изменения по товарам на которые подписались: " . count($productIds) . "\n");
@@ -74,17 +71,15 @@ class NotifyController extends Controller
 
         //Какие товары появлялись в наличии за это время?
         $productIds = ShopProductQuantityChange::find()
-            ->andWhere(['shop_product_id' => $productIds ])
+            ->andWhere(['shop_product_id' => $productIds])
             ->andWhere(['>=', 'created_at', $shopQuantityNoticeEmail->created_at])
             ->andWhere(['>', 'quantity', 0])
             ->groupBy('shop_product_id')
             ->indexBy('shop_product_id')
             ->asArray()
-            ->all()
-        ;
+            ->all();
 
-        if (!$productIds)
-        {
+        if (!$productIds) {
             $this->stdout("\tНе было изменений по товарам\n");
         }
         $productIds = array_keys($productIds);
@@ -92,13 +87,11 @@ class NotifyController extends Controller
         /**
          * @var ShopProduct $product
          */
-        foreach (ShopProduct::find()->where(['id' => $productIds])->each(10) as $product)
-        {
+        foreach (ShopProduct::find()->where(['id' => $productIds])->each(10) as $product) {
             $this->stdout("\t\tТовар: {$product->cmsContentElement->name}\n");
             $this->stdout("\t\tНаличие: {$product->quantity}\n");
 
-            if ($product->quantity <= 0)
-            {
+            if ($product->quantity <= 0) {
                 continue;
             }
 
@@ -107,15 +100,13 @@ class NotifyController extends Controller
                 ->groupBy('email')
                 ->orderBy(['created_at' => SORT_DESC])
                 ->all()
-            )
-            {
+            ) {
                 $count = count($noticeEmails);
                 $this->stdout("\t\tУведомить клиентов: {$count}\n");
                 /**
                  * @var ShopQuantityNoticeEmail $noticeEmail
                  */
-                foreach ($noticeEmails as $noticeEmail)
-                {
+                foreach ($noticeEmails as $noticeEmail) {
                     $this->stdout("\t\t\tКлиент: {$noticeEmail->email}\n");
                     $this->_notifyCleint($noticeEmail);
                 }
@@ -125,38 +116,38 @@ class NotifyController extends Controller
 
     protected function _notifyCleint(ShopQuantityNoticeEmail $noticeEmail)
     {
-        if ($noticeEmail->is_notified == 1)
-        {
+        if ($noticeEmail->is_notified == 1) {
             $this->stdout("\t\t\tУже уведомлен\n");
             return;
         }
 
         /*try
         {*/
-            \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-            \Yii::$app->mailer->compose('client-quantity-notice', [
-                'model'  => $noticeEmail,
-            ])
-                ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                ->setTo($noticeEmail->email)
-                ->setSubject(\Yii::t('skeeks/shop/app', "We've got the goods interesting you") . " (" . $noticeEmail->shopProduct->cmsContentElement->name . ")")
-                ->send();
+        \Yii::$app->mailer->compose('client-quantity-notice', [
+            'model' => $noticeEmail,
+        ])
+            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+            ->setTo($noticeEmail->email)
+            ->setSubject(\Yii::t('skeeks/shop/app',
+                    "We've got the goods interesting you") . " (" . $noticeEmail->shopProduct->cmsContentElement->name . ")")
+            ->send();
 
-            $noticeEmail->notified_at = \Yii::$app->formatter->asTimestamp(time());
-            $noticeEmail->is_notified = 1;
-            $noticeEmail->save();
+        $noticeEmail->notified_at = \Yii::$app->formatter->asTimestamp(time());
+        $noticeEmail->is_notified = 1;
+        $noticeEmail->save();
 
-            $this->stdout("\t\t\tУведомлен\n", Console::FG_GREEN);
+        $this->stdout("\t\t\tУведомлен\n", Console::FG_GREEN);
 
-            ShopQuantityNoticeEmail::updateAll([
-                'is_notified' => 1,
-                'notified_at' => \Yii::$app->formatter->asTimestamp(time()),
-            ], [
-                'shop_product_id'   => $noticeEmail->shop_product_id,
-                'email'             => $noticeEmail->email,
-                'is_notified'       => 0,
-            ]);
+        ShopQuantityNoticeEmail::updateAll([
+            'is_notified' => 1,
+            'notified_at' => \Yii::$app->formatter->asTimestamp(time()),
+        ], [
+            'shop_product_id' => $noticeEmail->shop_product_id,
+            'email' => $noticeEmail->email,
+            'is_notified' => 0,
+        ]);
 
         /*} catch (\Exception $e)
         {

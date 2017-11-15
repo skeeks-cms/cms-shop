@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
@@ -15,9 +16,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 
 <?php $form = ActiveForm::begin([
-    'id'                                            => 'sx-dynamic-form',
-    'enableAjaxValidation'                          => false,
-    'enableClientValidation'                          => false,
+    'id' => 'sx-dynamic-form',
+    'enableAjaxValidation' => false,
+    'enableClientValidation' => false,
 ]); ?>
 
 <? $this->registerJs(<<<JS
@@ -57,43 +58,44 @@ JS
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
-    <? if (\Yii::$app->request->get('cms_user_id')) : ?>
+<? if (\Yii::$app->request->get('cms_user_id')) : ?>
 
-        <? $model->cms_user_id = \Yii::$app->request->get('cms_user_id'); ?>
-        <div style="display: none;">
-            <?= $form->field($model, 'cms_user_id')->widget(
-                \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
-            ); ?>
-        </div>
-
-    <? elseif ($model->isNewRecord) : ?>
+    <? $model->cms_user_id = \Yii::$app->request->get('cms_user_id'); ?>
+    <div style="display: none;">
         <?= $form->field($model, 'cms_user_id')->widget(
             \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
         ); ?>
-    <? endif; ?>
+    </div>
 
-    <?= $form->field($model, 'name')->textInput(); ?>
+<? elseif ($model->isNewRecord) : ?>
+    <?= $form->field($model, 'cms_user_id')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
+    ); ?>
+<? endif; ?>
 
-    <?= $form->field($model, 'shop_person_type_id')->listBox(\yii\helpers\ArrayHelper::merge(['' => ' — '], \yii\helpers\ArrayHelper::map(
+<?= $form->field($model, 'name')->textInput(); ?>
+
+<?= $form->field($model, 'shop_person_type_id')->listBox(\yii\helpers\ArrayHelper::merge(['' => ' — '],
+    \yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name'
     )), [
-        'size' => 1,
-        'data-form-reload' => 'true',
+    'size' => 1,
+    'data-form-reload' => 'true',
+]); ?>
+
+<? if ($model->relatedProperties) : ?>
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('skeeks/cms', 'Settings')
     ]); ?>
-
-    <? if ($model->relatedProperties) : ?>
-        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('skeeks/cms', 'Settings')
-        ]); ?>
-        <? if ($properties = $model->relatedProperties) : ?>
-            <? foreach ($properties as $property) : ?>
-                <?= $property->renderActiveForm($form)?>
-            <? endforeach; ?>
-        <? endif; ?>
-
-    <? else : ?>
-        <?/*= \Yii::t('skeeks/cms','Additional properties are not set')*/?>
+    <? if ($properties = $model->relatedProperties) : ?>
+        <? foreach ($properties as $property) : ?>
+            <?= $property->renderActiveForm($form) ?>
+        <? endforeach; ?>
     <? endif; ?>
+
+<? else : ?>
+    <? /*= \Yii::t('skeeks/cms','Additional properties are not set')*/ ?>
+<? endif; ?>
 
 
 <?= $form->fieldSetEnd(); ?>

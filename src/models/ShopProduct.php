@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 14.09.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
@@ -48,24 +49,24 @@ use yii\helpers\ArrayHelper;
  * @property string $subscribe
  * @property string $product_type
  *
- * @property Measure                $measure
- * @property ShopCmsContentElement  $cmsContentElement
- * @property ShopTypePrice      $trialPrice
- * @property ShopVat            $vat
- * @property Currency           $purchasingCurrency
+ * @property Measure $measure
+ * @property ShopCmsContentElement $cmsContentElement
+ * @property ShopTypePrice $trialPrice
+ * @property ShopVat $vat
+ * @property Currency $purchasingCurrency
  * @property ShopProductPrice[] $shopProductPrices
  * @property ShopViewedProduct[] $shopViewedProducts
  *
- * @property string   $baseProductPriceValue
- * @property string   $baseProductPriceCurrency
+ * @property string $baseProductPriceValue
+ * @property string $baseProductPriceCurrency
  *
- * @property ShopProductPrice   $baseProductPrice
- * @property ShopProductPrice   $minProductPrice
- * @property ShopProductPrice[]   $viewProductPrices
+ * @property ShopProductPrice $baseProductPrice
+ * @property ShopProductPrice $minProductPrice
+ * @property ShopProductPrice[] $viewProductPrices
  * @property ShopProductQuantityChange[] $shopProductQuantityChanges
  * @property ShopQuantityNoticeEmail[] $shopQuantityNoticeEmails
  *
- * @property ShopCmsContentElement   $tradeOffers
+ * @property ShopCmsContentElement $tradeOffers
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -86,8 +87,8 @@ class ShopProduct extends \skeeks\cms\models\Core
     static public function possibleProductTypes()
     {
         return [
-            static::TYPE_SIMPLE => \Yii::t('skeeks/shop/app','Plain'),
-            static::TYPE_OFFERS => \Yii::t('skeeks/shop/app','With quotations'),
+            static::TYPE_SIMPLE => \Yii::t('skeeks/shop/app', 'Plain'),
+            static::TYPE_OFFERS => \Yii::t('skeeks/shop/app', 'With quotations'),
         ];
     }
 
@@ -99,22 +100,19 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     static public function getInstanceByContentElement(CmsContentElement $cmsContentElement)
     {
-        if ($self = ArrayHelper::getValue(static::$instances, $cmsContentElement->id))
-        {
+        if ($self = ArrayHelper::getValue(static::$instances, $cmsContentElement->id)) {
             return $self;
         }
 
         /**
          * @version SkeekS CMS > 2.6.0
          */
-        if ($cmsContentElement instanceof \skeeks\cms\shop\models\ShopCmsContentElement)
-        {
+        if ($cmsContentElement instanceof \skeeks\cms\shop\models\ShopCmsContentElement) {
             static::$instances[$cmsContentElement->id] = $cmsContentElement->shopProduct;
             return $cmsContentElement->shopProduct;
         }
 
-        if (!$self = static::find()->where(['id' => $cmsContentElement->id])->one())
-        {
+        if (!$self = static::find()->where(['id' => $cmsContentElement->id])->one()) {
             $self = new static([
                 'id' => $cmsContentElement->id
             ]);
@@ -136,27 +134,27 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        $this->on(self::EVENT_BEFORE_INSERT,    [$this, "_beforeSaveEvent"]);
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, "_beforeSaveEvent"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeSaveEvent"]);
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "_afterSaveEvent"]);
-        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "_afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "_afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "_afterSaveEvent"]);
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "_updateParentAfterInsert"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "_updateParentAfterInsert"]);
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "_logQuantityInsert"]);
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "_logQuantityUpdate"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "_logQuantityInsert"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_logQuantityUpdate"]);
     }
 
     public function _logQuantityInsert($event)
     {
-        $log                            = new ShopProductQuantityChange();
+        $log = new ShopProductQuantityChange();
 
-        $log->shop_product_id           = $this->id;
-        $log->quantity                  = $this->quantity;
-        $log->quantity_reserved         = $this->quantity_reserved;
-        $log->measure_id                = $this->measure_id;
-        $log->measure_ratio             = $this->measure_ratio;
+        $log->shop_product_id = $this->id;
+        $log->quantity = $this->quantity;
+        $log->quantity_reserved = $this->quantity_reserved;
+        $log->measure_id = $this->measure_id;
+        $log->measure_ratio = $this->measure_ratio;
 
         $log->save();
     }
@@ -167,18 +165,17 @@ class ShopProduct extends \skeeks\cms\models\Core
             ($this->isAttributeChanged('quantity', false)
                 || $this->isAttributeChanged('quantity_reserved', false)
                 || $this->isAttributeChanged('measure_id', false)
-                || $this->isAttributeChanged('measure_ratio', false) )
+                || $this->isAttributeChanged('measure_ratio', false))
             ||
             !$this->shopProductQuantityChanges
-        )
-        {
-            $log                            = new ShopProductQuantityChange();
+        ) {
+            $log = new ShopProductQuantityChange();
 
-            $log->shop_product_id           = $this->id;
-            $log->quantity                  = $this->quantity;
-            $log->quantity_reserved         = $this->quantity_reserved;
-            $log->measure_id                = $this->measure_id;
-            $log->measure_ratio             = $this->measure_ratio;
+            $log->shop_product_id = $this->id;
+            $log->quantity = $this->quantity;
+            $log->quantity_reserved = $this->quantity_reserved;
+            $log->measure_id = $this->measure_id;
+            $log->measure_ratio = $this->measure_ratio;
 
             $log->save();
         }
@@ -191,20 +188,18 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function _beforeSaveEvent($event)
     {
         //Проверка измененного типа
-        if ($this->isAttributeChanged('product_type'))
-        {
+        if ($this->isAttributeChanged('product_type')) {
             //Выставили что у него есть предложения
-            if ($this->product_type == self::TYPE_OFFERS)
-            {
-                if (!$this->getTradeOffers()->all())
-                {
+            if ($this->product_type == self::TYPE_OFFERS) {
+                if (!$this->getTradeOffers()->all()) {
                     $this->product_type = self::TYPE_SIMPLE;
                 }
-            } else if ($this->product_type == self::TYPE_SIMPLE) //Если указали что товар простой, значит у него не должно быть предложений
-            {
-                if ($this->getTradeOffers()->all())
+            } else {
+                if ($this->product_type == self::TYPE_SIMPLE) //Если указали что товар простой, значит у него не должно быть предложений
                 {
-                    $this->product_type = self::TYPE_OFFERS;
+                    if ($this->getTradeOffers()->all()) {
+                        $this->product_type = self::TYPE_OFFERS;
+                    }
                 }
             }
         }
@@ -217,64 +212,54 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function _afterSaveEvent($event)
     {
         //Prices update
-        if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue)
-        {
+        if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue) {
             /**
              * @var $baseProductPrice ShopProductPrice
              */
             $baseProductPrice = $this->getBaseProductPrice()->one();
 
-            if (!$baseProductPrice)
-            {
-                $baseProductPrice                   = new ShopProductPrice([
+            if (!$baseProductPrice) {
+                $baseProductPrice = new ShopProductPrice([
                     'product_id' => $this->id
                 ]);
 
-                $baseProductPrice->type_price_id    = \Yii::$app->shop->baseTypePrice->id;
+                $baseProductPrice->type_price_id = \Yii::$app->shop->baseTypePrice->id;
 
-                if ($this->_baseProductPriceValue)
-                {
-                    $baseProductPrice->price            = $this->_baseProductPriceValue;
+                if ($this->_baseProductPriceValue) {
+                    $baseProductPrice->price = $this->_baseProductPriceValue;
                 }
 
-                if ($this->_baseProductPriceCurrency)
-                {
-                    $baseProductPrice->currency_code            = $this->_baseProductPriceCurrency;
+                if ($this->_baseProductPriceCurrency) {
+                    $baseProductPrice->currency_code = $this->_baseProductPriceCurrency;
                 }
 
                 $baseProductPrice->save();
-            } else
-            {
+            } else {
                 $isChanged = false;
                 //Установка и сохранение только если что то изменилось
-                if ($this->_baseProductPriceValue && $this->_baseProductPriceValue != $baseProductPrice->price)
-                {
-                    $baseProductPrice->price            = $this->_baseProductPriceValue;
+                if ($this->_baseProductPriceValue && $this->_baseProductPriceValue != $baseProductPrice->price) {
+                    $baseProductPrice->price = $this->_baseProductPriceValue;
                     $isChanged = true;
                 }
 
-                if ($this->_baseProductPriceCurrency && $this->_baseProductPriceCurrency != $baseProductPrice->currency_code)
-                {
-                    $baseProductPrice->currency_code            = $this->_baseProductPriceCurrency;
+                if ($this->_baseProductPriceCurrency && $this->_baseProductPriceCurrency != $baseProductPrice->currency_code) {
+                    $baseProductPrice->currency_code = $this->_baseProductPriceCurrency;
                     $isChanged = true;
                 }
 
-                if ($isChanged)
-                {
+                if ($isChanged) {
                     $baseProductPrice->save();
                 }
             }
 
 
-        } else
-        {
-            if (!$this->baseProductPrice)
-            {
-                $baseProductPrice                   = new ShopProductPrice([
+        } else {
+            if (!$this->baseProductPrice) {
+                $baseProductPrice = new ShopProductPrice([
                     'product_id' => $this->id
                 ]);
 
-                $baseProductPrice->type_price_id    = \Yii::$app->shop->baseTypePrice->id;
+                $baseProductPrice->type_price_id = \Yii::$app->shop->baseTypePrice->id;
                 $baseProductPrice->save();
             }
         }
@@ -288,17 +273,12 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function _updateParentAfterInsert($event)
     {
         //Если есть родительский элемент
-        if ($this->cmsContentElement->parent_content_element_id)
-        {
+        if ($this->cmsContentElement->parent_content_element_id) {
             $parentProduct = $this->cmsContentElement->parentContentElement->shopProduct;
             $parentProduct->setAttribute('product_type', self::TYPE_OFFERS);
             $parentProduct->save();
         }
     }
-
-
-
-
 
 
     /**
@@ -307,9 +287,48 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'recur_scheme_length', 'trial_price_id', 'vat_id', 'measure_id'], 'integer'],
-            [['quantity', 'weight', 'purchasing_price', 'quantity_reserved', 'width', 'length', 'height', 'measure_ratio'], 'number'],
-            [['quantity_trace', 'price_type', 'recur_scheme_type', 'without_order', 'select_best_price', 'vat_included', 'can_buy_zero', 'negative_amount_trace', 'barcode_multi', 'subscribe'], 'string', 'max' => 1],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'recur_scheme_length',
+                    'trial_price_id',
+                    'vat_id',
+                    'measure_id'
+                ],
+                'integer'
+            ],
+            [
+                [
+                    'quantity',
+                    'weight',
+                    'purchasing_price',
+                    'quantity_reserved',
+                    'width',
+                    'length',
+                    'height',
+                    'measure_ratio'
+                ],
+                'number'
+            ],
+            [
+                [
+                    'quantity_trace',
+                    'price_type',
+                    'recur_scheme_type',
+                    'without_order',
+                    'select_best_price',
+                    'vat_included',
+                    'can_buy_zero',
+                    'negative_amount_trace',
+                    'barcode_multi',
+                    'subscribe'
+                ],
+                'string',
+                'max' => 1
+            ],
             [['tmp_id'], 'string', 'max' => 40],
             [['purchasing_currency'], 'string', 'max' => 3],
             [['quantity_trace', 'can_buy_zero', 'negative_amount_trace'], 'default', 'value' => Cms::BOOL_N],
@@ -323,10 +342,13 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['baseProductPriceCurrency'], 'string', 'max' => 3],
 
             [['vat_included'], 'default', 'value' => Cms::BOOL_Y],
-            [['measure_id'], 'default', 'value' => function()
-            {
-                return (int) Measure::find()->def()->one()->id;
-            }],
+            [
+                ['measure_id'],
+                'default',
+                'value' => function () {
+                    return (int)Measure::find()->def()->one()->id;
+                }
+            ],
 
             [['product_type'], 'string', 'max' => 10],
             [['product_type'], 'default', 'value' => static::TYPE_SIMPLE],
@@ -342,36 +364,36 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                        => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'                => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'                => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'                => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'                => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'quantity'                  => \Yii::t('skeeks/shop/app', 'Available quantity'),
-            'quantity_trace'            => \Yii::t('skeeks/shop/app', 'Include quantitative account'),
-            'weight'                    => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
-            'price_type'                => \Yii::t('skeeks/shop/app', 'Price Type'),
-            'recur_scheme_length'       => \Yii::t('skeeks/shop/app', 'Recur Scheme Length'),
-            'recur_scheme_type'         => \Yii::t('skeeks/shop/app', 'Recur Scheme Type'),
-            'trial_price_id'            => \Yii::t('skeeks/shop/app', 'Trial Price ID'),
-            'without_order'             => \Yii::t('skeeks/shop/app', 'Without Order'),
-            'select_best_price'         => \Yii::t('skeeks/shop/app', 'Select Best Price'),
-            'vat_id'                    => \Yii::t('skeeks/shop/app', 'VAT rate'),
-            'vat_included'              => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
-            'tmp_id'                    => \Yii::t('skeeks/shop/app', 'Tmp ID'),
-            'can_buy_zero'              => \Yii::t('skeeks/shop/app', 'Allow purchase if product is absent'),
-            'negative_amount_trace'     => \Yii::t('skeeks/shop/app', 'Allow negative quantity'),
-            'barcode_multi'             => \Yii::t('skeeks/shop/app', 'Barcode Multi'),
-            'purchasing_price'          => \Yii::t('skeeks/shop/app', 'Purchase price'),
-            'purchasing_currency'       => \Yii::t('skeeks/shop/app', 'Currency purchase price'),
-            'quantity_reserved'         => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
-            'measure_id'                => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
-            'measure_ratio'             => \Yii::t('skeeks/shop/app', 'The coefficient unit'),
-            'width'                     => \Yii::t('skeeks/shop/app', 'Width (mm)'),
-            'length'                    => \Yii::t('skeeks/shop/app', 'Length (mm)'),
-            'height'                    => \Yii::t('skeeks/shop/app', 'Height (mm)'),
-            'subscribe'                 => \Yii::t('skeeks/shop/app', 'Allow subscription without explanation'),
-            'product_type'              => \Yii::t('skeeks/shop/app', 'Product type'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'quantity' => \Yii::t('skeeks/shop/app', 'Available quantity'),
+            'quantity_trace' => \Yii::t('skeeks/shop/app', 'Include quantitative account'),
+            'weight' => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
+            'price_type' => \Yii::t('skeeks/shop/app', 'Price Type'),
+            'recur_scheme_length' => \Yii::t('skeeks/shop/app', 'Recur Scheme Length'),
+            'recur_scheme_type' => \Yii::t('skeeks/shop/app', 'Recur Scheme Type'),
+            'trial_price_id' => \Yii::t('skeeks/shop/app', 'Trial Price ID'),
+            'without_order' => \Yii::t('skeeks/shop/app', 'Without Order'),
+            'select_best_price' => \Yii::t('skeeks/shop/app', 'Select Best Price'),
+            'vat_id' => \Yii::t('skeeks/shop/app', 'VAT rate'),
+            'vat_included' => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
+            'tmp_id' => \Yii::t('skeeks/shop/app', 'Tmp ID'),
+            'can_buy_zero' => \Yii::t('skeeks/shop/app', 'Allow purchase if product is absent'),
+            'negative_amount_trace' => \Yii::t('skeeks/shop/app', 'Allow negative quantity'),
+            'barcode_multi' => \Yii::t('skeeks/shop/app', 'Barcode Multi'),
+            'purchasing_price' => \Yii::t('skeeks/shop/app', 'Purchase price'),
+            'purchasing_currency' => \Yii::t('skeeks/shop/app', 'Currency purchase price'),
+            'quantity_reserved' => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
+            'measure_id' => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
+            'measure_ratio' => \Yii::t('skeeks/shop/app', 'The coefficient unit'),
+            'width' => \Yii::t('skeeks/shop/app', 'Width (mm)'),
+            'length' => \Yii::t('skeeks/shop/app', 'Length (mm)'),
+            'height' => \Yii::t('skeeks/shop/app', 'Height (mm)'),
+            'subscribe' => \Yii::t('skeeks/shop/app', 'Allow subscription without explanation'),
+            'product_type' => \Yii::t('skeeks/shop/app', 'Product type'),
         ];
     }
 
@@ -383,16 +405,15 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function createNewView()
     {
-        if ($this->isNewRecord)
-        {
+        if ($this->isNewRecord) {
             return false;
         }
 
-        $shopViewdProduct                   = new ShopViewedProduct();
-        $shopViewdProduct->name             = $this->cmsContentElement->name;
-        $shopViewdProduct->shop_product_id  = $this->id;
-        $shopViewdProduct->site_id          = \Yii::$app->cms->site->id;
-        $shopViewdProduct->shop_fuser_id    = \Yii::$app->shop->shopFuser->id;
+        $shopViewdProduct = new ShopViewedProduct();
+        $shopViewdProduct->name = $this->cmsContentElement->name;
+        $shopViewdProduct->shop_product_id = $this->id;
+        $shopViewdProduct->site_id = \Yii::$app->cms->site->id;
+        $shopViewdProduct->shop_fuser_id = \Yii::$app->shop->shopFuser->id;
 
         return $shopViewdProduct->save();
     }
@@ -438,7 +459,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(Currency::className(), ['code' => 'purchasing_currency']);
     }
-    
 
 
     /**
@@ -462,7 +482,8 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getShopProductQuantityChanges()
     {
-        return $this->hasMany(ShopProductQuantityChange::className(), ['shop_product_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
+        return $this->hasMany(ShopProductQuantityChange::className(),
+            ['shop_product_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
 
     /**
@@ -495,14 +516,15 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getViewProductPrices($shopFuser = null)
     {
-        if ($shopFuser === null)
-        {
+        if ($shopFuser === null) {
             $shopFuser = \Yii::$app->shop->shopFuser;
         }
 
         return $this->hasMany(ShopProductPrice::className(), [
             'product_id' => 'id'
-        ])->andWhere(['type_price_id' => ArrayHelper::map($shopFuser->viewTypePrices, 'id', 'id')] )->orderBy(['price' => SORT_ASC]);
+        ])->andWhere([
+            'type_price_id' => ArrayHelper::map($shopFuser->viewTypePrices, 'id', 'id')
+        ])->orderBy(['price' => SORT_ASC]);
     }
 
     /**
@@ -515,28 +537,26 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getMinProductPrice($shopFuser = null)
     {
-        if ($shopFuser === null)
-        {
+        if ($shopFuser === null) {
             $shopFuser = \Yii::$app->shop->shopFuser;
         }
 
         return $this->hasOne(ShopProductPrice::className(), [
             'product_id' => 'id'
         ])
-            ->select(['shop_product_price.*', 'realPrice' => '( (SELECT course FROM `money_currency` WHERE `money_currency`.`code` = `shop_product_price`.`currency_code`) * `shop_product_price`.`price` )'])
+            ->select([
+                'shop_product_price.*',
+                'realPrice' => '( (SELECT course FROM `money_currency` WHERE `money_currency`.`code` = `shop_product_price`.`currency_code`) * `shop_product_price`.`price` )'
+            ])
             ->leftJoin('money_currency', '`money_currency`.`code` = `shop_product_price`.`currency_code`')
-
             ->orWhere([
                 'and',
                 ['>', 'price', 0],
                 ['type_price_id' => ArrayHelper::map($shopFuser->buyTypePrices, 'id', 'id')]
             ])
-
             ->orWhere(
                 ['type_price_id' => \Yii::$app->shop->baseTypePrice->id]
             )
-
-
             ->orderBy(['realPrice' => SORT_ASC]);
     }
 
@@ -548,11 +568,9 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getBaseProductPriceValue()
     {
-        if ($this->_baseProductPriceValue)
-        {
+        if ($this->_baseProductPriceValue) {
             return $this->_baseProductPriceValue;
-        } else
-        {
+        } else {
             $this->_baseProductPriceValue = $this->baseProductPrice ? $this->baseProductPrice->price : null;
         }
 
@@ -566,19 +584,17 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getBaseProductPriceCurrency()
     {
-        if ($this->_baseProductPriceCurrency)
-        {
+        if ($this->_baseProductPriceCurrency) {
             return $this->_baseProductPriceCurrency;
-        } else
-        {
+        } else {
             $this->_baseProductPriceCurrency = $this->baseProductPrice ? $this->baseProductPrice->currency_code : \Yii::$app->money->currencyCode;
         }
 
         return $this->_baseProductPriceCurrency;
     }
 
-    private $_baseProductPriceValue     = null;
-    private $_baseProductPriceCurrency  = null;
+    private $_baseProductPriceValue = null;
+    private $_baseProductPriceCurrency = null;
 
     /**
      * @param $value
@@ -607,7 +623,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function isTradeOffers()
     {
-        return (bool) ($this->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
+        return (bool)($this->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
     }
 
     /**
@@ -616,18 +632,17 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getTradeOffers()
     {
         $childContentId = null;
-        if ($this->cmsContentElement && $this->cmsContentElement->shopContent)
-        {
+        if ($this->cmsContentElement && $this->cmsContentElement->shopContent) {
             $childContentId = $this->cmsContentElement->shopContent->children_content_id;
         }
 
         return $this
-                ->hasMany(ShopCmsContentElement::className(), ['parent_content_element_id' => 'id'])
-                ->andWhere(["content_id" => $childContentId])
-                //->joinWith('cmsContentElement')
-                //->joinWith('cmsContentElement.cmsContent')
-                //->andWhere(["content.id" => $this->cmsContentElement->cmsContent->parent_content_id])
-                ->orderBy(['priority' => SORT_ASC]);
+            ->hasMany(ShopCmsContentElement::className(), ['parent_content_element_id' => 'id'])
+            ->andWhere(["content_id" => $childContentId])
+            //->joinWith('cmsContentElement')
+            //->joinWith('cmsContentElement.cmsContent')
+            //->andWhere(["content.id" => $this->cmsContentElement->cmsContent->parent_content_id])
+            ->orderBy(['priority' => SORT_ASC]);
     }
 
 }

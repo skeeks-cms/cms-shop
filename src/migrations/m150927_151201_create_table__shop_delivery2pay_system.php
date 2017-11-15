@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150927_151201_create_table__shop_delivery2pay_system extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_delivery2pay_system}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,16 +24,16 @@ class m150927_151201_create_table__shop_delivery2pay_system extends Migration
         }
 
         $this->createTable("{{%shop_delivery2pay_system}}", [
-            'id'                        => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'pay_system_id'             => $this->integer()->notNull(),
-            'delivery_id'               => $this->integer()->notNull(),
+            'pay_system_id' => $this->integer()->notNull(),
+            'delivery_id' => $this->integer()->notNull(),
 
         ], $tableOptions);
 
@@ -44,7 +44,8 @@ class m150927_151201_create_table__shop_delivery2pay_system extends Migration
         $this->createIndex('updated_at', '{{%shop_delivery2pay_system}}', 'updated_at');
 
 
-        $this->createIndex('shop_delivery2pay_system', '{{%shop_delivery2pay_system}}', ['pay_system_id', 'delivery_id'], true);
+        $this->createIndex('shop_delivery2pay_system', '{{%shop_delivery2pay_system}}',
+            ['pay_system_id', 'delivery_id'], true);
 
 
         $this->execute("ALTER TABLE {{%shop_delivery2pay_system}} COMMENT = 'Службы доставки с платежными системами';");

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150828_100558_create_table__shop_fuser extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_fuser}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,15 +24,15 @@ class m150828_100558_create_table__shop_fuser extends Migration
         }
 
         $this->createTable("{{%shop_fuser}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'user_id'               => $this->integer()->unique(),
+            'user_id' => $this->integer()->unique(),
 
         ], $tableOptions);
 

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -34,9 +35,9 @@ class AdminPaySystemController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Payment systems');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopPaySystem::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Payment systems');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopPaySystem::className();
 
         parent::init();
     }
@@ -49,46 +50,45 @@ class AdminPaySystemController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 'index' =>
-                [
-                    "gridConfig" =>
                     [
-                        'settingsData' =>
-                        [
-                            'order' => SORT_ASC,
-                            'orderBy' => "priority",
-                        ]
-                    ],
+                        "gridConfig" =>
+                            [
+                                'settingsData' =>
+                                    [
+                                        'order' => SORT_ASC,
+                                        'orderBy' => "priority",
+                                    ]
+                            ],
 
-                    "columns"      => [
-                        'name',
-                        'priority',
+                        "columns" => [
+                            'name',
+                            'priority',
 
-                        [
-                            'class'         => DataColumn::className(),
-                            'attribute'     => "personTypeIds",
-                            'filter'        => false,
-                            'value'         => function(ShopPaySystem $model)
-                            {
-                                return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
-                            }
+                            [
+                                'class' => DataColumn::className(),
+                                'attribute' => "personTypeIds",
+                                'filter' => false,
+                                'value' => function (ShopPaySystem $model) {
+                                    return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
+                                }
+                            ],
+
+                            [
+                                'class' => BooleanColumn::className(),
+                                'attribute' => "active"
+                            ]
                         ],
-
-                        [
-                            'class'         => BooleanColumn::className(),
-                            'attribute'     => "active"
-                        ]
                     ],
-                ],
 
                 'create' =>
-                [
-                    'callback'         => [$this, 'create'],
-                ],
+                    [
+                        'callback' => [$this, 'create'],
+                    ],
 
                 'update' =>
-                [
-                    'callback'         => [$this, 'update'],
-                ],
+                    [
+                        'callback' => [$this, 'update'],
+                    ],
             ]
         );
     }
@@ -105,25 +105,20 @@ class AdminPaySystemController extends AdminModelEditorController
         $model = new $modelClass();
         $model->loadDefaultValues();
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load($post);
         }
 
         $handler = $model->handler;
 
-        if ($handler)
-        {
-            if ($post = \Yii::$app->request->post())
-            {
+        if ($handler) {
+            if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
                 $handlerValid = true;
                 if ($handler) {
                     $model->component_settings = $handler->toArray();
@@ -131,30 +126,28 @@ class AdminPaySystemController extends AdminModelEditorController
 
                     $handlerValid = $handler->validate();
                 }
-                
+
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handlerValid)
-                {
+                    && $model->validate() && $handlerValid) {
                     $model->save();
 
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
                     return $this->redirect(
                         UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
                             ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
                             ->toString()
                     );
-                } else
-                {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
+                } else {
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms', 'Could not save'));
                 }
             }
         }
 
         return $this->render('_form', [
-            'model'     => $model,
-            'handler'   => $handler,
+            'model' => $model,
+            'handler' => $handler,
         ]);
     }
 
@@ -165,46 +158,37 @@ class AdminPaySystemController extends AdminModelEditorController
 
         $model = $this->model;
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load($post);
         }
 
         $handler = $model->handler;
-        if ($handler)
-        {
-            if ($post = \Yii::$app->request->post())
-            {
+        if ($handler) {
+            if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
-                if ($rr->isRequestPjaxPost())
-                {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
+                if ($rr->isRequestPjaxPost()) {
                     $handlerValid = true;
                     if ($handler) {
                         $model->component_settings = $handler->toArray();
                         $handler->load(\Yii::$app->request->post());
-    
+
                         $handlerValid = $handler->validate();
                     }
-                    
+
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handlerValid)
-                    {
+                        && $model->validate() && $handlerValid) {
                         $model->save();
 
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('app','Saved'));
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Saved'));
 
-                        if (\Yii::$app->request->post('submit-btn') == 'apply')
-                        {
+                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
 
-                        } else
-                        {
+                        } else {
                             return $this->redirect(
                                 $this->url
                             );
@@ -218,8 +202,8 @@ class AdminPaySystemController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model'     => $model,
-            'handler'   => $handler,
+            'model' => $model,
+            'handler' => $handler,
         ]);
     }
 

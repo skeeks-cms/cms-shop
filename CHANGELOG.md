@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1-alpha7.pre
+-----------------
+ * code style
+ 
 2.0.1-alpha6
 -----------------
  * Update agents

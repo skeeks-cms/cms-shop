@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150914_190601_create_table__shop_product_price extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_product_price}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,24 +24,24 @@ class m150914_190601_create_table__shop_product_price extends Migration
         }
 
         $this->createTable("{{%shop_product_price}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'product_id'            => $this->integer()->notNull(),
-            'type_price_id'         => $this->integer()->notNull(),
+            'product_id' => $this->integer()->notNull(),
+            'type_price_id' => $this->integer()->notNull(),
 
-            'price'                 => $this->decimal(18, 2)->notNull(),
-            'currency_code'         => $this->string(3)->notNull(),
+            'price' => $this->decimal(18, 2)->notNull(),
+            'currency_code' => $this->string(3)->notNull(),
 
-            'quantity_from'         => $this->integer(),
-            'quantity_to'           => $this->integer(),
+            'quantity_from' => $this->integer(),
+            'quantity_to' => $this->integer(),
 
-            'tmp_id'                => $this->string(40),
+            'tmp_id' => $this->string(40),
         ], $tableOptions);
 
 

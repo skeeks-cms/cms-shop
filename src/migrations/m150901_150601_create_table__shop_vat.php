@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150901_150601_create_table__shop_vat extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_vat}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,19 +24,19 @@ class m150901_150601_create_table__shop_vat extends Migration
         }
 
         $this->createTable("{{%shop_vat}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'name'                  => $this->string(255)->notNull(),
-            'priority'              => $this->integer()->notNull()->defaultValue(100),
-            'active'                => $this->string(1)->notNull()->defaultValue("Y"),
+            'name' => $this->string(255)->notNull(),
+            'priority' => $this->integer()->notNull()->defaultValue(100),
+            'active' => $this->string(1)->notNull()->defaultValue("Y"),
 
-            'rate'                  => $this->decimal(18, 2)->notNull()->defaultValue(0),
+            'rate' => $this->decimal(18, 2)->notNull()->defaultValue(0),
 
         ], $tableOptions);
 
@@ -65,17 +65,17 @@ class m150901_150601_create_table__shop_vat extends Migration
 
 
         $this->insert('{{%shop_vat}}', [
-            'name'          => 'Без НДС',
-            'priority'      => 100,
-            'active'        => 'Y',
-            'rate'          => 0,
+            'name' => 'Без НДС',
+            'priority' => 100,
+            'active' => 'Y',
+            'rate' => 0,
         ]);
 
         $this->insert('{{%shop_vat}}', [
-            'name'          => 'НДС 18%',
-            'priority'      => 200,
-            'active'        => 'Y',
-            'rate'          =>  18,
+            'name' => 'НДС 18%',
+            'priority' => 200,
+            'active' => 'Y',
+            'rate' => 18,
         ]);
     }
 

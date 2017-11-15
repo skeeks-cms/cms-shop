@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -12,10 +13,9 @@ class m161220_110601_create_table__shop_product_quantity_change extends Migratio
 {
     public function safeUp()
     {
-        $tableName  = 'shop_product_quantity_change';
+        $tableName = 'shop_product_quantity_change';
         $tableExist = $this->db->getTableSchema($tableName, true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
         $tableOptions = null;
@@ -24,20 +24,20 @@ class m161220_110601_create_table__shop_product_quantity_change extends Migratio
         }
 
         $this->createTable($tableName, [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'shop_product_id'       => $this->integer()->notNull(),
-            
-            'quantity'              => $this->double()->notNull()->defaultValue(0),
-            'quantity_reserved'     => $this->double()->notNull()->defaultValue(0),
-            'measure_id'            => $this->integer(),
-            'measure_ratio'         => $this->double()->notNull()->defaultValue(1),
+            'shop_product_id' => $this->integer()->notNull(),
+
+            'quantity' => $this->double()->notNull()->defaultValue(0),
+            'quantity_reserved' => $this->double()->notNull()->defaultValue(0),
+            'measure_id' => $this->integer(),
+            'measure_ratio' => $this->double()->notNull()->defaultValue(1),
 
         ], $tableOptions);
 

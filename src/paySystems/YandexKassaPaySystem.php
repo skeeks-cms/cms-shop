@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 12.10.2015
  */
+
 namespace skeeks\cms\shop\paySystems;
+
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Component;
@@ -21,12 +23,12 @@ use yii\widgets\ActiveForm;
  */
 class YandexKassaPaySystem extends PaySystemHandlerComponent
 {
-    const SECURITY_MD5      = 'MD5';
-    const SECURITY_PKCS7    = 'PKCS7';
+    const SECURITY_MD5 = 'MD5';
+    const SECURITY_PKCS7 = 'PKCS7';
 
-    public $isLive          = false;
+    public $isLive = false;
     public $shop_password;
-    public $security_type   = self::SECURITY_MD5;
+    public $security_type = self::SECURITY_MD5;
     public $shop_id;
     public $scid;
     public $payment_type = "";
@@ -35,6 +37,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     {
         return $this->isLive ? 'https://money.yandex.ru/eshop.xml' : 'https://demomoney.yandex.ru/eshop.xml';
     }
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -42,7 +45,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          =>  \Yii::t('skeeks/shop/app', 'YandexKassa'),
+            'name' => \Yii::t('skeeks/shop/app', 'YandexKassa'),
         ]);
     }
 
@@ -62,8 +65,8 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'isLive'                    => 'Рабочий режим',
-            'sMerchantPass2'            => 'sMerchantPass2',
+            'isLive' => 'Рабочий режим',
+            'sMerchantPass2' => 'sMerchantPass2',
         ]);
     }
 
@@ -74,7 +77,6 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
             'payment_type' => 'Смотреть https://tech.yandex.ru/money/doc/payment-solution/reference/payment-type-codes-docpage/',
         ]);
     }
-
 
 
     /**
@@ -108,19 +110,15 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
 <hr />
 <a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/examples/examples-test-data-docpage/">Тестовые данные</a><br />
 HTML
-,
+            ,
         ]);
 
     }
 
 
-
-
-
     static public function getRequest()
     {
-        if (\Yii::$app->request->contentType == "application/pkcs7-mime")
-        {
+        if (\Yii::$app->request->contentType == "application/pkcs7-mime") {
             return static::_verifySign();
         }
 
@@ -135,16 +133,16 @@ HTML
     {
         $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
         $certificate = \Yii::getAlias('@skeeks/cms/shop/paySystems/yandexkassa/pksc7-key-for-encode.cer');
-        
+
         \Yii::info("_verifySign(): {$certificate}", YandexKassaPaySystem::class);
 
         $process = proc_open('openssl smime -verify -inform PEM -nointern -certfile ' . $certificate . ' -CAfile ' . $certificate,
             $descriptorspec, $pipes);
-        
+
         if (is_resource($process)) {
-            
+
             \Yii::info("_verifySign() is_resource: true", YandexKassaPaySystem::class);
-            
+
             // Getting data from request body.
             $data = file_get_contents("php://input"); // "php://input"
             fwrite($pipes[0], $data);
@@ -152,19 +150,18 @@ HTML
             $content = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
             $resCode = proc_close($process);
-            
-            if ($resCode != 0) 
-            {
+
+            if ($resCode != 0) {
                 \Yii::info("resCode(): {$resCode}", YandexKassaPaySystem::class);
                 return null;
             } else {
                 \Yii::info("_verifySign() content: {$content}", YandexKassaPaySystem::class);
                 $xml = simplexml_load_string($content);
-                $array = json_decode(json_encode($xml), TRUE);
+                $array = json_decode(json_encode($xml), true);
                 return $array["@attributes"];
             }
         }
-        
+
         return null;
     }
 
@@ -174,7 +171,8 @@ HTML
      * @param  array $request payment parameters
      * @return bool true if MD5 hash is correct
      */
-    public function checkRequestMD5($request) {
+    public function checkRequestMD5($request)
+    {
 
         //return true;
 
@@ -200,24 +198,23 @@ HTML
      */
     public function checkRequest($request)
     {
-        if ($this->security_type == static::SECURITY_MD5)
-        {
-            if ($this->checkRequestMD5($request))
-            {
+        if ($this->security_type == static::SECURITY_MD5) {
+            if ($this->checkRequestMD5($request)) {
                 \Yii::info("checkRequest true", YandexKassaPaySystem::class);
                 return true;
             }
-        } else if ($yandexKassa->security_type == YandexKassaPaySystem::SECURITY_PKCS7)
-        {
-            // Checking for a certificate sign. If the checking fails, respond with "200" error code.
-            if (($request = $this->verifySign()) == null) {
-                $response = $this->buildResponse($this->action, null, 200);
-                $this->sendResponse($response);
-            }
-            $this->log("Request: " . print_r($request, true));
+        } else {
+            if ($yandexKassa->security_type == YandexKassaPaySystem::SECURITY_PKCS7) {
+                // Checking for a certificate sign. If the checking fails, respond with "200" error code.
+                if (($request = $this->verifySign()) == null) {
+                    $response = $this->buildResponse($this->action, null, 200);
+                    $this->sendResponse($response);
+                }
+                $this->log("Request: " . print_r($request, true));
 
-            //TODO:; make it's
-            \Yii::error('SECURITY_PKCS7 — todo:: not realized', YandexKassaPaySystem::class);
+                //TODO:; make it's
+                \Yii::error('SECURITY_PKCS7 — todo:: not realized', YandexKassaPaySystem::class);
+            }
         }
 
         \Yii::info("checkRequest true", YandexKassaPaySystem::class);
@@ -226,13 +223,14 @@ HTML
 
     /**
      * Building XML response.
-     * @param  string $functionName  "checkOrder" or "paymentAviso" string
-     * @param  string $invoiceId     transaction number
-     * @param  string $result_code   result code
-     * @param  string $message       error message. May be null.
+     * @param  string $functionName "checkOrder" or "paymentAviso" string
+     * @param  string $invoiceId transaction number
+     * @param  string $result_code result code
+     * @param  string $message error message. May be null.
      * @return string                prepared XML response
      */
-    public function buildResponse($functionName, $invoiceId, $result_code, $message = null) {
+    public function buildResponse($functionName, $invoiceId, $result_code, $message = null)
+    {
         try {
             $performedDatetime = self::formatDate(new \DateTime());
             $response = '<?xml version="1.0" encoding="UTF-8"?><' . $functionName . 'Response performedDatetime="' . $performedDatetime .
@@ -245,24 +243,25 @@ HTML
     }
 
 
-
-    public static function formatDate(\DateTime $date) {
+    public static function formatDate(\DateTime $date)
+    {
         $performedDatetime = $date->format("Y-m-d") . "T" . $date->format("H:i:s") . ".000" . $date->format("P");
         return $performedDatetime;
     }
 
-    public static function formatDateForMWS(\DateTime $date) {
+    public static function formatDateForMWS(\DateTime $date)
+    {
         $performedDatetime = $date->format("Y-m-d") . "T" . $date->format("H:i:s") . ".000Z";
         return $performedDatetime;
     }
-    
-    
-    
+
+
     /**
      * Checking for sign when XML/PKCS#7 scheme is used.
      * @return array if request is successful, returns key-value array of request params, null otherwise.
      */
-    private function verifySign() {
+    private function verifySign()
+    {
         $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
         $certificate = 'yamoney.pem';
         $process = proc_open('openssl smime -verify -inform PEM -nointern -certfile ' . $certificate . ' -CAfile ' . $certificate,
@@ -280,7 +279,7 @@ HTML
             } else {
                 $this->log("Row xml: " . $content);
                 $xml = simplexml_load_string($content);
-                $array = json_decode(json_encode($xml), TRUE);
+                $array = json_decode(json_encode($xml), true);
                 return $array["@attributes"];
             }
         }

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150915_100601_create_table__shop_content extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_content}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,20 +24,20 @@ class m150915_100601_create_table__shop_content extends Migration
         }
 
         $this->createTable("{{%shop_content}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'content_id'            => $this->integer()->notNull()->unique(),
+            'content_id' => $this->integer()->notNull()->unique(),
 
-            'yandex_export'         => $this->string(1)->notNull()->defaultValue("N"),
-            'subscription'          => $this->string(1)->notNull()->defaultValue("N"),
+            'yandex_export' => $this->string(1)->notNull()->defaultValue("N"),
+            'subscription' => $this->string(1)->notNull()->defaultValue("N"),
 
-            'vat_id'                => $this->integer(),
+            'vat_id' => $this->integer(),
 
         ], $tableOptions);
 

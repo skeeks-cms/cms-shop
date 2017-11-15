@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150915_110701_create_table__shop_affiliate_plan extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_affiliate_plan}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,26 +24,26 @@ class m150915_110701_create_table__shop_affiliate_plan extends Migration
         }
 
         $this->createTable("{{%shop_affiliate_plan}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'site_code'                 => $this->string(15)->notNull(),
-            'name'                      => $this->string(255)->notNull(),
-            'description'               => $this->text(),
-            'active'                    => $this->string(1)->notNull()->defaultValue("Y"),
+            'site_code' => $this->string(15)->notNull(),
+            'name' => $this->string(255)->notNull(),
+            'description' => $this->text(),
+            'active' => $this->string(1)->notNull()->defaultValue("Y"),
 
-            'base_rate'                 => $this->decimal(18,4)->notNull()->defaultValue(0),
-            'base_rate_type'            => $this->string(1)->notNull()->defaultValue("P"),
-            'base_rate_currency_code'   => $this->string(3),
+            'base_rate' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'base_rate_type' => $this->string(1)->notNull()->defaultValue("P"),
+            'base_rate_currency_code' => $this->string(3),
 
-            'min_pay'                   => $this->decimal(18,4)->notNull()->defaultValue(0),
-            'min_plan_value'            => $this->decimal(18,4),
-            'value_currency_code'       => $this->string(3),
+            'min_pay' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'min_plan_value' => $this->decimal(18, 4),
+            'value_currency_code' => $this->string(3),
 
 
         ], $tableOptions);
@@ -76,7 +76,6 @@ class m150915_110701_create_table__shop_affiliate_plan extends Migration
             'shop_affiliate_plan_updated_by', "{{%shop_affiliate_plan}}",
             'updated_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
         );
-
 
 
         $this->addForeignKey(

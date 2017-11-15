@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -27,9 +28,9 @@ class AdminTypePriceController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Types of prices');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopTypePrice::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Types of prices');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopTypePrice::className();
 
         parent::init();
     }
@@ -42,13 +43,13 @@ class AdminTypePriceController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 "def-multi" =>
-                [
-                    'class'             => AdminMultiModelEditAction::className(),
-                    "name"              => \Yii::t('skeeks/shop/app', 'Default'),
-                    //"icon"              => "glyphicon glyphicon-trash",
-                    "eachCallback"      => [$this, 'eachMultiDef'],
-                    "priority"          => 0,
-                ],
+                    [
+                        'class' => AdminMultiModelEditAction::className(),
+                        "name" => \Yii::t('skeeks/shop/app', 'Default'),
+                        //"icon"              => "glyphicon glyphicon-trash",
+                        "eachCallback" => [$this, 'eachMultiDef'],
+                        "priority" => 0,
+                    ],
             ]
         );
     }
@@ -60,12 +61,10 @@ class AdminTypePriceController extends AdminModelEditorController
      */
     public function eachMultiDef($model, $action)
     {
-        try
-        {
+        try {
             $model->def = Cms::BOOL_Y;
             return $model->save(false);
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return false;
         }
     }

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150828_130601_create_table__shop_person_type extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_person_type}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,17 +24,17 @@ class m150828_130601_create_table__shop_person_type extends Migration
         }
 
         $this->createTable("{{%shop_person_type}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'name'                  => $this->string(255)->notNull()->unique(),
-            'priority'              => $this->integer()->notNull()->defaultValue(100),
-            'active'                => $this->string(1)->notNull()->defaultValue("Y"),
+            'name' => $this->string(255)->notNull()->unique(),
+            'priority' => $this->integer()->notNull()->defaultValue(100),
+            'active' => $this->string(1)->notNull()->defaultValue("Y"),
 
         ], $tableOptions);
 
@@ -61,15 +61,15 @@ class m150828_130601_create_table__shop_person_type extends Migration
 
 
         $this->insert('{{%shop_person_type}}', [
-            'name'          => 'Физическое лицо',
-            'priority'      => '100',
-            'active'        => 'Y',
+            'name' => 'Физическое лицо',
+            'priority' => '100',
+            'active' => 'Y',
         ]);
 
         $this->insert('{{%shop_person_type}}', [
-            'name'          => 'Юридическое лицо',
-            'priority'      => '200',
-            'active'        => 'Y',
+            'name' => 'Юридическое лицо',
+            'priority' => '200',
+            'active' => 'Y',
         ]);
     }
 

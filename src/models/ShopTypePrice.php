@@ -53,8 +53,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function beforeUpdateChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y)
-        {
+        if ($this->def == Cms::BOOL_Y) {
             static::updateAll(
                 [
                     'def' => Cms::BOOL_N
@@ -64,6 +63,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
         }
 
     }
+
     /**
      * @param Event $e
      * @throws Exception
@@ -71,8 +71,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function beforeInsertChecks(Event $e)
     {
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y)
-        {
+        if ($this->def == Cms::BOOL_Y) {
             static::updateAll([
                 'def' => Cms::BOOL_N
             ]);
@@ -102,11 +101,11 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code'          => \Yii::t('skeeks/shop/app', 'Code'),
-            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
-            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
-            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
-            'def'           => \Yii::t('skeeks/shop/app', 'Default'),
+            'code' => \Yii::t('skeeks/shop/app', 'Code'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'description' => \Yii::t('skeeks/shop/app', 'Description'),
+            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
+            'def' => \Yii::t('skeeks/shop/app', 'Default'),
         ]);
     }
 

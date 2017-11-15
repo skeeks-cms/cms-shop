@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -36,9 +37,9 @@ class AdminUserAccountController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Account_customer');
-        $this->modelShowAttribute       = "id";
-        $this->modelClassName           = ShopUserAccount::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Account_customer');
+        $this->modelShowAttribute = "id";
+        $this->modelClassName = ShopUserAccount::className();
 
         parent::init();
     }
@@ -51,29 +52,28 @@ class AdminUserAccountController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 'index' =>
-                [
-                    "columns"               => [
-                        'id',
-                        [
-                            'class' => UserColumnData::className(),
-                            'attribute' => 'user_id'
-                        ],
+                    [
+                        "columns" => [
+                            'id',
+                            [
+                                'class' => UserColumnData::className(),
+                                'attribute' => 'user_id'
+                            ],
 
-                        [
-                            'attribute' => 'current_budget',
-                            'class'     => DataColumn::className(),
-                            'value'     => function(ShopUserAccount $userAccount)
-                            {
-                                return \Yii::$app->money->intlFormatter()->format($userAccount->money);
-                            },
-                        ],
+                            [
+                                'attribute' => 'current_budget',
+                                'class' => DataColumn::className(),
+                                'value' => function (ShopUserAccount $userAccount) {
+                                    return \Yii::$app->money->intlFormatter()->format($userAccount->money);
+                                },
+                            ],
 
-                        [
-                            'attribute' => 'locked',
-                            'class'     => BooleanColumn::className(),
-                        ]
+                            [
+                                'attribute' => 'locked',
+                                'class' => BooleanColumn::className(),
+                            ]
+                        ],
                     ],
-                ],
 
             ]
         );

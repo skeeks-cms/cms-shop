@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150914_180601_create_table__shop_product extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_product}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,51 +24,51 @@ class m150914_180601_create_table__shop_product extends Migration
         }
 
         $this->createTable("{{%shop_product}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'quantity'              => $this->double(),
-            'quantity_trace'        => $this->string(1)->defaultValue("N")->notNull(),
-            'weight'                => $this->double()->defaultValue(0)->notNull(),
+            'quantity' => $this->double(),
+            'quantity_trace' => $this->string(1)->defaultValue("N")->notNull(),
+            'weight' => $this->double()->defaultValue(0)->notNull(),
 
-            'price_type'            => $this->string(1)->defaultValue("S")->notNull(),
+            'price_type' => $this->string(1)->defaultValue("S")->notNull(),
 
-            'recur_scheme_length'   => $this->integer(),
-            'recur_scheme_type'     => $this->string(1)->defaultValue("D")->notNull(),
+            'recur_scheme_length' => $this->integer(),
+            'recur_scheme_type' => $this->string(1)->defaultValue("D")->notNull(),
 
-            'trial_price_id'        => $this->integer(),
-            'without_order'         => $this->string(1)->defaultValue("N")->notNull(),
+            'trial_price_id' => $this->integer(),
+            'without_order' => $this->string(1)->defaultValue("N")->notNull(),
 
-            'select_best_price'     => $this->string(1)->defaultValue("Y")->notNull(),
+            'select_best_price' => $this->string(1)->defaultValue("Y")->notNull(),
 
-            'vat_id'                => $this->integer(),
-            'vat_included'          => $this->string(1)->defaultValue("Y")->notNull(),
+            'vat_id' => $this->integer(),
+            'vat_included' => $this->string(1)->defaultValue("Y")->notNull(),
 
-            'tmp_id'                => $this->string(40),
+            'tmp_id' => $this->string(40),
 
-            'can_buy_zero'          => $this->string(1)->defaultValue("Y")->notNull(),
+            'can_buy_zero' => $this->string(1)->defaultValue("Y")->notNull(),
             'negative_amount_trace' => $this->string(1)->defaultValue("D")->notNull(),
 
-            'barcode_multi'         => $this->string(1)->defaultValue("N")->notNull(),
+            'barcode_multi' => $this->string(1)->defaultValue("N")->notNull(),
 
-            'purchasing_price'      => $this->decimal(18, 2),
-            'purchasing_currency'   => $this->string(3),
+            'purchasing_price' => $this->decimal(18, 2),
+            'purchasing_currency' => $this->string(3),
 
-            'quantity_reserved'     => $this->double()->defaultValue(0),
+            'quantity_reserved' => $this->double()->defaultValue(0),
 
-            'measure_id'            => $this->integer(),
-            'measure_ratio'         => $this->double()->notNull()->defaultValue(1),
+            'measure_id' => $this->integer(),
+            'measure_ratio' => $this->double()->notNull()->defaultValue(1),
 
-            'width'                 => $this->double(),
-            'length'                => $this->double(),
-            'height'                => $this->double(),
+            'width' => $this->double(),
+            'length' => $this->double(),
+            'height' => $this->double(),
 
-            'subscribe'             => $this->string(1)->defaultValue("D")->notNull(),
+            'subscribe' => $this->string(1)->defaultValue("D")->notNull(),
 
         ], $tableOptions);
 

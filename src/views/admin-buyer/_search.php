@@ -17,33 +17,32 @@ $filter->addRule('id', 'integer');
 
 $filter->load(\Yii::$app->request->get());
 
-if ($filter->id)
-{
+if ($filter->id) {
     $dataProvider->query->andWhere(['id' => $filter->id]);
 }
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-        'action' => '/' . \Yii::$app->request->pathInfo,
-        'namespace' => \Yii::$app->controller->uniqueId . ($shopPersonType ? "-{$shopPersonType->id}" : "")
-    ]); ?>
+    'action' => '/' . \Yii::$app->request->pathInfo,
+    'namespace' => \Yii::$app->controller->uniqueId . ($shopPersonType ? "-{$shopPersonType->id}" : "")
+]); ?>
 
-    <?= $form->field($filter, 'id')->setVisible(); ?>
+<?= $form->field($filter, 'id')->setVisible(); ?>
 
-    <? if ($shopPersonType) : ?>
-        <?= \yii\helpers\Html::hiddenInput('person_type_id', $shopPersonType->id) ?>
+<? if ($shopPersonType) : ?>
+    <?= \yii\helpers\Html::hiddenInput('person_type_id', $shopPersonType->id) ?>
 
-        <?
-            $shopBuyer = new \skeeks\cms\shop\models\ShopBuyer();
-            $shopBuyer->shop_person_type_id = $shopPersonType->id;
+    <?
+    $shopBuyer = new \skeeks\cms\shop\models\ShopBuyer();
+    $shopBuyer->shop_person_type_id = $shopPersonType->id;
 
-            $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-            $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::className();
-            $searchRelatedPropertiesModel->initProperties($shopBuyer->relatedProperties);
-            $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
-            $searchRelatedPropertiesModel->search($dataProvider, $shopBuyer::tableName());
-        ?>
-        <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
-    <? endif; ?>
+    $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
+    $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::className();
+    $searchRelatedPropertiesModel->initProperties($shopBuyer->relatedProperties);
+    $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+    $searchRelatedPropertiesModel->search($dataProvider, $shopBuyer::tableName());
+    ?>
+    <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
+<? endif; ?>
 
 
 <? $form::end(); ?>

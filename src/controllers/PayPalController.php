@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.09.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
@@ -42,7 +43,7 @@ class PayPalController extends Controller
 
     public function actionIpn()
     {
-        $custom = (int) \Yii::$app->request->post('custom');
+        $custom = (int)\Yii::$app->request->post('custom');
         \Yii::info('Ipn post data: ' . serialize(\Yii::$app->request->post()), 'paypal');
         \Yii::info('Ipn custom: ' . $custom, 'paypal');
 
@@ -51,8 +52,7 @@ class PayPalController extends Controller
             $custom = (int) \Yii::$app->request->get('custom');
         }*/
 
-        if (!$custom)
-        {
+        if (!$custom) {
             \Yii::error('Order id not found', 'paypal');
             return false;
         }
@@ -60,8 +60,7 @@ class PayPalController extends Controller
         $shopOrder = ShopOrder::findOne($custom);
         \Yii::info('Ordder id: ' . $shopOrder->id);
 
-        if (!$shopOrder)
-        {
+        if (!$shopOrder) {
             \Yii::error('Ordder not found: ' . $custom, 'paypal');
         }
 
@@ -70,15 +69,12 @@ class PayPalController extends Controller
          * @var $shopOrder ShopOrder
          */
         $payPal = $shopOrder->paySystem->paySystemHandler;
-        if (!$payPal instanceof PayPalPaySystem)
-        {
+        if (!$payPal instanceof PayPalPaySystem) {
             \Yii::error('Order handler not paypal: ', 'paypal');
         }
 
-        if ($payPal->initIpn())
-        {
-            if ($shopOrder->payed != "Y")
-            {
+        if ($payPal->initIpn()) {
+            if ($shopOrder->payed != "Y") {
                 \Yii::info('Order processNotePayment', 'paypal');
                 $shopOrder->processNotePayment();
             }
@@ -87,8 +83,7 @@ class PayPalController extends Controller
             $shopOrder->payed = "Y";
             $shopOrder->save();
 
-        } else
-        {
+        } else {
             \Yii::error('Ipn false: ', 'paypal');
         }
 

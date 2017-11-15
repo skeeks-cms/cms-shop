@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150828_110559_create_table__shop_order_status extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_order_status}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,21 +24,21 @@ class m150828_110559_create_table__shop_order_status extends Migration
         }
 
         $this->createTable("{{%shop_order_status}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'code'                  => $this->string(2)->notNull()->unique(),
+            'code' => $this->string(2)->notNull()->unique(),
 
-            'name'                  => $this->string(255)->notNull(),
-            'description'           => $this->text(),
-            'priority'              => $this->integer()->notNull()->defaultValue(100),
+            'name' => $this->string(255)->notNull(),
+            'description' => $this->text(),
+            'priority' => $this->integer()->notNull()->defaultValue(100),
 
-            'color'                 => $this->string(32),
+            'color' => $this->string(32),
 
         ], $tableOptions);
 
@@ -66,19 +66,19 @@ class m150828_110559_create_table__shop_order_status extends Migration
 
 
         $this->insert('{{%shop_order_status}}', [
-            'code'          => 'F',
-            'name'          => 'Выполнен',
-            'description'   => 'Заказ доставлен и оплачен',
-            'priority'      => '100',
-            'color'         => 'green',
+            'code' => 'F',
+            'name' => 'Выполнен',
+            'description' => 'Заказ доставлен и оплачен',
+            'priority' => '100',
+            'color' => 'green',
         ]);
 
         $this->insert('{{%shop_order_status}}', [
-            'code'          => 'N',
-            'name'          => 'Принят',
-            'description'   => 'Заказ принят, но пока не обрабатывается (например, заказ только что создан или ожидается оплата заказа)',
-            'priority'      => '200',
-            'color'         => 'orange',
+            'code' => 'N',
+            'name' => 'Принят',
+            'description' => 'Заказ принят, но пока не обрабатывается (например, заказ только что создан или ожидается оплата заказа)',
+            'priority' => '200',
+            'color' => 'orange',
         ]);
 
     }

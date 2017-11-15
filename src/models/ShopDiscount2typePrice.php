@@ -36,7 +36,12 @@ class ShopDiscount2typePrice extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'discount_id', 'type_price_id'], 'integer'],
             [['discount_id', 'type_price_id'], 'required'],
-            [['discount_id', 'type_price_id'], 'unique', 'targetAttribute' => ['discount_id', 'type_price_id'], 'message' => 'The combination of Discount ID and Type Price ID has already been taken.']
+            [
+                ['discount_id', 'type_price_id'],
+                'unique',
+                'targetAttribute' => ['discount_id', 'type_price_id'],
+                'message' => 'The combination of Discount ID and Type Price ID has already been taken.'
+            ]
         ];
     }
 
@@ -46,12 +51,12 @@ class ShopDiscount2typePrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'discount_id'   => \Yii::t('skeeks/shop/app', 'Discount ID'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'discount_id' => \Yii::t('skeeks/shop/app', 'Discount ID'),
             'type_price_id' => \Yii::t('skeeks/shop/app', 'Type Price ID'),
         ];
     }

@@ -41,7 +41,18 @@ class ShopProductPriceChange extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_product_price_id', 'quantity_from', 'quantity_to'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'shop_product_price_id',
+                    'quantity_from',
+                    'quantity_to'
+                ],
+                'integer'
+            ],
             [['price', 'currency_code'], 'required'],
             [['price'], 'number'],
             [['currency_code'], 'string', 'max' => 3]

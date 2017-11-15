@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.12.2016
  */
+
 namespace skeeks\cms\shop\models;
 
 use Yii;
@@ -44,17 +45,44 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_product_id', 'is_notified', 'notified_at', 'shop_fuser_id'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'shop_product_id',
+                    'is_notified',
+                    'notified_at',
+                    'shop_fuser_id'
+                ],
+                'integer'
+            ],
             [['shop_product_id', 'email'], 'required'],
             [['email', 'name'], 'string', 'max' => 255],
-            [['shop_fuser_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopFuser::className(), 'targetAttribute' => ['shop_fuser_id' => 'id']],
-            [['shop_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopProduct::className(), 'targetAttribute' => ['shop_product_id' => 'id']],
+            [
+                ['shop_fuser_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => ShopFuser::className(),
+                'targetAttribute' => ['shop_fuser_id' => 'id']
+            ],
+            [
+                ['shop_product_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => ShopProduct::className(),
+                'targetAttribute' => ['shop_product_id' => 'id']
+            ],
 
             [['email'], 'email'],
-            [['shop_fuser_id'], 'default', 'value' => function()
-            {
-                return \Yii::$app->shop->shopFuser ? \Yii::$app->shop->shopFuser->id : null;
-            }],
+            [
+                ['shop_fuser_id'],
+                'default',
+                'value' => function () {
+                    return \Yii::$app->shop->shopFuser ? \Yii::$app->shop->shopFuser->id : null;
+                }
+            ],
         ]);
     }
 

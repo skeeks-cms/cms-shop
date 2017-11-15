@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
@@ -15,8 +16,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 50]); ?>
-    <?= $form->field($model, 'value')->textInput(); ?>
+<?= $form->field($model, 'name')->textInput(['maxlength' => 50]); ?>
+<?= $form->field($model, 'value')->textInput(); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

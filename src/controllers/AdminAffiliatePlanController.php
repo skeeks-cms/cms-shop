@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -35,9 +36,9 @@ class AdminAffiliatePlanController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Plans affiliate commissions');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopAffiliatePlan::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Plans affiliate commissions');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopAffiliatePlan::className();
 
         parent::init();
     }

@@ -46,11 +46,11 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterInstertCallback"]);
-        $this->on(self::EVENT_BEFORE_UPDATE,    [$this, "afterUpdateCallback"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "afterInstertCallback"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "afterUpdateCallback"]);
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterSaveEvent"]);
-        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveEvent"]);
 
     }
 
@@ -58,16 +58,13 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function afterSaveEvent()
     {
         //Обновление цены у родительского элемента если она есть
-        if ($this->product->cmsContentElement->parent_content_element_id)
-        {
+        if ($this->product->cmsContentElement->parent_content_element_id) {
             $parentProduct = $this->product->cmsContentElement->parentContentElement->shopProduct;
-            if ($parentProduct)
-            {
-                $minPriceValue      = $this->price;
-                $minPriceCurrency   = $this->currency_code;
+            if ($parentProduct) {
+                $minPriceValue = $this->price;
+                $minPriceCurrency = $this->currency_code;
                 //У родительского элемента уже есть предложения
-                if ($offers = $parentProduct->tradeOffers)
-                {
+                if ($offers = $parentProduct->tradeOffers) {
                     //Все цены оферов этого типа
                     $minPrice = ShopProductPrice::find()
                         ->where([
@@ -78,8 +75,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
                         ])
                         ->orderBy(['price' => SORT_ASC])->one();
 
-                    if ($minPrice)
-                    {
+                    if ($minPrice) {
                         $minPriceValue = $minPrice->price;
                         $minPriceCurrency = $minPrice->currency_code;
                     }
@@ -93,8 +89,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
                 /**
                  * @var $price self
                  */
-                if ($price = $query->one())
-                {
+                if ($price = $query->one()) {
                     $price->price = $minPriceValue;
                     $price->currency_code = $minPriceCurrency;
                     $price->save();
@@ -107,38 +102,34 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
     public function afterInstertCallback()
     {
-        $shopProductPriceChange                 = new ShopProductPriceChange();
+        $shopProductPriceChange = new ShopProductPriceChange();
 
-        $shopProductPriceChange->price          = $this->price;
-        $shopProductPriceChange->currency_code  = $this->currency_code;
-        $shopProductPriceChange->quantity_from  = $this->quantity_from;
-        $shopProductPriceChange->quantity_to    = $this->quantity_to;
+        $shopProductPriceChange->price = $this->price;
+        $shopProductPriceChange->currency_code = $this->currency_code;
+        $shopProductPriceChange->quantity_from = $this->quantity_from;
+        $shopProductPriceChange->quantity_to = $this->quantity_to;
 
-        if ($shopProductPriceChange->save())
-        {
+        if ($shopProductPriceChange->save()) {
             $shopProductPriceChange->link('shopProductPrice', $this);
         }
     }
 
     public function afterUpdateCallback()
     {
-        if ($this->isAttributeChanged('price') || $this->isAttributeChanged('currency_code') || $this->isAttributeChanged('quantity_from') || $this->isAttributeChanged('quantity_to'))
-        {
-            $shopProductPriceChange                 = new ShopProductPriceChange();
+        if ($this->isAttributeChanged('price') || $this->isAttributeChanged('currency_code') || $this->isAttributeChanged('quantity_from') || $this->isAttributeChanged('quantity_to')) {
+            $shopProductPriceChange = new ShopProductPriceChange();
 
-            $shopProductPriceChange->price          = $this->price;
-            $shopProductPriceChange->currency_code  = $this->currency_code;
-            $shopProductPriceChange->quantity_from  = $this->quantity_from;
-            $shopProductPriceChange->quantity_to    = $this->quantity_to;
+            $shopProductPriceChange->price = $this->price;
+            $shopProductPriceChange->currency_code = $this->currency_code;
+            $shopProductPriceChange->quantity_from = $this->quantity_from;
+            $shopProductPriceChange->quantity_to = $this->quantity_to;
 
-            if ($shopProductPriceChange->save())
-            {
+            if ($shopProductPriceChange->save()) {
                 $shopProductPriceChange->link('shopProductPrice', $this);
             }
         }
 
     }
-
 
 
     /**
@@ -147,7 +138,19 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'product_id', 'type_price_id', 'quantity_from', 'quantity_to'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'product_id',
+                    'type_price_id',
+                    'quantity_from',
+                    'quantity_to'
+                ],
+                'integer'
+            ],
             [['product_id', 'type_price_id'], 'required'],
             [['price'], 'number'],
             [['currency_code'], 'string', 'max' => 3],
@@ -163,18 +166,18 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'product_id'    => \Yii::t('skeeks/shop/app', 'Product ID'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'product_id' => \Yii::t('skeeks/shop/app', 'Product ID'),
             'type_price_id' => \Yii::t('skeeks/shop/app', 'Type Price ID'),
-            'price'         => \Yii::t('skeeks/shop/app', 'Price'),
+            'price' => \Yii::t('skeeks/shop/app', 'Price'),
             'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
             'quantity_from' => \Yii::t('skeeks/shop/app', 'Quantity From'),
-            'quantity_to'   => \Yii::t('skeeks/shop/app', 'Quantity To'),
-            'tmp_id'        => \Yii::t('skeeks/shop/app', 'Tmp ID'),
+            'quantity_to' => \Yii::t('skeeks/shop/app', 'Quantity To'),
+            'tmp_id' => \Yii::t('skeeks/shop/app', 'Tmp ID'),
         ];
     }
 
@@ -215,6 +218,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
      */
     public function getShopProductPriceChanges()
     {
-        return $this->hasMany(ShopProductPriceChange::className(), ['shop_product_price_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
+        return $this->hasMany(ShopProductPriceChange::className(),
+            ['shop_product_price_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
 }

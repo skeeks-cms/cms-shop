@@ -16,39 +16,38 @@
 ?>
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'adminController'   => $controller,
-        'pjax'              => $pjax,
-        'settingsData' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'adminController' => $controller,
+    'pjax' => $pjax,
+    'settingsData' =>
         [
-            'order'     => SORT_ASC,
-            'orderBy'   => "priority",
+            'order' => SORT_ASC,
+            'orderBy' => "priority",
         ],
-        'columns' => [
-            'code',
-            [
-                'class'     => \yii\grid\DataColumn::className(),
-                'attribute'     => 'name',
-                'format'     => 'raw',
-                'value'     => function(\skeeks\cms\shop\models\ShopOrderStatus $model)
-                {
-                    return \yii\helpers\Html::label($model->name, null, [
-                        'style' => "background: {$model->color}",
-                        'class' => "label"
-                    ]);
-                }
-            ],
+    'columns' => [
+        'code',
+        [
+            'class' => \yii\grid\DataColumn::className(),
+            'attribute' => 'name',
+            'format' => 'raw',
+            'value' => function (\skeeks\cms\shop\models\ShopOrderStatus $model) {
+                return \yii\helpers\Html::label($model->name, null, [
+                    'style' => "background: {$model->color}",
+                    'class' => "label"
+                ]);
+            }
+        ],
 
-            'description',
-            'priority',
-        ],
-    ]); ?>
+        'description',
+        'priority',
+    ],
+]); ?>
 
 <? $pjax::end(); ?>

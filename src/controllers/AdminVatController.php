@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -30,9 +31,9 @@ class AdminVatController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'VAT rates');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopVat::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'VAT rates');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopVat::className();
 
         parent::init();
     }

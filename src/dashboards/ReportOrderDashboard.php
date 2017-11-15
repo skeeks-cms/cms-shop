@@ -38,8 +38,7 @@ class ReportOrderDashboard extends AdminDashboardWidget
     {
         parent::init();
 
-        if (!$this->name)
-        {
+        if (!$this->name) {
             $this->name = \Yii::t('skeeks/shop/app', 'Reports on orders');
         }
     }
@@ -57,7 +56,7 @@ class ReportOrderDashboard extends AdminDashboardWidget
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'name'                           => \Yii::t('skeeks/shop/app', 'Name'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
         ]);
     }
 

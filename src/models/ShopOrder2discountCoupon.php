@@ -2,9 +2,10 @@
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  * @link http://skeeks.com/
- * @copyright 2010 SkeekS (ÑêèêÑ)
+ * @copyright 2010 SkeekS (ï¿½ï¿½ï¿½ï¿½ï¿½)
  * @date 08.02.2017
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsUser;
@@ -42,10 +43,34 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'discount_coupon_id', 'order_id'], 'integer'],
             [['discount_coupon_id'], 'required'],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['discount_coupon_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopDiscountCoupon::className(), 'targetAttribute' => ['discount_coupon_id' => 'id']],
-            [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopOrder::className(), 'targetAttribute' => ['order_id' => 'id']],
-            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
+            [
+                ['created_by'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsUser::className(),
+                'targetAttribute' => ['created_by' => 'id']
+            ],
+            [
+                ['discount_coupon_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => ShopDiscountCoupon::className(),
+                'targetAttribute' => ['discount_coupon_id' => 'id']
+            ],
+            [
+                ['order_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => ShopOrder::className(),
+                'targetAttribute' => ['order_id' => 'id']
+            ],
+            [
+                ['updated_by'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsUser::className(),
+                'targetAttribute' => ['updated_by' => 'id']
+            ],
         ];
     }
 

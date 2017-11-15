@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -33,9 +34,9 @@ class AdminExtraController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Surcharges');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopExtra::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Surcharges');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopExtra::className();
 
         parent::init();
     }

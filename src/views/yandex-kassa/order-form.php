@@ -39,4 +39,4 @@ JS
         <input type="hidden" name="rebillingOn" value="true">
         <input type="submit" value="Заплатить"/>
     </form>
- </div>
+</div>

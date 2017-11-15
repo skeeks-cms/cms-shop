@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150915_110601_create_table__shop_user_account extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_user_account}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,22 +24,22 @@ class m150915_110601_create_table__shop_user_account extends Migration
         }
 
         $this->createTable("{{%shop_user_account}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'user_id'               => $this->integer()->notNull(),
+            'user_id' => $this->integer()->notNull(),
 
-            'current_budget'        => $this->decimal(18, 4)->notNull()->defaultValue(0),
-            'currency_code'         => $this->string(3)->notNull(),
+            'current_budget' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'currency_code' => $this->string(3)->notNull(),
 
-            'locked'                => $this->string(1)->notNull()->defaultValue('N'),
-            'locked_at'             => $this->integer(),
-            'notes'                 => $this->text(),
+            'locked' => $this->string(1)->notNull()->defaultValue('N'),
+            'locked_at' => $this->integer(),
+            'notes' => $this->text(),
 
         ], $tableOptions);
 

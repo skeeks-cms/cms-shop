@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 30.01.2016
  */
+
 namespace skeeks\cms\shop\models\search;
 
 use yii\base\Model;
@@ -32,9 +33,9 @@ class AdminReportOrderSearch extends Model
     public function attributeLabels()
     {
         return [
-            'from'  => \Yii::t('skeeks/shop/app', 'From'),
-            'to'    => \Yii::t('skeeks/shop/app', 'To'),
-            'groupType'    => \Yii::t('skeeks/shop/app', 'Group by')
+            'from' => \Yii::t('skeeks/shop/app', 'From'),
+            'to' => \Yii::t('skeeks/shop/app', 'To'),
+            'groupType' => \Yii::t('skeeks/shop/app', 'Group by')
         ];
     }
 
@@ -50,37 +51,37 @@ class AdminReportOrderSearch extends Model
     public function getColumns()
     {
         return
-        [
             [
-                'attribute' => 'groupType',
-                'label' => \Yii::t('skeeks/shop/app', 'Date'),
-                'filter' => false,
-            ],
-            [
-                'attribute' => 'total_orders',
-                'label' => \Yii::t('skeeks/shop/app', 'Total'),
-            ],
-            [
-                'attribute' => 'total_payed',
-                'label' => \Yii::t('skeeks/shop/app', 'Number of paid'),
-            ],
-            [
-                'attribute' => 'total_canceled',
-                'label' => \Yii::t('skeeks/shop/app', 'Number of canceled'),
-            ],
-            [
-                'attribute' => 'sum_price',
-                'label' => \Yii::t('skeeks/shop/app', 'Cost of'),
-            ],
-            [
-                'attribute' => 'sum_payed',
-                'label' => \Yii::t('skeeks/shop/app', 'Cost of paid'),
-            ],
-            [
-                'attribute' => 'sum_canceled',
-                'label' => \Yii::t('skeeks/shop/app', 'Cost of canceled'),
-            ],
-        ];
+                [
+                    'attribute' => 'groupType',
+                    'label' => \Yii::t('skeeks/shop/app', 'Date'),
+                    'filter' => false,
+                ],
+                [
+                    'attribute' => 'total_orders',
+                    'label' => \Yii::t('skeeks/shop/app', 'Total'),
+                ],
+                [
+                    'attribute' => 'total_payed',
+                    'label' => \Yii::t('skeeks/shop/app', 'Number of paid'),
+                ],
+                [
+                    'attribute' => 'total_canceled',
+                    'label' => \Yii::t('skeeks/shop/app', 'Number of canceled'),
+                ],
+                [
+                    'attribute' => 'sum_price',
+                    'label' => \Yii::t('skeeks/shop/app', 'Cost of'),
+                ],
+                [
+                    'attribute' => 'sum_payed',
+                    'label' => \Yii::t('skeeks/shop/app', 'Cost of paid'),
+                ],
+                [
+                    'attribute' => 'sum_canceled',
+                    'label' => \Yii::t('skeeks/shop/app', 'Cost of canceled'),
+                ],
+            ];
     }
 
     /**
@@ -94,27 +95,27 @@ class AdminReportOrderSearch extends Model
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' =>
-            [
-                'attributes' => array_keys( \yii\helpers\ArrayHelper::map($this->getColumns(), 'attribute', 'attribute') ),
-                'defaultOrder' => [
-                    'groupType' => SORT_DESC
+                [
+                    'attributes' => array_keys(\yii\helpers\ArrayHelper::map($this->getColumns(), 'attribute',
+                        'attribute')),
+                    'defaultOrder' => [
+                        'groupType' => SORT_DESC
+                    ]
                 ]
-            ]
         ]);
 
-        if ($params && ($this->load($params) && $this->validate()) )
-        {
-            if ($this->groupType)
-            {
-                if ($this->groupType == 'd')
-                {
+        if ($params && ($this->load($params) && $this->validate())) {
+            if ($this->groupType) {
+                if ($this->groupType == 'd') {
                     $format = '%d.%m.%Y';
-                } else if ($this->groupType == 'm')
-                {
-                    $format = '%m.%Y';
-                } else if ($this->groupType == 'Y')
-                {
-                    $format = '%Y';
+                } else {
+                    if ($this->groupType == 'm') {
+                        $format = '%m.%Y';
+                    } else {
+                        if ($this->groupType == 'Y') {
+                            $format = '%Y';
+                        }
+                    }
                 }
 
                 $query->addSelect([
@@ -131,36 +132,37 @@ class AdminReportOrderSearch extends Model
                     "(SELECT sum(price) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
                 ]);
 
-                if ($this->from)
-                {
+                if ($this->from) {
                     $query->andWhere([
-                        '>=', 'o.created_at', $this->from
+                        '>=',
+                        'o.created_at',
+                        $this->from
                     ]);
                 }
 
-                if ($this->to)
-                {
+                if ($this->to) {
                     $query->andWhere([
-                        '<=', 'o.created_at', $this->to
+                        '<=',
+                        'o.created_at',
+                        $this->to
                     ]);
                 }
             }
 
             return $dataProvider;
 
-        } else
-        {
-            if ($this->groupType)
-            {
-                if ($this->groupType == 'd')
-                {
+        } else {
+            if ($this->groupType) {
+                if ($this->groupType == 'd') {
                     $format = '%d.%m.%Y';
-                } else if ($this->groupType == 'm')
-                {
-                    $format = '%m.%Y';
-                } else if ($this->groupType == 'Y')
-                {
-                    $format = '%Y';
+                } else {
+                    if ($this->groupType == 'm') {
+                        $format = '%m.%Y';
+                    } else {
+                        if ($this->groupType == 'Y') {
+                            $format = '%Y';
+                        }
+                    }
                 }
 
                 $query->addSelect([

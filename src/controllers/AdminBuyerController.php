@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -41,9 +42,9 @@ class AdminBuyerController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Buyers');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopBuyer::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Buyers');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopBuyer::className();
 
         parent::init();
     }
@@ -55,13 +56,11 @@ class AdminBuyerController extends AdminModelEditorController
 
     public function getPersonType()
     {
-        if ($this->_personType !== null)
-        {
+        if ($this->_personType !== null) {
             return $this->_personType;
         }
 
-        if ($person_type_id = \Yii::$app->request->get('person_type_id'))
-        {
+        if ($person_type_id = \Yii::$app->request->get('person_type_id')) {
             $this->_personType = \skeeks\cms\shop\models\ShopPersonType::findOne($person_type_id);
         }
 
@@ -75,8 +74,7 @@ class AdminBuyerController extends AdminModelEditorController
     {
         $permissionName = parent::getPermissionName();
 
-        if ($this->personType)
-        {
+        if ($this->personType) {
             return $permissionName . "-" . $this->personType->id;
         }
 
@@ -102,14 +100,14 @@ class AdminBuyerController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 'create' =>
-                [
-                    'callback'         => [$this, 'create'],
-                ],
+                    [
+                        'callback' => [$this, 'create'],
+                    ],
 
                 'update' =>
-                [
-                    'callback'         => [$this, 'update'],
-                ],
+                    [
+                        'callback' => [$this, 'update'],
+                    ],
             ]
         );
     }
@@ -125,50 +123,43 @@ class AdminBuyerController extends AdminModelEditorController
         $model = new $modelClass();
         $model->loadDefaultValues();
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load($post);
         }
 
         $handler = $model->relatedPropertiesModel;
 
-        if ($handler)
-        {
-            if ($post = \Yii::$app->request->post())
-            {
+        if ($handler) {
+            if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
                 $handler->load(\Yii::$app->request->post());
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handler->validate())
-                {
+                    && $model->validate() && $handler->validate()) {
                     $model->save();
                     $handler->save();
 
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
                     return $this->redirect(
                         UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
                             ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
                             ->toString()
                     );
-                } else
-                {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms','Could not save'));
+                } else {
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms', 'Could not save'));
                 }
             }
         }
 
         return $this->render('_form', [
-            'model'     => $model,
-            'handler'   => $handler,
+            'model' => $model,
+            'handler' => $handler,
         ]);
     }
 
@@ -181,41 +172,32 @@ class AdminBuyerController extends AdminModelEditorController
          */
         $model = $this->model;
 
-        if ($post = \Yii::$app->request->post())
-        {
+        if ($post = \Yii::$app->request->post()) {
             $model->load($post);
         }
 
         $handler = $model->relatedPropertiesModel;
-        if ($handler)
-        {
-            if ($post = \Yii::$app->request->post())
-            {
+        if ($handler) {
+            if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
         }
 
-        if ($rr->isRequestPjaxPost())
-        {
-            if (!\Yii::$app->request->post($this->notSubmitParam))
-            {
-                if ($rr->isRequestPjaxPost())
-                {
+        if ($rr->isRequestPjaxPost()) {
+            if (!\Yii::$app->request->post($this->notSubmitParam)) {
+                if ($rr->isRequestPjaxPost()) {
                     $handler->load(\Yii::$app->request->post());
 
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handler->validate())
-                    {
+                        && $model->validate() && $handler->validate()) {
                         $model->save();
                         $handler->save();
 
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms','Saved'));
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
 
-                        if (\Yii::$app->request->post('submit-btn') == 'apply')
-                        {
+                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
 
-                        } else
-                        {
+                        } else {
                             return $this->redirect(
                                 $this->url
                             );
@@ -229,8 +211,8 @@ class AdminBuyerController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model'     => $model,
-            'handler'   => $handler,
+            'model' => $model,
+            'handler' => $handler,
         ]);
     }
 }

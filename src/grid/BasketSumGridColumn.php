@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 05.08.2015
  */
+
 namespace skeeks\cms\shop\grid;
 
 use skeeks\cms\helpers\UrlHelper;
@@ -18,8 +19,8 @@ use yii\helpers\Html;
  */
 class BasketSumGridColumn extends DataColumn
 {
-    public $attribute   = "price";
-    public $format      = "raw";
+    public $attribute = "price";
+    public $format = "raw";
 
     /**
      * @param mixed $model
@@ -29,8 +30,7 @@ class BasketSumGridColumn extends DataColumn
      */
     protected function renderDataCellContent($model, $key, $index)
     {
-        if (!$this->label)
-        {
+        if (!$this->label) {
             $this->label = \Yii::t('skeeks/shop/app', 'Sum');
         }
 

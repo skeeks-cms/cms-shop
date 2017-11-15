@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.09.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
@@ -57,8 +58,7 @@ class RobokassaController extends Controller
     {
         RobokassaPaySystem::logInfo('success request');
 
-        if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId'], $_REQUEST['SignatureValue']))
-        {
+        if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId'], $_REQUEST['SignatureValue'])) {
             RobokassaPaySystem::logError('Not found params');
             throw new BadRequestHttpException('Not found params');
         }
@@ -67,7 +67,8 @@ class RobokassaController extends Controller
         $merchant = $this->getMerchant($order);
         $shp = $this->getShp();
 
-        if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'], $merchant->sMerchantPass1, $shp)) {
+        if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'],
+            $merchant->sMerchantPass1, $shp)) {
 
             $order->ps_status = "STATUS_ACCEPTED";
             $order->save();
@@ -83,8 +84,7 @@ class RobokassaController extends Controller
     {
         RobokassaPaySystem::logInfo('result request');
 
-        if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId'], $_REQUEST['SignatureValue']))
-        {
+        if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId'], $_REQUEST['SignatureValue'])) {
             RobokassaPaySystem::logError('Not found params');
             throw new BadRequestHttpException('Not found params');
         }
@@ -93,11 +93,11 @@ class RobokassaController extends Controller
         $merchant = $this->getMerchant($order);
         $shp = $this->getShp();
 
-        if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'], $merchant->sMerchantPass2, $shp)) {
+        if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'],
+            $merchant->sMerchantPass2, $shp)) {
 
             RobokassaPaySystem::logInfo('result signature OK');
-            if ($order->payed != "Y")
-            {
+            if ($order->payed != "Y") {
                 $order->processNotePayment();
             }
 
@@ -117,8 +117,7 @@ class RobokassaController extends Controller
     {
         RobokassaPaySystem::logInfo('fail request');
 
-        if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId']))
-        {
+        if (!isset($_REQUEST['OutSum'], $_REQUEST['InvId'])) {
             RobokassaPaySystem::logError('Not found params');
             throw new BadRequestHttpException;
         }
@@ -197,16 +196,14 @@ class RobokassaController extends Controller
     {
         /** @var \skeeks\cms\shop\paySystems\robokassa\Merchant $merchant */
         $paySystemHandler = $order->paySystem->paySystemHandler;
-        if (!$paySystemHandler || !$paySystemHandler instanceof RobokassaPaySystem)
-        {
+        if (!$paySystemHandler || !$paySystemHandler instanceof RobokassaPaySystem) {
             RobokassaPaySystem::logError('Not found pay system');
             throw new BadRequestHttpException('Not found pay system');
         }
 
         $merchant = $paySystemHandler->getMerchant();
 
-        if (!$merchant instanceof Merchant)
-        {
+        if (!$merchant instanceof Merchant) {
             RobokassaPaySystem::logError('Not found merchant');
             throw new BadRequestHttpException('Not found merchant');
         }

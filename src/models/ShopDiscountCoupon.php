@@ -44,21 +44,67 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_discount_id', 'is_active', 'active_from', 'active_to', 'max_use', 'use_count', 'cms_user_id'], 'integer'],
-            [['shop_discount_id',
-                //'coupon'
-            ], 'required'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'shop_discount_id',
+                    'is_active',
+                    'active_from',
+                    'active_to',
+                    'max_use',
+                    'use_count',
+                    'cms_user_id'
+                ],
+                'integer'
+            ],
+            [
+                [
+                    'shop_discount_id',
+                    //'coupon'
+                ],
+                'required'
+            ],
             [['coupon'], 'string', 'max' => 32],
             [['description'], 'string', 'max' => 255],
-            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['cms_user_id' => 'id']],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['shop_discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopDiscount::className(), 'targetAttribute' => ['shop_discount_id' => 'id']],
-            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
+            [
+                ['cms_user_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsUser::className(),
+                'targetAttribute' => ['cms_user_id' => 'id']
+            ],
+            [
+                ['created_by'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsUser::className(),
+                'targetAttribute' => ['created_by' => 'id']
+            ],
+            [
+                ['shop_discount_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => ShopDiscount::className(),
+                'targetAttribute' => ['shop_discount_id' => 'id']
+            ],
+            [
+                ['updated_by'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => CmsUser::className(),
+                'targetAttribute' => ['updated_by' => 'id']
+            ],
 
-            [['coupon'], 'default', 'value' => function()
-            {
-                return "SO-" . StringHelper::strtoupper(\Yii::$app->security->generateRandomString(15));
-            }],
+            [
+                ['coupon'],
+                'default',
+                'value' => function () {
+                    return "SO-" . StringHelper::strtoupper(\Yii::$app->security->generateRandomString(15));
+                }
+            ],
         ];
     }
 

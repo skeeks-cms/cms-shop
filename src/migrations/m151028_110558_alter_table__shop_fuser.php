@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -22,5 +23,6 @@ class m151028_110558_alter_table__shop_fuser extends Migration
     }
 
     public function safeDown()
-    {}
+    {
+    }
 }

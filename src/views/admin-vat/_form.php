@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
@@ -16,11 +17,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
-    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
+<?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
+<?= $form->fieldRadioListBoolean($model, 'active'); ?>
 
-    <?= $form->field($model, 'rate')->textInput(); ?>
-    <?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'rate')->textInput(); ?>
+<?= $form->fieldInputInt($model, 'priority'); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

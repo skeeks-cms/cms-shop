@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m150926_120601_create_table__shop_order extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_order}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,107 +24,107 @@ class m150926_120601_create_table__shop_order extends Migration
         }
 
         $this->createTable("{{%shop_order}}", [
-            'id'                    => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'            => $this->integer(),
-            'updated_by'            => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'            => $this->integer(),
-            'updated_at'            => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'site_id'               => $this->integer(),
+            'site_id' => $this->integer(),
 
-            'person_type_id'        => $this->integer()->notNull(),
-            'buyer_id'              => $this->integer()->notNull(),
+            'person_type_id' => $this->integer()->notNull(),
+            'buyer_id' => $this->integer()->notNull(),
 
-            'payed'                 => $this->string(1)->notNull()->defaultValue('N'),
-            'payed_at'              => $this->integer(),
-            'emp_payed_id'          => $this->integer(),
+            'payed' => $this->string(1)->notNull()->defaultValue('N'),
+            'payed_at' => $this->integer(),
+            'emp_payed_id' => $this->integer(),
 
-            'canceled'              => $this->string(1)->notNull()->defaultValue('N'),
-            'canceled_at'           => $this->integer(),
-            'emp_canceled_id'       => $this->integer(),
-            'reason_canceled'       => $this->string(255),
+            'canceled' => $this->string(1)->notNull()->defaultValue('N'),
+            'canceled_at' => $this->integer(),
+            'emp_canceled_id' => $this->integer(),
+            'reason_canceled' => $this->string(255),
 
-            'status_code'           => $this->string(1)->notNull()->defaultValue('N'),
-            'status_at'             => $this->integer()->notNull(),
-            'emp_status_id'         => $this->integer(),
+            'status_code' => $this->string(1)->notNull()->defaultValue('N'),
+            'status_at' => $this->integer()->notNull(),
+            'emp_status_id' => $this->integer(),
 
-            'price_delivery'        => $this->decimal(18,2)->notNull()->defaultValue(0),
-            'allow_delivery'        => $this->string(1)->notNull()->defaultValue('N'),
-            'allow_delivery_at'     => $this->integer(),
+            'price_delivery' => $this->decimal(18, 2)->notNull()->defaultValue(0),
+            'allow_delivery' => $this->string(1)->notNull()->defaultValue('N'),
+            'allow_delivery_at' => $this->integer(),
             'emp_allow_delivery_id' => $this->integer(),
 
-            'price'                 => $this->decimal(18,2)->notNull()->defaultValue(0),
-            'currency_code'         => $this->string(3)->notNull(),
+            'price' => $this->decimal(18, 2)->notNull()->defaultValue(0),
+            'currency_code' => $this->string(3)->notNull(),
 
-            'discount_value'        => $this->decimal(18,2)->notNull()->defaultValue(0),
+            'discount_value' => $this->decimal(18, 2)->notNull()->defaultValue(0),
 
-            'user_id'               => $this->integer()->notNull(),
+            'user_id' => $this->integer()->notNull(),
 
-            'pay_system_id'         => $this->integer(),
+            'pay_system_id' => $this->integer(),
 
-            'delivery_id'           => $this->integer(),
-            'user_description'      => $this->string(255),
-            'additional_info'       => $this->string(255),
+            'delivery_id' => $this->integer(),
+            'user_description' => $this->string(255),
+            'additional_info' => $this->string(255),
 
-            'ps_status'             => $this->string(1),
-            'ps_status_code'        => $this->string(5),
+            'ps_status' => $this->string(1),
+            'ps_status_code' => $this->string(5),
             'ps_status_description' => $this->string(255),
-            'ps_status_message'     => $this->string(255),
-            'ps_sum'                => $this->decimal(18,2),
-            'ps_currency_code'      => $this->string(3),
-            'ps_response_at'        => $this->integer(),
+            'ps_status_message' => $this->string(255),
+            'ps_sum' => $this->decimal(18, 2),
+            'ps_currency_code' => $this->string(3),
+            'ps_response_at' => $this->integer(),
 
-            'comments'              => $this->text(),
+            'comments' => $this->text(),
 
-            'tax_value'             => $this->decimal(18,2)->notNull()->defaultValue(0),
-            'stat_gid'              => $this->string(255),
-            'sum_paid'              => $this->decimal(18,2)->notNull()->defaultValue(0),
+            'tax_value' => $this->decimal(18, 2)->notNull()->defaultValue(0),
+            'stat_gid' => $this->string(255),
+            'sum_paid' => $this->decimal(18, 2)->notNull()->defaultValue(0),
 
-            'recuring_id'           => $this->integer(),
+            'recuring_id' => $this->integer(),
 
-            'pay_voucher_num'       => $this->string(20),
-            'pay_voucher_at'        => $this->integer(),
+            'pay_voucher_num' => $this->string(20),
+            'pay_voucher_at' => $this->integer(),
 
-            'locked_by'             => $this->integer(),
-            'locked_at'             => $this->integer(),
+            'locked_by' => $this->integer(),
+            'locked_at' => $this->integer(),
 
-            'recount_flag'          => $this->string(1)->notNull()->defaultValue("Y"),
-            'affiliate_id'          => $this->integer(),
+            'recount_flag' => $this->string(1)->notNull()->defaultValue("Y"),
+            'affiliate_id' => $this->integer(),
 
-            'delivery_doc_num'      => $this->string(20),
-            'delivery_doc_at'       => $this->integer(),
+            'delivery_doc_num' => $this->string(20),
+            'delivery_doc_at' => $this->integer(),
 
-            'update_1c'             => $this->string(1)->notNull()->defaultValue("N"),
+            'update_1c' => $this->string(1)->notNull()->defaultValue("N"),
 
-            'deducted'              => $this->string(1)->notNull()->defaultValue("N"),
-            'deducted_at'           => $this->integer(),
-            'emp_deducted_id'       => $this->integer(),
-            'reason_undo_deducted'  => $this->string(255),
+            'deducted' => $this->string(1)->notNull()->defaultValue("N"),
+            'deducted_at' => $this->integer(),
+            'emp_deducted_id' => $this->integer(),
+            'reason_undo_deducted' => $this->string(255),
 
-            'marked'                => $this->string(1)->notNull()->defaultValue("N"),
-            'marked_at'             => $this->integer(),
-            'emp_marked_id'         => $this->integer(),
-            'reason_marked'         => $this->string(255),
+            'marked' => $this->string(1)->notNull()->defaultValue("N"),
+            'marked_at' => $this->integer(),
+            'emp_marked_id' => $this->integer(),
+            'reason_marked' => $this->string(255),
 
-            'reserved'              => $this->string(1)->notNull()->defaultValue("N"),
-            'store_id'              => $this->integer(),
+            'reserved' => $this->string(1)->notNull()->defaultValue("N"),
+            'store_id' => $this->integer(),
 
-            'order_topic'           => $this->string(255),
-            'responsible_id'        => $this->integer(),
+            'order_topic' => $this->string(255),
+            'responsible_id' => $this->integer(),
 
-            'pay_before_at'         => $this->integer(),
-            'account_id'            => $this->integer(),
+            'pay_before_at' => $this->integer(),
+            'account_id' => $this->integer(),
 
-            'bill_at'               => $this->integer(),
-            'tracking_number'       => $this->string(100),
-            'xml_id'                => $this->string(255),
-            'id_1c'                 => $this->string(15),
-            'version_1c'            => $this->string(15),
-            'version'               => $this->integer(),
+            'bill_at' => $this->integer(),
+            'tracking_number' => $this->string(100),
+            'xml_id' => $this->string(255),
+            'id_1c' => $this->string(15),
+            'version_1c' => $this->string(15),
+            'version' => $this->integer(),
 
-            'external_order'        => $this->string(1)->notNull()->defaultValue('N'),
+            'external_order' => $this->string(1)->notNull()->defaultValue('N'),
 
         ], $tableOptions);
 

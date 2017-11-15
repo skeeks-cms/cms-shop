@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.08.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsSite;
@@ -38,8 +39,13 @@ class ShopPersonTypeSite extends \yii\db\ActiveRecord
             [['person_type_id', 'site_code'], 'required'],
             [['person_type_id'], 'integer'],
             [['site_code'], 'string', 'max' => 15],
-            [['person_type_id', 'site_code'], 'unique', 'targetAttribute' => ['person_type_id', 'site_code'], 'message' => \Yii::t('skeeks/shop/app', 'The combination of Person Type ID and Site Code
-     has already been taken.')]
+            [
+                ['person_type_id', 'site_code'],
+                'unique',
+                'targetAttribute' => ['person_type_id', 'site_code'],
+                'message' => \Yii::t('skeeks/shop/app', 'The combination of Person Type ID and Site Code
+     has already been taken.')
+            ]
         ];
     }
 
@@ -49,8 +55,8 @@ class ShopPersonTypeSite extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'person_type_id'    => \Yii::t('skeeks/shop/app', 'Person type ID'),
-            'site_code'         => \Yii::t('skeeks/shop/app', 'Site code'),
+            'person_type_id' => \Yii::t('skeeks/shop/app', 'Person type ID'),
+            'site_code' => \Yii::t('skeeks/shop/app', 'Site code'),
         ];
     }
 

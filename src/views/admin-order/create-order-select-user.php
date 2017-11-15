@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
@@ -30,18 +31,20 @@ CSS
     'method' => 'get',
     'usePjax' => false,
 ]); ?>
-<h1 style="text-align: center;">Новый заказ для покупателя: <a href="#" class="sx-change-user">выбрать</a> или <a href="#">создать</a></h1>
-<hr />
+    <h1 style="text-align: center;">Новый заказ для покупателя: <a href="#" class="sx-change-user">выбрать</a> или <a
+                href="#">создать</a></h1>
+    <hr/>
 
-<div style="text-align: center">
-    <a href="#" class="btn btn-lg btn-primary sx-btn-for-me" data-me="<?= \Yii::$app->user->identity->id; ?>">Создать для меня</a>
-</div>
-<div style="display: none;">
-    <?= \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::widget([
-        'id'        => 'cmsUserId',
-        'name'      => 'cmsUserId',
-    ]); ?>
-</div>
+    <div style="text-align: center">
+        <a href="#" class="btn btn-lg btn-primary sx-btn-for-me" data-me="<?= \Yii::$app->user->identity->id; ?>">Создать
+            для меня</a>
+    </div>
+    <div style="display: none;">
+        <?= \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::widget([
+            'id' => 'cmsUserId',
+            'name' => 'cmsUserId',
+        ]); ?>
+    </div>
 
 <?
 $this->registerJs(<<<JS

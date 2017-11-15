@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -32,9 +33,9 @@ class AdminTaxController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'List of taxes');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopTax::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'List of taxes');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopTax::className();
 
         parent::init();
     }

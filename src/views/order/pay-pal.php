@@ -42,7 +42,7 @@ JS
         <input type="hidden" name="cancel_return" value="<?php echo $returnUrl; ?>">
         <input type="hidden" name="notify_url" value="<?php echo $notifyUrl; ?>">
 
-        <input type="hidden" name="custom" value="<?php echo $model->id;?>">
+        <input type="hidden" name="custom" value="<?php echo $model->id; ?>">
 
         <input type="hidden" name="currency_code" value="RUB">
         <input type="hidden" name="lc" value="US">
@@ -51,5 +51,5 @@ JS
         <button type="submit">
             Pay Now
         </button>
-     </form>
- </div>
+    </form>
+</div>

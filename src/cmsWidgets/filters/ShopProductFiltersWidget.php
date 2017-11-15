@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 25.05.2015
  */
+
 namespace skeeks\cms\shop\cmsWidgets\filters;
 
 use skeeks\cms\base\Widget;
@@ -32,10 +33,10 @@ use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
- * @property ShopTypePrice      $typePrice;
- * @property CmsContent         $cmsContent;
- * @property ShopContent        $shopContent;
- * @property CmsContent         $offerCmsContent;
+ * @property ShopTypePrice $typePrice;
+ * @property CmsContent $cmsContent;
+ * @property ShopContent $shopContent;
+ * @property CmsContent $offerCmsContent;
  * @property []                 $childrenElementIds;
  *
  * Class ShopProductFiltersWidget
@@ -45,45 +46,45 @@ class ShopProductFiltersWidget extends WidgetRenderable
 {
     //Навигация
     public $content_id;
-    public $searchModelAttributes       = [];
+    public $searchModelAttributes = [];
 
-    public $realatedProperties          = [];
-    public $offerRelatedProperties      = [];
+    public $realatedProperties = [];
+    public $offerRelatedProperties = [];
 
-    public $type_price_id               = "";
+    public $type_price_id = "";
 
     /**
      * @var bool Учитывать только доступные фильтры для текущей выборки
      */
-    public $onlyExistsFilters           = false;
+    public $onlyExistsFilters = false;
 
     /**
      * @var array (Массив ids записей, для показа только нужных фильтров)
      */
-    public $elementIds                  = [];
-    public $queryNeedElements           = null;
+    public $elementIds = [];
+    public $queryNeedElements = null;
 
     /**
      *
      * @var \skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel
      */
-    public $searchModel                 = null;
+    public $searchModel = null;
 
 
     /**
      * @var SearchRelatedPropertiesModel
      */
-    public $searchRelatedPropertiesModel  = null;
+    public $searchRelatedPropertiesModel = null;
 
     /**
      * @var SearchChildrenRelatedPropertiesModel
      */
-    public $searchOfferRelatedPropertiesModel  = null;
+    public $searchOfferRelatedPropertiesModel = null;
 
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          => \Yii::t('skeeks/shop/app', 'Filters'),
+            'name' => \Yii::t('skeeks/shop/app', 'Filters'),
         ]);
     }
 
@@ -91,27 +92,23 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         parent::init();
 
-        if (!$this->searchModelAttributes)
-        {
+        if (!$this->searchModelAttributes) {
             $this->searchModelAttributes = [];
         }
 
-        if (!$this->searchModel)
-        {
+        if (!$this->searchModel) {
             $this->searchModel = new \skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel();
         }
 
         $this->searchModel->load(\Yii::$app->request->get());
 
-        if ($this->cmsContent)
-        {
+        if ($this->cmsContent) {
             $this->searchRelatedPropertiesModel = new SearchRelatedPropertiesModel();
             $this->searchRelatedPropertiesModel->initCmsContent($this->cmsContent);
             $this->searchRelatedPropertiesModel->load(\Yii::$app->request->get());
         }
 
-        if ($this->offerRelatedProperties && $this->cmsContent)
-        {
+        if ($this->offerRelatedProperties && $this->cmsContent) {
             $this->searchOfferRelatedPropertiesModel = new SearchChildrenRelatedPropertiesModel();
             $this->searchOfferRelatedPropertiesModel->initCmsContent($this->offerCmsContent);
             $this->searchOfferRelatedPropertiesModel->load(\Yii::$app->request->get());
@@ -119,36 +116,34 @@ class ShopProductFiltersWidget extends WidgetRenderable
     }
 
 
-
-
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(),
-        [
-            'content_id'                => \Yii::t('skeeks/shop/app', 'Content'),
-            'searchModelAttributes'     => \Yii::t('skeeks/shop/app', 'Fields'),
-            'realatedProperties'        => \Yii::t('skeeks/shop/app', 'Properties'),
-            'offerRelatedProperties'    => \Yii::t('skeeks/shop/app', 'Offer properties'),
-            'type_price_id'             => \Yii::t('skeeks/shop/app', 'Types of prices'),
-        ]);
+            [
+                'content_id' => \Yii::t('skeeks/shop/app', 'Content'),
+                'searchModelAttributes' => \Yii::t('skeeks/shop/app', 'Fields'),
+                'realatedProperties' => \Yii::t('skeeks/shop/app', 'Properties'),
+                'offerRelatedProperties' => \Yii::t('skeeks/shop/app', 'Offer properties'),
+                'type_price_id' => \Yii::t('skeeks/shop/app', 'Types of prices'),
+            ]);
     }
 
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(),
-        [
-            [['content_id'], 'integer'],
-            [['searchModelAttributes'], 'safe'],
-            [['offerRelatedProperties'], 'safe'],
-            [['realatedProperties'], 'safe'],
-            [['type_price_id'], 'integer'],
-        ]);
+            [
+                [['content_id'], 'integer'],
+                [['searchModelAttributes'], 'safe'],
+                [['offerRelatedProperties'], 'safe'],
+                [['realatedProperties'], 'safe'],
+                [['type_price_id'], 'integer'],
+            ]);
     }
 
     public function renderConfigForm(ActiveForm $form)
     {
         echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
-            'form'  => $form,
+            'form' => $form,
             'model' => $this
         ], $this);
     }
@@ -158,8 +153,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function getTypePrice()
     {
-        if (!$this->type_price_id)
-        {
+        if (!$this->type_price_id) {
             return null;
         }
         return ShopTypePrice::find()->where(['id' => $this->type_price_id])->one();
@@ -172,6 +166,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         return $this->shopContent->offerContent;
     }
+
     /**
      * @return CmsContent
      */
@@ -193,9 +188,9 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function getChildrenElementIds()
     {
-        return array_keys( CmsContentElement::find()->andWhere([
+        return array_keys(CmsContentElement::find()->andWhere([
             'parent_content_element_id' => $this->elementIds
-        ])->asArray()->indexBy('id')->all() );
+        ])->asArray()->indexBy('id')->all());
     }
 
     /**
@@ -239,29 +234,26 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function search(ActiveDataProvider $activeDataProvider)
     {
-        if ($this->onlyExistsFilters)
-        {
+        if ($this->onlyExistsFilters) {
             /**
              * @var $query \yii\db\ActiveQuery
              */
-            $query  = clone $activeDataProvider->query;
+            $query = clone $activeDataProvider->query;
             //TODO::notice errors
             $query->with = [];
             $query->select(['cms_content_element.id as mainId', 'cms_content_element.id as id'])->indexBy('mainId');
-            $ids    = $query->asArray()->all();
+            $ids = $query->asArray()->all();
 
             $this->elementIds = array_keys($ids);
         }
 
         $this->searchModel->search($activeDataProvider);
 
-        if ($this->searchRelatedPropertiesModel)
-        {
+        if ($this->searchRelatedPropertiesModel) {
             $this->searchRelatedPropertiesModel->search($activeDataProvider);
         }
 
-        if ($this->searchOfferRelatedPropertiesModel)
-        {
+        if ($this->searchOfferRelatedPropertiesModel) {
             $this->searchOfferRelatedPropertiesModel->search($activeDataProvider);
         }
     }
@@ -269,13 +261,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     protected function _run()
     {
 
-        if ($this->elementIds && !$this->searchModel->price_from && $this->typePrice)
-        {
+        if ($this->elementIds && !$this->searchModel->price_from && $this->typePrice) {
             $this->searchModel->price_from = $this->minPrice->price;
         }
 
-        if ($this->elementIds && !$this->searchModel->price_to && $this->typePrice)
-        {
+        if ($this->elementIds && !$this->searchModel->price_to && $this->typePrice) {
             $this->searchModel->price_to = $this->maxPrice->price;
         }
 
@@ -289,24 +279,22 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function isShowRelatedProperty($property)
     {
-        if (!in_array($property->code, $this->realatedProperties))
-        {
+        if (!in_array($property->code, $this->realatedProperties)) {
             return false;
         }
 
-        if ($this->onlyExistsFilters === false)
-        {
+        if ($this->onlyExistsFilters === false) {
             return true;
         }
 
-        if (in_array($property->property_type, [\skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT, \skeeks\cms\relatedProperties\PropertyType::CODE_LIST]))
-        {
+        if (in_array($property->property_type, [
+            \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
+            \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+        ])) {
             $options = $this->getRelatedPropertyOptions($property);
-            if (count($options) > 1)
-            {
+            if (count($options) > 1) {
                 return true;
-            } else
-            {
+            } else {
                 return false;
             }
         }
@@ -323,8 +311,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         $value = [];
 
-        if ($this->elementIds)
-        {
+        if ($this->elementIds) {
             $value = \skeeks\cms\models\CmsContentElementProperty::find()
                 ->select(['value_enum'])
                 ->andWhere(['element_id' => $this->elementIds])
@@ -332,14 +319,14 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 ->asArray()
                 ->orderBy(['value_enum' => SORT_DESC])
                 ->limit(1)
-                ->one()
-            ;
+                ->one();
 
-            return (float) $value['value_enum'];
+            return (float)$value['value_enum'];
         }
 
         return null;
     }
+
     /**
      * @param $property
      *
@@ -349,8 +336,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         $value = [];
 
-        if ($this->elementIds)
-        {
+        if ($this->elementIds) {
             $value = \skeeks\cms\models\CmsContentElementProperty::find()
                 ->select(['value_enum'])
                 ->andWhere(['element_id' => $this->elementIds])
@@ -358,10 +344,9 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 ->asArray()
                 ->orderBy(['value_enum' => SORT_ASC])
                 ->limit(1)
-                ->one()
-            ;
+                ->one();
 
-            return (float) $value['value_enum'];
+            return (float)$value['value_enum'];
         }
 
         return null;
@@ -379,36 +364,32 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         $options = [];
 
-        if (isset($this->_relatedOptions[$property->code]))
-        {
+        if (isset($this->_relatedOptions[$property->code])) {
             return $this->_relatedOptions[$property->code];
         }
 
-        if ($this->onlyExistsFilters && !$this->elementIds)
-        {
+        if ($this->onlyExistsFilters && !$this->elementIds) {
             return [];
         }
 
-        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
-        {
+        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
             $propertyType = $property->handler;
 
             $options = \skeeks\cms\models\CmsContentElementProperty::find()->from([
-                            'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
-                        ])
-                        ->leftJoin(['e' => CmsContentElement::tableName()], 'e.id = map.value_enum')
-                        ->select(['e.id as key', 'e.name as value', 'map.value_enum'])
-                        ->indexBy('key')
-                        ->groupBy('key')
-                        ->andWhere(['map.element_id' => $this->elementIds])
-                        ->andWhere(['map.property_id' => $property->id])
-                        ->andWhere(['>', 'map.value_enum', 0])
-                        ->andWhere(['is not', 'map.value_enum', null])
-                        ->asArray()
-                        ->all();
+                'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
+            ])
+                ->leftJoin(['e' => CmsContentElement::tableName()], 'e.id = map.value_enum')
+                ->select(['e.id as key', 'e.name as value', 'map.value_enum'])
+                ->indexBy('key')
+                ->groupBy('key')
+                ->andWhere(['map.element_id' => $this->elementIds])
+                ->andWhere(['map.property_id' => $property->id])
+                ->andWhere(['>', 'map.value_enum', 0])
+                ->andWhere(['is not', 'map.value_enum', null])
+                ->asArray()
+                ->all();
 
-            if ($this->onlyExistsFilters && !$options)
-            {
+            if ($this->onlyExistsFilters && !$options) {
                 return [];
             }
 
@@ -416,23 +397,22 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 $options, 'key', 'value'
             );
 
-        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
-        {
+        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
 
             $options = \skeeks\cms\models\CmsContentElementProperty::find()->from([
-                            'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
-                        ])
-                        ->leftJoin(['enum' => CmsContentPropertyEnum::tableName()], 'enum.id = map.value_enum')
-                        //->leftJoin(['p' => CmsContentProperty::tableName()], 'p.id = enum.property_id')
-                        ->select(['enum.id as key', 'enum.value as value', 'map.value_enum'])
-                        ->indexBy('key')
-                        ->groupBy('key')
-                        ->andWhere(['map.element_id' => $this->elementIds])
-                        ->andWhere(['map.property_id' => $property->id])
-                        ->andWhere(['>', 'map.value_enum', 0])
-                        ->andWhere(['is not', 'map.value_enum', null])
-                        ->asArray()
-                        ->all();
+                'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
+            ])
+                ->leftJoin(['enum' => CmsContentPropertyEnum::tableName()], 'enum.id = map.value_enum')
+                //->leftJoin(['p' => CmsContentProperty::tableName()], 'p.id = enum.property_id')
+                ->select(['enum.id as key', 'enum.value as value', 'map.value_enum'])
+                ->indexBy('key')
+                ->groupBy('key')
+                ->andWhere(['map.element_id' => $this->elementIds])
+                ->andWhere(['map.property_id' => $property->id])
+                ->andWhere(['>', 'map.value_enum', 0])
+                ->andWhere(['is not', 'map.value_enum', null])
+                ->asArray()
+                ->all();
 
 
             /*$options =
@@ -449,8 +429,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
                     ])
             ;*/
 
-            if ($this->onlyExistsFilters && !$options)
-            {
+            if ($this->onlyExistsFilters && !$options) {
                 return [];
             }
 
@@ -458,11 +437,9 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 $options, 'key', 'value'
             );
 
-        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL)
-        {
+        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_BOOL) {
             $availables = [];
-            if ($this->elementIds)
-            {
+            if ($this->elementIds) {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
                     ->select(['value_bool'])
                     ->indexBy('value_bool')
@@ -470,14 +447,12 @@ class ShopProductFiltersWidget extends WidgetRenderable
                     ->andWhere(['element_id' => $this->elementIds])
                     ->andWhere(['property_id' => $property->id])
                     ->asArray()
-                    ->all()
-                ;
+                    ->all();
 
                 $availables = array_keys($availables);
             }
 
-            if ($this->onlyExistsFilters && !$availables)
-            {
+            if ($this->onlyExistsFilters && !$availables) {
                 return [];
             }
 
@@ -486,8 +461,10 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 $labal = $value;
                 if ($value == 0) {
                     $label = \Yii::t('skeeks/cms', 'No');
-                } else if ($value == 1) {
-                    $label = \Yii::t('skeeks/cms', 'Yes');
+                } else {
+                    if ($value == 1) {
+                        $label = \Yii::t('skeeks/cms', 'Yes');
+                    }
                 }
                 $options[$value] = $label;
             }
@@ -499,34 +476,28 @@ class ShopProductFiltersWidget extends WidgetRenderable
     }
 
 
-
-
-
-
     /**
      * @param $property
      * @return bool
      */
     public function isShowOfferProperty($property)
     {
-        if (!in_array($property->code, $this->offerRelatedProperties))
-        {
+        if (!in_array($property->code, $this->offerRelatedProperties)) {
             return false;
         }
 
-        if ($this->onlyExistsFilters === false)
-        {
+        if ($this->onlyExistsFilters === false) {
             return true;
         }
 
-        if (in_array($property->property_type, [\skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT, \skeeks\cms\relatedProperties\PropertyType::CODE_LIST]))
-        {
+        if (in_array($property->property_type, [
+            \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
+            \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+        ])) {
             $options = $this->getOfferRelatedPropertyOptions($property);
-            if (count($options) > 1)
-            {
+            if (count($options) > 1) {
                 return true;
-            } else
-            {
+            } else {
                 return false;
             }
         }
@@ -540,21 +511,17 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function isShowPriceFilter()
     {
-        if (!$this->typePrice)
-        {
+        if (!$this->typePrice) {
             return false;
         }
 
-        if ($this->onlyExistsFilters === false)
-        {
+        if ($this->onlyExistsFilters === false) {
             return true;
         }
 
-        if ($this->searchModel->price_from == $this->searchModel->price_to)
-        {
+        if ($this->searchModel->price_from == $this->searchModel->price_to) {
             return false;
         }
-
 
 
         return true;
@@ -570,70 +537,60 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function getOfferRelatedPropertyOptions($property)
     {
-        if (isset($this->_offerOptions[$property->code]))
-        {
+        if (isset($this->_offerOptions[$property->code])) {
             return $this->_offerOptions[$property->code];
         }
 
-        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT)
-        {
+        if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
             $propertyType = $property->handler;
 
             $availables = [];
-            if ($this->childrenElementIds)
-            {
+            if ($this->childrenElementIds) {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
                     ->select(['value_enum'])
                     ->indexBy('value_enum')
                     ->andWhere(['element_id' => $this->childrenElementIds])
                     ->andWhere(['property_id' => $property->id])
                     ->asArray()
-                    ->all()
-                ;
+                    ->all();
 
                 $availables = array_keys($availables);
             }
 
-            if ($this->onlyExistsFilters && !$availables)
-            {
+            if ($this->onlyExistsFilters && !$availables) {
                 return [];
             }
 
             $options = \skeeks\cms\models\CmsContentElement::find()
                 ->active()
                 ->andWhere(['content_id' => $propertyType->content_id]);
-                if ($this->childrenElementIds)
-                {
-                    $options->andWhere(['id' => $availables]);
-                }
+            if ($this->childrenElementIds) {
+                $options->andWhere(['id' => $availables]);
+            }
 
             $options = $options->select(['id', 'name'])->asArray()->all();
 
             $options = \yii\helpers\ArrayHelper::map(
                 $options, 'id', 'name'
             );
-        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST)
-        {
+        } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
             $options = $property->getEnums()->select(['id', 'value']);
 
             $availables = [];
-            if ($this->childrenElementIds)
-            {
+            if ($this->childrenElementIds) {
                 $availables = \skeeks\cms\models\CmsContentElementProperty::find()
                     ->select(['value_enum'])
                     ->indexBy('value_enum')
                     ->andWhere(['element_id' => $this->childrenElementIds])
                     ->andWhere(['property_id' => $property->id])
                     ->asArray()
-                    ->all()
-                ;
+                    ->all();
 
                 $availables = array_keys($availables);
                 $options->andWhere(['id' => $availables]);
             }
 
-            if ($this->onlyExistsFilters && !$availables)
-            {
+            if ($this->onlyExistsFilters && !$availables) {
                 return [];
             }
 

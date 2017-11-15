@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 21.09.2015
  */
+
 namespace skeeks\cms\shop\controllers;
+
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\paySystems\YandexKassaPaySystem;
 use yii\base\Exception;
@@ -22,8 +24,7 @@ class YandexKassaController extends Controller
 {
     public function beforeAction($action)
     {
-        if (in_array($action->id, ['check-order', 'payment-aviso']))
-        {
+        if (in_array($action->id, ['check-order', 'payment-aviso'])) {
             $this->enableCsrfValidation = false;
             \Yii::$app->response->setStatusCode(200);
             \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
@@ -41,15 +42,13 @@ class YandexKassaController extends Controller
         $request = YandexKassaPaySystem::getRequest();
         \Yii::info("{$action->id} REQUEST2: " . print_r($request, true), YandexKassaPaySystem::class);
 
-        try
-        {
+        try {
             $shopOrder = $this->getOrder($request);
             /**
              * @var $yandexKassa YandexKassaPaySystem
              */
             $yandexKassa = $shopOrder->paySystem->handler;
-            if (!$yandexKassa->checkRequest($request))
-            {
+            if (!$yandexKassa->checkRequest($request)) {
                 $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 1);
                 return $response;
             }
@@ -60,8 +59,7 @@ class YandexKassaController extends Controller
                 $shopOrder->processNotePayment();
             }*/
 
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
             $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 500, $e->getMessage());
             return $response;
@@ -69,7 +67,8 @@ class YandexKassaController extends Controller
 
         if ($request['orderSumAmount'] < 1) {
             \Yii::error("The amount should be more than 1 rubles.", YandexKassaPaySystem::class);
-            $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 100, "The amount should be more than 100 rubles.");
+            $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 100,
+                "The amount should be more than 100 rubles.");
         } else {
             $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 0);
         }
@@ -85,22 +84,19 @@ class YandexKassaController extends Controller
     {
         $request = YandexKassaPaySystem::getRequest();
         \Yii::info("{$this->action->id} REQUEST2: " . print_r($request, true), YandexKassaPaySystem::class);
-        
-        try
-        {
+
+        try {
             $shopOrder = $this->getOrder($request);
             /**
              * @var $yandexKassa YandexKassaPaySystem
              */
             $yandexKassa = $shopOrder->paySystem->handler;
-            if (!$yandexKassa->checkRequest($request))
-            {
+            if (!$yandexKassa->checkRequest($request)) {
                 $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 1);
                 return $response;
             }
 
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
             $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 500, $e->getMessage());
             return $response;
@@ -117,9 +113,6 @@ class YandexKassaController extends Controller
     }
 
 
-    
-
-    
     /**
      * Payment form
      *
@@ -127,13 +120,11 @@ class YandexKassaController extends Controller
      */
     public function actionOrderForm()
     {
-        if (!$key = \Yii::$app->request->get('key'))
-        {
+        if (!$key = \Yii::$app->request->get('key')) {
             throw new Exception('Order not found');
         }
 
-        if (!$order = ShopOrder::find()->where(['key' => $key])->one())
-        {
+        if (!$order = ShopOrder::find()->where(['key' => $key])->one()) {
             throw new Exception('Order not found');
         }
 
@@ -142,29 +133,25 @@ class YandexKassaController extends Controller
         ]);
     }
 
-    
+
     public function getOrder($request)
     {
-        if (!$orderNumber = ArrayHelper::getValue($request, 'orderNumber'))
-        {
+        if (!$orderNumber = ArrayHelper::getValue($request, 'orderNumber')) {
             throw new Exception('Некорректный запрос от банка. Не указан orderNumber.');
         }
 
         /**
          * @var $shopOrder ShopOrder
          */
-        if (!$shopOrder = ShopOrder::findOne($orderNumber))
-        {
+        if (!$shopOrder = ShopOrder::findOne($orderNumber)) {
             throw new Exception('Заказ не найден в базе.');
         }
 
-        if ($shopOrder->id != $orderNumber)
-        {
+        if ($shopOrder->id != $orderNumber) {
             throw new Exception('Не совпадает номер заказа.');
         }
 
-        if ((float) $shopOrder->money->getValue() != (float) ArrayHelper::getValue($request, 'orderSumAmount'))
-        {
+        if ((float)$shopOrder->money->getValue() != (float)ArrayHelper::getValue($request, 'orderSumAmount')) {
             throw new Exception('Не совпадает сумма заказа.');
         }
 

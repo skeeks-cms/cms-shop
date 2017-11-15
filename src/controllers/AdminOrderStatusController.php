@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -28,9 +29,9 @@ class AdminOrderStatusController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Order statuses');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopOrderStatus::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Order statuses');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopOrderStatus::className();
 
         parent::init();
     }

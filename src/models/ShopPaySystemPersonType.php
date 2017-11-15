@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.08.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use Yii;
@@ -36,7 +37,12 @@ class ShopPaySystemPersonType extends \yii\db\ActiveRecord
         return [
             [['pay_system_id', 'person_type_id'], 'required'],
             [['pay_system_id', 'person_type_id'], 'integer'],
-            [['pay_system_id', 'person_type_id'], 'unique', 'targetAttribute' => ['pay_system_id', 'person_type_id'], 'message' => 'The combination of Pay System ID and Person Type ID has already been taken.']
+            [
+                ['pay_system_id', 'person_type_id'],
+                'unique',
+                'targetAttribute' => ['pay_system_id', 'person_type_id'],
+                'message' => 'The combination of Pay System ID and Person Type ID has already been taken.'
+            ]
         ];
     }
 
@@ -46,8 +52,8 @@ class ShopPaySystemPersonType extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'pay_system_id'     => \Yii::t('skeeks/shop/app', 'ID pay system'),
-            'person_type_id'    => \Yii::t('skeeks/shop/app', 'ID of person'),
+            'pay_system_id' => \Yii::t('skeeks/shop/app', 'ID pay system'),
+            'person_type_id' => \Yii::t('skeeks/shop/app', 'ID of person'),
         ];
     }
 

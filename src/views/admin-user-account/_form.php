@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
@@ -17,16 +18,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 
-    <?= $form->fieldSelect($model, 'user_id', \yii\helpers\ArrayHelper::map(
-        \skeeks\cms\models\User::find()->active()->all(), 'id', 'displayName'
-    )); ?>
+<?= $form->fieldSelect($model, 'user_id', \yii\helpers\ArrayHelper::map(
+    \skeeks\cms\models\User::find()->active()->all(), 'id', 'displayName'
+)); ?>
 
-    <?= $form->field($model, 'current_budget')->textInput(); ?>
-    <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
-        \Yii::$app->money->activeCurrencies, 'code', 'name'
-    )); ?>
+<?= $form->field($model, 'current_budget')->textInput(); ?>
+<?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
+    \Yii::$app->money->activeCurrencies, 'code', 'name'
+)); ?>
 
-    <?= $form->field($model, 'notes')->textarea(); ?>
+<?= $form->field($model, 'notes')->textarea(); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

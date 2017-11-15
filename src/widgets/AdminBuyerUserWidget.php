@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 08.10.2015
  */
+
 namespace skeeks\cms\shop\widgets;
+
 use skeeks\cms\mail\helpers\Html;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget;
@@ -28,17 +30,19 @@ class AdminBuyerUserWidget extends Widget
      */
     public function run()
     {
-        if (!$this->user)
-        {
+        if (!$this->user) {
             return '-';
         }
 
         return (new AdminImagePreviewWidget([
-            'image' => $this->user ? $this->user->image : null,
-            'maxWidth' => "25px"
-        ]))->run() . " " . Html::a($this->user->displayName, \skeeks\cms\helpers\UrlHelper::construct(['/shop/admin-buyer-user/update', 'pk' => $this->user->id ])->enableAdmin(), [
-            'data-pjax' => 0
-        ] );
+                'image' => $this->user ? $this->user->image : null,
+                'maxWidth' => "25px"
+            ]))->run() . " " . Html::a($this->user->displayName, \skeeks\cms\helpers\UrlHelper::construct([
+                '/shop/admin-buyer-user/update',
+                'pk' => $this->user->id
+            ])->enableAdmin(), [
+                'data-pjax' => 0
+            ]);
     }
 
 

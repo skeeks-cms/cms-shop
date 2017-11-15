@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
@@ -13,8 +14,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?php $form = ActiveForm::begin([
-    'id'                                            => 'sx-dynamic-form',
-    'enableAjaxValidation'                          => false,
+    'id' => 'sx-dynamic-form',
+    'enableAjaxValidation' => false,
 ]); ?>
 
 <? $this->registerJs(<<<JS
@@ -54,38 +55,37 @@ JS
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
-    <?= $form->field($model, 'description')->textarea(); ?>
-    <?= $form->fieldRadioListBoolean($model, 'active'); ?>
-    <?= $form->field($model, 'personTypeIds')->checkboxList(
-        \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name')
-    ); ?>
-    <?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
+<?= $form->field($model, 'description')->textarea(); ?>
+<?= $form->fieldRadioListBoolean($model, 'active'); ?>
+<?= $form->field($model, 'personTypeIds')->checkboxList(
+    \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name')
+); ?>
+<?= $form->fieldInputInt($model, 'priority'); ?>
 
 
-    <?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '],
-            [
-                \skeeks\cms\shop\paySystems\RobokassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobokassaPaySystem())->descriptor->name,
-                \skeeks\cms\shop\paySystems\PayPalPaySystem::className() => (new \skeeks\cms\shop\paySystems\PayPalPaySystem())->descriptor->name,
-                \skeeks\cms\shop\paySystems\YandexKassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\YandexKassaPaySystem())->descriptor->name,
-                \skeeks\cms\shop\paySystems\TinkoffPaySystem::className() => (new \skeeks\cms\shop\paySystems\TinkoffPaySystem())->descriptor->name,
-            ]
-        ), [
-            'size' => 1,
-            'data-form-reload' => 'true'
-        ])
-        ;
-    ?>
+<?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '],
+    [
+        \skeeks\cms\shop\paySystems\RobokassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobokassaPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\PayPalPaySystem::className() => (new \skeeks\cms\shop\paySystems\PayPalPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\YandexKassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\YandexKassaPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\TinkoffPaySystem::className() => (new \skeeks\cms\shop\paySystems\TinkoffPaySystem())->descriptor->name,
+    ]
+), [
+    'size' => 1,
+    'data-form-reload' => 'true'
+]);
+?>
 
-    <? if ($handler) : ?>
-        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
-            <?= $handler->renderConfigForm($form); ?>
-    <? endif; ?>
+<? if ($handler) : ?>
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget(['content' => \Yii::t('skeeks/cms', 'Settings')]); ?>
+    <?= $handler->renderConfigForm($form); ?>
+<? endif; ?>
 
 
-    <!--<div class="row">
+<!--<div class="row">
         <div class="col-md-6">
-            <?/*= $form->fieldSelect($model, 'component', [
+            <? /*= $form->fieldSelect($model, 'component', [
                 \skeeks\cms\shop\Module::t('app', 'Basic payment systems')          =>
                 [
                     \skeeks\cms\shop\paySystems\RobokassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobokassaPaySystem())->descriptor->name,
@@ -93,21 +93,20 @@ JS
                 ],
             ], [
                 'allowDeselect' => true
-            ]); */?>
+            ]); */ ?>
         </div>
         <div class="col-md-6">
             <label></label>
-            <?/*= $form->field($model, 'componentSettingsString')->label(false)->widget(
+            <? /*= $form->field($model, 'componentSettingsString')->label(false)->widget(
                 \skeeks\cms\widgets\formInputs\componentSettings\ComponentSettingsWidget::className(),
                 [
                     'componentSelectId' => Html::getInputId($model, "component"),
                     'buttonText'        => \skeeks\cms\shop\Module::t('app', 'Settings handler'),
                     'buttonClasses'     => "sx-btn-edit btn btn-default"
                 ]
-            ); */?>
+            ); */ ?>
         </div>
     </div>-->
-
 
 
 <?= $form->fieldSetEnd(); ?>

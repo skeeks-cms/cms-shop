@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -35,9 +36,9 @@ class AdminViewedProductController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Viewed products');
-        $this->modelShowAttribute       = "name";
-        $this->modelClassName           = ShopViewedProduct::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Viewed products');
+        $this->modelShowAttribute = "name";
+        $this->modelClassName = ShopViewedProduct::className();
 
         parent::init();
     }
@@ -50,14 +51,14 @@ class AdminViewedProductController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 'create' =>
-                [
-                    'isVisible' => false
-                ],
+                    [
+                        'isVisible' => false
+                    ],
 
                 'update' =>
-                [
-                    'isVisible' => false
-                ],
+                    [
+                        'isVisible' => false
+                    ],
 
             ]
         );

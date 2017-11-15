@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -55,9 +56,9 @@ class AdminOrderController extends AdminModelEditorController
 
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Orders');
-        $this->modelShowAttribute       = "id";
-        $this->modelClassName           = ShopOrder::className();
+        $this->name = \Yii::t('skeeks/shop/app', 'Orders');
+        $this->modelShowAttribute = "id";
+        $this->modelClassName = ShopOrder::className();
 
         parent::init();
     }
@@ -73,17 +74,17 @@ class AdminOrderController extends AdminModelEditorController
             [
 
                 'create' =>
-                [
-                    'isVisible'         => false,
-                ],
+                    [
+                        'isVisible' => false,
+                    ],
 
                 'create-order' =>
-                [
-                    'class'         => AdminAction::className(),
-                    'name'          => \Yii::t('skeeks/shop/app','Place your order'),
-                    "icon"          => "glyphicon glyphicon-plus",
-                    "callback"      => [$this, 'createOrder'],
-                ],
+                    [
+                        'class' => AdminAction::className(),
+                        'name' => \Yii::t('skeeks/shop/app', 'Place your order'),
+                        "icon" => "glyphicon glyphicon-plus",
+                        "callback" => [$this, 'createOrder'],
+                    ],
 
 
                 /*"view" =>
@@ -135,17 +136,13 @@ class AdminOrderController extends AdminModelEditorController
          * @var $model ShopOrder;
          */
         $model = $this->model;
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
-        {
+        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             $rr->success = true;
 
-            if ($model->payed != "Y")
-            {
+            if ($model->payed != "Y") {
                 $model->processNotePayment();
-            } else
-            {
-                if (\Yii::$app->request->post('payment-close') == 1)
-                {
+            } else {
+                if (\Yii::$app->request->post('payment-close') == 1) {
                     $model->processCloseNotePayment();
                 }
             }
@@ -165,14 +162,11 @@ class AdminOrderController extends AdminModelEditorController
          * @var $model ShopOrder;
          */
         $model = $this->model;
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
-        {
+        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             $rr->success = true;
             return $rr;
         }
     }
-
-
 
 
     /**
@@ -183,19 +177,17 @@ class AdminOrderController extends AdminModelEditorController
         $rr = new RequestResponse();
 
         $model = null;
-        if ($id = \Yii::$app->request->get('shopFuserId'))
-        {
+        if ($id = \Yii::$app->request->get('shopFuserId')) {
             $model = ShopFuser::findOne($id);
         }
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save())
-        {
+        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             $rr->success = true;
             return $rr;
-        } else
-        {
+        } else {
             $rr->success = false;
-            print_r($model->getErrors());die;
+            print_r($model->getErrors());
+            die;
             $rr->message = implode(',', $model->getFirstError());
             return $rr;
         }
@@ -210,61 +202,54 @@ class AdminOrderController extends AdminModelEditorController
         $rr = new RequestResponse();
 
         $shopFuser = null;
-        if ($id = \Yii::$app->request->get('shopFuserId'))
-        {
+        if ($id = \Yii::$app->request->get('shopFuserId')) {
             $shopFuser = ShopFuser::findOne($id);
         }
 
 
-        if ($rr->isRequestAjaxPost())
-        {
-            $product_id         = \Yii::$app->request->post('product_id');
-            $quantity           = \Yii::$app->request->post('quantity');
+        if ($rr->isRequestAjaxPost()) {
+            $product_id = \Yii::$app->request->post('product_id');
+            $quantity = \Yii::$app->request->post('quantity');
 
             /**
              * @var ShopProduct $product
              */
             $product = ShopProduct::find()->where(['id' => $product_id])->one();
 
-            if (!$product)
-            {
+            if (!$product) {
                 $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
-                return (array) $rr;
+                return (array)$rr;
             }
 
             $shopBasket = ShopBasket::find()->where([
-                'fuser_id'      => $shopFuser->id,
-                'product_id'    => $product_id,
-                'order_id'      => null,
+                'fuser_id' => $shopFuser->id,
+                'product_id' => $product_id,
+                'order_id' => null,
             ])->one();
 
-            if (!$shopBasket)
-            {
+            if (!$shopBasket) {
                 $shopBasket = new ShopBasket([
-                    'fuser_id'          => $shopFuser->id,
-                    'product_id'        => $product->id,
-                    'quantity'          => 0,
+                    'fuser_id' => $shopFuser->id,
+                    'product_id' => $product->id,
+                    'quantity' => 0,
                 ]);
             }
 
-            $shopBasket->quantity                   = $shopBasket->quantity + $quantity;
+            $shopBasket->quantity = $shopBasket->quantity + $quantity;
 
 
-            if (!$shopBasket->recalculate()->save())
-            {
+            if (!$shopBasket->recalculate()->save()) {
                 $rr->success = false;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
-            } else
-            {
+            } else {
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
             $shopFuser->link('site', \Yii::$app->cms->site);
             $rr->data = $shopFuser->toArray([], $shopFuser->extraFields());
-            return (array) $rr;
-        } else
-        {
+            return (array)$rr;
+        } else {
             return $this->goBack();
         }
     }
@@ -276,76 +261,66 @@ class AdminOrderController extends AdminModelEditorController
     {
         $rr = new RequestResponse();
 
-        if ($this->model)
-        {
+        if ($this->model) {
             $model = $this->model;
         }
 
 
-        if ($rr->isRequestAjaxPost())
-        {
-            $product_id         = \Yii::$app->request->post('product_id');
-            $quantity           = \Yii::$app->request->post('quantity');
+        if ($rr->isRequestAjaxPost()) {
+            $product_id = \Yii::$app->request->post('product_id');
+            $quantity = \Yii::$app->request->post('quantity');
 
             /**
              * @var ShopProduct $product
              */
             $product = ShopProduct::find()->where(['id' => $product_id])->one();
 
-            if (!$product)
-            {
+            if (!$product) {
                 $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
-                return (array) $rr;
+                return (array)$rr;
             }
 
             $shopBasket = ShopBasket::find()->where([
-                'order_id'      => $model->id,
-                'product_id'    => $product_id,
-                'fuser_id'      => null,
+                'order_id' => $model->id,
+                'product_id' => $product_id,
+                'fuser_id' => null,
             ])->one();
 
-            if (!$shopBasket)
-            {
+            if (!$shopBasket) {
                 $shopBasket = new ShopBasket([
-                    'order_id'          => $model->id,
-                    'product_id'        => $product->id,
-                    'quantity'          => 0,
+                    'order_id' => $model->id,
+                    'product_id' => $product->id,
+                    'quantity' => 0,
                 ]);
             }
 
-            $shopBasket->quantity                   = $shopBasket->quantity + $quantity;
+            $shopBasket->quantity = $shopBasket->quantity + $quantity;
 
 
-            if (!$shopBasket->recalculate()->save())
-            {
+            if (!$shopBasket->recalculate()->save()) {
                 $rr->success = false;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
-            } else
-            {
+            } else {
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
             $rr->data = $model->toArray([], $model->extraFields());
-            return (array) $rr;
-        } else
-        {
+            return (array)$rr;
+        } else {
             return $this->goBack();
         }
     }
 
 
-
     public function createOrder()
     {
         $cmsUser = null;
-        if ($userId = \Yii::$app->request->get('cmsUserId'))
-        {
+        if ($userId = \Yii::$app->request->get('cmsUserId')) {
             $cmsUser = CmsUser::findOne($userId);
         }
 
-        if ($cmsUser)
-        {
+        if ($cmsUser) {
             /**
              * @var $shopFuser ShopFuser
              */
@@ -354,72 +329,62 @@ class AdminOrderController extends AdminModelEditorController
 
             $rr = new RequestResponse();
 
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax)
-            {
+            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
                 $model->scenario = ShopFuser::SCENARIO_CREATE_ORDER;
                 return $rr->ajaxValidateForm($model);
             }
 
-            if ($rr->isRequestPjaxPost())
-            {
-                try
-                {
-                    if ($model->load(\Yii::$app->request->post()) && $model->save())
-                    {
+            if ($rr->isRequestPjaxPost()) {
+                try {
+                    if ($model->load(\Yii::$app->request->post()) && $model->save()) {
 
                         $model->scenario = ShopFuser::SCENARIO_CREATE_ORDER;
 
-                        if ($model->validate())
-                        {
+                        if ($model->validate()) {
                             $order = ShopOrder::createOrderByFuser($model);
 
-                            if (!$order->isNewRecord)
-                            {
+                            if (!$order->isNewRecord) {
                                 \Yii::$app->getSession()->setFlash('success',
-                                    \Yii::t('skeeks/shop/app', 'The order #{order_id} created successfully', ['order_id' => $order->id])
+                                    \Yii::t('skeeks/shop/app', 'The order #{order_id} created successfully',
+                                        ['order_id' => $order->id])
                                 );
 
-                                if (\Yii::$app->request->post('submit-btn') == 'apply')
-                                {
+                                if (\Yii::$app->request->post('submit-btn') == 'apply') {
                                     return $this->redirect(
                                         UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
                                             ->addData([$this->requestPkParamName => $order->id])
                                             ->toString()
                                     );
-                                } else
-                                {
+                                } else {
                                     return $this->redirect(
                                         $this->url
                                     );
                                 }
 
 
-                            } else
-                            {
-                                throw new Exception(\Yii::t('skeeks/shop/app', 'Incorrect data of the new order').": " . array_shift($order->getFirstErrors()));
+                            } else {
+                                throw new Exception(\Yii::t('skeeks/shop/app',
+                                        'Incorrect data of the new order') . ": " . array_shift($order->getFirstErrors()));
                             }
 
-                        } else
-                        {
-                            throw new Exception(\Yii::t('skeeks/shop/app', 'Not enogh data for ordering').": " . array_shift($model->getFirstErrors()));
+                        } else {
+                            throw new Exception(\Yii::t('skeeks/shop/app',
+                                    'Not enogh data for ordering') . ": " . array_shift($model->getFirstErrors()));
                         }
-                    } else
-                    {
-                        throw new Exception(\Yii::t('skeeks/shop/app','Could not save'));
+                    } else {
+                        throw new Exception(\Yii::t('skeeks/shop/app', 'Could not save'));
                     }
-                } catch(\Exception $e)
-                {
+                } catch (\Exception $e) {
                     \Yii::$app->getSession()->setFlash('error', $e->getMessage());
                 }
 
             }
 
             return $this->render($this->action->id, [
-                'cmsUser'   => $cmsUser,
+                'cmsUser' => $cmsUser,
                 'shopFuser' => $model
             ]);
-        } else
-        {
+        } else {
             return $this->render($this->action->id . "-select-user");
         }
     }

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
@@ -12,13 +13,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $model \skeeks\cms\models\CmsUser */
 
 
-
 $result = [];
 
-if ($roles = \Yii::$app->authManager->getRolesByUser($model->id))
-{
-    foreach ($roles as $role)
-    {
+if ($roles = \Yii::$app->authManager->getRolesByUser($model->id)) {
+    foreach ($roles as $role) {
         $result[] = $role->description . " ({$role->name})";
     }
 }
@@ -31,108 +29,106 @@ $roles = implode(', ', $result);
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app','General information')
-    ])?>
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => \Yii::t('skeeks/shop/app', 'General information')
+]) ?>
 
-        <?= \yii\widgets\DetailView::widget([
-            'model' => $model,
-            'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-            'attributes' =>
-            [
-                [                      // the owner name of the model
-                    'label' => \Yii::t('skeeks/shop/app', 'User site'),
-                    'format' => 'raw',
-                    'value' => ($model->avatarSrc ? Html::img($model->avatarSrc) . " " : "") . $model->username,
-                ],
+<?= \yii\widgets\DetailView::widget([
+    'model' => $model,
+    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'attributes' =>
+        [
+            [                      // the owner name of the model
+                'label' => \Yii::t('skeeks/shop/app', 'User site'),
+                'format' => 'raw',
+                'value' => ($model->avatarSrc ? Html::img($model->avatarSrc) . " " : "") . $model->username,
+            ],
 
-                'email',
-                [                      // the owner name of the model
-                    'label' => \Yii::t('skeeks/shop/app', 'Date of registration'),
-                    'format' => 'raw',
-                    'value' =>\Yii::$app->formatter->asDatetime($model->created_at),
-                ],
+            'email',
+            [                      // the owner name of the model
+                'label' => \Yii::t('skeeks/shop/app', 'Date of registration'),
+                'format' => 'raw',
+                'value' => \Yii::$app->formatter->asDatetime($model->created_at),
+            ],
 
-                [                      // the owner name of the model
-                  'label' => \Yii::t('skeeks/shop/app', 'Date of last login'),
-                  'format' => 'raw',
-                  'value' => \Yii::$app->formatter->asDatetime($model->logged_at),
-                ],
-                [                      // the owner name of the model
-                  'label' => \Yii::t('skeeks/shop/app', 'User groups'),
-                  'value' => $roles,
-                ],
-            ]
-        ])?>
+            [                      // the owner name of the model
+                'label' => \Yii::t('skeeks/shop/app', 'Date of last login'),
+                'format' => 'raw',
+                'value' => \Yii::$app->formatter->asDatetime($model->logged_at),
+            ],
+            [                      // the owner name of the model
+                'label' => \Yii::t('skeeks/shop/app', 'User groups'),
+                'value' => $roles,
+            ],
+        ]
+]) ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => 'Статистика заказов'
-    ])?>
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => 'Статистика заказов'
+]) ?>
 
-        <?
+<?
 
-            $money = \Yii::$app->money->newMoney();
+$money = \Yii::$app->money->newMoney();
 
-            $payedOrders = \skeeks\cms\shop\models\ShopOrder::find()->where([
-                'user_id'   => $model->id,
-                'payed'     => \skeeks\cms\components\Cms::BOOL_Y
-            ])->all();
+$payedOrders = \skeeks\cms\shop\models\ShopOrder::find()->where([
+    'user_id' => $model->id,
+    'payed' => \skeeks\cms\components\Cms::BOOL_Y
+])->all();
 
-            if ($payedOrders)
-            {
-                foreach ($payedOrders as $shopOrder)
-                {
-                    /**
-                     * @var $shopOrder \skeeks\cms\shop\models\ShopOrder
-                     */
-                    $money = $money->add($shopOrder->money);
-                }
-            }
+if ($payedOrders) {
+    foreach ($payedOrders as $shopOrder) {
+        /**
+         * @var $shopOrder \skeeks\cms\shop\models\ShopOrder
+         */
+        $money = $money->add($shopOrder->money);
+    }
+}
 
 
-            $userStatistics = [
-                'total'         => \skeeks\cms\shop\models\ShopOrder::find()->where(['user_id' => $model->id])->count(),
-                'totalPayed'         => \skeeks\cms\shop\models\ShopOrder::find()->where([
-                    'user_id'   => $model->id,
-                    'payed'     => \skeeks\cms\components\Cms::BOOL_Y
-                ])->count(),
-            ];
+$userStatistics = [
+    'total' => \skeeks\cms\shop\models\ShopOrder::find()->where(['user_id' => $model->id])->count(),
+    'totalPayed' => \skeeks\cms\shop\models\ShopOrder::find()->where([
+        'user_id' => $model->id,
+        'payed' => \skeeks\cms\components\Cms::BOOL_Y
+    ])->count(),
+];
 
 
-            $average = "-";
-            if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed'))
-            {
-                $average = \Yii::$app->money->intlFormatter()->format($money->multiply(
-                    (1/\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed'))
-                ));
-            }
+$average = "-";
+if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed')) {
+    $average = \Yii::$app->money->intlFormatter()->format($money->multiply(
+        (1 / \yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed'))
+    ));
+}
 
-        ?>
-        <?= \yii\widgets\DetailView::widget([
-            'model'         => $userStatistics,
-            'template'      => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-            'attributes'    =>
-            [
-                [                      // the owner name of the model
-                    'label'     => \Yii::t('skeeks/shop/app', 'Orders (paid / total)'),
-                    'format'    => 'raw',
-                    'value'     => \yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed') . "/" . \yii\helpers\ArrayHelper::getValue($userStatistics, 'total'),
-                ],
+?>
+<?= \yii\widgets\DetailView::widget([
+    'model' => $userStatistics,
+    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'attributes' =>
+        [
+            [                      // the owner name of the model
+                'label' => \Yii::t('skeeks/shop/app', 'Orders (paid / total)'),
+                'format' => 'raw',
+                'value' => \yii\helpers\ArrayHelper::getValue($userStatistics,
+                        'totalPayed') . "/" . \yii\helpers\ArrayHelper::getValue($userStatistics, 'total'),
+            ],
 
-                [                      // the owner name of the model
-                    'label'     => \Yii::t('skeeks/shop/app', 'Paid orders worth'),
-                    'format'    => 'raw',
-                    'value'     => \Yii::$app->money->intlFormatter()->format($money),
-                ],
+            [                      // the owner name of the model
+                'label' => \Yii::t('skeeks/shop/app', 'Paid orders worth'),
+                'format' => 'raw',
+                'value' => \Yii::$app->money->intlFormatter()->format($money),
+            ],
 
-                [                      // the owner name of the model
-                    'label'     => \Yii::t('skeeks/shop/app', 'The average price paid orders'),
-                    'format'    => 'raw',
-                    'value'     => $average
-                ],
+            [                      // the owner name of the model
+                'label' => \Yii::t('skeeks/shop/app', 'The average price paid orders'),
+                'format' => 'raw',
+                'value' => $average
+            ],
 
-            ]
-        ])?>
+        ]
+]) ?>
 
 
 
@@ -140,55 +136,55 @@ $roles = implode(', ', $result);
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Profiles buyer') . " (" . \skeeks\cms\shop\models\ShopBuyer::find()->where([
-                'cms_user_id' => $model->id
-            ])->count() .  ")"); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app',
+        'Profiles buyer') . " (" . \skeeks\cms\shop\models\ShopBuyer::find()->where([
+        'cms_user_id' => $model->id
+    ])->count() . ")"); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'All of the buyer profile')
-    ])?>
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => \Yii::t('skeeks/shop/app', 'All of the buyer profile')
+]) ?>
 
-        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                'label'             => "",
-                'parentModel'       => $model,
-                'relation'          => [
-                    'cms_user_id'      => 'id',
-                ],
+<?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+    'label' => "",
+    'parentModel' => $model,
+    'relation' => [
+        'cms_user_id' => 'id',
+    ],
 
-                'sort'              => [
-                    'defaultOrder' =>
-                    [
-                        'updated_at' => SORT_DESC
-                    ]
-                ],
+    'sort' => [
+        'defaultOrder' =>
+            [
+                'updated_at' => SORT_DESC
+            ]
+    ],
 
-                'controllerRoute'   => 'shop/admin-buyer',
-                'gridViewOptions'   =>
+    'controllerRoute' => 'shop/admin-buyer',
+    'gridViewOptions' =>
+        [
+            'columns' =>
                 [
-                    'columns' =>
+                    'id',
+                    'name',
+
                     [
-                        'id',
-                        'name',
+                        'class' => \yii\grid\DataColumn::className(),
+                        'attribute' => 'shop_person_type_id',
+                        'format' => 'raw',
+                        'value' => function (\skeeks\cms\shop\models\ShopBuyer $model) {
+                            return $model->shopPersonType->name;
+                        }
+                    ],
 
-                        [
-                            'class'         => \yii\grid\DataColumn::className(),
-                            'attribute'     => 'shop_person_type_id',
-                            'format'        => 'raw',
-                            'value'         => function(\skeeks\cms\shop\models\ShopBuyer $model)
-                            {
-                                return $model->shopPersonType->name;
-                            }
-                        ],
+                    [
+                        'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+                        'attribute' => 'created_at',
+                    ],
 
-                        [
-                            'class'         => \skeeks\cms\grid\DateTimeColumnData::className(),
-                            'attribute'     => 'created_at',
-                        ],
-
-                    ]
                 ]
-        ]);
-        ?>
+        ]
+]);
+?>
 
 
 <?= $form->fieldSetEnd(); ?>
@@ -197,29 +193,29 @@ $roles = implode(', ', $result);
 $view = $this;
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Orders') . " (" . \skeeks\cms\shop\models\ShopOrder::find()->where([
-                'user_id' => $model->id
-            ])->count() .  ")"); ?>
+        'user_id' => $model->id
+    ])->count() . ")"); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'All customer orders')
-    ])?>
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => \Yii::t('skeeks/shop/app', 'All customer orders')
+]) ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-        'dataProvider' => new \yii\data\ActiveDataProvider([
-            'query' => \skeeks\cms\shop\models\ShopOrder::find()->where([
-                'user_id' => $model->id
-            ]),
-
-            'sort' =>
-            [
-                'defaultOrder' =>
-                [
-                    'created_at' => SORT_DESC
-                ]
-            ],
+<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+    'dataProvider' => new \yii\data\ActiveDataProvider([
+        'query' => \skeeks\cms\shop\models\ShopOrder::find()->where([
+            'user_id' => $model->id
         ]),
 
-        'columns' =>
+        'sort' =>
+            [
+                'defaultOrder' =>
+                    [
+                        'created_at' => SORT_DESC
+                    ]
+            ],
+    ]),
+
+    'columns' =>
         [
             [
                 'class' => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
@@ -230,49 +226,46 @@ $view = $this;
             'id',
 
             [
-                'class'     => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
             ],
 
             [
-                'class'         => \yii\grid\DataColumn::className(),
-                'attribute'     => 'status_code',
-                'format'        => 'raw',
-                'value'         => function(\skeeks\cms\shop\models\ShopOrder $order)
-                {
+                'class' => \yii\grid\DataColumn::className(),
+                'attribute' => 'status_code',
+                'format' => 'raw',
+                'value' => function (\skeeks\cms\shop\models\ShopOrder $order) {
                     return Html::label($order->status->name, null, [
-                        'style' => "background: {$order->status->color}",
-                        'class' => "label"
-                    ]) . "<br />" .
-                        Html::tag("small", \Yii::$app->formatter->asDatetime($order->status_at) . " (" . \Yii::$app->formatter->asRelativeTime($order->status_at) . ")")
-                    ;
+                            'style' => "background: {$order->status->color}",
+                            'class' => "label"
+                        ]) . "<br />" .
+                        Html::tag("small",
+                            \Yii::$app->formatter->asDatetime($order->status_at) . " (" . \Yii::$app->formatter->asRelativeTime($order->status_at) . ")");
                 }
             ],
 
             [
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute'     => 'payed',
-                'format'        => 'raw',
+                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => 'payed',
+                'format' => 'raw',
             ],
 
 
             [
-                'class'         => \yii\grid\DataColumn::className(),
-                'attribute'     => "canceled",
-                'format'        => "raw",
-                'filter'        => [
+                'class' => \yii\grid\DataColumn::className(),
+                'attribute' => "canceled",
+                'format' => "raw",
+                'filter' => [
                     'Y' => \Yii::t('skeeks/shop/app', 'Yes'),
                     'N' => \Yii::t('skeeks/shop/app', 'No'),
                 ],
 
-                'value' => function(\skeeks\cms\shop\models\ShopOrder $shopOrder, $key, $index) use ($view)
-                {
+                'value' => function (\skeeks\cms\shop\models\ShopOrder $shopOrder, $key, $index) use ($view) {
                     $reuslt = "<div>";
-                    if ($shopOrder->canceled == "Y")
-                    {
+                    if ($shopOrder->canceled == "Y") {
                         $view->registerJs(<<<JS
 $('tr[data-key={$key}]').addClass('sx-tr-red');
 JS
-);
+                        );
 
                         $view->registerCss(<<<CSS
 tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
@@ -280,11 +273,12 @@ tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
 background: #FFECEC !important;
 }
 CSS
-);
+                        );
                         $reuslt = "<div style='color: red;'>";
                     }
 
-                    $reuslt .=  $shopOrder->canceled == "Y" ? \Yii::t('skeeks/shop/app', 'Yes') : \Yii::t('skeeks/shop/app', 'No');
+                    $reuslt .= $shopOrder->canceled == "Y" ? \Yii::t('skeeks/shop/app',
+                        'Yes') : \Yii::t('skeeks/shop/app', 'No');
                     $reuslt .= "</div>";
                     return $reuslt;
                 }
@@ -292,17 +286,14 @@ CSS
 
 
             [
-                'class'         => \yii\grid\DataColumn::className(),
-                'filter'        => false,
-                'format'        => 'raw',
-                'label'         => \Yii::t('skeeks/shop/app', 'Good'),
-                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
-                {
-                    if ($model->shopBaskets)
-                    {
+                'class' => \yii\grid\DataColumn::className(),
+                'filter' => false,
+                'format' => 'raw',
+                'label' => \Yii::t('skeeks/shop/app', 'Good'),
+                'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
+                    if ($model->shopBaskets) {
                         $result = [];
-                        foreach ($model->shopBaskets as $shopBasket)
-                        {
+                        foreach ($model->shopBaskets as $shopBasket) {
                             $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
                             $result[] = Html::a($shopBasket->name, $shopBasket->url, [
                                     'target' => '_blank',
@@ -318,47 +309,45 @@ HTML;
             ],
 
             [
-                'class'         => \yii\grid\DataColumn::className(),
-                'format'        => 'raw',
-                'attribute'     => 'price',
-                'label'         => \Yii::t('skeeks/shop/app', 'Sum'),
-                'value'         => function(\skeeks\cms\shop\models\ShopOrder $model)
-                {
+                'class' => \yii\grid\DataColumn::className(),
+                'format' => 'raw',
+                'attribute' => 'price',
+                'label' => \Yii::t('skeeks/shop/app', 'Sum'),
+                'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
                     return \Yii::$app->money->intlFormatter()->format($model->money);
                 },
             ],
 
 
         ]
-    ]); ?>
+]); ?>
 <?= $form->fieldSetEnd(); ?>
 
 
 
 <?
-    $countBaskets = 0;
-    $fuser = \skeeks\cms\shop\models\ShopFuser::getInstanceByUser($model);
-    if ($fuser)
-    {
-        $countBaskets = \skeeks\cms\shop\models\ShopBasket::find()->where([
-            'fuser_id' => $fuser->id
-        ])->count();
-    }
+$countBaskets = 0;
+$fuser = \skeeks\cms\shop\models\ShopFuser::getInstanceByUser($model);
+if ($fuser) {
+    $countBaskets = \skeeks\cms\shop\models\ShopBasket::find()->where([
+        'fuser_id' => $fuser->id
+    ])->count();
+}
 ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Basket').' (' . $countBaskets . ")"); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Basket') . ' (' . $countBaskets . ")"); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'At the moment the user in a basket')
-    ]); ?>
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => \Yii::t('skeeks/shop/app', 'At the moment the user in a basket')
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-        'dataProvider' => new \yii\data\ActiveDataProvider([
-            'query' => \skeeks\cms\shop\models\ShopBasket::find()->where([
-                'fuser_id' => $fuser->id
-            ])
-        ]),
-        'columns' =>
+<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+    'dataProvider' => new \yii\data\ActiveDataProvider([
+        'query' => \skeeks\cms\shop\models\ShopBasket::find()->where([
+            'fuser_id' => $fuser->id
+        ])
+    ]),
+    'columns' =>
         [
 
             [
@@ -386,22 +375,23 @@ HTML;
             ],
 
         ]
-    ]); ?>
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Viewed products')." (" . \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
-                'shop_fuser_id' => $fuser->id
-            ])->count() .  ")"); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app',
+        'Viewed products') . " (" . \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
+        'shop_fuser_id' => $fuser->id
+    ])->count() . ")"); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-        'dataProvider' => new \yii\data\ActiveDataProvider([
-            'query' => \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
-                'shop_fuser_id' => $fuser->id
-            ])->orderBy(['created_at' => SORT_DESC])
-        ]),
-        'columns' =>
+<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+    'dataProvider' => new \yii\data\ActiveDataProvider([
+        'query' => \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
+            'shop_fuser_id' => $fuser->id
+        ])->orderBy(['created_at' => SORT_DESC])
+    ]),
+    'columns' =>
         [
             [
                 'class' => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
@@ -417,37 +407,38 @@ HTML;
                 'class' => \yii\grid\DataColumn::className(),
                 'format' => 'raw',
                 'label' => \Yii::t('skeeks/shop/app', 'Good'),
-                'value' => function(\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct)
-                {
+                'value' => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
                     return (new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-                        'image' => $shopViewedProduct->shopProduct->cmsContentElement->image,
-                        'maxWidth' => "25px"
-                    ]))->run() . " " . Html::a($shopViewedProduct->shopProduct->cmsContentElement->name, $shopViewedProduct->shopProduct->cmsContentElement->url, [
-                        'target' => "_blank",
-                        'data-pjax' => 0,
-                    ] );
+                            'image' => $shopViewedProduct->shopProduct->cmsContentElement->image,
+                            'maxWidth' => "25px"
+                        ]))->run() . " " . Html::a($shopViewedProduct->shopProduct->cmsContentElement->name,
+                            $shopViewedProduct->shopProduct->cmsContentElement->url, [
+                                'target' => "_blank",
+                                'data-pjax' => 0,
+                            ]);
 
                     return null;
                 },
             ],
 
         ]
-    ]); ?>
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Notify admission')." (" . \skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
-                'shop_fuser_id' => $fuser->id
-            ])->count() .  ")"); ?>
+<?= $form->fieldSet(\Yii::t('skeeks/shop/app',
+        'Notify admission') . " (" . \skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
+        'shop_fuser_id' => $fuser->id
+    ])->count() . ")"); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-        'dataProvider' => new \yii\data\ActiveDataProvider([
-            'query' => \skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
-                'shop_fuser_id' => $fuser->id
-            ])->orderBy(['created_at' => SORT_DESC])
-        ]),
-        'columns'           =>
+<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+    'dataProvider' => new \yii\data\ActiveDataProvider([
+        'query' => \skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
+            'shop_fuser_id' => $fuser->id
+        ])->orderBy(['created_at' => SORT_DESC])
+    ]),
+    'columns' =>
         [
             [
                 'class' => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
@@ -464,17 +455,17 @@ HTML;
                 'class' => \yii\grid\DataColumn::className(),
                 'format' => 'raw',
                 'label' => \Yii::t('skeeks/shop/app', 'Good'),
-                'value' => function(\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail)
-                {
-                    if ($shopQuantityNoticeEmail->shopProduct)
-                    {
+                'value' => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
+                    if ($shopQuantityNoticeEmail->shopProduct) {
                         return (new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-                            'image' => $shopQuantityNoticeEmail->shopProduct->cmsContentElement->image,
-                            'maxWidth' => "25px"
-                        ]))->run() . " " . \yii\helpers\Html::a($shopQuantityNoticeEmail->shopProduct->cmsContentElement->name, $shopQuantityNoticeEmail->shopProduct->cmsContentElement->url, [
-                            'target' => "_blank",
-                            'data-pjax' => 0,
-                        ] ) . "<br /><small>" . \Yii::t('skeeks/shop/app', 'In stock') . ": " . $shopQuantityNoticeEmail->shopProduct->quantity . "</small>";
+                                'image' => $shopQuantityNoticeEmail->shopProduct->cmsContentElement->image,
+                                'maxWidth' => "25px"
+                            ]))->run() . " " . \yii\helpers\Html::a($shopQuantityNoticeEmail->shopProduct->cmsContentElement->name,
+                                $shopQuantityNoticeEmail->shopProduct->cmsContentElement->url, [
+                                    'target' => "_blank",
+                                    'data-pjax' => 0,
+                                ]) . "<br /><small>" . \Yii::t('skeeks/shop/app',
+                                'In stock') . ": " . $shopQuantityNoticeEmail->shopProduct->quantity . "</small>";
                     }
 
                     return null;
@@ -496,12 +487,15 @@ HTML;
             ],
 
         ]
-    ]); ?>
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 <div style="text-align: center; margin-top: 15px;">
-    <a data-pjax="0" href="<?= \skeeks\cms\helpers\UrlHelper::construct(['/shop/admin-order/create-order', 'cmsUserId' => $model->id])->enableAdmin()->toString()?>" class="btn btn-primary">Создать заказ</a>
+    <a data-pjax="0" href="<?= \skeeks\cms\helpers\UrlHelper::construct([
+        '/shop/admin-order/create-order',
+        'cmsUserId' => $model->id
+    ])->enableAdmin()->toString() ?>" class="btn btn-primary">Создать заказ</a>
 </div>
 
 <?php ActiveForm::end(); ?>

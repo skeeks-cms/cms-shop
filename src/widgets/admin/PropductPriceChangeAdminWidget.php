@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 08.10.2015
  */
+
 namespace skeeks\cms\shop\widgets\admin;
+
 use skeeks\cms\mail\helpers\Html;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget;

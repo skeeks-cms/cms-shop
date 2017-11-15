@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.08.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\Component;
@@ -48,10 +49,10 @@ class ShopPaySystem extends Core
     {
         return ArrayHelper::merge(parent::behaviors(), [
             Serialize::className() =>
-            [
-                'class' => Serialize::className(),
-                'fields' => ['component_settings']
-            ]
+                [
+                    'class' => Serialize::className(),
+                    'fields' => ['component_settings']
+                ]
         ]);
     }
 
@@ -62,8 +63,8 @@ class ShopPaySystem extends Core
     {
         parent::init();
 
-        $this->on(self::EVENT_AFTER_INSERT,    [$this, "afterSaveEvent"]);
-        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveEvent"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveEvent"]);
     }
 
     /**
@@ -71,29 +72,24 @@ class ShopPaySystem extends Core
      */
     public function afterSaveEvent($event)
     {
-        if ($this->_personTypes)
-        {
+        if ($this->_personTypes) {
             //Для начала удаляем текущие связи
             $all = $this->getShopPaySystemPersonTypes()->all();
-            if ($all)
-            {
-                foreach ($all as $one)
-                {
+            if ($all) {
+                foreach ($all as $one) {
                     $one->delete();
                 }
             }
 
             //добавляем новые
-            foreach ($this->_personTypes as $id)
-            {
+            foreach ($this->_personTypes as $id) {
                 $shopTypeSite = $this->getShopPaySystemPersonTypes()->andWhere(['person_type_id' => $id])->one();
                 //Такой связи еще нет
-                if (!$shopTypeSite)
-                {
-                    $shopTypeSite                   = new ShopPaySystemPersonType();
+                if (!$shopTypeSite) {
+                    $shopTypeSite = new ShopPaySystemPersonType();
 
-                    $shopTypeSite->pay_system_id    = $this->id;
-                    $shopTypeSite->person_type_id   = $id;
+                    $shopTypeSite->pay_system_id = $this->id;
+                    $shopTypeSite->person_type_id = $id;
 
                     $shopTypeSite->save();
                 }
@@ -127,12 +123,12 @@ class ShopPaySystem extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
-            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active'        => \Yii::t('skeeks/shop/app', 'Active'),
-            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active' => \Yii::t('skeeks/shop/app', 'Active'),
+            'description' => \Yii::t('skeeks/shop/app', 'Description'),
             'personTypeIds' => \Yii::t('skeeks/shop/app', 'Payers'),
-            'component'     => \Yii::t('skeeks/shop/app', 'Handler'),
+            'component' => \Yii::t('skeeks/shop/app', 'Handler'),
         ]);
     }
 
@@ -150,12 +146,9 @@ class ShopPaySystem extends Core
      */
     public function getPersonTypes()
     {
-        return $this->hasMany(ShopPersonType::className(), ['id' => 'person_type_id'])->viaTable('{{%shop_pay_system_person_type}}', ['pay_system_id' => 'id']);
+        return $this->hasMany(ShopPersonType::className(),
+            ['id' => 'person_type_id'])->viaTable('{{%shop_pay_system_person_type}}', ['pay_system_id' => 'id']);
     }
-
-
-
-
 
 
     /**
@@ -163,7 +156,7 @@ class ShopPaySystem extends Core
      */
     public function getPersonTypeIds()
     {
-        return (array) ArrayHelper::map($this->personTypes, 'id', 'id');
+        return (array)ArrayHelper::map($this->personTypes, 'id', 'id');
     }
 
 
@@ -195,15 +188,12 @@ class ShopPaySystem extends Core
      */
     public function getHandler()
     {
-        if ($this->_handler !== null)
-        {
+        if ($this->_handler !== null) {
             return $this->_handler;
         }
 
-        if ($this->component)
-        {
-            try
-            {
+        if ($this->component) {
+            try {
                 /**
                  * @var $component PropertyType
                  */
@@ -216,8 +206,7 @@ class ShopPaySystem extends Core
 
                 $this->_handler = $component;
                 return $this->_handler;
-            } catch (\Exception $e)
-            {
+            } catch (\Exception $e) {
                 \Yii::error("Related property handler not found '{$this->component}'", self::className());
                 return null;
             }

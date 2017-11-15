@@ -36,7 +36,12 @@ class ShopDelivery2paySystem extends \skeeks\cms\models\Core
         return [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'pay_system_id', 'delivery_id'], 'integer'],
             [['pay_system_id', 'delivery_id'], 'required'],
-            [['pay_system_id', 'delivery_id'], 'unique', 'targetAttribute' => ['pay_system_id', 'delivery_id'], 'message' => 'The combination of Pay System ID and Delivery ID has already been taken.']
+            [
+                ['pay_system_id', 'delivery_id'],
+                'unique',
+                'targetAttribute' => ['pay_system_id', 'delivery_id'],
+                'message' => 'The combination of Pay System ID and Delivery ID has already been taken.'
+            ]
         ];
     }
 
@@ -46,13 +51,13 @@ class ShopDelivery2paySystem extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
             'pay_system_id' => \Yii::t('skeeks/shop/app', 'Pay System ID'),
-            'delivery_id'   => \Yii::t('skeeks/shop/app', 'Delivery ID'),
+            'delivery_id' => \Yii::t('skeeks/shop/app', 'Delivery ID'),
         ];
     }
 

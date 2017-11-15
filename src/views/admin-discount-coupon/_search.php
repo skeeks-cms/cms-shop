@@ -17,18 +17,17 @@ $filter->addRule('id', 'integer');
 
 $filter->load(\Yii::$app->request->get());
 
-if ($filter->id)
-{
+if ($filter->id) {
     $dataProvider->query->andWhere(['id' => $filter->id]);
 }
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-        'action' => '/' . \Yii::$app->request->pathInfo,
-    ]); ?>
+    'action' => '/' . \Yii::$app->request->pathInfo,
+]); ?>
 
-    <?= $form->field($searchModel, 'coupon')->setVisible(); ?>
-    <?= $form->field($filter, 'id'); ?>
+<?= $form->field($searchModel, 'coupon')->setVisible(); ?>
+<?= $form->field($filter, 'id'); ?>
 
-    <?/*= $form->field($searchModel, 'name')->setVisible(); */?>
+<? /*= $form->field($searchModel, 'name')->setVisible(); */ ?>
 
 <? $form::end(); ?>

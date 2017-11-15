@@ -17,19 +17,18 @@ $filter->addRule('id', 'integer');
 
 $filter->load(\Yii::$app->request->get());
 
-if ($filter->id)
-{
+if ($filter->id) {
     $dataProvider->query->andWhere(['id' => $filter->id]);
 }
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-        'action' => '/' . \Yii::$app->request->pathInfo,
-    ]); ?>
+    'action' => '/' . \Yii::$app->request->pathInfo,
+]); ?>
 
-    <?= $form->field($searchModel, 'name')->setVisible(); ?>
+<?= $form->field($searchModel, 'name')->setVisible(); ?>
 
-    <?/*= $form->field($searchModel, 'status_code')->listBox(\yii\helpers\ArrayHelper::merge([
+<? /*= $form->field($searchModel, 'status_code')->listBox(\yii\helpers\ArrayHelper::merge([
         '' => null,
-    ], \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name')), ['size' => 1]); */?>
+    ], \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name')), ['size' => 1]); */ ?>
 
 <? $form::end(); ?>

@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 10.10.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\behaviors\RelationalBehavior;
@@ -65,8 +66,8 @@ class ShopDiscount extends \skeeks\cms\models\Core
     CONST VALUE_TYPE_F = "F";
     CONST VALUE_TYPE_S = "S";
 
-    const TYPE_DEFAULT          = 0;
-    const TYPE_DISCOUNT_SAVE    = 1; //накопительная скидка
+    const TYPE_DEFAULT = 0;
+    const TYPE_DISCOUNT_SAVE = 1; //накопительная скидка
 
     static public function getValueTypes()
     {
@@ -76,6 +77,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
             self::VALUE_TYPE_S => \Yii::t('skeeks/shop/app', 'Set the price for the goods'),
         ];
     }
+
     /**
      * @inheritdoc
      */
@@ -98,19 +100,43 @@ class ShopDiscount extends \skeeks\cms\models\Core
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'site_id', 'active_from', 'active_to', 'max_uses', 'count_uses', 'type', 'count_size', 'count_from', 'count_to', 'action_size', 'priority', 'version'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'site_id',
+                    'active_from',
+                    'active_to',
+                    'max_uses',
+                    'count_uses',
+                    'type',
+                    'count_size',
+                    'count_from',
+                    'count_to',
+                    'action_size',
+                    'priority',
+                    'version'
+                ],
+                'integer'
+            ],
             [['max_discount', 'value', 'min_order_sum'], 'number'],
             [['currency_code', 'name'], 'required'],
             [['conditions', 'unpack'], 'string'],
-            [['active', 'renewal', 'value_type', 'count_period', 'count_type', 'action_type', 'last_discount'], 'string', 'max' => 1],
+            [
+                ['active', 'renewal', 'value_type', 'count_period', 'count_type', 'action_type', 'last_discount'],
+                'string',
+                'max' => 1
+            ],
             [['name', 'notes', 'xml_id'], 'string', 'max' => 255],
             [['coupon'], 'string', 'max' => 20],
             [['currency_code'], 'string', 'max' => 3],
             [['active', 'last_discount'], 'default', 'value' => Cms::BOOL_Y],
             [['type'], 'default', 'value' => self::TYPE_DEFAULT],
             [['value_type'], 'default', 'value' => self::VALUE_TYPE_P],
-            [['value'], 'default', 'value' =>  0],
-            [['priority'], 'default', 'value' =>  1],
+            [['value'], 'default', 'value' => 0],
+            [['priority'], 'default', 'value' => 1],
             ['typePrices', 'safe'], // allow set permissions with setAttributes()
         ];
     }
@@ -121,41 +147,42 @@ class ShopDiscount extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'site_id'       => \Yii::t('skeeks/shop/app', 'Site'),
-            'active'        => \Yii::t('skeeks/shop/app', 'Active'),
-            'active_from'   => \Yii::t('skeeks/shop/app', 'Active from'),
-            'active_to'     => \Yii::t('skeeks/shop/app', 'Active to'),
-            'renewal'       => \Yii::t('skeeks/shop/app', 'Renewal'),
-            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
-            'max_uses'      => \Yii::t('skeeks/shop/app', 'Max Uses'),
-            'count_uses'    => \Yii::t('skeeks/shop/app', 'Count Uses'),
-            'coupon'        => \Yii::t('skeeks/shop/app', 'Coupon'),
-            'max_discount'  => \Yii::t('skeeks/shop/app', 'The maximum amount of discount (in currency of discount ; 0 - the discount is not limited to)'),
-            'value_type'    => \Yii::t('skeeks/shop/app', 'Discount Type'),
-            'value'         => \Yii::t('skeeks/shop/app', 'Markdown'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'site_id' => \Yii::t('skeeks/shop/app', 'Site'),
+            'active' => \Yii::t('skeeks/shop/app', 'Active'),
+            'active_from' => \Yii::t('skeeks/shop/app', 'Active from'),
+            'active_to' => \Yii::t('skeeks/shop/app', 'Active to'),
+            'renewal' => \Yii::t('skeeks/shop/app', 'Renewal'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'max_uses' => \Yii::t('skeeks/shop/app', 'Max Uses'),
+            'count_uses' => \Yii::t('skeeks/shop/app', 'Count Uses'),
+            'coupon' => \Yii::t('skeeks/shop/app', 'Coupon'),
+            'max_discount' => \Yii::t('skeeks/shop/app',
+                'The maximum amount of discount (in currency of discount ; 0 - the discount is not limited to)'),
+            'value_type' => \Yii::t('skeeks/shop/app', 'Discount Type'),
+            'value' => \Yii::t('skeeks/shop/app', 'Markdown'),
             'currency_code' => \Yii::t('skeeks/shop/app', 'Currency discount'),
             'min_order_sum' => \Yii::t('skeeks/shop/app', 'Min Order Sum'),
-            'notes'         => \Yii::t('skeeks/shop/app', 'Short description (up to 255 characters)'),
-            'type'          => \Yii::t('skeeks/shop/app', 'Type'),
-            'xml_id'        => \Yii::t('skeeks/shop/app', 'Xml ID'),
-            'count_period'  => \Yii::t('skeeks/shop/app', 'Count Period'),
-            'count_size'    => \Yii::t('skeeks/shop/app', 'Count Size'),
-            'count_type'    => \Yii::t('skeeks/shop/app', 'Count Type'),
-            'count_from'    => \Yii::t('skeeks/shop/app', 'Count From'),
-            'count_to'      => \Yii::t('skeeks/shop/app', 'Count To'),
-            'action_size'   => \Yii::t('skeeks/shop/app', 'Action Size'),
-            'action_type'   => \Yii::t('skeeks/shop/app', 'Action Type'),
-            'priority'      => \Yii::t('skeeks/shop/app', 'Priority applicability'),
+            'notes' => \Yii::t('skeeks/shop/app', 'Short description (up to 255 characters)'),
+            'type' => \Yii::t('skeeks/shop/app', 'Type'),
+            'xml_id' => \Yii::t('skeeks/shop/app', 'Xml ID'),
+            'count_period' => \Yii::t('skeeks/shop/app', 'Count Period'),
+            'count_size' => \Yii::t('skeeks/shop/app', 'Count Size'),
+            'count_type' => \Yii::t('skeeks/shop/app', 'Count Type'),
+            'count_from' => \Yii::t('skeeks/shop/app', 'Count From'),
+            'count_to' => \Yii::t('skeeks/shop/app', 'Count To'),
+            'action_size' => \Yii::t('skeeks/shop/app', 'Action Size'),
+            'action_type' => \Yii::t('skeeks/shop/app', 'Action Type'),
+            'priority' => \Yii::t('skeeks/shop/app', 'Priority applicability'),
             'last_discount' => \Yii::t('skeeks/shop/app', 'Stop further application of discounts'),
-            'conditions'    => \Yii::t('skeeks/shop/app', 'Conditions'),
-            'unpack'        => \Yii::t('skeeks/shop/app', 'Unpack'),
-            'version'       => \Yii::t('skeeks/shop/app', 'Version'),
-            'typePrices'    => \Yii::t('skeeks/shop/app', 'Types of prices, to which the discount is applicable'),
+            'conditions' => \Yii::t('skeeks/shop/app', 'Conditions'),
+            'unpack' => \Yii::t('skeeks/shop/app', 'Unpack'),
+            'version' => \Yii::t('skeeks/shop/app', 'Version'),
+            'typePrices' => \Yii::t('skeeks/shop/app', 'Types of prices, to which the discount is applicable'),
         ];
     }
 
@@ -166,6 +193,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
     {
         return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -192,8 +220,6 @@ class ShopDiscount extends \skeeks\cms\models\Core
     }
 
 
-
-
     /**
      * @return string
      */
@@ -201,7 +227,6 @@ class ShopDiscount extends \skeeks\cms\models\Core
     {
         return "shop-discount-" . $this->id;
     }
-
 
 
 }

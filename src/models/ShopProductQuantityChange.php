@@ -42,7 +42,13 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_product_id', 'measure_id'], 'integer'],
             [['shop_product_id'], 'required'],
             [['quantity', 'quantity_reserved', 'measure_ratio'], 'number'],
-            [['measure_id'], 'exist', 'skipOnError' => true, 'targetClass' => Measure::className(), 'targetAttribute' => ['measure_id' => 'id']],
+            [
+                ['measure_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Measure::className(),
+                'targetAttribute' => ['measure_id' => 'id']
+            ],
         ]);
     }
 

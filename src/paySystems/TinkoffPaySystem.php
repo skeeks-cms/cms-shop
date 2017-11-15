@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 12.10.2015
  */
+
 namespace skeeks\cms\shop\paySystems;
+
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Component;
@@ -27,7 +29,7 @@ class TinkoffPaySystem extends PaySystemHandlerComponent
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name'          =>  \Yii::t('skeeks/shop/app', 'Tinkoff'),
+            'name' => \Yii::t('skeeks/shop/app', 'Tinkoff'),
         ]);
     }
 
@@ -42,7 +44,7 @@ class TinkoffPaySystem extends PaySystemHandlerComponent
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'terminal_key'                    => 'Идентификатор магазина из ЛК',
+            'terminal_key' => 'Идентификатор магазина из ЛК',
         ]);
     }
 
@@ -52,7 +54,6 @@ class TinkoffPaySystem extends PaySystemHandlerComponent
             'isLive' => '',
         ]);
     }
-
 
 
     /**

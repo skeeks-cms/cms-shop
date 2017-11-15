@@ -12,8 +12,7 @@
 
 $autoColumns = [];
 $shopPersonType = $controller->personType;
-if ($shopPersonType)
-{
+if ($shopPersonType) {
     $dataProvider->query->andWhere(['shop_person_type_id' => $shopPersonType->id]);
     /**
      * @var $shopPersonType \skeeks\cms\shop\models\ShopPersonType
@@ -25,40 +24,39 @@ if ($shopPersonType)
 
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <? if ($shopPersonType) : ?>
-        <?
-            $shopBuyer = new \skeeks\cms\shop\models\ShopBuyer();
-            $shopBuyer->shop_person_type_id = $shopPersonType->id;
+<? if ($shopPersonType) : ?>
+    <?
+    $shopBuyer = new \skeeks\cms\shop\models\ShopBuyer();
+    $shopBuyer->shop_person_type_id = $shopPersonType->id;
 
-            $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-            $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::class;
-            $searchRelatedPropertiesModel->initProperties( $shopBuyer->relatedProperties );
-            $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
-            if ($dataProvider)
-            {
-                $searchRelatedPropertiesModel->search($dataProvider, $shopBuyer->tableName());
-            }
+    $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
+    $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::class;
+    $searchRelatedPropertiesModel->initProperties($shopBuyer->relatedProperties);
+    $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+    if ($dataProvider) {
+        $searchRelatedPropertiesModel->search($dataProvider, $shopBuyer->tableName());
+    }
 
-            if ($shopBuyer->relatedPropertiesModel)
-            {
-                $autoColumns = \skeeks\cms\modules\admin\widgets\GridViewStandart::getColumnsByRelatedPropertiesModel($shopBuyer->relatedPropertiesModel, $searchRelatedPropertiesModel);
-            }
-        ?>
-    <? endif; ?>
+    if ($shopBuyer->relatedPropertiesModel) {
+        $autoColumns = \skeeks\cms\modules\admin\widgets\GridViewStandart::getColumnsByRelatedPropertiesModel($shopBuyer->relatedPropertiesModel,
+            $searchRelatedPropertiesModel);
+    }
+    ?>
+<? endif; ?>
 
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider,
-        'shopPersonType'  => $shopPersonType
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider,
+    'shopPersonType' => $shopPersonType
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'pjax'              => $pjax,
-        'adminController'   => \Yii::$app->controller,
-        'columns'           => \yii\helpers\ArrayHelper::merge(
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'pjax' => $pjax,
+    'adminController' => \Yii::$app->controller,
+    'columns' => \yii\helpers\ArrayHelper::merge(
         [
             /*[
                 'class' => \yii\grid\DataColumn::className(),
@@ -78,6 +76,6 @@ if ($shopPersonType)
 
 
         ], $autoColumns)
-    ]); ?>
+]); ?>
 
 <? $pjax::end(); ?>

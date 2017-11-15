@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 17.09.2015
  */
+
 use yii\db\Schema;
 use yii\db\Migration;
 
@@ -13,8 +14,7 @@ class m151001_181201_create_table__shop_user_transact extends Migration
     public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_user_transact}}", true);
-        if ($tableExist)
-        {
+        if ($tableExist) {
             return true;
         }
 
@@ -24,23 +24,23 @@ class m151001_181201_create_table__shop_user_transact extends Migration
         }
 
         $this->createTable("{{%shop_user_transact}}", [
-            'id'                        => $this->primaryKey(),
+            'id' => $this->primaryKey(),
 
-            'created_by'                => $this->integer(),
-            'updated_by'                => $this->integer(),
+            'created_by' => $this->integer(),
+            'updated_by' => $this->integer(),
 
-            'created_at'                => $this->integer(),
-            'updated_at'                => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
 
-            'cms_user_id'               => $this->integer()->notNull(),
-            'shop_order_id'             => $this->integer(),
+            'cms_user_id' => $this->integer()->notNull(),
+            'shop_order_id' => $this->integer(),
 
-            'amount'                    => $this->decimal(18, 4)->notNull()->defaultValue(0),
-            'currency_code'             => $this->string(3)->notNull(),
+            'amount' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'currency_code' => $this->string(3)->notNull(),
 
-            'debit'                     => $this->string(1)->notNull()->defaultValue('N'),
-            'description'               => $this->string(255)->notNull(),
-            'notes'                     => $this->text(),
+            'debit' => $this->string(1)->notNull()->defaultValue('N'),
+            'description' => $this->string(255)->notNull(),
+            'notes' => $this->text(),
 
 
         ], $tableOptions);

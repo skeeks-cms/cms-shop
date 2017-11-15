@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
@@ -38,18 +39,18 @@ class AdminReportOrderController extends AdminController
 {
     public function init()
     {
-        $this->name                     = \Yii::t('skeeks/shop/app', 'Reports on orders');
+        $this->name = \Yii::t('skeeks/shop/app', 'Reports on orders');
         parent::init();
     }
 
     public function actionIndex()
     {
-        $search         = new AdminReportOrderSearch();
-        $dataProvider   = $search->search(\Yii::$app->request->get());
+        $search = new AdminReportOrderSearch();
+        $dataProvider = $search->search(\Yii::$app->request->get());
 
         return $this->render($this->action->id, [
-            'search'        => $search,
-            'dataProvider'  => $dataProvider,
+            'search' => $search,
+            'dataProvider' => $dataProvider,
         ]);
     }
 }

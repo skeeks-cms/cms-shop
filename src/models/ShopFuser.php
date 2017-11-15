@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 28.08.2015
  */
+
 namespace skeeks\cms\shop\models;
+
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\CmsContentElement;
@@ -22,10 +24,10 @@ use yii\helpers\ArrayHelper;
  * This is the model class for table "shop_fuser".
  *
  *
- * @property User           $user
- * @property ShopBasket[]   $shopBaskets
- * @property ShopDelivery   $delivery
- * @property ShopBuyer      $buyer
+ * @property User $user
+ * @property ShopBasket[] $shopBaskets
+ * @property ShopDelivery $delivery
+ * @property ShopBuyer $buyer
  * @property ShopPaySystem $paySystem
  *
  * @property ShopPersonType $personType
@@ -85,10 +87,10 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return ArrayHelper::merge(parent::behaviors(), [
             Implode::class =>
-            [
-                'class' => Implode::class,
-                'fields' => ['discount_coupons']
-            ]
+                [
+                    'class' => Implode::class,
+                    'fields' => ['discount_coupons']
+                ]
         ]);
     }
 
@@ -96,31 +98,26 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         parent::loadDefaultValues($skipIfSet);
 
-        if (!$this->site_id)
-        {
+        if (!$this->site_id) {
             $this->site_id = \Yii::$app->cms->site->id;
         }
 
-        if (!$this->delivery_id)
-        {
+        if (!$this->delivery_id) {
             //$this->delivery_id = \Yii::$app->cms->site->id;
         }
 
-        if (!$this->person_type_id && \Yii::$app->shop->shopPersonTypes)
-        {
+        if (!$this->person_type_id && \Yii::$app->shop->shopPersonTypes) {
             $shopPersonType = \Yii::$app->shop->shopPersonTypes[0];
             $this->person_type_id = $shopPersonType->id;
         }
 
-        if (!$this->pay_system_id && $this->paySystems)
-        {
+        if (!$this->pay_system_id && $this->paySystems) {
             $paySystem = $this->paySystems[0];
             $this->pay_system_id = $paySystem->id;
         }
 
         $deliveries = \skeeks\cms\shop\models\ShopDelivery::find()->active()->all();
-        if (!$this->delivery_id && $deliveries)
-        {
+        if (!$this->delivery_id && $deliveries) {
             $delivery = $deliveries[0];
             $this->delivery_id = $delivery->id;
         }
@@ -132,15 +129,15 @@ class ShopFuser extends Core implements \JsonSerializable
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'user_id'           => \Yii::t('skeeks/shop/app', 'User site'),
-            'additional'        => \Yii::t('skeeks/shop/app', 'Additional'),
-            'person_type_id'    => \Yii::t('skeeks/shop/app', 'Type of buyer'),
-            'site_id'           => \Yii::t('skeeks/shop/app', 'Site ID'),
-            'delivery_id'       => \Yii::t('skeeks/shop/app', 'Delivery service'),
-            'buyer_id'          => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
-            'pay_system_id'     => \Yii::t('skeeks/shop/app', 'Payment system'),
-            'store_id'          => \Yii::t('skeeks/shop/app', 'Warehouse/Store'),
-            'discount_coupons'  => \Yii::t('skeeks/shop/app', 'Discount coupons'),
+            'user_id' => \Yii::t('skeeks/shop/app', 'User site'),
+            'additional' => \Yii::t('skeeks/shop/app', 'Additional'),
+            'person_type_id' => \Yii::t('skeeks/shop/app', 'Type of buyer'),
+            'site_id' => \Yii::t('skeeks/shop/app', 'Site ID'),
+            'delivery_id' => \Yii::t('skeeks/shop/app', 'Delivery service'),
+            'buyer_id' => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'pay_system_id' => \Yii::t('skeeks/shop/app', 'Payment system'),
+            'store_id' => \Yii::t('skeeks/shop/app', 'Warehouse/Store'),
+            'discount_coupons' => \Yii::t('skeeks/shop/app', 'Discount coupons'),
         ]);
     }
 
@@ -154,8 +151,7 @@ class ShopFuser extends Core implements \JsonSerializable
 
     public function beforeSaveCallback()
     {
-        if ($this->buyer)
-        {
+        if ($this->buyer) {
             $this->person_type_id = $this->buyer->shopPersonType->id;
         }
     }
@@ -175,17 +171,32 @@ class ShopFuser extends Core implements \JsonSerializable
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'user_id', 'person_type_id', 'site_id', 'store_id'], 'integer'],
+            [
+                [
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'user_id',
+                    'person_type_id',
+                    'site_id',
+                    'store_id'
+                ],
+                'integer'
+            ],
             [['additional'], 'string'],
             [['discount_coupons'], 'safe'],
             [['delivery_id'], 'integer'],
             [['user_id'], 'unique'],
             [['buyer_id'], 'integer'],
             [['pay_system_id'], 'integer'],
-            [['person_type_id'], 'default', 'value' => function(ShopFuser $model)
-            {
-                return ($model->buyer && $model->buyer->shopPersonType) ? $model->buyer->shopPersonType->id : null;
-            }],
+            [
+                ['person_type_id'],
+                'default',
+                'value' => function (ShopFuser $model) {
+                    return ($model->buyer && $model->buyer->shopPersonType) ? $model->buyer->shopPersonType->id : null;
+                }
+            ],
             [['pay_system_id', 'buyer_id', 'site_id', 'user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
 
         ]);
@@ -209,11 +220,15 @@ class ShopFuser extends Core implements \JsonSerializable
     public function jsonSerialize()
     {
         return ArrayHelper::merge($this->toArray([], $this->extraFields()), [
-            'money'                     => ArrayHelper::merge($this->money->jsonSerialize(), ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
-            'moneyDelivery'             => ArrayHelper::merge($this->moneyDelivery->jsonSerialize(), ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDelivery)]),
-            'moneyDiscount'             => ArrayHelper::merge($this->moneyDiscount->jsonSerialize(), ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDiscount)]),
-            'moneyOriginal'             => ArrayHelper::merge($this->moneyOriginal->jsonSerialize(), ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyOriginal)]),
-            'moneyVat'                  => ArrayHelper::merge($this->moneyVat->jsonSerialize(), [
+            'money' => ArrayHelper::merge($this->money->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
+            'moneyDelivery' => ArrayHelper::merge($this->moneyDelivery->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDelivery)]),
+            'moneyDiscount' => ArrayHelper::merge($this->moneyDiscount->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDiscount)]),
+            'moneyOriginal' => ArrayHelper::merge($this->moneyOriginal->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyOriginal)]),
+            'moneyVat' => ArrayHelper::merge($this->moneyVat->jsonSerialize(), [
                 'convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyVat)
             ]),
         ]);
@@ -236,8 +251,7 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $shopFuser = static::find()->where(['user_id' => $cmsUser->id])->one();
 
-        if (!$shopFuser)
-        {
+        if (!$shopFuser) {
             $shopFuser = new static();
             $shopFuser->user_id = $cmsUser->id;
 
@@ -320,8 +334,7 @@ class ShopFuser extends Core implements \JsonSerializable
      */
     public function getDiscountCoupons()
     {
-        if (!$this->discount_coupons)
-        {
+        if (!$this->discount_coupons) {
             return [];
         }
 
@@ -340,17 +353,14 @@ class ShopFuser extends Core implements \JsonSerializable
         /**
          * @var $currentBasket ShopBasket
          */
-        foreach ($baskets as $basket)
-        {
+        foreach ($baskets as $basket) {
             //Если в корзине которую необходимо добавить продукт такой же который уже есть у текущего пользователя, то нужно обновить количество.
-            if ($currentBasket = $this->getShopBaskets()->andWhere(['product_id' => $basket->product_id])->one())
-            {
+            if ($currentBasket = $this->getShopBaskets()->andWhere(['product_id' => $basket->product_id])->one()) {
                 $currentBasket->quantity = $currentBasket->quantity + $basket->quantity;
                 $currentBasket->save();
 
                 $basket->delete();
-            } else
-            {
+            } else {
                 $basket->fuser_id = $this->id;
                 $basket->save();
             }
@@ -360,11 +370,7 @@ class ShopFuser extends Core implements \JsonSerializable
     }
 
 
-
-
-
-
-     /**
+    /**
      * Количество позиций в корзине
      *
      * @return int
@@ -381,14 +387,12 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $result = 0;
 
-        if ($this->shopBaskets)
-        {
-            foreach ($this->shopBaskets as $shopBasket)
-            {
+        if ($this->shopBaskets) {
+            foreach ($this->shopBaskets as $shopBasket) {
                 $result = $shopBasket->quantity + $result;
             }
         }
-        return (float) $result;
+        return (float)$result;
     }
 
     /**
@@ -401,13 +405,11 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $money = \Yii::$app->money->newMoney();
 
-        foreach ($this->shopBaskets as $shopBasket)
-        {
+        foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->money->multiply($shopBasket->quantity));
         }
 
-        if ($this->moneyDelivery)
-        {
+        if ($this->moneyDelivery) {
             $money = $money->add($this->moneyDelivery);
         }
 
@@ -424,8 +426,7 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $money = \Yii::$app->money->newMoney();
 
-        foreach ($this->shopBaskets as $shopBasket)
-        {
+        foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->moneyOriginal->multiply($shopBasket->quantity));
         }
 
@@ -440,8 +441,7 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $result = 0;
 
-        foreach ($this->shopBaskets as $shopBasket)
-        {
+        foreach ($this->shopBaskets as $shopBasket) {
             $result = $result + ($shopBasket->weight * $shopBasket->quantity);
         }
 
@@ -458,8 +458,7 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $money = \Yii::$app->money->newMoney();
 
-        foreach ($this->shopBaskets as $shopBasket)
-        {
+        foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->moneyVat->multiply($shopBasket->quantity));
         }
 
@@ -475,8 +474,7 @@ class ShopFuser extends Core implements \JsonSerializable
     public function getMoneyDiscount()
     {
         $money = \Yii::$app->money->newMoney();
-        foreach ($this->shopBaskets as $shopBasket)
-        {
+        foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->moneyDiscount->multiply($shopBasket->quantity));
         }
         return $money;
@@ -490,8 +488,7 @@ class ShopFuser extends Core implements \JsonSerializable
      */
     public function getMoneyDelivery()
     {
-        if ($this->delivery)
-        {
+        if ($this->delivery) {
             return $this->delivery->money;
         }
 
@@ -499,15 +496,12 @@ class ShopFuser extends Core implements \JsonSerializable
     }
 
 
-
-
-
     /**
      * @return bool
      */
     public function isEmpty()
     {
-        return (bool) $this->countShopBaskets == 0;
+        return (bool)$this->countShopBaskets == 0;
     }
 
     /**
@@ -519,7 +513,6 @@ class ShopFuser extends Core implements \JsonSerializable
     }
 
 
-
     /**
      * Возможные опции для выбора покупателя
      * @return array
@@ -528,17 +521,16 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $result = [];
 
-        if (\Yii::$app->shop->shopPersonTypes)
-        {
-            foreach (\Yii::$app->shop->shopPersonTypes as $shopPersonType)
-            {
+        if (\Yii::$app->shop->shopPersonTypes) {
+            foreach (\Yii::$app->shop->shopPersonTypes as $shopPersonType) {
                 $result[$shopPersonType->name] = [
-                    'shopPersonType-' . $shopPersonType->id => " + " .\Yii::t('skeeks/shop/app', 'New profile'). " ({$shopPersonType->name})"
+                    'shopPersonType-' . $shopPersonType->id => " + " . \Yii::t('skeeks/shop/app',
+                            'New profile') . " ({$shopPersonType->name})"
                 ];
 
-                if ($existsBuyers = $this->getShopBuyers()->andWhere(['shop_person_type_id' => $shopPersonType->id])->all())
-                {
-                    $result[$shopPersonType->name] = ArrayHelper::merge($result[$shopPersonType->name], ArrayHelper::map($existsBuyers, 'id', 'name'));
+                if ($existsBuyers = $this->getShopBuyers()->andWhere(['shop_person_type_id' => $shopPersonType->id])->all()) {
+                    $result[$shopPersonType->name] = ArrayHelper::merge($result[$shopPersonType->name],
+                        ArrayHelper::map($existsBuyers, 'id', 'name'));
                 }
             }
         }
@@ -554,8 +546,7 @@ class ShopFuser extends Core implements \JsonSerializable
      */
     public function getPaySystems()
     {
-        if (!$this->personType)
-        {
+        if (!$this->personType) {
             $query = ShopPaySystem::find()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
             $query->multiple = true;
 
@@ -576,10 +567,8 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $result = [];
 
-        foreach (\Yii::$app->shop->shopTypePrices as $typePrice)
-        {
-            if (\Yii::$app->authManager->checkAccess($this->user->id, $typePrice->viewPermissionName))
-            {
+        foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
+            if (\Yii::$app->authManager->checkAccess($this->user->id, $typePrice->viewPermissionName)) {
                 $result[$typePrice->id] = $typePrice;
             }
         }
@@ -597,10 +586,9 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         $result = [];
 
-        foreach (\Yii::$app->shop->shopTypePrices as $typePrice)
-        {
-            if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null, $typePrice->buyPermissionName))
-            {
+        foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
+            if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null,
+                $typePrice->buyPermissionName)) {
                 $result[$typePrice->id] = $typePrice;
             }
         }
@@ -614,10 +602,8 @@ class ShopFuser extends Core implements \JsonSerializable
      */
     public function recalculate()
     {
-        if ($this->shopBaskets)
-        {
-            foreach ($this->shopBaskets as $shopBasket)
-            {
+        if ($this->shopBaskets) {
+            foreach ($this->shopBaskets as $shopBasket) {
                 $shopBasket->recalculate()->save();
             }
         }

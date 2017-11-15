@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.08.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
@@ -53,13 +54,13 @@ class ShopExtra extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
-            'value'         => \Yii::t('skeeks/shop/app', 'Value'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'value' => \Yii::t('skeeks/shop/app', 'Value'),
         ]);
     }
 }

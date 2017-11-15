@@ -5,7 +5,9 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 22.09.2015
  */
+
 namespace skeeks\cms\shop\widgets;
+
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\shop\assets\ShopAsset;
 use yii\base\Widget;
@@ -34,12 +36,12 @@ class ShopGlobalWidget extends Widget
     public function baseClientOptions()
     {
         return [
-            'backend-add-product'               => UrlHelper::construct('shop/cart/add-product')->toString(),
-            'backend-remove-basket'             => UrlHelper::construct('shop/cart/remove-basket')->toString(),
-            'backend-update-basket'             => UrlHelper::construct('shop/cart/update-basket')->toString(),
-            'backend-clear-cart'                => UrlHelper::construct('shop/cart/clear')->toString(),
-            'backend-remove-discount-coupon'    => UrlHelper::construct('shop/cart/remove-discount-coupon')->toString(),
-            'backend-add-discount-coupon'       => UrlHelper::construct('shop/cart/add-discount-coupon')->toString(),
+            'backend-add-product' => UrlHelper::construct('shop/cart/add-product')->toString(),
+            'backend-remove-basket' => UrlHelper::construct('shop/cart/remove-basket')->toString(),
+            'backend-update-basket' => UrlHelper::construct('shop/cart/update-basket')->toString(),
+            'backend-clear-cart' => UrlHelper::construct('shop/cart/clear')->toString(),
+            'backend-remove-discount-coupon' => UrlHelper::construct('shop/cart/remove-discount-coupon')->toString(),
+            'backend-add-discount-coupon' => UrlHelper::construct('shop/cart/add-discount-coupon')->toString(),
         ];
     }
 
@@ -49,10 +51,9 @@ class ShopGlobalWidget extends Widget
      */
     public function run()
     {
-        if (static::$isRegisteredAssets === false)
-        {
+        if (static::$isRegisteredAssets === false) {
             ShopAsset::register($this->getView());
-            $options = (array) $this->clientOptions;
+            $options = (array)$this->clientOptions;
             $options['cartData'] = \Yii::$app->shop->shopFuser->jsonSerialize();
 
             $options = Json::encode($options);
@@ -63,7 +64,7 @@ class ShopGlobalWidget extends Widget
         sx.Shop = new sx.classes.shop.App($options);
     })(sx, sx.$, sx._);
 JS
-);
+            );
             static::$isRegisteredAssets = true;
         }
 

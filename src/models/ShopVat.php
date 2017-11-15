@@ -5,6 +5,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 31.08.2015
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
@@ -57,15 +58,15 @@ class ShopVat extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
-            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active'        => \Yii::t('skeeks/shop/app', 'Active'),
-            'rate'          => \Yii::t('skeeks/shop/app', 'Bet'),
+            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active' => \Yii::t('skeeks/shop/app', 'Active'),
+            'rate' => \Yii::t('skeeks/shop/app', 'Bet'),
         ]);
     }
 }

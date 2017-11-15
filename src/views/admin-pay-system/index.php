@@ -16,40 +16,39 @@
 ?>
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
-    <?php echo $this->render('_search', [
-        'searchModel'   => $searchModel,
-        'dataProvider'  => $dataProvider
-    ]); ?>
+<?php echo $this->render('_search', [
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider
+]); ?>
 
-    <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider'      => $dataProvider,
-        'filterModel'       => $searchModel,
-        'adminController'   => $controller,
-        'pjax'              => $pjax,
-        'settingsData' =>
+<?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'adminController' => $controller,
+    'pjax' => $pjax,
+    'settingsData' =>
         [
-            'order'     => SORT_ASC,
-            'orderBy'   => "priority",
+            'order' => SORT_ASC,
+            'orderBy' => "priority",
         ],
-        'columns' => [
-            'name',
-            'priority',
+    'columns' => [
+        'name',
+        'priority',
 
-            [
-                'class'         => \yii\grid\DataColumn::className(),
-                'attribute'     => "personTypeIds",
-                'filter'        => false,
-                'value'         => function(\skeeks\cms\shop\models\ShopPaySystem $model)
-                {
-                    return implode(", ", \yii\helpers\ArrayHelper::map($model->personTypes, 'id', 'name'));
-                }
-            ],
-
-            [
-                'class'         => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute'     => "active"
-            ]
+        [
+            'class' => \yii\grid\DataColumn::className(),
+            'attribute' => "personTypeIds",
+            'filter' => false,
+            'value' => function (\skeeks\cms\shop\models\ShopPaySystem $model) {
+                return implode(", ", \yii\helpers\ArrayHelper::map($model->personTypes, 'id', 'name'));
+            }
         ],
-    ]); ?>
+
+        [
+            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'attribute' => "active"
+        ]
+    ],
+]); ?>
 
 <? $pjax::end(); ?>
