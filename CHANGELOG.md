@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.1-alpha7.pre
+2.0.1-alpha7
 -----------------
  * code style
  

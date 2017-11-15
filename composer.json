@@ -28,7 +28,6 @@
     },
     "extra": {
         "config-plugin": {
-            "common": "src/config/common.php",
             "web": [
                 "src/config/common.php",
                 "src/config/web.php"
