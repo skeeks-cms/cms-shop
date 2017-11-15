@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.1-alpha6.pre
+2.0.1-alpha6
 -----------------
  * Update agents
  * Optimization of filters
