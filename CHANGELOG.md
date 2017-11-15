@@ -3,6 +3,7 @@ Changelog
 
 2.0.1-alpha6.pre
 -----------------
+ * Update agents
  * Optimization of filters
  * Fixed filters
  

@@ -7,10 +7,9 @@
  */
 return [
 
-    'modules' =>
-    [
+    'modules' => [
         'shop' => [
-            'controllerNamespace'   => 'skeeks\cms\shop\console\controllers'
+            'controllerNamespace' => 'skeeks\cms\shop\console\controllers'
         ]
     ]
 ];
