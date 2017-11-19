@@ -38,15 +38,13 @@ class m150901_180601_create_table__shop_extra extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_extra}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_extra}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_extra}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_extra}}', 'updated_at');
+        $this->createIndex('shop_extra__updated_by', '{{%shop_extra}}', 'updated_by');
+        $this->createIndex('shop_extra__created_by', '{{%shop_extra}}', 'created_by');
+        $this->createIndex('shop_extra__created_at', '{{%shop_extra}}', 'created_at');
+        $this->createIndex('shop_extra__updated_at', '{{%shop_extra}}', 'updated_at');
 
-        $this->createIndex('name', '{{%shop_extra}}', 'name');
-        $this->createIndex('value', '{{%shop_extra}}', 'value');
-
-        $this->execute("ALTER TABLE {{%shop_extra}} COMMENT = 'Наценки';");
+        $this->createIndex('shop_extra__name', '{{%shop_extra}}', 'name');
+        $this->createIndex('shop_extra__value', '{{%shop_extra}}', 'value');
 
         $this->addForeignKey(
             'shop_extra_created_by', "{{%shop_extra}}",

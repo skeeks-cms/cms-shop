@@ -43,16 +43,14 @@ class m150828_110559_create_table__shop_order_status extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_order_status}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_order_status}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_order_status}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_order_status}}', 'updated_at');
+        $this->createIndex('shop_order_status__updated_by', '{{%shop_order_status}}', 'updated_by');
+        $this->createIndex('shop_order_status__created_by', '{{%shop_order_status}}', 'created_by');
+        $this->createIndex('shop_order_status__created_at', '{{%shop_order_status}}', 'created_at');
+        $this->createIndex('shop_order_status__updated_at', '{{%shop_order_status}}', 'updated_at');
 
-        $this->createIndex('name', '{{%shop_order_status}}', 'name');
-        $this->createIndex('priority', '{{%shop_order_status}}', 'priority');
-        $this->createIndex('color', '{{%shop_order_status}}', 'color');
-
-        $this->execute("ALTER TABLE {{%shop_order_status}} COMMENT = 'Статусы заказов';");
+        $this->createIndex('shop_order_status__name', '{{%shop_order_status}}', 'name');
+        $this->createIndex('shop_order_status__priority', '{{%shop_order_status}}', 'priority');
+        $this->createIndex('shop_order_status__color', '{{%shop_order_status}}', 'color');
 
         $this->addForeignKey(
             'shop_order_status_created_by', "{{%shop_order_status}}",

@@ -42,14 +42,14 @@ class m150915_100601_create_table__shop_content extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_content}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_content}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_content}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_content}}', 'updated_at');
+        $this->createIndex('shop_content__updated_by', '{{%shop_content}}', 'updated_by');
+        $this->createIndex('shop_content__created_by', '{{%shop_content}}', 'created_by');
+        $this->createIndex('shop_content__created_at', '{{%shop_content}}', 'created_at');
+        $this->createIndex('shop_content__updated_at', '{{%shop_content}}', 'updated_at');
 
 
-        $this->createIndex('yandex_export', '{{%shop_content}}', 'yandex_export');
-        $this->createIndex('subscription', '{{%shop_content}}', 'subscription');
+        $this->createIndex('shop_content__yandex_export', '{{%shop_content}}', 'yandex_export');
+        $this->createIndex('shop_content__subscription', '{{%shop_content}}', 'subscription');
 
         $this->execute("ALTER TABLE {{%shop_content}} COMMENT = 'Связь контента с магазином';");
 

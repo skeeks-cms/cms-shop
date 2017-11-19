@@ -36,12 +36,10 @@ class m150828_100558_create_table__shop_fuser extends Migration
 
         ], $tableOptions);
 
-        $this->createIndex('updated_by', '{{%shop_fuser}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_fuser}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_fuser}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_fuser}}', 'updated_at');
-
-        $this->execute("ALTER TABLE {{%shop_fuser}} COMMENT = 'Пользователи для корзины';");
+        $this->createIndex('shop_fuser__updated_by', '{{%shop_fuser}}', 'updated_by');
+        $this->createIndex('shop_fuser__created_by', '{{%shop_fuser}}', 'created_by');
+        $this->createIndex('shop_fuser__created_at', '{{%shop_fuser}}', 'created_at');
+        $this->createIndex('shop_fuser__updated_at', '{{%shop_fuser}}', 'updated_at');
 
         $this->addForeignKey(
             'shop_fuser_created_by', "{{%shop_fuser}}",

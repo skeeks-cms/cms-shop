@@ -45,17 +45,17 @@ class m150914_190601_create_table__shop_product_price extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_product_price}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_product_price}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_product_price}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_product_price}}', 'updated_at');
+        $this->createIndex('shop_product_price__updated_by', '{{%shop_product_price}}', 'updated_by');
+        $this->createIndex('shop_product_price__created_by', '{{%shop_product_price}}', 'created_by');
+        $this->createIndex('shop_product_price__created_at', '{{%shop_product_price}}', 'created_at');
+        $this->createIndex('shop_product_price__updated_at', '{{%shop_product_price}}', 'updated_at');
 
 
-        $this->createIndex('price', '{{%shop_product_price}}', 'price');
-        $this->createIndex('currency_code', '{{%shop_product_price}}', 'currency_code');
-        $this->createIndex('quantity_from', '{{%shop_product_price}}', 'quantity_from');
-        $this->createIndex('quantity_to', '{{%shop_product_price}}', 'quantity_to');
-        $this->createIndex('tmp_id', '{{%shop_product_price}}', 'tmp_id');
+        $this->createIndex('shop_product_price__price', '{{%shop_product_price}}', 'price');
+        $this->createIndex('shop_product_price__currency_code', '{{%shop_product_price}}', 'currency_code');
+        $this->createIndex('shop_product_price__quantity_from', '{{%shop_product_price}}', 'quantity_from');
+        $this->createIndex('shop_product_price__quantity_to', '{{%shop_product_price}}', 'quantity_to');
+        $this->createIndex('shop_product_price__tmp_id', '{{%shop_product_price}}', 'tmp_id');
 
 
         $this->execute("ALTER TABLE {{%shop_product_price}} COMMENT = 'Цены товаров';");

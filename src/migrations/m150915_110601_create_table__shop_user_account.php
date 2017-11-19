@@ -44,16 +44,16 @@ class m150915_110601_create_table__shop_user_account extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_user_account}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_user_account}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_user_account}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_user_account}}', 'updated_at');
+        $this->createIndex('shop_user_account__updated_by', '{{%shop_user_account}}', 'updated_by');
+        $this->createIndex('shop_user_account__created_by', '{{%shop_user_account}}', 'created_by');
+        $this->createIndex('shop_user_account__created_at', '{{%shop_user_account}}', 'created_at');
+        $this->createIndex('shop_user_account__updated_at', '{{%shop_user_account}}', 'updated_at');
 
 
-        $this->createIndex('current_budget', '{{%shop_user_account}}', 'current_budget');
-        $this->createIndex('locked', '{{%shop_user_account}}', 'locked');
-        $this->createIndex('locked_at', '{{%shop_user_account}}', 'locked_at');
-        $this->createIndex('currency_user', '{{%shop_user_account}}', ['currency_code', 'user_id'], true);
+        $this->createIndex('shop_user_account__current_budget', '{{%shop_user_account}}', 'current_budget');
+        $this->createIndex('shop_user_account__locked', '{{%shop_user_account}}', 'locked');
+        $this->createIndex('shop_user_account__locked_at', '{{%shop_user_account}}', 'locked_at');
+        $this->createIndex('shop_user_account__currency_user', '{{%shop_user_account}}', ['currency_code', 'user_id'], true);
 
         $this->execute("ALTER TABLE {{%shop_user_account}} COMMENT = 'Счета покупателей';");
 

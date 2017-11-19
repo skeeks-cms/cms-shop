@@ -39,15 +39,13 @@ class m150828_130601_create_table__shop_person_type extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_person_type}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_person_type}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_person_type}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_person_type}}', 'updated_at');
+        $this->createIndex('shop_person_type__updated_by', '{{%shop_person_type}}', 'updated_by');
+        $this->createIndex('shop_person_type__created_by', '{{%shop_person_type}}', 'created_by');
+        $this->createIndex('shop_person_type__created_at', '{{%shop_person_type}}', 'created_at');
+        $this->createIndex('shop_person_type__updated_at', '{{%shop_person_type}}', 'updated_at');
 
-        $this->createIndex('priority', '{{%shop_person_type}}', 'priority');
-        $this->createIndex('active', '{{%shop_person_type}}', 'active');
-
-        $this->execute("ALTER TABLE {{%shop_person_type}} COMMENT = 'Типы плательщиков';");
+        $this->createIndex('shop_person_type__priority', '{{%shop_person_type}}', 'priority');
+        $this->createIndex('shop_person_type__active', '{{%shop_person_type}}', 'active');
 
         $this->addForeignKey(
             'shop_person_type_created_by', "{{%shop_person_type}}",

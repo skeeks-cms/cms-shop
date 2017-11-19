@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1-alpha8
+-----------------
+ * Pgsql support
+ 
 2.0.1-alpha7
 -----------------
  * code style

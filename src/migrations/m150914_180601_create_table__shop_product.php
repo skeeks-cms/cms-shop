@@ -73,33 +73,33 @@ class m150914_180601_create_table__shop_product extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_product}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_product}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_product}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_product}}', 'updated_at');
+        $this->createIndex('shop_product__updated_by', '{{%shop_product}}', 'updated_by');
+        $this->createIndex('shop_product__created_by', '{{%shop_product}}', 'created_by');
+        $this->createIndex('shop_product__created_at', '{{%shop_product}}', 'created_at');
+        $this->createIndex('shop_product__updated_at', '{{%shop_product}}', 'updated_at');
 
 
-        $this->createIndex('quantity', '{{%shop_product}}', 'quantity');
-        $this->createIndex('quantity_trace', '{{%shop_product}}', 'quantity_trace');
-        $this->createIndex('weight', '{{%shop_product}}', 'weight');
-        $this->createIndex('price_type', '{{%shop_product}}', 'price_type');
-        $this->createIndex('recur_scheme_length', '{{%shop_product}}', 'recur_scheme_length');
-        $this->createIndex('recur_scheme_type', '{{%shop_product}}', 'recur_scheme_type');
-        $this->createIndex('select_best_price', '{{%shop_product}}', 'select_best_price');
-        $this->createIndex('vat_included', '{{%shop_product}}', 'vat_included');
-        $this->createIndex('tmp_id', '{{%shop_product}}', 'tmp_id');
-        $this->createIndex('can_buy_zero', '{{%shop_product}}', 'can_buy_zero');
-        $this->createIndex('negative_amount_trace', '{{%shop_product}}', 'negative_amount_trace');
-        $this->createIndex('barcode_multi', '{{%shop_product}}', 'barcode_multi');
-        $this->createIndex('purchasing_price', '{{%shop_product}}', 'purchasing_price');
-        $this->createIndex('purchasing_currency', '{{%shop_product}}', 'purchasing_currency');
-        $this->createIndex('quantity_reserved', '{{%shop_product}}', 'quantity_reserved');
-        $this->createIndex('measure_id', '{{%shop_product}}', 'measure_id');
-        $this->createIndex('width', '{{%shop_product}}', 'width');
-        $this->createIndex('length', '{{%shop_product}}', 'length');
-        $this->createIndex('height', '{{%shop_product}}', 'height');
-        $this->createIndex('subscribe', '{{%shop_product}}', 'subscribe');
-        $this->createIndex('measure_ratio', '{{%shop_product}}', 'measure_ratio');
+        $this->createIndex('shop_product__quantity', '{{%shop_product}}', 'quantity');
+        $this->createIndex('shop_product__quantity_trace', '{{%shop_product}}', 'quantity_trace');
+        $this->createIndex('shop_product__weight', '{{%shop_product}}', 'weight');
+        $this->createIndex('shop_product__price_type', '{{%shop_product}}', 'price_type');
+        $this->createIndex('shop_product__recur_scheme_length', '{{%shop_product}}', 'recur_scheme_length');
+        $this->createIndex('shop_product__recur_scheme_type', '{{%shop_product}}', 'recur_scheme_type');
+        $this->createIndex('shop_product__select_best_price', '{{%shop_product}}', 'select_best_price');
+        $this->createIndex('shop_product__vat_included', '{{%shop_product}}', 'vat_included');
+        $this->createIndex('shop_product__tmp_id', '{{%shop_product}}', 'tmp_id');
+        $this->createIndex('shop_product__can_buy_zero', '{{%shop_product}}', 'can_buy_zero');
+        $this->createIndex('shop_product__negative_amount_trace', '{{%shop_product}}', 'negative_amount_trace');
+        $this->createIndex('shop_product__barcode_multi', '{{%shop_product}}', 'barcode_multi');
+        $this->createIndex('shop_product__purchasing_price', '{{%shop_product}}', 'purchasing_price');
+        $this->createIndex('shop_product__purchasing_currency', '{{%shop_product}}', 'purchasing_currency');
+        $this->createIndex('shop_product__quantity_reserved', '{{%shop_product}}', 'quantity_reserved');
+        $this->createIndex('shop_product__measure_id', '{{%shop_product}}', 'measure_id');
+        $this->createIndex('shop_product__width', '{{%shop_product}}', 'width');
+        $this->createIndex('shop_product__length', '{{%shop_product}}', 'length');
+        $this->createIndex('shop_product__height', '{{%shop_product}}', 'height');
+        $this->createIndex('shop_product__subscribe', '{{%shop_product}}', 'subscribe');
+        $this->createIndex('shop_product__measure_ratio', '{{%shop_product}}', 'measure_ratio');
 
 
         $this->execute("ALTER TABLE {{%shop_product}} COMMENT = 'Товары';");

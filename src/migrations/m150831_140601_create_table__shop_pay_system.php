@@ -41,15 +41,13 @@ class m150831_140601_create_table__shop_pay_system extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_pay_system}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_pay_system}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_pay_system}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_pay_system}}', 'updated_at');
+        $this->createIndex('shop_pay_system__updated_by', '{{%shop_pay_system}}', 'updated_by');
+        $this->createIndex('shop_pay_system__created_by', '{{%shop_pay_system}}', 'created_by');
+        $this->createIndex('shop_pay_system__created_at', '{{%shop_pay_system}}', 'created_at');
+        $this->createIndex('shop_pay_system__updated_at', '{{%shop_pay_system}}', 'updated_at');
 
-        $this->createIndex('priority', '{{%shop_pay_system}}', 'priority');
-        $this->createIndex('active', '{{%shop_pay_system}}', 'active');
-
-        $this->execute("ALTER TABLE {{%shop_pay_system}} COMMENT = 'Платежные системы';");
+        $this->createIndex('shop_pay_system__priority', '{{%shop_pay_system}}', 'priority');
+        $this->createIndex('shop_pay_system__active', '{{%shop_pay_system}}', 'active');
 
         $this->addForeignKey(
             'shop_pay_system_created_by', "{{%shop_pay_system}}",

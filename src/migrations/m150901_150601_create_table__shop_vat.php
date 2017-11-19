@@ -41,17 +41,15 @@ class m150901_150601_create_table__shop_vat extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_vat}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_vat}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_vat}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_vat}}', 'updated_at');
+        $this->createIndex('shop_vat__updated_by', '{{%shop_vat}}', 'updated_by');
+        $this->createIndex('shop_vat__created_by', '{{%shop_vat}}', 'created_by');
+        $this->createIndex('shop_vat__created_at', '{{%shop_vat}}', 'created_at');
+        $this->createIndex('shop_vat__updated_at', '{{%shop_vat}}', 'updated_at');
 
-        $this->createIndex('priority', '{{%shop_vat}}', 'priority');
-        $this->createIndex('active', '{{%shop_vat}}', 'active');
-        $this->createIndex('name', '{{%shop_vat}}', 'name');
-        $this->createIndex('rate', '{{%shop_vat}}', 'rate');
-
-        $this->execute("ALTER TABLE {{%shop_vat}} COMMENT = 'Ставки НДС';");
+        $this->createIndex('shop_vat__priority', '{{%shop_vat}}', 'priority');
+        $this->createIndex('shop_vat__active', '{{%shop_vat}}', 'active');
+        $this->createIndex('shop_vat__name', '{{%shop_vat}}', 'name');
+        $this->createIndex('shop_vat__rate', '{{%shop_vat}}', 'rate');
 
         $this->addForeignKey(
             'shop_vat_created_by', "{{%shop_vat}}",

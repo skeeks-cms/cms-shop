@@ -44,17 +44,15 @@ class m150828_120559_create_table__shop_typ_price extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_type_price}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_type_price}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_type_price}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_type_price}}', 'updated_at');
+        $this->createIndex('shop_type_price__updated_by', '{{%shop_type_price}}', 'updated_by');
+        $this->createIndex('shop_type_price__created_by', '{{%shop_type_price}}', 'created_by');
+        $this->createIndex('shop_type_price__created_at', '{{%shop_type_price}}', 'created_at');
+        $this->createIndex('shop_type_price__updated_at', '{{%shop_type_price}}', 'updated_at');
 
-        $this->createIndex('name', '{{%shop_type_price}}', 'name');
-        $this->createIndex('priority', '{{%shop_type_price}}', 'priority');
-        $this->createIndex('def', '{{%shop_type_price}}', 'def');
-        $this->createIndex('xml_id', '{{%shop_type_price}}', 'xml_id');
-
-        $this->execute("ALTER TABLE {{%shop_type_price}} COMMENT = 'Типы цен';");
+        $this->createIndex('shop_type_price__name', '{{%shop_type_price}}', 'name');
+        $this->createIndex('shop_type_price__priority', '{{%shop_type_price}}', 'priority');
+        $this->createIndex('shop_type_price__def', '{{%shop_type_price}}', 'def');
+        $this->createIndex('shop_type_price__xml_id', '{{%shop_type_price}}', 'xml_id');
 
         $this->addForeignKey(
             'shop_type_price_created_by', "{{%shop_type_price}}",

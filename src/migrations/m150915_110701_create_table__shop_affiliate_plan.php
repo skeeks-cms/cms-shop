@@ -49,21 +49,21 @@ class m150915_110701_create_table__shop_affiliate_plan extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_affiliate_plan}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_affiliate_plan}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_affiliate_plan}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_affiliate_plan}}', 'updated_at');
+        $this->createIndex('shop_affiliate_plan__updated_by', '{{%shop_affiliate_plan}}', 'updated_by');
+        $this->createIndex('shop_affiliate_plan__created_by', '{{%shop_affiliate_plan}}', 'created_by');
+        $this->createIndex('shop_affiliate_plan__created_at', '{{%shop_affiliate_plan}}', 'created_at');
+        $this->createIndex('shop_affiliate_plan__updated_at', '{{%shop_affiliate_plan}}', 'updated_at');
 
 
-        $this->createIndex('name', '{{%shop_affiliate_plan}}', 'name');
-        $this->createIndex('active', '{{%shop_affiliate_plan}}', 'active');
-        $this->createIndex('base_rate', '{{%shop_affiliate_plan}}', 'base_rate');
-        $this->createIndex('base_rate_type', '{{%shop_affiliate_plan}}', ['base_rate_type']);
-        $this->createIndex('min_pay', '{{%shop_affiliate_plan}}', ['min_pay']);
-        $this->createIndex('min_plan_value', '{{%shop_affiliate_plan}}', ['min_plan_value']);
-        $this->createIndex('site_code', '{{%shop_affiliate_plan}}', ['site_code']);
-        $this->createIndex('base_rate_currency_code', '{{%shop_affiliate_plan}}', ['base_rate_currency_code']);
-        $this->createIndex('value_currency_code', '{{%shop_affiliate_plan}}', ['value_currency_code']);
+        $this->createIndex('shop_affiliate_plan__name', '{{%shop_affiliate_plan}}', 'name');
+        $this->createIndex('shop_affiliate_plan__active', '{{%shop_affiliate_plan}}', 'active');
+        $this->createIndex('shop_affiliate_plan__base_rate', '{{%shop_affiliate_plan}}', 'base_rate');
+        $this->createIndex('shop_affiliate_plan__base_rate_type', '{{%shop_affiliate_plan}}', ['base_rate_type']);
+        $this->createIndex('shop_affiliate_plan__min_pay', '{{%shop_affiliate_plan}}', ['min_pay']);
+        $this->createIndex('shop_affiliate_plan__min_plan_value', '{{%shop_affiliate_plan}}', ['min_plan_value']);
+        $this->createIndex('shop_affiliate_plan__site_code', '{{%shop_affiliate_plan}}', ['site_code']);
+        $this->createIndex('shop_affiliate_plan__base_rate_currency_code', '{{%shop_affiliate_plan}}', ['base_rate_currency_code']);
+        $this->createIndex('shop_affiliate_plan__value_currency_code', '{{%shop_affiliate_plan}}', ['value_currency_code']);
 
         $this->execute("ALTER TABLE {{%shop_affiliate_plan}} COMMENT = 'Планы для аффилиатов';");
 

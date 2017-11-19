@@ -31,10 +31,7 @@ class m150831_130601_create_table__shop_person_type_site extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('site_code__person_type_id', '{{%shop_person_type_site}}', ['person_type_id', 'site_code'],
-            true);
-
-        $this->execute("ALTER TABLE {{%shop_person_type_site}} COMMENT = 'Связь плательщиков с сайтами';");
+        $this->createIndex('site_code__person_type_id', '{{%shop_person_type_site}}', ['person_type_id', 'site_code'], true);
 
         $this->addForeignKey(
             'shop_person_type_site_person_type_id', "{{%shop_person_type_site}}",

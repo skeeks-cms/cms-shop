@@ -43,17 +43,17 @@ class m150915_110901_create_table__shop_affiliate_tier extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_affiliate_tier}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_affiliate_tier}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_affiliate_tier}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_affiliate_tier}}', 'updated_at');
+        $this->createIndex('shop_affiliate_tier__updated_by', '{{%shop_affiliate_tier}}', 'updated_by');
+        $this->createIndex('shop_affiliate_tier__created_by', '{{%shop_affiliate_tier}}', 'created_by');
+        $this->createIndex('shop_affiliate_tier__created_at', '{{%shop_affiliate_tier}}', 'created_at');
+        $this->createIndex('shop_affiliate_tier__updated_at', '{{%shop_affiliate_tier}}', 'updated_at');
 
 
-        $this->createIndex('rate1', '{{%shop_affiliate_tier}}', 'rate1');
-        $this->createIndex('rate2', '{{%shop_affiliate_tier}}', 'rate2');
-        $this->createIndex('rate3', '{{%shop_affiliate_tier}}', ['rate3']);
-        $this->createIndex('rate4', '{{%shop_affiliate_tier}}', ['rate4']);
-        $this->createIndex('rate5', '{{%shop_affiliate_tier}}', ['rate5']);
+        $this->createIndex('shop_affiliate_tier__rate1', '{{%shop_affiliate_tier}}', 'rate1');
+        $this->createIndex('shop_affiliate_tier__rate2', '{{%shop_affiliate_tier}}', 'rate2');
+        $this->createIndex('shop_affiliate_tier__rate3', '{{%shop_affiliate_tier}}', ['rate3']);
+        $this->createIndex('shop_affiliate_tier__rate4', '{{%shop_affiliate_tier}}', ['rate4']);
+        $this->createIndex('shop_affiliate_tier__rate5', '{{%shop_affiliate_tier}}', ['rate5']);
 
         $this->execute("ALTER TABLE {{%shop_affiliate_tier}} COMMENT = 'Пирамиды аффилиатов';");
 

@@ -51,22 +51,20 @@ class m150910_170601_create_table__kladr_location extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%kladr_location}}', 'updated_by');
-        $this->createIndex('created_by', '{{%kladr_location}}', 'created_by');
-        $this->createIndex('created_at', '{{%kladr_location}}', 'created_at');
-        $this->createIndex('updated_at', '{{%kladr_location}}', 'updated_at');
+        $this->createIndex('kladr_location__updated_by', '{{%kladr_location}}', 'updated_by');
+        $this->createIndex('kladr_location__created_by', '{{%kladr_location}}', 'created_by');
+        $this->createIndex('kladr_location__created_at', '{{%kladr_location}}', 'created_at');
+        $this->createIndex('kladr_location__updated_at', '{{%kladr_location}}', 'updated_at');
 
-        $this->createIndex('name', '{{%kladr_location}}', 'name');
-        $this->createIndex('name_short', '{{%kladr_location}}', 'name_short');
-        $this->createIndex('name_full', '{{%kladr_location}}', 'name_full');
-        $this->createIndex('zip', '{{%kladr_location}}', 'zip');
-        $this->createIndex('okato', '{{%kladr_location}}', 'okato');
-        $this->createIndex('type', '{{%kladr_location}}', 'type');
-        $this->createIndex('active', '{{%kladr_location}}', 'active');
+        $this->createIndex('kladr_location__name', '{{%kladr_location}}', 'name');
+        $this->createIndex('kladr_location__name_short', '{{%kladr_location}}', 'name_short');
+        $this->createIndex('kladr_location__name_full', '{{%kladr_location}}', 'name_full');
+        $this->createIndex('kladr_location__zip', '{{%kladr_location}}', 'zip');
+        $this->createIndex('kladr_location__okato', '{{%kladr_location}}', 'okato');
+        $this->createIndex('kladr_location__type', '{{%kladr_location}}', 'type');
+        $this->createIndex('kladr_location__active', '{{%kladr_location}}', 'active');
 
-        $this->createIndex('parent_sort', '{{%kladr_location}}', ['parent_id', 'sort']);
-
-        $this->execute("ALTER TABLE {{%kladr_location}} COMMENT = 'База адресов';");
+        $this->createIndex('kladr_location__parent_sort', '{{%kladr_location}}', ['parent_id', 'sort']);
 
         $this->addForeignKey(
             'kladr_location_created_by', "{{%kladr_location}}",

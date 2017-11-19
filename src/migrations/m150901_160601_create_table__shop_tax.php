@@ -41,16 +41,14 @@ class m150901_160601_create_table__shop_tax extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_tax}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_tax}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_tax}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_tax}}', 'updated_at');
+        $this->createIndex('shop_tax__updated_by', '{{%shop_tax}}', 'updated_by');
+        $this->createIndex('shop_tax__created_by', '{{%shop_tax}}', 'created_by');
+        $this->createIndex('shop_tax__created_at', '{{%shop_tax}}', 'created_at');
+        $this->createIndex('shop_tax__updated_at', '{{%shop_tax}}', 'updated_at');
 
-        $this->createIndex('name', '{{%shop_tax}}', 'name');
-        $this->createIndex('code', '{{%shop_tax}}', 'code');
-        $this->createIndex('site_code', '{{%shop_tax}}', 'site_code');
-
-        $this->execute("ALTER TABLE {{%shop_tax}} COMMENT = 'Налоги';");
+        $this->createIndex('shop_tax__name', '{{%shop_tax}}', 'name');
+        $this->createIndex('shop_tax__code', '{{%shop_tax}}', 'code');
+        $this->createIndex('shop_tax__site_code', '{{%shop_tax}}', 'site_code');
 
         $this->addForeignKey(
             'shop_tax_created_by', "{{%shop_tax}}",

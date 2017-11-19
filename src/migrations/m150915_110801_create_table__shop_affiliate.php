@@ -55,26 +55,26 @@ class m150915_110801_create_table__shop_affiliate extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_affiliate}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_affiliate}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_affiliate}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_affiliate}}', 'updated_at');
+        $this->createIndex('shop_affiliate__updated_by', '{{%shop_affiliate}}', 'updated_by');
+        $this->createIndex('shop_affiliate__created_by', '{{%shop_affiliate}}', 'created_by');
+        $this->createIndex('shop_affiliate__created_at', '{{%shop_affiliate}}', 'created_at');
+        $this->createIndex('shop_affiliate__updated_at', '{{%shop_affiliate}}', 'updated_at');
 
-        $this->createIndex('affiliate_id', '{{%shop_affiliate}}', 'affiliate_id');
+        $this->createIndex('shop_affiliate__affiliate_id', '{{%shop_affiliate}}', 'affiliate_id');
 
 
-        $this->createIndex('site_code', '{{%shop_affiliate}}', 'site_code');
-        $this->createIndex('active', '{{%shop_affiliate}}', 'active');
-        $this->createIndex('paid_sum', '{{%shop_affiliate}}', 'paid_sum');
-        $this->createIndex('approved_sum', '{{%shop_affiliate}}', ['approved_sum']);
-        $this->createIndex('items_number', '{{%shop_affiliate}}', ['items_number']);
-        $this->createIndex('items_sum', '{{%shop_affiliate}}', ['items_sum']);
-        $this->createIndex('last_calculate_at', '{{%shop_affiliate}}', ['last_calculate_at']);
-        $this->createIndex('aff_site', '{{%shop_affiliate}}', ['aff_site']);
-        $this->createIndex('fix_plan', '{{%shop_affiliate}}', ['fix_plan']);
-        $this->createIndex('user_id', '{{%shop_affiliate}}', ['user_id']);
-        $this->createIndex('plan_id', '{{%shop_affiliate}}', ['plan_id']);
-        $this->createIndex('user_id__site_code', '{{%shop_affiliate}}', ['user_id', 'site_code'], true);
+        $this->createIndex('shop_affiliate__site_code', '{{%shop_affiliate}}', 'site_code');
+        $this->createIndex('shop_affiliate__active', '{{%shop_affiliate}}', 'active');
+        $this->createIndex('shop_affiliate__paid_sum', '{{%shop_affiliate}}', 'paid_sum');
+        $this->createIndex('shop_affiliate__approved_sum', '{{%shop_affiliate}}', ['approved_sum']);
+        $this->createIndex('shop_affiliate__items_number', '{{%shop_affiliate}}', ['items_number']);
+        $this->createIndex('shop_affiliate__items_sum', '{{%shop_affiliate}}', ['items_sum']);
+        $this->createIndex('shop_affiliate__last_calculate_at', '{{%shop_affiliate}}', ['last_calculate_at']);
+        $this->createIndex('shop_affiliate__aff_site', '{{%shop_affiliate}}', ['aff_site']);
+        $this->createIndex('shop_affiliate__fix_plan', '{{%shop_affiliate}}', ['fix_plan']);
+        $this->createIndex('shop_affiliate__user_id', '{{%shop_affiliate}}', ['user_id']);
+        $this->createIndex('shop_affiliate__plan_id', '{{%shop_affiliate}}', ['plan_id']);
+        $this->createIndex('shop_affiliate__user_id__site_code', '{{%shop_affiliate}}', ['user_id', 'site_code'], true);
 
         $this->execute("ALTER TABLE {{%shop_affiliate}} COMMENT = 'Аффилиаты';");
 

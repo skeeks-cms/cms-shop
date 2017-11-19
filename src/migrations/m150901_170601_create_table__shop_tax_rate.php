@@ -47,21 +47,19 @@ class m150901_170601_create_table__shop_tax_rate extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_tax_rate}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_tax_rate}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_tax_rate}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_tax_rate}}', 'updated_at');
+        $this->createIndex('shop_tax_rate__updated_by', '{{%shop_tax_rate}}', 'updated_by');
+        $this->createIndex('shop_tax_rate__created_by', '{{%shop_tax_rate}}', 'created_by');
+        $this->createIndex('shop_tax_rate__created_at', '{{%shop_tax_rate}}', 'created_at');
+        $this->createIndex('shop_tax_rate__updated_at', '{{%shop_tax_rate}}', 'updated_at');
 
-        $this->createIndex('tax_id', '{{%shop_tax_rate}}', 'tax_id');
-        $this->createIndex('person_type_id', '{{%shop_tax_rate}}', 'person_type_id');
-        $this->createIndex('value', '{{%shop_tax_rate}}', 'value');
-        $this->createIndex('currency', '{{%shop_tax_rate}}', 'currency');
-        $this->createIndex('is_percent', '{{%shop_tax_rate}}', 'is_percent');
-        $this->createIndex('is_in_price', '{{%shop_tax_rate}}', 'is_in_price');
-        $this->createIndex('priority', '{{%shop_tax_rate}}', 'priority');
-        $this->createIndex('active', '{{%shop_tax_rate}}', 'active');
-
-        $this->execute("ALTER TABLE {{%shop_tax_rate}} COMMENT = 'Ставки налогов';");
+        $this->createIndex('shop_tax_rate__tax_id', '{{%shop_tax_rate}}', 'tax_id');
+        $this->createIndex('shop_tax_rate__person_type_id', '{{%shop_tax_rate}}', 'person_type_id');
+        $this->createIndex('shop_tax_rate__value', '{{%shop_tax_rate}}', 'value');
+        $this->createIndex('shop_tax_rate__currency', '{{%shop_tax_rate}}', 'currency');
+        $this->createIndex('shop_tax_rate__is_percent', '{{%shop_tax_rate}}', 'is_percent');
+        $this->createIndex('shop_tax_rate__is_in_price', '{{%shop_tax_rate}}', 'is_in_price');
+        $this->createIndex('shop_tax_rate__priority', '{{%shop_tax_rate}}', 'priority');
+        $this->createIndex('shop_tax_rate__active', '{{%shop_tax_rate}}', 'active');
 
         $this->addForeignKey(
             'shop_tax_rate_created_by', "{{%shop_tax_rate}}",
