@@ -110,8 +110,6 @@ class m150925_113220_create_table__shop_person_type_property extends Migration
         $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_name);");
         $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_buyer_name);");
 
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} COMMENT = 'Свойства типов пользователей';");
-
         $this->addForeignKey(
             'shop_person_type_property_created_by', "{{%shop_person_type_property}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

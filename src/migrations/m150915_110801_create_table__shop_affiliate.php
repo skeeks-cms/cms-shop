@@ -76,8 +76,6 @@ class m150915_110801_create_table__shop_affiliate extends Migration
         $this->createIndex('shop_affiliate__plan_id', '{{%shop_affiliate}}', ['plan_id']);
         $this->createIndex('shop_affiliate__user_id__site_code', '{{%shop_affiliate}}', ['user_id', 'site_code'], true);
 
-        $this->execute("ALTER TABLE {{%shop_affiliate}} COMMENT = 'Аффилиаты';");
-
         $this->addForeignKey(
             'shop_affiliate_created_by', "{{%shop_affiliate}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

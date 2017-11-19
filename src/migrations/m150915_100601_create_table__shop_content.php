@@ -51,8 +51,6 @@ class m150915_100601_create_table__shop_content extends Migration
         $this->createIndex('shop_content__yandex_export', '{{%shop_content}}', 'yandex_export');
         $this->createIndex('shop_content__subscription', '{{%shop_content}}', 'subscription');
 
-        $this->execute("ALTER TABLE {{%shop_content}} COMMENT = 'Связь контента с магазином';");
-
         $this->addForeignKey(
             'shop_content_created_by', "{{%shop_content}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

@@ -57,9 +57,6 @@ class m150914_190601_create_table__shop_product_price extends Migration
         $this->createIndex('shop_product_price__quantity_to', '{{%shop_product_price}}', 'quantity_to');
         $this->createIndex('shop_product_price__tmp_id', '{{%shop_product_price}}', 'tmp_id');
 
-
-        $this->execute("ALTER TABLE {{%shop_product_price}} COMMENT = 'Цены товаров';");
-
         $this->addForeignKey(
             'shop_product_price_created_by', "{{%shop_product_price}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

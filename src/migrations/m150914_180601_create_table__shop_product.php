@@ -102,8 +102,6 @@ class m150914_180601_create_table__shop_product extends Migration
         $this->createIndex('shop_product__measure_ratio', '{{%shop_product}}', 'measure_ratio');
 
 
-        $this->execute("ALTER TABLE {{%shop_product}} COMMENT = 'Товары';");
-
         $this->addForeignKey(
             'shop_product_created_by', "{{%shop_product}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

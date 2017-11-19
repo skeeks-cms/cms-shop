@@ -55,8 +55,6 @@ class m150915_110601_create_table__shop_user_account extends Migration
         $this->createIndex('shop_user_account__locked_at', '{{%shop_user_account}}', 'locked_at');
         $this->createIndex('shop_user_account__currency_user', '{{%shop_user_account}}', ['currency_code', 'user_id'], true);
 
-        $this->execute("ALTER TABLE {{%shop_user_account}} COMMENT = 'Счета покупателей';");
-
         $this->addForeignKey(
             'shop_user_account_created_by', "{{%shop_user_account}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

@@ -55,8 +55,6 @@ class m150915_110901_create_table__shop_affiliate_tier extends Migration
         $this->createIndex('shop_affiliate_tier__rate4', '{{%shop_affiliate_tier}}', ['rate4']);
         $this->createIndex('shop_affiliate_tier__rate5', '{{%shop_affiliate_tier}}', ['rate5']);
 
-        $this->execute("ALTER TABLE {{%shop_affiliate_tier}} COMMENT = 'Пирамиды аффилиатов';");
-
         $this->addForeignKey(
             'shop_affiliate_tier_created_by', "{{%shop_affiliate_tier}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

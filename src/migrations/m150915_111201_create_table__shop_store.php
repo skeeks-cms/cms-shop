@@ -58,28 +58,26 @@ class m150915_111201_create_table__shop_store extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_store}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_store}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_store}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_store}}', 'updated_at');
+        $this->createIndex('shop_store__updated_by', '{{%shop_store}}', 'updated_by');
+        $this->createIndex('shop_store__created_by', '{{%shop_store}}', 'created_by');
+        $this->createIndex('shop_store__created_at', '{{%shop_store}}', 'created_at');
+        $this->createIndex('shop_store__updated_at', '{{%shop_store}}', 'updated_at');
 
 
-        $this->createIndex('name', '{{%shop_store}}', 'name');
-        $this->createIndex('address', '{{%shop_store}}', 'address');
-        $this->createIndex('gps_n', '{{%shop_store}}', ['gps_n']);
-        $this->createIndex('gps_s', '{{%shop_store}}', ['gps_s']);
-        $this->createIndex('image_id', '{{%shop_store}}', ['image_id']);
-        $this->createIndex('location_id', '{{%shop_store}}', ['location_id']);
-        $this->createIndex('phone', '{{%shop_store}}', ['phone']);
-        $this->createIndex('schedule', '{{%shop_store}}', ['schedule']);
-        $this->createIndex('xml_id', '{{%shop_store}}', ['xml_id']);
-        $this->createIndex('priority', '{{%shop_store}}', ['priority']);
-        $this->createIndex('email', '{{%shop_store}}', ['email']);
-        $this->createIndex('issuing_center', '{{%shop_store}}', ['issuing_center']);
-        $this->createIndex('shipping_center', '{{%shop_store}}', ['shipping_center']);
-        $this->createIndex('site_code', '{{%shop_store}}', ['site_code']);
-
-        $this->execute("ALTER TABLE {{%shop_store}} COMMENT = 'Склады';");
+        $this->createIndex('shop_store__name', '{{%shop_store}}', 'name');
+        $this->createIndex('shop_store__address', '{{%shop_store}}', 'address');
+        $this->createIndex('shop_store__gps_n', '{{%shop_store}}', ['gps_n']);
+        $this->createIndex('shop_store__gps_s', '{{%shop_store}}', ['gps_s']);
+        $this->createIndex('shop_store__image_id', '{{%shop_store}}', ['image_id']);
+        $this->createIndex('shop_store__location_id', '{{%shop_store}}', ['location_id']);
+        $this->createIndex('shop_store__phone', '{{%shop_store}}', ['phone']);
+        $this->createIndex('shop_store__schedule', '{{%shop_store}}', ['schedule']);
+        $this->createIndex('shop_store__xml_id', '{{%shop_store}}', ['xml_id']);
+        $this->createIndex('shop_store__priority', '{{%shop_store}}', ['priority']);
+        $this->createIndex('shop_store__email', '{{%shop_store}}', ['email']);
+        $this->createIndex('shop_store__issuing_center', '{{%shop_store}}', ['issuing_center']);
+        $this->createIndex('shop_store__shipping_center', '{{%shop_store}}', ['shipping_center']);
+        $this->createIndex('shop_store__site_code', '{{%shop_store}}', ['site_code']);
 
         $this->addForeignKey(
             'shop_store_created_by', "{{%shop_store}}",

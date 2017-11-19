@@ -65,8 +65,6 @@ class m150915_110701_create_table__shop_affiliate_plan extends Migration
         $this->createIndex('shop_affiliate_plan__base_rate_currency_code', '{{%shop_affiliate_plan}}', ['base_rate_currency_code']);
         $this->createIndex('shop_affiliate_plan__value_currency_code', '{{%shop_affiliate_plan}}', ['value_currency_code']);
 
-        $this->execute("ALTER TABLE {{%shop_affiliate_plan}} COMMENT = 'Планы для аффилиатов';");
-
         $this->addForeignKey(
             'shop_affiliate_plan_created_by', "{{%shop_affiliate_plan}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'
