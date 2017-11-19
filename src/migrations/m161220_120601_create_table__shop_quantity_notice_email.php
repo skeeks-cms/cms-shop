@@ -45,16 +45,16 @@ class m161220_120601_create_table__shop_quantity_notice_email extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', $tableName, 'updated_by');
-        $this->createIndex('created_by', $tableName, 'created_by');
-        $this->createIndex('created_at', $tableName, 'created_at');
-        $this->createIndex('updated_at', $tableName, 'updated_at');
-        $this->createIndex('shop_product_id', $tableName, 'shop_product_id');
-        $this->createIndex('email', $tableName, 'email');
-        $this->createIndex('name', $tableName, 'name');
-        $this->createIndex('shop_fuser_id', $tableName, 'shop_fuser_id');
-        $this->createIndex('is_notified', $tableName, 'is_notified');
-        $this->createIndex('notified_at', $tableName, 'notified_at');
+        $this->createIndex($tableName . '__updated_by', $tableName, 'updated_by');
+        $this->createIndex($tableName . '__created_by', $tableName, 'created_by');
+        $this->createIndex($tableName . '__created_at', $tableName, 'created_at');
+        $this->createIndex($tableName . '__updated_at', $tableName, 'updated_at');
+        $this->createIndex($tableName . '__shop_product_id', $tableName, 'shop_product_id');
+        $this->createIndex($tableName . '__email', $tableName, 'email');
+        $this->createIndex($tableName . '__name', $tableName, 'name');
+        $this->createIndex($tableName . '__shop_fuser_id', $tableName, 'shop_fuser_id');
+        $this->createIndex($tableName . '__is_notified', $tableName, 'is_notified');
+        $this->createIndex($tableName . '__notified_at', $tableName, 'notified_at');
 
         $this->addCommentOnTable($tableName, 'Subscribers to the notice of receipt product');
 

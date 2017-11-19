@@ -13,7 +13,7 @@ class m160518_110558_alter_table__shop_fuser extends Migration
 {
     public function safeUp()
     {
-        $this->execute("ALTER TABLE {{%shop_fuser}} ADD `store_id` INT(11) NULL;");
+        $this->addColumn('{{%shop_fuser}}', 'store_id', $this->integer(11));
 
         $this->addForeignKey(
             'shop_fuser__store_id', "{{%shop_fuser}}",

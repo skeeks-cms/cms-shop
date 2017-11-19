@@ -42,14 +42,14 @@ class m161220_110601_create_table__shop_product_quantity_change extends Migratio
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', $tableName, 'updated_by');
-        $this->createIndex('created_by', $tableName, 'created_by');
-        $this->createIndex('created_at', $tableName, 'created_at');
-        $this->createIndex('updated_at', $tableName, 'updated_at');
-        $this->createIndex('quantity', $tableName, 'quantity');
-        $this->createIndex('quantity_reserved', $tableName, 'quantity_reserved');
-        $this->createIndex('measure_ratio', $tableName, 'measure_ratio');
-        $this->createIndex('measure_id', $tableName, 'measure_id');
+        $this->createIndex($tableName . '__updated_by', $tableName, 'updated_by');
+        $this->createIndex($tableName . '__created_by', $tableName, 'created_by');
+        $this->createIndex($tableName . '__created_at', $tableName, 'created_at');
+        $this->createIndex($tableName . '__updated_at', $tableName, 'updated_at');
+        $this->createIndex($tableName . '__quantity', $tableName, 'quantity');
+        $this->createIndex($tableName . '__quantity_reserved', $tableName, 'quantity_reserved');
+        $this->createIndex($tableName . '__measure_ratio', $tableName, 'measure_ratio');
+        $this->createIndex($tableName . '__measure_id', $tableName, 'measure_id');
 
         $this->addCommentOnTable($tableName, 'Changes in the quantity of products');
 

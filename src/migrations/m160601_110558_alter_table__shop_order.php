@@ -13,8 +13,12 @@ class m160601_110558_alter_table__shop_order extends Migration
 {
     public function safeUp()
     {
-        $this->execute('UPDATE `shop_fuser` SET `store_id` = NULL');
-        $this->execute('UPDATE `shop_order` SET `store_id` = NULL');
+        $this->update('shop_fuser', [
+            'store_id' => null
+        ]);
+        $this->update('shop_order', [
+            'store_id' => null
+        ]);
 
         $this->dropForeignKey('shop_order__store_id', "{{%shop_order}}");
         $this->dropForeignKey('shop_fuser__store_id', "{{%shop_fuser}}");
