@@ -40,16 +40,13 @@ class m151001_161201_create_table__shop_order_change extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_order_change}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_order_change}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_order_change}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_order_change}}', 'updated_at');
+        $this->createIndex('shop_order_change__updated_by', '{{%shop_order_change}}', 'updated_by');
+        $this->createIndex('shop_order_change__created_by', '{{%shop_order_change}}', 'created_by');
+        $this->createIndex('shop_order_change__created_at', '{{%shop_order_change}}', 'created_at');
+        $this->createIndex('shop_order_change__updated_at', '{{%shop_order_change}}', 'updated_at');
 
-        $this->createIndex('shop_order_id', '{{%shop_order_change}}', 'shop_order_id');
-        $this->createIndex('type', '{{%shop_order_change}}', 'type');
-
-
-        $this->execute("ALTER TABLE {{%shop_order_change}} COMMENT = 'История по заказу';");
+        $this->createIndex('shop_order_change__shop_order_id', '{{%shop_order_change}}', 'shop_order_id');
+        $this->createIndex('shop_order_change__type', '{{%shop_order_change}}', 'type');
 
         $this->addForeignKey(
             'shop_order_change_created_by', "{{%shop_order_change}}",

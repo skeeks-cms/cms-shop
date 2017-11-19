@@ -46,20 +46,17 @@ class m151001_181201_create_table__shop_user_transact extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_user_transact}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_user_transact}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_user_transact}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_user_transact}}', 'updated_at');
+        $this->createIndex('shop_user_transact__updated_by', '{{%shop_user_transact}}', 'updated_by');
+        $this->createIndex('shop_user_transact__created_by', '{{%shop_user_transact}}', 'created_by');
+        $this->createIndex('shop_user_transact__created_at', '{{%shop_user_transact}}', 'created_at');
+        $this->createIndex('shop_user_transact__updated_at', '{{%shop_user_transact}}', 'updated_at');
 
-        $this->createIndex('shop_order_id', '{{%shop_user_transact}}', 'shop_order_id');
-        $this->createIndex('cms_user_id', '{{%shop_user_transact}}', 'cms_user_id');
-        $this->createIndex('amount', '{{%shop_user_transact}}', 'amount');
-        $this->createIndex('currency_code', '{{%shop_user_transact}}', 'currency_code');
-        $this->createIndex('debit', '{{%shop_user_transact}}', 'debit');
-        $this->createIndex('description', '{{%shop_user_transact}}', 'description');
-
-
-        $this->execute("ALTER TABLE {{%shop_user_transact}} COMMENT = 'Транзакции пользователя';");
+        $this->createIndex('shop_user_transact__shop_order_id', '{{%shop_user_transact}}', 'shop_order_id');
+        $this->createIndex('shop_user_transact__cms_user_id', '{{%shop_user_transact}}', 'cms_user_id');
+        $this->createIndex('shop_user_transact__amount', '{{%shop_user_transact}}', 'amount');
+        $this->createIndex('shop_user_transact__currency_code', '{{%shop_user_transact}}', 'currency_code');
+        $this->createIndex('shop_user_transact__debit', '{{%shop_user_transact}}', 'debit');
+        $this->createIndex('shop_user_transact__description', '{{%shop_user_transact}}', 'description');
 
         $this->addForeignKey(
             'shop_user_transact_created_by', "{{%shop_user_transact}}",

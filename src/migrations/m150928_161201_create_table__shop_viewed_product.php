@@ -43,17 +43,14 @@ class m150928_161201_create_table__shop_viewed_product extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_viewed_product}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_viewed_product}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_viewed_product}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_viewed_product}}', 'updated_at');
+        $this->createIndex('shop_viewed_product__updated_by', '{{%shop_viewed_product}}', 'updated_by');
+        $this->createIndex('shop_viewed_product__created_by', '{{%shop_viewed_product}}', 'created_by');
+        $this->createIndex('shop_viewed_product__created_at', '{{%shop_viewed_product}}', 'created_at');
+        $this->createIndex('shop_viewed_product__updated_at', '{{%shop_viewed_product}}', 'updated_at');
 
-        $this->createIndex('shop_fuser_id', '{{%shop_viewed_product}}', 'shop_fuser_id');
-        $this->createIndex('shop_product_id', '{{%shop_viewed_product}}', 'shop_product_id');
-        $this->createIndex('site_id', '{{%shop_viewed_product}}', 'site_id');
-
-
-        $this->execute("ALTER TABLE {{%shop_viewed_product}} COMMENT = 'Ранее просмотренные товары';");
+        $this->createIndex('shop_viewed_product__shop_fuser_id', '{{%shop_viewed_product}}', 'shop_fuser_id');
+        $this->createIndex('shop_viewed_product__shop_product_id', '{{%shop_viewed_product}}', 'shop_product_id');
+        $this->createIndex('shop_viewed_product__site_id', '{{%shop_viewed_product}}', 'site_id');
 
         $this->addForeignKey(
             'shop_viewed_product_created_by', "{{%shop_viewed_product}}",

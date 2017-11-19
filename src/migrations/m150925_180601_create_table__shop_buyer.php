@@ -40,16 +40,14 @@ class m150925_180601_create_table__shop_buyer extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_buyer}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_buyer}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_buyer}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_buyer}}', 'updated_at');
+        $this->createIndex('shop_buyer__updated_by', '{{%shop_buyer}}', 'updated_by');
+        $this->createIndex('shop_buyer__created_by', '{{%shop_buyer}}', 'created_by');
+        $this->createIndex('shop_buyer__created_at', '{{%shop_buyer}}', 'created_at');
+        $this->createIndex('shop_buyer__updated_at', '{{%shop_buyer}}', 'updated_at');
 
-        $this->createIndex('cms_user_id', '{{%shop_buyer}}', 'cms_user_id');
-        $this->createIndex('shop_person_type_id', '{{%shop_buyer}}', 'shop_person_type_id');
-        $this->createIndex('name', '{{%shop_buyer}}', 'name');
-
-        $this->execute("ALTER TABLE {{%shop_buyer}} COMMENT = 'Покупатели';");
+        $this->createIndex('shop_buyer__cms_user_id', '{{%shop_buyer}}', 'cms_user_id');
+        $this->createIndex('shop_buyer__shop_person_type_id', '{{%shop_buyer}}', 'shop_person_type_id');
+        $this->createIndex('shop_buyer__name', '{{%shop_buyer}}', 'name');
 
         $this->addForeignKey(
             'shop_buyer_created_by', "{{%shop_buyer}}",

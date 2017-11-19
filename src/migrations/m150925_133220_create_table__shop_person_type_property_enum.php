@@ -11,7 +11,7 @@ use yii\db\Migration;
 
 class m150925_133220_create_table__shop_person_type_property_enum extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_person_type_property_enum}}", true);
         if ($tableExist) {
@@ -40,21 +40,16 @@ class m150925_133220_create_table__shop_person_type_property_enum extends Migrat
             'priority' => Schema::TYPE_INTEGER . "(11) NOT NULL DEFAULT '500'",
 
         ], $tableOptions);
-
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(created_by);");
-
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(updated_at);");
-
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(property_id);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(def);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(code);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(priority);");
-
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} ADD INDEX(value);");
-
-        $this->execute("ALTER TABLE {{%shop_person_type_property_enum}} COMMENT = 'Справочник значений свойств типа список';");
+        
+        $this->createIndex('shop_person_type_property_enum__updated_by', '{{%shop_person_type_property_enum}}', 'updated_by');
+        $this->createIndex('shop_person_type_property_enum__created_by', '{{%shop_person_type_property_enum}}', 'created_by');
+        $this->createIndex('shop_person_type_property_enum__created_at', '{{%shop_person_type_property_enum}}', 'created_at');
+        $this->createIndex('shop_person_type_property_enum__updated_at', '{{%shop_person_type_property_enum}}', 'updated_at');
+        $this->createIndex('shop_person_type_property_enum__property_id', '{{%shop_person_type_property_enum}}', 'property_id');
+        $this->createIndex('shop_person_type_property_enum__def', '{{%shop_person_type_property_enum}}', 'def');
+        $this->createIndex('shop_person_type_property_enum__code', '{{%shop_person_type_property_enum}}', 'code');
+        $this->createIndex('shop_person_type_property_enum__priority', '{{%shop_person_type_property_enum}}', 'priority');
+        $this->createIndex('shop_person_type_property_enum__value', '{{%shop_person_type_property_enum}}', 'value');
 
         $this->addForeignKey(
             'shop_person_type_property_enum_created_by', "{{%shop_person_type_property_enum}}",

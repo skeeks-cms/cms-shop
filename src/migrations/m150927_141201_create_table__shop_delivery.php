@@ -59,31 +59,29 @@ class m150927_141201_create_table__shop_delivery extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_delivery}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_delivery}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_delivery}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_delivery}}', 'updated_at');
+        $this->createIndex('shop_delivery__updated_by', '{{%shop_delivery}}', 'updated_by');
+        $this->createIndex('shop_delivery__created_by', '{{%shop_delivery}}', 'created_by');
+        $this->createIndex('shop_delivery__created_at', '{{%shop_delivery}}', 'created_at');
+        $this->createIndex('shop_delivery__updated_at', '{{%shop_delivery}}', 'updated_at');
 
-        $this->createIndex('name', '{{%shop_delivery}}', 'name');
+        $this->createIndex('shop_delivery__name', '{{%shop_delivery}}', 'name');
 
-        $this->createIndex('site_id', '{{%shop_delivery}}', 'site_id');
-        $this->createIndex('period_from', '{{%shop_delivery}}', 'period_from');
-        $this->createIndex('period_to', '{{%shop_delivery}}', 'period_to');
-        $this->createIndex('period_type', '{{%shop_delivery}}', 'period_type');
+        $this->createIndex('shop_delivery__site_id', '{{%shop_delivery}}', 'site_id');
+        $this->createIndex('shop_delivery__period_from', '{{%shop_delivery}}', 'period_from');
+        $this->createIndex('shop_delivery__period_to', '{{%shop_delivery}}', 'period_to');
+        $this->createIndex('shop_delivery__period_type', '{{%shop_delivery}}', 'period_type');
 
-        $this->createIndex('weight_from', '{{%shop_delivery}}', 'weight_from');
-        $this->createIndex('weight_to', '{{%shop_delivery}}', 'weight_to');
+        $this->createIndex('shop_delivery__weight_from', '{{%shop_delivery}}', 'weight_from');
+        $this->createIndex('shop_delivery__weight_to', '{{%shop_delivery}}', 'weight_to');
 
-        $this->createIndex('order_price_from', '{{%shop_delivery}}', 'order_price_from');
-        $this->createIndex('order_price_to', '{{%shop_delivery}}', 'order_price_to');
-        $this->createIndex('order_currency_code', '{{%shop_delivery}}', 'order_currency_code');
-        $this->createIndex('active', '{{%shop_delivery}}', 'active');
-        $this->createIndex('price', '{{%shop_delivery}}', 'price');
-        $this->createIndex('currency_code', '{{%shop_delivery}}', 'currency_code');
-        $this->createIndex('priority', '{{%shop_delivery}}', 'priority');
-        $this->createIndex('logo_id', '{{%shop_delivery}}', 'logo_id');
-
-        $this->execute("ALTER TABLE {{%shop_delivery}} COMMENT = 'Службы доставки';");
+        $this->createIndex('shop_delivery__order_price_from', '{{%shop_delivery}}', 'order_price_from');
+        $this->createIndex('shop_delivery__order_price_to', '{{%shop_delivery}}', 'order_price_to');
+        $this->createIndex('shop_delivery__order_currency_code', '{{%shop_delivery}}', 'order_currency_code');
+        $this->createIndex('shop_delivery__active', '{{%shop_delivery}}', 'active');
+        $this->createIndex('shop_delivery__price', '{{%shop_delivery}}', 'price');
+        $this->createIndex('shop_delivery__currency_code', '{{%shop_delivery}}', 'currency_code');
+        $this->createIndex('shop_delivery__priority', '{{%shop_delivery}}', 'priority');
+        $this->createIndex('shop_delivery__logo_id', '{{%shop_delivery}}', 'logo_id');
 
         $this->addForeignKey(
             'shop_delivery_created_by', "{{%shop_delivery}}",

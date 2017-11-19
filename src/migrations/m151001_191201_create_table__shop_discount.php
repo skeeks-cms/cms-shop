@@ -65,38 +65,36 @@ class m151001_191201_create_table__shop_discount extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_discount}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_discount}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_discount}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_discount}}', 'updated_at');
+        $this->createIndex('shop_discount__updated_by', '{{%shop_discount}}', 'updated_by');
+        $this->createIndex('shop_discount__created_by', '{{%shop_discount}}', 'created_by');
+        $this->createIndex('shop_discount__created_at', '{{%shop_discount}}', 'created_at');
+        $this->createIndex('shop_discount__updated_at', '{{%shop_discount}}', 'updated_at');
 
-        $this->createIndex('site_id', '{{%shop_discount}}', 'site_id');
-        $this->createIndex('active', '{{%shop_discount}}', 'active');
-        $this->createIndex('active_from', '{{%shop_discount}}', 'active_from');
-        $this->createIndex('active_to', '{{%shop_discount}}', 'active_to');
-        $this->createIndex('renewal', '{{%shop_discount}}', 'renewal');
-        $this->createIndex('name', '{{%shop_discount}}', 'name');
-        $this->createIndex('max_uses', '{{%shop_discount}}', 'max_uses');
-        $this->createIndex('count_uses', '{{%shop_discount}}', 'count_uses');
-        $this->createIndex('coupon', '{{%shop_discount}}', 'coupon');
-        $this->createIndex('priority', '{{%shop_discount}}', 'priority');
-        $this->createIndex('max_discount', '{{%shop_discount}}', 'max_discount');
-        $this->createIndex('value_type', '{{%shop_discount}}', 'value_type');
-        $this->createIndex('value', '{{%shop_discount}}', 'value');
-        $this->createIndex('currency_code', '{{%shop_discount}}', 'currency_code');
-        $this->createIndex('min_order_sum', '{{%shop_discount}}', 'min_order_sum');
-        $this->createIndex('type', '{{%shop_discount}}', 'type');
-        $this->createIndex('count_period', '{{%shop_discount}}', 'count_period');
-        $this->createIndex('count_size', '{{%shop_discount}}', 'count_size');
-        $this->createIndex('count_type', '{{%shop_discount}}', 'count_type');
-        $this->createIndex('count_from', '{{%shop_discount}}', 'count_from');
-        $this->createIndex('count_to', '{{%shop_discount}}', 'count_to');
-        $this->createIndex('action_size', '{{%shop_discount}}', 'action_size');
-        $this->createIndex('action_type', '{{%shop_discount}}', 'action_type');
-        $this->createIndex('last_discount', '{{%shop_discount}}', 'last_discount');
-        $this->createIndex('version', '{{%shop_discount}}', 'version');
-
-        $this->execute("ALTER TABLE {{%shop_discount}} COMMENT = 'Скидки на товары';");
+        $this->createIndex('shop_discount__site_id', '{{%shop_discount}}', 'site_id');
+        $this->createIndex('shop_discount__active', '{{%shop_discount}}', 'active');
+        $this->createIndex('shop_discount__active_from', '{{%shop_discount}}', 'active_from');
+        $this->createIndex('shop_discount__active_to', '{{%shop_discount}}', 'active_to');
+        $this->createIndex('shop_discount__renewal', '{{%shop_discount}}', 'renewal');
+        $this->createIndex('shop_discount__name', '{{%shop_discount}}', 'name');
+        $this->createIndex('shop_discount__max_uses', '{{%shop_discount}}', 'max_uses');
+        $this->createIndex('shop_discount__count_uses', '{{%shop_discount}}', 'count_uses');
+        $this->createIndex('shop_discount__coupon', '{{%shop_discount}}', 'coupon');
+        $this->createIndex('shop_discount__priority', '{{%shop_discount}}', 'priority');
+        $this->createIndex('shop_discount__max_discount', '{{%shop_discount}}', 'max_discount');
+        $this->createIndex('shop_discount__value_type', '{{%shop_discount}}', 'value_type');
+        $this->createIndex('shop_discount__value', '{{%shop_discount}}', 'value');
+        $this->createIndex('shop_discount__currency_code', '{{%shop_discount}}', 'currency_code');
+        $this->createIndex('shop_discount__min_order_sum', '{{%shop_discount}}', 'min_order_sum');
+        $this->createIndex('shop_discount__type', '{{%shop_discount}}', 'type');
+        $this->createIndex('shop_discount__count_period', '{{%shop_discount}}', 'count_period');
+        $this->createIndex('shop_discount__count_size', '{{%shop_discount}}', 'count_size');
+        $this->createIndex('shop_discount__count_type', '{{%shop_discount}}', 'count_type');
+        $this->createIndex('shop_discount__count_from', '{{%shop_discount}}', 'count_from');
+        $this->createIndex('shop_discount__count_to', '{{%shop_discount}}', 'count_to');
+        $this->createIndex('shop_discount__action_size', '{{%shop_discount}}', 'action_size');
+        $this->createIndex('shop_discount__action_type', '{{%shop_discount}}', 'action_type');
+        $this->createIndex('shop_discount__last_discount', '{{%shop_discount}}', 'last_discount');
+        $this->createIndex('shop_discount__version', '{{%shop_discount}}', 'version');
 
         $this->addForeignKey(
             'shop_discount_created_by', "{{%shop_discount}}",

@@ -37,14 +37,13 @@ class m151001_201201_create_table__shop_discount2type_price extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_discount2type_price}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_discount2type_price}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_discount2type_price}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_discount2type_price}}', 'updated_at');
+        $this->createIndex('shop_discount2type_price__updated_by', '{{%shop_discount2type_price}}', 'updated_by');
+        $this->createIndex('shop_discount2type_price__created_by', '{{%shop_discount2type_price}}', 'created_by');
+        $this->createIndex('shop_discount2type_price__created_at', '{{%shop_discount2type_price}}', 'created_at');
+        $this->createIndex('shop_discount2type_price__updated_at', '{{%shop_discount2type_price}}', 'updated_at');
 
         $this->createIndex('discount_id__type_price_id', '{{%shop_discount2type_price}}',
             ['discount_id', 'type_price_id'], true);
-        $this->execute("ALTER TABLE {{%shop_discount2type_price}} COMMENT = 'Связь скидок с типами цен';");
 
         $this->addForeignKey(
             'shop_discount2type_price_created_by', "{{%shop_discount2type_price}}",

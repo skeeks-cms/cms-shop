@@ -85,29 +85,27 @@ class m150926_131201_create_table__shop_basket extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_basket}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_basket}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_basket}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_basket}}', 'updated_at');
+        $this->createIndex('shop_basket__updated_by', '{{%shop_basket}}', 'updated_by');
+        $this->createIndex('shop_basket__created_by', '{{%shop_basket}}', 'created_by');
+        $this->createIndex('shop_basket__created_at', '{{%shop_basket}}', 'created_at');
+        $this->createIndex('shop_basket__updated_at', '{{%shop_basket}}', 'updated_at');
 
 
-        $this->createIndex('site_id', '{{%shop_basket}}', ['site_id']);
-        $this->createIndex('fuser_id', '{{%shop_basket}}', ['fuser_id']);
-        $this->createIndex('order_id', '{{%shop_basket}}', ['order_id']);
-        $this->createIndex('product_id', '{{%shop_basket}}', ['product_id']);
-        $this->createIndex('product_price_id', '{{%shop_basket}}', ['product_price_id']);
-        $this->createIndex('currency_code', '{{%shop_basket}}', ['currency_code']);
+        $this->createIndex('shop_basket__site_id', '{{%shop_basket}}', ['site_id']);
+        $this->createIndex('shop_basket__fuser_id', '{{%shop_basket}}', ['fuser_id']);
+        $this->createIndex('shop_basket__order_id', '{{%shop_basket}}', ['order_id']);
+        $this->createIndex('shop_basket__product_id', '{{%shop_basket}}', ['product_id']);
+        $this->createIndex('shop_basket__product_price_id', '{{%shop_basket}}', ['product_price_id']);
+        $this->createIndex('shop_basket__currency_code', '{{%shop_basket}}', ['currency_code']);
 
-        $this->createIndex('price', '{{%shop_basket}}', ['price']);
-        $this->createIndex('delay', '{{%shop_basket}}', ['delay']);
-        $this->createIndex('name', '{{%shop_basket}}', ['name']);
-        $this->createIndex('measure_name', '{{%shop_basket}}', ['measure_name']);
-        $this->createIndex('set_parent_id', '{{%shop_basket}}', ['set_parent_id']);
-        $this->createIndex('measure_code', '{{%shop_basket}}', ['measure_code']);
+        $this->createIndex('shop_basket__price', '{{%shop_basket}}', ['price']);
+        $this->createIndex('shop_basket__delay', '{{%shop_basket}}', ['delay']);
+        $this->createIndex('shop_basket__name', '{{%shop_basket}}', ['name']);
+        $this->createIndex('shop_basket__measure_name', '{{%shop_basket}}', ['measure_name']);
+        $this->createIndex('shop_basket__set_parent_id', '{{%shop_basket}}', ['set_parent_id']);
+        $this->createIndex('shop_basket__measure_code', '{{%shop_basket}}', ['measure_code']);
 
-        $this->createIndex('catalog_product_xml_id', '{{%shop_basket}}', ['catalog_xml_id', 'product_xml_id']);
-
-        $this->execute("ALTER TABLE {{%shop_basket}} COMMENT = 'Позиции в корзине';");
+        $this->createIndex('shop_basket__catalog_product_xml_id', '{{%shop_basket}}', ['catalog_xml_id', 'product_xml_id']);
 
         $this->addForeignKey(
             'shop_basket_created_by', "{{%shop_basket}}",

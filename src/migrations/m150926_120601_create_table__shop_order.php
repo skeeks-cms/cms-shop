@@ -129,28 +129,26 @@ class m150926_120601_create_table__shop_order extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_order}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_order}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_order}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_order}}', 'updated_at');
+        $this->createIndex('shop_order__updated_by', '{{%shop_order}}', 'updated_by');
+        $this->createIndex('shop_order__created_by', '{{%shop_order}}', 'created_by');
+        $this->createIndex('shop_order__created_at', '{{%shop_order}}', 'created_at');
+        $this->createIndex('shop_order__updated_at', '{{%shop_order}}', 'updated_at');
 
-        $this->createIndex('site_id', '{{%shop_order}}', 'site_id');
-        $this->createIndex('person_type_id', '{{%shop_order}}', 'person_type_id');
-        $this->createIndex('status_code', '{{%shop_order}}', 'status_code');
-        $this->createIndex('currency_code', '{{%shop_order}}', 'currency_code');
-        $this->createIndex('user_id', '{{%shop_order}}', 'user_id');
-        $this->createIndex('pay_system_id', '{{%shop_order}}', 'pay_system_id');
-        $this->createIndex('locked_by', '{{%shop_order}}', 'locked_by');
-        $this->createIndex('affiliate_id', '{{%shop_order}}', 'affiliate_id');
-        $this->createIndex('store_id', '{{%shop_order}}', 'store_id');
-        $this->createIndex('delivery_id', '{{%shop_order}}', 'delivery_id');
-
-
-        $this->createIndex('payed', '{{%shop_order}}', 'payed');
-        $this->createIndex('payed_at', '{{%shop_order}}', 'payed_at');
+        $this->createIndex('shop_order__site_id', '{{%shop_order}}', 'site_id');
+        $this->createIndex('shop_order__person_type_id', '{{%shop_order}}', 'person_type_id');
+        $this->createIndex('shop_order__status_code', '{{%shop_order}}', 'status_code');
+        $this->createIndex('shop_order__currency_code', '{{%shop_order}}', 'currency_code');
+        $this->createIndex('shop_order__user_id', '{{%shop_order}}', 'user_id');
+        $this->createIndex('shop_order__pay_system_id', '{{%shop_order}}', 'pay_system_id');
+        $this->createIndex('shop_order__locked_by', '{{%shop_order}}', 'locked_by');
+        $this->createIndex('shop_order__affiliate_id', '{{%shop_order}}', 'affiliate_id');
+        $this->createIndex('shop_order__store_id', '{{%shop_order}}', 'store_id');
+        $this->createIndex('shop_order__delivery_id', '{{%shop_order}}', 'delivery_id');
 
 
-        $this->execute("ALTER TABLE {{%shop_order}} COMMENT = 'Заказы';");
+        $this->createIndex('shop_order__payed', '{{%shop_order}}', 'payed');
+        $this->createIndex('shop_order__payed_at', '{{%shop_order}}', 'payed_at');
+
 
         $this->addForeignKey(
             'shop_order_created_by', "{{%shop_order}}",

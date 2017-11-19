@@ -42,19 +42,16 @@ class m160209_161201_create_table__shop_basket_props extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_basket_props}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_basket_props}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_basket_props}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_basket_props}}', 'updated_at');
+        $this->createIndex('shop_basket_props__updated_by', '{{%shop_basket_props}}', 'updated_by');
+        $this->createIndex('shop_basket_props__created_by', '{{%shop_basket_props}}', 'created_by');
+        $this->createIndex('shop_basket_props__created_at', '{{%shop_basket_props}}', 'created_at');
+        $this->createIndex('shop_basket_props__updated_at', '{{%shop_basket_props}}', 'updated_at');
 
-        $this->createIndex('shop_basket_id', '{{%shop_basket_props}}', 'shop_basket_id');
-        $this->createIndex('name', '{{%shop_basket_props}}', 'name');
-        $this->createIndex('value', '{{%shop_basket_props}}', 'value');
-        $this->createIndex('code', '{{%shop_basket_props}}', 'code');
-        $this->createIndex('priority', '{{%shop_basket_props}}', 'priority');
-
-
-        $this->execute("ALTER TABLE {{%shop_basket_props}} COMMENT = 'Своуйства заказов';");
+        $this->createIndex('shop_basket_props__shop_basket_id', '{{%shop_basket_props}}', 'shop_basket_id');
+        $this->createIndex('shop_basket_props__name', '{{%shop_basket_props}}', 'name');
+        $this->createIndex('shop_basket_props__value', '{{%shop_basket_props}}', 'value');
+        $this->createIndex('shop_basket_props__code', '{{%shop_basket_props}}', 'code');
+        $this->createIndex('shop_basket_props__priority', '{{%shop_basket_props}}', 'priority');
 
         $this->addForeignKey(
             'shop_basket_props_created_by', "{{%shop_basket_props}}",

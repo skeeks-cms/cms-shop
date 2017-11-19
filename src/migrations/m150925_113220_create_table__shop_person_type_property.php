@@ -11,7 +11,7 @@ use yii\db\Migration;
 
 class m150925_113220_create_table__shop_person_type_property extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_person_type_property}}", true);
         if ($tableExist) {
@@ -74,41 +74,38 @@ class m150925_113220_create_table__shop_person_type_property extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(created_by);");
+        $this->createIndex('shop_person_type_property__updated_by', '{{%shop_person_type_property}}', 'updated_by');
+        $this->createIndex('shop_person_type_property__created_by', '{{%shop_person_type_property}}', 'created_by');
+        $this->createIndex('shop_person_type_property__created_at', '{{%shop_person_type_property}}', 'created_at');
+        $this->createIndex('shop_person_type_property__updated_at', '{{%shop_person_type_property}}', 'updated_at');
+        $this->createIndex('shop_person_type_property__name', '{{%shop_person_type_property}}', 'name');
 
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(updated_at);");
+        $this->createIndex('shop_person_type_property__active', '{{%shop_person_type_property}}', 'active');
+        $this->createIndex('shop_person_type_property__priority', '{{%shop_person_type_property}}', 'priority');
+        $this->createIndex('shop_person_type_property__property_type', '{{%shop_person_type_property}}', 'property_type');
+        $this->createIndex('shop_person_type_property__list_type', '{{%shop_person_type_property}}', 'list_type');
+        $this->createIndex('shop_person_type_property__multiple', '{{%shop_person_type_property}}', 'multiple');
+        $this->createIndex('shop_person_type_property__multiple_cnt', '{{%shop_person_type_property}}', 'multiple_cnt');
+        $this->createIndex('shop_person_type_property__with_description', '{{%shop_person_type_property}}', 'with_description');
+        $this->createIndex('shop_person_type_property__searchable', '{{%shop_person_type_property}}', 'searchable');
+        $this->createIndex('shop_person_type_property__filtrable', '{{%shop_person_type_property}}', 'filtrable');
+        $this->createIndex('shop_person_type_property__is_required', '{{%shop_person_type_property}}', 'is_required');
+        $this->createIndex('shop_person_type_property__version', '{{%shop_person_type_property}}', 'version');
+        $this->createIndex('shop_person_type_property__component', '{{%shop_person_type_property}}', 'component');
+        $this->createIndex('shop_person_type_property__hint', '{{%shop_person_type_property}}', 'hint');
+        $this->createIndex('shop_person_type_property__smart_filtrable', '{{%shop_person_type_property}}', 'smart_filtrable');
 
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(name);");
+        $this->createIndex('shop_person_type_property__shop_person_type_id', '{{%shop_person_type_property}}', 'shop_person_type_id');
+        $this->createIndex('shop_person_type_property__type_code', '{{%shop_person_type_property}}', ['shop_person_type_id', 'code'], true);
 
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(active);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(priority);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(property_type);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(list_type);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(multiple);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(multiple_cnt);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(with_description);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(searchable);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(filtrable);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_required);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(version);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(component);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(hint);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(smart_filtrable);");
-
-
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(shop_person_type_id);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD UNIQUE(shop_person_type_id, code);");
-
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_order_location_delivery);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_order_location_tax);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_order_postcode);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_email);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_phone);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_username);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_user_name);");
-        $this->execute("ALTER TABLE {{%shop_person_type_property}} ADD INDEX(is_buyer_name);");
+        $this->createIndex('shop_person_type_property__is_order_location_delivery', '{{%shop_person_type_property}}', 'is_order_location_delivery');
+        $this->createIndex('shop_person_type_property__is_order_location_tax', '{{%shop_person_type_property}}', 'is_order_location_tax');
+        $this->createIndex('shop_person_type_property__is_order_postcode', '{{%shop_person_type_property}}', 'is_order_postcode');
+        $this->createIndex('shop_person_type_property__is_user_email', '{{%shop_person_type_property}}', 'is_user_email');
+        $this->createIndex('shop_person_type_property__is_user_phone', '{{%shop_person_type_property}}', 'is_user_phone');
+        $this->createIndex('shop_person_type_property__is_user_username', '{{%shop_person_type_property}}', 'is_user_username');
+        $this->createIndex('shop_person_type_property__is_user_name', '{{%shop_person_type_property}}', 'is_user_name');
+        $this->createIndex('shop_person_type_property__is_buyer_name', '{{%shop_person_type_property}}', 'is_buyer_name');
 
         $this->addForeignKey(
             'shop_person_type_property_created_by', "{{%shop_person_type_property}}",

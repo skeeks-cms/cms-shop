@@ -11,7 +11,7 @@ use yii\db\Migration;
 
 class m150925_190601_create_table__shop_buyer_property extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $tableExist = $this->db->getTableSchema("{{%shop_buyer_property}}", true);
         if ($tableExist) {
@@ -43,22 +43,17 @@ class m150925_190601_create_table__shop_buyer_property extends Migration
 
         ], $tableOptions);
 
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(updated_by);");
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(created_by);");
-
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(created_at);");
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(updated_at);");
-
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(property_id);");
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(element_id);");
-
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(value);");
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(value_enum);");
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(value_num);");
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} ADD INDEX(description);");
-
-        $this->execute("ALTER TABLE {{%shop_buyer_property}} COMMENT = 'Связь свойства и значения';");
-
+        $this->createIndex('shop_buyer_property__updated_by', '{{%shop_buyer_property}}', 'updated_by');
+        $this->createIndex('shop_buyer_property__created_by', '{{%shop_buyer_property}}', 'created_by');
+        $this->createIndex('shop_buyer_property__created_at', '{{%shop_buyer_property}}', 'created_at');
+        $this->createIndex('shop_buyer_property__updated_at', '{{%shop_buyer_property}}', 'updated_at');
+        $this->createIndex('shop_buyer_property__property_id', '{{%shop_buyer_property}}', 'property_id');
+        $this->createIndex('shop_buyer_property__element_id', '{{%shop_buyer_property}}', 'element_id');
+        $this->createIndex('shop_buyer_property__value', '{{%shop_buyer_property}}', 'value');
+        $this->createIndex('shop_buyer_property__value_enum', '{{%shop_buyer_property}}', 'value_enum');
+        $this->createIndex('shop_buyer_property__value_num', '{{%shop_buyer_property}}', 'value_num');
+        $this->createIndex('shop_buyer_property__description', '{{%shop_buyer_property}}', 'description');
+        
         $this->addForeignKey(
             'shop_buyer_property_created_by', "{{%shop_buyer_property}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

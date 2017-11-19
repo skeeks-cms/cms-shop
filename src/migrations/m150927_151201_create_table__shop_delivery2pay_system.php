@@ -48,7 +48,6 @@ class m150927_151201_create_table__shop_delivery2pay_system extends Migration
             ['pay_system_id', 'delivery_id'], true);
 
 
-        $this->execute("ALTER TABLE {{%shop_delivery2pay_system}} COMMENT = 'Службы доставки с платежными системами';");
 
         $this->addForeignKey(
             'shop_delivery2pay_system_created_by', "{{%shop_delivery2pay_system}}",

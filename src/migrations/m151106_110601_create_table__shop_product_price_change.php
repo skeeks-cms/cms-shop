@@ -43,20 +43,18 @@ class m151106_110601_create_table__shop_product_price_change extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_product_price_change}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_product_price_change}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_product_price_change}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_product_price_change}}', 'updated_at');
+        $this->createIndex('shop_product_price_change__updated_by', '{{%shop_product_price_change}}', 'updated_by');
+        $this->createIndex('shop_product_price_change__created_by', '{{%shop_product_price_change}}', 'created_by');
+        $this->createIndex('shop_product_price_change__created_at', '{{%shop_product_price_change}}', 'created_at');
+        $this->createIndex('shop_product_price_change__updated_at', '{{%shop_product_price_change}}', 'updated_at');
 
 
-        $this->createIndex('price', '{{%shop_product_price_change}}', 'price');
-        $this->createIndex('currency_code', '{{%shop_product_price_change}}', 'currency_code');
-        $this->createIndex('quantity_from', '{{%shop_product_price_change}}', 'quantity_from');
-        $this->createIndex('quantity_to', '{{%shop_product_price_change}}', 'quantity_to');
-        $this->createIndex('shop_product_price_id', '{{%shop_product_price_change}}', 'shop_product_price_id');
+        $this->createIndex('shop_product_price_change__price', '{{%shop_product_price_change}}', 'price');
+        $this->createIndex('shop_product_price_change__currency_code', '{{%shop_product_price_change}}', 'currency_code');
+        $this->createIndex('shop_product_price_change__quantity_from', '{{%shop_product_price_change}}', 'quantity_from');
+        $this->createIndex('shop_product_price_change__quantity_to', '{{%shop_product_price_change}}', 'quantity_to');
+        $this->createIndex('shop_product_price_change__shop_product_price_id', '{{%shop_product_price_change}}', 'shop_product_price_id');
 
-
-        $this->execute("ALTER TABLE {{%shop_product_price_change}} COMMENT = 'Изменение цены товара';");
 
         $this->addForeignKey(
             'shop_product_price_change_created_by', "{{%shop_product_price_change}}",
