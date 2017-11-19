@@ -13,12 +13,12 @@ class m150927_100558_alter_table__shop_fuser extends Migration
 {
     public function safeUp()
     {
-        $this->alterColumn('{{%shop_fuser}}', 'additional', $this->text());
-        $this->alterColumn('{{%shop_fuser}}', 'person_type_id', $this->integer());
-        $this->alterColumn('{{%shop_fuser}}', 'site_id', $this->integer());
-        $this->alterColumn('{{%shop_fuser}}', 'delivery_code', $this->string(50));
-        $this->alterColumn('{{%shop_fuser}}', 'buyer_id', $this->integer());
-        $this->alterColumn('{{%shop_fuser}}', 'pay_system_id', $this->integer());
+        $this->addColumn('{{%shop_fuser}}', 'additional', $this->text());
+        $this->addColumn('{{%shop_fuser}}', 'person_type_id', $this->integer());
+        $this->addColumn('{{%shop_fuser}}', 'site_id', $this->integer());
+        $this->addColumn('{{%shop_fuser}}', 'delivery_code', $this->string(50));
+        $this->addColumn('{{%shop_fuser}}', 'buyer_id', $this->integer());
+        $this->addColumn('{{%shop_fuser}}', 'pay_system_id', $this->integer());
        
         $this->addForeignKey(
             'shop_fuser__pay_system_id', "{{%shop_fuser}}",

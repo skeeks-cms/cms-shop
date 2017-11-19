@@ -38,13 +38,13 @@ class m150927_151201_create_table__shop_delivery2pay_system extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex('updated_by', '{{%shop_delivery2pay_system}}', 'updated_by');
-        $this->createIndex('created_by', '{{%shop_delivery2pay_system}}', 'created_by');
-        $this->createIndex('created_at', '{{%shop_delivery2pay_system}}', 'created_at');
-        $this->createIndex('updated_at', '{{%shop_delivery2pay_system}}', 'updated_at');
+        $this->createIndex('shop_delivery2pay_system__updated_by', '{{%shop_delivery2pay_system}}', 'updated_by');
+        $this->createIndex('shop_delivery2pay_system__created_by', '{{%shop_delivery2pay_system}}', 'created_by');
+        $this->createIndex('shop_delivery2pay_system__created_at', '{{%shop_delivery2pay_system}}', 'created_at');
+        $this->createIndex('shop_delivery2pay_system__updated_at', '{{%shop_delivery2pay_system}}', 'updated_at');
 
 
-        $this->createIndex('shop_delivery2pay_system', '{{%shop_delivery2pay_system}}',
+        $this->createIndex('shop_delivery2pay_system__shop_delivery2pay_system', '{{%shop_delivery2pay_system}}',
             ['pay_system_id', 'delivery_id'], true);
 
 

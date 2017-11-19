@@ -13,8 +13,8 @@ class m151012_100558_alter_table__shop_pay_system extends Migration
 {
     public function safeUp()
     {
-        $this->execute("ALTER TABLE {{%shop_pay_system}} ADD `component` VARCHAR(255) NULL;");
-        $this->execute("ALTER TABLE {{%shop_pay_system}} ADD `component_settings` TEXT NULL;");
+        $this->addColumn('{{%shop_pay_system}}', 'component', $this->string(255));
+        $this->addColumn('{{%shop_pay_system}}', 'component_settings', $this->text());
     }
 
     public function safeDown()

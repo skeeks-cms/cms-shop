@@ -13,7 +13,7 @@ class m151028_100558_alter_table__shop_delivery extends Migration
 {
     public function safeUp()
     {
-        $this->execute("ALTER TABLE `shop_delivery` CHANGE `site_id` `site_id` INT(11) NULL;");
+        $this->alterColumn('{{%shop_delivery}}', 'site_id', $this->integer(11));
     }
 
     public function safeDown()

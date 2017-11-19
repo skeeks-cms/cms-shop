@@ -13,7 +13,7 @@ class m151001_100558_alter_table__shop_order extends Migration
 {
     public function safeUp()
     {
-        $this->execute("ALTER TABLE {{%shop_order}} ADD `allow_payment` VARCHAR(1) NOT NULL DEFAULT 'N';");
+        $this->addColumn('{{%shop_order}}', 'allow_payment', $this->string(1)->notNull()->defaultValue('N'));
     }
 
     public function safeDown()
