@@ -201,23 +201,22 @@ JS
         'content' => \Yii::t('skeeks/shop/app', 'Main prices')
     ]) ?>
 
-    <div class="row">
+    <!--<div class="row">
         <div class="col-md-3">
-            <?= $form->field($shopProduct, 'purchasing_price')->textInput(); ?>
+            <?/*= $form->field($shopProduct, 'purchasing_price')->textInput(); */?>
         </div>
         <div class="col-md-2">
-            <?= $form->fieldSelect($shopProduct, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
+            <?/*= $form->fieldSelect($shopProduct, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
                 \Yii::$app->money->activeCurrencies, 'code', 'code'
-            )); ?>
+            )); */?>
         </div>
-    </div>
+    </div>-->
 
 
     <div class="row">
         <div class="col-md-3">
             <?= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
-                ->label(\Yii::t('skeeks/shop/app', 'Base price') . " (" . \Yii::t('skeeks/shop/app',
-                        'Price type') . " «{$baseProductPrice->typePrice->name}»)"); ?>
+                ->label($baseProductPrice->typePrice->name); ?>
         </div>
         <div class="col-md-2">
             <?= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(

@@ -248,7 +248,9 @@ class AdminCmsContentElementController extends AdminModelEditorController
             $shopProduct->save();
 
         } else {
-            if ($typePrices = ShopTypePrice::find()->where(['!=', 'def', Cms::BOOL_Y])->all()) {
+            if ($typePrices = ShopTypePrice::find()
+                ->where(['!=', 'def', Cms::BOOL_Y])
+                ->orderBy(['priority' => SORT_ASC])->all()) {
                 foreach ($typePrices as $typePrice) {
                     $productPrice = ShopProductPrice::find()->where([
                         'product_id' => $shopProduct->id,
