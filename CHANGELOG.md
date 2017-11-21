@@ -3,6 +3,7 @@ Changelog
 
 2.0.1-alpha9.pre
 -----------------
+ * Pgsql support
  * Depricated purchasing_currency
  * Depricated purchasing_price
  

@@ -87,16 +87,16 @@ class SearchProductsModel extends Model
             }
         }
 
-        $query->leftJoin('shop_product', '`shop_product`.`id` = `cms_content_element`.`id`');
+        $query->leftJoin('shop_product', 'shop_product.id = cms_content_element.id');
 
         if ($this->type_price_id) {
 
-            $query->leftJoin('shop_product_price', '`shop_product_price`.`product_id` = `shop_product`.`id`');
-            $query->leftJoin('money_currency', '`money_currency`.`code` = `shop_product_price`.`currency_code`');
+            $query->leftJoin('shop_product_price', 'shop_product_price.product_id = shop_product.id');
+            $query->leftJoin('money_currency', 'money_currency.code = shop_product_price.currency_code');
 
             $query->select([
                 'cms_content_element.*',
-                'realPrice' => '( (SELECT course FROM `money_currency` WHERE `money_currency`.`code` = `shop_product_price`.`currency_code`) * `shop_product_price`.`price` )'
+                'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = shop_product_price.currency_code) * shop_product_price.price )'
             ]);
 
             $query->andWhere(['shop_product_price.type_price_id' => $this->type_price_id]);

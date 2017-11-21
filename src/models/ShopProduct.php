@@ -546,9 +546,9 @@ class ShopProduct extends \skeeks\cms\models\Core
         ])
             ->select([
                 'shop_product_price.*',
-                'realPrice' => '( (SELECT course FROM `money_currency` WHERE `money_currency`.`code` = `shop_product_price`.`currency_code`) * `shop_product_price`.`price` )'
+                'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = shop_product_price.currency_code) * shop_product_price.price )'
             ])
-            ->leftJoin('money_currency', '`money_currency`.`code` = `shop_product_price`.`currency_code`')
+            ->leftJoin('money_currency', 'money_currency.code = shop_product_price.currency_code')
             ->orWhere([
                 'and',
                 ['>', 'price', 0],

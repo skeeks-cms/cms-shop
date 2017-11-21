@@ -401,7 +401,7 @@ class ShopBasket extends \skeeks\cms\models\Core
         $shopDiscounts = ShopDiscount::find()
             ->active()
             ->orderBy(['shop_discount.priority' => SORT_ASC])
-            ->leftJoin('shop_discount2type_price', '`shop_discount2type_price`.`discount_id` = `shop_discount`.`id`')
+            ->leftJoin('shop_discount2type_price', 'shop_discount2type_price.discount_id = shop_discount.id')
             ->andWhere([
                 'or',
                 ['shop_discount.site_id' => ""],

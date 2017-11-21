@@ -13,7 +13,7 @@
 $query = $dataProvider->query;
 
 $query->groupBy([\skeeks\cms\models\CmsUser::tableName() . '.id']);
-$query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), '`shop_order`.`user_id` = `cms_user`.`id`');
+$query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.user_id = cms_user.id');
 
 ?>
 
