@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.1-alpha9.pre
+2.0.1-alpha9
 -----------------
  * Pgsql support
  * Depricated purchasing_currency
