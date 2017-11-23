@@ -8,28 +8,17 @@
 
 namespace skeeks\cms\shop\cmsWidgets\filters;
 
-use skeeks\cms\base\Widget;
 use skeeks\cms\base\WidgetRenderable;
-use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\models\CmsContentElementTree;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
-use skeeks\cms\models\Search;
 use skeeks\cms\models\searchs\SearchChildrenRelatedPropertiesModel;
-use skeeks\cms\models\Tree;
-use skeeks\cms\shop\cmsWidgets\filters\models\SearchProductsModel;
 use skeeks\cms\models\searchs\SearchRelatedPropertiesModel;
 use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopTypePrice;
-use yii\base\DynamicModel;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
@@ -81,7 +70,14 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public $searchOfferRelatedPropertiesModel = null;
 
-    static public function descriptorConfig()
+
+    public $enableCache = false;
+
+    public $cacheKey = null;
+    protected $_relatedOptions = [];
+    protected $_offerOptions = [];
+
+    public static function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
             'name' => \Yii::t('skeeks/shop/app', 'Filters'),
@@ -114,7 +110,6 @@ class ShopProductFiltersWidget extends WidgetRenderable
             $this->searchOfferRelatedPropertiesModel->load(\Yii::$app->request->get());
         }
     }
-
 
     public function attributeLabels()
     {
@@ -244,6 +239,8 @@ class ShopProductFiltersWidget extends WidgetRenderable
             $query->select(['cms_content_element.id as mainId', 'cms_content_element.id as id'])->indexBy('mainId');
             $ids = $query->asArray()->all();
 
+            $this->cacheKey = md5($query->limit(10)->createCommand()->rawSql);
+
             $this->elementIds = array_keys($ids);
         }
 
@@ -257,21 +254,6 @@ class ShopProductFiltersWidget extends WidgetRenderable
             $this->searchOfferRelatedPropertiesModel->search($activeDataProvider);
         }
     }
-
-    protected function _run()
-    {
-
-        if ($this->elementIds && !$this->searchModel->price_from && $this->typePrice) {
-            $this->searchModel->price_from = $this->minPrice->price;
-        }
-
-        if ($this->elementIds && !$this->searchModel->price_to && $this->typePrice) {
-            $this->searchModel->price_to = $this->maxPrice->price;
-        }
-
-        return parent::_run();
-    }
-
 
     /**
      * @param $property
@@ -303,58 +285,6 @@ class ShopProductFiltersWidget extends WidgetRenderable
     }
 
     /**
-     * @param $property
-     *
-     * @return null
-     */
-    public function getMaxValue($property)
-    {
-        $value = [];
-
-        if ($this->elementIds) {
-            $value = \skeeks\cms\models\CmsContentElementProperty::find()
-                ->select(['value_enum'])
-                ->andWhere(['element_id' => $this->elementIds])
-                ->andWhere(['property_id' => $property->id])
-                ->asArray()
-                ->orderBy(['value_enum' => SORT_DESC])
-                ->limit(1)
-                ->one();
-
-            return (float)$value['value_enum'];
-        }
-
-        return null;
-    }
-
-    /**
-     * @param $property
-     *
-     * @return null
-     */
-    public function getMinValue($property)
-    {
-        $value = [];
-
-        if ($this->elementIds) {
-            $value = \skeeks\cms\models\CmsContentElementProperty::find()
-                ->select(['value_enum'])
-                ->andWhere(['element_id' => $this->elementIds])
-                ->andWhere(['property_id' => $property->id])
-                ->asArray()
-                ->orderBy(['value_enum' => SORT_ASC])
-                ->limit(1)
-                ->one();
-
-            return (float)$value['value_enum'];
-        }
-
-        return null;
-    }
-
-    protected $_relatedOptions = [];
-
-    /**
      *
      * Получение доступных опций для свойства
      * @param CmsContentProperty $property
@@ -363,6 +293,13 @@ class ShopProductFiltersWidget extends WidgetRenderable
     public function getRelatedPropertyOptions($property)
     {
         $options = [];
+
+        $cacheKey = $this->cacheKey . "_rp_options_{$property->id}";
+        $options = \Yii::$app->cache->get($cacheKey);
+        if ($this->enableCache && $options) {
+            return $options;
+        }
+
 
         if (isset($this->_relatedOptions[$property->code])) {
             return $this->_relatedOptions[$property->code];
@@ -472,9 +409,83 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
         $this->_relatedOptions[$property->code] = $options;
 
+        if ($this->enableCache) {
+            \Yii::$app->cache->set($cacheKey, $options);
+        }
+
         return $options;
     }
 
+    /**
+     * @param $property
+     *
+     * @return null
+     */
+    public function getMaxValue($property)
+    {
+        $cacheKey = $this->cacheKey . "_max_{$property->id}";
+        $value = \Yii::$app->cache->get($cacheKey);
+        if (!$this->enableCache) {
+            $value = null;
+        }
+
+        if (!$value) {
+            if ($this->elementIds) {
+                $value = \skeeks\cms\models\CmsContentElementProperty::find()
+                    ->select(['value_enum'])
+                    ->andWhere(['element_id' => $this->elementIds])
+                    ->andWhere(['property_id' => $property->id])
+                    ->asArray()
+                    ->orderBy(['value_enum' => SORT_DESC])
+                    ->limit(1)
+                    ->one();
+
+
+                $value = (float)$value['value_enum'];
+
+                if ($this->enableCache) {
+                    \Yii::$app->cache->set($cacheKey, $value);
+                }
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param $property
+     *
+     * @return null
+     */
+    public function getMinValue($property)
+    {
+        $cacheKey = $this->cacheKey . "_min_{$property->id}";
+        $value = \Yii::$app->cache->get($cacheKey);
+        if (!$this->enableCache) {
+            $value = null;
+        }
+
+        if (!$value) {
+            if ($this->elementIds) {
+                $value = \skeeks\cms\models\CmsContentElementProperty::find()
+                    ->select(['value_enum'])
+                    ->andWhere(['element_id' => $this->elementIds])
+                    ->andWhere(['property_id' => $property->id])
+                    ->asArray()
+                    ->orderBy(['value_enum' => SORT_ASC])
+                    ->limit(1)
+                    ->one();
+
+                $value = (float)$value['value_enum'];
+
+                if ($this->enableCache) {
+                    \Yii::$app->cache->set($cacheKey, $value);
+                }
+            }
+        }
+
+        return $value;
+    }
 
     /**
      * @param $property
@@ -504,30 +515,6 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
         return true;
     }
-
-    /**
-     * @param $property
-     * @return bool
-     */
-    public function isShowPriceFilter()
-    {
-        if (!$this->typePrice) {
-            return false;
-        }
-
-        if ($this->onlyExistsFilters === false) {
-            return true;
-        }
-
-        if ($this->searchModel->price_from == $this->searchModel->price_to) {
-            return false;
-        }
-
-
-        return true;
-    }
-
-    protected $_offerOptions = [];
 
     /**
      *
@@ -604,5 +591,41 @@ class ShopProductFiltersWidget extends WidgetRenderable
         $this->_offerOptions[$property->code] = $options;
 
         return $options;
+    }
+
+    /**
+     * @param $property
+     * @return bool
+     */
+    public function isShowPriceFilter()
+    {
+        if (!$this->typePrice) {
+            return false;
+        }
+
+        if ($this->onlyExistsFilters === false) {
+            return true;
+        }
+
+        if ($this->searchModel->price_from == $this->searchModel->price_to) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+    protected function _run()
+    {
+
+        if ($this->elementIds && !$this->searchModel->price_from && $this->typePrice) {
+            $this->searchModel->price_from = $this->minPrice->price;
+        }
+
+        if ($this->elementIds && !$this->searchModel->price_to && $this->typePrice) {
+            $this->searchModel->price_to = $this->maxPrice->price;
+        }
+
+        return parent::_run();
     }
 }

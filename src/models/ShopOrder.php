@@ -9,11 +9,8 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\Module;
 use skeeks\modules\cms\money\Currency;
 use skeeks\modules\cms\money\Money;
-use Yii;
-use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use yii\web\UrlManager;
 
 /**
  * This is the model class for table "{{%shop_order}}".
@@ -138,6 +135,98 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
     /**
+     * @param ShopFuser $shopFuser
+     * @return static
+     */
+    static public function createOrderByFuser(ShopFuser $shopFuser, $isNotify = true)
+    {
+        $order = static::createByFuser($shopFuser);
+
+        if ($order->save()) {
+            foreach ($shopFuser->shopBaskets as $basket) {
+                $basket->unlink('fuser', $shopFuser);
+                $basket->link('order', $order);
+            }
+
+            if ($shopFuser->discountCoupons) {
+                foreach ($shopFuser->discountCoupons as $discountCoupon) {
+                    $shopOrder2discountCoupon = new ShopOrder2discountCoupon();
+                    $shopOrder2discountCoupon->order_id = $order->id;
+                    $shopOrder2discountCoupon->discount_coupon_id = $discountCoupon->id;
+
+                    if (!$shopOrder2discountCoupon->save()) {
+                        print_r($shopOrder2discountCoupon->errors);
+                        die;
+                    }
+                }
+
+                $shopFuser->discount_coupons = [];
+                $shopFuser->save(false);
+            }
+
+            //Notify admins
+            if (\Yii::$app->shop->notifyEmails) {
+                foreach (\Yii::$app->shop->notifyEmails as $email) {
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                    \Yii::$app->mailer->compose('create-order', [
+                        'order' => $order
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setTo($email)
+                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
+                                'New order') . ' #' . $order->id)
+                        ->send();
+                }
+            }
+
+            //Письмо тому кто заказывает
+            if ($order->email && $isNotify) {
+                $order->notifyNew();
+            }
+        }
+
+        return $order;
+    }
+
+    /**
+     * @param ShopFuser $shopFuser
+     * @return static
+     */
+    static public function createByFuser(ShopFuser $shopFuser)
+    {
+        $order = new static();
+
+        $order->site_id = $shopFuser->site->id;
+        $order->person_type_id = $shopFuser->person_type_id;
+        $order->buyer_id = $shopFuser->buyer_id;
+        $order->user_id = $shopFuser->user_id;
+
+        $order->price = $shopFuser->money ? ($shopFuser->money->getAmount() / $shopFuser->money->getCurrency()->getSubUnit()) : "";
+        $order->currency_code = $shopFuser->money ? $shopFuser->money->getCurrency()->getCurrencyCode() : "";
+        if ($shopFuser->paySystem) {
+            $order->pay_system_id = $shopFuser->paySystem->id;
+        }
+
+        if ($shopFuser->moneyVat) {
+            $order->tax_value = $shopFuser->moneyVat->getValue();
+        }
+
+        if ($shopFuser->moneyDiscount) {
+            $order->discount_value = $shopFuser->moneyDiscount->getValue();
+        }
+
+        $order->delivery_id = $shopFuser->delivery_id;
+        $order->store_id = $shopFuser->store_id;
+
+        if ($shopFuser->delivery) {
+            $order->price_delivery = $shopFuser->delivery->money->getAmount() / $shopFuser->delivery->money->getCurrency()->getSubUnit();
+        }
+
+        return $order;
+    }
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -148,7 +237,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         //$this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterUpdateCallback"]);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeUpdateCallback"]);
     }
-
 
     public function afterInstertCallback($e)
     {
@@ -323,7 +411,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
     }
 
-
     /**
      * @inheritdoc
      */
@@ -455,7 +542,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         ];
     }
 
-
     /**
      * Процесс оплаты заказа
      *
@@ -511,7 +597,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->addError($attribute, \Yii::t('skeeks/shop/app', 'Enter the reason for cancellation'));
         }
     }
-
 
     /**
      * @inheritdoc
@@ -599,106 +684,31 @@ class ShopOrder extends \skeeks\cms\models\Core
         ];
     }
 
-
-    /**
-     * @param ShopFuser $shopFuser
-     * @return static
-     */
-    static public function createByFuser(ShopFuser $shopFuser)
+    public function notifyNew()
     {
-        $order = new static();
+        if ($this->email) {
+            \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-        $order->site_id = $shopFuser->site->id;
-        $order->person_type_id = $shopFuser->person_type_id;
-        $order->buyer_id = $shopFuser->buyer_id;
-        $order->user_id = $shopFuser->user_id;
-
-        $order->price = $shopFuser->money ? ($shopFuser->money->getAmount() / $shopFuser->money->getCurrency()->getSubUnit()) : "";
-        $order->currency_code = $shopFuser->money ? $shopFuser->money->getCurrency()->getCurrencyCode() : "";
-        if ($shopFuser->paySystem) {
-            $order->pay_system_id = $shopFuser->paySystem->id;
+            \Yii::$app->mailer->compose('create-order', [
+                'order' => $this
+            ])
+                ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                ->setTo($this->email)
+                ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
+                        'New order') . ' #' . $this->id)
+                ->send();
         }
-
-        if ($shopFuser->moneyVat) {
-            $order->tax_value = $shopFuser->moneyVat->getValue();
-        }
-
-        if ($shopFuser->moneyDiscount) {
-            $order->discount_value = $shopFuser->moneyDiscount->getValue();
-        }
-
-        $order->delivery_id = $shopFuser->delivery_id;
-        $order->store_id = $shopFuser->store_id;
-
-        if ($shopFuser->delivery) {
-            $order->price_delivery = $shopFuser->delivery->money->getAmount() / $shopFuser->delivery->money->getCurrency()->getSubUnit();
-        }
-
-        return $order;
     }
 
+    protected $_email = null;
+
     /**
-     * @param ShopFuser $shopFuser
-     * @return static
+     * @return null|string
      */
-    static public function createOrderByFuser(ShopFuser $shopFuser, $isNotify = true)
+    public function setEmail($email)
     {
-        $order = static::createByFuser($shopFuser);
-
-        if ($order->save()) {
-            foreach ($shopFuser->shopBaskets as $basket) {
-                $basket->unlink('fuser', $shopFuser);
-                $basket->link('order', $order);
-            }
-
-            if ($shopFuser->discountCoupons) {
-                foreach ($shopFuser->discountCoupons as $discountCoupon) {
-                    $shopOrder2discountCoupon = new ShopOrder2discountCoupon();
-                    $shopOrder2discountCoupon->order_id = $order->id;
-                    $shopOrder2discountCoupon->discount_coupon_id = $discountCoupon->id;
-
-                    if (!$shopOrder2discountCoupon->save()) {
-                        print_r($shopOrder2discountCoupon->errors);
-                        die;
-                    }
-                }
-
-                $shopFuser->discount_coupons = [];
-                $shopFuser->save(false);
-            }
-
-            //Notify admins
-            if (\Yii::$app->shop->notifyEmails) {
-                foreach (\Yii::$app->shop->notifyEmails as $email) {
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
-
-                    \Yii::$app->mailer->compose('create-order', [
-                        'order' => $order
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                        ->setTo($email)
-                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                'New order') . ' #' . $order->id)
-                        ->send();
-                }
-            }
-
-            //Письмо тому кто заказывает
-            if ($order->email && $isNotify) {
-                \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
-
-                \Yii::$app->mailer->compose('create-order', [
-                    'order' => $order
-                ])
-                    ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                    ->setTo($order->email)
-                    ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                            'New order') . ' #' . $order->id)
-                    ->send();
-            }
-        }
-
-        return $order;
+        $this->_email = $email;
+        return $this;
     }
 
     /**
@@ -706,6 +716,10 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getEmail()
     {
+        if ($this->_email !== null) {
+            return $this->_email;
+        }
+
         if ($this->user && $this->user->email) {
             return $this->user->email;
         }

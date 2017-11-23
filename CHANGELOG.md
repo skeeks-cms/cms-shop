@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1-alpha10.pre
+-----------------
+ * Cache shopProductFiltersWidget
+
 2.0.1-alpha9
 -----------------
  * Pgsql support
