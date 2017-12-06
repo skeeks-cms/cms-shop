@@ -120,8 +120,7 @@ class PriceFiltersHandler extends Model
         $query->orderBy = [];
         $query->groupBy = [];
         $query->with = [];
-        $min = $query->select(['prices.id', 'min(price) as value'])->asArray()->one();
-
+        $min = $query->select(['min(price) as value'])->createCommand()->queryOne();
         if ($min) {
             return ArrayHelper::getValue($min, 'value');
         }
@@ -139,8 +138,7 @@ class PriceFiltersHandler extends Model
         $query->orderBy = [];
         $query->groupBy = [];
         $query->with = [];
-        $min = $query->select(['prices.id', 'max(price) as value'])->asArray()->one();
-
+        $min = $query->select(['max(price) as value'])->createCommand()->queryOne();
         if ($min) {
             return ArrayHelper::getValue($min, 'value');
         }
