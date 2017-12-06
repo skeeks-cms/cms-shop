@@ -3,6 +3,7 @@ Changelog
 
 2.0.1-alpha10.pre
 -----------------
+ * Query filters
  * Cache shopProductFiltersWidget
 
 2.0.1-alpha9
