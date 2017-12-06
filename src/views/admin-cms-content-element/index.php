@@ -8,6 +8,7 @@
 /* @var $this yii\web\View */
 /* @var $searchModel \skeeks\cms\models\Search */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $dataProvider \skeeks\cms\models\CmsContent */
 
 ?>
 <? $pjax = \yii\widgets\Pjax::begin(); ?>

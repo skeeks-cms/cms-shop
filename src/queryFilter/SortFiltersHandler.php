@@ -39,9 +39,22 @@ class SortFiltersHandler extends Model
     public $value = '-popular';
     public $formName = 's';
 
+    public $type_price_id;
+
     public function formName()
     {
         return $this->formName;
+    }
+
+    public function init() {
+        parent::init();
+
+        if (!$this->type_price_id) {
+            $typePrice = \skeeks\cms\shop\models\ShopTypePrice::find()->andWhere(['def' => 'Y'])->one();
+            if ($typePrice) {
+                $this->type_price_id = $typePrice->id;
+            }
+        }
     }
 
     /**
@@ -92,7 +105,22 @@ class SortFiltersHandler extends Model
                     /*$query->joinWith('shopProduct.baseProductPrice as basePrice');
                     $query->orderBy(['baseProductPrice.price' => SORT_ASC]);*/
 
-                    $joined = [];
+                    if ($this->type_price_id) {
+                        $query->joinWith('shopProduct as p');
+                        $query->joinWith('shopProduct.shopProductPrices as prices');
+                        $query->joinWith('shopProduct.shopProductPrices.currency as currency');
+                        $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
+
+                        $query->select([
+                            'cms_content_element.*',
+                            'realPrice' => '( currency.course * prices.price )'
+                        ]);
+
+                        $query->orderBy(['realPrice' => SORT_ASC]);
+
+                    }
+
+                    /*$joined = [];
                     if ($query->join)
                     {
                         $joined = (array) ArrayHelper::map($query->join, 1, 1);
@@ -109,7 +137,7 @@ class SortFiltersHandler extends Model
                     {
                         $query->joinWith('shopProduct.baseProductPrice as basePrice');
                         $query->orderBy(['basePrice.price' => SORT_ASC]);
-                    }
+                    }*/
 
 
                     break;
@@ -117,25 +145,20 @@ class SortFiltersHandler extends Model
                 case ('-price'):
                     /*$query->joinWith('shopProduct.baseProductPrice as basePrice');
                     $query->orderBy(['baseProductPrice.price' => SORT_DESC]);*/
-                    $joined = [];
-                    if ($query->join)
-                    {
-                        $joined = (array) ArrayHelper::map($query->join, 1, 1);
-                    }
+                    if ($this->type_price_id) {
+                        $query->joinWith('shopProduct as p');
+                        $query->joinWith('shopProduct.shopProductPrices as prices');
+                        $query->joinWith('shopProduct.shopProductPrices.currency as currency');
+                        $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
 
-                    if (ArrayHelper::getValue($joined, 'shop_product_price'))
-                    {
-                        $query->orderBy(['shop_product_price.price' => SORT_DESC]);
-                    } else if (ArrayHelper::getValue($joined, 'shop_product'))
-                    {
-                        $query->leftJoin('shop_product_price', '`shop_product_price`.`product_id` = `shop_product`.`id`');
-                        $query->orderBy(['shop_product_price.price' => SORT_DESC]);
-                    } else
-                    {
-                        $query->joinWith('shopProduct.baseProductPrice as basePrice');
-                        $query->orderBy(['basePrice.price' => SORT_DESC]);
-                    }
+                        $query->select([
+                            'cms_content_element.*',
+                            'realPrice' => '( currency.course * prices.price )'
+                        ]);
 
+                        $query->orderBy(['realPrice' => SORT_DESC]);
+
+                    }
 
                     break;
             }
