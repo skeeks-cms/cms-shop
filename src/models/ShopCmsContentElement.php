@@ -88,7 +88,7 @@ class ShopCmsContentElement extends CmsContentElement
      */
     public function getShopProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'id']);
+        return $this->hasOne(ShopProduct::className(), ['id' => 'id'])->from(['shopProduct' => ShopProduct::tableName()]);
     }
 
     /**

@@ -114,7 +114,7 @@ class PriceFiltersHandler extends Model
     public function getMinValue()
     {
         $query = clone $this->baseQuery;
-        $query->joinWith('shopProduct as p');
+        $query->joinWith('shopProduct as shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
         $query->orderBy = [];
@@ -132,7 +132,7 @@ class PriceFiltersHandler extends Model
     public function getMaxValue()
     {
         $query = clone $this->baseQuery;
-        $query->joinWith('shopProduct as p');
+        $query->joinWith('shopProduct as shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
         $query->orderBy = [];
@@ -156,7 +156,7 @@ class PriceFiltersHandler extends Model
 
         if ($this->type_price_id) {
 
-            $query->joinWith('shopProduct as p');
+            $query->joinWith('shopProduct as shopProduct');
             $query->joinWith('shopProduct.shopProductPrices as prices');
             $query->joinWith('shopProduct.shopProductPrices.currency as currency');
             $query->andWhere(['prices.type_price_id' => $this->type_price_id]);

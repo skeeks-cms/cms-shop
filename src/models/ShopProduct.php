@@ -466,7 +466,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getShopProductPrices()
     {
-        return $this->hasMany(ShopProductPrice::className(), ['product_id' => 'id']);
+        return $this->hasMany(ShopProductPrice::className(), ['product_id' => 'id'])->from(['prices' => ShopProductPrice::tableName()]);
     }
 
     /**
