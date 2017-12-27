@@ -15,6 +15,7 @@ use common\models\V3pFeatureValue;
 use common\models\V3pFtSoption;
 use common\models\V3pProduct;
 use skeeks\yii2\queryfilter\IQueryFilterHandler;
+use v3p\aff\models\V3pShopCmsContentElement;
 use v3project\yii2\productfilter\EavFiltersHandler;
 use v3project\yii2\productfilter\IFiltersHandler;
 use yii\base\DynamicModel;
@@ -50,6 +51,8 @@ class PriceFiltersHandler extends Model
      */
     protected $_baseQuery;
 
+    public $cms_content_element_ids = [];
+
     public $from;
     public $to;
 
@@ -80,7 +83,8 @@ class PriceFiltersHandler extends Model
      * @param QueryInterface $baseQuery
      * @return $this
      */
-    public function setBaseQuery(QueryInterface $baseQuery) {
+    public function setBaseQuery(QueryInterface $baseQuery)
+    {
         $this->_baseQuery = clone $baseQuery;
         return $this;
     }
@@ -88,7 +92,8 @@ class PriceFiltersHandler extends Model
     /**
      * @return ActiveQuery
      */
-    public function getBaseQuery() {
+    public function getBaseQuery()
+    {
         return $this->_baseQuery;
     }
 
@@ -111,39 +116,52 @@ class PriceFiltersHandler extends Model
         ];
     }
 
-    public function getMinValue()
+    protected $_min_max_data = null;
+
+    /**
+     * @return array
+     */
+    protected function _getMinMaxPriceFromQuery()
     {
-        $query = clone $this->baseQuery;
+
+        if ($this->_min_max_data !== null) {
+            return $this->_min_max_data;
+        }
+
+        /*$query = clone $this->baseQuery;
         $query->joinWith('shopProduct as shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
         $query->orderBy = [];
         $query->groupBy = [];
-        $query->with = [];
-        $min = $query->select(['min(price) as value'])->createCommand()->queryOne();
-        if ($min) {
-            return ArrayHelper::getValue($min, 'value');
-        }
+        $query->with = [];*/
 
-        return 0;
+        $query = V3pShopCmsContentElement::find();
+        $query->joinWith('shopProduct');
+        $query->joinWith('shopProduct.shopProductPrices as prices');
+        $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
+        $query->andWhere('cms_content_element.id IN (' . $this->cms_content_element_ids . ")");
+
+        $data = $query->select(['min(price) as min', 'max(price) as max'])->createCommand()->queryOne();
+        $this->_min_max_data = [
+            ArrayHelper::getValue($data, 'min'),
+            ArrayHelper::getValue($data, 'max'),
+        ];
+
+        return $this->_min_max_data;
+    }
+
+    public function getMinValue()
+    {
+        $data = $this->_getMinMaxPriceFromQuery();
+        return $data[0];
     }
 
 
     public function getMaxValue()
     {
-        $query = clone $this->baseQuery;
-        $query->joinWith('shopProduct as shopProduct');
-        $query->joinWith('shopProduct.shopProductPrices as prices');
-        $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
-        $query->orderBy = [];
-        $query->groupBy = [];
-        $query->with = [];
-        $min = $query->select(['max(price) as value'])->createCommand()->queryOne();
-        if ($min) {
-            return ArrayHelper::getValue($min, 'value');
-        }
-
-        return 0;
+        $data = $this->_getMinMaxPriceFromQuery();
+        return $data[1];
     }
 
     /**
@@ -180,8 +198,6 @@ class PriceFiltersHandler extends Model
             ]);*/
 
 
-
-
             if ($this->to) {
                 $query->andHaving(['<=', 'realPrice', $this->to]);
             }
@@ -200,16 +216,6 @@ class PriceFiltersHandler extends Model
     public function applyToDataProvider(DataProviderInterface $dataProvider)
     {
         return $this->applyToQuery($dataProvider->query);
-    }
-
-    public function getSelected()
-    {
-
-        if ($this->from && $this->to) {
-            return ["from" => "от {$this->from} до {$this->to} руб."];
-        }
-
-        return [];
     }
 
     public function render(ActiveForm $form)
