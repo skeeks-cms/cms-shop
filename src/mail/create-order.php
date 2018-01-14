@@ -108,10 +108,22 @@ $order->refresh();
     <?= Html::beginTag('h2'); ?>
         Покупатель:
     <?= Html::endTag('h2'); ?>
+
+    <?
+        $attributes = [];
+        if ($order->buyer->relatedPropertiesModel->toArray()) {
+            foreach ($order->buyer->relatedPropertiesModel->toArray() as $key => $value) {
+                $attributes[] = [
+                    'attribute' => $key,
+                    'value' => $order->buyer->relatedPropertiesModel->getSmartAttribute($key)
+                ];
+            }
+        }
+    ?>
     <?=
     \yii\widgets\DetailView::widget([
         'model' => $order->buyer->relatedPropertiesModel,
-        'attributes' => $order->buyer->relatedPropertiesModel->attributes()
+        'attributes' => $attributes
     ]);
     ?>
 
