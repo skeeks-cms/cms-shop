@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.1-alpha10.pre
+2.0.1-alpha10
 -----------------
  * New yandex .cer
  * Optimization queries
