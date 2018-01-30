@@ -462,6 +462,18 @@ class ShopBasket extends \skeeks\cms\models\Core
 
         //Если это предложение, нужно добавить свойства
         if ($parentElement && !$this->isNewRecord) {
+
+
+            if ($product->cmsContentElement->name != $parentElement->name) {
+                $basketProperty = new ShopBasketProps();
+                $basketProperty->shop_basket_id = $this->id;
+                $basketProperty->code = 'name';
+                $basketProperty->value = $product->cmsContentElement->name;
+                $basketProperty->name = \Yii::t('skeeks/cms', 'name');
+
+                $basketProperty->save();
+            }
+
             if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray()) {
                 foreach ($properties as $code => $value) {
                     if (!$this->getShopBasketProps()->andWhere(['code' => $code])->count() && $value) {

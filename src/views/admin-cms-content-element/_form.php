@@ -162,7 +162,7 @@ JS
 
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Prices and availability')); ?>
-<? if ($shopContent->childrenContent) : ?>
+<? if ($shopContent && $shopContent->childrenContent) : ?>
     <?
     $id = Html::getInputId($shopProduct, 'product_type');
     $this->registerJs(<<<JS
@@ -365,7 +365,7 @@ JS
     <?= $form->fieldRadioListBoolean($shopProduct, 'subscribe'); ?>
 </div>
 
-<? if ($shopContent->childrenContent) : ?>
+<? if ($shopContent && $shopContent->childrenContent) : ?>
     <div id="sx-shop-product-tradeOffers">
 
         <? if ($model->isNewRecord) : ?>
@@ -427,7 +427,7 @@ JS
     <? endif; ?>
 <? endif; ?>
 
-<? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
+<? if ($shopContent && $shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
         '!=',
         'id',
         $shopContent->childrenContent->id

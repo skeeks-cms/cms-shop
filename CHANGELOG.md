@@ -3,6 +3,7 @@ Changelog
 
 2.0.1-alpha10
 -----------------
+ * Update basket item
  * New yandex .cer
  * Optimization queries
  * Query filters
