@@ -52,6 +52,20 @@ class ShopProductPrice extends \skeeks\cms\models\Core
         $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveEvent"]);
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveEvent"]);
 
+
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, '_logPrice']);
+
+    }
+
+
+    public function _logPrice() {
+        \Yii::info('Change price'
+            . 'produt = ' . $this->product->id
+            . 'data = ' . print_r($this->toArray(), true)
+            . '$_REQUEST = ' . print_r($_REQUEST, true)
+            . '$_SESSION = ' . print_r($_SESSION, true)
+            . '$_SERVER = ' . print_r($_SERVER, true)
+            , static::className());
     }
 
 

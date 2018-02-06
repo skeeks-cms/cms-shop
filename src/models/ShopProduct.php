@@ -14,6 +14,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "{{%shop_product}}".
