@@ -5,6 +5,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\modules\cms\money\Money;
 use Yii;
+use yii\console\Application;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -62,6 +63,9 @@ class ShopProductPrice extends \skeeks\cms\models\Core
         \Yii::info('Change price'
             . 'produt = ' . $this->product->id
             . 'data = ' . print_r($this->toArray(), true)
+            . 'is console = ' . (\Yii::$app instanceof Application ? 1 : 0)
+            . '$_POST = ' . print_r($_POST, true)
+            . '$_GET = ' . print_r($_GET, true)
             . '$_REQUEST = ' . print_r($_REQUEST, true)
             . '$_SESSION = ' . print_r($_SESSION, true)
             . '$_SERVER = ' . print_r($_SERVER, true)
@@ -74,7 +78,18 @@ class ShopProductPrice extends \skeeks\cms\models\Core
         //Обновление цены у родительского элемента если она есть
         if ($this->product->cmsContentElement->parent_content_element_id) {
             $parentProduct = $this->product->cmsContentElement->parentContentElement->shopProduct;
-            if ($parentProduct) {
+            //Если родитель является офером
+            $shopParentContent = ShopContent::findOne($parentProduct->cmsContentElement->content_id);
+
+            if (!$shopParentContent) {
+                return;
+            }
+
+            if (!$shopParentContent->children_content_id) {
+                return;
+            }
+            
+            if ($parentProduct && $shopParentContent->children_content_id && $shopParentContent->children_content_id == $this->product->cmsContentElement->content_id) {
                 $minPriceValue = $this->price;
                 $minPriceCurrency = $this->currency_code;
                 //У родительского элемента уже есть предложения

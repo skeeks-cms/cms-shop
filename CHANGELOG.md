@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.1.pre
+-----------------
+ * Fixed update price parent content element 
+ 
 2.0.1-alpha10
 -----------------
  * Update basket item
