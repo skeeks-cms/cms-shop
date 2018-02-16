@@ -88,7 +88,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             if (!$shopParentContent->children_content_id) {
                 return;
             }
-            
+
             if ($parentProduct && $shopParentContent->children_content_id && $shopParentContent->children_content_id == $this->product->cmsContentElement->content_id) {
                 $minPriceValue = $this->price;
                 $minPriceCurrency = $this->currency_code;
