@@ -56,6 +56,19 @@ if ($model->isNewRecord) {
 $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
 ?>
 
+<? if (!$model->isNewRecord) : ?>
+    <div class="sx-box sx-p-10 sx-bg-primary" style="margin-bottom: 10px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <a href='<?= $model->url; ?>' target='_blank' class="btn btn-default btn-sm" title="<?= \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>"><i class="glyphicon glyphicon-arrow-right"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+<? endif; ?>
+
 <?php $form = $action->beginActiveForm([
     'id' => 'sx-dynamic-form',
     'enableAjaxValidation' => false,
@@ -162,7 +175,7 @@ JS
 
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Prices and availability')); ?>
-<? if ($shopContent && $shopContent->childrenContent) : ?>
+<? if ($shopContent->childrenContent) : ?>
     <?
     $id = Html::getInputId($shopProduct, 'product_type');
     $this->registerJs(<<<JS
@@ -365,7 +378,7 @@ JS
     <?= $form->fieldRadioListBoolean($shopProduct, 'subscribe'); ?>
 </div>
 
-<? if ($shopContent && $shopContent->childrenContent) : ?>
+<? if ($shopContent->childrenContent) : ?>
     <div id="sx-shop-product-tradeOffers">
 
         <? if ($model->isNewRecord) : ?>
@@ -427,7 +440,7 @@ JS
     <? endif; ?>
 <? endif; ?>
 
-<? if ($shopContent && $shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
+<? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
         '!=',
         'id',
         $shopContent->childrenContent->id

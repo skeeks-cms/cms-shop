@@ -3,6 +3,7 @@ Changelog
 
 2.0.1.pre
 -----------------
+ * Link on page with item
  * Fixed update price parent content element 
  
 2.0.1-alpha10
