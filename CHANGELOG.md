@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.1.pre
+2.0.1
 -----------------
  * Copy elements
  * Link on page with item
