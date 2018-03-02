@@ -31,16 +31,20 @@ use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopTypePrice;
+use skeeks\yii2\form\fields\BoolField;
 use Yii;
 use skeeks\cms\models\User;
 use skeeks\cms\models\searchs\User as UserSearch;
 use yii\base\ActionEvent;
+use yii\base\DynamicModel;
+use yii\base\Event;
 use yii\caching\TagDependency;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Application;
 
 /**
@@ -78,6 +82,62 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "create" => ["callback" => [$this, 'create']],
                 "update" => ["callback" => [$this, 'update']],
+
+
+
+                "copy"   => [
+                    'class'          => BackendModelUpdateAction::class,
+                    "name"           => \Yii::t('skeeks/cms', 'Copy'),
+                    "icon"           => "fas fa-copy",
+                    "preContent"     => "Механизм создания копии текущего элемента. Укажите параметры копирования и нажмите применить.",
+                    "successMessage" => "Товар успешно скопирован",
+
+                    'on initFormModels' => function (Event $e) {
+                        $model = $e->sender->model;
+                        $dm = new DynamicModel(['is_copy_images', 'is_copy_files']);
+                        $dm->addRule(['is_copy_images', 'is_copy_files'], 'boolean');
+
+                        $dm->is_copy_images = true;
+                        $dm->is_copy_files = true;
+
+                        $e->sender->formModels['dm'] = $dm;
+                    },
+
+                    'on beforeSave' => function (Event $e) {
+                        /**
+                         * @var $action BackendModelUpdateAction;
+                         */
+                        $action = $e->sender;
+                        $action->isSaveFormModels = false;
+                        $dm = ArrayHelper::getValue($action->formModels, 'dm');
+
+                        /**
+                         * @var $newModel ShopCmsContentElement
+                         * @var $model ShopCmsContentElement
+                         */
+                        $newModel = $action->model->copy();
+
+                        if ($newModel) {
+                            $action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                        } else {
+                            throw new Exception(print_r($newModel->errors, true));
+                        }
+
+                    },
+
+                    'fields' => function () {
+                        return [
+                            'dm.is_copy_images' => [
+                                'class' => BoolField::class,
+                                'label' => ['skeeks/cms', 'Copy images?'],
+                            ],
+                            'dm.is_copy_files'  => [
+                                'class' => BoolField::class,
+                                'label' => ['skeeks/cms', 'Copy files?'],
+                            ],
+                        ];
+                    },
+                ],
 
                 "activate-multi" =>
                     [

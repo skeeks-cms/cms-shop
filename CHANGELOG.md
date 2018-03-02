@@ -3,6 +3,7 @@ Changelog
 
 2.0.1.pre
 -----------------
+ * Copy elements
  * Link on page with item
  * Fixed update price parent content element 
  
