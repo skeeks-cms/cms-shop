@@ -73,6 +73,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 {
     const TYPE_SIMPLE = 'simple';
     const TYPE_OFFERS = 'offers';
+    const TYPE_OFFER = 'offer';
 
     /**
      * @inheritdoc
@@ -90,6 +91,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         return [
             static::TYPE_SIMPLE => \Yii::t('skeeks/shop/app', 'Plain'),
             static::TYPE_OFFERS => \Yii::t('skeeks/shop/app', 'With quotations'),
+            static::TYPE_OFFER => \Yii::t('skeeks/shop/app', 'Товар-предложение'),
         ];
     }
 

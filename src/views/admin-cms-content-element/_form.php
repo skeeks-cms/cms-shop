@@ -187,13 +187,13 @@ function initProductType(jQuery)
         $('#sx-shop-product-simple').hide();
 
         $('input', $('#sx-shop-product-simple')).attr('disabled', 'disabled');
-    } else
+    } else if (jQuery.val() == 'simple' || jQuery.val() == 'offer')
     {
         $('#sx-shop-product-simple').show();
         $('#sx-shop-product-tradeOffers').hide();
 
         $('input', $('#sx-shop-product-simple')).removeAttr('disabled');
-    }
+    } 
 }
 
 $('#{$id}').on("change", function()
