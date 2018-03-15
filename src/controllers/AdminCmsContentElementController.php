@@ -185,6 +185,17 @@ class AdminCmsContentElementController extends AdminModelEditorController
                             'eachRelatedProperties'
                         ],
                     ],
+
+                "to-offer" =>
+                    [
+                        'class' => AdminMultiDialogModelEditAction::class,
+                        "name" => "Привязать к общему",
+                        "viewDialog" => "@skeeks/cms/shop/views/admin-cms-content-element/to-offer",
+                        "eachCallback" => [
+                            $this,
+                            'eachToOffer'
+                        ],
+                    ],
             ]
         );
 
@@ -197,6 +208,30 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
         return $actions;
+    }
+
+    /**
+     * @param CmsContentElement $model
+     * @param                   $action
+     * @return bool
+     */
+    public function eachToOffer($model, $action)
+    {
+        try {
+            $formData = [];
+            parse_str(\Yii::$app->request->post('formData'), $formData);
+            $model->load($formData);
+
+            $sp = $model->shopProduct;
+            $sp->product_type = ShopProduct::TYPE_OFFER;
+
+            $model->save(false);
+            $sp->save();
+            return true;
+
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function create($adminAction)

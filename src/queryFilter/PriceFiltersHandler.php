@@ -154,14 +154,22 @@ class PriceFiltersHandler extends Model
     public function getMinValue()
     {
         $data = $this->_getMinMaxPriceFromQuery();
-        return $data[0];
+        if (isset($data[0])) {
+            return $data[0];
+        }
+
+        return 0;
     }
 
 
     public function getMaxValue()
     {
         $data = $this->_getMinMaxPriceFromQuery();
-        return $data[1];
+        if (isset($data[1])) {
+            return $data[1];
+        }
+
+        return 0;
     }
 
     /**

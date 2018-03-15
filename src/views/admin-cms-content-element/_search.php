@@ -4,6 +4,19 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 26.05.2016
  */
+
+
+$filter = new \yii\base\DynamicModel([
+    'product_type',
+]);
+$filter->addRule('product_type', 'safe');
+
+$filter->load(\Yii::$app->request->get());
+
+if ($filter->product_type) {
+    $dataProvider->query->andWhere(['sp.product_type' => $filter->product_type]);
+}
+
 ?>
 
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
@@ -15,9 +28,13 @@
 
 <?= $form->field($searchModel, 'id'); ?>
 
+
 <?= $form->field($searchModel, 'q')->textInput([
     'placeholder' => \Yii::t('skeeks/cms', 'Search name and description')
 ])->setVisible(); ?>
+
+<?= $form->fieldSelectMulti($filter, 'product_type', \skeeks\cms\shop\models\ShopProduct::possibleProductTypes())->label('Тип товара')->setVisible(); ?>
+
 
 <?= $form->field($searchModel, 'name')->textInput([
     'placeholder' => \Yii::t('skeeks/cms', 'Search by name')

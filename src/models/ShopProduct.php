@@ -13,6 +13,7 @@ use skeeks\cms\measure\models\Measure;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
 use Yii;
+use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -189,13 +190,17 @@ class ShopProduct extends \skeeks\cms\models\Core
                 if (!$this->getTradeOffers()->all()) {
                     $this->product_type = self::TYPE_SIMPLE;
                 }
-            } else {
-                if ($this->product_type == self::TYPE_SIMPLE) //Если указали что товар простой, значит у него не должно быть предложений
-                {
-                    if ($this->getTradeOffers()->all()) {
-                        $this->product_type = self::TYPE_OFFERS;
-                    }
+            } elseif ($this->product_type == self::TYPE_SIMPLE) //Если указали что товар простой, значит у него не должно быть предложений
+            {
+                if ($this->getTradeOffers()->all()) {
+                    $this->product_type = self::TYPE_OFFERS;
                 }
+            } elseif ($this->product_type == self::TYPE_OFFER) //Если указали что товар простой, значит у него не должно быть предложений
+            {
+                if (!$this->cmsContentElement->parent_content_element_id) {
+                    $this->product_type = self::TYPE_SIMPLE;
+                }
+
             }
         }
     }
@@ -221,7 +226,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      * После сохранения следим за ценами создаем если нет
      * @param $event
      */
-    public function _afterSaveEvent($event)
+    public function _afterSaveEvent(AfterSaveEvent $event)
     {
         //Prices update
         if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue) {
@@ -275,6 +280,19 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $baseProductPrice->save();
             }
         }
+
+        if (in_array('product_type', (array) $event->changedAttributes)) {
+            if ($this->product_type == self::TYPE_OFFER) {
+                if ($this->cmsContentElement->parentContentElement->shopProduct) {
+                    $sp = $this->cmsContentElement->parentContentElement->shopProduct;
+                    $sp->product_type = self::TYPE_OFFERS;
+                    $sp->save();
+                }
+            }
+        }
+
+
+
     }
     /**
      *

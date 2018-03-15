@@ -189,10 +189,16 @@ function initProductType(jQuery)
         $('input', $('#sx-shop-product-simple')).attr('disabled', 'disabled');
     } else if (jQuery.val() == 'simple' || jQuery.val() == 'offer')
     {
+        $('.sx-offer').hide();
+        
         $('#sx-shop-product-simple').show();
         $('#sx-shop-product-tradeOffers').hide();
 
         $('input', $('#sx-shop-product-simple')).removeAttr('disabled');
+        
+        if (jQuery.val() == 'offer') {
+            $('.sx-offer').show();
+        }
     } 
 }
 
@@ -209,6 +215,22 @@ JS
 <? endif; ?>
 
 <div id="sx-shop-product-simple">
+
+    <div class="sx-offer">
+
+
+        <?= $form->field($model, 'parent_content_element_id')->widget(
+                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+            [
+                    'content_id' => $shopContent->childrenContent->id,
+                    'dialogRoute' => ['/shop/admin-cms-content-element', 'DynamicModel' => [
+                        'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS]
+                    ]]
+            ]
+        )
+                ->label('Общий товар с предложениями');
+        ?>
+    </div>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('skeeks/shop/app', 'Main prices')
