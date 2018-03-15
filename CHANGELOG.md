@@ -1,7 +1,7 @@
 Changelog
 ==============
 
-2.0.2
+2.0.2.pre
 -----------------
  * Update filters widget
  
