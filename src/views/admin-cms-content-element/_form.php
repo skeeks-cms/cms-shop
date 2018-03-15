@@ -445,6 +445,7 @@ JS
         'id',
         $shopContent->childrenContent->id
     ])->all()) : ?>
+    <?print_r($shopContent->children_content_id);?>
     <? $childContents = $model->cmsContent->getChildrenContents()->andWhere([
         '!=',
         'id',

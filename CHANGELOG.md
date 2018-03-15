@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.0.2
+-----------------
+ * Update filters widget
+ 
 2.0.1
 -----------------
  * Copy elements

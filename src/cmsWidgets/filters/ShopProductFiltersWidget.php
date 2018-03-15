@@ -322,6 +322,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 ->andWhere(['map.element_id' => $this->elementIds])
                 ->andWhere(['map.property_id' => $property->id])
                 ->andWhere(['>', 'map.value_enum', 0])
+                ->andWhere(['>', 'e.id', 0])
                 ->andWhere(['is not', 'map.value_enum', null])
                 ->asArray()
                 ->all();

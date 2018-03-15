@@ -44,11 +44,11 @@ JS
 <? $form = \skeeks\cms\base\widgets\ActiveForm::begin([
     'options' =>
         [
-            'id' => 'sx-filters-form',
-            'data-pjax' => '1'
+            'id'        => 'sx-filters-form',
+            'data-pjax' => '1',
         ],
-    'method' => 'get',
-    'action' => "/" . \Yii::$app->request->getPathInfo(),
+    'method'  => 'get',
+    'action'  => "/".\Yii::$app->request->getPathInfo(),
 ]); ?>
 
 <? if ($widget->searchModel) : ?>
@@ -58,22 +58,22 @@ JS
         <?= $form->field($widget->searchModel, "type_price_id", [
             'options' =>
                 [
-                    'class' => 'hidden'
-                ]
+                    'class' => 'hidden',
+                ],
         ])->hiddenInput([
-            'value' => $widget->typePrice->id
+            'value' => $widget->typePrice->id,
         ])->label(false); ?>
         <div class="form-group">
             <label class="control-label">Цена</label>
             <div class="row">
                 <div class="col-md-6">
                     <?= $form->field($widget->searchModel, "price_from")->textInput([
-                        'placeholder' => \Yii::$app->money->currencyCode
+                        'placeholder' => \Yii::$app->money->currencyCode,
                     ])->label("От"); ?>
                 </div>
                 <div class="col-md-6">
                     <?= $form->field($widget->searchModel, "price_to")->textInput([
-                        'placeholder' => \Yii::$app->money->currencyCode
+                        'placeholder' => \Yii::$app->money->currencyCode,
                     ])->label("До"); ?>
                 </div>
             </div>
@@ -115,7 +115,7 @@ JS
 
     <? if (in_array('image', $widget->searchModelAttributes)) : ?>
         <?= $form->fieldSelect($widget->searchModel, "image", [
-            '' => \skeeks\cms\shop\Module::t('app', 'Does not matter'),
+            ''  => \skeeks\cms\shop\Module::t('app', 'Does not matter'),
             'Y' => \skeeks\cms\shop\Module::t('app', 'With photo'),
             'N' => \skeeks\cms\shop\Module::t('app', 'Without photo'),
         ]); ?>
@@ -138,7 +138,7 @@ JS
 
                 <? if (in_array($property->property_type, [
                     \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
-                    \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+                    \skeeks\cms\relatedProperties\PropertyType::CODE_LIST,
                 ])) : ?>
 
                     <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(
@@ -150,29 +150,30 @@ JS
                     <?
                     $options = $widget->getRelatedPropertyOptions($property);
                     \yii\helpers\ArrayHelper::remove($options, 0);
+
                     ?>
-                    <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(
-                        $options
-                        , ['class' => 'sx-filters-checkbox-options']
-                    ); ?>
+                    <? if ($options) : ?>
+                        <?= $form->field($widget->searchRelatedPropertiesModel, $property->code)->checkboxList(
+                            $options
+                            , ['class' => 'sx-filters-checkbox-options']
+                        ); ?>
+                    <? endif; ?>
 
 
                 <? elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) : ?>
                     <div class="form-group">
+                        <label class="control-label"><?= $property->name; ?></label>
                         <div class="row">
-                            <div class="col-md-12">
-                                <label class="control-label"><?= $property->name; ?></label>
-                            </div>
                             <div class="col-md-6">
                                 <?= $form->field($widget->searchRelatedPropertiesModel,
                                     $widget->searchRelatedPropertiesModel->getAttributeNameRangeFrom($property->code))->textInput([
-                                    'placeholder' => 'от'
+                                    'placeholder' => 'от',
                                 ])->label(false); ?>
                             </div>
                             <div class="col-md-6">
                                 <?= $form->field($widget->searchRelatedPropertiesModel,
                                     $widget->searchRelatedPropertiesModel->getAttributeNameRangeTo($property->code))->textInput([
-                                    'placeholder' => 'до'
+                                    'placeholder' => 'до',
                                 ])->label(false); ?>
                             </div>
                         </div>
@@ -182,7 +183,7 @@ JS
 
                     <? $propertiesValues = \skeeks\cms\models\CmsContentElementProperty::find()->select(['value'])->where([
                         'property_id' => $property->id,
-                        'element_id' => $widget->elementIds
+                        'element_id'  => $widget->elementIds,
                     ])->all(); ?>
 
                     <? if ($propertiesValues) : ?>
@@ -215,7 +216,7 @@ JS
 
                 <? if (in_array($property->property_type, [
                     \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
-                    \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+                    \skeeks\cms\relatedProperties\PropertyType::CODE_LIST,
                 ])) : ?>
 
                     <?= $form->field($widget->searchOfferRelatedPropertiesModel, $property->code)
@@ -231,15 +232,15 @@ JS
                             <div class="col-md-6">
                                 <?= $form->field($widget->searchOfferRelatedPropertiesModel,
                                     $widget->searchOfferRelatedPropertiesModel->getAttributeNameRangeFrom($property->code))->textInput([
-                                    'placeholder' => 'от'
+                                    'placeholder' => 'от',
                                 ])->label(
-                                    $property->name . ""
+                                    $property->name.""
                                 ); ?>
                             </div>
                             <div class="col-md-6">
                                 <?= $form->field($widget->searchOfferRelatedPropertiesModel,
                                     $widget->searchOfferRelatedPropertiesModel->getAttributeNameRangeTo($property->code))->textInput([
-                                    'placeholder' => 'до'
+                                    'placeholder' => 'до',
                                 ])->label("&nbsp;"); ?>
                             </div>
                         </div>
@@ -249,7 +250,7 @@ JS
 
                     <? $propertiesValues = \skeeks\cms\models\CmsContentElementProperty::find()->select(['value'])->where([
                         'property_id' => $property->id,
-                        'element_id' => $widget->elementIds
+                        'element_id'  => $widget->elementIds,
                     ])->all(); ?>
 
                     <? if ($propertiesValues) : ?>
