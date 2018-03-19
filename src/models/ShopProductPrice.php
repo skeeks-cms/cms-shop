@@ -5,6 +5,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\modules\cms\money\Money;
 use Yii;
+use yii\base\Exception;
 use yii\console\Application;
 use yii\helpers\ArrayHelper;
 
@@ -79,7 +80,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
         if ($this->product->cmsContentElement->parent_content_element_id) {
             $parentProduct = $this->product->cmsContentElement->parentContentElement->shopProduct;
             //Если родитель является офером
-            $shopParentContent = ShopContent::findOne($parentProduct->cmsContentElement->content_id);
+            $shopParentContent = ShopContent::find()->where(['content_id' => $parentProduct->cmsContentElement->content_id])->one();
 
             if (!$shopParentContent) {
                 return;
@@ -92,6 +93,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             if ($parentProduct && $shopParentContent->children_content_id && $shopParentContent->children_content_id == $this->product->cmsContentElement->content_id) {
                 $minPriceValue = $this->price;
                 $minPriceCurrency = $this->currency_code;
+
                 //У родительского элемента уже есть предложения
                 if ($offers = $parentProduct->tradeOffers) {
                     //Все цены оферов этого типа
@@ -121,7 +123,11 @@ class ShopProductPrice extends \skeeks\cms\models\Core
                 if ($price = $query->one()) {
                     $price->price = $minPriceValue;
                     $price->currency_code = $minPriceCurrency;
-                    $price->save();
+                    if (!$price->save()) {
+                        throw new Exception(print_r($price->errors, true));
+                    } else {
+                        //var_dump($minPriceValue);die;
+                    }
                 }
 
             }
