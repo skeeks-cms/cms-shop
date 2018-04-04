@@ -13,9 +13,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $model \skeeks\cms\shop\models\ShopContent */
 $cofing = [];
 
-if (!$model->isNewRecord) {
+/*if (!$model->isNewRecord) {
     $cofing = ['disabled' => 'disabled'];
-}
+}*/
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -25,9 +25,7 @@ if (!$model->isNewRecord) {
 <?= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect(), $cofing); ?>
 
 <? if (!$model->isNewRecord) : ?>
-    <?= $form->fieldSelect($model, 'children_content_id', \yii\helpers\ArrayHelper::map(
-        $model->content->childrenContents, 'id', 'name'
-    )); ?>
+    <?= $form->fieldSelect($model, 'children_content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); ?>
 <? endif; ?>
 <? /*= $form->fieldRadioListBoolean($model, 'yandex_export'); */ ?>
 
