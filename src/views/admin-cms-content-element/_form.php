@@ -29,6 +29,7 @@ $action = $controller->action;
 /* @var $model \skeeks\cms\models\CmsContentElement */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 
+$parent_content_element_id = null;
 if ($model->isNewRecord) {
     if ($content_id = \Yii::$app->request->get("content_id")) {
         $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id);
@@ -40,6 +41,17 @@ if ($model->isNewRecord) {
     }
 
     if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
+        $parent = \skeeks\cms\shop\models\ShopCmsContentElement::findOne($parent_content_element_id);
+
+        $data = $parent->toArray();
+        \yii\helpers\ArrayHelper::remove($data, 'image_id');
+        \yii\helpers\ArrayHelper::remove($data, 'image_full_id');
+        \yii\helpers\ArrayHelper::remove($data, 'imageIds');
+        \yii\helpers\ArrayHelper::remove($data, 'fileIds');
+        \yii\helpers\ArrayHelper::remove($data, 'code');
+        \yii\helpers\ArrayHelper::remove($data, 'id');
+        $model->setAttributes($data);
+        $model->relatedPropertiesModel->setAttributes($parent->relatedPropertiesModel->toArray());
         $model->parent_content_element_id = $parent_content_element_id;
     }
 
@@ -210,8 +222,19 @@ initProductType($('#{$id}'));
 JS
     )
     ?>
-    <?= $form->fieldSelect($shopProduct, 'product_type',
+
+    <? if ($parent_content_element_id) : ?>
+        <div style="display: none;">
+            <? $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER; ?>
+            <?= $form->fieldSelect($shopProduct, 'product_type',
+                \skeeks\cms\shop\models\ShopProduct::possibleProductTypes()); ?>
+        </div>
+    <? else: ?>
+        <?= $form->fieldSelect($shopProduct, 'product_type',
         \skeeks\cms\shop\models\ShopProduct::possibleProductTypes()); ?>
+    <? endif; ?>
+
+
 <? endif; ?>
 
 <div id="sx-shop-product-simple">
