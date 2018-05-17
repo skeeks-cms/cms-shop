@@ -8,7 +8,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\Module;
 use skeeks\modules\cms\money\Currency;
-use skeeks\modules\cms\money\Money;
+use skeeks\cms\money\Money;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
@@ -884,7 +884,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getBasketsMoney()
     {
-        $money = Money::fromString("", $this->currency_code);
+        $money = new Money("", $this->currency_code);
 
         foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->money->multiply($shopBasket->quantity));
@@ -900,7 +900,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoney()
     {
-        return Money::fromString($this->price, $this->currency_code);
+        return new Money($this->price, $this->currency_code);
     }
 
     /**
@@ -910,7 +910,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneyVat()
     {
-        return Money::fromString($this->tax_value, $this->currency_code);
+        return new Money($this->tax_value, $this->currency_code);
     }
 
     /**
@@ -920,7 +920,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneyDiscount()
     {
-        return Money::fromString($this->discount_value, $this->currency_code);
+        return new Money($this->discount_value, $this->currency_code);
     }
 
     /**
@@ -931,7 +931,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneyOriginal()
     {
-        return Money::fromString((string)($this->price + $this->discount_value), $this->currency_code);
+        return new Money((string)($this->price + $this->discount_value), $this->currency_code);
     }
 
     /**
@@ -941,7 +941,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneySummPaid()
     {
-        return Money::fromString($this->sum_paid, $this->currency_code);
+        return new Money($this->sum_paid, $this->currency_code);
     }
 
     /**
@@ -951,7 +951,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneyDelivery()
     {
-        return Money::fromString($this->price_delivery, $this->currency_code);
+        return new Money($this->price_delivery, $this->currency_code);
     }
 
 

@@ -31,7 +31,7 @@ use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTax;
 use skeeks\cms\shop\models\ShopVat;
-use skeeks\modules\cms\money\Money;
+use skeeks\cms\money\Money;
 use yii\data\ActiveDataProvider;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;

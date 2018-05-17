@@ -15,7 +15,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\Core;
 use skeeks\cms\models\User;
-use skeeks\modules\cms\money\Money;
+use skeeks\cms\money\Money;
 use \Yii;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;

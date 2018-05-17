@@ -4,7 +4,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsUser;
 use skeeks\modules\cms\money\models\Currency;
-use skeeks\modules\cms\money\Money;
+use skeeks\cms\money\Money;
 use Yii;
 
 /**
@@ -100,6 +100,6 @@ class ShopUserAccount extends \skeeks\cms\models\Core
      */
     public function getMoney()
     {
-        return Money::fromString($this->current_budget, $this->currency_code);
+        return new Money($this->current_budget, $this->currency_code);
     }
 }

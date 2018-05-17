@@ -15,7 +15,7 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\catalog\models\Product;
 use skeeks\modules\cms\money\Currency;
-use skeeks\modules\cms\money\Money;
+use skeeks\cms\money\Money;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\Json;
@@ -315,7 +315,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoney()
     {
-        return Money::fromString((string)$this->price, $this->currency_code);
+        return new Money((string)$this->price, $this->currency_code);
     }
 
     /**
@@ -326,7 +326,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyOriginal()
     {
-        return Money::fromString((string)($this->price + $this->discount_price), $this->currency_code);
+        return new Money((string)($this->price + $this->discount_price), $this->currency_code);
     }
 
 
@@ -336,7 +336,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getMoneyDiscount()
     {
-        return Money::fromString((string)$this->discount_price, $this->currency_code);
+        return new Money((string)$this->discount_price, $this->currency_code);
     }
 
 
@@ -504,13 +504,13 @@ class ShopBasket extends \skeeks\cms\models\Core
     public function getMoneyVat()
     {
         if ((float)$this->vat_rate == 0) {
-            return Money::fromString("0", $this->currency_code);
+            return new Money("0", $this->currency_code);
         }
 
         $value = $this->money->getValue();
         $calculateValue = $value - ($value * 100 / 118);
 
-        return Money::fromString((string)$calculateValue, $this->currency_code);
+        return new Money((string)$calculateValue, $this->currency_code);
     }
 
 

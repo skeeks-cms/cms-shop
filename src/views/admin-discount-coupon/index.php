@@ -50,7 +50,7 @@
                                     return \Yii::$app->formatter->asPercent($shopDiscount->value / 100);
                                 } else
                                 {
-                                    $money = \skeeks\modules\cms\money\Money::fromString((string) $shopDiscount->value, $shopDiscount->currency_code);
+                                    $money = \skeeks\cms\money\new Money((string) $shopDiscount->value, $shopDiscount->currency_code);
                                     return \Yii::$app->money->intlFormatter()->format($money);
                                 }
                             },

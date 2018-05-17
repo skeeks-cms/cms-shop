@@ -7,7 +7,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\cms\models\behaviors\HasStorageFile;
-use skeeks\modules\cms\money\Money;
+use skeeks\cms\money\Money;
 use Yii;
 
 /**
@@ -183,7 +183,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
      */
     public function getMoney()
     {
-        return Money::fromString($this->price, $this->currency_code);
+        return new Money($this->price, $this->currency_code);
     }
 
     /**
