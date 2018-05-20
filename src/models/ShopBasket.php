@@ -359,7 +359,7 @@ class ShopBasket extends \skeeks\cms\models\Core
 
 
         $productPrice = $product->minProductPrice;
-        $productPriceMoney = $productPrice->money->convertToCurrency(\Yii::$app->money->getCurrencyObject());
+        $productPriceMoney = $productPrice->money->convertToCurrency(\Yii::$app->money->currencyCode);
 
         $this->measure_name = $product->measure->symbol_rus;
         $this->measure_code = $product->measure->code;

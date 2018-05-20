@@ -202,7 +202,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->buyer_id = $shopFuser->buyer_id;
         $order->user_id = $shopFuser->user_id;
 
-        $order->price = $shopFuser->money ? ($shopFuser->money->getAmount() / $shopFuser->money->getCurrency()->getSubUnit()) : "";
+        $order->price = $shopFuser->money ? ($shopFuser->money->amount) : "";
         $order->currency_code = $shopFuser->money ? $shopFuser->money->getCurrency()->getCurrencyCode() : "";
         if ($shopFuser->paySystem) {
             $order->pay_system_id = $shopFuser->paySystem->id;
@@ -220,7 +220,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->store_id = $shopFuser->store_id;
 
         if ($shopFuser->delivery) {
-            $order->price_delivery = $shopFuser->delivery->money->getAmount() / $shopFuser->delivery->money->getCurrency()->getSubUnit();
+            $order->price_delivery = $shopFuser->delivery->money->amount;
         }
 
         return $order;
@@ -552,7 +552,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction = new ShopUserTransact();
         $transaction->cms_user_id = $this->user_id;
         $transaction->shop_order_id = $this->id;
-        $transaction->amount = $this->money->getAmount() / $this->money->getCurrency()->getSubUnit();
+        $transaction->amount = $this->money->amount;
         $transaction->currency_code = $this->money->getCurrency()->getCurrencyCode();
         $transaction->debit = "Y";
         $transaction->description = ShopUserTransact::OUT_CHARGE_OFF;
@@ -562,7 +562,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction = new ShopUserTransact();
         $transaction->cms_user_id = $this->user_id;
         $transaction->shop_order_id = $this->id;
-        $transaction->amount = $this->money->getAmount() / $this->money->getCurrency()->getSubUnit();
+        $transaction->amount = $this->money->amount;
         $transaction->currency_code = $this->money->getCurrency()->getCurrencyCode();
         $transaction->debit = "N";
         $transaction->description = ShopUserTransact::ORDER_PAY;
@@ -987,10 +987,10 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $money = $this->basketsMoney;
         if ($this->moneyDelivery) {
-            $money = $money->add($this->moneyDelivery);
+            $money->add($this->moneyDelivery);
         }
 
-        $this->price = $money->getAmount() / $money->getCurrency()->getSubUnit();
+        $this->price = $money->amount;
         return $this;
     }
 
