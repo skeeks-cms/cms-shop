@@ -12,7 +12,7 @@
     ],
     "homepage": "http://www.skeeks.com/",
     "type": "yii2-extension",
-    "license": "GPL-3.0+",
+    "license": "BSD-3-Clause",
     "support": {
         "issues": "https://cms.skeeks.com",
         "wiki": "https://git.skeeks.com/skeeks/cms/wikis/home",
