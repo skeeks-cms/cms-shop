@@ -1,14 +1,22 @@
 {
     "name": "skeeks/cms-shop",
     "description": "Интернет магазин для SkeekS CMS",
-    "keywords": ["module", "cms", "skeeks", "sx", "app", "yii2", "shop"],
+    "keywords": [
+        "module",
+        "cms",
+        "skeeks",
+        "sx",
+        "app",
+        "yii2",
+        "shop"
+    ],
     "homepage": "http://www.skeeks.com/",
     "type": "yii2-extension",
     "license": "GPL-3.0+",
     "support": {
-        "issues": "http://cms.skeeks.com",
-        "wiki": "http://git.skeeks.com/skeeks/cms/wikis/home",
-        "source": "http://git.skeeks.com/skeeks/cms"
+        "issues": "https://cms.skeeks.com",
+        "wiki": "https://git.skeeks.com/skeeks/cms/wikis/home",
+        "source": "https://git.skeeks.com/skeeks/cms"
     },
     "authors": [
         {
@@ -17,9 +25,9 @@
         }
     ],
     "require": {
-        "skeeks/cms": "~5.0 || dev-master",
-        "skeeks/cms-module-money": "~3.0 || dev-master",
-        "skeeks/cms-measure": "~2.0 || dev-master"
+        "skeeks/cms": "^5.0.4 || dev-master",
+        "skeeks/cms-money": "^0.1.0 || ^1.0.0 || dev-master",
+        "skeeks/cms-measure": "^2.0.0 || dev-master"
     },
     "autoload": {
         "psr-4": {
