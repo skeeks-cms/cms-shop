@@ -6,8 +6,8 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\shop\Module;
-use skeeks\modules\cms\money\Currency;
 use skeeks\cms\money\Money;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -203,7 +203,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->user_id = $shopFuser->user_id;
 
         $order->price = $shopFuser->money ? ($shopFuser->money->amount) : "";
-        $order->currency_code = $shopFuser->money ? $shopFuser->money->getCurrency()->getCurrencyCode() : "";
+        $order->currency_code = $shopFuser->money ? $shopFuser->money->currency->code : "";
         if ($shopFuser->paySystem) {
             $order->pay_system_id = $shopFuser->paySystem->id;
         }
@@ -553,7 +553,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction->cms_user_id = $this->user_id;
         $transaction->shop_order_id = $this->id;
         $transaction->amount = $this->money->amount;
-        $transaction->currency_code = $this->money->getCurrency()->getCurrencyCode();
+        $transaction->currency_code = $this->money->currency->code;
         $transaction->debit = "Y";
         $transaction->description = ShopUserTransact::OUT_CHARGE_OFF;
         $transaction->save();
@@ -563,7 +563,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction->cms_user_id = $this->user_id;
         $transaction->shop_order_id = $this->id;
         $transaction->amount = $this->money->amount;
-        $transaction->currency_code = $this->money->getCurrency()->getCurrencyCode();
+        $transaction->currency_code = $this->money->currency->code;
         $transaction->debit = "N";
         $transaction->description = ShopUserTransact::ORDER_PAY;
         $transaction->save();
@@ -765,7 +765,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(MoneyCurrency::className(), ['code' => 'currency_code']);
     }
 
     /**

@@ -12,9 +12,9 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\StorageFile;
+use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\modules\cms\catalog\models\Product;
-use skeeks\modules\cms\money\Currency;
 use skeeks\cms\money\Money;
 use Yii;
 use yii\base\Exception;
@@ -72,7 +72,7 @@ use yii\helpers\Url;
  * @property string $url
  * @property string $absoluteUrl
  *
- * @property Currency $currency
+ * @property MoneyCurrency $currency
  * @property ShopFuser $fuser
  * @property ShopOrder $order
  * @property ShopProduct $product
@@ -256,7 +256,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(MoneyCurrency::className(), ['code' => 'currency_code']);
     }
 
     /**
@@ -391,7 +391,7 @@ class ShopBasket extends \skeeks\cms\models\Core
             $this->price = $productPriceMoney->getValue();
         }
 
-        $this->currency_code = $productPriceMoney->getCurrency()->getCurrencyCode();
+        $this->currency_code = $productPriceMoney->currency->code;
 
 
         //Проверка скидок
