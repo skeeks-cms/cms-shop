@@ -64,7 +64,7 @@ class AdminUserAccountController extends AdminModelEditorController
                                 'attribute' => 'current_budget',
                                 'class' => DataColumn::className(),
                                 'value' => function (ShopUserAccount $userAccount) {
-                                    return \Yii::$app->money->intlFormatter()->format($userAccount->money);
+                                    return (string) $userAccount->money;
                                 },
                             ],
 

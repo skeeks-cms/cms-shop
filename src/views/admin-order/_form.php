@@ -385,22 +385,22 @@ CSS
                     'attributes' => [
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'The total value of the goods'),
-                            'value' => \Yii::$app->money->intlFormatter()->format($model->basketsMoney),
+                            'value' => (string) $model->basketsMoney,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Discount, margin'),
-                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDiscount),
+                            'value' => (string) $model->moneyDiscount,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Delivery service'),
-                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDelivery),
+                            'value' => (string) $model->moneyDelivery,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Taxe'),
-                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneyVat),
+                            'value' => (string) $model->moneyVat,
                         ],
 
                         [
@@ -410,13 +410,13 @@ CSS
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Already paid'),
-                            'value' => \Yii::$app->money->intlFormatter()->format($model->moneySummPaid),
+                            'value' => (string) $model->moneySummPaid,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'In total'),
                             'format' => 'raw',
-                            'value' => Html::tag('b', \Yii::$app->money->intlFormatter()->format($model->money)),
+                            'value' => Html::tag('b', (string) $model->money),
                         ]
                     ]
                 ])
@@ -511,7 +511,7 @@ JS
                 'label' => \Yii::t('skeeks/shop/app', 'Sum'),
                 'format' => 'raw',
                 'value' => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
-                    return ($shopUserTransact->debit == "Y" ? "+" : "-") . \Yii::$app->money->intlFormatter()->format($shopUserTransact->money);
+                    return ($shopUserTransact->debit == "Y" ? "+" : "-") . (string) $shopUserTransact->money;
                 }
             ],
 

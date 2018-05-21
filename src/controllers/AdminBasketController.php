@@ -105,12 +105,12 @@ class AdminBasketController extends AdminModelEditorController
                                 'format' => 'raw',
                                 'value' => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
                                     if ($shopBasket->discount_value) {
-                                        return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />" . Html::tag('small',
-                                                $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small',
+                                        return "<span style='text-decoration: line-through;'>" . (string) $shopBasket->moneyOriginal  . "</span><br />" . Html::tag('small',
+                                                $shopBasket->notes) . "<br />" . (string) $shopBasket->money . "<br />" . Html::tag('small',
                                                 \Yii::t('skeeks/shop/app',
                                                     'Discount') . ": " . $shopBasket->discount_value);
                                     } else {
-                                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small',
+                                        return (string) $shopBasket->money . "<br />" . Html::tag('small',
                                                 $shopBasket->notes);
                                     }
 
@@ -122,7 +122,8 @@ class AdminBasketController extends AdminModelEditorController
                                 'attribute' => 'price',
                                 'format' => 'raw',
                                 'value' => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
-                                    return \Yii::$app->money->intlFormatter()->format($shopBasket->money->multiply($shopBasket->quantity));
+                                    $shopBasket->money->multiply($shopBasket->quantity);
+                                    return (string) $shopBasket->money;
                                 }
                             ],
                         ],

@@ -76,11 +76,11 @@ $url = $order->getPublicUrl();
                 'format' => 'raw',
                 'value' => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
                     if ($shopBasket->discount_value) {
-                        return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />" . Html::tag('small',
-                                $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small',
+                        return "<span style='text-decoration: line-through;'>" . (string) $shopBasket->moneyOriginal . "</span><br />" . Html::tag('small',
+                                $shopBasket->notes) . "<br />" . (string) $shopBasket->money . "<br />" . Html::tag('small',
                                 \Yii::t('skeeks/shop/app', 'Discount') . ": " . $shopBasket->discount_value);
                     } else {
-                        return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small',
+                        return (string) $shopBasket->money . "<br />" . Html::tag('small',
                                 $shopBasket->notes);
                     }
 
@@ -92,7 +92,8 @@ $url = $order->getPublicUrl();
                 'attribute' => 'price',
                 'format' => 'raw',
                 'value' => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
-                    return \Yii::$app->money->intlFormatter()->format($shopBasket->money->multiply($shopBasket->quantity));
+                    $shopBasket->money->multiply($shopBasket->quantity);
+                    return (string) $shopBasket->money;
                 }
             ],
         ]
@@ -105,9 +106,9 @@ $url = $order->getPublicUrl();
 <?= Html::endTag('h2'); ?>
 
 <?= Html::beginTag('p'); ?>
-    Стоимость товаров: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->basketsMoney)); ?><br/>
-    Стоимость доставки: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->moneyDelivery)); ?><br/>
-    Оплачено: <?= Html::tag('b', \Yii::$app->money->intlFormatter()->format($order->money)); ?>
+    Стоимость товаров: <?= Html::tag('b', (string) $order->basketsMoney); ?><br/>
+    Стоимость доставки: <?= Html::tag('b', (string) $order->moneyDelivery); ?><br/>
+    Оплачено: <?= Html::tag('b', (string) $order->money); ?>
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('h2'); ?>

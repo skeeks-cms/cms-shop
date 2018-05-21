@@ -280,22 +280,22 @@ CSS
                 'attributes' => [
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'The total value of the goods'),
-                        'value' => \Yii::$app->money->intlFormatter()->format($model->money),
+                        'value' => (string) $model->money,
                     ],
 
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'Discount, margin'),
-                        'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDiscount),
+                        'value' => (string) $model->moneyDiscount,
                     ],
 
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'Delivery service'),
-                        'value' => \Yii::$app->money->intlFormatter()->format($model->moneyDelivery),
+                        'value' => (string) $model->moneyDelivery,
                     ],
 
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'Taxe'),
-                        'value' => \Yii::$app->money->intlFormatter()->format($model->moneyVat),
+                        'value' => (string) $model->moneyVat,
                     ],
 
                     [
@@ -306,7 +306,7 @@ CSS
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'In total'),
                         'format' => 'raw',
-                        'value' => Html::tag('b', \Yii::$app->money->intlFormatter()->format($model->money)),
+                        'value' => Html::tag('b', (string) $model->money),
                     ]
                 ]
             ])

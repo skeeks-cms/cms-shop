@@ -216,7 +216,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
                                 ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
                             ) {
-                                return \Yii::$app->money->intlFormatter()->format($shopProductPrice->money);
+                                return (string) $shopProductPrice->money;
                             }
                         }
 

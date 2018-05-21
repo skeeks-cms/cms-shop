@@ -76,7 +76,7 @@ use skeeks\cms\mail\helpers\Html;
                 'attribute' => 'price',
                 'format' => 'raw',
                 'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
-                    return \Yii::$app->money->intlFormatter()->format($shopProduct->baseProductPrice->money) . "<br />";
+                    return (string) $shopProduct->baseProductPrice->money . "<br />";
                 }
             ],
         ]

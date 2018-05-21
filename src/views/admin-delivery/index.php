@@ -49,7 +49,7 @@
             'format' => 'raw',
             'filter' => false,
             'value' => function (\skeeks\cms\shop\models\ShopDelivery $model) {
-                return \Yii::$app->money->intlFormatter()->format($model->money);
+                return (string) $model->money;
             }
         ],
         [

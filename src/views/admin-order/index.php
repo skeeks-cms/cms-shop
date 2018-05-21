@@ -137,7 +137,6 @@ CSS
                 if ($model->shopBaskets) {
                     $result = [];
                     foreach ($model->shopBaskets as $shopBasket) {
-                        $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
                         $result[] = \yii\helpers\Html::a($shopBasket->name, $shopBasket->url, [
                                 'target' => '_blank',
                                 'data-pjax' => '0'
@@ -177,17 +176,17 @@ HTML;
             'attribute' => 'price',
             'label' => \Yii::t('skeeks/shop/app', 'Sum'),
             'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
-                $result = \Yii::$app->money->intlFormatter()->format($model->money);
+                $result = (string) $model->money;
 
 
                 if ($model->moneyDiscount->getValue()) {
                     $result .= "<br /><small>" . \Yii::t('skeeks/shop/app',
-                            'Discount') . ":" . \Yii::$app->money->intlFormatter()->format($model->moneyDiscount) . "</small>";
+                            'Discount') . ":" . (string) $model->moneyDiscount . "</small>";
                 }
 
                 if ($model->moneyDelivery->getValue()) {
                     $result .= "<br /><small>" . \Yii::t('skeeks/shop/app',
-                            'Delivery') . ":" . \Yii::$app->money->intlFormatter()->format($model->moneyDelivery) . "</small>";
+                            'Delivery') . ":" . (string) $model->moneyDelivery . "</small>";
                 }
 
                 return $result;
@@ -203,7 +202,7 @@ HTML;
             'attribute' => 'discount_value',
             'label' => \Yii::t('skeeks/shop/app', 'Discount'),
             'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
-                return \Yii::$app->money->intlFormatter()->format($model->moneyDiscount);
+                return (string) $model->moneyDiscount;
             },
         ],
 

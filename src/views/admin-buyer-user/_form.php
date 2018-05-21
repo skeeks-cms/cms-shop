@@ -97,9 +97,11 @@ $userStatistics = [
 
 $average = "-";
 if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed')) {
-    $average = \Yii::$app->money->intlFormatter()->format($money->multiply(
+    $money->multiply(
         (1 / \yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed'))
-    ));
+    );
+
+    $average = (string) $money;
 }
 
 ?>
@@ -118,7 +120,7 @@ if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed')) {
             [                      // the owner name of the model
                 'label' => \Yii::t('skeeks/shop/app', 'Paid orders worth'),
                 'format' => 'raw',
-                'value' => \Yii::$app->money->intlFormatter()->format($money),
+                'value' => (string) $money,
             ],
 
             [                      // the owner name of the model
@@ -294,7 +296,7 @@ CSS
                     if ($model->shopBaskets) {
                         $result = [];
                         foreach ($model->shopBaskets as $shopBasket) {
-                            $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
+                            $money = (string) $shopBasket->money;
                             $result[] = Html::a($shopBasket->name, $shopBasket->url, [
                                     'target' => '_blank',
                                     'data-pjax' => '0'
@@ -314,7 +316,7 @@ HTML;
                 'attribute' => 'price',
                 'label' => \Yii::t('skeeks/shop/app', 'Sum'),
                 'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
-                    return \Yii::$app->money->intlFormatter()->format($model->money);
+                    return (string) $model->money;
                 },
             ],
 

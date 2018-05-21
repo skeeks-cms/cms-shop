@@ -46,7 +46,7 @@
                     'class' => \yii\grid\DataColumn::className(),
                     'label' => \Yii::t('skeeks/shop/app', 'Price'),
                     'value' => function (\skeeks\cms\shop\models\ShopProductPriceChange $model) {
-                        return \Yii::$app->money->intlFormatter()->format($model->money);
+                        return (string) $model->money;
                     }
                 ],
 

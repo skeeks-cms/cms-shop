@@ -97,7 +97,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
                 'filter' => false,
                 'label' => \Yii::t('skeeks/shop/app', 'Price of basket'),
                 'value' => function (\skeeks\cms\shop\models\ShopFuser $model) {
-                    return \Yii::$app->money->intlFormatter()->format($model->money);
+                    return (string) $model->money;
                 },
             ],
 
@@ -119,7 +119,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
                     if ($model->shopBaskets) {
                         $result = [];
                         foreach ($model->shopBaskets as $shopBasket) {
-                            $money = \Yii::$app->money->intlFormatter()->format($shopBasket->money);
+                            $money = (string) $shopBasket->money;
                             $result[] = \yii\helpers\Html::a($shopBasket->name,
                                     $shopBasket->product ? $shopBasket->product->cmsContentElement->url : '#',
                                     ['target' => '_blank']) . <<<HTML

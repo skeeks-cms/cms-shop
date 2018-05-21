@@ -111,7 +111,7 @@ return [
         'value' => function (\skeeks\cms\models\CmsContentElement $model) {
             $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
             if ($shopProduct) {
-                return \Yii::$app->money->intlFormatter()->format($shopProduct->baseProductPrice->money);
+                return (string) $shopProduct->baseProductPrice->money;
             }
 
             return null;
