@@ -1,8 +1,9 @@
 Changelog
 ==============
 
-2.0.2.pre
+2.1.0
 -----------------
+ * New module money
  * Update filters widget
  
 2.0.1
