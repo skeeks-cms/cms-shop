@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.1.1
+-----------------
+ * Fixed delivery
+ 
 2.1.0
 -----------------
  * New module money

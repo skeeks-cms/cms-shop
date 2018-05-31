@@ -195,7 +195,7 @@ return
         'Order cancelled. The reason: "{reason canceled}"' => 'Заказ отменен. Причина: "{reason_canceled}"',
         'Order currency code' => 'Валюта заказа',
         'Order price from' => 'Стоимость заказа. От',
-        'Order price to' => 'Стоимость заказа. Дт',
+        'Order price to' => 'Стоимость заказа. До',
         'Order statuses' => 'Статусы заказов',
         'Types of profiles' => 'Типы профилей',
         'Order' => 'Заказ',

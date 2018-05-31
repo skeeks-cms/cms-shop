@@ -75,7 +75,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
                 ],
                 'integer'
             ],
-            [['name'], 'required'],
+            [['name', 'site_id'], 'required'],
             [['order_price_from', 'order_price_to', 'price'], 'number'],
             [['description', 'store', 'name'], 'string'],
             [['period_type', 'active'], 'string', 'max' => 1],
@@ -85,6 +85,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
             [['price'], 'default', 'value' => 0],
             [['active'], 'default', 'value' => Cms::BOOL_Y],
             [['currency_code'], 'default', 'value' => Yii::$app->money->currencyCode],
+            [['order_currency_code'], 'default', 'value' => Yii::$app->money->currencyCode],
         ];
     }
 
@@ -127,8 +128,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
     {
         return array_merge(parent::behaviors(), [
             \skeeks\cms\behaviors\RelationalBehavior::className(),
-            HasStorageFile::className() =>
-                [
+            HasStorageFile::className() => [
                     'class' => HasStorageFile::className(),
                     'fields' => ['logo_id']
                 ]

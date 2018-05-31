@@ -59,7 +59,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     </div>
     <div class="col-md-4">
         <?= $form->fieldSelect($model, 'order_currency_code',
-            \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code',
+            \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where([
+                'is_active' => 1
+            ])->all(), 'code',
                 'code')); ?>
     </div>
 </div>
@@ -75,7 +77,9 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
     <div class="col-md-4">
         <?= $form->fieldSelect($model, 'currency_code',
-            \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code',
+            \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where([
+                'is_active' => 1
+            ])->all(), 'code',
                 'code')); ?>
     </div>
 </div>
