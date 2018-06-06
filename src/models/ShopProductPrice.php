@@ -2,6 +2,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\cms\money\Money;
 use Yii;
@@ -221,7 +222,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(MoneyCurrency::className(), ['code' => 'currency_code']);
     }
 
     /**
