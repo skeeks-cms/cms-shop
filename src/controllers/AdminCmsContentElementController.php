@@ -620,6 +620,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
 
+
+
             return \yii\widgets\ActiveForm::validateMultiple([
                 $model,
                 $relatedModel,
@@ -628,9 +630,11 @@ class AdminCmsContentElementController extends AdminModelEditorController
         }
 
         if ($post = \Yii::$app->request->post()) {
+
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
+
         }
 
         if ($rr->isRequestPjaxPost()) {
@@ -639,20 +643,22 @@ class AdminCmsContentElementController extends AdminModelEditorController
                 $relatedModel->load(\Yii::$app->request->post());
                 $shopProduct->load(\Yii::$app->request->post());
 
-                /**
-                 * @var $productPrice ShopProductPrice
-                 */
-                foreach ($productPrices as $productPrice) {
-                    if ($productPrice->save()) {
+                if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
 
-                    } else {
-                        \Yii::$app->getSession()->setFlash('error',
-                            \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
+                    /**
+                     * @var $productPrice ShopProductPrice
+                     */
+                    foreach ($productPrices as $productPrice) {
+                        if ($productPrice->save()) {
+
+                        } else {
+                            \Yii::$app->getSession()->setFlash('error',
+                                \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
+                        }
+
                     }
 
-                }
 
-                if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                     if (\Yii::$app->request->post('submit-btn') == 'apply') {
