@@ -1,0 +1,22 @@
+.sx-discount-conditions .sx-rule {
+    background: #afffaf3b;
+    border: 1px solid green;
+    margin: 15px 10px 15px 0px;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.sx-discount-conditions .sx-group {
+    /*background: #c0c0c030;
+    border: 1px solid #adadad;*/
+    background: #ff980021;
+    border: 1px solid green;
+    margin: 15px 10px 15px 0px;
+    padding: 15px 15px 15px 35px;
+    border-radius: 5px;
+}
+
+.sx-discount-conditions a {
+    text-decoration: none;
+    border-bottom: 1px dashed;
+}

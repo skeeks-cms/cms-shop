@@ -124,6 +124,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
             [['max_discount', 'value', 'min_order_sum'], 'number'],
             [['currency_code', 'name'], 'required'],
             [['conditions', 'unpack'], 'string'],
+            [['conditions'], 'required'],
             [
                 ['active', 'renewal', 'value_type', 'count_period', 'count_type', 'action_type', 'last_discount'],
                 'string',

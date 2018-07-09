@@ -28,7 +28,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->field($model, 'max_discount')->textInput(); ?>
 
 <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
-    \skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'
+    \skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(), 'code', 'code'
 )); ?>
 
 <?= $form->fieldInputInt($model, 'priority'); ?>
@@ -38,6 +38,11 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Conditions')); ?>
+
+<?= $form->field($model, 'conditions')->widget(
+    \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class
+); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 
