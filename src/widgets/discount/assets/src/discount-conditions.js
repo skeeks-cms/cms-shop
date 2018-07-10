@@ -15,6 +15,8 @@
 
         _onDomReady: function()
         {
+            var self = this;
+
             this.jWrapper = $("#" + this.get('id'));
 
             this.jElement = $(".sx-element textarea", this.jWrapper);
@@ -27,43 +29,100 @@
             this.value = this.jElement.val();
 
             //this.jContent.append(this.renderRule());
-            console.log(this.getValue(this.jContent, true));
+
+            $('select', this.jWrapper).on('change', function() {
+                if ($(this).data('no-update') === true) {
+                    return false;
+                }
+                self.jElement.val(JSON.stringify(self.getValue())).change();
+                return false;
+            });
+
+            $('input', this.jWrapper).on('change', function() {
+                self.jElement.val(JSON.stringify(self.getValue())).change();
+                return false;
+            });
+
+            $('.sx-remove', this.jWrapper).on('click', function() {
+                $(this).closest(".sx-row").remove();
+                self.jElement.val(JSON.stringify(self.getValue())).change();
+                return false;
+            });
+
+            $('.sx-add-condition', this.jWrapper).on('click', function() {
+                var val = $(this).closest(".sx-add").children().children().children("[name=condition]").val();
+
+                $(this).closest(".sx-row");
+
+                var jRules = $(this).closest(".sx-row").children(".sx-rules");
 
 
+                var row = '';
 
+                if (val == 'group') {
+                    row = $("<div>", {'class' : 'sx-row sx-group', 'data-type': 'group'});
+                } else {
+                    row = $("<div>", {'class' : 'sx-row sx-rule', 'data-type': 'rule', 'data-field': val});
+                }
 
+                jRules.append(
+                    row
+                );
 
+                self.jElement.val(JSON.stringify(self.getValue())).change();
+
+                return false;
+            });
         },
 
-        getValue: function(jRules)
+        getValue: function()
         {
-            jRules = jRules || null;
+            var self = this;
+            var result = {};
 
-            if (jRules) {
-                var type = this.jContent.children('.sx-row').data('type');
-                /*var type = this.jContent.children('.sx-row').data('type');*/
-            }
+            result = self.getValueByJRule(this.jContent.children());
 
+            return result;
+        },
 
-            if (ifFirst) {
-                var result = {};
+        getValueByJRule: function(jRule)
+        {
+            var self = this;
+            var result = {};
 
-                this.jContent.children('.sx-row').each(function() {
+            result.type = jRule.data('type');
 
-                });
+            if (result.type == 'group') {
+                result.rules_type = jRule.children('.sx-conditions').children().children(".sx-andor").children("select").val();
+                result.condition = jRule.children('.sx-conditions').children().children(".sx-condition").children("select").val();
 
+                result.rules_type = result.rules_type || 'and';
+                result.condition = result.condition || 'equal';
             } else {
-                var result = [];
+                result.field = jRule.children().children(".sx-field").children().data('field');
+                result.condition = jRule.children().children(".sx-andor").children("select").val();
+                result.value = jRule.children().children(".sx-value").children().val();
 
-                this.jContent.children('.sx-row').each(function() {
-
-                });
-
+                result.condition = result.condition || 'equal';
+                result.field = result.field || jRule.data('field');
             }
 
 
+            var jRules = jRule.children('.sx-rules').children('.sx-row');
 
-            //this.jContent.append(this.renderRule());
+            if (jRules.length) {
+                var rules = [];
+
+                jRules.each(function() {
+                    rules.push(
+                        self.getValueByJRule($(this))
+                    );
+                });
+
+                result.rules = rules;
+            }
+
+            return result;
         },
 
         renderRule: function() {

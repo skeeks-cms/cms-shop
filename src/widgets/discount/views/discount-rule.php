@@ -16,9 +16,9 @@
             <a href="#">Выполнено(ы)</a>-->
 
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-3 sx-andor">
                     <?
-                    echo \yii\helpers\Html::listBox('andor', null, [
+                    echo \yii\helpers\Html::listBox('andor', \yii\helpers\ArrayHelper::getValue($rule, 'rules_type'), [
                         'and' => 'Все условия',
                         'or'  => 'Любое условие',
                     ], [
@@ -28,9 +28,9 @@
                     ?>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-3 sx-condition">
                     <?
-                    echo \yii\helpers\Html::listBox('equality', null, [
+                    echo \yii\helpers\Html::listBox('condition', \yii\helpers\ArrayHelper::getValue($rule, 'condition'), [
                         'equal'     => 'Выполнены',
                         'not_equal' => 'Не выполнены',
                     ], [
@@ -38,6 +38,11 @@
                         'class' => 'form-control',
                     ]);
                     ?>
+                </div>
+                <div class="col-md-6 sx-remove-wrapper">
+                    <a href="#" class="btn btn-xs sx-remove pull-right" title="Удалить группу условий">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -52,20 +57,38 @@
             <? endif; ?>
         </div>
         <div class="sx-add">
-            <a href="#">Добавить условие</a>
+            <div class="row">
+                <div class="col-md-3">
+                    <?
+                        echo \yii\helpers\Html::listBox('condition', \yii\helpers\ArrayHelper::getValue($rule, 'condition'), $widget->availableConditions, [
+                            'size' => 1,
+                            'class' => 'form-control',
+                            'data-no-update' => 'true'
+                        ]);
+                    ?>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-default sx-add-condition">Добавить условие</button>
+                </div>
+
+
+            </div>
+
         </div>
     </div>
 <? else: ?>
     <div class="sx-rule sx-row" data-type="rule">
         <div class="row">
-            <div class="col-md-3" style="line-height: 34px;">
+            <div class="col-md-3 sx-field" style="line-height: 34px;">
                 <? $widget->availableConditions; ?>
-                <span class="label label-info"><?= \yii\helpers\ArrayHelper::getValue($widget->allConditions, \yii\helpers\ArrayHelper::getValue($rule, 'field'), '-- Не задано --'); ?></span>
+                <span class="label label-info" data-field="<?= \yii\helpers\ArrayHelper::getValue($rule, 'field'); ?>">
+                    <?= \yii\helpers\ArrayHelper::getValue($widget->allConditions, \yii\helpers\ArrayHelper::getValue($rule, 'field'), '-- Не задано --'); ?>
+                </span>
             </div>
             <!--<a href="#"><? /*= \yii\helpers\ArrayHelper::getValue($rule, 'condition'); */ ?></a>-->
-            <div class="col-md-3">
+            <div class="col-md-3 sx-andor">
                 <?
-                echo \yii\helpers\Html::listBox('andor', null, [
+                echo \yii\helpers\Html::listBox('andor', \yii\helpers\ArrayHelper::getValue($rule, 'condition'), [
                     'and' => 'Равно',
                     'or'  => 'Не равно',
                 ], [
@@ -73,6 +96,21 @@
                     'class' => 'form-control',
                 ]);
                 ?>
+            </div>
+
+            <div class="col-md-3 sx-value">
+                <?
+                echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
+                    'size'  => 1,
+                    'class' => 'form-control',
+                ]);
+                ?>
+            </div>
+
+            <div class="col-md-3 sx-remove-wrapper">
+                <a href="#" class="btn btn-xs sx-remove pull-right" title="Удалить условие">
+                    <i class="glyphicon glyphicon-remove"></i>
+                </a>
             </div>
         </div>
 

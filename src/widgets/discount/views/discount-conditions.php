@@ -66,31 +66,33 @@ JSON;*/
 
 <?= \yii\helpers\Html::beginTag('div', $widget->wrapperOptions); ?>
 
+<div style="display: none;">
     <div class="sx-element">
         <?= $element; ?>
     </div>
+</div>
 
-    <div class="sx-content">
+<div class="sx-content">
 
-        <? if ($value) : ?>
-            <?= $this->render('discount-rule', [
-                'rule' => $value,
-                'widget' => $widget
-            ]); ?>
-        <? else : ?>
+    <? if ($value) : ?>
+        <?= $this->render('discount-rule', [
+            'rule'   => $value,
+            'widget' => $widget,
+        ]); ?>
+    <? else : ?>
 
-        <? endif; ?>
+    <? endif; ?>
 
-    </div>
+</div>
 
-    <div class="sx-elements">
-        <?/*
+<div class="sx-elements">
+    <? /*
             echo \yii\helpers\Html::listBox('condition', null, $widget->availableConditions, [
                 'size' => 1,
                 'class' => 'form-control'
             ]);
-        */?><!--
-        <?/*
+        */ ?><!--
+        <? /*
             echo \yii\helpers\Html::listBox('andor', null, [
                     'and' => 'Все условия',
                     'or' => 'Любое условие',
@@ -98,8 +100,8 @@ JSON;*/
                 'size' => 1,
                 'class' => 'form-control'
             ]);
-        */?>
-        --><?/*
+        */ ?>
+        --><? /*
             echo \yii\helpers\Html::listBox('equality', null, [
                     'equal' => 'Выполнены',
                     'not_equal' => 'Не выполнены',
@@ -107,7 +109,7 @@ JSON;*/
                 'size' => 1,
                 'class' => 'form-control'
             ]);
-        */?>
-    </div>
+        */ ?>
+</div>
 
 <?= \yii\helpers\Html::endTag('div'); ?>

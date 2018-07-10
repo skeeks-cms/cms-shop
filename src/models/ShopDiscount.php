@@ -12,7 +12,7 @@ use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
-use skeeks\modules\cms\money\models\Currency;
+use skeeks\cms\money\models\MoneyCurrency;
 use Yii;
 
 /**
@@ -89,7 +89,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
     public function behaviors()
     {
         return [
-            RelationalBehavior::className()
+            RelationalBehavior::class
         ];
     }
 
@@ -124,7 +124,6 @@ class ShopDiscount extends \skeeks\cms\models\Core
             [['max_discount', 'value', 'min_order_sum'], 'number'],
             [['currency_code', 'name'], 'required'],
             [['conditions', 'unpack'], 'string'],
-            [['conditions'], 'required'],
             [
                 ['active', 'renewal', 'value_type', 'count_period', 'count_type', 'action_type', 'last_discount'],
                 'string',
@@ -192,7 +191,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
      */
     public function getCurrencyCode()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
     }
 
     /**
@@ -200,7 +199,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
+        return $this->hasOne(CmsSite::class, ['id' => 'site_id']);
     }
 
     /**
@@ -208,7 +207,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
      */
     public function getShopDiscount2typePrices()
     {
-        return $this->hasMany(ShopDiscount2typePrice::className(), ['discount_id' => 'id']);
+        return $this->hasMany(ShopDiscount2typePrice::class, ['discount_id' => 'id']);
     }
 
     /**
@@ -216,7 +215,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
      */
     public function getTypePrices()
     {
-        return $this->hasMany(ShopTypePrice::className(), ['id' => 'type_price_id'])
+        return $this->hasMany(ShopTypePrice::class, ['id' => 'type_price_id'])
             ->viaTable('{{%shop_discount2type_price}}', ['discount_id' => 'id']);
     }
 

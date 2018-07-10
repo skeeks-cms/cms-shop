@@ -1,19 +1,21 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
- * @date 28.08.2015
  */
 
 use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
+/* @var $action \skeeks\cms\backend\actions\BackendModelUpdateAction */
+$action = $this->context->action;
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
-
+<?php $form = $action->beginDynamicActiveForm(); ?>
+<?= $form->errorSummary($model); ?>
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
 <?= $form->fieldCheckboxBoolean($model, 'active'); ?>
@@ -40,7 +42,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Conditions')); ?>
 
 <?= $form->field($model, 'conditions')->widget(
-    \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class
+    \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class,
+    [
+        'options' => [
+            $action->reloadFieldParam => 'true'
+        ]
+    ]
 ); ?>
 
 <?= $form->fieldSetEnd(); ?>
@@ -73,8 +80,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Coupons')); ?>
-<?= $form->fieldSetEnd(); ?>
-
 <?= $form->buttonsCreateOrUpdate($model); ?>
-<?php ActiveForm::end(); ?>
+<?= $form->errorSummary($model); ?>
+<?php $action->endActiveForm(); ?>
