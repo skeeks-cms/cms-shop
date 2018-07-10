@@ -63,7 +63,7 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
 
         <div class="col-md-2">
             <?= $form->field($model, 'currency_code')->listBox(
-                \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(),
+                \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(),
                     'code', 'code')
                 , ['size' => 1]
             ); ?>

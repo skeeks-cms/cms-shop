@@ -49,6 +49,12 @@
                 return false;
             });
 
+            $('.sx-create-first', this.jWrapper).on('click', function() {
+
+                self.jElement.val(JSON.stringify({'type':'group','condition':'equal','rules_type':'and'})).change();
+                return false;
+            });
+
             $('.sx-add-condition', this.jWrapper).on('click', function() {
                 var val = $(this).closest(".sx-add").children().children().children("[name=condition]").val();
 
@@ -80,7 +86,12 @@
             var self = this;
             var result = {};
 
-            result = self.getValueByJRule(this.jContent.children());
+            if (this.jContent.children().length) {
+                result = self.getValueByJRule(this.jContent.children());
+            } else {
+                result = '';
+            }
+
 
             return result;
         },

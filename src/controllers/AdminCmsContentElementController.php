@@ -477,6 +477,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             return false;
         }
     }
+
     public function create($adminAction)
     {
         $productPrices = [];

@@ -101,8 +101,11 @@ if ($filter->product_type) {
 
 <?
 $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-$searchRelatedPropertiesModel->initProperties($cmsContent->cmsContentProperties);
-$searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+if ($cmsContent) {
+    $searchRelatedPropertiesModel->initProperties($cmsContent->cmsContentProperties);
+    $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
+}
+
 ?>
 <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
 

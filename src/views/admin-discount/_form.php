@@ -27,11 +27,12 @@ $action = $this->context->action;
 
 <?= $form->fieldSelect($model, 'value_type', \skeeks\cms\shop\models\ShopDiscount::getValueTypes()); ?>
 <?= $form->field($model, 'value')->textInput(); ?>
-<?= $form->field($model, 'max_discount')->textInput(); ?>
 
 <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
     \skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(), 'code', 'code'
 )); ?>
+
+<?= $form->field($model, 'max_discount')->textInput(); ?>
 
 <?= $form->fieldInputInt($model, 'priority'); ?>
 <?= $form->fieldCheckboxBoolean($model, 'last_discount'); ?>

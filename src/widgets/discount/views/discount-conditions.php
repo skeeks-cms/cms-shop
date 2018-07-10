@@ -26,41 +26,10 @@ JSON;*/
 
         $value = \yii\helpers\Json::decode($value);
     } catch (\Exception $e) {
-        $value = [];
+//        $value = [];
+        throw $e;
     }
 
-    /*print_r(\yii\helpers\Json::encode([
-    "type" => "group",
-    "condition" => "equal",
-    "rules_type" => "and",
-    "rules" => [
-        [
-            "type" => "rule",
-            "condition" => "equal",
-            "field" => "element.tree",
-            "value" => "1432",
-        ],
-        [
-            "type" => "rule",
-            "condition" => "equal",
-            "field" => "element.name",
-            "value" => "Спальни",
-        ],
-        [
-            "type" => "group",
-            "condition" => "equal",
-            "rules_type" => "and",
-            "rules" => [
-                [
-                    "type" => "rule",
-                    "condition" => "equal",
-                    "field" => "element.name",
-                    "value" => "Спальни",
-                ]
-            ]
-        ],
-    ]
-]));die;*/
 }
 ?>
 
@@ -73,7 +42,6 @@ JSON;*/
 </div>
 
 <div class="sx-content">
-
     <? if ($value) : ?>
         <?= $this->render('discount-rule', [
             'rule'   => $value,
@@ -82,34 +50,10 @@ JSON;*/
     <? else : ?>
 
     <? endif; ?>
-
 </div>
 
-<div class="sx-elements">
-    <? /*
-            echo \yii\helpers\Html::listBox('condition', null, $widget->availableConditions, [
-                'size' => 1,
-                'class' => 'form-control'
-            ]);
-        */ ?><!--
-        <? /*
-            echo \yii\helpers\Html::listBox('andor', null, [
-                    'and' => 'Все условия',
-                    'or' => 'Любое условие',
-            ], [
-                'size' => 1,
-                'class' => 'form-control'
-            ]);
-        */ ?>
-        --><? /*
-            echo \yii\helpers\Html::listBox('equality', null, [
-                    'equal' => 'Выполнены',
-                    'not_equal' => 'Не выполнены',
-            ], [
-                'size' => 1,
-                'class' => 'form-control'
-            ]);
-        */ ?>
-</div>
+<? if (!$value) : ?>
+    <button class="btn btn-default sx-create-first">Добавить условие</button>
+<? endif; ?>
 
 <?= \yii\helpers\Html::endTag('div'); ?>

@@ -156,6 +156,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         $log->save();
     }
+
     public function _logQuantityUpdate($event)
     {
         if (
@@ -281,7 +282,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             }
         }
 
-        if (in_array('product_type', (array) $event->changedAttributes)) {
+        if (in_array('product_type', (array)$event->changedAttributes)) {
             if ($this->product_type == self::TYPE_OFFER) {
                 if ($this->cmsContentElement->parentContentElement->shopProduct) {
                     $sp = $this->cmsContentElement->parentContentElement->shopProduct;
@@ -290,7 +291,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                 }
             }
         }
-
 
 
     }
@@ -527,6 +527,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopQuantityNoticeEmail::className(), ['shop_product_id' => 'id']);
     }
+
     /**
      * Цены доступные к просмотру
      *
@@ -545,10 +546,10 @@ class ShopProduct extends \skeeks\cms\models\Core
             'type_price_id' => ArrayHelper::map($shopFuser->viewTypePrices, 'id', 'id'),
         ])->orderBy(['price' => SORT_ASC]);
     }
+
     /**
      *
      * Лучшая цена по которой может купить этот товар пользователь, среди всех доступных
-     * Операемся на курс
      *
      * @param null $shopFuser
      * @return $this
@@ -577,6 +578,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             )
             ->orderBy(['realPrice' => SORT_ASC]);
     }
+
     /**
      * Значение базовой цены
      *
@@ -592,6 +594,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         return $this->_baseProductPriceValue;
     }
+
     /**
      * @param $value
      * @return $this
@@ -616,6 +619,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         return $this->_baseProductPriceCurrency;
     }
+
     /**
      * @param $value
      * @return $this
@@ -625,6 +629,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         $this->_baseProductPriceCurrency = $value;
         return $this;
     }
+
     /**
      * Товар с предложениями?
      * @return bool

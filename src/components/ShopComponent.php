@@ -388,5 +388,4 @@ class ShopComponent extends Component
 
         return $emailsAll;
     }
-
 }

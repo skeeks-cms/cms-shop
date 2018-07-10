@@ -15,7 +15,8 @@ $model = new \skeeks\cms\shop\models\ShopCmsContentElement();
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
-<?= $form->field($model, 'parent_content_element_id')->widget(
+<? if ($cmsContent) : ?>
+    <?= $form->field($model, 'parent_content_element_id')->widget(
                 \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
                     'content_id' => $cmsContent->parent_content_id,
@@ -26,6 +27,8 @@ $model = new \skeeks\cms\shop\models\ShopCmsContentElement();
         )
                 ->label('Общий товар с предложениями');
         ?>
+<? endif; ?>
+
 
 <?= $form->buttonsStandart($model, ['save']); ?>
 

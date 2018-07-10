@@ -16,62 +16,62 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\Core;
 use skeeks\cms\models\User;
 use skeeks\cms\money\Money;
-use \Yii;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "shop_fuser".
+ *
+ * Это объект корзины
+ *
+ * @property User                 $user
+ * @property ShopBasket[]         $shopBaskets
+ * @property ShopDelivery         $delivery
+ * @property ShopBuyer            $buyer
+ * @property ShopPaySystem        $paySystem
+ *
+ * @property ShopPersonType       $personType
+ * @property CmsSite              $site
+ *
+ * @property int                  $countShopBaskets
+ * @property float                $quantity
+ *
+ * @property ShopBuyer[]          $shopBuyers
+ * @property ShopPaySystem[]      $paySystems
  *
  *
- * @property User $user
- * @property ShopBasket[] $shopBaskets
- * @property ShopDelivery $delivery
- * @property ShopBuyer $buyer
- * @property ShopPaySystem $paySystem
+ * @property integer              $id
+ * @property integer              $created_by
+ * @property integer              $updated_by
+ * @property integer              $created_at
+ * @property integer              $updated_at
+ * @property integer              $user_id Пользователь сайта
+ * @property string               $additional
+ * @property integer              $person_type_id
+ * @property integer              $site_id
+ * @property integer              $delivery_id
+ * @property integer              $buyer_id
+ * @property integer              $pay_system_id
+ * @property integer              $store_id
+ * @property array                $discount_coupons
  *
- * @property ShopPersonType $personType
- * @property CmsSite $site
- *
- * @property int $countShopBaskets
- * @property float $quantity
- *
- * @property ShopBuyer[] $shopBuyers
- * @property ShopPaySystem[] $paySystems
- *
- *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $user_id
- * @property string $additional
- * @property integer $person_type_id
- * @property integer $site_id
- * @property integer $delivery_id
- * @property integer $buyer_id
- * @property integer $pay_system_id
- * @property integer $store_id
- * @property array $discount_coupons
- *
- * @property Money $money
- * @property Money $moneyOriginal
- * @property Money $moneyVat
- * @property Money $moneyDiscount
- * @property Money $moneyDelivery
+ * @property Money                $money
+ * @property Money                $moneyOriginal
+ * @property Money                $moneyVat
+ * @property Money                $moneyDiscount
+ * @property Money                $moneyDelivery
  * @property ShopDiscountCoupon[] $discountCoupons
  *
- * @property int $weight
- * @property bool $isEmpty
+ * @property int                  $weight
+ * @property bool                 $isEmpty
  *
- * @property ShopTypePrice $buyTypePrices
- * @property ShopTypePrice $viewTypePrices
- * @property CmsContentElement $store
+ * @property ShopTypePrice        $buyTypePrices
+ * @property ShopTypePrice        $viewTypePrices
+ * @property CmsContentElement    $store
  *
  */
 class ShopFuser extends Core implements \JsonSerializable
 {
+    const SCENARIO_CREATE_ORDER = 'scentarioCreateOrder';
     /**
      * @inheritdoc
      */
@@ -79,7 +79,23 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return '{{%shop_fuser}}';
     }
+    /**
+     * @param CmsUser $cmsUser
+     * @return array|null|\yii\db\ActiveRecord|static
+     */
+    static public function getInstanceByUser(CmsUser $cmsUser)
+    {
+        $shopFuser = static::find()->where(['user_id' => $cmsUser->id])->one();
 
+        if (!$shopFuser) {
+            $shopFuser = new static();
+            $shopFuser->user_id = $cmsUser->id;
+
+            $shopFuser->save();
+        }
+
+        return $shopFuser;
+    }
     /**
      * @inheritdoc
      */
@@ -88,12 +104,11 @@ class ShopFuser extends Core implements \JsonSerializable
         return ArrayHelper::merge(parent::behaviors(), [
             Implode::class =>
                 [
-                    'class' => Implode::class,
-                    'fields' => ['discount_coupons']
-                ]
+                    'class'  => Implode::class,
+                    'fields' => ['discount_coupons'],
+                ],
         ]);
     }
-
     public function loadDefaultValues($skipIfSet = true)
     {
         parent::loadDefaultValues($skipIfSet);
@@ -122,25 +137,23 @@ class ShopFuser extends Core implements \JsonSerializable
             $this->delivery_id = $delivery->id;
         }
     }
-
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'user_id' => \Yii::t('skeeks/shop/app', 'User site'),
-            'additional' => \Yii::t('skeeks/shop/app', 'Additional'),
-            'person_type_id' => \Yii::t('skeeks/shop/app', 'Type of buyer'),
-            'site_id' => \Yii::t('skeeks/shop/app', 'Site ID'),
-            'delivery_id' => \Yii::t('skeeks/shop/app', 'Delivery service'),
-            'buyer_id' => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
-            'pay_system_id' => \Yii::t('skeeks/shop/app', 'Payment system'),
-            'store_id' => \Yii::t('skeeks/shop/app', 'Warehouse/Store'),
+            'user_id'          => \Yii::t('skeeks/shop/app', 'User site'),
+            'additional'       => \Yii::t('skeeks/shop/app', 'Additional'),
+            'person_type_id'   => \Yii::t('skeeks/shop/app', 'Type of buyer'),
+            'site_id'          => \Yii::t('skeeks/shop/app', 'Site ID'),
+            'delivery_id'      => \Yii::t('skeeks/shop/app', 'Delivery service'),
+            'buyer_id'         => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'pay_system_id'    => \Yii::t('skeeks/shop/app', 'Payment system'),
+            'store_id'         => \Yii::t('skeeks/shop/app', 'Warehouse/Store'),
             'discount_coupons' => \Yii::t('skeeks/shop/app', 'Discount coupons'),
         ]);
     }
-
     public function init()
     {
         parent::init();
@@ -148,23 +161,18 @@ class ShopFuser extends Core implements \JsonSerializable
         $this->on(self::EVENT_BEFORE_INSERT, [$this, 'beforeSaveCallback']);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'beforeSaveCallback']);
     }
-
     public function beforeSaveCallback()
     {
         if ($this->buyer) {
             $this->person_type_id = $this->buyer->shopPersonType->id;
         }
     }
-
-    const SCENARIO_CREATE_ORDER = 'scentarioCreateOrder';
-
     public function scenarios()
     {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_CREATE_ORDER] = $scenarios[self::SCENARIO_DEFAULT];
         return $scenarios;
     }
-
     /**
      * @inheritdoc
      */
@@ -180,9 +188,9 @@ class ShopFuser extends Core implements \JsonSerializable
                     'user_id',
                     'person_type_id',
                     'site_id',
-                    'store_id'
+                    'store_id',
                 ],
-                'integer'
+                'integer',
             ],
             [['additional'], 'string'],
             [['discount_coupons'], 'safe'],
@@ -195,22 +203,12 @@ class ShopFuser extends Core implements \JsonSerializable
                 'default',
                 'value' => function (ShopFuser $model) {
                     return ($model->buyer && $model->buyer->shopPersonType) ? $model->buyer->shopPersonType->id : null;
-                }
+                },
             ],
             [['pay_system_id', 'buyer_id', 'site_id', 'user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
 
         ]);
     }
-
-    public function extraFields()
-    {
-        return [
-            'countShopBaskets',
-            'shopBaskets',
-            'quantity',
-        ];
-    }
-
     /**
      *
      * Массив для json ответа, используется при обновлении корзины, добавлении позиций и т.д.
@@ -220,7 +218,7 @@ class ShopFuser extends Core implements \JsonSerializable
     public function jsonSerialize()
     {
         return ArrayHelper::merge($this->toArray([], $this->extraFields()), [
-            'money' => ArrayHelper::merge($this->money->jsonSerialize(),
+            'money'         => ArrayHelper::merge($this->money->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
             'moneyDelivery' => ArrayHelper::merge($this->moneyDelivery->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDelivery)]),
@@ -228,12 +226,19 @@ class ShopFuser extends Core implements \JsonSerializable
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDiscount)]),
             'moneyOriginal' => ArrayHelper::merge($this->moneyOriginal->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyOriginal)]),
-            'moneyVat' => ArrayHelper::merge($this->moneyVat->jsonSerialize(), [
-                'convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyVat)
+            'moneyVat'      => ArrayHelper::merge($this->moneyVat->jsonSerialize(), [
+                'convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyVat),
             ]),
         ]);
     }
-
+    public function extraFields()
+    {
+        return [
+            'countShopBaskets',
+            'shopBaskets',
+            'quantity',
+        ];
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -241,26 +246,6 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
-
-
-    /**
-     * @param CmsUser $cmsUser
-     * @return array|null|\yii\db\ActiveRecord|static
-     */
-    static public function getInstanceByUser(CmsUser $cmsUser)
-    {
-        $shopFuser = static::find()->where(['user_id' => $cmsUser->id])->one();
-
-        if (!$shopFuser) {
-            $shopFuser = new static();
-            $shopFuser->user_id = $cmsUser->id;
-
-            $shopFuser->save();
-        }
-
-        return $shopFuser;
-    }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -285,16 +270,6 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return $this->hasOne(ShopBuyer::className(), ['id' => 'buyer_id']);
     }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopBaskets()
-    {
-        return $this->hasMany(ShopBasket::className(), ['fuser_id' => 'id']);
-    }
-
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -302,16 +277,6 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return $this->hasOne(ShopDelivery::className(), ['id' => 'delivery_id']);
     }
-
-    /**
-     *
-     * @return ActiveQuery
-     */
-    public function getShopBuyers()
-    {
-        return $this->hasMany(ShopBuyer::className(), ['cms_user_id' => 'id'])->via('user');
-    }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -319,8 +284,6 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return $this->hasOne(ShopPaySystem::className(), ['id' => 'pay_system_id']);
     }
-
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -328,7 +291,6 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return $this->hasOne(CmsContentElement::className(), ['id' => 'store_id']);
     }
-
     /**
      * @return ShopDiscountCoupon[]
      */
@@ -340,8 +302,6 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return ShopDiscountCoupon::find()->where(['id' => $this->discount_coupons])->all();
     }
-
-
     /**
      * Добавить корзины этому пользователю
      *
@@ -368,8 +328,13 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return $this;
     }
-
-
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopBaskets()
+    {
+        return $this->hasMany(ShopBasket::className(), ['fuser_id' => 'id']);
+    }
     /**
      * Количество позиций в корзине
      *
@@ -379,7 +344,6 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return count($this->shopBaskets);
     }
-
     /**
      * @return float
      */
@@ -394,7 +358,6 @@ class ShopFuser extends Core implements \JsonSerializable
         }
         return (float)$result;
     }
-
     /**
      *
      * Итоговая стоимость корзины с учетом скидок, то что будет платить человек
@@ -415,7 +378,6 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return $money;
     }
-
     /**
      *
      * Итоговая стоимость корзины, без учета скидок
@@ -432,8 +394,6 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return $money;
     }
-
-
     /**
      * @return int
      */
@@ -447,7 +407,6 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return $result;
     }
-
     /**
      *
      * Итоговая стоимость налога
@@ -464,7 +423,6 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return $money;
     }
-
     /**
      *
      * Итоговая скидка по всей корзине
@@ -479,7 +437,6 @@ class ShopFuser extends Core implements \JsonSerializable
         }
         return $money;
     }
-
     /**
      *
      * Итоговая скидка по всей корзине
@@ -494,16 +451,6 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return \Yii::$app->money->newMoney();
     }
-
-
-    /**
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return (bool)$this->countShopBaskets == 0;
-    }
-
     /**
      * @return bool
      */
@@ -511,8 +458,13 @@ class ShopFuser extends Core implements \JsonSerializable
     {
         return $this->isEmpty();
     }
-
-
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return (bool)$this->countShopBaskets == 0;
+    }
     /**
      * Возможные опции для выбора покупателя
      * @return array
@@ -524,8 +476,8 @@ class ShopFuser extends Core implements \JsonSerializable
         if (\Yii::$app->shop->shopPersonTypes) {
             foreach (\Yii::$app->shop->shopPersonTypes as $shopPersonType) {
                 $result[$shopPersonType->name] = [
-                    'shopPersonType-' . $shopPersonType->id => " + " . \Yii::t('skeeks/shop/app',
-                            'New profile') . " ({$shopPersonType->name})"
+                    'shopPersonType-'.$shopPersonType->id => " + ".\Yii::t('skeeks/shop/app',
+                            'New profile')." ({$shopPersonType->name})",
                 ];
 
                 if ($existsBuyers = $this->getShopBuyers()->andWhere(['shop_person_type_id' => $shopPersonType->id])->all()) {
@@ -537,8 +489,14 @@ class ShopFuser extends Core implements \JsonSerializable
 
         return $result;
     }
-
-
+    /**
+     *
+     * @return ActiveQuery
+     */
+    public function getShopBuyers()
+    {
+        return $this->hasMany(ShopBuyer::className(), ['cms_user_id' => 'id'])->via('user');
+    }
     /**
      * Доступные платежные системы
      *
@@ -547,13 +505,13 @@ class ShopFuser extends Core implements \JsonSerializable
     public function getPaySystems()
     {
         if (!$this->personType) {
-            $query = ShopPaySystem::find()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
+            $query = ShopPaySystem::find()->andWhere([ShopPaySystem::tableName().".active" => Cms::BOOL_Y]);
             $query->multiple = true;
 
             return $query;
         }
 
-        return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
+        return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName().".active" => Cms::BOOL_Y]);
     }
 
 
@@ -587,8 +545,7 @@ class ShopFuser extends Core implements \JsonSerializable
         $result = [];
 
         foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
-            if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null,
-                $typePrice->buyPermissionName)) {
+            if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null, $typePrice->buyPermissionName)) {
                 $result[$typePrice->id] = $typePrice;
             }
         }
@@ -611,4 +568,92 @@ class ShopFuser extends Core implements \JsonSerializable
         return $this;
     }
 
+
+    /**
+     * Минимальная цена по которой можно купить товар
+     *
+     * @param ShopCmsContentElement $shopCmsContentElement
+     * @return array
+     */
+    public function getMinMoneyByProduct(ShopCmsContentElement $shopCmsContentElement)
+    {
+        $price = $shopCmsContentElement->shopProduct->baseProductPrice;
+        $money = clone $price->money;
+
+        $applyedShopDiscounts = [];
+
+        $shopDiscounts = [];
+        /**
+         * @var ShopDiscount $shopDiscount
+         */
+        $shopDiscountsTmp = ShopDiscount::find()
+            ->active()
+            ->orderBy(['shop_discount.priority' => SORT_ASC])
+            ->leftJoin('shop_discount2type_price', 'shop_discount2type_price.discount_id = shop_discount.id')
+            ->andWhere([
+                'or',
+                ['shop_discount.site_id' => ""],
+                ['shop_discount.site_id' => null],
+                ['shop_discount.site_id' => \Yii::$app->cms->site->id],
+            ])
+            ->andWhere([
+                'shop_discount2type_price.type_price_id' => $price->typePrice->id,
+            ])
+            ->all();
+
+
+        if ($shopDiscountsTmp) {
+            foreach ($shopDiscountsTmp as $shopDiscount) {
+                if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null, $shopDiscount->permissionName)) {
+                    $shopDiscounts[$shopDiscount->id] = $shopDiscount;
+                }
+            }
+        }
+
+        if ($this->discountCoupons) {
+            foreach ($this->discountCoupons as $discountCoupon) {
+                $shopDiscounts[$discountCoupon->shopDiscount->id] = $discountCoupon->shopDiscount;
+            }
+        }
+
+        if ($shopDiscounts) {
+            ArrayHelper::multisort($shopDiscounts, 'priority');
+        }
+
+        if ($shopDiscounts) {
+
+            $discountPercent = 0;
+
+            foreach ($shopDiscounts as $shopDiscount) {
+
+                if ($shopDiscount->isTrueConditions($shopCmsContentElement)) {
+                    if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
+
+                        $percent = $shopDiscount->value / 100;
+                        $discountPercent = $discountPercent + $percent;
+
+                        $discountMoney = clone $money;
+                        $discountMoney->multiply($percent);
+
+                        if ($shopDiscount->max_discount > 0) {
+                            if ($shopDiscount->max_discount < $discountMoney->amount) {
+                                $discountMoney->amount = $shopDiscount->max_discount;
+                            }
+                        }
+                        $money->sub($discountMoney);
+                        $applyedShopDiscounts[] = $shopDiscount;
+
+                        //Нужно остановится и не применять другие скидки
+                        if ($shopDiscount->last_discount === Cms::BOOL_Y) {
+                            break;
+                        }
+                    } elseif ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
+
+                    }
+                }
+            }
+        }
+
+        return [$money, $applyedShopDiscounts];
+    }
 }

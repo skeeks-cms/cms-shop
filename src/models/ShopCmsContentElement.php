@@ -182,4 +182,8 @@ class ShopCmsContentElement extends CmsContentElement
         return $model;
 
     }
+
+
+
+
 }
