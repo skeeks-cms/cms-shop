@@ -13,7 +13,7 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
-use skeeks\cms\shop\helpers\DiscountCondition;
+use skeeks\cms\shop\helpers\DiscountConditionHelper;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -252,11 +252,11 @@ class ShopDiscount extends \skeeks\cms\models\Core
             return true;
         }
 
-        $condition = new DiscountCondition([
+        $condition = new DiscountConditionHelper([
             'data' => $conditions,
             'shopCmsContentElement' => $shopCmsContentElement,
         ]);
 
-        return $condition->getIsTrue();
+        return $condition->isTrue;
     }
 }

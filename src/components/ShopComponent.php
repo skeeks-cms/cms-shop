@@ -21,6 +21,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminController;
 use skeeks\cms\reviews2\actions\AdminOneModelMessagesAction;
 use skeeks\cms\shop\actions\AdminContentElementShopAction;
+use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopPersonType;
@@ -37,7 +38,7 @@ use yii\widgets\ActiveForm;
  * @property ShopTypePrice[] $shopTypePrices
  *
  * @property ShopFuser $shopFuser
- * @property ShopFuser $adminShopFuser
+ * @property ShopCart $cart
  *
  * @property CmsContent $shopContents
  * @property CmsContent $storeContent
@@ -209,7 +210,8 @@ class ShopComponent extends Component
     /**
      * Если нет будет создан
      *
-     * @return ShopFuser
+     * @deprecated
+     * @return ShopCart
      */
     public function getShopFuser()
     {
@@ -222,7 +224,7 @@ class ShopComponent extends Component
             //Проверка сессии
             if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
                 $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
-                $shopFuser = ShopFuser::find()->where(['id' => $fuserId])->one();
+                $shopFuser = ShopCart::find()->where(['id' => $fuserId])->one();
                 //Поиск юзера
                 if ($shopFuser) {
                     $this->_shopFuser = $shopFuser;
@@ -230,7 +232,7 @@ class ShopComponent extends Component
             }
 
             if (!$this->_shopFuser) {
-                $shopFuser = new ShopFuser();
+                $shopFuser = new ShopCart();
                 $shopFuser->save();
 
                 \Yii::$app->getSession()->set($this->sessionFuserName, $shopFuser->id);
@@ -241,16 +243,16 @@ class ShopComponent extends Component
                 return null;
             }
 
-            $this->_shopFuser = ShopFuser::find()->where(['user_id' => \Yii::$app->user->identity->id])->one();
+            $this->_shopFuser = ShopCart::find()->where(['user_id' => \Yii::$app->user->identity->id])->one();
             //Если у авторизовнного пользоывателя уже есть пользователь корзины
             if ($this->_shopFuser) {
                 //Проверка сессии, а было ли чего то в корзине
                 if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
                     $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
-                    $shopFuser = ShopFuser::find()->where(['id' => $fuserId])->one();
+                    $shopFuser = ShopCart::find()->where(['id' => $fuserId])->one();
 
                     /**
-                     * @var $shopFuser ShopFuser
+                     * @var $shopFuser ShopCart
                      */
                     if ($shopFuser) {
                         $this->_shopFuser->addBaskets($shopFuser->shopBaskets);
@@ -264,10 +266,10 @@ class ShopComponent extends Component
                 //Проверка сессии, а было ли чего то в корзине
                 if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
                     $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
-                    $shopFuser = ShopFuser::find()->where(['id' => $fuserId])->one();
+                    $shopFuser = ShopCart::find()->where(['id' => $fuserId])->one();
                     //Поиск юзера
                     /**
-                     * @var $shopFuser ShopFuser
+                     * @var $shopFuser ShopCart
                      */
                     if ($shopFuser) {
                         $shopFuser->user_id = \Yii::$app->user->identity->id;
@@ -277,7 +279,7 @@ class ShopComponent extends Component
                     $this->_shopFuser = $shopFuser;
                     \Yii::$app->getSession()->remove($this->sessionFuserName);
                 } else {
-                    $shopFuser = new ShopFuser([
+                    $shopFuser = new ShopCart([
                         'user_id' => \Yii::$app->user->identity->id
                     ]);
 
@@ -291,12 +293,28 @@ class ShopComponent extends Component
     }
 
     /**
+     * @deprecated
      * @param ShopFuser $shopFuser
      * @return $this
      */
     public function setShopFuser(ShopFuser $shopFuser)
     {
         $this->_shopFuser = $shopFuser;
+        return $this;
+    }
+
+    public function getCart()
+    {
+        return $this->shopFuser;
+    }
+
+    /**
+     * @param ShopCart $shopCart
+     * @return ShopFuser
+     */
+    public function setCart(ShopCart $shopCart)
+    {
+        $this->_shopFuser = $shopCart;
         return $this;
     }
 

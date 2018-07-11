@@ -13,7 +13,9 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
+use skeeks\cms\shop\helpers\ProductPriceHelper;
 use skeeks\modules\cms\catalog\models\Product;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
 
@@ -70,6 +72,7 @@ use yii\helpers\Url;
  *
  * @property MoneyCurrency     $currency
  * @property ShopFuser         $fuser
+ * @property ShopCart         $cart
  * @property ShopOrder         $order
  * @property ShopProduct       $product
  * @property ShopProductPrice  $productPrice
@@ -94,8 +97,8 @@ class ShopBasket extends \skeeks\cms\models\Core
     /*public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            HasJsonFieldsBehavior::className() => [
-                'class'     => HasJsonFieldsBehavior::className(),
+            HasJsonFieldsBehavior::class => [
+                'class'     => HasJsonFieldsBehavior::class,
                 'fields'    => ['dimensions']
             ]
         ]);
@@ -252,42 +255,49 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(MoneyCurrency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getFuser()
     {
-        return $this->hasOne(ShopFuser::className(), ['id' => 'fuser_id']);
+        return $this->hasOne(ShopCart::class, ['id' => 'fuser_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCart()
+    {
+        return $this->hasOne(ShopCart::class, ['id' => 'fuser_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getOrder()
     {
-        return $this->hasOne(ShopOrder::className(), ['id' => 'order_id']);
+        return $this->hasOne(ShopOrder::class, ['id' => 'order_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'product_id']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'product_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getProductPrice()
     {
-        return $this->hasOne(ShopProductPrice::className(), ['id' => 'product_price_id']);
+        return $this->hasOne(ShopProductPrice::class, ['id' => 'product_price_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
+        return $this->hasOne(CmsSite::class, ['id' => 'site_id']);
     }
     /**
      * Итоговая стоимость одной позиции  включая скидки и наценки
@@ -316,6 +326,7 @@ class ShopBasket extends \skeeks\cms\models\Core
     {
         return new Money((string)$this->discount_price, $this->currency_code);
     }
+
     /**
      *
      * Пересчет состояния позиции согласно текущемим данным
@@ -328,6 +339,11 @@ class ShopBasket extends \skeeks\cms\models\Core
         if (!$this->product) {
             return $this;
         }
+
+        $priceHelper = new ProductPriceHelper([
+            'shopCmsContentElement' => $this->product->cmsContentElement,
+            'shopCart' => $this->cart,
+        ]);;
 
         $product = $this->product;
         $parentElement = $product->cmsContentElement->parentContentElement;
@@ -352,8 +368,8 @@ class ShopBasket extends \skeeks\cms\models\Core
             'length' => $product->length,
         ]);
 
-        //Рассчет налогов
-        if ($product->vat && (float)$product->vat->rate > 0) {
+        //Рассчет налогов TODO: переделать
+        /*if ($product->vat && (float)$product->vat->rate > 0) {
             $this->vat_rate = $product->vat->rate;
 
             if ($product->vat_included == Cms::BOOL_Y) {
@@ -364,80 +380,25 @@ class ShopBasket extends \skeeks\cms\models\Core
 
         } else {
             $this->price = $productPriceMoney->getValue();
-        }
+        }*/
 
         $this->currency_code = $productPriceMoney->currency->code;
 
 
         //Проверка скидок
-        /**
-         * @var ShopDiscount $shopDiscount
-         */
-        $shopDiscounts = ShopDiscount::find()
-            ->active()
-            ->orderBy(['shop_discount.priority' => SORT_ASC])
-            ->leftJoin('shop_discount2type_price', 'shop_discount2type_price.discount_id = shop_discount.id')
-            ->andWhere([
-                'or',
-                ['shop_discount.site_id' => ""],
-                ['shop_discount.site_id' => null],
-                ['shop_discount.site_id' => \Yii::$app->cms->site->id],
-            ])
-            ->andWhere([
-                'shop_discount2type_price.type_price_id' => $this->productPrice->typePrice->id,
-            ])
-            ->all();
-
-
-        if ($shopDiscounts) {
-            foreach ($shopDiscounts as $key => $shopDiscount) {
-                if (!\Yii::$app->user->can($shopDiscount->permissionName)) {
-                    unset($shopDiscounts[$key]);
-                }
-            }
-        }
-
-        if ($this->fuser && $this->fuser->discountCoupons) {
-            foreach ($this->fuser->discountCoupons as $discountCoupon) {
-                $shopDiscounts[] = $discountCoupon->shopDiscount;
-            }
-        }
-
-
-        $price = $this->price;
         $this->discount_price = 0;
         $this->discount_value = "";
         $this->discount_name = "";
+        $this->price = $priceHelper->minMoney->amount;
 
-        if ($shopDiscounts) {
-            $discountNames = [];
-            $discountPercent = 0;
-
-            foreach ($shopDiscounts as $shopDiscount) {
-                $discountNames[] = $shopDiscount->name;
-
-                if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
-                    $percent = $shopDiscount->value / 100;
-                    $discountPercent = $discountPercent + $percent;
-
-                    $discountPrice = $price * $percent;
-                    $this->price = $this->price - $discountPrice;
-                    $this->discount_price = $this->discount_price + $discountPrice;
-
-                    //Нужно остановится и не применять другие скидки
-                    if ($shopDiscount->last_discount === Cms::BOOL_Y) {
-                        break;
-                    }
-                }
-            }
-
-            $this->discount_name = implode(" + ", $discountNames);
-            $this->discount_value = \Yii::$app->formatter->asPercent($discountPercent);
+        if ($priceHelper->hasDiscount) {
+            $this->discount_price = $priceHelper->discountMoney->amount;
+            $this->discount_name = implode(" + ", ArrayHelper::map($priceHelper->applyedDiscounts, 'id', 'name'));
+            $this->discount_value = \Yii::$app->formatter->asPercent($priceHelper->percent);
         }
 
         //Если это предложение, нужно добавить свойства
         if ($parentElement && !$this->isNewRecord) {
-
 
             if ($product->cmsContentElement->name != $parentElement->name) {
                 $basketProperty = new ShopBasketProps();
@@ -475,7 +436,7 @@ class ShopBasket extends \skeeks\cms\models\Core
      */
     public function getShopBasketProps()
     {
-        return $this->hasMany(ShopBasketProps::className(), ['shop_basket_id' => 'id']);
+        return $this->hasMany(ShopBasketProps::class, ['shop_basket_id' => 'id']);
     }
     /**
      * Значение налога за одну единицу товара

@@ -68,6 +68,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopTypePrice        $viewTypePrices
  * @property CmsContentElement    $store
  *
+ * @deprecated
  */
 class ShopFuser extends Core implements \JsonSerializable
 {
@@ -566,94 +567,5 @@ class ShopFuser extends Core implements \JsonSerializable
         }
 
         return $this;
-    }
-
-
-    /**
-     * Минимальная цена по которой можно купить товар
-     *
-     * @param ShopCmsContentElement $shopCmsContentElement
-     * @return array
-     */
-    public function getMinMoneyByProduct(ShopCmsContentElement $shopCmsContentElement)
-    {
-        $price = $shopCmsContentElement->shopProduct->baseProductPrice;
-        $money = clone $price->money;
-
-        $applyedShopDiscounts = [];
-
-        $shopDiscounts = [];
-        /**
-         * @var ShopDiscount $shopDiscount
-         */
-        $shopDiscountsTmp = ShopDiscount::find()
-            ->active()
-            ->orderBy(['shop_discount.priority' => SORT_ASC])
-            ->leftJoin('shop_discount2type_price', 'shop_discount2type_price.discount_id = shop_discount.id')
-            ->andWhere([
-                'or',
-                ['shop_discount.site_id' => ""],
-                ['shop_discount.site_id' => null],
-                ['shop_discount.site_id' => \Yii::$app->cms->site->id],
-            ])
-            ->andWhere([
-                'shop_discount2type_price.type_price_id' => $price->typePrice->id,
-            ])
-            ->all();
-
-
-        if ($shopDiscountsTmp) {
-            foreach ($shopDiscountsTmp as $shopDiscount) {
-                if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null, $shopDiscount->permissionName)) {
-                    $shopDiscounts[$shopDiscount->id] = $shopDiscount;
-                }
-            }
-        }
-
-        if ($this->discountCoupons) {
-            foreach ($this->discountCoupons as $discountCoupon) {
-                $shopDiscounts[$discountCoupon->shopDiscount->id] = $discountCoupon->shopDiscount;
-            }
-        }
-
-        if ($shopDiscounts) {
-            ArrayHelper::multisort($shopDiscounts, 'priority');
-        }
-
-        if ($shopDiscounts) {
-
-            $discountPercent = 0;
-
-            foreach ($shopDiscounts as $shopDiscount) {
-
-                if ($shopDiscount->isTrueConditions($shopCmsContentElement)) {
-                    if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
-
-                        $percent = $shopDiscount->value / 100;
-                        $discountPercent = $discountPercent + $percent;
-
-                        $discountMoney = clone $money;
-                        $discountMoney->multiply($percent);
-
-                        if ($shopDiscount->max_discount > 0) {
-                            if ($shopDiscount->max_discount < $discountMoney->amount) {
-                                $discountMoney->amount = $shopDiscount->max_discount;
-                            }
-                        }
-                        $money->sub($discountMoney);
-                        $applyedShopDiscounts[] = $shopDiscount;
-
-                        //Нужно остановится и не применять другие скидки
-                        if ($shopDiscount->last_discount === Cms::BOOL_Y) {
-                            break;
-                        }
-                    } elseif ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
-
-                    }
-                }
-            }
-        }
-
-        return [$money, $applyedShopDiscounts];
     }
 }
