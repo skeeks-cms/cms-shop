@@ -9,16 +9,16 @@ $order->refresh();
 ?>
 
 <?= Html::beginTag('h1'); ?>
-<?= \Yii::t('skeeks/shop/app', 'New order'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app',
-    'in site'); ?> <?= \Yii::$app->cms->appName ?>
+<?= \Yii::t('skeeks/shop/app', 'New order'); ?> #<?= $order->id; ?> «<?= \Yii::t('skeeks/shop/app',
+    'in site'); ?> <?= \Yii::$app->cms->appName ?>»
 <?= Html::endTag('h1'); ?>
 
 <?= Html::tag('hr'); ?>
 
 <div style="text-align: left;">
-    <?= Html::beginTag('h2'); ?>
+    <?= Html::beginTag('h3'); ?>
         Заказ:
-    <?= Html::endTag('h2'); ?>
+    <?= Html::endTag('h3'); ?>
     <?= Html::beginTag('p'); ?>
 
     <?=
@@ -95,8 +95,8 @@ $order->refresh();
                     'attribute' => 'price',
                     'format' => 'raw',
                     'value' => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
-                        $shopBasket->money->multiply($shopBasket->quantity);
-                        return (string) $shopBasket->money;
+                        $money = $shopBasket->money;
+                        return (string) $money->mul($shopBasket->quantity);
                     }
                 ],
             ]
@@ -106,9 +106,9 @@ $order->refresh();
     <?= Html::endTag('p'); ?>
 
 
-    <?= Html::beginTag('h2'); ?>
+    <?= Html::beginTag('h3'); ?>
         Покупатель:
-    <?= Html::endTag('h2'); ?>
+    <?= Html::endTag('h3'); ?>
 
     <?
         $attributes = [];
@@ -129,9 +129,9 @@ $order->refresh();
     ?>
 
     <? if ($order->pay_system_id) : ?>
-        <?= Html::beginTag('h2'); ?>
+        <?= Html::beginTag('h3'); ?>
         Оплата:
-        <?= Html::endTag('h2'); ?>
+        <?= Html::endTag('h3'); ?>
 
         <?=
         \yii\widgets\DetailView::widget([
@@ -153,9 +153,9 @@ $order->refresh();
     <? endif; ?>
 
     <? if ($order->delivery_id) : ?>
-        <?= Html::beginTag('h2'); ?>
+        <?= Html::beginTag('h3'); ?>
         Доставка:
-        <?= Html::endTag('h2'); ?>
+        <?= Html::endTag('h3'); ?>
 
         <?=
         \yii\widgets\DetailView::widget([
@@ -172,13 +172,14 @@ $order->refresh();
     <? endif; ?>
 
 
-    <?= Html::beginTag('h2'); ?>
+    <?= Html::beginTag('h3'); ?>
         Итого:
-    <?= Html::endTag('h2'); ?>
+    <?= Html::endTag('h3'); ?>
 
     <?= Html::beginTag('p'); ?>
-        Стоимость товаров: <?= Html::tag('b', (string) $order->basketsMoney); ?><br/>
+        Стоимость товаров: <?= Html::tag('b', (string) $order->moneyOriginal); ?><br/>
         Стоимость доставки: <?= Html::tag('b', (string) $order->moneyDelivery); ?><br/>
+        Скидка: <?= Html::tag('b', (string) $order->moneyDiscount); ?><br/>
         К оплате: <?= Html::tag('b', (string) $order->money); ?>
     <?= Html::endTag('p'); ?>
 

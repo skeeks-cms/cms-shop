@@ -720,10 +720,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             return $this->_email;
         }
 
-        if ($this->user && $this->user->email) {
-            return $this->user->email;
-        }
-
         if ($this->buyer) {
             if ($properties = $this->buyer->relatedPropertiesModel->properties) {
                 /**
@@ -738,6 +734,10 @@ class ShopOrder extends \skeeks\cms\models\Core
                     }
                 }
             }
+        }
+
+        if ($this->user && $this->user->email) {
+            return $this->user->email;
         }
 
         return null;
