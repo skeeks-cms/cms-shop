@@ -98,16 +98,32 @@
                 ?>
             </div>
 
-            <div class="col-md-3 sx-value">
-                <?
-                echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
-                    'size'  => 1,
-                    'class' => 'form-control',
-                ]);
-                ?>
+            <div class="col-md-5 sx-value">
+                <? if (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.tree_id', 'element.treeIds'])) : ?>
+                    <?
+                        echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
+                            'name' => 'value',
+                            'multiple' => true,
+                            'value' => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
+                            'options' => [
+                                'data-no-update' => 'true',
+                                'class' => 'sx-value-element'
+                            ]
+                        ]);
+                    ?>
+                <? else : ?>
+                    <?
+                        echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
+                            'size'  => 1,
+                            'class' => 'form-control sx-value-element',
+                            'data-no-update' => 'true'
+                        ]);
+                    ?>
+                <? endif; ?>
+
             </div>
 
-            <div class="col-md-3 sx-remove-wrapper">
+            <div class="col-md-1 sx-remove-wrapper">
                 <a href="#" class="btn btn-xs sx-remove pull-right" title="Удалить условие">
                     <i class="glyphicon glyphicon-remove"></i>
                 </a>

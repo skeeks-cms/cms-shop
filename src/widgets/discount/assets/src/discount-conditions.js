@@ -39,6 +39,10 @@
             });
 
             $('input', this.jWrapper).on('change', function() {
+                if ($(this).data('no-update') === true) {
+                    return false;
+                }
+
                 self.jElement.val(JSON.stringify(self.getValue())).change();
                 return false;
             });
@@ -112,7 +116,7 @@
             } else {
                 result.field = jRule.children().children(".sx-field").children().data('field');
                 result.condition = jRule.children().children(".sx-andor").children("select").val();
-                result.value = jRule.children().children(".sx-value").children().val();
+                result.value = jRule.children().children(".sx-value").find('.sx-value-element').val();
 
                 result.condition = result.condition || 'equal';
                 result.field = result.field || jRule.data('field');
