@@ -20,6 +20,8 @@ use yii\widgets\InputWidget;
  */
 class DiscountConditionsWidget extends InputWidget
 {
+    public static $autoIdPrefix = 'DiscountConditionsWidget';
+
     /**
      * @var array
      */
@@ -63,8 +65,17 @@ class DiscountConditionsWidget extends InputWidget
         $elementOptions = [];
         foreach ($element->attributeLabels() as $key => $name)
         {
-            $elementOptions['element.' . $key] = $name;
-            $this->allConditions['element.' . $key] = $name;
+            if (in_array($key, [
+                'tree_id',
+                'treeIds',
+                'id',
+                'created_by',
+                'name',
+            ])) {
+                $elementOptions['element.' . $key] = $name;
+                $this->allConditions['element.' . $key] = $name;
+            }
+
         }
 
         $fields["Основные свойства"] = $elementOptions;

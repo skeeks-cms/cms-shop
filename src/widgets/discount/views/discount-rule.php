@@ -99,7 +99,20 @@
             </div>
 
             <div class="col-md-5 sx-value">
+
                 <? if (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.tree_id', 'element.treeIds'])) : ?>
+                    <?
+                        echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
+                            'name' => 'value',
+                            'multiple' => true,
+                            'value' => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
+                            'options' => [
+                                'data-no-update' => 'true',
+                                'class' => 'sx-value-element'
+                            ]
+                        ]);
+                    ?>
+                <? elseif (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.tree_id', 'element.treeIds'])) : ?>
                     <?
                         echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
                             'name' => 'value',

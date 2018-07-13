@@ -31,19 +31,25 @@
             //this.jContent.append(this.renderRule());
 
             $('select', this.jWrapper).on('change', function() {
+                self.jElement.val(JSON.stringify(self.getValue()));
+
                 if ($(this).data('no-update') === true) {
                     return false;
                 }
-                self.jElement.val(JSON.stringify(self.getValue())).change();
+                self.jElement.change();
+
                 return false;
             });
 
             $('input', this.jWrapper).on('change', function() {
+                self.jElement.val(JSON.stringify(self.getValue()));
+
                 if ($(this).data('no-update') === true) {
                     return false;
                 }
 
-                self.jElement.val(JSON.stringify(self.getValue())).change();
+                self.jElement.change();
+
                 return false;
             });
 
