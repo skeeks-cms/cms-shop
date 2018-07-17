@@ -546,7 +546,7 @@ class ShopFuser extends Core implements \JsonSerializable
         $result = [];
 
         foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
-            if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null, $typePrice->buyPermissionName)) {
+            if (\Yii::$app->authManager->checkAccess($this->user ? $this->user->id : null, $typePrice->buyPermissionName) || $typePrice->def == "Y") {
                 $result[$typePrice->id] = $typePrice;
             }
         }

@@ -340,10 +340,11 @@ class ShopBasket extends \skeeks\cms\models\Core
             return $this;
         }
 
-        $priceHelper = new ProductPriceHelper([
+        $priceHelper = $this->cart->getProductPriceHelper($this->product->cmsContentElement);
+        /*$priceHelper = new ProductPriceHelper([
             'shopCmsContentElement' => $this->product->cmsContentElement,
             'shopCart' => $this->cart,
-        ]);;
+        ]);*/
 
         $product = $this->product;
         $parentElement = $product->cmsContentElement->parentContentElement;

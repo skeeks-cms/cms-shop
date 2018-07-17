@@ -49,6 +49,11 @@ class ProductPriceHelper extends Component
     /**
      * @var ShopProductPrice
      */
+    public $price;
+
+    /**
+     * @var ShopProductPrice
+     */
     protected $_minPrice;
 
     /**
@@ -67,6 +72,20 @@ class ProductPriceHelper extends Component
     protected $_applyedDiscounts;
 
     /**
+     * @var ShopDiscount[]
+     */
+    static protected $_shopDiscounts = false;
+    
+    static public function getShopDiscounts()
+    {
+        if (self::$_shopDiscounts === false) {
+            self::$_shopDiscounts = ShopDiscount::find()->active()->all();
+        }
+        
+        return self::$_shopDiscounts;
+    }
+
+    /**
      *
      */
     public function init()
@@ -77,7 +96,11 @@ class ProductPriceHelper extends Component
             throw new InvalidConfigException("Не заполнены обязательные данные");
         }
 
-        $price = $this->shopCmsContentElement->shopProduct->baseProductPrice;
+        if (!$this->price) {
+            throw new InvalidConfigException("Не заполнены обязательные данные");
+        }
+
+        $price = $this->price;
         $money = clone $price->money;
 
         $applyedShopDiscounts = [];
@@ -86,21 +109,8 @@ class ProductPriceHelper extends Component
         /**
          * @var ShopDiscount $shopDiscount
          */
-        $shopDiscountsTmp = ShopDiscount::find()
-            ->active()
-            ->orderBy(['shop_discount.priority' => SORT_ASC])
-            ->leftJoin('shop_discount2type_price', 'shop_discount2type_price.discount_id = shop_discount.id')
-            ->andWhere([
-                'or',
-                ['shop_discount.site_id' => ""],
-                ['shop_discount.site_id' => null],
-                ['shop_discount.site_id' => \Yii::$app->cms->site->id],
-            ])
-            ->andWhere([
-                'shop_discount2type_price.type_price_id' => $price->typePrice->id,
-            ])
-            ->all();
-
+        $shopDiscountsTmp = self::getShopDiscounts();
+      
         if ($shopDiscountsTmp) {
             foreach ($shopDiscountsTmp as $shopDiscount) {
                 if (\Yii::$app->authManager->checkAccess($this->shopCart->user ? $this->shopCart->id : null, $shopDiscount->permissionName)) {
@@ -125,7 +135,7 @@ class ProductPriceHelper extends Component
 
             foreach ($shopDiscounts as $shopDiscount) {
 
-                if ($shopDiscount->isTrueConditions($this->shopCmsContentElement)) {
+                if ($shopDiscount->isTrue($this->shopCmsContentElement, $price)) {
                     if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
 
                         $percent = $shopDiscount->value / 100;

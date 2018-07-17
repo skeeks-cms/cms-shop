@@ -65,6 +65,8 @@ class DiscountCondition extends Component
 
     public function getIsTrue()
     {
+        
+        
         if ($this->type == 'group') {
 
             if (!$this->rules) {

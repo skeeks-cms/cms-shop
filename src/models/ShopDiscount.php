@@ -231,12 +231,36 @@ class ShopDiscount extends \skeeks\cms\models\Core
         return "shop-discount-" . $this->id;
     }
 
+    /**
+     * @param ShopCmsContentElement $shopCmsContentElement
+     * @return bool|void
+     */
+    public function isTrue(ShopCmsContentElement $shopCmsContentElement, ShopProductPrice $shopProductPrice)
+    {
+        /**
+         * Если в скидке указаны условия применения цен
+         */
+        if ($this->typePrices) {
+            $ids = ArrayHelper::map($this->typePrices, 'id', 'id');
+            if (!in_array($shopProductPrice->type_price_id, $ids)) {
+                return false;
+            }
+        }
+        
+        if ($this->site_id) {
+            if ($this->site_id != \Yii::$app->cms->cmsSite->id) {
+                return false;
+            }
+        }
+        
+        return $this->isTrueConditions($shopCmsContentElement, $shopProductPrice);
+    }
 
     /**
      * @param ShopCmsContentElement $shopCmsContentElement
      * @return bool|void
      */
-    public function isTrueConditions(ShopCmsContentElement $shopCmsContentElement)
+    public function isTrueConditions(ShopCmsContentElement $shopCmsContentElement, ShopProductPrice $shopProductPrice)
     {
         if (!$this->conditions) {
             return true;
