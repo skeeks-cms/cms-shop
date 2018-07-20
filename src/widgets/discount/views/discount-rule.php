@@ -82,7 +82,7 @@
             <div class="col-md-3 sx-field" style="line-height: 34px;">
                 <? $widget->availableConditions; ?>
                 <span class="label label-info" data-field="<?= \yii\helpers\ArrayHelper::getValue($rule, 'field'); ?>">
-                    <?= \yii\helpers\ArrayHelper::getValue($widget->allConditions, \yii\helpers\ArrayHelper::getValue($rule, 'field'), '-- Не задано --'); ?>
+                    <?= \yii\helpers\ArrayHelper::getValue($widget->allConditions, \yii\helpers\ArrayHelper::getValue($rule, 'field'), '-- Не задано -- ' . \yii\helpers\ArrayHelper::getValue($rule, 'field')); ?>
                 </span>
             </div>
             <!--<a href="#"><? /*= \yii\helpers\ArrayHelper::getValue($rule, 'condition'); */ ?></a>-->
@@ -126,12 +126,23 @@
                     ?>
                 <? else : ?>
                     <?
+                    $value = \yii\helpers\ArrayHelper::getValue($rule, 'value');
+                    if (is_string($value)) {
                         echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
                             'size'  => 1,
                             'class' => 'form-control sx-value-element',
                             'data-no-update' => 'true'
                         ]);
-                    ?>
+                    } else {
+                        print_r($value);
+                    }
+                    /*
+                        echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
+                            'size'  => 1,
+                            'class' => 'form-control sx-value-element',
+                            'data-no-update' => 'true'
+                        ]);
+                    */?>
                 <? endif; ?>
 
             </div>

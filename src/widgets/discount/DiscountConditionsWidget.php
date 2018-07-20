@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\widgets\discount;
 
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\shop\widgets\discount\assets\DiscountConditionsWidgetAsset;
 use yii\helpers\Html;
 use yii\widgets\InputWidget;
@@ -75,10 +76,24 @@ class DiscountConditionsWidget extends InputWidget
                 $elementOptions['element.' . $key] = $name;
                 $this->allConditions['element.' . $key] = $name;
             }
-
         }
 
         $fields["Основные свойства"] = $elementOptions;
+
+        $props = CmsContentProperty::find()->all();
+        $propsOptions = [];
+        /**
+         * @var $props CmsContentProperty[]
+         */
+        if ($props) {
+            foreach ($props as $prop)
+            {
+                $propsOptions['rp.' . $prop->code] = $prop->name;
+                $this->allConditions['rp.' . $prop->code] = $prop->name;
+            }
+        }
+
+        $fields["Свойства"] = $propsOptions;
 
         return $fields;
     }
