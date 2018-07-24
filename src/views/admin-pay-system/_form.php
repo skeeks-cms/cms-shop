@@ -70,6 +70,7 @@ JS
         \skeeks\cms\shop\paySystems\PayPalPaySystem::className() => (new \skeeks\cms\shop\paySystems\PayPalPaySystem())->descriptor->name,
         \skeeks\cms\shop\paySystems\YandexKassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\YandexKassaPaySystem())->descriptor->name,
         \skeeks\cms\shop\paySystems\TinkoffPaySystem::className() => (new \skeeks\cms\shop\paySystems\TinkoffPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\SberbankPaySystem::className() => (new \skeeks\cms\shop\paySystems\SberbankPaySystem())->descriptor->name,
     ]
 ), [
     'size' => 1,
