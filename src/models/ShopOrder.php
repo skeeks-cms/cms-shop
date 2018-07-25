@@ -317,15 +317,15 @@ class ShopOrder extends \skeeks\cms\models\Core
             if ($emails) {
                 foreach ($emails as $email) {
                     try {
-                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
 
-                        \Yii::$app->mailer->compose('order-payed', [
+                        \Yii::$app->mailer->compose('payed', [
                             'order' => $this,
                         ])
                             ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                             ->setTo($email)
                             ->setSubject(\Yii::t('skeeks/shop/app',
-                                    'Order successfully paid').' #'.$this->id)
+                                    'Order successfully paid').' №'.$this->id)
                             ->send();
 
                     } catch (\Exception $e) {
@@ -382,8 +382,8 @@ class ShopOrder extends \skeeks\cms\models\Core
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
-                                'Resolution of payment on request').' #'.$this->id)
+                        ->setSubject(\Yii::t('skeeks/shop/app',
+                                'Resolution of payment on request').' №' . $this->id)
                         ->send();
 
                 } catch (\Exception $e) {
@@ -406,15 +406,15 @@ class ShopOrder extends \skeeks\cms\models\Core
             if ($this->email) {
                 try {
 
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
 
-                    \Yii::$app->mailer->compose('order-canceled', [
+                    \Yii::$app->mailer->compose('canceled', [
                         'order' => $this,
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
-                                'Cancellations').' #'.$this->id)
+                        ->setSubject(\Yii::t('skeeks/shop/app',
+                                'Cancellations').' №'.$this->id)
                         ->send();
                 } catch (\Exception $e) {
                     \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::className());

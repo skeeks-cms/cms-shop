@@ -20,6 +20,12 @@ use yii\widgets\ActiveForm;
  */
 class SberbankPaySystem extends PaySystemHandlerComponent
 {
+    /**
+     * @see https://developer.sberbank.ru/acquiring-api-rest-requests1pay
+     */
+    const ORDER_STATUS_2 = 2; //Проведена полная авторизация суммы заказа
+
+
     public $isLive = true; //https://auth.robokassa.ru/Merchant/Index.aspx
 
     public $gatewayUrl = 'https://securepayments.sberbank.ru/payment/rest/';

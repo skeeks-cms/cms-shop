@@ -12,6 +12,7 @@ use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
 use Yii;
+use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 

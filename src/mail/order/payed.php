@@ -8,8 +8,7 @@ $url = $order->getPublicUrl();
 ?>
 
 <?= Html::beginTag('h1'); ?>
-<?= \Yii::t('skeeks/shop/app', 'Order successfully paid'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app',
-    'in site'); ?> <?= \Yii::$app->cms->appName ?>
+<?= \Yii::t('skeeks/shop/app', 'Order successfully paid'); ?> №<?= $order->id; ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::tag('hr'); ?>

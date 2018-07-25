@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
+use skeeks\cms\money\models\MoneyCurrency;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -47,6 +49,16 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
         return '{{%shop_payment}}';
     }
 
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            HasJsonFieldsBehavior::class => [
+                'class' => HasJsonFieldsBehavior::class,
+                'fields' => ['external_data']
+            ]
+        ]);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -56,7 +68,8 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'is_debit', 'paid_at'], 'integer'],
             [['shop_buyer_id', 'shop_order_id', 'shop_pay_system_id'], 'required'],
             [['amount'], 'number'],
-            [['comment', 'external_data'], 'string'],
+            [['external_data'], 'safe'],
+            [['comment'], 'string'],
             [['currency_code'], 'string', 'max' => 3],
             [['external_name', 'external_id'], 'string', 'max' => 255],
             [['currency_code'], 'exist', 'skipOnError' => true, 'targetClass' => MoneyCurrency::className(), 'targetAttribute' => ['currency_code' => 'code']],
