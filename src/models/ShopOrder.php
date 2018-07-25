@@ -7,125 +7,127 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
-use skeeks\cms\shop\Module;
 use skeeks\cms\money\Money;
+use skeeks\cms\shop\Module;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 /**
  * This is the model class for table "{{%shop_order}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $site_id
- * @property integer $person_type_id
- * @property string $payed
- * @property integer $payed_at
- * @property integer $buyer_id
- * @property integer $emp_payed_id
- * @property string $canceled
- * @property integer $canceled_at
- * @property integer $emp_canceled_id
- * @property string $reason_canceled
- * @property string $status_code
- * @property integer $status_at
- * @property integer $emp_status_id
- * @property string $price_delivery
- * @property string $allow_delivery
- * @property string $allow_payment
- * @property integer $allow_delivery_at
- * @property integer $emp_allow_delivery_id
- * @property string $price
- * @property string $currency_code
- * @property string $discount_value
- * @property integer $user_id
- * @property integer $pay_system_id
- * @property integer $delivery_id
- * @property string $user_description
- * @property string $additional_info
- * @property string $ps_status
- * @property string $ps_status_code
- * @property string $ps_status_description
- * @property string $ps_status_message
- * @property string $ps_sum
- * @property string $ps_currency_code
- * @property integer $ps_response_at
- * @property string $comments
- * @property string $tax_value
- * @property string $stat_gid
- * @property string $sum_paid
- * @property integer $recuring_id
- * @property string $pay_voucher_num
- * @property integer $pay_voucher_at
- * @property integer $locked_by
- * @property integer $locked_at
- * @property string $recount_flag
- * @property integer $affiliate_id
- * @property string $delivery_doc_num
- * @property integer $delivery_doc_at
- * @property string $update_1c
- * @property string $deducted
- * @property integer $deducted_at
- * @property integer $emp_deducted_id
- * @property string $reason_undo_deducted
- * @property string $marked
- * @property integer $marked_at
- * @property integer $emp_marked_id
- * @property string $reason_marked
- * @property string $reserved
- * @property integer $store_id
- * @property string $order_topic
- * @property integer $responsible_id
- * @property integer $pay_before_at
- * @property integer $account_id
- * @property integer $bill_at
- * @property string $tracking_number
- * @property string $xml_id
- * @property string $id_1c
- * @property string $version_1c
- * @property integer $version
- * @property string $external_order
- * @property string $key
+ * @property integer                    $id
+ * @property integer                    $created_by
+ * @property integer                    $updated_by
+ * @property integer                    $created_at
+ * @property integer                    $updated_at
+ * @property integer                    $site_id
+ * @property integer                    $person_type_id
+ * @property string                     $payed
+ * @property integer                    $payed_at
+ * @property integer                    $buyer_id
+ * @property integer                    $emp_payed_id
+ * @property string                     $canceled
+ * @property integer                    $canceled_at
+ * @property integer                    $emp_canceled_id
+ * @property string                     $reason_canceled
+ * @property string                     $status_code
+ * @property integer                    $status_at
+ * @property integer                    $emp_status_id
+ * @property string                     $price_delivery
+ * @property string                     $allow_delivery
+ * @property string                     $allow_payment
+ * @property integer                    $allow_delivery_at
+ * @property integer                    $emp_allow_delivery_id
+ * @property string                     $price
+ * @property string                     $currency_code
+ * @property string                     $discount_value
+ * @property integer                    $user_id
+ * @property integer                    $pay_system_id
+ * @property integer                    $delivery_id
+ * @property string                     $user_description
+ * @property string                     $additional_info
+ * @property string                     $ps_status
+ * @property string                     $ps_status_code
+ * @property string                     $ps_status_description
+ * @property string                     $ps_status_message
+ * @property string                     $ps_sum
+ * @property string                     $ps_currency_code
+ * @property integer                    $ps_response_at
+ * @property string                     $comments
+ * @property string                     $tax_value
+ * @property string                     $stat_gid
+ * @property string                     $sum_paid
+ * @property integer                    $recuring_id
+ * @property string                     $pay_voucher_num
+ * @property integer                    $pay_voucher_at
+ * @property integer                    $locked_by
+ * @property integer                    $locked_at
+ * @property string                     $recount_flag
+ * @property integer                    $affiliate_id
+ * @property string                     $delivery_doc_num
+ * @property integer                    $delivery_doc_at
+ * @property string                     $update_1c
+ * @property string                     $deducted
+ * @property integer                    $deducted_at
+ * @property integer                    $emp_deducted_id
+ * @property string                     $reason_undo_deducted
+ * @property string                     $marked
+ * @property integer                    $marked_at
+ * @property integer                    $emp_marked_id
+ * @property string                     $reason_marked
+ * @property string                     $reserved
+ * @property integer                    $store_id
+ * @property string                     $order_topic
+ * @property integer                    $responsible_id
+ * @property integer                    $pay_before_at
+ * @property integer                    $account_id
+ * @property integer                    $bill_at
+ * @property string                     $tracking_number
+ * @property string                     $xml_id
+ * @property string                     $id_1c
+ * @property string                     $version_1c
+ * @property integer                    $version
+ * @property string                     $external_order
+ * @property string                     $key
  *
  *
- * @property string $email read-only
+ * @property string                     $email read-only
+ * @property ShopBasket[]               $shopBaskets
+ * @property CmsContentElement          $store
+ * @property ShopAffiliate              $affiliate
+ * @property Currency                   $currency
+ * @property CmsUser                    $lockedBy
+ * @property ShopPaySystem              $paySystem
+ * @property ShopPersonType             $personType
+ * @property CmsSite                    $site
+ * @property ShopOrderStatus            $status
+ * @property CmsUser                    $user
+ * @property ShopBuyer                  $buyer
+ * @property ShopDelivery               $delivery
  *
- * @property ShopBasket[] $shopBaskets
- * @property CmsContentElement $store
- * @property ShopAffiliate $affiliate
- * @property Currency $currency
- * @property CmsUser $lockedBy
- * @property ShopPaySystem $paySystem
- * @property ShopPersonType $personType
- * @property CmsSite $site
- * @property ShopOrderStatus $status
- * @property CmsUser $user
- * @property ShopBuyer $buyer
- * @property ShopDelivery $delivery
- *
- * @property ShopOrderChange[] $shopOrderChanges
- * @property ShopUserTransact[] $shopUserTransacts
+ * @property ShopOrderChange[]          $shopOrderChanges
+ * @property ShopUserTransact[]         $shopUserTransacts
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
- * @property ShopDiscountCoupon[] $discountCoupons
+ * @property ShopDiscountCoupon[]       $discountCoupons
  *
- * @property string $publicUrl
  *
- * @property Money $money
- * @property Money $moneyVat
- * @property Money $moneyDiscount
- * @property Money $moneyOriginal
- * @property Money $moneySummPaid
- * @property Money $moneyDelivery
+ * @property Money                      $money
+ * @property Money                      $moneyVat
+ * @property Money                      $moneyDiscount
+ * @property Money                      $moneyOriginal
+ * @property Money                      $moneySummPaid
+ * @property Money                      $moneyDelivery
  *
- * @property Money $basketsMoney
+ * @property Money                      $basketsMoney
  *
- * @property int $weight
+ * @property int                        $weight
+ *
+ * @property string                     $payUrl read-only ссылка на оплату
+ * @property string                     $url read-only ссылка на заказ
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
+    protected $_email = null;
     /**
      * @inheritdoc
      */
@@ -133,7 +135,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return '{{%shop_order}}';
     }
-
     /**
      * @param ShopFuser $shopFuser
      * @return static
@@ -170,12 +171,12 @@ class ShopOrder extends \skeeks\cms\models\Core
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                     \Yii::$app->mailer->compose('create-order', [
-                        'order' => $order
+                        'order' => $order,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($email)
-                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                'New order') . ' #' . $order->id)
+                        ->setSubject(\Yii::t('skeeks/shop/app',
+                                'New order').' #'.$order->id)
                         ->send();
                 }
             }
@@ -188,7 +189,6 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $order;
     }
-
     /**
      * @param ShopFuser $shopFuser
      * @return static
@@ -225,7 +225,21 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $order;
     }
+    public function notifyNew()
+    {
+        if ($this->email) {
+            \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
+            \Yii::$app->mailer->compose('create-order', [
+                'order' => $this,
+            ])
+                ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                ->setTo($this->email)
+                ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
+                        'New order').' #'.$this->id)
+                ->send();
+        }
+    }
     /**
      * @inheritdoc
      */
@@ -237,15 +251,13 @@ class ShopOrder extends \skeeks\cms\models\Core
         //$this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterUpdateCallback"]);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeUpdateCallback"]);
     }
-
     public function afterInstertCallback($e)
     {
         (new ShopOrderChange([
-            'type' => ShopOrderChange::ORDER_ADDED,
-            'shop_order_id' => $this->id
+            'type'          => ShopOrderChange::ORDER_ADDED,
+            'shop_order_id' => $this->id,
         ]))->save();
     }
-
     public function beforeUpdateCallback($e)
     {
         if ($this->isAttributeChanged('canceled')) {
@@ -260,12 +272,12 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->status_at = \Yii::$app->formatter->asTimestamp(time());
 
             (new ShopOrderChange([
-                'type' => ShopOrderChange::ORDER_STATUS_CHANGED,
+                'type'          => ShopOrderChange::ORDER_STATUS_CHANGED,
                 'shop_order_id' => $this->id,
-                'data' =>
+                'data'          =>
                     [
-                        'status' => $this->status->name
-                    ]
+                        'status' => $this->status->name,
+                    ],
             ]))->save();
 
 
@@ -275,16 +287,16 @@ class ShopOrder extends \skeeks\cms\models\Core
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                     \Yii::$app->mailer->compose('order-status-change', [
-                        'order' => $this
+                        'order' => $this,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                'Change order status') . ' #' . $this->id)
+                        ->setSubject(\Yii::t('skeeks/shop/app',
+                                'Change order status').' #'.$this->id)
                         ->send();
 
                 } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::className());
                 }
 
             }
@@ -292,7 +304,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         if ($this->isAttributeChanged('payed') && $this->payed == Cms::BOOL_Y) {
             (new ShopOrderChange([
-                'type' => ShopOrderChange::ORDER_PAYED,
+                'type'          => ShopOrderChange::ORDER_PAYED,
                 'shop_order_id' => $this->id,
             ]))->save();
 
@@ -308,16 +320,16 @@ class ShopOrder extends \skeeks\cms\models\Core
                         \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                         \Yii::$app->mailer->compose('order-payed', [
-                            'order' => $this
+                            'order' => $this,
                         ])
-                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                             ->setTo($email)
-                            ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                    'Order successfully paid') . ' #' . $this->id)
+                            ->setSubject(\Yii::t('skeeks/shop/app',
+                                    'Order successfully paid').' #'.$this->id)
                             ->send();
 
                     } catch (\Exception $e) {
-                        \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                        \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::className());
                     }
                 }
 
@@ -326,7 +338,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         if ($this->isAttributeChanged('allow_payment') && $this->allow_payment == Cms::BOOL_Y) {
             (new ShopOrderChange([
-                'type' => ShopOrderChange::ORDER_ALLOW_PAYMENT,
+                'type'          => ShopOrderChange::ORDER_ALLOW_PAYMENT,
                 'shop_order_id' => $this->id,
             ]))->save();
 
@@ -335,26 +347,26 @@ class ShopOrder extends \skeeks\cms\models\Core
             if ($this->email) {
                 try {
 
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
 
-                    \Yii::$app->mailer->compose('order-allow-payment', [
-                        'order' => $this
+                    \Yii::$app->mailer->compose('allow-payment', [
+                        'order' => $this,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                'Resolution of payment on request') . ' #' . $this->id)
+                        ->setSubject(\Yii::t('skeeks/shop/app',
+                                'Resolution of payment on request').' №'.$this->id)
                         ->send();
 
                 } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::className());
                 }
             }
         }
 
         if ($this->isAttributeChanged('allow_delivery') && $this->allow_delivery == Cms::BOOL_Y) {
             (new ShopOrderChange([
-                'type' => ShopOrderChange::ORDER_ALLOW_DELIVERY,
+                'type'          => ShopOrderChange::ORDER_ALLOW_DELIVERY,
                 'shop_order_id' => $this->id,
             ]))->save();
 
@@ -366,27 +378,27 @@ class ShopOrder extends \skeeks\cms\models\Core
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                     \Yii::$app->mailer->compose('order-allow-delivery', [
-                        'order' => $this
+                        'order' => $this,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                'Resolution of payment on request') . ' #' . $this->id)
+                        ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
+                                'Resolution of payment on request').' #'.$this->id)
                         ->send();
 
                 } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::className());
                 }
             }
         }
 
         if ($this->isAttributeChanged('canceled') && $this->canceled == Cms::BOOL_Y) {
             (new ShopOrderChange([
-                'type' => ShopOrderChange::ORDER_CANCELED,
+                'type'          => ShopOrderChange::ORDER_CANCELED,
                 'shop_order_id' => $this->id,
-                'data' => [
-                    'reason_canceled' => $this->reason_canceled
-                ]
+                'data'          => [
+                    'reason_canceled' => $this->reason_canceled,
+                ],
             ]))->save();
 
 
@@ -397,20 +409,19 @@ class ShopOrder extends \skeeks\cms\models\Core
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                     \Yii::$app->mailer->compose('order-canceled', [
-                        'order' => $this
+                        'order' => $this,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                'Cancellations') . ' #' . $this->id)
+                        ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
+                                'Cancellations').' #'.$this->id)
                         ->send();
                 } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: ' . $e->getMessage(), Module::className());
+                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::className());
                 }
             }
         }
     }
-
     /**
      * @inheritdoc
      */
@@ -450,9 +461,9 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'pay_before_at',
                     'account_id',
                     'bill_at',
-                    'version'
+                    'version',
                 ],
-                'integer'
+                'integer',
             ],
             [['person_type_id'], 'required'],
             [['price_delivery', 'price', 'discount_value', 'ps_sum', 'tax_value', 'sum_paid'], 'number'],
@@ -473,10 +484,10 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'marked',
                     'reserved',
                     'external_order',
-                    'allow_payment'
+                    'allow_payment',
                 ],
                 'string',
-                'max' => 1
+                'max' => 1,
             ],
             [
                 [
@@ -489,10 +500,10 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'reason_undo_deducted',
                     'reason_marked',
                     'order_topic',
-                    'xml_id'
+                    'xml_id',
                 ],
                 'string',
-                'max' => 255
+                'max' => 255,
             ],
             [['currency_code', 'ps_currency_code'], 'string', 'max' => 3],
             [['delivery_id'], 'integer'],
@@ -509,10 +520,10 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'deducted',
                     'marked',
                     'reserved',
-                    'external_order'
+                    'external_order',
                 ],
                 'default',
-                'value' => Cms::BOOL_N
+                'value' => Cms::BOOL_N,
             ],
             [['recount_flag'], 'default', 'value' => Cms::BOOL_Y],
             [['status_code'], 'default', 'value' => ShopOrderStatus::STATUS_CODE_START],
@@ -527,7 +538,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'default',
                 'value' => function () {
                     return (\Yii::$app->shop->payAfterConfirmation == Cms::BOOL_Y) ? Cms::BOOL_N : Cms::BOOL_Y;
-                }
+                },
             ],
 
             [['key'], 'string'],
@@ -541,7 +552,6 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         ];
     }
-
     /**
      * Процесс оплаты заказа
      *
@@ -573,7 +583,6 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $this;
     }
-
     /**
      * Отмена оплаты заказа
      * @return $this
@@ -585,7 +594,6 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $this;
     }
-
     /**
      * Валидация причины отмены
      *
@@ -597,120 +605,91 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->addError($attribute, \Yii::t('skeeks/shop/app', 'Enter the reason for cancellation'));
         }
     }
-
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'site_id' => \Yii::t('skeeks/shop/app', 'Site'),
-            'person_type_id' => \Yii::t('skeeks/shop/app', 'Person Type ID'),
-            'payed' => \Yii::t('skeeks/shop/app', 'Оплачен'),
-            'payed_at' => \Yii::t('skeeks/shop/app', 'Payed At'),
-            'emp_payed_id' => \Yii::t('skeeks/shop/app', 'Emp Payed ID'),
-            'canceled' => \Yii::t('skeeks/shop/app', 'Canceled'),
-            'canceled_at' => \Yii::t('skeeks/shop/app', 'Canceled At'),
-            'emp_canceled_id' => \Yii::t('skeeks/shop/app', 'Emp Canceled ID'),
-            'reason_canceled' => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
-            'status_code' => \Yii::t('skeeks/shop/app', 'Status'),
-            'status_at' => \Yii::t('skeeks/shop/app', 'Status At'),
-            'emp_status_id' => \Yii::t('skeeks/shop/app', 'Emp Status ID'),
-            'price_delivery' => \Yii::t('skeeks/shop/app', 'Price Delivery'),
-            'allow_delivery' => \Yii::t('skeeks/shop/app', 'Allow Delivery'),
-            'allow_delivery_at' => \Yii::t('skeeks/shop/app', 'Allow Delivery At'),
+            'id'                    => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'            => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'            => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'site_id'               => \Yii::t('skeeks/shop/app', 'Site'),
+            'person_type_id'        => \Yii::t('skeeks/shop/app', 'Person Type ID'),
+            'payed'                 => \Yii::t('skeeks/shop/app', 'Оплачен'),
+            'payed_at'              => \Yii::t('skeeks/shop/app', 'Payed At'),
+            'emp_payed_id'          => \Yii::t('skeeks/shop/app', 'Emp Payed ID'),
+            'canceled'              => \Yii::t('skeeks/shop/app', 'Canceled'),
+            'canceled_at'           => \Yii::t('skeeks/shop/app', 'Canceled At'),
+            'emp_canceled_id'       => \Yii::t('skeeks/shop/app', 'Emp Canceled ID'),
+            'reason_canceled'       => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
+            'status_code'           => \Yii::t('skeeks/shop/app', 'Status'),
+            'status_at'             => \Yii::t('skeeks/shop/app', 'Status At'),
+            'emp_status_id'         => \Yii::t('skeeks/shop/app', 'Emp Status ID'),
+            'price_delivery'        => \Yii::t('skeeks/shop/app', 'Price Delivery'),
+            'allow_delivery'        => \Yii::t('skeeks/shop/app', 'Allow Delivery'),
+            'allow_delivery_at'     => \Yii::t('skeeks/shop/app', 'Allow Delivery At'),
             'emp_allow_delivery_id' => \Yii::t('skeeks/shop/app', 'Emp Allow Delivery ID'),
-            'price' => \Yii::t('skeeks/shop/app', 'Price'),
-            'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'discount_value' => \Yii::t('skeeks/shop/app', 'Discount Value'),
-            'user_id' => \Yii::t('skeeks/shop/app', 'User site'),
-            'pay_system_id' => \Yii::t('skeeks/shop/app', 'Pay System ID'),
-            'delivery_id' => \Yii::t('skeeks/shop/app', 'Delivery'),
-            'user_description' => \Yii::t('skeeks/shop/app', 'User Description'),
-            'additional_info' => \Yii::t('skeeks/shop/app', 'Additional Info'),
-            'ps_status' => \Yii::t('skeeks/shop/app', 'Ps Status'),
-            'ps_status_code' => \Yii::t('skeeks/shop/app', 'Ps Status Code'),
+            'price'                 => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code'         => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'discount_value'        => \Yii::t('skeeks/shop/app', 'Discount Value'),
+            'user_id'               => \Yii::t('skeeks/shop/app', 'User site'),
+            'pay_system_id'         => \Yii::t('skeeks/shop/app', 'Pay System ID'),
+            'delivery_id'           => \Yii::t('skeeks/shop/app', 'Delivery'),
+            'user_description'      => \Yii::t('skeeks/shop/app', 'User Description'),
+            'additional_info'       => \Yii::t('skeeks/shop/app', 'Additional Info'),
+            'ps_status'             => \Yii::t('skeeks/shop/app', 'Ps Status'),
+            'ps_status_code'        => \Yii::t('skeeks/shop/app', 'Ps Status Code'),
             'ps_status_description' => \Yii::t('skeeks/shop/app', 'Ps Status Description'),
-            'ps_status_message' => \Yii::t('skeeks/shop/app', 'Ps Status Message'),
-            'ps_sum' => \Yii::t('skeeks/shop/app', 'Ps Sum'),
-            'ps_currency_code' => \Yii::t('skeeks/shop/app', 'Ps Currency Code'),
-            'ps_response_at' => \Yii::t('skeeks/shop/app', 'Ps Response At'),
-            'comments' => \Yii::t('skeeks/shop/app', 'Comments'),
-            'tax_value' => \Yii::t('skeeks/shop/app', 'Tax Value'),
-            'stat_gid' => \Yii::t('skeeks/shop/app', 'Stat Gid'),
-            'sum_paid' => \Yii::t('skeeks/shop/app', 'Sum Paid'),
-            'recuring_id' => \Yii::t('skeeks/shop/app', 'Recuring ID'),
-            'pay_voucher_num' => \Yii::t('skeeks/shop/app', 'Pay Voucher Num'),
-            'pay_voucher_at' => \Yii::t('skeeks/shop/app', 'Pay Voucher At'),
-            'locked_by' => \Yii::t('skeeks/shop/app', 'Locked By'),
-            'locked_at' => \Yii::t('skeeks/shop/app', 'Locked At'),
-            'recount_flag' => \Yii::t('skeeks/shop/app', 'Recount Flag'),
-            'affiliate_id' => \Yii::t('skeeks/shop/app', 'Affiliate ID'),
-            'delivery_doc_num' => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
-            'delivery_doc_at' => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
-            'update_1c' => \Yii::t('skeeks/shop/app', 'Update 1c'),
-            'deducted' => \Yii::t('skeeks/shop/app', 'Deducted'),
-            'deducted_at' => \Yii::t('skeeks/shop/app', 'Deducted At'),
-            'emp_deducted_id' => \Yii::t('skeeks/shop/app', 'Emp Deducted ID'),
-            'reason_undo_deducted' => \Yii::t('skeeks/shop/app', 'Reason Undo Deducted'),
-            'marked' => \Yii::t('skeeks/shop/app', 'Marked'),
-            'marked_at' => \Yii::t('skeeks/shop/app', 'Marked At'),
-            'emp_marked_id' => \Yii::t('skeeks/shop/app', 'Emp Marked ID'),
-            'reason_marked' => \Yii::t('skeeks/shop/app', 'Reason Marked'),
-            'reserved' => \Yii::t('skeeks/shop/app', 'Reserved'),
-            'store_id' => \Yii::t('skeeks/shop/app', 'Store ID'),
-            'order_topic' => \Yii::t('skeeks/shop/app', 'Order Topic'),
-            'responsible_id' => \Yii::t('skeeks/shop/app', 'Responsible ID'),
-            'pay_before_at' => \Yii::t('skeeks/shop/app', 'Pay Before At'),
-            'account_id' => \Yii::t('skeeks/shop/app', 'Account ID'),
-            'bill_at' => \Yii::t('skeeks/shop/app', 'Bill At'),
-            'tracking_number' => \Yii::t('skeeks/shop/app', 'Tracking Number'),
-            'xml_id' => \Yii::t('skeeks/shop/app', 'Xml ID'),
-            'id_1c' => \Yii::t('skeeks/shop/app', 'Id 1c'),
-            'version_1c' => \Yii::t('skeeks/shop/app', 'Version 1c'),
-            'version' => \Yii::t('skeeks/shop/app', 'Version'),
-            'external_order' => \Yii::t('skeeks/shop/app', 'External Order'),
-            'buyer_id' => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
-            'allow_payment' => \Yii::t('skeeks/shop/app', 'Allow Payment'),
+            'ps_status_message'     => \Yii::t('skeeks/shop/app', 'Ps Status Message'),
+            'ps_sum'                => \Yii::t('skeeks/shop/app', 'Ps Sum'),
+            'ps_currency_code'      => \Yii::t('skeeks/shop/app', 'Ps Currency Code'),
+            'ps_response_at'        => \Yii::t('skeeks/shop/app', 'Ps Response At'),
+            'comments'              => \Yii::t('skeeks/shop/app', 'Comments'),
+            'tax_value'             => \Yii::t('skeeks/shop/app', 'Tax Value'),
+            'stat_gid'              => \Yii::t('skeeks/shop/app', 'Stat Gid'),
+            'sum_paid'              => \Yii::t('skeeks/shop/app', 'Sum Paid'),
+            'recuring_id'           => \Yii::t('skeeks/shop/app', 'Recuring ID'),
+            'pay_voucher_num'       => \Yii::t('skeeks/shop/app', 'Pay Voucher Num'),
+            'pay_voucher_at'        => \Yii::t('skeeks/shop/app', 'Pay Voucher At'),
+            'locked_by'             => \Yii::t('skeeks/shop/app', 'Locked By'),
+            'locked_at'             => \Yii::t('skeeks/shop/app', 'Locked At'),
+            'recount_flag'          => \Yii::t('skeeks/shop/app', 'Recount Flag'),
+            'affiliate_id'          => \Yii::t('skeeks/shop/app', 'Affiliate ID'),
+            'delivery_doc_num'      => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
+            'delivery_doc_at'       => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
+            'update_1c'             => \Yii::t('skeeks/shop/app', 'Update 1c'),
+            'deducted'              => \Yii::t('skeeks/shop/app', 'Deducted'),
+            'deducted_at'           => \Yii::t('skeeks/shop/app', 'Deducted At'),
+            'emp_deducted_id'       => \Yii::t('skeeks/shop/app', 'Emp Deducted ID'),
+            'reason_undo_deducted'  => \Yii::t('skeeks/shop/app', 'Reason Undo Deducted'),
+            'marked'                => \Yii::t('skeeks/shop/app', 'Marked'),
+            'marked_at'             => \Yii::t('skeeks/shop/app', 'Marked At'),
+            'emp_marked_id'         => \Yii::t('skeeks/shop/app', 'Emp Marked ID'),
+            'reason_marked'         => \Yii::t('skeeks/shop/app', 'Reason Marked'),
+            'reserved'              => \Yii::t('skeeks/shop/app', 'Reserved'),
+            'store_id'              => \Yii::t('skeeks/shop/app', 'Store ID'),
+            'order_topic'           => \Yii::t('skeeks/shop/app', 'Order Topic'),
+            'responsible_id'        => \Yii::t('skeeks/shop/app', 'Responsible ID'),
+            'pay_before_at'         => \Yii::t('skeeks/shop/app', 'Pay Before At'),
+            'account_id'            => \Yii::t('skeeks/shop/app', 'Account ID'),
+            'bill_at'               => \Yii::t('skeeks/shop/app', 'Bill At'),
+            'tracking_number'       => \Yii::t('skeeks/shop/app', 'Tracking Number'),
+            'xml_id'                => \Yii::t('skeeks/shop/app', 'Xml ID'),
+            'id_1c'                 => \Yii::t('skeeks/shop/app', 'Id 1c'),
+            'version_1c'            => \Yii::t('skeeks/shop/app', 'Version 1c'),
+            'version'               => \Yii::t('skeeks/shop/app', 'Version'),
+            'external_order'        => \Yii::t('skeeks/shop/app', 'External Order'),
+            'buyer_id'              => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'allow_payment'         => \Yii::t('skeeks/shop/app', 'Allow Payment'),
 
-            'delivery_id' => \Yii::t('skeeks/shop/app', 'Delivery service'),
-            'buyer_id' => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'delivery_id'   => \Yii::t('skeeks/shop/app', 'Delivery service'),
+            'buyer_id'      => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
             'pay_system_id' => \Yii::t('skeeks/shop/app', 'Payment system'),
         ];
     }
-
-    public function notifyNew()
-    {
-        if ($this->email) {
-            \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
-
-            \Yii::$app->mailer->compose('create-order', [
-                'order' => $this
-            ])
-                ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
-                ->setTo($this->email)
-                ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                        'New order') . ' #' . $this->id)
-                ->send();
-        }
-    }
-
-    protected $_email = null;
-
-    /**
-     * @return null|string
-     */
-    public function setEmail($email)
-    {
-        $this->_email = $email;
-        return $this;
-    }
-
     /**
      * @return null|string
      */
@@ -721,18 +700,8 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         if ($this->buyer) {
-            if ($properties = $this->buyer->relatedPropertiesModel->properties) {
-                /**
-                 * @var $property ShopPersonTypeProperty
-                 */
-                foreach ($properties as $property) {
-                    if ($property->is_user_email == "Y") {
-                        $value = $this->buyer->relatedPropertiesModel->getAttribute($property->code);
-                        if ($value) {
-                            return (string)$value;
-                        }
-                    }
-                }
+            if ($this->buyer->email) {
+                return $this->buyer->email;
             }
         }
 
@@ -742,7 +711,14 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return null;
     }
-
+    /**
+     * @return null|string
+     */
+    public function setEmail($email)
+    {
+        $this->_email = $email;
+        return $this;
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -977,7 +953,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getPaySystems()
     {
-        return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName() . ".active" => Cms::BOOL_Y]);
+        return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName().".active" => Cms::BOOL_Y]);
     }
 
     /**
@@ -993,14 +969,35 @@ class ShopOrder extends \skeeks\cms\models\Core
         $this->price = $money->amount;
         return $this;
     }
-
     /**
+     * @deprecated
      * @return string
      */
     public function getPublicUrl($options = [], $scheme = true)
     {
+        return $this->getUrl($options = [], $scheme = true);
+    }
+    /**
+     * @param array $options
+     * @param bool  $scheme
+     * @return string
+     */
+    public function getUrl($options = [], $scheme = true)
+    {
         return Url::to(ArrayHelper::merge(
             ['/shop/order/finish', 'key' => $this->key],
+            $options
+        ), $scheme);
+    }
+    /**
+     * @param array $options
+     * @param bool  $scheme
+     * @return string
+     */
+    public function getPayUrl($options = [], $scheme = true)
+    {
+        return Url::to(ArrayHelper::merge(
+            ['/shop/order/pay', 'key' => $this->key],
             $options
         ), $scheme);
     }

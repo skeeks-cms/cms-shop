@@ -4,6 +4,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
 use Yii;
 
@@ -25,6 +26,8 @@ use Yii;
  * @property CmsUser $updatedBy
  * @property ShopBuyerProperty[] $shopBuyerProperties
  * @property ShopOrder[] $shopOrders
+ *
+ * @property string $email read-only
  */
 class ShopBuyer extends RelatedElementModel
 {
@@ -152,5 +155,33 @@ class ShopBuyer extends RelatedElementModel
         //return $this->shopPersonType->getShopPersonTypeProperties();
         return $this->hasMany(ShopPersonTypeProperty::className(), ['shop_person_type_id' => 'id'])
             ->via('shopPersonType')->orderBy(['priority' => SORT_ASC]);
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getEmail()
+    {
+        $this->relatedPropertiesModel->initAllProperties();
+        if ($properties = $this->relatedPropertiesModel->properties) {
+            /**
+             * @var $property ShopPersonTypeProperty
+             */
+            foreach ($properties as $property) {
+                if ($property->is_user_email == "Y") {
+                    $value = $this->relatedPropertiesModel->getAttribute($property->code);
+                    if ($value) {
+                        return (string)$value;
+                    }
+                }
+            }
+        }
+
+        if ($this->cmsUser && $this->cmsUser->email) {
+            return $this->cmsUser->email;
+        }
+
+        return null;
     }
 }
