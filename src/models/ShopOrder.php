@@ -870,4 +870,66 @@ class ShopOrder extends \skeeks\cms\models\Core
             $options
         ), $scheme);
     }
+
+
+
+    /**
+     *
+     * Массив для json ответа, используется при обновлении корзины, добавлении позиций и т.д.
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return ArrayHelper::merge($this->toArray([], $this->extraFields()), [
+            'money'         => ArrayHelper::merge($this->money->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
+            'moneyDelivery' => ArrayHelper::merge($this->moneyDelivery->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDelivery)]),
+            'moneyDiscount' => ArrayHelper::merge($this->moneyDiscount->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDiscount)]),
+            'moneyOriginal' => ArrayHelper::merge($this->moneyOriginal->jsonSerialize(),
+                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyOriginal)]),
+            'moneyVat'      => ArrayHelper::merge($this->moneyVat->jsonSerialize(), [
+                'convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyVat),
+            ]),
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function extraFields()
+    {
+        return [
+            'shopOrderItems',
+            'quantity',
+            'countShopOrderItems',
+        ];
+    }
+
+    /**
+     * Количество позиций в корзине
+     *
+     * @return int
+     */
+    public function getCountShopOrderItems()
+    {
+        return count($this->shopOrderItems);
+    }
+
+    /**
+     * @return float
+     */
+    public function getQuantity()
+    {
+        $result = 0;
+
+        if ($this->shopOrderItems) {
+            foreach ($this->shopOrderItems as $item) {
+                $result = $item->quantity + $result;
+            }
+        }
+        return (float) $result;
+    }
 }

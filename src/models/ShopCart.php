@@ -219,28 +219,6 @@ class ShopCart extends ActiveRecord
 
         ]);
     }
-    /**
-     *
-     * Массив для json ответа, используется при обновлении корзины, добавлении позиций и т.д.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return ArrayHelper::merge($this->toArray([], $this->extraFields()), [
-            'money'         => ArrayHelper::merge($this->money->jsonSerialize(),
-                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
-            'moneyDelivery' => ArrayHelper::merge($this->moneyDelivery->jsonSerialize(),
-                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDelivery)]),
-            'moneyDiscount' => ArrayHelper::merge($this->moneyDiscount->jsonSerialize(),
-                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDiscount)]),
-            'moneyOriginal' => ArrayHelper::merge($this->moneyOriginal->jsonSerialize(),
-                ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyOriginal)]),
-            'moneyVat'      => ArrayHelper::merge($this->moneyVat->jsonSerialize(), [
-                'convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyVat),
-            ]),
-        ]);
-    }
     public function extraFields()
     {
         return [
@@ -348,10 +326,11 @@ class ShopCart extends ActiveRecord
     }
     /**
      * @return \yii\db\ActiveQuery
+     * @deprecated
      */
     public function getShopBaskets()
     {
-        return $this->hasMany(ShopBasket::class, ['fuser_id' => 'id']);
+        return $this->shopOrder->getShopOrderItems();
     }
     /**
      * Количество позиций в корзине

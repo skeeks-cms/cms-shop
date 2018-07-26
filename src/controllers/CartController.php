@@ -18,15 +18,14 @@ use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopOrderItem;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopPersonTypeProperty;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Exception;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 use yii\helpers\Url;
-use yii\validators\EmailValidator;
 
 /**
  * Class CartController
@@ -44,16 +43,16 @@ class CartController extends Controller
         return ArrayHelper::merge(parent::behaviors(), [
 
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class'   => VerbFilter::className(),
                 'actions' => [
-                    'add-product' => ['post'],
-                    'remove-basket' => ['post'],
-                    'clear' => ['post'],
-                    'update-basket' => ['post'],
+                    'add-product'               => ['post'],
+                    'remove-basket'             => ['post'],
+                    'clear'                     => ['post'],
+                    'update-basket'             => ['post'],
                     'shop-person-type-validate' => ['post'],
-                    'shop-person-type-submit' => ['post'],
-                    'remove-discount-coupon' => ['post'],
-                    'add-discount-coupon' => ['post'],
+                    'shop-person-type-submit'   => ['post'],
+                    'remove-discount-coupon'    => ['post'],
+                    'add-discount-coupon'       => ['post'],
                 ],
             ],
         ]);
@@ -65,7 +64,7 @@ class CartController extends Controller
      */
     public function actionCart()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'Basket') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Basket').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
 
@@ -74,7 +73,7 @@ class CartController extends Controller
      */
     public function actionCheckout()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'Checkout') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Checkout').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
 
@@ -89,6 +88,7 @@ class CartController extends Controller
         $rr = new RequestResponse();
 
         if ($rr->isRequestAjaxPost()) {
+
             $product_id = \Yii::$app->request->post('product_id');
             $quantity = \Yii::$app->request->post('quantity');
 
@@ -108,17 +108,16 @@ class CartController extends Controller
                 }
             }
 
-            $shopBasket = ShopBasket::find()->where([
-                'fuser_id' => \Yii::$app->shop->cart->id,
+            $shopBasket = ShopOrderItem::find()->where([
+                'shop_order_id'   => \Yii::$app->shop->cart->shopOrder->id,
                 'product_id' => $product_id,
-                'order_id' => null,
             ])->one();
 
             if (!$shopBasket) {
                 $shopBasket = new ShopBasket([
-                    'fuser_id' => \Yii::$app->shop->cart->id,
+                    'shop_order_id'   => \Yii::$app->shop->cart->shopOrder->id,
                     'product_id' => $product->id,
-                    'quantity' => 0,
+                    'quantity'   => 0,
                 ]);
             }
 
@@ -136,7 +135,7 @@ class CartController extends Controller
             }
 
             \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
+            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -427,23 +426,23 @@ class CartController extends Controller
                             $rr->success = true;
                             $rr->redirect = Url::to(['/shop/order/view', 'id' => $order->id]);
                             $rr->data = [
-                                'order' => $order
+                                'order' => $order,
                             ];
 
 
                         } else {
                             throw new Exception(\Yii::t('skeeks/shop/app',
-                                    'Incorrect data of the new order') . ": " . array_shift($order->getFirstErrors()));
+                                    'Incorrect data of the new order').": ".array_shift($order->getFirstErrors()));
                         }
 
                     } else {
                         throw new Exception(\Yii::t('skeeks/shop/app',
-                                'Not enogh data for ordering') . ": " . array_shift($fuser->getFirstErrors()));
+                                'Not enogh data for ordering').": ".array_shift($fuser->getFirstErrors()));
                     }
 
                 } else {
                     throw new Exception(\Yii::t('skeeks/shop/app',
-                            'Not enogh data for ordering') . ": " . array_shift($fuser->getFirstErrors()));
+                            'Not enogh data for ordering').": ".array_shift($fuser->getFirstErrors()));
                 }
 
             } catch (Exception $e) {
@@ -555,8 +554,8 @@ class CartController extends Controller
 
 
                         $modelBuyer->name = $modelBuyerName ? implode(", ",
-                            $modelBuyerName) : $shopPersonType->name . " от (" . \Yii::$app->formatter->asDate(time(),
-                                'medium') . ")";
+                            $modelBuyerName) : $shopPersonType->name." от (".\Yii::$app->formatter->asDate(time(),
+                                'medium').")";
                         $modelBuyer->cms_user_id = \Yii::$app->user->identity->id;
                         $modelBuyer->shop_person_type_id = $shopPersonType->id;
 
@@ -635,7 +634,7 @@ class CartController extends Controller
      */
     public function actionPayment()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'Choose payment method') . ' | ' . \Yii::t('skeeks/shop/app',
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Choose payment method').' | '.\Yii::t('skeeks/shop/app',
                 'Shop');
         return $this->render($this->action->id);
     }

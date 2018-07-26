@@ -54,7 +54,7 @@ class ShopGlobalWidget extends Widget
         if (static::$isRegisteredAssets === false) {
             ShopAsset::register($this->getView());
             $options = (array)$this->clientOptions;
-            $options['cartData'] = \Yii::$app->shop->cart->jsonSerialize();
+            $options['cartData'] = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
 
             $options = Json::encode($options);
 
