@@ -109,14 +109,14 @@ class CartController extends Controller
             }
 
             $shopBasket = ShopBasket::find()->where([
-                'fuser_id' => \Yii::$app->shop->shopFuser->id,
+                'fuser_id' => \Yii::$app->shop->cart->id,
                 'product_id' => $product_id,
                 'order_id' => null,
             ])->one();
 
             if (!$shopBasket) {
                 $shopBasket = new ShopBasket([
-                    'fuser_id' => \Yii::$app->shop->shopFuser->id,
+                    'fuser_id' => \Yii::$app->shop->cart->id,
                     'product_id' => $product->id,
                     'quantity' => 0,
                 ]);
@@ -135,8 +135,8 @@ class CartController extends Controller
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
-            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
+            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -164,8 +164,8 @@ class CartController extends Controller
                 }
             }
 
-            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
+            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -183,12 +183,12 @@ class CartController extends Controller
         $rr = new RequestResponse();
 
         if ($rr->isRequestAjaxPost()) {
-            foreach (\Yii::$app->shop->shopFuser->shopBaskets as $basket) {
+            foreach (\Yii::$app->shop->cart->shopBaskets as $basket) {
                 $basket->delete();
             }
 
-            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
+            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
             $rr->success = true;
             $rr->message = "";
 
@@ -241,8 +241,8 @@ class CartController extends Controller
 
             }
 
-            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
+            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -266,7 +266,7 @@ class CartController extends Controller
 
 
                 $newValue = [];
-                $discount_coupons = \Yii::$app->shop->shopFuser->discount_coupons;
+                $discount_coupons = \Yii::$app->shop->cart->discount_coupons;
                 if ($discount_coupons) {
                     foreach ($discount_coupons as $id) {
                         if ($id != $couponId) {
@@ -274,11 +274,11 @@ class CartController extends Controller
                         }
                     }
                 }
-                \Yii::$app->shop->shopFuser->discount_coupons = $newValue;
-                \Yii::$app->shop->shopFuser->save();
-                \Yii::$app->shop->shopFuser->recalculate()->save();
+                \Yii::$app->shop->cart->discount_coupons = $newValue;
+                \Yii::$app->shop->cart->save();
+                \Yii::$app->shop->cart->recalculate()->save();
 
-                $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+                $rr->data = \Yii::$app->shop->cart->jsonSerialize();
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Your coupon was successfully deleted');
 
@@ -319,14 +319,14 @@ class CartController extends Controller
                     throw new Exception(\Yii::t('skeeks/shop/app', 'Coupon does not exist or is not active'));
                 }
 
-                $discount_coupons = \Yii::$app->shop->shopFuser->discount_coupons;
+                $discount_coupons = \Yii::$app->shop->cart->discount_coupons;
                 $discount_coupons[] = $applyShopDiscountCoupon->id;
                 array_unique($discount_coupons);
-                \Yii::$app->shop->shopFuser->discount_coupons = $discount_coupons;
-                \Yii::$app->shop->shopFuser->save();
-                \Yii::$app->shop->shopFuser->recalculate()->save();
+                \Yii::$app->shop->cart->discount_coupons = $discount_coupons;
+                \Yii::$app->shop->cart->save();
+                \Yii::$app->shop->cart->recalculate()->save();
 
-                $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+                $rr->data = \Yii::$app->shop->cart->jsonSerialize();
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Coupon successfully installed');
 
@@ -370,23 +370,23 @@ class CartController extends Controller
             }
 
             if ($buyer) {
-                \Yii::$app->shop->shopFuser->buyer_id = $buyer->id;
-                \Yii::$app->shop->shopFuser->person_type_id = $buyer->shopPersonType->id;
+                \Yii::$app->shop->cart->buyer_id = $buyer->id;
+                \Yii::$app->shop->cart->person_type_id = $buyer->shopPersonType->id;
             } else {
                 if ($shopPersonType) {
-                    \Yii::$app->shop->shopFuser->person_type_id = $shopPersonType->id;
-                    \Yii::$app->shop->shopFuser->buyer_id = null;
+                    \Yii::$app->shop->cart->person_type_id = $shopPersonType->id;
+                    \Yii::$app->shop->cart->buyer_id = null;
                 }
             }
 
-            \Yii::$app->shop->shopFuser->save();
-            \Yii::$app->shop->shopFuser->link('site', \Yii::$app->cms->site);
+            \Yii::$app->shop->cart->save();
+            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
 
             $rr->message = "";
             $rr->success = true;
 
 
-            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -406,7 +406,7 @@ class CartController extends Controller
 
         if ($rr->isRequestAjaxPost()) {
             try {
-                $fuser = \Yii::$app->shop->shopFuser;
+                $fuser = \Yii::$app->shop->cart;
 
                 if (!$fuser->shopBaskets) {
                     throw new Exception(\Yii::t('skeeks/shop/app', 'Your basket is empty'));
@@ -452,7 +452,7 @@ class CartController extends Controller
             }
 
 
-            $rr->data = \Yii::$app->shop->shopFuser->jsonSerialize();
+            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -566,10 +566,10 @@ class CartController extends Controller
 
                         $validateModel->save();
 
-                        \Yii::$app->shop->shopFuser->buyer_id = $modelBuyer->id;
-                        \Yii::$app->shop->shopFuser->person_type_id = $modelBuyer->shopPersonType->id;
+                        \Yii::$app->shop->cart->buyer_id = $modelBuyer->id;
+                        \Yii::$app->shop->cart->person_type_id = $modelBuyer->shopPersonType->id;
 
-                        \Yii::$app->shop->shopFuser->save();
+                        \Yii::$app->shop->cart->save();
 
                         $rr->success = true;
                         $rr->message = \Yii::t('skeeks/shop/app', 'Successfully sent');

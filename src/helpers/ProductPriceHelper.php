@@ -113,7 +113,7 @@ class ProductPriceHelper extends Component
       
         if ($shopDiscountsTmp) {
             foreach ($shopDiscountsTmp as $shopDiscount) {
-                if (\Yii::$app->authManager->checkAccess($this->shopCart->user ? $this->shopCart->id : null, $shopDiscount->permissionName)) {
+                if (\Yii::$app->authManager->checkAccess($this->shopCart->cmsUser ? $this->shopCart->id : null, $shopDiscount->permissionName)) {
                     $shopDiscounts[$shopDiscount->id] = $shopDiscount;
                 }
             }
@@ -199,7 +199,7 @@ class ProductPriceHelper extends Component
     public function getShopCart()
     {
         if (!$this->_shopCart) {
-            $this->_shopCart = \Yii::$app->shop->shopFuser;
+            $this->_shopCart = \Yii::$app->shop->cart;
         }
 
         return $this->_shopCart;

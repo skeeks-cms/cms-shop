@@ -459,7 +459,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         $shopViewdProduct->name = $this->cmsContentElement->name;
         $shopViewdProduct->shop_product_id = $this->id;
         $shopViewdProduct->site_id = \Yii::$app->cms->site->id;
-        $shopViewdProduct->shop_fuser_id = \Yii::$app->shop->shopFuser->id;
+        $shopViewdProduct->shop_fuser_id = \Yii::$app->shop->cart->id;
 
         return $shopViewdProduct->save();
     }
@@ -537,7 +537,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getViewProductPrices($shopFuser = null)
     {
         if ($shopFuser === null) {
-            $shopFuser = \Yii::$app->shop->shopFuser;
+            $shopFuser = \Yii::$app->shop->cart;
         }
 
         return $this->hasMany(ShopProductPrice::className(), [
@@ -557,7 +557,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getMinProductPrice($shopFuser = null)
     {
         if ($shopFuser === null) {
-            $shopFuser = \Yii::$app->shop->shopFuser;
+            $shopFuser = \Yii::$app->shop->cart;
         }
 
         return $this->hasOne(ShopProductPrice::className(), [

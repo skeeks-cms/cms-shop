@@ -41,11 +41,11 @@ class ShopPersonTypeFormWidget extends Widget
         parent::init();
 
         if (!$this->shopPersonType) {
-            $this->shopPersonType = \Yii::$app->shop->shopFuser->personType;
+            $this->shopPersonType = \Yii::$app->shop->cart->personType;
         }
 
         if (!$this->shopBuyer) {
-            $this->shopBuyer = \Yii::$app->shop->shopFuser->buyer;
+            $this->shopBuyer = \Yii::$app->shop->cart->buyer;
         }
 
         if ($this->shopBuyer) {
