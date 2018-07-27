@@ -72,7 +72,6 @@ use yii\helpers\Url;
  * @property ShopOrderStatus            $status
  *
  * @property ShopOrderChange[]          $shopOrderChanges
- * @property ShopUserTransact[]         $shopUserTransacts
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
  * @property ShopDiscountCoupon[]       $discountCoupons
  *
@@ -501,7 +500,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function processNotePayment()
     {
-        $transaction = new ShopUserTransact();
+        /*$transaction = new ShopUserTransact();
         $transaction->cms_user_id = $this->user_id;
         $transaction->shop_order_id = $this->id;
         $transaction->amount = $this->money->amount;
@@ -518,7 +517,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction->currency_code = $this->money->currency->code;
         $transaction->debit = "N";
         $transaction->description = ShopUserTransact::ORDER_PAY;
-        $transaction->save();
+        $transaction->save();*/
 
         $this->payed = "Y";
         $this->save();
@@ -732,13 +731,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopUserTransacts()
-    {
-        return $this->hasMany(ShopUserTransact::class, ['shop_order_id' => 'id'])->orderBy(['id' => SORT_DESC]);
-    }
 
 
     /**

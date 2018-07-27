@@ -484,8 +484,8 @@ JS
 
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Transactions by order')); ?>
-
-<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+<!--
+--><?/*= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
         'models' => $model->shopUserTransacts,
     ]),
@@ -517,7 +517,7 @@ JS
 
             'descriptionText',
         ],
-]); ?>
+]); */?>
 
 <?= $form->fieldSetEnd(); ?>
 
