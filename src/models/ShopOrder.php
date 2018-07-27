@@ -8,6 +8,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
+use skeeks\cms\shop\helpers\ProductPriceHelper;
 use skeeks\cms\shop\Module;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -29,7 +30,7 @@ use yii\helpers\Url;
  * @property string                     $reason_canceled
  * @property string                     $status_code
  * @property integer                    $status_at
- * @property string                     $price_delivery
+ * @property string                     $delivery_amount
  * @property string                     $allow_delivery
  * @property string                     $allow_payment
  * @property integer                    $allow_delivery_at
@@ -62,6 +63,9 @@ use yii\helpers\Url;
  * @property ShopAffiliate              $shopAffiliate
  * @property ShopOrderItem[]            $shopOrderItems
  *
+ * @property ShopCart                   $shopCart
+ * @property CmsUser|null               $cmsUser
+ *
  * @property CmsContentElement          $store
  * @property Currency                   $currency
  * @property CmsUser                    $lockedBy
@@ -71,6 +75,8 @@ use yii\helpers\Url;
  * @property ShopUserTransact[]         $shopUserTransacts
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
  * @property ShopDiscountCoupon[]       $discountCoupons
+ *
+ * @property ShopTypePrice[]            $buyTypePrices
  *
  *
  * @property Money                      $money
@@ -88,6 +94,8 @@ use yii\helpers\Url;
  * @property string                     $email read-only
  * @property string                     $payUrl read-only ссылка на оплату
  * @property string                     $url read-only ссылка на заказ
+ *
+ * @property int                        $countShopOrderItems
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
@@ -184,7 +192,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $order->store_id = $shopFuser->store_id;
 
         if ($shopFuser->delivery) {
-            $order->price_delivery = $shopFuser->delivery->money->amount;
+            $order->delivery_amount = $shopFuser->delivery->money->amount;
         }
 
         return $order;
@@ -412,7 +420,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ],
                 'integer',
             ],
-            [['price_delivery', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
+            [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
             [['comments'], 'string'],
             [['shop_buyer_id'], 'integer'],
             [['cms_site_id'], 'integer'],
@@ -533,41 +541,41 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                   => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'           => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'           => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'           => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'           => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'cms_site_id'          => \Yii::t('skeeks/shop/app', 'Site'),
-            'shop_person_type_id'  => \Yii::t('skeeks/shop/app', 'Person Type ID'),
-            'payed'                => \Yii::t('skeeks/shop/app', 'Оплачен'),
-            'payed_at'             => \Yii::t('skeeks/shop/app', 'Payed At'),
-            'canceled'             => \Yii::t('skeeks/shop/app', 'Canceled'),
-            'canceled_at'          => \Yii::t('skeeks/shop/app', 'Canceled At'),
-            'reason_canceled'      => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
-            'status_code'          => \Yii::t('skeeks/shop/app', 'Status'),
-            'status_at'            => \Yii::t('skeeks/shop/app', 'Status At'),
-            'price_delivery'       => \Yii::t('skeeks/shop/app', 'Price Delivery'),
-            'allow_delivery'       => \Yii::t('skeeks/shop/app', 'Allow Delivery'),
-            'allow_delivery_at'    => \Yii::t('skeeks/shop/app', 'Allow Delivery At'),
-            'amount'                => \Yii::t('skeeks/shop/app', 'Price'),
-            'currency_code'        => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'discount_amount'       => \Yii::t('skeeks/shop/app', 'Discount Value'),
-            'shop_pay_system_id'   => \Yii::t('skeeks/shop/app', 'Pay System ID'),
-            'shop_delivery_id'     => \Yii::t('skeeks/shop/app', 'Delivery'),
-            'user_description'     => \Yii::t('skeeks/shop/app', 'User Description'),
-            'additional_info'      => \Yii::t('skeeks/shop/app', 'Additional Info'),
-            'comments'             => \Yii::t('skeeks/shop/app', 'Comments'),
-            'tax_amount'            => \Yii::t('skeeks/shop/app', 'Tax Value'),
-            'paid_amount'             => \Yii::t('skeeks/shop/app', 'Sum Paid'),
-            'locked_by'            => \Yii::t('skeeks/shop/app', 'Locked By'),
-            'locked_at'            => \Yii::t('skeeks/shop/app', 'Locked At'),
-            'shop_affiliate_id'         => \Yii::t('skeeks/shop/app', 'Affiliate ID'),
-            'delivery_doc_num'     => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
-            'delivery_doc_at'      => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
-            'tracking_number'      => \Yii::t('skeeks/shop/app', 'Tracking Number'),
-            'shop_buyer_id'        => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
-            'allow_payment'        => \Yii::t('skeeks/shop/app', 'Allow Payment'),
+            'id'                  => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'          => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'          => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'          => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'          => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'cms_site_id'         => \Yii::t('skeeks/shop/app', 'Site'),
+            'shop_person_type_id' => \Yii::t('skeeks/shop/app', 'Person Type ID'),
+            'payed'               => \Yii::t('skeeks/shop/app', 'Оплачен'),
+            'payed_at'            => \Yii::t('skeeks/shop/app', 'Payed At'),
+            'canceled'            => \Yii::t('skeeks/shop/app', 'Canceled'),
+            'canceled_at'         => \Yii::t('skeeks/shop/app', 'Canceled At'),
+            'reason_canceled'     => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
+            'status_code'         => \Yii::t('skeeks/shop/app', 'Status'),
+            'status_at'           => \Yii::t('skeeks/shop/app', 'Status At'),
+            'delivery_amount'      => \Yii::t('skeeks/shop/app', 'Price Delivery'),
+            'allow_delivery'      => \Yii::t('skeeks/shop/app', 'Allow Delivery'),
+            'allow_delivery_at'   => \Yii::t('skeeks/shop/app', 'Allow Delivery At'),
+            'amount'              => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code'       => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'discount_amount'     => \Yii::t('skeeks/shop/app', 'Discount Value'),
+            'shop_pay_system_id'  => \Yii::t('skeeks/shop/app', 'Pay System ID'),
+            'shop_delivery_id'    => \Yii::t('skeeks/shop/app', 'Delivery'),
+            'user_description'    => \Yii::t('skeeks/shop/app', 'User Description'),
+            'additional_info'     => \Yii::t('skeeks/shop/app', 'Additional Info'),
+            'comments'            => \Yii::t('skeeks/shop/app', 'Comments'),
+            'tax_amount'          => \Yii::t('skeeks/shop/app', 'Tax Value'),
+            'paid_amount'         => \Yii::t('skeeks/shop/app', 'Sum Paid'),
+            'locked_by'           => \Yii::t('skeeks/shop/app', 'Locked By'),
+            'locked_at'           => \Yii::t('skeeks/shop/app', 'Locked At'),
+            'shop_affiliate_id'   => \Yii::t('skeeks/shop/app', 'Affiliate ID'),
+            'delivery_doc_num'    => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
+            'delivery_doc_at'     => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
+            'tracking_number'     => \Yii::t('skeeks/shop/app', 'Tracking Number'),
+            'shop_buyer_id'       => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'allow_payment'       => \Yii::t('skeeks/shop/app', 'Allow Payment'),
 
             'shop_delivery_id'   => \Yii::t('skeeks/shop/app', 'Delivery service'),
             'shop_buyer_id'      => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
@@ -682,7 +690,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getShopOrderItems()
     {
-        return $this->hasMany(ShopOrderItem::class, ['order_id' => 'id']);
+        return $this->hasMany(ShopOrderItem::class, ['shop_order_id' => 'id']);
     }
 
     /**
@@ -731,8 +739,8 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $money = new Money("", $this->currency_code);
 
-        foreach ($this->shopBaskets as $shopBasket) {
-            $money = $money->add($shopBasket->money->multiply($shopBasket->quantity));
+        foreach ($this->shopOrderItems as $shopOrderItem) {
+            $money = $money->add($shopOrderItem->money->multiply($shopOrderItem->quantity));
         }
 
         return $money;
@@ -796,8 +804,9 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneyDelivery()
     {
-        return new Money($this->price_delivery, $this->currency_code);
+        return new Money($this->delivery_amount, $this->currency_code);
     }
+
 
 
     /**
@@ -807,8 +816,8 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $result = 0;
 
-        foreach ($this->shopBaskets as $shopBasket) {
-            $result = $result + ($shopBasket->weight * $shopBasket->quantity);
+        foreach ($this->shopOrderItems as $shopOrderItem) {
+            $result = $result + ($shopOrderItem->weight * $shopOrderItem->quantity);
         }
 
         return $result;
@@ -822,7 +831,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getPaySystems()
     {
-        return $this->personType->getPaySystems()->andWhere([ShopPaySystem::tableName().".active" => Cms::BOOL_Y]);
+        return $this->shopPersonType->getPaySystems()->andWhere([ShopPaySystem::tableName().".active" => Cms::BOOL_Y]);
     }
 
     /**
@@ -870,7 +879,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             $options
         ), $scheme);
     }
-
 
 
     /**
@@ -930,6 +938,92 @@ class ShopOrder extends \skeeks\cms\models\Core
                 $result = $item->quantity + $result;
             }
         }
-        return (float) $result;
+        return (float)$result;
+    }
+
+
+    /**
+     * @param ShopCmsContentElement $shopCmsContentElement
+     * @return ProductPriceHelper
+     */
+    public function getProductPriceHelper(ShopCmsContentElement $shopCmsContentElement)
+    {
+        $ids = ArrayHelper::map($this->buyTypePrices, 'id', 'id');
+        $minPh = null;
+
+        if ($shopCmsContentElement->shopProduct->shopProductPrices) {
+            foreach ($shopCmsContentElement->shopProduct->shopProductPrices as $price) {
+
+
+                if (in_array($price->type_price_id, $ids)) {
+
+                    $ph = new ProductPriceHelper([
+                        'shopCmsContentElement' => $shopCmsContentElement,
+                        'shopOrder'             => $this,
+                        'price'                 => $price,
+                    ]);
+
+                    if ($minPh === null) {
+                        $minPh = $ph;
+                        continue;
+                    }
+
+
+                    if ((float)$minPh->minMoney->amount == 0) {
+                        $minPh = $ph;
+                    } elseif ((float)$minPh->minMoney->amount > (float)$ph->minMoney->amount && (float)$ph->minMoney->amount > 0) {
+                        $minPh = $ph;
+                    }
+                }
+            }
+        }
+
+        return $minPh;
+    }
+
+
+    /**
+     *
+     * Доступные цены для покупки на сайте
+     *
+     * @return ShopTypePrice[]
+     */
+    public function getBuyTypePrices()
+    {
+        $result = [];
+
+        foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
+            if (\Yii::$app->authManager->checkAccess($this->cmsUser ? $this->cmsUser->id : null, $typePrice->buyPermissionName)
+                || $typePrice->isDefault
+            ) {
+                $result[$typePrice->id] = $typePrice;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCart()
+    {
+        return $this->hasOne(ShopCart::className(), ['shop_order_id' => 'id']);
+    }
+
+    /**
+     * @return null|CmsUser
+     */
+    public function getCmsUser()
+    {
+        if ($this->shopBuyer) {
+            return $this->shopBuyer->cmsUser;
+        }
+
+        if ($this->shopCart) {
+            return $this->shopCart->cmsUser;
+        }
+
+        return null;
     }
 }

@@ -10,7 +10,7 @@ namespace skeeks\cms\shop\helpers;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\money\Money;
-use skeeks\cms\shop\models\ShopCart;
+use skeeks\cms\shop\models\shopOrder;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopDiscount;
 use skeeks\cms\shop\models\ShopProductPrice;
@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  *
- * @property ShopCart         $shopCart;
+ * @property ShopOrder         $shopOrder;
  *
  * @property ShopProductPrice $basePrice; Базовая цена
  *
@@ -41,9 +41,9 @@ class ProductPriceHelper extends Component
     public $shopCmsContentElement;
 
     /**
-     * @var ShopCart
+     * @var shopOrder
      */
-    protected $_shopCart;
+    protected $_shopOrder;
 
 
     /**
@@ -113,14 +113,14 @@ class ProductPriceHelper extends Component
       
         if ($shopDiscountsTmp) {
             foreach ($shopDiscountsTmp as $shopDiscount) {
-                if (\Yii::$app->authManager->checkAccess($this->shopCart->cmsUser ? $this->shopCart->id : null, $shopDiscount->permissionName)) {
+                if (\Yii::$app->authManager->checkAccess($this->shopOrder->cmsUser ? $this->shopOrder->cmsUser->id : null, $shopDiscount->permissionName)) {
                     $shopDiscounts[$shopDiscount->id] = $shopDiscount;
                 }
             }
         }
 
-        if ($this->shopCart->discountCoupons) {
-            foreach ($this->shopCart->discountCoupons as $discountCoupon) {
+        if ($this->shopOrder->discountCoupons) {
+            foreach ($this->shopOrder->discountCoupons as $discountCoupon) {
                 $shopDiscounts[$discountCoupon->shopDiscount->id] = $discountCoupon->shopDiscount;
             }
         }
@@ -194,24 +194,24 @@ class ProductPriceHelper extends Component
     }
 
     /**
-     * @return ShopCart
+     * @return ShopOrder
      */
-    public function getShopCart()
+    public function getshopOrder()
     {
-        if (!$this->_shopCart) {
-            $this->_shopCart = \Yii::$app->shop->cart;
+        if (!$this->_shopOrder) {
+            $this->_shopOrder = \Yii::$app->shop->cart->shopOrder;
         }
 
-        return $this->_shopCart;
+        return $this->_shopOrder;
     }
 
     /**
-     * @param ShopCart $shopCart
+     * @param shopOrder $shopOrder
      * @return $this
      */
-    public function setShopCart(ShopCart $shopCart)
+    public function setshopOrder(ShopOrder $shopOrder)
     {
-        $this->_shopCart = $shopCart;
+        $this->_shopOrder = $shopOrder;
         return $this;
     }
 

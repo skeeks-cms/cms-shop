@@ -31,15 +31,7 @@ use yii\helpers\ArrayHelper;
  * @property integer              $created_at
  * @property integer              $updated_at
  * @property integer              $cms_user_id Пользователь сайта
- * @property string               $additional
- * @property integer              $person_type_id
- * @property integer              $site_id
- * @property integer              $delivery_id
  * @property integer              $shop_order_id
- * @property integer              $buyer_id
- * @property integer              $pay_system_id
- * @property integer              $store_id
- * @property array                $discount_coupons
  *
  * ***
  *
@@ -68,7 +60,6 @@ use yii\helpers\ArrayHelper;
  * @property Money                $moneyVat
  * @property Money                $moneyDiscount
  * @property Money                $moneyDelivery
- * @property ShopDiscountCoupon[] $discountCoupons
  *
  * @property int                  $weight
  * @property bool                 $isEmpty
@@ -104,46 +95,11 @@ class ShopCart extends ActiveRecord
 
         return $shopFuser;
     }
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-            Implode::class =>
-                [
-                    'class'  => Implode::class,
-                    'fields' => ['discount_coupons'],
-                ],
-        ]);
-    }
+
     public function loadDefaultValues($skipIfSet = true)
     {
         parent::loadDefaultValues($skipIfSet);
 
-        if (!$this->site_id) {
-            $this->site_id = \Yii::$app->cms->site->id;
-        }
-
-        if (!$this->delivery_id) {
-            //$this->delivery_id = \Yii::$app->cms->site->id;
-        }
-
-        if (!$this->person_type_id && \Yii::$app->shop->shopPersonTypes) {
-            $shopPersonType = \Yii::$app->shop->shopPersonTypes[0];
-            $this->person_type_id = $shopPersonType->id;
-        }
-
-        if (!$this->pay_system_id && $this->paySystems) {
-            $paySystem = $this->paySystems[0];
-            $this->pay_system_id = $paySystem->id;
-        }
-
-        $deliveries = \skeeks\cms\shop\models\ShopDelivery::find()->active()->all();
-        if (!$this->delivery_id && $deliveries) {
-            $delivery = $deliveries[0];
-            $this->delivery_id = $delivery->id;
-        }
     }
     /**
      * @inheritdoc
@@ -152,30 +108,10 @@ class ShopCart extends ActiveRecord
     {
         return array_merge(parent::attributeLabels(), [
             'cms_user_id'      => \Yii::t('skeeks/shop/app', 'User site'),
-            'additional'       => \Yii::t('skeeks/shop/app', 'Additional'),
-            'person_type_id'   => \Yii::t('skeeks/shop/app', 'Type of buyer'),
-            'site_id'          => \Yii::t('skeeks/shop/app', 'Site ID'),
-            'delivery_id'      => \Yii::t('skeeks/shop/app', 'Delivery service'),
-            'buyer_id'         => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
-            'pay_system_id'    => \Yii::t('skeeks/shop/app', 'Payment system'),
-            'store_id'         => \Yii::t('skeeks/shop/app', 'Warehouse/Store'),
-            'discount_coupons' => \Yii::t('skeeks/shop/app', 'Discount coupons'),
             'shop_order_id'    => \Yii::t('skeeks/shop/app', 'Заказ'),
         ]);
     }
-    public function init()
-    {
-        parent::init();
 
-        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'beforeSaveCallback']);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'beforeSaveCallback']);
-    }
-    public function beforeSaveCallback()
-    {
-        if ($this->buyer) {
-            $this->person_type_id = $this->buyer->shopPersonType->id;
-        }
-    }
     public function scenarios()
     {
         $scenarios = parent::scenarios();
@@ -195,27 +131,13 @@ class ShopCart extends ActiveRecord
                     'created_at',
                     'updated_at',
                     'cms_user_id',
-                    'person_type_id',
-                    'site_id',
-                    'store_id',
                     'shop_order_id',
                 ],
                 'integer',
             ],
-            [['additional'], 'string'],
-            [['discount_coupons'], 'safe'],
-            [['delivery_id'], 'integer'],
             [['cms_user_id'], 'unique'],
-            [['buyer_id'], 'integer'],
-            [['pay_system_id'], 'integer'],
-            [
-                ['person_type_id'],
-                'default',
-                'value' => function (self $model) {
-                    return ($model->buyer && $model->buyer->shopPersonType) ? $model->buyer->shopPersonType->id : null;
-                },
-            ],
-            [['pay_system_id', 'buyer_id', 'site_id', 'cms_user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
+
+            [['cms_user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
 
         ]);
     }
@@ -234,21 +156,7 @@ class ShopCart extends ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'cms_user_id']);
     }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPersonType()
-    {
-        return $this->hasOne(ShopPersonType::class, ['id' => 'person_type_id']);
-    }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSite()
-    {
-        return $this->hasOne(CmsSite::class, ['id' => 'site_id']);
-    }
 
 
     /**
@@ -259,45 +167,7 @@ class ShopCart extends ActiveRecord
         return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getBuyer()
-    {
-        return $this->hasOne(ShopBuyer::class, ['id' => 'buyer_id']);
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDelivery()
-    {
-        return $this->hasOne(ShopDelivery::class, ['id' => 'delivery_id']);
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPaySystem()
-    {
-        return $this->hasOne(ShopPaySystem::class, ['id' => 'pay_system_id']);
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStore()
-    {
-        return $this->hasOne(CmsContentElement::class, ['id' => 'store_id']);
-    }
-    /**
-     * @return ShopDiscountCoupon[]
-     */
-    public function getDiscountCoupons()
-    {
-        if (!$this->discount_coupons) {
-            return [];
-        }
 
-        return ShopDiscountCoupon::find()->where(['id' => $this->discount_coupons])->all();
-    }
     /**
      * Добавить корзины этому пользователю
      *
@@ -442,11 +312,12 @@ class ShopCart extends ActiveRecord
      */
     public function getMoneyDelivery()
     {
-        if ($this->delivery) {
+        return $this->shopOrder->moneyDelivery;
+        /*if ($this->delivery) {
             return $this->delivery->money;
         }
 
-        return \Yii::$app->money->newMoney();
+        return \Yii::$app->money->newMoney();*/
     }
     /**
      * @return bool
@@ -460,32 +331,9 @@ class ShopCart extends ActiveRecord
      */
     public function isEmpty()
     {
-        return (bool)$this->countShopBaskets == 0;
+        return (bool)$this->shopOrder->countShopOrderItems == 0;
     }
-    /**
-     * Возможные опции для выбора покупателя
-     * @return array
-     */
-    public function getBuyersList()
-    {
-        $result = [];
 
-        if (\Yii::$app->shop->shopPersonTypes) {
-            foreach (\Yii::$app->shop->shopPersonTypes as $shopPersonType) {
-                $result[$shopPersonType->name] = [
-                    'shopPersonType-'.$shopPersonType->id => " + ".\Yii::t('skeeks/shop/app',
-                            'New profile')." ({$shopPersonType->name})",
-                ];
-
-                if ($existsBuyers = $this->getShopBuyers()->andWhere(['shop_person_type_id' => $shopPersonType->id])->all()) {
-                    $result[$shopPersonType->name] = ArrayHelper::merge($result[$shopPersonType->name],
-                        ArrayHelper::map($existsBuyers, 'id', 'name'));
-                }
-            }
-        }
-
-        return $result;
-    }
     /**
      *
      * @return ActiveQuery
@@ -517,6 +365,7 @@ class ShopCart extends ActiveRecord
      * Доступные типы цен для просмотра
      *
      * @return ShopTypePrice[]
+     * @deprecated
      */
     public function getViewTypePrices()
     {
@@ -531,76 +380,55 @@ class ShopCart extends ActiveRecord
         return $result;
     }
 
-    /**
-     *
-     * Доступные цены для покупки на сайте
-     *
-     * @return ShopTypePrice[]
-     */
-    public function getBuyTypePrices()
-    {
-        $result = [];
-
-        foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
-            if (\Yii::$app->authManager->checkAccess($this->cmsUser ? $this->cmsUser->id : null, $typePrice->buyPermissionName) || $typePrice->def == "Y") {
-                $result[$typePrice->id] = $typePrice;
-            }
-        }
-
-        return $result;
-    }
 
 
     /**
      * @return $this
+     * @deprecated
      */
     public function recalculate()
     {
-        if ($this->shopBaskets) {
+        return $this->shopOrder->recalculate();
+        /*if ($this->shopBaskets) {
             foreach ($this->shopBaskets as $shopBasket) {
                 $shopBasket->recalculate()->save();
             }
         }
 
-        return $this;
+        return $this;*/
     }
+
+
+
+
+
 
     /**
      * @param ShopCmsContentElement $shopCmsContentElement
      * @return ProductPriceHelper
+     * @deprecated
      */
     public function getProductPriceHelper(ShopCmsContentElement $shopCmsContentElement)
     {
-        $ids = ArrayHelper::map($this->buyTypePrices, 'id', 'id');
-        $minPh = null;
-
-        if ($shopCmsContentElement->shopProduct->shopProductPrices) {
-            foreach ($shopCmsContentElement->shopProduct->shopProductPrices as $price) {
-
-
-                if (in_array($price->type_price_id, $ids)) {
-
-                    $ph = new ProductPriceHelper([
-                        'shopCmsContentElement' => $shopCmsContentElement,
-                        'shopCart'              => $this,
-                        'price'                 => $price,
-                    ]);
-
-                    if ($minPh === null) {
-                        $minPh = $ph;
-                        continue;
-                    }
-
-
-                    if ((float)$minPh->minMoney->amount == 0) {
-                        $minPh = $ph;
-                    } elseif ((float)$minPh->minMoney->amount > (float)$ph->minMoney->amount && (float)$ph->minMoney->amount > 0) {
-                        $minPh = $ph;
-                    }
-                }
-            }
-        }
-
-        return $minPh;
+        return $this->shopOrder->getProductPriceHelper($shopCmsContentElement);
     }
+
+    /**
+     *
+     * Доступные цены для покупки на сайте
+     *
+     * @return ShopTypePrice[]
+     * @deprecated
+     */
+    public function getBuyTypePrices()
+    {
+        return $this->shopOrder->buyTypePrices;
+    }
+    
+    
+    public function getDiscountCoupons()
+    {
+        return $this->shopOrder->discountCoupons;
+    }
+
 }

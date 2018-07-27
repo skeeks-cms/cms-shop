@@ -28,56 +28,35 @@ use yii\helpers\Url;
  * @property integer           $updated_by
  * @property integer           $created_at
  * @property integer           $updated_at
- * @property integer           $fuser_id
- * @property integer           $order_id
- * @property integer           $product_id
- * @property integer           $product_price_id
- * @property string            $price
+ * @property integer           $shop_order_id
+ * @property integer           $shop_product_id
+ * @property integer           $shop_product_price_id
+ * @property string            $amount
  * @property string            $currency_code
  * @property string            $weight
  * @property string            $quantity
- * @property integer           $site_id
- * @property string            $delay
  * @property string            $name
- * @property string            $can_buy
- * @property string            $callback_func
  * @property string            $notes
- * @property string            $order_callback_func
- * @property string            $detail_page_url
- * @property string            $discount_price
- * @property string            $cancel_callback_func
- * @property string            $pay_callback_func
- * @property string            $catalog_xml_id
- * @property string            $product_xml_id
+ * @property string            $discount_amount
  * @property string            $discount_name
  * @property string            $discount_value
- * @property string            $discount_coupon
  * @property string            $vat_rate
- * @property string            $subscribe
- * @property string            $barcode_multi
- * @property string            $reserved
  * @property double            $reserve_quantity
- * @property string            $deducted
- * @property string            $custom_price
  * @property string            $dimensions
- * @property integer           $type
- * @property integer           $set_parent_id
  * @property string            $measure_name
  * @property integer           $measure_code
- * @property string            $recommendation
  *
+ * ***
  *
  * @property StorageFile       $image
  * @property string            $url
  * @property string            $absoluteUrl
  *
+ * @property ShopOrder         $shopOrder
+ * @property ShopProduct       $shopProduct
+ * @property ShopProductPrice  $shopProductPrice
+ *
  * @property MoneyCurrency     $currency
- * @property ShopFuser         $fuser
- * @property ShopCart         $cart
- * @property ShopOrder         $order
- * @property ShopProduct       $product
- * @property ShopProductPrice  $productPrice
- * @property CmsSite           $site
  * @property ShopBasketProps[] $shopBasketProps
  *
  * @property Money             $money
@@ -112,7 +91,6 @@ class ShopOrderItem extends ActiveRecord
         parent::init();
 
         //$this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeSaveEvent"]);
 
         $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveCallback"]);
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveCallback"]);
@@ -122,24 +100,10 @@ class ShopOrderItem extends ActiveRecord
     public function afterSaveCallback($event)
     {
         //Эта позиция привязана к заказу, после ее обновления нужно обновить заказ целиком
-        if ($this->order) {
-            $this->order->recalculate()->save();
+        if ($this->shopOrder) {
+            $this->shopOrder->recalculate()->save();
         }
     }
-
-    /**
-     * @param $event
-     */
-    public function beforeSaveEvent($event)
-    {
-        if ($this->isAttributeChanged('price')) {
-            /*if ( round($this->getAttribute('price'), 4) != round($this->getOldAttribute('price'), 4))
-            {
-                throw new Exception("TODO: реализовать");
-            }*/
-        }
-    }
-
 
     /**
      * @inheritdoc
@@ -153,50 +117,34 @@ class ShopOrderItem extends ActiveRecord
                     'updated_by',
                     'created_at',
                     'updated_at',
-                    'fuser_id',
-                    'order_id',
-                    'product_id',
-                    'product_price_id',
-                    'type',
-                    'set_parent_id',
+                    'shop_order_id',
+                    'shop_product_id',
+                    'shop_product_price_id',
                     'measure_code',
                 ],
                 'integer',
             ],
             [['name'], 'required'],
-            [['price', 'weight', 'quantity', 'discount_price', 'vat_rate', 'reserve_quantity'], 'number'],
+            [['amount', 'weight', 'quantity', 'discount_amount', 'vat_rate', 'reserve_quantity'], 'number'],
             [['quantity'], 'number', 'max' => \Yii::$app->shop->maxQuantity, 'min' => \Yii::$app->shop->minQuantity],
             [['currency_code'], 'string', 'max' => 3],
-            [['site_id'], 'integer'],
-            [
-                ['delay', 'can_buy', 'subscribe', 'barcode_multi', 'reserved', 'deducted', 'custom_price'],
-                'string',
-                'max' => 1,
-            ],
+
             [
                 [
                     'name',
-                    'callback_func',
                     'notes',
-                    'order_callback_func',
-                    'detail_page_url',
-                    'cancel_callback_func',
-                    'pay_callback_func',
                     'discount_name',
                     'dimensions',
-                    'recommendation',
                 ],
                 'string',
                 'max' => 255,
             ],
-            [['catalog_xml_id', 'product_xml_id'], 'string', 'max' => 100],
-            [['discount_value', 'discount_coupon'], 'string', 'max' => 32],
+            [['discount_value'], 'string', 'max' => 32],
             [['measure_name'], 'string', 'max' => 50],
 
             [['quantity'], 'default', 'value' => 1],
-            [['site_id'], 'default', 'value' => \Yii::$app->cms->site->id],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
-            [['price'], 'default', 'value' => 0],
+            [['amount'], 'default', 'value' => 0],
         ];
     }
 
@@ -211,43 +159,23 @@ class ShopOrderItem extends ActiveRecord
             'updated_by'           => \Yii::t('skeeks/shop/app', 'Updated By'),
             'created_at'           => \Yii::t('skeeks/shop/app', 'Created At'),
             'updated_at'           => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'fuser_id'             => \Yii::t('skeeks/shop/app', 'Fuser ID'),
-            'order_id'             => \Yii::t('skeeks/shop/app', 'Order ID'),
-            'product_id'           => \Yii::t('skeeks/shop/app', 'Product'),
-            'product_price_id'     => \Yii::t('skeeks/shop/app', 'Product Price ID'),
-            'price'                => \Yii::t('skeeks/shop/app', 'Price'),
+            'shop_order_id'             => \Yii::t('skeeks/shop/app', 'Order ID'),
+            'shop_product_id'           => \Yii::t('skeeks/shop/app', 'Product'),
+            'shop_product_price_id'     => \Yii::t('skeeks/shop/app', 'Product Price ID'),
+            'amount'                => \Yii::t('skeeks/shop/app', 'Price'),
             'currency_code'        => \Yii::t('skeeks/shop/app', 'Currency Code'),
             'weight'               => \Yii::t('skeeks/shop/app', 'Weight'),
             'quantity'             => \Yii::t('skeeks/shop/app', 'Amount'),
-            'site_id'              => \Yii::t('skeeks/shop/app', 'Site'),
-            'delay'                => \Yii::t('skeeks/shop/app', 'Delay'),
             'name'                 => \Yii::t('skeeks/shop/app', 'Name'),
-            'can_buy'              => \Yii::t('skeeks/shop/app', 'Can Buy'),
-            'callback_func'        => \Yii::t('skeeks/shop/app', 'Callback Func'),
             'notes'                => \Yii::t('skeeks/shop/app', 'Notes'),
-            'order_callback_func'  => \Yii::t('skeeks/shop/app', 'Order Callback Func'),
-            'detail_page_url'      => \Yii::t('skeeks/shop/app', 'Detail Page Url'),
-            'discount_price'       => \Yii::t('skeeks/shop/app', 'Discount Price'),
-            'cancel_callback_func' => \Yii::t('skeeks/shop/app', 'Cancel Callback Func'),
-            'pay_callback_func'    => \Yii::t('skeeks/shop/app', 'Pay Callback Func'),
-            'catalog_xml_id'       => \Yii::t('skeeks/shop/app', 'Catalog Xml ID'),
-            'product_xml_id'       => \Yii::t('skeeks/shop/app', 'Product Xml ID'),
+            'discount_amount'       => \Yii::t('skeeks/shop/app', 'Discount Price'),
             'discount_name'        => \Yii::t('skeeks/shop/app', 'Discount Name'),
             'discount_value'       => \Yii::t('skeeks/shop/app', 'Discount Value'),
-            'discount_coupon'      => \Yii::t('skeeks/shop/app', 'Discount Coupon'),
             'vat_rate'             => \Yii::t('skeeks/shop/app', 'Vat Rate'),
-            'subscribe'            => \Yii::t('skeeks/shop/app', 'Subscribe'),
-            'barcode_multi'        => \Yii::t('skeeks/shop/app', 'Barcode Multi'),
-            'reserved'             => \Yii::t('skeeks/shop/app', 'Reserved'),
             'reserve_quantity'     => \Yii::t('skeeks/shop/app', 'Reserve Quantity'),
-            'deducted'             => \Yii::t('skeeks/shop/app', 'Deducted'),
-            'custom_price'         => \Yii::t('skeeks/shop/app', 'Custom Price'),
             'dimensions'           => \Yii::t('skeeks/shop/app', 'Dimensions'),
-            'type'                 => \Yii::t('skeeks/shop/app', 'Type'),
-            'set_parent_id'        => \Yii::t('skeeks/shop/app', 'Set Parent ID'),
             'measure_name'         => \Yii::t('skeeks/shop/app', 'Measure Name'),
             'measure_code'         => \Yii::t('skeeks/shop/app', 'Measure Code'),
-            'recommendation'       => \Yii::t('skeeks/shop/app', 'Recommendation'),
         ];
     }
 
@@ -258,48 +186,29 @@ class ShopOrderItem extends ActiveRecord
     {
         return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
     }
+    
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFuser()
+    public function getShopOrder()
     {
-        return $this->hasOne(ShopCart::class, ['id' => 'fuser_id']);
+        return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCart()
+    public function getShopProduct()
     {
-        return $this->hasOne(ShopCart::class, ['id' => 'fuser_id']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder()
+    public function getShopProductPrice()
     {
-        return $this->hasOne(ShopOrder::class, ['id' => 'order_id']);
+        return $this->hasOne(ShopProductPrice::class, ['id' => 'shop_product_price_id']);
     }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProduct()
-    {
-        return $this->hasOne(ShopProduct::class, ['id' => 'product_id']);
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProductPrice()
-    {
-        return $this->hasOne(ShopProductPrice::class, ['id' => 'product_price_id']);
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSite()
-    {
-        return $this->hasOne(CmsSite::class, ['id' => 'site_id']);
-    }
+    
     /**
      * Итоговая стоимость одной позиции  включая скидки и наценки
      *
@@ -307,7 +216,7 @@ class ShopOrderItem extends ActiveRecord
      */
     public function getMoney()
     {
-        return new Money((string)$this->price, $this->currency_code);
+        return new Money((string)$this->amount, $this->currency_code);
     }
     /**
      * Итоговая стоимость позиции без скидок и наценок
@@ -317,7 +226,7 @@ class ShopOrderItem extends ActiveRecord
      */
     public function getMoneyOriginal()
     {
-        return new Money((string)($this->price + $this->discount_price), $this->currency_code);
+        return new Money((string)($this->amount + $this->discount_amount), $this->currency_code);
     }
     /**
      * Итоговая стоимость скидки
@@ -325,7 +234,7 @@ class ShopOrderItem extends ActiveRecord
      */
     public function getMoneyDiscount()
     {
-        return new Money((string)$this->discount_price, $this->currency_code);
+        return new Money((string)$this->discount_amount, $this->currency_code);
     }
 
     /**
@@ -337,17 +246,17 @@ class ShopOrderItem extends ActiveRecord
      */
     public function recalculate()
     {
-        if (!$this->product) {
+        if (!$this->shopProduct) {
             return $this;
         }
 
-        $priceHelper = $this->cart->getProductPriceHelper($this->product->cmsContentElement);
+        $priceHelper = $this->shopOrder->getProductPriceHelper($this->shopProduct->cmsContentElement);
         /*$priceHelper = new ProductPriceHelper([
             'shopCmsContentElement' => $this->product->cmsContentElement,
             'shopCart' => $this->cart,
         ]);*/
 
-        $product = $this->product;
+        $product = $this->shopProduct;
         $parentElement = $product->cmsContentElement->parentContentElement;
 
 
@@ -356,12 +265,11 @@ class ShopOrderItem extends ActiveRecord
 
         $this->measure_name = $product->measure->symbol_rus;
         $this->measure_code = $product->measure->code;
-        $this->product_price_id = $productPrice->id;
+        $this->shop_product_price_id = $productPrice->id;
         $this->notes = $productPrice->typePrice->name;
 
         $this->name = $parentElement ? $parentElement->name : $product->cmsContentElement->name;
         $this->weight = $product->weight;
-        $this->site_id = \Yii::$app->cms->site->id; //TODO: неправильно
 
 
         $this->dimensions = Json::encode([
@@ -388,13 +296,13 @@ class ShopOrderItem extends ActiveRecord
 
 
         //Проверка скидок
-        $this->discount_price = 0;
+        $this->discount_amount = 0;
         $this->discount_value = "";
         $this->discount_name = "";
-        $this->price = $priceHelper->minMoney->amount;
+        $this->amount = $priceHelper->minMoney->amount;
 
         if ($priceHelper->hasDiscount) {
-            $this->discount_price = $priceHelper->discountMoney->amount;
+            $this->discount_amount = $priceHelper->discountMoney->amount;
             $this->discount_name = implode(" + ", ArrayHelper::map($priceHelper->applyedDiscounts, 'id', 'name'));
             $this->discount_value = \Yii::$app->formatter->asPercent($priceHelper->percent);
         }
@@ -472,7 +380,7 @@ class ShopOrderItem extends ActiveRecord
             }
         }
 
-        return $this->detail_page_url;
+        return "";
     }
 
     /**
@@ -489,7 +397,7 @@ class ShopOrderItem extends ActiveRecord
             }
         }
 
-        return Url::home().$this->detail_page_url;
+        return Url::home()."";
     }
 
     /**
@@ -507,5 +415,15 @@ class ShopOrderItem extends ActiveRecord
         }
 
         return null;
+    }
+
+
+    /**
+     * @return ShopProduct
+     * @deprecated
+     */
+    public function getProduct()
+    {
+        return $this->shopProduct;
     }
 }

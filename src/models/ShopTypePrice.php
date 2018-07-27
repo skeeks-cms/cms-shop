@@ -23,6 +23,9 @@ use yii\helpers\ArrayHelper;
  * @property string $def
  * @property string $xml_id
  *
+ * ***
+ *
+ * @property string $isDefault
  * @property string $buyPermissionName
  * @property string $viewPermissionName
  */
@@ -124,5 +127,13 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function getBuyPermissionName()
     {
         return "view-shop-type-price-" . $this->id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsDefault()
+    {
+        return (bool) ($this->def == 'Y');
     }
 }

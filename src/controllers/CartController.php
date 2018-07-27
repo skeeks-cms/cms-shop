@@ -110,14 +110,14 @@ class CartController extends Controller
 
             $shopBasket = ShopOrderItem::find()->where([
                 'shop_order_id'   => \Yii::$app->shop->cart->shopOrder->id,
-                'product_id' => $product_id,
+                'shop_product_id' => $product_id,
             ])->one();
 
             if (!$shopBasket) {
-                $shopBasket = new ShopBasket([
+                $shopBasket = new ShopOrderItem([
                     'shop_order_id'   => \Yii::$app->shop->cart->shopOrder->id,
-                    'product_id' => $product->id,
-                    'quantity'   => 0,
+                    'shop_product_id' => $product->id,
+                    'quantity'        => 0,
                 ]);
             }
 
