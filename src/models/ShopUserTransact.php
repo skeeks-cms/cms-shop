@@ -82,21 +82,21 @@ class ShopUserTransact extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(Currency::class, ['code' => 'currency_code']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getCmsUser()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'cms_user_id']);
+        return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopOrder()
     {
-        return $this->hasOne(ShopOrder::className(), ['id' => 'shop_order_id']);
+        return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
     /**
      * Итоговая стоимость заказа

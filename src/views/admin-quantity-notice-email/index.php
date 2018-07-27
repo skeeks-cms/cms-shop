@@ -25,13 +25,13 @@
     'columns'         =>
         [
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
 
             'email',
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'Good'),
                 'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
@@ -66,7 +66,7 @@
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {

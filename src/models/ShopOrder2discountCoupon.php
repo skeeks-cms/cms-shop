@@ -47,28 +47,28 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
                 ['created_by'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => CmsUser::className(),
+                'targetClass'     => CmsUser::class,
                 'targetAttribute' => ['created_by' => 'id'],
             ],
             [
                 ['discount_coupon_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => ShopDiscountCoupon::className(),
+                'targetClass'     => ShopDiscountCoupon::class,
                 'targetAttribute' => ['discount_coupon_id' => 'id'],
             ],
             [
                 ['order_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => ShopOrder::className(),
+                'targetClass'     => ShopOrder::class,
                 'targetAttribute' => ['order_id' => 'id'],
             ],
             [
                 ['updated_by'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => CmsUser::className(),
+                'targetClass'     => CmsUser::class,
                 'targetAttribute' => ['updated_by' => 'id'],
             ],
         ];
@@ -95,7 +95,7 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
      */
     public function getDiscountCoupon()
     {
-        return $this->hasOne(ShopDiscountCoupon::className(), ['id' => 'discount_coupon_id']);
+        return $this->hasOne(ShopDiscountCoupon::class, ['id' => 'discount_coupon_id']);
     }
 
     /**
@@ -103,7 +103,7 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
      */
     public function getOrder()
     {
-        return $this->hasOne(ShopOrder::className(), ['id' => 'order_id']);
+        return $this->hasOne(ShopOrder::class, ['id' => 'order_id']);
     }
 
 }

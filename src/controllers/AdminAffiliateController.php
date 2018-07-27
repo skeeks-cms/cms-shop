@@ -25,7 +25,7 @@ class AdminAffiliateController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Affiliates');
         $this->modelShowAttribute = "id";
-        $this->modelClassName = ShopAffiliate::className();
+        $this->modelClassName = ShopAffiliate::class;
 
         parent::init();
     }

@@ -64,7 +64,7 @@ class ShopDiscount2typePrice extends \skeeks\cms\models\Core
      */
     public function getDiscount()
     {
-        return $this->hasOne(ShopDiscount::className(), ['id' => 'discount_id']);
+        return $this->hasOne(ShopDiscount::class, ['id' => 'discount_id']);
     }
 
     /**
@@ -72,6 +72,6 @@ class ShopDiscount2typePrice extends \skeeks\cms\models\Core
      */
     public function getTypePrice()
     {
-        return $this->hasOne(ShopTypePrice::className(), ['id' => 'type_price_id']);
+        return $this->hasOne(ShopTypePrice::class, ['id' => 'type_price_id']);
     }
 }

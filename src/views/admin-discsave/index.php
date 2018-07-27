@@ -40,15 +40,15 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
 
             [
                 'attribute' => 'active',
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedByColumn::className(),
+                'class' => \skeeks\cms\grid\UpdatedByColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
             ],
 
             'priority',

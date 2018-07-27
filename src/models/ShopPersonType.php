@@ -110,7 +110,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getShopPersonTypeSites()
     {
-        return $this->hasMany(ShopPersonTypeSite::className(), ['person_type_id' => 'id']);
+        return $this->hasMany(ShopPersonTypeSite::class, ['person_type_id' => 'id']);
     }
     /**
      * @inheritdoc
@@ -153,28 +153,28 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getShopBuyers()
     {
-        return $this->hasMany(ShopBuyer::className(), ['shop_person_type_id' => 'id']);
+        return $this->hasMany(ShopBuyer::class, ['shop_person_type_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopOrders()
     {
-        return $this->hasMany(ShopOrder::className(), ['person_type_id' => 'id']);
+        return $this->hasMany(ShopOrder::class, ['person_type_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopPaySystemPersonTypes()
     {
-        return $this->hasMany(ShopPaySystemPersonType::className(), ['person_type_id' => 'id']);
+        return $this->hasMany(ShopPaySystemPersonType::class, ['person_type_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getPaySystems()
     {
-        return $this->hasMany(ShopPaySystem::className(), ['id' => 'pay_system_id'])
+        return $this->hasMany(ShopPaySystem::class, ['id' => 'pay_system_id'])
             ->viaTable('shop_pay_system_person_type', ['person_type_id' => 'id']);
     }
     /**
@@ -182,7 +182,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getShopPersonTypeProperties()
     {
-        return $this->hasMany(ShopPersonTypeProperty::className(),
+        return $this->hasMany(ShopPersonTypeProperty::class,
             ['shop_person_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
     /**
@@ -190,14 +190,14 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getShopTaxRates()
     {
-        return $this->hasMany(ShopTaxRate::className(), ['person_type_id' => 'id']);
+        return $this->hasMany(ShopTaxRate::class, ['person_type_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getSites()
     {
-        return $this->hasMany(CmsSite::className(), ['code' => 'site_code'])->viaTable('{{%shop_person_type_site}}',
+        return $this->hasMany(CmsSite::class, ['code' => 'site_code'])->viaTable('{{%shop_person_type_site}}',
             ['person_type_id' => 'id']);
     }
 

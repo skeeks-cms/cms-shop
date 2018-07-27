@@ -26,7 +26,7 @@ class AdminViewedProductController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Viewed products');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopViewedProduct::className();
+        $this->modelClassName = ShopViewedProduct::class;
 
         parent::init();
     }

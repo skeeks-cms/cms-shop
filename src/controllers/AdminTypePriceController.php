@@ -28,7 +28,7 @@ class AdminTypePriceController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Types of prices');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopTypePrice::className();
+        $this->modelClassName = ShopTypePrice::class;
 
         parent::init();
     }
@@ -42,7 +42,7 @@ class AdminTypePriceController extends AdminModelEditorController
             [
                 "def-multi" =>
                     [
-                        'class'        => AdminMultiModelEditAction::className(),
+                        'class'        => AdminMultiModelEditAction::class,
                         "name"         => \Yii::t('skeeks/shop/app', 'Default'),
                         //"icon"              => "glyphicon glyphicon-trash",
                         "eachCallback" => [$this, 'eachMultiDef'],

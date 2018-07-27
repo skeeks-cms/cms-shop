@@ -341,23 +341,23 @@ HTML
         'columns' => [
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::class,
             ],
         ],
     ],
@@ -493,11 +493,11 @@ JS
     'columns' =>
         [
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'format' => 'raw',
                 'value'  => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
@@ -506,7 +506,7 @@ JS
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'type',
                 'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
                 'format'    => 'raw',
@@ -531,11 +531,11 @@ JS
     'columns' =>
         [
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'format' => 'raw',
                 'value'  => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
@@ -548,7 +548,7 @@ JS
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'type',
                 'label'     => \Yii::t('skeeks/shop/app', 'Transaction'),
                 'format'    => 'raw',
@@ -557,7 +557,7 @@ JS
                 },
             ],
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'type',
                 'label'     => \Yii::t('skeeks/shop/app', 'Description'),
                 'format'    => 'raw',
@@ -605,7 +605,7 @@ JS
 
             <?= $form->field($model, 'pay_voucher_num'); ?>
             <?= $form->field($model, 'pay_voucher_at')->widget(
-                \kartik\datecontrol\DateControl::classname(), [
+                \kartik\datecontrol\DateControl::class, [
                 'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
             ]); ?>
 
@@ -644,7 +644,7 @@ JS
 
             <?= $form->field($model, 'pay_voucher_num'); ?>
             <?= $form->field($model, 'pay_voucher_at')->widget(
-                \kartik\datecontrol\DateControl::classname(), [
+                \kartik\datecontrol\DateControl::class, [
                 'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
             ]); ?>
 

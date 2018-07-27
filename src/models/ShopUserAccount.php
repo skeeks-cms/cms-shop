@@ -82,7 +82,7 @@ class ShopUserAccount extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(Currency::class, ['code' => 'currency_code']);
     }
 
     /**
@@ -90,7 +90,7 @@ class ShopUserAccount extends \skeeks\cms\models\Core
      */
     public function getUser()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'user_id']);
+        return $this->hasOne(CmsUser::class, ['id' => 'user_id']);
     }
 
 

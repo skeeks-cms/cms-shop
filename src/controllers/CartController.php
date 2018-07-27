@@ -43,7 +43,7 @@ class CartController extends Controller
         return ArrayHelper::merge(parent::behaviors(), [
 
             'verbs' => [
-                'class'   => VerbFilter::className(),
+                'class'   => VerbFilter::class,
                 'actions' => [
                     'add-product'               => ['post'],
                     'remove-basket'             => ['post'],

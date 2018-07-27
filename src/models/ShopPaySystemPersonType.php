@@ -60,7 +60,7 @@ class ShopPaySystemPersonType extends \yii\db\ActiveRecord
      */
     public function getPaySystem()
     {
-        return $this->hasOne(ShopPaySystem::className(), ['id' => 'pay_system_id']);
+        return $this->hasOne(ShopPaySystem::class, ['id' => 'pay_system_id']);
     }
 
     /**
@@ -68,6 +68,6 @@ class ShopPaySystemPersonType extends \yii\db\ActiveRecord
      */
     public function getPersonType()
     {
-        return $this->hasOne(ShopPersonType::className(), ['id' => 'person_type_id']);
+        return $this->hasOne(ShopPersonType::class, ['id' => 'person_type_id']);
     }
 }

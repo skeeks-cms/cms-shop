@@ -85,7 +85,7 @@ class ShopAffiliatePlan extends \skeeks\cms\models\Core
      */
     public function getShopAffiliates()
     {
-        return $this->hasMany(ShopAffiliate::className(), ['plan_id' => 'id']);
+        return $this->hasMany(ShopAffiliate::class, ['plan_id' => 'id']);
     }
 
     /**
@@ -93,7 +93,7 @@ class ShopAffiliatePlan extends \skeeks\cms\models\Core
      */
     public function getValueCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'value_currency_code']);
+        return $this->hasOne(Currency::class, ['code' => 'value_currency_code']);
     }
 
     /**
@@ -101,7 +101,7 @@ class ShopAffiliatePlan extends \skeeks\cms\models\Core
      */
     public function getBaseRateCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'base_rate_currency_code']);
+        return $this->hasOne(Currency::class, ['code' => 'base_rate_currency_code']);
     }
 
     /**
@@ -109,7 +109,7 @@ class ShopAffiliatePlan extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::class, ['code' => 'site_code']);
     }
 
 }

@@ -30,7 +30,7 @@
         [
             'filter'    => false,
             'attribute' => 'content_id',
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'value'     => function (\skeeks\cms\shop\models\ShopContent $model) {
                 return $model->content->name." ({$model->content->contentType->name})";
             },
@@ -38,7 +38,7 @@
 
         /*[
             'attribute' => 'yandex_export',
-            'class' => BooleanColumn::className(),
+            'class' => BooleanColumn::class,
         ]*/
     ],
 ]); ?>

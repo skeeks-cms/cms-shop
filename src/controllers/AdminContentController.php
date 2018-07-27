@@ -25,7 +25,7 @@ class AdminContentController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Content settings');
         $this->modelShowAttribute = "id";
-        $this->modelClassName = ShopContent::className();
+        $this->modelClassName = ShopContent::class;
 
         parent::init();
     }

@@ -27,7 +27,7 @@ class AdminQuantityNoticeEmailController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Notification of receipt products by email');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopQuantityNoticeEmail::className();
+        $this->modelClassName = ShopQuantityNoticeEmail::class;
 
         parent::init();
     }

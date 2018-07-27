@@ -36,7 +36,7 @@
         'priority',
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => "personTypeIds",
             'filter'    => false,
             'value'     => function (\skeeks\cms\shop\models\ShopPaySystem $model) {
@@ -45,7 +45,7 @@
         ],
 
         [
-            'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+            'class'     => \skeeks\cms\grid\BooleanColumn::class,
             'attribute' => "active",
         ],
     ],

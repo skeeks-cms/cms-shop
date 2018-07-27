@@ -26,7 +26,7 @@ class AdminFuserController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Baskets');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopFuser::className();
+        $this->modelClassName = ShopFuser::class;
 
         parent::init();
     }

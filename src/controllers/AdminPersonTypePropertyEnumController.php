@@ -21,7 +21,7 @@ class AdminPersonTypePropertyEnumController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Control of property values payer');
         $this->modelShowAttribute = "value";
-        $this->modelClassName = ShopPersonTypePropertyEnum::className();
+        $this->modelClassName = ShopPersonTypePropertyEnum::class;
 
         parent::init();
 

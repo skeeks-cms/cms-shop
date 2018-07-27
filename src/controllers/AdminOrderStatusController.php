@@ -25,7 +25,7 @@ class AdminOrderStatusController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Order statuses');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopOrderStatus::className();
+        $this->modelClassName = ShopOrderStatus::class;
 
         parent::init();
     }

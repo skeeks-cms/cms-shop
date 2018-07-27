@@ -110,7 +110,7 @@ class ShopAffiliate extends \skeeks\cms\models\Core
      */
     public function getPlan()
     {
-        return $this->hasOne(ShopAffiliatePlan::className(), ['id' => 'plan_id']);
+        return $this->hasOne(ShopAffiliatePlan::class, ['id' => 'plan_id']);
     }
 
     /**
@@ -118,7 +118,7 @@ class ShopAffiliate extends \skeeks\cms\models\Core
      */
     public function getUser()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'user_id']);
+        return $this->hasOne(CmsUser::class, ['id' => 'user_id']);
     }
 
     /**
@@ -126,7 +126,7 @@ class ShopAffiliate extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::class, ['code' => 'site_code']);
     }
 
     /**
@@ -134,7 +134,7 @@ class ShopAffiliate extends \skeeks\cms\models\Core
      */
     public function getAffiliate()
     {
-        return $this->hasOne(ShopAffiliate::className(), ['id' => 'affiliate_id']);
+        return $this->hasOne(ShopAffiliate::class, ['id' => 'affiliate_id']);
     }
 
     /**
@@ -142,6 +142,6 @@ class ShopAffiliate extends \skeeks\cms\models\Core
      */
     public function getShopAffiliates()
     {
-        return $this->hasMany(ShopAffiliate::className(), ['affiliate_id' => 'id']);
+        return $this->hasMany(ShopAffiliate::class, ['affiliate_id' => 'id']);
     }
 }

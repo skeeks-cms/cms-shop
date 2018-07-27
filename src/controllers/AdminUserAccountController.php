@@ -29,7 +29,7 @@ class AdminUserAccountController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Account_customer');
         $this->modelShowAttribute = "id";
-        $this->modelClassName = ShopUserAccount::className();
+        $this->modelClassName = ShopUserAccount::class;
 
         parent::init();
     }
@@ -46,13 +46,13 @@ class AdminUserAccountController extends AdminModelEditorController
                         "columns" => [
                             'id',
                             [
-                                'class'     => UserColumnData::className(),
+                                'class'     => UserColumnData::class,
                                 'attribute' => 'user_id',
                             ],
 
                             [
                                 'attribute' => 'current_budget',
-                                'class'     => DataColumn::className(),
+                                'class'     => DataColumn::class,
                                 'value'     => function (ShopUserAccount $userAccount) {
                                     return (string)$userAccount->money;
                                 },
@@ -60,7 +60,7 @@ class AdminUserAccountController extends AdminModelEditorController
 
                             [
                                 'attribute' => 'locked',
-                                'class'     => BooleanColumn::className(),
+                                'class'     => BooleanColumn::class,
                             ],
                         ],
                     ],

@@ -71,7 +71,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             .'$_REQUEST = '.print_r($_REQUEST, true)
             .'$_SESSION = '.print_r($_SESSION, true)
             .'$_SERVER = '.print_r($_SERVER, true)
-            , static::className());
+            , static::class);
     }
 
 
@@ -223,7 +223,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(MoneyCurrency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
     }
 
     /**
@@ -231,7 +231,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
      */
     public function getProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'product_id']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'product_id']);
     }
 
     /**
@@ -239,7 +239,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
      */
     public function getTypePrice()
     {
-        return $this->hasOne(ShopTypePrice::className(), ['id' => 'type_price_id']);
+        return $this->hasOne(ShopTypePrice::class, ['id' => 'type_price_id']);
     }
 
     /**
@@ -255,7 +255,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
      */
     public function getShopProductPriceChanges()
     {
-        return $this->hasMany(ShopProductPriceChange::className(),
+        return $this->hasMany(ShopProductPriceChange::class,
             ['shop_product_price_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
 }

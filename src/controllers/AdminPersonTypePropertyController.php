@@ -27,7 +27,7 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Control of properties payer');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopPersonTypeProperty::className();
+        $this->modelClassName = ShopPersonTypeProperty::class;
 
         parent::init();
 
@@ -91,7 +91,7 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
                             ->toString()
                     );
                 } else {
-                    \Yii::error(Json::encode($model->errors), self::className());
+                    \Yii::error(Json::encode($model->errors), self::class);
                     \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms', 'Could not save'));
                 }
             }

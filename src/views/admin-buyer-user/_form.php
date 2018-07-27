@@ -170,7 +170,7 @@ if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed')) {
                     'name',
 
                     [
-                        'class'     => \yii\grid\DataColumn::className(),
+                        'class'     => \yii\grid\DataColumn::class,
                         'attribute' => 'shop_person_type_id',
                         'format'    => 'raw',
                         'value'     => function (\skeeks\cms\shop\models\ShopBuyer $model) {
@@ -179,7 +179,7 @@ if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed')) {
                     ],
 
                     [
-                        'class'     => \skeeks\cms\grid\DateTimeColumnData::className(),
+                        'class'     => \skeeks\cms\grid\DateTimeColumnData::class,
                         'attribute' => 'created_at',
                     ],
 
@@ -220,7 +220,7 @@ $view = $this;
     'columns' =>
         [
             [
-                'class'      => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'class'      => \skeeks\cms\modules\admin\grid\ActionColumn::class,
                 'controller' => \Yii::$app->createController('/shop/admin-order')[0],
             ],
 
@@ -228,11 +228,11 @@ $view = $this;
             'id',
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'status_code',
                 'format'    => 'raw',
                 'value'     => function (\skeeks\cms\shop\models\ShopOrder $order) {
@@ -246,14 +246,14 @@ $view = $this;
             ],
 
             [
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
                 'attribute' => 'payed',
                 'format'    => 'raw',
             ],
 
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'attribute' => "canceled",
                 'format'    => "raw",
                 'filter'    => [
@@ -288,7 +288,7 @@ CSS
 
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'filter' => false,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'Good'),
@@ -311,7 +311,7 @@ HTML;
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'format'    => 'raw',
                 'attribute' => 'price',
                 'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
@@ -353,27 +353,27 @@ if ($fuser) {
         [
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::class,
             ],
 
         ],
@@ -396,17 +396,17 @@ if ($fuser) {
     'columns'      =>
         [
             [
-                'class'      => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'class'      => \skeeks\cms\modules\admin\grid\ActionColumn::class,
                 'controller' => \Yii::$app->createController('/shop/admin-viewed-product')[0],
             ],
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'Date views'),
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'Good'),
                 'value'  => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
@@ -443,18 +443,18 @@ if ($fuser) {
     'columns'      =>
         [
             [
-                'class'      => \skeeks\cms\modules\admin\grid\ActionColumn::className(),
+                'class'      => \skeeks\cms\modules\admin\grid\ActionColumn::class,
                 'controller' => \Yii::$app->createController('/shop/admin-quantity-notice-email')[0],
             ],
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
 
             'email',
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'Good'),
                 'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {

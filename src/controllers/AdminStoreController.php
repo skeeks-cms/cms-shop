@@ -23,7 +23,7 @@ class AdminStoreController extends \skeeks\cms\controllers\AdminCmsContentElemen
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Stocks');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = CmsContentElement::className();
+        $this->modelClassName = CmsContentElement::class;
 
         parent::init();
     }

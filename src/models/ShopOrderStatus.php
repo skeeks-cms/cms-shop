@@ -121,6 +121,6 @@ class ShopOrderStatus extends Core
      */
     public function getShopOrders()
     {
-        return $this->hasMany(ShopOrder::className(), ['status_code' => 'code']);
+        return $this->hasMany(ShopOrder::class, ['status_code' => 'code']);
     }
 }

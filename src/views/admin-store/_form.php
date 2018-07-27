@@ -64,13 +64,13 @@ if ($model->isNewRecord) {
 <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 <div class="row">
     <div class="col-md-3">
-        <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+        <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::class, [
             //'displayFormat' => 'php:d-M-Y H:i:s',
             'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
         ]); ?>
     </div>
     <div class="col-md-3">
-        <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::classname(), [
+        <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::class, [
             //'displayFormat' => 'php:d-M-Y H:i:s',
             'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
         ]); ?>
@@ -118,11 +118,11 @@ if ($model->isNewRecord) {
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Announcement')); ?>
 <?= $form->field($model, 'image_id')->widget(
-    \skeeks\cms\widgets\formInputs\StorageImage::className()
+    \skeeks\cms\widgets\formInputs\StorageImage::class
 ); ?>
 
 <?= $form->field($model, 'description_short')->widget(
-    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::class,
     [
         'modelAttributeSaveType' => 'description_short_type',
     ]);
@@ -133,11 +133,11 @@ if ($model->isNewRecord) {
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'In detal')); ?>
 
 <?= $form->field($model, 'image_full_id')->widget(
-    \skeeks\cms\widgets\formInputs\StorageImage::className()
+    \skeeks\cms\widgets\formInputs\StorageImage::class
 ); ?>
 
 <?= $form->field($model, 'description_full')->widget(
-    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::class,
     [
         'modelAttributeSaveType' => 'description_full_type',
     ]);
@@ -171,7 +171,7 @@ if ($model->isNewRecord) {
     }
     ?>
     <?= $form->field($model, 'treeIds')->label(\Yii::t('skeeks/shop/app', 'Sections of the site'))->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::class,
         [
             "attributeMulti" => "treeIds",
             "mode"           => $mode,
@@ -195,11 +195,11 @@ if ($model->isNewRecord) {
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Images/Files')); ?>
 
 <?= $form->field($model, 'images')->widget(
-    \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    \skeeks\cms\widgets\formInputs\ModelStorageFiles::class
 ); ?>
 
 <?= $form->field($model, 'files')->widget(
-    \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    \skeeks\cms\widgets\formInputs\ModelStorageFiles::class
 ); ?>
 
 <?= $form->fieldSetEnd() ?>

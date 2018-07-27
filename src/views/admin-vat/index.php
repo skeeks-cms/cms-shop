@@ -34,7 +34,7 @@
             'rate',
 
             [
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
                 'attribute' => "active",
             ],
         ],

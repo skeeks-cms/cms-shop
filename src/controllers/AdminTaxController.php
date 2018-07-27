@@ -25,7 +25,7 @@ class AdminTaxController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'List of taxes');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopTax::className();
+        $this->modelClassName = ShopTax::class;
 
         parent::init();
     }

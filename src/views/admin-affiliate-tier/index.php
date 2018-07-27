@@ -26,7 +26,7 @@
         [
             [
                 'attribute' => 'site_code',
-                'class'     => \skeeks\cms\grid\SiteColumn::className(),
+                'class'     => \skeeks\cms\grid\SiteColumn::class,
             ],
 
             'rate1',

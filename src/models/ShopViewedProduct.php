@@ -73,7 +73,7 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
+        return $this->hasOne(CmsSite::class, ['id' => 'site_id']);
     }
 
 
@@ -82,7 +82,7 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
      */
     public function getShopFuser()
     {
-        return $this->hasOne(ShopFuser::className(), ['id' => 'shop_fuser_id']);
+        return $this->hasOne(ShopFuser::class, ['id' => 'shop_fuser_id']);
     }
 
     /**
@@ -90,7 +90,7 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
      */
     public function getShopProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'shop_product_id']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
 
     /**
@@ -98,7 +98,7 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
      */
     public function getCmsContentElement()
     {
-        return $this->hasOne(CmsContentElement::className(), ['id' => 'shop_product_id']);
+        return $this->hasOne(CmsContentElement::class, ['id' => 'shop_product_id']);
     }
 
 }

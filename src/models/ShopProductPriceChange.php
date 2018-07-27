@@ -82,7 +82,7 @@ class ShopProductPriceChange extends \skeeks\cms\models\Core
      */
     public function getShopProductPrice()
     {
-        return $this->hasOne(ShopProductPrice::className(), ['id' => 'shop_product_price_id']);
+        return $this->hasOne(ShopProductPrice::class, ['id' => 'shop_product_price_id']);
     }
 
     /**
@@ -90,7 +90,7 @@ class ShopProductPriceChange extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(Currency::class, ['code' => 'currency_code']);
     }
 
     /**

@@ -25,7 +25,7 @@ class AdminPersonTypeController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Types of payers');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopPersonType::className();
+        $this->modelClassName = ShopPersonType::class;
 
         parent::init();
     }

@@ -32,7 +32,7 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
     'columns'         =>
         [
             [
-                'class'     => \skeeks\cms\grid\UserColumnData::className(),
+                'class'     => \skeeks\cms\grid\UserColumnData::class,
                 'attribute' => 'id',
                 'label'     => \Yii::t('skeeks/shop/app', 'Buyer'),
             ],
@@ -41,13 +41,13 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
             'phone',
 
             [
-                'class'     => \skeeks\cms\grid\DateTimeColumnData::className(),
+                'class'     => \skeeks\cms\grid\DateTimeColumnData::class,
                 'attribute' => 'created_at',
                 'label'     => \Yii::t('skeeks/shop/app', 'Date of registration'),
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'Date of last order'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     if ($order = \skeeks\cms\shop\models\ShopOrder::find()->where(['user_id' => $model->id])
@@ -61,7 +61,7 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     return \skeeks\cms\shop\models\ShopOrder::find()->where([
@@ -72,7 +72,7 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     return \skeeks\cms\shop\models\ShopOrder::find()->where([

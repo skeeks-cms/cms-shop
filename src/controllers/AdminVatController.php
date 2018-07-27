@@ -25,7 +25,7 @@ class AdminVatController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'VAT rates');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopVat::className();
+        $this->modelClassName = ShopVat::class;
 
         parent::init();
     }

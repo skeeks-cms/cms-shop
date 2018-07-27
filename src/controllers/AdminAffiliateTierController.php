@@ -25,7 +25,7 @@ class AdminAffiliateTierController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Pyramid');
         $this->modelShowAttribute = "id";
-        $this->modelClassName = ShopAffiliateTier::className();
+        $this->modelClassName = ShopAffiliateTier::class;
 
         parent::init();
     }

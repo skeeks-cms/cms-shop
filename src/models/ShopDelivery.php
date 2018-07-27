@@ -127,9 +127,9 @@ class ShopDelivery extends \skeeks\cms\models\Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            \skeeks\cms\behaviors\RelationalBehavior::className(),
-            HasStorageFile::className() => [
-                'class'  => HasStorageFile::className(),
+            \skeeks\cms\behaviors\RelationalBehavior::class,
+            HasStorageFile::class => [
+                'class'  => HasStorageFile::class,
                 'fields' => ['logo_id'],
             ],
         ]);
@@ -140,7 +140,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['id' => 'site_id']);
+        return $this->hasOne(CmsSite::class, ['id' => 'site_id']);
     }
 
 
@@ -149,7 +149,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
      */
     public function getCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(Currency::class, ['code' => 'currency_code']);
     }
 
     /**
@@ -157,7 +157,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
      */
     public function getLogo()
     {
-        return $this->hasOne(CmsStorageFile::className(), ['id' => 'logo_id']);
+        return $this->hasOne(CmsStorageFile::class, ['id' => 'logo_id']);
     }
 
     /**
@@ -165,7 +165,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
      */
     public function getOrderCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'order_currency_code']);
+        return $this->hasOne(Currency::class, ['code' => 'order_currency_code']);
     }
 
     /**
@@ -173,7 +173,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
      */
     public function getShopDelivery2paySystems()
     {
-        return $this->hasMany(ShopDelivery2paySystem::className(), ['delivery_id' => 'id']);
+        return $this->hasMany(ShopDelivery2paySystem::class, ['delivery_id' => 'id']);
     }
 
     /**
@@ -191,7 +191,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
      */
     public function getShopPaySystems()
     {
-        return $this->hasMany(ShopPaySystem::className(), ['id' => 'pay_system_id'])
+        return $this->hasMany(ShopPaySystem::class, ['id' => 'pay_system_id'])
             ->viaTable('shop_delivery2pay_system', ['delivery_id' => 'id']);
     }
 

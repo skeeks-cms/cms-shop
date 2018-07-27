@@ -44,9 +44,9 @@ class ShopPaySystem extends Core
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
-            Serialize::className() =>
+            Serialize::class =>
                 [
-                    'class'  => Serialize::className(),
+                    'class'  => Serialize::class,
                     'fields' => ['component_settings'],
                 ],
         ]);
@@ -96,7 +96,7 @@ class ShopPaySystem extends Core
      */
     public function getShopPaySystemPersonTypes()
     {
-        return $this->hasMany(ShopPaySystemPersonType::className(), ['pay_system_id' => 'id']);
+        return $this->hasMany(ShopPaySystemPersonType::class, ['pay_system_id' => 'id']);
     }
     /**
      * @inheritdoc
@@ -135,7 +135,7 @@ class ShopPaySystem extends Core
      */
     public function getPersonTypes()
     {
-        return $this->hasMany(ShopPersonType::className(),
+        return $this->hasMany(ShopPersonType::class,
             ['id' => 'person_type_id'])->viaTable('{{%shop_pay_system_person_type}}', ['pay_system_id' => 'id']);
     }
     /**
@@ -187,7 +187,7 @@ class ShopPaySystem extends Core
                 $this->_handler = $component;
                 return $this->_handler;
             } catch (\Exception $e) {
-                \Yii::error("Related property handler not found '{$this->component}'", self::className());
+                \Yii::error("Related property handler not found '{$this->component}'", self::class);
                 return null;
             }
 

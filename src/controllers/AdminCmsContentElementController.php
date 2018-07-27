@@ -112,14 +112,14 @@ class AdminCmsContentElementController extends AdminModelEditorController
         $columns = [
 
             [
-                'class' => \skeeks\cms\grid\ImageColumn2::className(),
+                'class' => \skeeks\cms\grid\ImageColumn2::class,
             ],
 
             'name',
-            ['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
+            ['class' => \skeeks\cms\grid\UpdatedAtColumn::class],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
                     if (!$model->cmsTree) {
                         return null;
@@ -146,7 +146,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
                     $result = [];
 
@@ -167,13 +167,13 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
             [
                 'attribute' => 'active',
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
             ],
 
 
             /*[
                 'label' => \Yii::t('skeeks/shop/app', 'Base price'),
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'attribute' => 'baseProductPrice',
                 'value' => function(\skeeks\cms\models\CmsContentElement $model)
                 {
@@ -188,7 +188,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             ],*/
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
 
                     return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl,
@@ -208,7 +208,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
                 $columns[] = [
                     'label'     => $shopTypePrice->name,
-                    'class'     => \yii\grid\DataColumn::className(),
+                    'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'price.'.$shopTypePrice->id,
                     'value'     => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
@@ -228,7 +228,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         $typeColumn = //TODO: показывать только для контента с предложениями
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'label' => 'Тип товара',
                 'value' => function (\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement) {
                     if ($shopCmsContentElement->shopProduct) {
@@ -279,7 +279,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     'attribute' => $name,
                     'visible'   => false,
                     'format'    => 'raw',
-                    'class'     => \yii\grid\DataColumn::className(),
+                    'class'     => \yii\grid\DataColumn::class,
                     'value'     => function ($model, $key, $index) use ($name) {
                         if (is_array($model->{$name})) {
                             return implode(",", $model->{$name});
@@ -323,7 +323,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
             [
                 'index' =>
                     [
-                        "modelSearchClassName" => ShopCmsContentElementSearch::className(),
+                        "modelSearchClassName" => ShopCmsContentElementSearch::class,
                     ],
 
                 "create" => ["callback" => [$this, 'create']],
@@ -386,14 +386,14 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
                 "activate-multi" =>
                     [
-                        'class'        => AdminMultiModelEditAction::className(),
+                        'class'        => AdminMultiModelEditAction::class,
                         "name"         => \Yii::t('skeeks/shop/app', 'Activate'),
                         "eachCallback" => [$this, 'eachMultiActivate'],
                     ],
 
                 "inActivate-multi" =>
                     [
-                        'class'        => AdminMultiModelEditAction::className(),
+                        'class'        => AdminMultiModelEditAction::class,
                         "name"         => \Yii::t('skeeks/shop/app', 'Deactivate'),
                         "eachCallback" => [$this, 'eachMultiInActivate'],
                     ],

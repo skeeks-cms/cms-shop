@@ -72,7 +72,7 @@ class ShopPersonTypePropertyEnum extends RelatedPropertyEnumModel
      */
     public function getProperty()
     {
-        return $this->hasOne(ShopPersonTypeProperty::className(), ['id' => 'property_id']);
+        return $this->hasOne(ShopPersonTypeProperty::class, ['id' => 'property_id']);
     }
 
 

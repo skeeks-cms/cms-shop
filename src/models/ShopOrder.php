@@ -1007,7 +1007,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getShopCart()
     {
-        return $this->hasOne(ShopCart::className(), ['shop_order_id' => 'id']);
+        return $this->hasOne(ShopCart::class, ['shop_order_id' => 'id']);
     }
 
     /**

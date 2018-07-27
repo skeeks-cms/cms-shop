@@ -72,10 +72,10 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             [['comment'], 'string'],
             [['currency_code'], 'string', 'max' => 3],
             [['external_name', 'external_id'], 'string', 'max' => 255],
-            [['currency_code'], 'exist', 'skipOnError' => true, 'targetClass' => MoneyCurrency::className(), 'targetAttribute' => ['currency_code' => 'code']],
-            [['shop_buyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopBuyer::className(), 'targetAttribute' => ['shop_buyer_id' => 'id']],
-            [['shop_order_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopOrder::className(), 'targetAttribute' => ['shop_order_id' => 'id']],
-            [['shop_pay_system_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopPaySystem::className(), 'targetAttribute' => ['shop_pay_system_id' => 'id']],
+            [['currency_code'], 'exist', 'skipOnError' => true, 'targetClass' => MoneyCurrency::class, 'targetAttribute' => ['currency_code' => 'code']],
+            [['shop_buyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopBuyer::class, 'targetAttribute' => ['shop_buyer_id' => 'id']],
+            [['shop_order_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopOrder::class, 'targetAttribute' => ['shop_order_id' => 'id']],
+            [['shop_pay_system_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopPaySystem::class, 'targetAttribute' => ['shop_pay_system_id' => 'id']],
         ];
     }
 
@@ -105,7 +105,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
      */
     public function getShopBills()
     {
-        return $this->hasMany(ShopBill::className(), ['shop_payment_id' => 'id']);
+        return $this->hasMany(ShopBill::class, ['shop_payment_id' => 'id']);
     }
 
     /**
@@ -113,7 +113,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
      */
     public function getCurrencyCode()
     {
-        return $this->hasOne(MoneyCurrency::className(), ['code' => 'currency_code']);
+        return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
     }
 
     /**
@@ -121,7 +121,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
      */
     public function getShopBuyer()
     {
-        return $this->hasOne(ShopBuyer::className(), ['id' => 'shop_buyer_id']);
+        return $this->hasOne(ShopBuyer::class, ['id' => 'shop_buyer_id']);
     }
 
     /**
@@ -129,7 +129,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
      */
     public function getShopOrder()
     {
-        return $this->hasOne(ShopOrder::className(), ['id' => 'shop_order_id']);
+        return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
 
     /**
@@ -137,6 +137,6 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
      */
     public function getShopPaySystem()
     {
-        return $this->hasOne(ShopPaySystem::className(), ['id' => 'shop_pay_system_id']);
+        return $this->hasOne(ShopPaySystem::class, ['id' => 'shop_pay_system_id']);
     }
 }

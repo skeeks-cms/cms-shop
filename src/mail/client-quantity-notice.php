@@ -29,7 +29,7 @@ use skeeks\cms\mail\helpers\Html;
         [
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
                 'value'  => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
                     if ($shopProduct->cmsContentElement->image) {
@@ -44,7 +44,7 @@ use skeeks\cms\mail\helpers\Html;
                 },
             ],
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'label'  => \Yii::t('skeeks/shop/app', 'Product name'),
                 'format' => 'raw',
                 'value'  => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
@@ -63,7 +63,7 @@ use skeeks\cms\mail\helpers\Html;
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'quantity',
                 'value'     => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
                     return $shopProduct->quantity." ".$shopProduct->measure->symbol_rus;
@@ -71,7 +71,7 @@ use skeeks\cms\mail\helpers\Html;
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'label'     => \Yii::t('skeeks/shop/app', 'Price'),
                 'attribute' => 'price',
                 'format'    => 'raw',

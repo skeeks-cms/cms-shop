@@ -27,14 +27,14 @@
             'value',
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'value'     => function (\skeeks\cms\shop\models\ShopTaxRate $model) {
                     return $model->tax->name." (".$model->tax->site->name.")";
                 },
                 'attribute' => "tax_id",
             ],
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'value'     => function (\skeeks\cms\shop\models\ShopTaxRate $model) {
                     return $model->personType->name;
                 },
@@ -42,12 +42,12 @@
             ],
 
             [
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
                 'attribute' => "is_in_price",
             ],
 
             [
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
                 'attribute' => "active",
             ],
 

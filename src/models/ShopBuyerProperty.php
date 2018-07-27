@@ -39,7 +39,7 @@ class ShopBuyerProperty extends RelatedElementPropertyModel
      */
     public function getProperty()
     {
-        return $this->hasOne(ShopPersonTypeProperty::className(), ['id' => 'property_id']);
+        return $this->hasOne(ShopPersonTypeProperty::class, ['id' => 'property_id']);
     }
 
     /**
@@ -47,7 +47,7 @@ class ShopBuyerProperty extends RelatedElementPropertyModel
      */
     public function getCreatedBy()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'created_by']);
+        return $this->hasOne(CmsUser::class, ['id' => 'created_by']);
     }
 
     /**
@@ -55,7 +55,7 @@ class ShopBuyerProperty extends RelatedElementPropertyModel
      */
     public function getElement()
     {
-        return $this->hasOne(ShopBuyer::className(), ['id' => 'element_id']);
+        return $this->hasOne(ShopBuyer::class, ['id' => 'element_id']);
     }
 
     /**
@@ -63,6 +63,6 @@ class ShopBuyerProperty extends RelatedElementPropertyModel
      */
     public function getUpdatedBy()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'updated_by']);
+        return $this->hasOne(CmsUser::class, ['id' => 'updated_by']);
     }
 }

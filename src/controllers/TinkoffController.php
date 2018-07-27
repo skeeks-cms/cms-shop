@@ -78,7 +78,7 @@ class TinkoffController extends Controller
 
     public function actionNotify()
     {
-        \Yii::info("POST: ".Json::encode(\Yii::$app->request->post()), self::className());
+        \Yii::info("POST: ".Json::encode(\Yii::$app->request->post()), self::class);
 
         try {
             if (!\Yii::$app->request->post('OrderId')) {
@@ -101,12 +101,12 @@ class TinkoffController extends Controller
             }
 
             if (\Yii::$app->request->post('Status') == "CONFIRMED") {
-                \Yii::info("Успешный платеж", self::className());
+                \Yii::info("Успешный платеж", self::class);
                 $shopOrder->processNotePayment();
             }
 
         } catch (\Exception $e) {
-            \Yii::error($e->getMessage(), self::className());
+            \Yii::error($e->getMessage(), self::class);
         }
 
         $this->layout = false;

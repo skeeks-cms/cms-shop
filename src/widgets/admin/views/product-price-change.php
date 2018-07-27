@@ -38,12 +38,12 @@
         'columns'      =>
             [
                 [
-                    'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                    'class' => \skeeks\cms\grid\CreatedAtColumn::class,
                     'label' => \Yii::t('skeeks/shop/app', 'Date and time changes'),
                 ],
 
                 [
-                    'class' => \yii\grid\DataColumn::className(),
+                    'class' => \yii\grid\DataColumn::class,
                     'label' => \Yii::t('skeeks/shop/app', 'Price'),
                     'value' => function (\skeeks\cms\shop\models\ShopProductPriceChange $model) {
                         return (string)$model->money;
@@ -51,7 +51,7 @@
                 ],
 
                 [
-                    'class' => \skeeks\cms\grid\CreatedByColumn::className(),
+                    'class' => \skeeks\cms\grid\CreatedByColumn::class,
                 ],
             ],
     ]); ?>

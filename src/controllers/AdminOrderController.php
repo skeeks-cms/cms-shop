@@ -34,7 +34,7 @@ class AdminOrderController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Orders');
         $this->modelShowAttribute = "id";
-        $this->modelClassName = ShopOrder::className();
+        $this->modelClassName = ShopOrder::class;
 
         parent::init();
     }
@@ -56,7 +56,7 @@ class AdminOrderController extends AdminModelEditorController
 
                 'create-order' =>
                     [
-                        'class'    => AdminAction::className(),
+                        'class'    => AdminAction::class,
                         'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
                         "icon"     => "glyphicon glyphicon-plus",
                         "callback" => [$this, 'createOrder'],
@@ -65,7 +65,7 @@ class AdminOrderController extends AdminModelEditorController
 
                 /*"view" =>
                 [
-                    'class'         => AdminOneModelEditAction::className(),
+                    'class'         => AdminOneModelEditAction::class,
                     "name"         => \Yii::t('skeeks/shop/app',"Информация"),
                     "icon"          => "glyphicon glyphicon-eye-open",
                     "priority"      => 5,

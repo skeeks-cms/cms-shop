@@ -28,12 +28,12 @@
 
             [
                 'attribute' => 'site_code',
-                'class'     => \skeeks\cms\grid\SiteColumn::className(),
+                'class'     => \skeeks\cms\grid\SiteColumn::class,
             ],
 
             [
                 'attribute' => 'active',
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
             ],
 
             'name',

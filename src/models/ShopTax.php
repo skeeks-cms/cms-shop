@@ -75,6 +75,6 @@ class ShopTax extends Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::class, ['code' => 'site_code']);
     }
 }

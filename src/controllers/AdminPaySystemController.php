@@ -32,7 +32,7 @@ class AdminPaySystemController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Payment systems');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopPaySystem::className();
+        $this->modelClassName = ShopPaySystem::class;
 
         parent::init();
     }
@@ -60,7 +60,7 @@ class AdminPaySystemController extends AdminModelEditorController
                             'priority',
 
                             [
-                                'class'     => DataColumn::className(),
+                                'class'     => DataColumn::class,
                                 'attribute' => "personTypeIds",
                                 'filter'    => false,
                                 'value'     => function (ShopPaySystem $model) {
@@ -69,7 +69,7 @@ class AdminPaySystemController extends AdminModelEditorController
                             ],
 
                             [
-                                'class'     => BooleanColumn::className(),
+                                'class'     => BooleanColumn::class,
                                 'attribute' => "active",
                             ],
                         ],

@@ -46,7 +46,7 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
                 ['measure_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Measure::className(),
+                'targetClass'     => Measure::class,
                 'targetAttribute' => ['measure_id' => 'id'],
             ],
         ]);
@@ -72,7 +72,7 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
      */
     public function getMeasure()
     {
-        return $this->hasOne(Measure::className(), ['id' => 'measure_id']);
+        return $this->hasOne(Measure::class, ['id' => 'measure_id']);
     }
 
     /**
@@ -80,6 +80,6 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
      */
     public function getShopProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'shop_product_id']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
 }

@@ -25,7 +25,7 @@ class AdminDiscountCouponController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Discount coupons');
         $this->modelShowAttribute = "id";
-        $this->modelClassName = ShopDiscountCoupon::className();
+        $this->modelClassName = ShopDiscountCoupon::class;
 
         parent::init();
     }

@@ -81,7 +81,7 @@ $content_id = \Yii::$app->request->get('content_id');
     ]);
 
 
-    $search = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsContentElement::className());
+    $search = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsContentElement::class);
     $dataProvider = $search->search(\Yii::$app->request->queryParams);
     $searchModel = $search->loadedModel;
 
@@ -105,7 +105,7 @@ $content_id = \Yii::$app->request->get('content_id');
                 'attribute' => $name,
                 'visible'   => false,
                 'format'    => 'raw',
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'value'     => function ($model, $key, $index) use ($name) {
                     if (is_array($model->{$name})) {
                         return implode(",", $model->{$name});
@@ -182,7 +182,7 @@ $content_id = \Yii::$app->request->get('content_id');
                     'visible'   => false,
                     'format'    => 'raw',
                     'filter'    => $filter,
-                    'class'     => \yii\grid\DataColumn::className(),
+                    'class'     => \yii\grid\DataColumn::class,
                     'value'     => function ($model, $key, $index) use ($name) {
                         /**
                          * @var $model \skeeks\cms\models\CmsContentElement

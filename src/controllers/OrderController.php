@@ -32,7 +32,7 @@ class OrderController extends Controller
         return ArrayHelper::merge(parent::behaviors(), [
 
             'accessToView' => [
-                'class' => CmsAccessControl::className(),
+                'class' => CmsAccessControl::class,
                 'only'  => ['view'],
                 'rules' => [
                     // deny all POST request
@@ -58,7 +58,7 @@ class OrderController extends Controller
             ],
 
             'accessToList' => [
-                'class' => CmsAccessControl::className(),
+                'class' => CmsAccessControl::class,
                 'only'  => ['list'],
                 'rules' => [
                     [

@@ -37,7 +37,7 @@
         'columns'      =>
             [
                 [
-                    'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                    'class' => \skeeks\cms\grid\CreatedAtColumn::class,
                     'label' => \Yii::t('skeeks/shop/app', 'Date and time changes'),
                 ],
 
@@ -54,7 +54,7 @@
                 ],
 
                 [
-                    'class' => \skeeks\cms\grid\CreatedByColumn::className(),
+                    'class' => \skeeks\cms\grid\CreatedByColumn::class,
                 ],
             ],
     ]); ?>

@@ -36,7 +36,7 @@ if ($filter->id) {
     $shopBuyer->shop_person_type_id = $shopPersonType->id;
 
     $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-    $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::className();
+    $searchRelatedPropertiesModel->propertyElementClassName = \skeeks\cms\shop\models\ShopBuyerProperty::class;
     $searchRelatedPropertiesModel->initProperties($shopBuyer->relatedProperties);
     $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
     $searchRelatedPropertiesModel->search($dataProvider, $shopBuyer::tableName());

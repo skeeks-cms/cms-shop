@@ -64,7 +64,7 @@ class ShopDelivery2paySystem extends \skeeks\cms\models\Core
      */
     public function getDelivery()
     {
-        return $this->hasOne(ShopDelivery::className(), ['id' => 'delivery_id']);
+        return $this->hasOne(ShopDelivery::class, ['id' => 'delivery_id']);
     }
 
     /**
@@ -72,6 +72,6 @@ class ShopDelivery2paySystem extends \skeeks\cms\models\Core
      */
     public function getPaySystem()
     {
-        return $this->hasOne(ShopPaySystem::className(), ['id' => 'pay_system_id']);
+        return $this->hasOne(ShopPaySystem::class, ['id' => 'pay_system_id']);
     }
 }

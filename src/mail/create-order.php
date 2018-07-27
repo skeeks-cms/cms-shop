@@ -34,11 +34,11 @@ $order->refresh();
         'columns'      =>
             [
                 /*[
-                    'class' => \yii\grid\SerialColumn::className()
+                    'class' => \yii\grid\SerialColumn::class
                 ],*/
 
                 [
-                    'class'  => \yii\grid\DataColumn::className(),
+                    'class'  => \yii\grid\DataColumn::class,
                     'format' => 'raw',
                     'value'  => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
                         if ($shopBasket->image) {
@@ -47,7 +47,7 @@ $order->refresh();
                     },
                 ],
                 [
-                    'class'     => \yii\grid\DataColumn::className(),
+                    'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'name',
                     'format'    => 'raw',
                     'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
@@ -65,7 +65,7 @@ $order->refresh();
                 ],
 
                 [
-                    'class'     => \yii\grid\DataColumn::className(),
+                    'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'quantity',
                     'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
                         return $shopBasket->quantity." ".$shopBasket->measure_name;
@@ -73,7 +73,7 @@ $order->refresh();
                 ],
 
                 [
-                    'class'     => \yii\grid\DataColumn::className(),
+                    'class'     => \yii\grid\DataColumn::class,
                     'label'     => \Yii::t('skeeks/shop/app', 'Price'),
                     'attribute' => 'price',
                     'format'    => 'raw',
@@ -90,7 +90,7 @@ $order->refresh();
                     },
                 ],
                 [
-                    'class'     => \yii\grid\DataColumn::className(),
+                    'class'     => \yii\grid\DataColumn::class,
                     'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
                     'attribute' => 'price',
                     'format'    => 'raw',

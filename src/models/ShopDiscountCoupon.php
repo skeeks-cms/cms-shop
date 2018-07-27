@@ -73,28 +73,28 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
                 ['cms_user_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => CmsUser::className(),
+                'targetClass'     => CmsUser::class,
                 'targetAttribute' => ['cms_user_id' => 'id'],
             ],
             [
                 ['created_by'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => CmsUser::className(),
+                'targetClass'     => CmsUser::class,
                 'targetAttribute' => ['created_by' => 'id'],
             ],
             [
                 ['shop_discount_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => ShopDiscount::className(),
+                'targetClass'     => ShopDiscount::class,
                 'targetAttribute' => ['shop_discount_id' => 'id'],
             ],
             [
                 ['updated_by'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => CmsUser::className(),
+                'targetClass'     => CmsUser::class,
                 'targetAttribute' => ['updated_by' => 'id'],
             ],
 
@@ -136,7 +136,7 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
      */
     public function getCmsUser()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'cms_user_id']);
+        return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']);
     }
 
 
@@ -145,7 +145,7 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
      */
     public function getShopDiscount()
     {
-        return $this->hasOne(ShopDiscount::className(), ['id' => 'shop_discount_id']);
+        return $this->hasOne(ShopDiscount::class, ['id' => 'shop_discount_id']);
     }
 
 
@@ -154,7 +154,7 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
      */
     public function getShopOrder2discountCoupons()
     {
-        return $this->hasMany(ShopOrder2discountCoupon::className(), ['discount_coupon_id' => 'id']);
+        return $this->hasMany(ShopOrder2discountCoupon::class, ['discount_coupon_id' => 'id']);
     }
 
 }

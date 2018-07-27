@@ -25,7 +25,7 @@ class AdminDiscsaveController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Cumulative discounts');
         $this->modelShowAttribute = "id";
-        $this->modelClassName = ShopDiscount::className();
+        $this->modelClassName = ShopDiscount::class;
 
         parent::init();
     }

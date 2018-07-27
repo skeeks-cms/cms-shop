@@ -71,6 +71,6 @@ class ShopOrderItemProperty extends \skeeks\cms\models\Core
      */
     public function getShopOrderItem()
     {
-        return $this->hasOne(ShopOrderItem::className(), ['id' => 'shop_order_item_id']);
+        return $this->hasOne(ShopOrderItem::class, ['id' => 'shop_order_item_id']);
     }
 }

@@ -34,7 +34,7 @@
     'columns'         => [
         'code',
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => 'name',
             'format'    => 'raw',
             'value'     => function (\skeeks\cms\shop\models\ShopOrderStatus $model) {

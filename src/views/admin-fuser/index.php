@@ -51,11 +51,11 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
     'columns'         =>
         [
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'filter' => false,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'User'),
@@ -66,7 +66,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'filter' => false,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
@@ -82,7 +82,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'filter'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopPersonType::find()->active()->all(),
                     'id', 'name'),
                 'attribute' => 'person_type_id',
@@ -93,7 +93,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'filter' => false,
                 'label'  => \Yii::t('skeeks/shop/app', 'Price of basket'),
                 'value'  => function (\skeeks\cms\shop\models\ShopFuser $model) {
@@ -102,7 +102,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'filter' => false,
                 'label'  => \Yii::t('skeeks/shop/app', 'Number of items'),
                 'value'  => function (\skeeks\cms\shop\models\ShopFuser $model) {
@@ -111,7 +111,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
             ],
 
             [
-                'class'  => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'filter' => false,
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'Good'),
@@ -133,7 +133,7 @@ HTML;
             ],
 
             [
-                'class'     => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'filter'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsSite::find()->active()->all(), 'id',
                     'name'),
                 'attribute' => 'site_id',
@@ -146,7 +146,7 @@ HTML;
             ],
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
         ],
 ]); ?>

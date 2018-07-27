@@ -216,7 +216,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         }
 
         return $this
-            ->hasMany(ShopCmsContentElement::className(), ['parent_content_element_id' => 'id'])
+            ->hasMany(ShopCmsContentElement::class, ['parent_content_element_id' => 'id'])
             ->andWhere(["content_id" => $childContentId])
             //->joinWith('cmsContentElement')
             //->joinWith('cmsContentElement.cmsContent')
@@ -302,7 +302,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getBaseProductPrice()
     {
-        return $this->hasOne(ShopProductPrice::className(), [
+        return $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
         ])->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id]);
     }
@@ -468,56 +468,56 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getMeasure()
     {
-        return $this->hasOne(Measure::className(), ['id' => 'measure_id']);
+        return $this->hasOne(Measure::class, ['id' => 'measure_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getCmsContentElement()
     {
-        return $this->hasOne(ShopCmsContentElement::className(), ['id' => 'id']);
+        return $this->hasOne(ShopCmsContentElement::class, ['id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getTrialPrice()
     {
-        return $this->hasOne(ShopTypePrice::className(), ['id' => 'trial_price_id']);
+        return $this->hasOne(ShopTypePrice::class, ['id' => 'trial_price_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getVat()
     {
-        return $this->hasOne(ShopVat::className(), ['id' => 'vat_id']);
+        return $this->hasOne(ShopVat::class, ['id' => 'vat_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getPurchasingCurrency()
     {
-        return $this->hasOne(Currency::className(), ['code' => 'purchasing_currency']);
+        return $this->hasOne(Currency::class, ['code' => 'purchasing_currency']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopProductPrices()
     {
-        return $this->hasMany(ShopProductPrice::className(), ['product_id' => 'id'])->from(['prices' => ShopProductPrice::tableName()]);
+        return $this->hasMany(ShopProductPrice::class, ['product_id' => 'id'])->from(['prices' => ShopProductPrice::tableName()]);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopViewedProducts()
     {
-        return $this->hasMany(ShopViewedProduct::className(), ['shop_product_id' => 'id']);
+        return $this->hasMany(ShopViewedProduct::class, ['shop_product_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopProductQuantityChanges()
     {
-        return $this->hasMany(ShopProductQuantityChange::className(),
+        return $this->hasMany(ShopProductQuantityChange::class,
             ['shop_product_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
     /**
@@ -525,7 +525,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getShopQuantityNoticeEmails()
     {
-        return $this->hasMany(ShopQuantityNoticeEmail::className(), ['shop_product_id' => 'id']);
+        return $this->hasMany(ShopQuantityNoticeEmail::class, ['shop_product_id' => 'id']);
     }
 
     /**
@@ -540,7 +540,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             $shopFuser = \Yii::$app->shop->cart;
         }
 
-        return $this->hasMany(ShopProductPrice::className(), [
+        return $this->hasMany(ShopProductPrice::class, [
             'product_id' => 'id',
         ])->andWhere([
             'type_price_id' => ArrayHelper::map($shopFuser->viewTypePrices, 'id', 'id'),
@@ -560,7 +560,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             $shopFuser = \Yii::$app->shop->cart;
         }
 
-        return $this->hasOne(ShopProductPrice::className(), [
+        return $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
         ])
             ->select([

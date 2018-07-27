@@ -91,7 +91,7 @@ class ShopTaxRate extends Core
      */
     public function getTax()
     {
-        return $this->hasOne(ShopTax::className(), ['id' => 'tax_id']);
+        return $this->hasOne(ShopTax::class, ['id' => 'tax_id']);
     }
 
     /**
@@ -99,7 +99,7 @@ class ShopTaxRate extends Core
      */
     public function getPersonType()
     {
-        return $this->hasOne(ShopPersonType::className(), ['id' => 'person_type_id']);
+        return $this->hasOne(ShopPersonType::class, ['id' => 'person_type_id']);
     }
 
 }

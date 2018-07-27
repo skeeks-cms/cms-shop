@@ -77,24 +77,24 @@ if ($filter->product_type) {
 
 
 <?= $form->field($searchModel, 'created_at_from')->widget(
-    \kartik\datetime\DateTimePicker::className()
+    \kartik\datetime\DateTimePicker::class
 ); ?>
 <?= $form->field($searchModel, 'created_at_to')->widget(
-    \kartik\datetime\DateTimePicker::className()
+    \kartik\datetime\DateTimePicker::class
 ); ?>
 
 <?= $form->field($searchModel, 'updated_at_from')->widget(
-    \kartik\datetime\DateTimePicker::className()
+    \kartik\datetime\DateTimePicker::class
 ); ?>
 <?= $form->field($searchModel, 'updated_at_to')->widget(
-    \kartik\datetime\DateTimePicker::className()
+    \kartik\datetime\DateTimePicker::class
 ); ?>
 
 <?= $form->field($searchModel, 'published_at_from')->widget(
-    \kartik\datetime\DateTimePicker::className()
+    \kartik\datetime\DateTimePicker::class
 ); ?>
 <?= $form->field($searchModel, 'published_at_to')->widget(
-    \kartik\datetime\DateTimePicker::className()
+    \kartik\datetime\DateTimePicker::class
 ); ?>
 
 <?= $form->field($searchModel, 'code'); ?>

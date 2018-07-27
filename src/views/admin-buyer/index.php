@@ -59,7 +59,7 @@ if ($shopPersonType) {
     'columns'         => \yii\helpers\ArrayHelper::merge(
         [
             /*[
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'filter' => \yii\helpers\ArrayHelper::map(\Yii::$app->shop->shopPersonTypes, 'id', 'name'),
                 'attribute' => 'shop_person_type_id',
                 'value' => function(\skeeks\cms\shop\models\ShopBuyer $model)
@@ -70,7 +70,7 @@ if ($shopPersonType) {
 
             'name',
             [
-                'class'     => \skeeks\cms\grid\UserColumnData::className(),
+                'class'     => \skeeks\cms\grid\UserColumnData::class,
                 'attribute' => 'cms_user_id',
             ],
 

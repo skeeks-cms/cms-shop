@@ -64,7 +64,7 @@ class ShopPersonTypeSite extends \yii\db\ActiveRecord
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::class, ['code' => 'site_code']);
     }
 
     /**
@@ -72,6 +72,6 @@ class ShopPersonTypeSite extends \yii\db\ActiveRecord
      */
     public function getPersonType()
     {
-        return $this->hasOne(ShopPersonType::className(), ['id' => 'person_type_id']);
+        return $this->hasOne(ShopPersonType::class, ['id' => 'person_type_id']);
     }
 }

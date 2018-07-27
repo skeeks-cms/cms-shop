@@ -28,23 +28,23 @@
 
             [
                 'attribute' => 'site_code',
-                'class'     => \skeeks\cms\grid\SiteColumn::className(),
+                'class'     => \skeeks\cms\grid\SiteColumn::class,
             ],
 
             [
                 'attribute' => 'user_id',
-                'class'     => \skeeks\cms\grid\UserColumnData::className(),
+                'class'     => \skeeks\cms\grid\UserColumnData::class,
             ],
 
             [
                 'attribute' => 'active',
-                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
             ],
 
             'plan_id',
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
         ],
 ]); ?>

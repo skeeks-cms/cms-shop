@@ -93,7 +93,7 @@ JS
 
 <?=
 $form->field($shopFuser, 'buyer_id')->widget(
-    \skeeks\cms\widgets\formInputs\EditedSelect::className(),
+    \skeeks\cms\widgets\formInputs\EditedSelect::class,
     [
         'items' => \yii\helpers\ArrayHelper::map(
             $shopFuser->shopBuyers, 'id', 'name'
@@ -232,24 +232,24 @@ HTML
         'columns' => [
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::class,
             ],
 
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::class,
             ],
         ],
     ],

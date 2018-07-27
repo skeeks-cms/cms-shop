@@ -64,14 +64,14 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
                 ['shop_fuser_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => ShopFuser::className(),
+                'targetClass'     => ShopFuser::class,
                 'targetAttribute' => ['shop_fuser_id' => 'id'],
             ],
             [
                 ['shop_product_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => ShopProduct::className(),
+                'targetClass'     => ShopProduct::class,
                 'targetAttribute' => ['shop_product_id' => 'id'],
             ],
 
@@ -111,7 +111,7 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
      */
     public function getShopFuser()
     {
-        return $this->hasOne(ShopFuser::className(), ['id' => 'shop_fuser_id']);
+        return $this->hasOne(ShopFuser::class, ['id' => 'shop_fuser_id']);
     }
 
 
@@ -120,7 +120,7 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
      */
     public function getShopProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'shop_product_id']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
 
 }

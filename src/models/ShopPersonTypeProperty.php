@@ -68,7 +68,7 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
      */
     public function getEnums()
     {
-        return $this->hasMany(ShopPersonTypePropertyEnum::className(), ['property_id' => 'id']);
+        return $this->hasMany(ShopPersonTypePropertyEnum::class, ['property_id' => 'id']);
     }
 
     /**
@@ -173,7 +173,7 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
      */
     public function getShopPersonType()
     {
-        return $this->hasOne(ShopPersonType::className(), ['id' => 'shop_person_type_id']);
+        return $this->hasOne(ShopPersonType::class, ['id' => 'shop_person_type_id']);
     }
 
     /**
@@ -181,6 +181,6 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
      */
     public function getShopPersonTypePropertyEnums()
     {
-        return $this->hasMany(ShopPersonTypePropertyEnum::className(), ['property_id' => 'id']);
+        return $this->hasMany(ShopPersonTypePropertyEnum::class, ['property_id' => 'id']);
     }
 }

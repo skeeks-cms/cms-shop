@@ -47,7 +47,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
                 ],
 
                 [
-                    'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                    'class'         => \skeeks\cms\grid\BooleanColumn::class,
                     'attribute'     => 'active',
                     'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
                     'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,

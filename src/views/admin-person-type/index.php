@@ -36,7 +36,7 @@
         'priority',
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => "siteCodes",
             'filter'    => false,
             'value'     => function (\skeeks\cms\shop\models\ShopPersonType $model) {
@@ -52,7 +52,7 @@
         ],
 
         [
-            'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+            'class'     => \skeeks\cms\grid\BooleanColumn::class,
             'attribute' => "active",
         ],
     ],

@@ -91,7 +91,7 @@ class ShopContent extends \skeeks\cms\models\Core
      */
     public function getOfferContent()
     {
-        return $this->hasOne(CmsContent::className(), ['id' => 'children_content_id']);
+        return $this->hasOne(CmsContent::class, ['id' => 'children_content_id']);
     }
 
     /**
@@ -99,7 +99,7 @@ class ShopContent extends \skeeks\cms\models\Core
      */
     public function getChildrenContent()
     {
-        return $this->hasOne(CmsContent::className(), ['id' => 'children_content_id']);
+        return $this->hasOne(CmsContent::class, ['id' => 'children_content_id']);
     }
 
     /**
@@ -107,7 +107,7 @@ class ShopContent extends \skeeks\cms\models\Core
      */
     public function getContent()
     {
-        return $this->hasOne(CmsContent::className(), ['id' => 'content_id']);
+        return $this->hasOne(CmsContent::class, ['id' => 'content_id']);
     }
 
     /**
@@ -115,7 +115,7 @@ class ShopContent extends \skeeks\cms\models\Core
      */
     public function getVat()
     {
-        return $this->hasOne(ShopVat::className(), ['id' => 'vat_id']);
+        return $this->hasOne(ShopVat::class, ['id' => 'vat_id']);
     }
 
 }

@@ -78,9 +78,9 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     {
         return ArrayHelper::merge(parent::behaviors(), [
 
-            Serialize::className() =>
+            Serialize::class =>
                 [
-                    'class'  => Serialize::className(),
+                    'class'  => Serialize::class,
                     "fields" => [
                         "data",
                     ],
@@ -124,7 +124,7 @@ class ShopOrderChange extends \skeeks\cms\models\Core
      */
     public function getShopOrder()
     {
-        return $this->hasOne(ShopOrder::className(), ['id' => 'shop_order_id']);
+        return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
 
 }

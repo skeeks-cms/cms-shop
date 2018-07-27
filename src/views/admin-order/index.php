@@ -29,7 +29,7 @@
     'columns'         => [
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => 'id',
             'format'    => 'raw',
             'value'     => function (\skeeks\cms\shop\models\ShopOrder $order) {
@@ -42,11 +42,11 @@
 
 
         [
-            'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+            'class' => \skeeks\cms\grid\CreatedAtColumn::class,
         ],
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => 'status_code',
             'format'    => 'raw',
             'filter'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code',
@@ -62,7 +62,7 @@
         ],
 
         /*[
-            'class'     => DataColumn::className(),
+            'class'     => DataColumn::class,
             'attribute' => 'buyer_id',
             'format'    => 'raw',
             'value'     => function(ShopOrder $model)
@@ -77,13 +77,13 @@
         ],*/
 
         [
-            'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+            'class'     => \skeeks\cms\grid\BooleanColumn::class,
             'attribute' => 'payed',
             'format'    => 'raw',
         ],
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => "canceled",
             'format'    => "raw",
             'filter'    => [
@@ -118,7 +118,7 @@ CSS
 
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => "user_id",
             'label'     => \Yii::t('skeeks/shop/app', 'Buyer'),
             'format'    => "raw",
@@ -129,7 +129,7 @@ CSS
         ],
 
         [
-            'class'  => \yii\grid\DataColumn::className(),
+            'class'  => \yii\grid\DataColumn::class,
             'filter' => false,
             'format' => 'raw',
             'label'  => \Yii::t('skeeks/shop/app', 'Good'),
@@ -151,7 +151,7 @@ HTML;
         ],
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'format'    => 'raw',
             'filter'    => false,
             'visible'   => true,
@@ -169,7 +169,7 @@ HTML;
 
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'format'    => 'raw',
             'filter'    => false,
             'visible'   => false,
@@ -195,7 +195,7 @@ HTML;
 
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'format'    => 'raw',
             'filter'    => false,
             'visible'   => false,
@@ -207,7 +207,7 @@ HTML;
         ],
 
         [
-            'class'  => \yii\grid\DataColumn::className(),
+            'class'  => \yii\grid\DataColumn::class,
             'format' => 'raw',
             'filter' => false,
             //'visible'        => false,
@@ -228,7 +228,7 @@ HTML;
         ],
 
         [
-            'class'     => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'filter'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsSite::find()->active()->all(), 'id',
                 'name'),
             'attribute' => 'site_id',

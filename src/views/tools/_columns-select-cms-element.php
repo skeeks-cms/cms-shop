@@ -8,7 +8,7 @@
 return [
 
     [
-        'class'  => \yii\grid\DataColumn::className(),
+        'class'  => \yii\grid\DataColumn::class,
         'value'  => function ($model) {
             $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
             $basePrice = $shopProduct->baseProductPrice;
@@ -32,7 +32,7 @@ return [
 
 
     [
-        'class'     => \yii\grid\DataColumn::className(),
+        'class'     => \yii\grid\DataColumn::class,
         'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
             return $model->cmsContent->name;
         },
@@ -43,23 +43,23 @@ return [
 
 
     [
-        'class' => \skeeks\cms\grid\ImageColumn2::className(),
+        'class' => \skeeks\cms\grid\ImageColumn2::class,
     ],
 
     'name',
-    ['class' => \skeeks\cms\grid\CreatedAtColumn::className()],
-    ///['class' => \skeeks\cms\grid\UpdatedAtColumn::className()],
-    ///['class' => \skeeks\cms\grid\PublishedAtColumn::className()],
+    ['class' => \skeeks\cms\grid\CreatedAtColumn::class],
+    ///['class' => \skeeks\cms\grid\UpdatedAtColumn::class],
+    ///['class' => \skeeks\cms\grid\PublishedAtColumn::class],
     /*[
-        'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+        'class' => \skeeks\cms\grid\DateTimeColumnData::class,
         'attribute' => "published_to",
     ],*/
 
-    //['class' => \skeeks\cms\grid\CreatedByColumn::className()],
-    //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
+    //['class' => \skeeks\cms\grid\CreatedByColumn::class],
+    //['class' => \skeeks\cms\grid\UpdatedByColumn::class],
 
     [
-        'class'     => \yii\grid\DataColumn::className(),
+        'class'     => \yii\grid\DataColumn::class,
         'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
             if (!$model->cmsTree) {
                 return null;
@@ -85,7 +85,7 @@ return [
     ],
 
     [
-        'class'  => \yii\grid\DataColumn::className(),
+        'class'  => \yii\grid\DataColumn::class,
         'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
             $result = [];
 
@@ -107,7 +107,7 @@ return [
 
     [
         'label' => \skeeks\cms\shop\Module::t('app', 'Base price'),
-        'class' => \yii\grid\DataColumn::className(),
+        'class' => \yii\grid\DataColumn::class,
         'value' => function (\skeeks\cms\models\CmsContentElement $model) {
             $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
             if ($shopProduct) {
@@ -120,11 +120,11 @@ return [
 
     [
         'attribute' => 'active',
-        'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+        'class'     => \skeeks\cms\grid\BooleanColumn::class,
     ],
 
     [
-        'class'  => \yii\grid\DataColumn::className(),
+        'class'  => \yii\grid\DataColumn::class,
         'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
 
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [

@@ -53,9 +53,9 @@ class ShopStore extends \skeeks\cms\models\Core
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
-            HasStorageFile::className() =>
+            HasStorageFile::class =>
                 [
-                    'class'  => HasStorageFile::className(),
+                    'class'  => HasStorageFile::class,
                     'fields' => ['image_id'],
                 ],
         ]);
@@ -116,7 +116,7 @@ class ShopStore extends \skeeks\cms\models\Core
      */
     public function getLocation()
     {
-        return $this->hasOne(KladrLocation::className(), ['id' => 'location_id']);
+        return $this->hasOne(KladrLocation::class, ['id' => 'location_id']);
     }
 
 
@@ -125,7 +125,7 @@ class ShopStore extends \skeeks\cms\models\Core
      */
     public function getImage()
     {
-        return $this->hasOne(StorageFile::className(), ['id' => 'image_id']);
+        return $this->hasOne(StorageFile::class, ['id' => 'image_id']);
     }
 
     /**
@@ -133,6 +133,6 @@ class ShopStore extends \skeeks\cms\models\Core
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::className(), ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::class, ['code' => 'site_code']);
     }
 }

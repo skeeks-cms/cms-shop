@@ -93,7 +93,7 @@ JS
 <? else: ?>
 
     <?= $form->field($model, 'shop_person_type_id')->label(\skeeks\cms\shop\Module::t('app', 'Type payer'))->widget(
-        \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
+        \skeeks\cms\widgets\formInputs\EditedSelect::class, [
         'items'           => \yii\helpers\ArrayHelper::map(
             \skeeks\cms\shop\models\ShopPersonType::find()->all(),
             "id",

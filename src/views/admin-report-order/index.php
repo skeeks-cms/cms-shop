@@ -23,13 +23,13 @@
         ]); ?>
     </div>
     <div class="col-md-3">
-        <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::classname(), [
+        <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::class, [
             //'displayFormat' => 'php:d-M-Y H:i:s',
             'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
         ]); ?>
     </div>
     <div class="col-md-3">
-        <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::classname(), [
+        <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::class, [
             //'displayFormat' => 'php:d-M-Y H:i:s',
             'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
         ]); ?>
