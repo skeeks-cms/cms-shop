@@ -20,66 +20,66 @@ use skeeks\cms\mail\helpers\Html;
 <?=
 \yii\grid\GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
-        'allModels' => $model->getShopProduct()->all()
+        'allModels' => $model->getShopProduct()->all(),
     ]),
-    'filterModel' => null,
-    'filterUrl' => \yii\helpers\Url::to('/', true),
-    'layout' => "{items}",
-    'columns' =>
+    'filterModel'  => null,
+    'filterUrl'    => \yii\helpers\Url::to('/', true),
+    'layout'       => "{items}",
+    'columns'      =>
         [
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::className(),
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
+                'value'  => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
                     if ($shopProduct->cmsContentElement->image) {
                         return Html::a(
                             Html::img($shopProduct->cmsContentElement->image->absoluteSrc, ['width' => 80])
                             , $shopProduct->cmsContentElement->absoluteUrl, [
-                            'target' => '_blank',
-                            'titla' => "Смотреть на сайте",
-                            'data-pjax' => 0
+                            'target'    => '_blank',
+                            'titla'     => "Смотреть на сайте",
+                            'data-pjax' => 0,
                         ]);
                     }
-                }
+                },
             ],
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \Yii::t('skeeks/shop/app', 'Product name'),
+                'class'  => \yii\grid\DataColumn::className(),
+                'label'  => \Yii::t('skeeks/shop/app', 'Product name'),
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
+                'value'  => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
                     if ($shopProduct->cmsContentElement->absoluteUrl) {
                         return Html::a($shopProduct->cmsContentElement->name,
                             $shopProduct->cmsContentElement->absoluteUrl, [
-                                'target' => '_blank',
-                                'titla' => "Смотреть на сайте",
-                                'data-pjax' => 0
+                                'target'    => '_blank',
+                                'titla'     => "Смотреть на сайте",
+                                'data-pjax' => 0,
                             ]);
                     } else {
                         return $shopProduct->cmsContentElement->name;
                     }
 
-                }
+                },
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::className(),
                 'attribute' => 'quantity',
-                'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
-                    return $shopProduct->quantity . " " . $shopProduct->measure->symbol_rus;
-                }
+                'value'     => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
+                    return $shopProduct->quantity." ".$shopProduct->measure->symbol_rus;
+                },
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \Yii::t('skeeks/shop/app', 'Price'),
+                'class'     => \yii\grid\DataColumn::className(),
+                'label'     => \Yii::t('skeeks/shop/app', 'Price'),
                 'attribute' => 'price',
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
-                    return (string) $shopProduct->baseProductPrice->money . "<br />";
-                }
+                'format'    => 'raw',
+                'value'     => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
+                    return (string)$shopProduct->baseProductPrice->money."<br />";
+                },
             ],
-        ]
+        ],
 ])
 ?>
 <?= Html::endTag('p'); ?>

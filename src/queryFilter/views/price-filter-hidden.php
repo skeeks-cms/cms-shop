@@ -17,7 +17,7 @@ $min = $handler->getMinValue();
 $max = $handler->getMaxValue();
 
 $val1 = $handler->from ? $handler->from : $min;
-$val2 = $handler->to? $handler->to : $max;
+$val2 = $handler->to ? $handler->to : $max;
 
 $fromId = \yii\helpers\Html::getInputId($handler, 'from');
 $toId = \yii\helpers\Html::getInputId($handler, 'to');
@@ -36,7 +36,7 @@ $toId = \yii\helpers\Html::getInputId($handler, 'to');
                 <?= $form->field($handler, 'from')
                     ->textInput([
                         'placeholder' => $min,
-                        'data-value' => 'sx-price-from'
+                        'data-value'  => 'sx-price-from',
                     ])
                     ->label('От');
                 ?>
@@ -45,7 +45,7 @@ $toId = \yii\helpers\Html::getInputId($handler, 'to');
                 <?= $form->field($handler, 'to')
                     ->textInput([
                         'placeholder' => $max,
-                        'data-value' => 'sx-price-to'
+                        'data-value'  => 'sx-price-to',
                     ])
                     ->label('До');
                 ?>
@@ -55,26 +55,26 @@ $toId = \yii\helpers\Html::getInputId($handler, 'to');
             <div class="row">
                 <div class="col-md-12" style="height: 40px;">
                     <? echo \yii\jui\Slider::widget([
-                        'clientEvents' => [
+                        'clientEvents'  => [
                             'change' => new \yii\web\JsExpression(<<<JS
                 function( event, ui ) {
                   $("[data-value=sx-price-from]").change();
                 }
 JS
-),
-                            'slide' => new \yii\web\JsExpression(<<<JS
+                            ),
+                            'slide'  => new \yii\web\JsExpression(<<<JS
                 function( event, ui ) {
                     $("[data-value=sx-price-from]").val(ui.values[ 0 ]);
                     $("[data-value=sx-price-to]").val(ui.values[ 1 ]);
                 }
 JS
-),
+                            ),
                         ],
                         'clientOptions' => [
-                            'range' =>  true,
-                            'min' => (float) $min,
-                            'max' => (float) $max,
-                            'values' => [(float) $val1, (float) $val2],
+                            'range'  => true,
+                            'min'    => (float)$min,
+                            'max'    => (float)$max,
+                            'values' => [(float)$val1, (float)$val2],
                         ],
                     ]); ?>
                 </div>

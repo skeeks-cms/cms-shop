@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150901_160601_create_table__shop_tax extends Migration
@@ -32,9 +31,9 @@ class m150901_160601_create_table__shop_tax extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'name' => $this->string(255)->notNull(),
+            'name'        => $this->string(255)->notNull(),
             'description' => $this->text(),
-            'code' => $this->string(50)->notNull(),
+            'code'        => $this->string(50)->notNull(),
 
             'site_code' => $this->string(15),
 
@@ -75,8 +74,8 @@ class m150901_160601_create_table__shop_tax extends Migration
         }
 
         $this->insert('{{%shop_tax}}', [
-            'name' => 'НДС',
-            'code' => 'NDS',
+            'name'      => 'НДС',
+            'code'      => 'NDS',
             'site_code' => $site_code,
         ]);
 

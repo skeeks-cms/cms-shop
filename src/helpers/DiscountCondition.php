@@ -50,10 +50,9 @@ class DiscountCondition extends Component
             }
 
             if ($rules = ArrayHelper::getValue($this->data, 'rules')) {
-                foreach ($rules as $ruledata)
-                {
+                foreach ($rules as $ruledata) {
                     $rulesTmp[] = new self([
-                        'data' => $ruledata,
+                        'data'                  => $ruledata,
                         'shopCmsContentElement' => $this->shopCmsContentElement,
                     ]);
                 }
@@ -65,8 +64,8 @@ class DiscountCondition extends Component
 
     public function getIsTrue()
     {
-        
-        
+
+
         if ($this->type == 'group') {
 
             if (!$this->rules) {
@@ -75,8 +74,7 @@ class DiscountCondition extends Component
 
             if ($this->rules_type == 'and' && $this->condition == 'equal') {
 
-                foreach ($this->rules as $rule)
-                {
+                foreach ($this->rules as $rule) {
                     if (!$rule->getIsTrue()) {
                         /*print_r($rule);die;*/
                         return false;
@@ -87,8 +85,7 @@ class DiscountCondition extends Component
 
             } elseif ($this->rules_type == 'or' && $this->condition == 'equal') {
 
-                foreach ($this->rules as $rule)
-                {
+                foreach ($this->rules as $rule) {
                     if ($rule->getIsTrue()) {
                         return true;
                     }

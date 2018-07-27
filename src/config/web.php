@@ -10,19 +10,19 @@ return [
         'admin' => [
             'dashboards' => [
                 'Shop' => [
-                    'skeeks\cms\shop\dashboards\ReportOrderDashboard'
-                ]
+                    'skeeks\cms\shop\dashboards\ReportOrderDashboard',
+                ],
             ],
         ],
 
 
         'urlManager' => [
             'rules' => [
-                '~shop-cart' => 'shop/cart',
+                '~shop-cart'                    => 'shop/cart',
                 '~shop-<_a:(checkout|payment)>' => 'shop/cart/<_a>',
-                '~shop-<_a:(finish)>' => 'shop/order/<_a>',
-                '~shop-order/<_a>' => 'shop/order/<_a>',
-            ]
+                '~shop-<_a:(finish)>'           => 'shop/order/<_a>',
+                '~shop-order/<_a>'              => 'shop/order/<_a>',
+            ],
         ],
     ],
 ];

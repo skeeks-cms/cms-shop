@@ -12,7 +12,7 @@ namespace skeeks\cms\shop\models;
  * @author Semenov Alexander <semenov@skeeks.com>
  * @deprecated
  */
-class ShopBasketProps extends ShopOrderItemProps
+class ShopBasketProperty extends ShopOrderItemProperty
 {
 
 }

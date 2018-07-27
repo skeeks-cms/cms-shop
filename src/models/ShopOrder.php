@@ -555,7 +555,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'reason_canceled'     => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
             'status_code'         => \Yii::t('skeeks/shop/app', 'Status'),
             'status_at'           => \Yii::t('skeeks/shop/app', 'Status At'),
-            'delivery_amount'      => \Yii::t('skeeks/shop/app', 'Price Delivery'),
+            'delivery_amount'     => \Yii::t('skeeks/shop/app', 'Price Delivery'),
             'allow_delivery'      => \Yii::t('skeeks/shop/app', 'Allow Delivery'),
             'allow_delivery_at'   => \Yii::t('skeeks/shop/app', 'Allow Delivery At'),
             'amount'              => \Yii::t('skeeks/shop/app', 'Price'),
@@ -806,7 +806,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return new Money($this->delivery_amount, $this->currency_code);
     }
-
 
 
     /**

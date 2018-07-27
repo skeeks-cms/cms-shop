@@ -8,15 +8,13 @@
 
 namespace skeeks\cms\shop\models;
 
-use Yii;
-
 /**
  * This is the model class for table "{{%shop_pay_system_person_type}}".
  *
- * @property integer $pay_system_id
- * @property integer $person_type_id
+ * @property integer        $pay_system_id
+ * @property integer        $person_type_id
  *
- * @property ShopPaySystem $paySystem
+ * @property ShopPaySystem  $paySystem
  * @property ShopPersonType $personType
  */
 class ShopPaySystemPersonType extends \yii\db\ActiveRecord
@@ -41,8 +39,8 @@ class ShopPaySystemPersonType extends \yii\db\ActiveRecord
                 ['pay_system_id', 'person_type_id'],
                 'unique',
                 'targetAttribute' => ['pay_system_id', 'person_type_id'],
-                'message' => 'The combination of Pay System ID and Person Type ID has already been taken.'
-            ]
+                'message'         => 'The combination of Pay System ID and Person Type ID has already been taken.',
+            ],
         ];
     }
 
@@ -52,7 +50,7 @@ class ShopPaySystemPersonType extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'pay_system_id' => \Yii::t('skeeks/shop/app', 'ID pay system'),
+            'pay_system_id'  => \Yii::t('skeeks/shop/app', 'ID pay system'),
             'person_type_id' => \Yii::t('skeeks/shop/app', 'ID of person'),
         ];
     }

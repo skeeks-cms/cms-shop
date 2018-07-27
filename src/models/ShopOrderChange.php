@@ -3,20 +3,19 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\Serialize;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_order_change}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $shop_order_id
- * @property string $type
- * @property string $data
+ * @property integer   $id
+ * @property integer   $created_by
+ * @property integer   $updated_by
+ * @property integer   $created_at
+ * @property integer   $updated_at
+ * @property integer   $shop_order_id
+ * @property string    $type
+ * @property string    $data
  *
  * @property ShopOrder $shopOrder
  */
@@ -41,27 +40,21 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     static public function types()
     {
         return [
-            self::ORDER_ADDED => \Yii::t('skeeks/shop/app', 'Create Order'),
-            self::ORDER_CANCELED => \Yii::t('skeeks/shop/app', 'Cancellations'),
+            self::ORDER_ADDED          => \Yii::t('skeeks/shop/app', 'Create Order'),
+            self::ORDER_CANCELED       => \Yii::t('skeeks/shop/app', 'Cancellations'),
             self::ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Changing status'),
-            self::ORDER_ALLOW_PAYMENT => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::ORDER_ALLOW_PAYMENT  => \Yii::t('skeeks/shop/app', 'Payment agreement'),
             self::ORDER_ALLOW_DELIVERY => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
-            self::ORDER_PAYED => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
+            self::ORDER_PAYED          => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
         ];
     }
-
-    static public function typeMessages()
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
     {
-        return [
-            self::ORDER_ADDED => \Yii::t('skeeks/shop/app', 'The order created'),
-            self::ORDER_CANCELED => \Yii::t('skeeks/shop/app', 'Order cancelled. The reason: "{reason canceled}"'),
-            self::ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Status changed to: "{status}"'),
-            self::ORDER_ALLOW_PAYMENT => \Yii::t('skeeks/shop/app', 'Payment agreement'),
-            self::ORDER_ALLOW_DELIVERY => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
-            self::ORDER_PAYED => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
-        ];
+        return '{{%shop_order_change}}';
     }
-
     /**
      * @return string
      */
@@ -70,25 +63,27 @@ class ShopOrderChange extends \skeeks\cms\models\Core
         $message = ArrayHelper::getValue(self::typeMessages(), $this->type);
         return \Yii::t('skeeks/shop/app', $message, $this->data);
     }
-
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
+    static public function typeMessages()
     {
-        return '{{%shop_order_change}}';
+        return [
+            self::ORDER_ADDED          => \Yii::t('skeeks/shop/app', 'The order created'),
+            self::ORDER_CANCELED       => \Yii::t('skeeks/shop/app', 'Order cancelled. The reason: "{reason canceled}"'),
+            self::ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Status changed to: "{status}"'),
+            self::ORDER_ALLOW_PAYMENT  => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
+            self::ORDER_PAYED          => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
+        ];
     }
-
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
 
             Serialize::className() =>
                 [
-                    'class' => Serialize::className(),
+                    'class'  => Serialize::className(),
                     "fields" => [
-                        "data"
-                    ]
+                        "data",
+                    ],
                 ],
 
         ]);
@@ -103,7 +98,7 @@ class ShopOrderChange extends \skeeks\cms\models\Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_order_id'], 'integer'],
             [['shop_order_id', 'type'], 'required'],
             [['data'], 'safe'],
-            [['type'], 'string', 'max' => 255]
+            [['type'], 'string', 'max' => 255],
         ];
     }
 
@@ -113,14 +108,14 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
             'shop_order_id' => \Yii::t('skeeks/shop/app', 'Shop Order ID'),
-            'type' => \Yii::t('skeeks/shop/app', 'Type'),
-            'data' => \Yii::t('skeeks/shop/app', 'Data'),
+            'type'          => \Yii::t('skeeks/shop/app', 'Type'),
+            'data'          => \Yii::t('skeeks/shop/app', 'Data'),
         ];
     }
 

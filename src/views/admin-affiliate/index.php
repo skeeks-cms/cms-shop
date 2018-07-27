@@ -13,40 +13,40 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'columns' =>
+    'columns'         =>
         [
             'id',
 
             [
                 'attribute' => 'site_code',
-                'class' => \skeeks\cms\grid\SiteColumn::className(),
+                'class'     => \skeeks\cms\grid\SiteColumn::className(),
             ],
 
             [
                 'attribute' => 'user_id',
-                'class' => \skeeks\cms\grid\UserColumnData::className(),
+                'class'     => \skeeks\cms\grid\UserColumnData::className(),
             ],
 
             [
                 'attribute' => 'active',
-                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
             ],
 
             'plan_id',
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className()
-            ]
-        ]
+                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+            ],
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

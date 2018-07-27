@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\paySystems;
 
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopOrder;
-use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -24,15 +23,9 @@ class PayPalPaySystem extends PaySystemHandlerComponent
 {
     public $receiverEmail = 'semenov-facilitator@skeeks.com';
     public $isLive = true;
-
-    /**
-     * @return string
-     */
-    public function getPayPalUrl()
-    {
-        return $this->isLive ? 'https://www.paypal.com/cgi-bin/websc' : 'https://www.sandbox.paypal.com/cgi-bin/websc';
-    }
-
+    private $debug = true;
+    private $service;
+    private $projectName = 'test';
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -43,7 +36,13 @@ class PayPalPaySystem extends PaySystemHandlerComponent
             'name' => \Yii::t('skeeks/shop/app', 'PayPal'),
         ]);
     }
-
+    /**
+     * @return string
+     */
+    public function getPayPalUrl()
+    {
+        return $this->isLive ? 'https://www.paypal.com/cgi-bin/websc' : 'https://www.sandbox.paypal.com/cgi-bin/websc';
+    }
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
@@ -51,22 +50,19 @@ class PayPalPaySystem extends PaySystemHandlerComponent
             [['receiverEmail'], 'string'],
         ]);
     }
-
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'receiverEmail' => \Yii::t('skeeks/shop/app', 'PayPal account email'),
-            'isLive' => \Yii::t('skeeks/shop/app', 'Is live'),
+            'isLive'        => \Yii::t('skeeks/shop/app', 'Is live'),
         ]);
     }
-
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
             'isLive' => 'If is live used url: https://www.paypal.com/cgi-bin/websc else https://www.sandbox.paypal.com/cgi-bin/websc',
         ]);
     }
-
     /**
      * @return \skeeks\cms\shop\paySystems\robokassa\Merchant
      * @throws \yii\base\InvalidConfigException
@@ -80,14 +76,13 @@ class PayPalPaySystem extends PaySystemHandlerComponent
             'baseUrl',
             'sMerchantLogin',
             'sMerchantPass1',
-            'sMerchantPass2'
+            'sMerchantPass2',
         ]), [
             'class' => '\skeeks\cms\shop\paySystems\robokassa\Merchant',
         ]));
 
         return $merchant;
     }
-
     /**
      * @param ShopOrder $shopOrder
      * @return $this
@@ -100,17 +95,11 @@ class PayPalPaySystem extends PaySystemHandlerComponent
             'model' => $shopOrder
         ], $this);*/
     }
-
     public function renderConfigForm(ActiveForm $activeForm)
     {
         echo $activeForm->field($this, 'isLive')->checkbox();
         echo $activeForm->field($this, 'receiverEmail')->textInput();
     }
-
-    private $debug = true;
-    private $service;
-    private $projectName = 'test';
-
     /**
      * @throws Exception
      */
@@ -135,7 +124,7 @@ class PayPalPaySystem extends PaySystemHandlerComponent
         $raw_post_data = file_get_contents('php://input');
 
         $raw_post_array = explode('&', $raw_post_data);
-        $myPost = array();
+        $myPost = [];
         foreach ($raw_post_array as $keyval) {
             $keyval = explode('=', $keyval);
             if (count($keyval) == 2) {
@@ -195,7 +184,33 @@ class PayPalPaySystem extends PaySystemHandlerComponent
         }
         /**/
     }
+    public function getPaymentType($rawPostData)
+    {
+        $post = $this->getPostFromRawData($rawPostData);
 
+        if (isset($post['subscr_id'])) {
+            return "subscr_payment";
+        } else {
+            return "web_accept";
+        }
+    }
+    /**
+     * @param $raw_post_data
+     * @return array
+     */
+    public function getPostFromRawData($raw_post_data)
+    {
+        $raw_post_array = explode('&', $raw_post_data);
+        $myPost = [];
+        foreach ($raw_post_array as $keyval) {
+            $keyval = explode('=', $keyval);
+            if (count($keyval) == 2) {
+                $myPost[$keyval[0]] = urldecode($keyval[1]);
+            }
+        }
+
+        return $myPost;
+    }
     private function sendRequest($paypal_url, $req)
     {
         $debug = $this->debug;
@@ -221,40 +236,11 @@ class PayPalPaySystem extends PaySystemHandlerComponent
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
 
         //передаем заголовок, указываем User-Agent - название нашего приложения. Необходимо для работы в live режиме
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', 'User-Agent: ' . $this->projectName));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Connection: Close', 'User-Agent: '.$this->projectName]);
 
         $res = curl_exec($ch);
         curl_close($ch);
 
         return $res;
-    }
-
-    public function getPaymentType($rawPostData)
-    {
-        $post = $this->getPostFromRawData($rawPostData);
-
-        if (isset($post['subscr_id'])) {
-            return "subscr_payment";
-        } else {
-            return "web_accept";
-        }
-    }
-
-    /**
-     * @param $raw_post_data
-     * @return array
-     */
-    public function getPostFromRawData($raw_post_data)
-    {
-        $raw_post_array = explode('&', $raw_post_data);
-        $myPost = array();
-        foreach ($raw_post_array as $keyval) {
-            $keyval = explode('=', $keyval);
-            if (count($keyval) == 2) {
-                $myPost[$keyval[0]] = urldecode($keyval[1]);
-            }
-        }
-
-        return $myPost;
     }
 }

@@ -1,10 +1,8 @@
 <?php
 
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-use skeeks\cms\models\Tree;
-use skeeks\cms\modules\admin\widgets\Pjax;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
@@ -82,8 +80,8 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 <? endif; ?>
 
 <?php $form = $action->beginActiveForm([
-    'id' => 'sx-dynamic-form',
-    'enableAjaxValidation' => false,
+    'id'                     => 'sx-dynamic-form',
+    'enableAjaxValidation'   => false,
     'enableClientValidation' => false,
 ]); ?>
 
@@ -137,45 +135,45 @@ JS
 
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-main', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-seo', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
-    'form' => $form,
+    'form'         => $form,
     'contentModel' => $contentModel,
-    'model' => $model,
+    'model'        => $model,
 ]); ?>
 
 
@@ -231,7 +229,7 @@ JS
         </div>
     <? else: ?>
         <?= $form->fieldSelect($shopProduct, 'product_type',
-        \skeeks\cms\shop\models\ShopProduct::possibleProductTypes()); ?>
+            \skeeks\cms\shop\models\ShopProduct::possibleProductTypes()); ?>
     <? endif; ?>
 
 
@@ -243,30 +241,33 @@ JS
 
 
         <?= $form->field($model, 'parent_content_element_id')->widget(
-                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+            \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
-                    'content_id' => $shopContent->childrenContent->id,
-                    'dialogRoute' => ['/shop/admin-cms-content-element', 'DynamicModel' => [
-                        'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS]
-                    ]]
+                'content_id'  => $shopContent->childrenContent->id,
+                'dialogRoute' => [
+                    '/shop/admin-cms-content-element',
+                    'DynamicModel' => [
+                        'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS],
+                    ],
+                ],
             ]
         )
-                ->label('Общий товар с предложениями');
+            ->label('Общий товар с предложениями');
         ?>
     </div>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Main prices')
+        'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
     ]) ?>
 
     <!--<div class="row">
         <div class="col-md-3">
-            <?/*= $form->field($shopProduct, 'purchasing_price')->textInput(); */?>
+            <? /*= $form->field($shopProduct, 'purchasing_price')->textInput(); */ ?>
         </div>
         <div class="col-md-2">
-            <?/*= $form->fieldSelect($shopProduct, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
+            <? /*= $form->fieldSelect($shopProduct, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
                 \Yii::$app->money->activeCurrencies, 'code', 'code'
-            )); */?>
+            )); */ ?>
         </div>
     </div>-->
 
@@ -286,7 +287,7 @@ JS
             <label>&nbsp;</label>
             <p>
                 <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
-                    'productPrice' => $shopProduct->baseProductPrice
+                    'productPrice' => $shopProduct->baseProductPrice,
                 ]) ?>
             </p>
         </div>
@@ -304,20 +305,20 @@ JS
             <div class="row">
                 <div class="col-md-3">
                     <label><?= $productPrice->typePrice->name; ?></label>
-                    <?= Html::textInput("prices[" . $productPrice->typePrice->id . "][price]", $productPrice->price, [
-                        'class' => 'form-control'
+                    <?= Html::textInput("prices[".$productPrice->typePrice->id."][price]", $productPrice->price, [
+                        'class' => 'form-control',
                     ]); ?>
                 </div>
                 <div class="col-md-2">
                     <label>Валюта</label>
 
                     <?= \skeeks\widget\chosen\Chosen::widget([
-                        'name' => "prices[" . $productPrice->typePrice->id . "][currency_code]",
-                        'value' => $productPrice->currency_code,
+                        'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
+                        'value'         => $productPrice->currency_code,
                         'allowDeselect' => false,
-                        'items' => \yii\helpers\ArrayHelper::map(
+                        'items'         => \yii\helpers\ArrayHelper::map(
                             \Yii::$app->money->activeCurrencies, 'code', 'code'
-                        )
+                        ),
                     ]) ?>
                 </div>
 
@@ -325,7 +326,7 @@ JS
                     <label>&nbsp;</label>
                     <p>
                         <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
-                            'productPrice' => $productPrice
+                            'productPrice' => $productPrice,
                         ]); ?>
                     </p>
                 </div>
@@ -336,7 +337,7 @@ JS
     <? endif; ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'The number and account')
+        'content' => \Yii::t('skeeks/shop/app', 'The number and account'),
     ]); ?>
 
     <div class="row">
@@ -359,7 +360,7 @@ JS
             <div class="col-md-12" style="margin-bottom: 20px;">
                 <div style="text-align: center;">
                     <?= \skeeks\cms\shop\widgets\admin\PropductQuantityChangeAdminWidget::widget([
-                        'product' => $shopProduct
+                        'product' => $shopProduct,
                     ]); ?>
                 </div>
             </div>
@@ -369,36 +370,36 @@ JS
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Weight and size')
+        'content' => \Yii::t('skeeks/shop/app', 'Weight and size'),
     ]); ?>
 
     <div class="row">
         <div class="col-md-3">
             <?= $form->field($shopProduct, 'weight')->textInput([
-                'type' => 'number'
+                'type' => 'number',
             ]); ?>
         </div>
         <div class="col-md-3">
             <?= $form->field($shopProduct, 'length')->textInput([
-                'type' => 'number'
+                'type' => 'number',
             ]); ?>
 
         </div>
         <div class="col-md-3">
             <?= $form->field($shopProduct, 'width')->textInput([
-                'type' => 'number'
+                'type' => 'number',
             ]); ?>
         </div>
         <div class="col-md-3">
             <?= $form->field($shopProduct, 'height')->textInput([
-                'type' => 'number'
+                'type' => 'number',
             ]); ?>
         </div>
     </div>
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Setting prices')
+        'content' => \Yii::t('skeeks/shop/app', 'Setting prices'),
     ]); ?>
 
     <div class="row">
@@ -414,7 +415,7 @@ JS
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Options')
+        'content' => \Yii::t('skeeks/shop/app', 'Options'),
     ]); ?>
 
     <?= $form->fieldRadioListBoolean($shopProduct, 'quantity_trace'); ?>
@@ -431,30 +432,30 @@ JS
             <?= \yii\bootstrap\Alert::widget([
                 'options' =>
                     [
-                        'class' => 'alert-warning'
+                        'class' => 'alert-warning',
                     ],
-                'body' => \Yii::t('skeeks/shop/app', 'Management will be available after saving')
+                'body'    => \Yii::t('skeeks/shop/app', 'Management will be available after saving'),
             ]); ?>
         <? else: ?>
 
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                'label' => $shopContent->childrenContent->name,
+                'label'       => $shopContent->childrenContent->name,
                 'parentModel' => $model,
-                'relation' => [
-                    'content_id' => $shopContent->childrenContent->id,
-                    'parent_content_element_id' => $model->id
+                'relation'    => [
+                    'content_id'                => $shopContent->childrenContent->id,
+                    'parent_content_element_id' => $model->id,
                 ],
 
                 'sort' => [
                     'defaultOrder' =>
                         [
-                            'priority' => 'published_at'
-                        ]
+                            'priority' => 'published_at',
+                        ],
                 ],
 
                 'controllerRoute' => '/shop/admin-cms-content-element',
                 'gridViewOptions' => [
-                    'columns' => (array)\skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($shopContent->childrenContent)
+                    'columns' => (array)\skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($shopContent->childrenContent),
                 ],
             ]); ?>
 
@@ -477,9 +478,9 @@ JS
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-            'permissionName' => $model->permissionName,
-            'permissionDescription' => \Yii::t('skeeks/shop/app', 'Access to this member') . ': ' . $model->name,
-            'label' => \Yii::t('skeeks/shop/app', 'Access to this member'),
+            'permissionName'        => $model->permissionName,
+            'permissionDescription' => \Yii::t('skeeks/shop/app', 'Access to this member').': '.$model->name,
+            'label'                 => \Yii::t('skeeks/shop/app', 'Access to this member'),
         ]); ?>
         <?= $form->fieldSetEnd() ?>
     <? endif; ?>
@@ -488,13 +489,14 @@ JS
 <? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
         '!=',
         'id',
-        $shopContent->childrenContent->id
-    ])->all()) : ?>
-    <?print_r($shopContent->children_content_id);?>
+        $shopContent->childrenContent->id,
+    ])->all()
+) : ?>
+    <? print_r($shopContent->children_content_id); ?>
     <? $childContents = $model->cmsContent->getChildrenContents()->andWhere([
         '!=',
         'id',
-        $shopContent->childrenContent->id
+        $shopContent->childrenContent->id,
     ])->all(); ?>
 
     <? foreach ($childContents as $childContent) : ?>
@@ -505,31 +507,31 @@ JS
             <?= \yii\bootstrap\Alert::widget([
                 'options' =>
                     [
-                        'class' => 'alert-warning'
+                        'class' => 'alert-warning',
                     ],
-                'body' => \Yii::t('skeeks/shop/app', 'Management will be available after saving')
+                'body'    => \Yii::t('skeeks/shop/app', 'Management will be available after saving'),
             ]); ?>
         <? else: ?>
 
             <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                'label' => $childContent->name,
-                'namespace' => md5($model->className() . $childContent->id),
+                'label'       => $childContent->name,
+                'namespace'   => md5($model->className().$childContent->id),
                 'parentModel' => $model,
-                'relation' => [
-                    'content_id' => $childContent->id,
-                    'parent_content_element_id' => $model->id
+                'relation'    => [
+                    'content_id'                => $childContent->id,
+                    'parent_content_element_id' => $model->id,
                 ],
 
                 'sort' => [
                     'defaultOrder' =>
                         [
-                            'priority' => 'published_at'
-                        ]
+                            'priority' => 'published_at',
+                        ],
                 ],
 
                 'controllerRoute' => '/shop/admin-cms-content-element',
                 'gridViewOptions' => [
-                    'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent)
+                    'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
                 ],
             ]); ?>
 

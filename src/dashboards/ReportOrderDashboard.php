@@ -8,14 +8,9 @@
 
 namespace skeeks\cms\shop\dashboards;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\base\WidgetRenderable;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\modules\admin\base\AdminDashboardWidget;
 use skeeks\cms\modules\admin\base\AdminDashboardWidgetRenderable;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
 /**
@@ -24,16 +19,14 @@ use yii\widgets\ActiveForm;
  */
 class ReportOrderDashboard extends AdminDashboardWidget
 {
+    public $viewFile = 'report-order';
+    public $name;
     static public function descriptorConfig()
     {
         return array_merge(parent::descriptorConfig(), [
-            'name' => \Yii::t('skeeks/shop/app', 'Reports on orders')
+            'name' => \Yii::t('skeeks/shop/app', 'Reports on orders'),
         ]);
     }
-
-    public $viewFile = 'report-order';
-    public $name;
-
     public function init()
     {
         parent::init();

@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150927_141201_create_table__shop_delivery extends Migration
@@ -37,24 +36,24 @@ class m150927_141201_create_table__shop_delivery extends Migration
             'site_id' => $this->integer()->notNull(),
 
             'period_from' => $this->integer(),
-            'period_to' => $this->integer(),
+            'period_to'   => $this->integer(),
             'period_type' => $this->string(1),
 
             'weight_from' => $this->integer(),
-            'weight_to' => $this->integer(),
+            'weight_to'   => $this->integer(),
 
-            'order_price_from' => $this->decimal(18, 2),
-            'order_price_to' => $this->decimal(18, 2),
+            'order_price_from'    => $this->decimal(18, 2),
+            'order_price_to'      => $this->decimal(18, 2),
             'order_currency_code' => $this->string(3),
-            'active' => $this->string(1)->notNull()->defaultValue('Y'),
+            'active'              => $this->string(1)->notNull()->defaultValue('Y'),
 
-            'price' => $this->decimal(18, 2)->notNull(),
+            'price'         => $this->decimal(18, 2)->notNull(),
             'currency_code' => $this->string(3)->notNull(),
 
-            'priority' => $this->integer()->notNull()->defaultValue(100),
+            'priority'    => $this->integer()->notNull()->defaultValue(100),
             'description' => $this->text(),
-            'logo_id' => $this->integer(),
-            'store' => $this->text(),
+            'logo_id'     => $this->integer(),
+            'store'       => $this->text(),
 
         ], $tableOptions);
 

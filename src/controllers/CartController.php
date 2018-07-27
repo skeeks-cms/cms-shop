@@ -134,13 +134,14 @@ class CartController extends Controller
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
-            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
             $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
         }
     }
+
 
     /**
      * Removing the basket position
@@ -155,7 +156,7 @@ class CartController extends Controller
         if ($rr->isRequestAjaxPost()) {
             $basket_id = \Yii::$app->request->post('basket_id');
 
-            $shopBasket = ShopBasket::find()->where(['id' => $basket_id])->one();
+            $shopBasket = ShopOrderItem::find()->where(['id' => $basket_id])->one();
             if ($shopBasket) {
                 if ($shopBasket->delete()) {
                     $rr->success = true;
@@ -163,8 +164,8 @@ class CartController extends Controller
                 }
             }
 
-            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
+            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -182,12 +183,12 @@ class CartController extends Controller
         $rr = new RequestResponse();
 
         if ($rr->isRequestAjaxPost()) {
-            foreach (\Yii::$app->shop->cart->shopBaskets as $basket) {
+            foreach (\Yii::$app->shop->cart->shopOrder->shopOrderItems as $basket) {
                 $basket->delete();
             }
 
-            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
+            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             $rr->success = true;
             $rr->message = "";
 
@@ -214,7 +215,7 @@ class CartController extends Controller
             /**
              * @var $shopBasket ShopBasket
              */
-            $shopBasket = ShopBasket::find()->where(['id' => $basket_id])->one();
+            $shopBasket = ShopOrderItem::find()->where(['id' => $basket_id])->one();
             if ($shopBasket) {
                 if ($quantity > 0) {
                     $product = $shopBasket->product;
@@ -240,8 +241,8 @@ class CartController extends Controller
 
             }
 
-            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
-            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
+            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -277,7 +278,7 @@ class CartController extends Controller
                 \Yii::$app->shop->cart->save();
                 \Yii::$app->shop->cart->recalculate()->save();
 
-                $rr->data = \Yii::$app->shop->cart->jsonSerialize();
+                $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Your coupon was successfully deleted');
 
@@ -325,7 +326,7 @@ class CartController extends Controller
                 \Yii::$app->shop->cart->save();
                 \Yii::$app->shop->cart->recalculate()->save();
 
-                $rr->data = \Yii::$app->shop->cart->jsonSerialize();
+                $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Coupon successfully installed');
 
@@ -340,302 +341,4 @@ class CartController extends Controller
         }
     }
 
-
-    /**
-     * TODO: @deprecated
-     * Обнолвение данных покупателя
-     * @return array|\yii\web\Response
-     */
-    public function actionUpdateBuyer()
-    {
-        $rr = new RequestResponse();
-
-        if ($rr->isRequestAjaxPost()) {
-            $buyerId = \Yii::$app->request->post('buyer');
-            $buyer = null;
-
-            if (strpos($buyerId, '-') === false) {
-                /**
-                 * @var $buyer ShopBuyer
-                 * @var $shopPersonType ShopPersonType
-                 */
-                $buyer = ShopBuyer::findOne($buyerId);
-            } else {
-                $shopPersonTypeId = explode("-", $buyerId);
-                $shopPersonTypeId = $shopPersonTypeId[1];
-
-                $shopPersonType = ShopPersonType::findOne($shopPersonTypeId);
-
-            }
-
-            if ($buyer) {
-                \Yii::$app->shop->cart->buyer_id = $buyer->id;
-                \Yii::$app->shop->cart->person_type_id = $buyer->shopPersonType->id;
-            } else {
-                if ($shopPersonType) {
-                    \Yii::$app->shop->cart->person_type_id = $shopPersonType->id;
-                    \Yii::$app->shop->cart->buyer_id = null;
-                }
-            }
-
-            \Yii::$app->shop->cart->save();
-            \Yii::$app->shop->cart->link('site', \Yii::$app->cms->site);
-
-            $rr->message = "";
-            $rr->success = true;
-
-
-            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
-            return (array)$rr;
-        } else {
-            return $this->goBack();
-        }
-    }
-
-
-    /**
-     * TODO: @deprecated
-     *
-     * Создание заказа
-     * @return array|\yii\web\Response
-     */
-    public function actionCreateOrder()
-    {
-        $rr = new RequestResponse();
-
-        if ($rr->isRequestAjaxPost()) {
-            try {
-                $fuser = \Yii::$app->shop->cart;
-
-                if (!$fuser->shopBaskets) {
-                    throw new Exception(\Yii::t('skeeks/shop/app', 'Your basket is empty'));
-                }
-
-                if ($fuser->load(\Yii::$app->request->post()) && $fuser->save()) {
-                    $rr->success = true;
-                    $rr->message = "";
-
-                    $fuser->scenario = ShopFuser::SCENARIO_CREATE_ORDER;
-
-                    if ($fuser->validate()) {
-                        $order = ShopOrder::createOrderByFuser($fuser);
-
-                        if (!$order->isNewRecord) {
-                            $rr->message = \Yii::t('skeeks/shop/app', 'The order #{order_id} created successfully',
-                                ['order_id' => $order->id]);
-                            $rr->success = true;
-                            $rr->redirect = Url::to(['/shop/order/view', 'id' => $order->id]);
-                            $rr->data = [
-                                'order' => $order,
-                            ];
-
-
-                        } else {
-                            throw new Exception(\Yii::t('skeeks/shop/app',
-                                    'Incorrect data of the new order').": ".array_shift($order->getFirstErrors()));
-                        }
-
-                    } else {
-                        throw new Exception(\Yii::t('skeeks/shop/app',
-                                'Not enogh data for ordering').": ".array_shift($fuser->getFirstErrors()));
-                    }
-
-                } else {
-                    throw new Exception(\Yii::t('skeeks/shop/app',
-                            'Not enogh data for ordering').": ".array_shift($fuser->getFirstErrors()));
-                }
-
-            } catch (Exception $e) {
-                $rr->message = $e->getMessage();
-                $rr->success = false;
-            }
-
-
-            $rr->data = \Yii::$app->shop->cart->jsonSerialize();
-            return (array)$rr;
-        } else {
-            return $this->goBack();
-        }
-    }
-
-
-    /**
-     * TODO: @deprecated
-     *
-     * Процесс отправки формы
-     * @return array
-     */
-    public function actionShopPersonTypeSubmit()
-    {
-        $rr = new RequestResponse();
-
-        try {
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-                if (\Yii::$app->request->post('shop_person_type_id')) {
-                    $shop_person_type_id = \Yii::$app->request->post('shop_person_type_id');
-                    $shop_buyer_id = \Yii::$app->request->post('shop_buyer_id');
-
-                    /**
-                     * @var $shopPersonType ShopPersonType
-                     */
-                    $modelBuyer = ShopBuyer::findOne($shop_buyer_id);
-                    $shopPersonType = ShopPersonType::find()->active()->andWhere(['id' => $shop_person_type_id])->one();
-                    if (!$shopPersonType) {
-                        throw new Exception(\Yii::t('skeeks/shop/app',
-                            'This payer is disabled or deleted. Refresh the page.'));
-                    }
-
-                    if (!$modelBuyer) {
-                        $modelBuyer = $shopPersonType->createModelShopBuyer();
-                    }
-
-                    $validateModel = $modelBuyer->relatedPropertiesModel;
-
-                    if ($validateModel->load(\Yii::$app->request->post()) && $validateModel->validate()) {
-                        $modelBuyerName = [];
-
-                        //Проверка свойств
-                        foreach ($validateModel->toArray($validateModel->attributes()) as $code => $value) {
-                            /**
-                             * @var $property ShopPersonTypeProperty
-                             */
-                            $property = $validateModel->getRelatedProperty($code);
-                            if ($property->is_buyer_name == Cms::BOOL_Y) {
-                                $modelBuyerName[] = $value;
-                            }
-
-                            if ($property->is_user_email == Cms::BOOL_Y) {
-                                $userEmail = $value;
-                            }
-
-                            if ($property->is_user_name == Cms::BOOL_Y) {
-                                $userName = $value;
-                            }
-
-                            if ($property->is_user_username == Cms::BOOL_Y) {
-                                $userUsername = $value;
-                            }
-
-                            if ($property->is_user_phone == Cms::BOOL_Y) {
-                                $userPhone = $value;
-                            }
-                        }
-
-                        //Нужно создать польозвателя
-                        if (\Yii::$app->user->isGuest) {
-
-                            if (!$userEmail) {
-                                throw new Exception(\Yii::t('skeeks/shop/app', 'Unknown email address user'));
-                            }
-
-                            if ($userEmail) {
-                                if ($userExist = CmsUser::find()->where(['email' => $userEmail])->one()) {
-                                    throw new Exception(\Yii::t('skeeks/shop/app',
-                                        'In our database, there are already a user with this email. Login to your account, or enter a different email address.'));
-                                }
-                            }
-
-                            $newUser = new SignupForm();
-                            $newUser->scenario = SignupForm::SCENARION_ONLYEMAIL;
-                            $newUser->email = $userEmail;
-
-                            if (!$user = $newUser->signup()) {
-                                throw new Exception(\Yii::t('skeeks/shop/app', 'Do not create a user profile.'));
-                            }
-
-                            if ($userName) {
-                                $user->name = $userName;
-                            }
-
-                            //Авторизация пользователя
-                            \Yii::$app->user->login($user, 0);
-
-                        }
-
-
-                        $modelBuyer->name = $modelBuyerName ? implode(", ",
-                            $modelBuyerName) : $shopPersonType->name." от (".\Yii::$app->formatter->asDate(time(),
-                                'medium').")";
-                        $modelBuyer->cms_user_id = \Yii::$app->user->identity->id;
-                        $modelBuyer->shop_person_type_id = $shopPersonType->id;
-
-                        if (!$modelBuyer->save()) {
-                            throw new Exception(\Yii::t('skeeks/shop/app', 'The data for the buyer are not saved.'));
-                        }
-
-                        $validateModel->save();
-
-                        \Yii::$app->shop->cart->buyer_id = $modelBuyer->id;
-                        \Yii::$app->shop->cart->person_type_id = $modelBuyer->shopPersonType->id;
-
-                        \Yii::$app->shop->cart->save();
-
-                        $rr->success = true;
-                        $rr->message = \Yii::t('skeeks/shop/app', 'Successfully sent');
-
-                    } else {
-                        throw new Exception(\Yii::t('skeeks/shop/app',
-                            'Check the correctness of filling the form fields'));
-                    }
-
-
-                }
-            }
-        } catch (\Exception $e) {
-            $rr->success = false;
-            $rr->message = $e->getMessage();
-        }
-
-        return (array)$rr;
-    }
-
-    /**
-     * TODO: @deprecated
-     *
-     * Валидация данных с формы
-     * @return array
-     */
-    public function actionShopPersonTypeValidate()
-    {
-        $rr = new RequestResponse();
-
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            if (\Yii::$app->request->post('shop_person_type_id')) {
-                $shop_person_type_id = \Yii::$app->request->post('shop_person_type_id');
-
-                /**
-                 * @var $shopPersonType ShopPersonType
-                 */
-                $shopPersonType = ShopPersonType::find()->active()->andWhere(['id' => $shop_person_type_id])->one();
-                if (!$shopPersonType) {
-                    $rr->message = \Yii::t('skeeks/shop/app', 'This payer is disabled or deleted. Refresh the page.');
-                    $rr->success = false;
-                    return $rr;
-                }
-
-                $modelHasRelatedProperties = $shopPersonType->createModelShopBuyer();
-
-                if (method_exists($modelHasRelatedProperties, "createPropertiesValidateModel")) {
-                    $model = $modelHasRelatedProperties->createPropertiesValidateModel();
-                } else {
-                    $model = $modelHasRelatedProperties->getRelatedPropertiesModel();
-                }
-
-                return $rr->ajaxValidateForm($model);
-            }
-        }
-    }
-
-
-    /**
-     * TODO: @deprecated
-     *
-     * @return string
-     */
-    public function actionPayment()
-    {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'Choose payment method').' | '.\Yii::t('skeeks/shop/app',
-                'Shop');
-        return $this->render($this->action->id);
-    }
 }

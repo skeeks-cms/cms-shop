@@ -8,37 +8,37 @@
 return [
 
     [
-        'class' => \yii\grid\DataColumn::className(),
-        'value' => function ($model) {
+        'class'  => \yii\grid\DataColumn::className(),
+        'value'  => function ($model) {
             $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
             $basePrice = $shopProduct->baseProductPrice;
 
 
-            return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> ' . \Yii::t('app',
+            return \yii\helpers\Html::a('<i class="glyphicon glyphicon-circle-arrow-left"></i> '.\Yii::t('app',
                     'Choose'), $model->id, [
-                'class' => 'btn btn-primary sx-row-action',
-                'onclick' => 'sx.SelectCmsElement.submit(' . \yii\helpers\Json::encode(array_merge($model->toArray(), [
-                        'url' => $model->url,
-                        'basePrice' => $basePrice,
+                'class'     => 'btn btn-primary sx-row-action',
+                'onclick'   => 'sx.SelectCmsElement.submit('.\yii\helpers\Json::encode(array_merge($model->toArray(), [
+                        'url'           => $model->url,
+                        'basePrice'     => $basePrice,
                         'basePriceType' => $basePrice->typePrice,
-                        'product' => $shopProduct,
-                        'measure' => $shopProduct->measure
-                    ])) . '); return false;',
-                'data-pjax' => 0
+                        'product'       => $shopProduct,
+                        'measure'       => $shopProduct->measure,
+                    ])).'); return false;',
+                'data-pjax' => 0,
             ]);
         },
-        'format' => 'raw'
+        'format' => 'raw',
     ],
 
 
     [
-        'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'class'     => \yii\grid\DataColumn::className(),
+        'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
             return $model->cmsContent->name;
         },
-        'format' => 'raw',
+        'format'    => 'raw',
         'attribute' => 'content_id',
-        'filter' => \Yii::$app->shop->getArrayForSelectElement()
+        'filter'    => \Yii::$app->shop->getArrayForSelectElement(),
     ],
 
 
@@ -59,8 +59,8 @@ return [
     //['class' => \skeeks\cms\grid\UpdatedByColumn::className()],
 
     [
-        'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'class'     => \yii\grid\DataColumn::className(),
+        'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
             if (!$model->cmsTree) {
                 return null;
             }
@@ -70,7 +70,7 @@ return [
             if ($model->cmsTree->parents) {
                 foreach ($model->cmsTree->parents as $parent) {
                     if ($parent->isRoot()) {
-                        $path[] = "[" . $parent->site->name . "] " . $parent->name;
+                        $path[] = "[".$parent->site->name."] ".$parent->name;
                     } else {
                         $path[] = $parent->name;
                     }
@@ -79,14 +79,14 @@ return [
             $path = implode(" / ", $path);
             return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
         },
-        'format' => 'raw',
-        'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
-        'attribute' => 'tree_id'
+        'format'    => 'raw',
+        'filter'    => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
+        'attribute' => 'tree_id',
     ],
 
     [
-        'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'class'  => \yii\grid\DataColumn::className(),
+        'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
             $result = [];
 
             if ($model->cmsContentElementTrees) {
@@ -102,7 +102,7 @@ return [
 
         },
         'format' => 'raw',
-        'label' => \Yii::t('app', 'Additional sections'),
+        'label'  => \Yii::t('app', 'Additional sections'),
     ],
 
     [
@@ -111,32 +111,32 @@ return [
         'value' => function (\skeeks\cms\models\CmsContentElement $model) {
             $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
             if ($shopProduct) {
-                return (string) $shopProduct->baseProductPrice->money;
+                return (string)$shopProduct->baseProductPrice->money;
             }
 
             return null;
-        }
+        },
     ],
 
     [
         'attribute' => 'active',
-        'class' => \skeeks\cms\grid\BooleanColumn::className()
+        'class'     => \skeeks\cms\grid\BooleanColumn::className(),
     ],
 
     [
-        'class' => \yii\grid\DataColumn::className(),
-        'value' => function (\skeeks\cms\models\CmsContentElement $model) {
+        'class'  => \yii\grid\DataColumn::className(),
+        'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
 
             return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl, [
-                'target' => '_blank',
-                'title' => \Yii::t('app', 'Watch to site (opens new window)'),
+                'target'    => '_blank',
+                'title'     => \Yii::t('app', 'Watch to site (opens new window)'),
                 'data-pjax' => '0',
-                'class' => 'btn btn-default btn-sm'
+                'class'     => 'btn btn-default btn-sm',
             ]);
 
         },
-        'format' => 'raw'
-    ]
+        'format' => 'raw',
+    ],
 ]
 ?>
 

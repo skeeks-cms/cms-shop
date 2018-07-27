@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m180726_160601__alter_table__shop_cart extends Migration
@@ -16,7 +15,7 @@ class m180726_160601__alter_table__shop_cart extends Migration
         $tableName = "shop_cart";
 
         $this->addColumn("{{%shop_cart}}", "shop_order_id", $this->integer());
-        $this->createIndex($tableName . '__shop_order_id', $tableName, 'shop_order_id');
+        $this->createIndex($tableName.'__shop_order_id', $tableName, 'shop_order_id');
 
         $this->addForeignKey(
             "{$tableName}__shop_order_id", $tableName,

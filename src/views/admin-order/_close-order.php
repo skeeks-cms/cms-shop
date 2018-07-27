@@ -6,8 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
-
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
 $statusDate = \Yii::$app->formatter->asDatetime($model->canceled_at);

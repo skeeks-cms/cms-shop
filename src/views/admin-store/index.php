@@ -39,23 +39,23 @@
     <? $pjax = \yii\widgets\Pjax::begin(); ?>
 
     <?php echo $this->render('@skeeks/cms/views/admin-cms-content-element/_search', [
-        'searchModel' => $searchModel,
+        'searchModel'  => $searchModel,
         'dataProvider' => $dataProvider,
-        'content_id' => $content_id,
-        'cmsContent' => $cmsContent,
+        'content_id'   => $content_id,
+        'cmsContent'   => $cmsContent,
     ]); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'autoColumns' => false,
-        'pjax' => $pjax,
+        'dataProvider'    => $dataProvider,
+        'filterModel'     => $searchModel,
+        'autoColumns'     => false,
+        'pjax'            => $pjax,
         'adminController' => $controller,
-        'settingsData' =>
+        'settingsData'    =>
             [
-                'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
+                'namespace' => \Yii::$app->controller->action->getUniqueId().$content_id,
             ],
-        'columns' => $columns
+        'columns'         => $columns,
     ]); ?>
 
     <? $pjax::end() ?>
@@ -69,7 +69,7 @@
         'Change the properties and rights of access to information block you can'); ?> <?= \yii\helpers\Html::a(\Yii::t('skeeks/shop/app',
         'Content Settings'), \skeeks\cms\helpers\UrlHelper::construct([
         '/cms/admin-cms-content/update',
-        'pk' => $content_id
+        'pk' => $content_id,
     ])->enableAdmin()->toString()); ?>.
     <? \yii\bootstrap\Alert::end(); ?>
 

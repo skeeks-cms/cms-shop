@@ -18,11 +18,11 @@ class DiscountConditionsWidgetAsset extends AssetBundle
     public $sourcePath = '@skeeks/cms/shop/widgets/discount/assets/src';
 
     public $css = [
-        'discount-conditions.css'
+        'discount-conditions.css',
     ];
 
     public $js = [
-        'discount-conditions.js'
+        'discount-conditions.js',
     ];
 
     public $depends = [

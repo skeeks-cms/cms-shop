@@ -13,7 +13,6 @@ use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn;
-use skeeks\cms\grid\ImageColumn2;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
@@ -70,12 +69,12 @@ class AdminDeliveryController extends BackendModelStandartController
                         'shopPaySystems',
                     ],
                     'columns'        => [
-                        'active'  => [
+                        'active'         => [
                             'class' => BooleanColumn::class,
                         ],
-                        'logo_id' => [
+                        'logo_id'        => [
                             'relationName' => 'logo',
-                            'class' => ImageColumn::class,
+                            'class'        => ImageColumn::class,
                         ],
                         'shopPaySystems' => [
                             'label' => 'Платежные системы',
@@ -85,7 +84,7 @@ class AdminDeliveryController extends BackendModelStandartController
                                 } else {
                                     return 'Все';
                                 }
-                            }
+                            },
                         ],
                     ],
                 ],
@@ -188,10 +187,10 @@ class AdminDeliveryController extends BackendModelStandartController
                     'store',
 
                     'shopPaySystems' => [
-                        'class' => SelectField::class,
-                        'hint' => \Yii::t('skeeks/shop/app', 'if nothing is selected, it means all'),
+                        'class'    => SelectField::class,
+                        'hint'     => \Yii::t('skeeks/shop/app', 'if nothing is selected, it means all'),
                         'multiple' => true,
-                        'items' => \yii\helpers\ArrayHelper::map(
+                        'items'    => \yii\helpers\ArrayHelper::map(
                             \skeeks\cms\shop\models\ShopPaySystem::find()->active()->all(), 'id', 'name'
                         ),
                     ],

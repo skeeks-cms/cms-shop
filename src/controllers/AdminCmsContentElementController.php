@@ -216,7 +216,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
                                 ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
                             ) {
-                                return (string) $shopProductPrice->money;
+                                return (string)$shopProductPrice->money;
                             }
                         }
 
@@ -620,7 +620,6 @@ class AdminCmsContentElementController extends AdminModelEditorController
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
-
 
 
             return \yii\widgets\ActiveForm::validateMultiple([

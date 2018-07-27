@@ -1,20 +1,17 @@
 /**
-* @link https://cms.skeeks.com/
-* @copyright Copyright (c) 2010 SkeekS
-* @license https://cms.skeeks.com/license/
-* @author Semenov Alexander <semenov@skeeks.com>
-*/
-(function(sx, $, _)
-{
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
+ * @author Semenov Alexander <semenov@skeeks.com>
+ */
+(function (sx, $, _) {
     sx.classes.DiscountWidget = sx.classes.Component.extend({
 
-        _init: function()
-        {
+        _init: function () {
 
         },
 
-        _onDomReady: function()
-        {
+        _onDomReady: function () {
             var self = this;
 
             this.jWrapper = $("#" + this.get('id'));
@@ -23,14 +20,14 @@
             this.jContent = $(".sx-content", this.jWrapper);
 
             /*this.jConditionElement = $("name=[condition]", this.jWrapper);
-            this.jAndorElement = $("name=[andor]", this.jWrapper);
-            this.jEqualityElement = $("name=[equality]", this.jWrapper);*/
+             this.jAndorElement = $("name=[andor]", this.jWrapper);
+             this.jEqualityElement = $("name=[equality]", this.jWrapper);*/
 
             this.value = this.jElement.val();
 
             //this.jContent.append(this.renderRule());
 
-            $('select', this.jWrapper).on('change', function() {
+            $('select', this.jWrapper).on('change', function () {
                 self.jElement.val(JSON.stringify(self.getValue()));
 
                 if ($(this).data('no-update') === true) {
@@ -41,7 +38,7 @@
                 return false;
             });
 
-            $('input', this.jWrapper).on('change', function() {
+            $('input', this.jWrapper).on('change', function () {
                 self.jElement.val(JSON.stringify(self.getValue()));
 
                 if ($(this).data('no-update') === true) {
@@ -53,19 +50,19 @@
                 return false;
             });
 
-            $('.sx-remove', this.jWrapper).on('click', function() {
+            $('.sx-remove', this.jWrapper).on('click', function () {
                 $(this).closest(".sx-row").remove();
                 self.jElement.val(JSON.stringify(self.getValue())).change();
                 return false;
             });
 
-            $('.sx-create-first', this.jWrapper).on('click', function() {
+            $('.sx-create-first', this.jWrapper).on('click', function () {
 
-                self.jElement.val(JSON.stringify({'type':'group','condition':'equal','rules_type':'and'})).change();
+                self.jElement.val(JSON.stringify({'type': 'group', 'condition': 'equal', 'rules_type': 'and'})).change();
                 return false;
             });
 
-            $('.sx-add-condition', this.jWrapper).on('click', function() {
+            $('.sx-add-condition', this.jWrapper).on('click', function () {
                 var val = $(this).closest(".sx-add").children().children().children("[name=condition]").val();
 
                 $(this).closest(".sx-row");
@@ -76,9 +73,9 @@
                 var row = '';
 
                 if (val == 'group') {
-                    row = $("<div>", {'class' : 'sx-row sx-group', 'data-type': 'group'});
+                    row = $("<div>", {'class': 'sx-row sx-group', 'data-type': 'group'});
                 } else {
-                    row = $("<div>", {'class' : 'sx-row sx-rule', 'data-type': 'rule', 'data-field': val});
+                    row = $("<div>", {'class': 'sx-row sx-rule', 'data-type': 'rule', 'data-field': val});
                 }
 
                 jRules.append(
@@ -91,8 +88,7 @@
             });
         },
 
-        getValue: function()
-        {
+        getValue: function () {
             var self = this;
             var result = {};
 
@@ -106,8 +102,7 @@
             return result;
         },
 
-        getValueByJRule: function(jRule)
-        {
+        getValueByJRule: function (jRule) {
             var self = this;
             var result = {};
 
@@ -134,7 +129,7 @@
             if (jRules.length) {
                 var rules = [];
 
-                jRules.each(function() {
+                jRules.each(function () {
                     rules.push(
                         self.getValueByJRule($(this))
                     );
@@ -146,7 +141,7 @@
             return result;
         },
 
-        renderRule: function() {
+        renderRule: function () {
             var jRule = $("<div>", {'class': 'sx-rule'});
 
             var jRuleRules = $("<div>", {'class': 'sx-rules'});
@@ -161,13 +156,11 @@
 
     sx.classes.DiscountRule = sx.classes.Component.extend({
 
-        _init: function()
-        {
+        _init: function () {
 
         },
 
-        _onDomReady: function()
-        {
+        _onDomReady: function () {
             this.jWrapper = $("#" + this.get('id'));
 
             this.jElement = $(".sx-element textarea", this.jWrapper);

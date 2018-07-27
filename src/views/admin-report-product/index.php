@@ -11,9 +11,9 @@
 ?>
 
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
-    'method' => 'get',
+    'method'               => 'get',
     'enableAjaxValidation' => false,
-    'usePjax' => false
+    'usePjax'              => false,
 ]); ?>
 <div class="row">
     <div class="col-md-3">
@@ -45,7 +45,7 @@
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => $dataProvider,
-    'filterModel' => $search,
-    'columns' => $search->getColumns(),
+    'filterModel'  => $search,
+    'columns'      => $search->getColumns(),
 ]); ?>
 

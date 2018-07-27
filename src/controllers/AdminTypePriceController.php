@@ -10,11 +10,9 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\models\CmsContent;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
-use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopTypePrice;
 use yii\helpers\ArrayHelper;
 
@@ -44,11 +42,11 @@ class AdminTypePriceController extends AdminModelEditorController
             [
                 "def-multi" =>
                     [
-                        'class' => AdminMultiModelEditAction::className(),
-                        "name" => \Yii::t('skeeks/shop/app', 'Default'),
+                        'class'        => AdminMultiModelEditAction::className(),
+                        "name"         => \Yii::t('skeeks/shop/app', 'Default'),
                         //"icon"              => "glyphicon glyphicon-trash",
                         "eachCallback" => [$this, 'eachMultiDef'],
-                        "priority" => 0,
+                        "priority"     => 0,
                     ],
             ]
         );

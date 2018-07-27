@@ -9,12 +9,9 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
-use skeeks\cms\components\Cms;
-use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
-use skeeks\cms\shop\helpers\ProductPriceHelper;
 use skeeks\modules\cms\catalog\models\Product;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -57,7 +54,7 @@ use yii\helpers\Url;
  * @property ShopProductPrice  $shopProductPrice
  *
  * @property MoneyCurrency     $currency
- * @property ShopBasketProps[] $shopBasketProps
+ * @property ShopOrderItemProperty[] $shopOrderItemProperties
  *
  * @property Money             $money
  * @property Money             $moneyOriginal
@@ -154,28 +151,28 @@ class ShopOrderItem extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id'                   => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'           => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'           => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'           => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'           => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'shop_order_id'             => \Yii::t('skeeks/shop/app', 'Order ID'),
-            'shop_product_id'           => \Yii::t('skeeks/shop/app', 'Product'),
-            'shop_product_price_id'     => \Yii::t('skeeks/shop/app', 'Product Price ID'),
+            'id'                    => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'            => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'            => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'shop_order_id'         => \Yii::t('skeeks/shop/app', 'Order ID'),
+            'shop_product_id'       => \Yii::t('skeeks/shop/app', 'Product'),
+            'shop_product_price_id' => \Yii::t('skeeks/shop/app', 'Product Price ID'),
             'amount'                => \Yii::t('skeeks/shop/app', 'Price'),
-            'currency_code'        => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'weight'               => \Yii::t('skeeks/shop/app', 'Weight'),
-            'quantity'             => \Yii::t('skeeks/shop/app', 'Amount'),
-            'name'                 => \Yii::t('skeeks/shop/app', 'Name'),
-            'notes'                => \Yii::t('skeeks/shop/app', 'Notes'),
+            'currency_code'         => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'weight'                => \Yii::t('skeeks/shop/app', 'Weight'),
+            'quantity'              => \Yii::t('skeeks/shop/app', 'Amount'),
+            'name'                  => \Yii::t('skeeks/shop/app', 'Name'),
+            'notes'                 => \Yii::t('skeeks/shop/app', 'Notes'),
             'discount_amount'       => \Yii::t('skeeks/shop/app', 'Discount Price'),
-            'discount_name'        => \Yii::t('skeeks/shop/app', 'Discount Name'),
-            'discount_value'       => \Yii::t('skeeks/shop/app', 'Discount Value'),
-            'vat_rate'             => \Yii::t('skeeks/shop/app', 'Vat Rate'),
-            'reserve_quantity'     => \Yii::t('skeeks/shop/app', 'Reserve Quantity'),
-            'dimensions'           => \Yii::t('skeeks/shop/app', 'Dimensions'),
-            'measure_name'         => \Yii::t('skeeks/shop/app', 'Measure Name'),
-            'measure_code'         => \Yii::t('skeeks/shop/app', 'Measure Code'),
+            'discount_name'         => \Yii::t('skeeks/shop/app', 'Discount Name'),
+            'discount_value'        => \Yii::t('skeeks/shop/app', 'Discount Value'),
+            'vat_rate'              => \Yii::t('skeeks/shop/app', 'Vat Rate'),
+            'reserve_quantity'      => \Yii::t('skeeks/shop/app', 'Reserve Quantity'),
+            'dimensions'            => \Yii::t('skeeks/shop/app', 'Dimensions'),
+            'measure_name'          => \Yii::t('skeeks/shop/app', 'Measure Name'),
+            'measure_code'          => \Yii::t('skeeks/shop/app', 'Measure Code'),
         ];
     }
 
@@ -186,7 +183,7 @@ class ShopOrderItem extends ActiveRecord
     {
         return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -208,7 +205,7 @@ class ShopOrderItem extends ActiveRecord
     {
         return $this->hasOne(ShopProductPrice::class, ['id' => 'shop_product_price_id']);
     }
-    
+
     /**
      * Итоговая стоимость одной позиции  включая скидки и наценки
      *
@@ -311,8 +308,8 @@ class ShopOrderItem extends ActiveRecord
         if ($parentElement && !$this->isNewRecord) {
 
             if ($product->cmsContentElement->name != $parentElement->name) {
-                $basketProperty = new ShopBasketProps();
-                $basketProperty->shop_basket_id = $this->id;
+                $basketProperty = new ShopOrderItemProperty();
+                $basketProperty->shop_order_item_id = $this->id;
                 $basketProperty->code = 'name';
                 $basketProperty->value = $product->cmsContentElement->name;
                 $basketProperty->name = \Yii::t('skeeks/cms', 'name');
@@ -322,11 +319,11 @@ class ShopOrderItem extends ActiveRecord
 
             if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray()) {
                 foreach ($properties as $code => $value) {
-                    if (!$this->getShopBasketProps()->andWhere(['code' => $code])->count() && $value) {
+                    if (!$this->getShopOrderItemProperties()->andWhere(['code' => $code])->count() && $value) {
                         $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
 
                         $basketProperty = new ShopBasketProps();
-                        $basketProperty->shop_basket_id = $this->id;
+                        $basketProperty->shop_order_item_id = $this->id;
                         $basketProperty->code = $code;
                         $basketProperty->value = $product->cmsContentElement->relatedPropertiesModel->getSmartAttribute($code);
                         $basketProperty->name = $property->name;
@@ -344,9 +341,9 @@ class ShopOrderItem extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopBasketProps()
+    public function getShopOrderItemProperties()
     {
-        return $this->hasMany(ShopBasketProps::class, ['shop_basket_id' => 'id']);
+        return $this->hasMany(ShopOrderItemProperty::class, ['shop_order_item_id' => 'id']);
     }
     /**
      * Значение налога за одну единицу товара
@@ -425,5 +422,14 @@ class ShopOrderItem extends ActiveRecord
     public function getProduct()
     {
         return $this->shopProduct;
+    }
+
+    /**
+     * @return ShopOrderItemProperty[]
+     * @deprecated
+     */
+    public function getShopBasketProps()
+    {
+        return $this->getShopOrderItemProperties();
     }
 }

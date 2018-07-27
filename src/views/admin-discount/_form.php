@@ -6,9 +6,6 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 
-use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-
 /* @var $this yii\web\View */
 /* @var $action \skeeks\cms\backend\actions\BackendModelUpdateAction */
 $action = $this->context->action;
@@ -46,8 +43,8 @@ $action = $this->context->action;
     \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class,
     [
         'options' => [
-            $action->reloadFieldParam => 'true'
-        ]
+            $action->reloadFieldParam => 'true',
+        ],
     ]
 ); ?>
 
@@ -71,11 +68,11 @@ $action = $this->context->action;
 <? \yii\bootstrap\Alert::end() ?>
 
 <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-    'permissionName' => $model->permissionName,
-    'notClosedRoles' => [],
+    'permissionName'        => $model->permissionName,
+    'notClosedRoles'        => [],
     'permissionDescription' => \Yii::t('skeeks/shop/app',
-            'Groups of users who can benefit from discounted rates') . ": '{$model->name}'",
-    'label' => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
+            'Groups of users who can benefit from discounted rates').": '{$model->name}'",
+    'label'                 => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
 ]); ?>
 
 <?= $form->fieldSetEnd(); ?>

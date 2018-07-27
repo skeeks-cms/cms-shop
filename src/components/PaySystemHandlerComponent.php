@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\shop\components;
 
-use skeeks\cms\base\Component;
 use skeeks\cms\base\ConfigFormInterface;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
@@ -23,20 +22,17 @@ class PaySystemHandlerComponent extends Model implements ConfigFormInterface
 {
     use HasComponentDescriptorTrait;
 
+    static public function logError($message, $group = "")
+    {
+        \Yii::error($message, static::className()."::".$group);
+    }
+    static public function logInfo($message, $group = "")
+    {
+        \Yii::info($message, static::className()."::".$group);
+    }
     public function renderConfigForm(ActiveForm $activeForm)
     {
     }
-
-    static public function logError($message, $group = "")
-    {
-        \Yii::error($message, static::className() . "::" . $group);
-    }
-
-    static public function logInfo($message, $group = "")
-    {
-        \Yii::info($message, static::className() . "::" . $group);
-    }
-
     /**
      * @param ShopBill $shopBill
      * @return bool

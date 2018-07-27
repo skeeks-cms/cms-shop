@@ -8,33 +8,32 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\Core;
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
-use Yii;
 use yii\helpers\ArrayHelper;
-use yii\helpers\StringHelper;
 
 /**
  * This is the model class for table "{{%shop_pay_system}}".
  *
- * @property string $name
- * @property integer $priority
- * @property string $active
- * @property string $description
- * @property string $component
- * @property string $component_settings
+ * @property string                    $name
+ * @property integer                   $priority
+ * @property string                    $active
+ * @property string                    $description
+ * @property string                    $component
+ * @property string                    $component_settings
  *
  * @property ShopPaySystemPersonType[] $shopPaySystemPersonTypes
- * @property ShopPersonType[] $personTypes
+ * @property ShopPersonType[]          $personTypes
  *
  * @property PaySystemHandlerComponent $paySystemHandler
  * @property PaySystemHandlerComponent $handler
  */
 class ShopPaySystem extends Core
 {
+    protected $_personTypes = [];
+    protected $_handler = null;
     /**
      * @inheritdoc
      */
@@ -42,20 +41,16 @@ class ShopPaySystem extends Core
     {
         return '{{%shop_pay_system}}';
     }
-
-    protected $_personTypes = [];
-
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
             Serialize::className() =>
                 [
-                    'class' => Serialize::className(),
-                    'fields' => ['component_settings']
-                ]
+                    'class'  => Serialize::className(),
+                    'fields' => ['component_settings'],
+                ],
         ]);
     }
-
     /**
      * @inheritdoc
      */
@@ -66,7 +61,6 @@ class ShopPaySystem extends Core
         $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveEvent"]);
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveEvent"]);
     }
-
     /**
      * @param $event
      */
@@ -97,7 +91,13 @@ class ShopPaySystem extends Core
 
         }
     }
-
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopPaySystemPersonTypes()
+    {
+        return $this->hasMany(ShopPaySystemPersonType::className(), ['pay_system_id' => 'id']);
+    }
     /**
      * @inheritdoc
      */
@@ -113,34 +113,23 @@ class ShopPaySystem extends Core
             [['name'], 'unique'],
             [['personTypeIds'], 'safe'],
             [['priority'], 'default', 'value' => 100],
-            [['active'], 'default', 'value' => Cms::BOOL_Y]
+            [['active'], 'default', 'value' => Cms::BOOL_Y],
         ]);
     }
-
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name' => \Yii::t('skeeks/shop/app', 'Name'),
-            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active' => \Yii::t('skeeks/shop/app', 'Active'),
-            'description' => \Yii::t('skeeks/shop/app', 'Description'),
+            'name'          => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active'        => \Yii::t('skeeks/shop/app', 'Active'),
+            'description'   => \Yii::t('skeeks/shop/app', 'Description'),
             'personTypeIds' => \Yii::t('skeeks/shop/app', 'Payers'),
-            'component' => \Yii::t('skeeks/shop/app', 'Handler'),
+            'component'     => \Yii::t('skeeks/shop/app', 'Handler'),
         ]);
     }
-
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopPaySystemPersonTypes()
-    {
-        return $this->hasMany(ShopPaySystemPersonType::className(), ['pay_system_id' => 'id']);
-    }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -149,8 +138,6 @@ class ShopPaySystem extends Core
         return $this->hasMany(ShopPersonType::className(),
             ['id' => 'person_type_id'])->viaTable('{{%shop_pay_system_person_type}}', ['pay_system_id' => 'id']);
     }
-
-
     /**
      * @return int[]
      */
@@ -158,8 +145,6 @@ class ShopPaySystem extends Core
     {
         return (array)ArrayHelper::map($this->personTypes, 'id', 'id');
     }
-
-
     /**
      * @param array $codes
      * @return $this
@@ -169,7 +154,6 @@ class ShopPaySystem extends Core
         $this->_personTypes = $ids;
         return $this;
     }
-
     /**
      * @return null|PaySystemHandlerComponent
      * @throws \yii\base\InvalidConfigException
@@ -178,10 +162,6 @@ class ShopPaySystem extends Core
     {
         return $this->handler;
     }
-
-
-    protected $_handler = null;
-
     /**
      * @return PaySystemHandlerComponent
      * @throws \skeeks\cms\import\InvalidParamException

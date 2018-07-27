@@ -14,19 +14,19 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%shop_quantity_notice_email}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $shop_product_id
- * @property string $email
- * @property string $name
- * @property integer $is_notified
- * @property integer $notified_at
- * @property integer $shop_fuser_id
+ * @property integer     $id
+ * @property integer     $created_by
+ * @property integer     $updated_by
+ * @property integer     $created_at
+ * @property integer     $updated_at
+ * @property integer     $shop_product_id
+ * @property string      $email
+ * @property string      $name
+ * @property integer     $is_notified
+ * @property integer     $notified_at
+ * @property integer     $shop_fuser_id
  *
- * @property ShopFuser $shopFuser
+ * @property ShopFuser   $shopFuser
  * @property ShopProduct $shopProduct
  */
 class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
@@ -54,25 +54,25 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
                     'shop_product_id',
                     'is_notified',
                     'notified_at',
-                    'shop_fuser_id'
+                    'shop_fuser_id',
                 ],
-                'integer'
+                'integer',
             ],
             [['shop_product_id', 'email'], 'required'],
             [['email', 'name'], 'string', 'max' => 255],
             [
                 ['shop_fuser_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => ShopFuser::className(),
-                'targetAttribute' => ['shop_fuser_id' => 'id']
+                'skipOnError'     => true,
+                'targetClass'     => ShopFuser::className(),
+                'targetAttribute' => ['shop_fuser_id' => 'id'],
             ],
             [
                 ['shop_product_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => ShopProduct::className(),
-                'targetAttribute' => ['shop_product_id' => 'id']
+                'skipOnError'     => true,
+                'targetClass'     => ShopProduct::className(),
+                'targetAttribute' => ['shop_product_id' => 'id'],
             ],
 
             [['email'], 'email'],
@@ -81,7 +81,7 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
                 'default',
                 'value' => function () {
                     return \Yii::$app->shop->cart ? \Yii::$app->shop->cart->id : null;
-                }
+                },
             ],
         ]);
     }
@@ -92,17 +92,17 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id' => Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => Yii::t('skeeks/shop/app', 'Updated At'),
+            'id'              => Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'      => Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'      => Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'      => Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'      => Yii::t('skeeks/shop/app', 'Updated At'),
             'shop_product_id' => Yii::t('skeeks/shop/app', 'Shop Product ID'),
-            'email' => Yii::t('skeeks/shop/app', 'Email'),
-            'name' => Yii::t('skeeks/shop/app', 'Customer name'),
-            'is_notified' => Yii::t('skeeks/shop/app', 'Is notified'),
-            'notified_at' => Yii::t('skeeks/shop/app', 'Notified At'),
-            'shop_fuser_id' => Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
+            'email'           => Yii::t('skeeks/shop/app', 'Email'),
+            'name'            => Yii::t('skeeks/shop/app', 'Customer name'),
+            'is_notified'     => Yii::t('skeeks/shop/app', 'Is notified'),
+            'notified_at'     => Yii::t('skeeks/shop/app', 'Notified At'),
+            'shop_fuser_id'   => Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
         ]);
     }
 

@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150901_150601_create_table__shop_vat extends Migration
@@ -32,9 +31,9 @@ class m150901_150601_create_table__shop_vat extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'name' => $this->string(255)->notNull(),
+            'name'     => $this->string(255)->notNull(),
             'priority' => $this->integer()->notNull()->defaultValue(100),
-            'active' => $this->string(1)->notNull()->defaultValue("Y"),
+            'active'   => $this->string(1)->notNull()->defaultValue("Y"),
 
             'rate' => $this->decimal(18, 2)->notNull()->defaultValue(0),
 
@@ -63,17 +62,17 @@ class m150901_150601_create_table__shop_vat extends Migration
 
 
         $this->insert('{{%shop_vat}}', [
-            'name' => 'Без НДС',
+            'name'     => 'Без НДС',
             'priority' => 100,
-            'active' => 'Y',
-            'rate' => 0,
+            'active'   => 'Y',
+            'rate'     => 0,
         ]);
 
         $this->insert('{{%shop_vat}}', [
-            'name' => 'НДС 18%',
+            'name'     => 'НДС 18%',
             'priority' => 200,
-            'active' => 'Y',
-            'rate' => 18,
+            'active'   => 'Y',
+            'rate'     => 18,
         ]);
     }
 

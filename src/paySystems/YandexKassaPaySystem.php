@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\paySystems;
 
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopOrder;
-use yii\base\Component;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -32,12 +31,6 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     public $shop_id;
     public $scid;
     public $payment_type = "";
-
-    public function getBaseUrl()
-    {
-        return $this->isLive ? 'https://money.yandex.ru/eshop.xml' : 'https://demomoney.yandex.ru/eshop.xml';
-    }
-
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -48,74 +41,6 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
             'name' => \Yii::t('skeeks/shop/app', 'YandexKassa'),
         ]);
     }
-
-
-    public function rules()
-    {
-        return ArrayHelper::merge(parent::rules(), [
-            [['shop_password'], 'string'],
-            [['security_type'], 'string'],
-            [['shop_id'], 'string'],
-            [['scid'], 'string'],
-            [['isLive'], 'boolean'],
-            [['payment_type'], 'string'],
-        ]);
-    }
-
-    public function attributeLabels()
-    {
-        return ArrayHelper::merge(parent::attributeLabels(), [
-            'isLive' => 'Рабочий режим',
-            'sMerchantPass2' => 'sMerchantPass2',
-        ]);
-    }
-
-    public function attributeHints()
-    {
-        return ArrayHelper::merge(parent::attributeHints(), [
-            'isLive' => '',
-            'payment_type' => 'Смотреть https://tech.yandex.ru/money/doc/payment-solution/reference/payment-type-codes-docpage/',
-        ]);
-    }
-
-
-    /**
-     * @param ShopOrder $shopOrder
-     * @return $this
-     */
-    public function paymentResponse(ShopOrder $shopOrder)
-    {
-        return \Yii::$app->response->redirect(['shop/yandex-kassa/order-form', 'key' => $shopOrder->key]);;
-    }
-
-    public function renderConfigForm(ActiveForm $activeForm)
-    {
-
-        echo $activeForm->field($this, 'isLive')->checkbox();
-        echo $activeForm->field($this, 'shop_password');
-        echo $activeForm->field($this, 'security_type');
-        echo $activeForm->field($this, 'shop_id');
-        echo $activeForm->field($this, 'scid');
-        echo $activeForm->field($this, 'payment_type');
-
-        echo Alert::widget([
-            'options' => [
-                'class' => 'alert-info',
-            ],
-            'body' => <<<HTML
-<a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/shop-config/intro-docpage/">Подключение магазина</a><br />
-В настройках вашего магазина на yandex укажите: <br />
-Укажите checkUrl: /shop/yandex-kassa/check-order<br />
-Укажите avisoUrl: /shop/yandex-kassa/payment-aviso<br />
-<hr />
-<a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/examples/examples-test-data-docpage/">Тестовые данные</a><br />
-HTML
-            ,
-        ]);
-
-    }
-
-
     static public function getRequest()
     {
         if (\Yii::$app->request->contentType == "application/pkcs7-mime") {
@@ -124,19 +49,18 @@ HTML
 
         return $_REQUEST;
     }
-
     /**
      * Checking for sign when XML/PKCS#7 scheme is used.
      * @return array if request is successful, returns key-value array of request params, null otherwise.
      */
     static private function _verifySign()
     {
-        $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
+        $descriptorspec = [0 => ["pipe", "r"], 1 => ["pipe", "w"], 2 => ["pipe", "w"]];
         $certificate = \Yii::getAlias('@skeeks/cms/shop/paySystems/yandexkassa/pksc7-key-for-encode.cer');
 
         \Yii::info("_verifySign(): {$certificate}", YandexKassaPaySystem::class);
 
-        $process = proc_open('openssl smime -verify -inform PEM -nointern -certfile ' . $certificate . ' -CAfile ' . $certificate,
+        $process = proc_open('openssl smime -verify -inform PEM -nointern -certfile '.$certificate.' -CAfile '.$certificate,
             $descriptorspec, $pipes);
 
         if (is_resource($process)) {
@@ -164,33 +88,74 @@ HTML
 
         return null;
     }
-
-
+    public static function formatDateForMWS(\DateTime $date)
+    {
+        $performedDatetime = $date->format("Y-m-d")."T".$date->format("H:i:s").".000Z";
+        return $performedDatetime;
+    }
+    public function getBaseUrl()
+    {
+        return $this->isLive ? 'https://money.yandex.ru/eshop.xml' : 'https://demomoney.yandex.ru/eshop.xml';
+    }
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [['shop_password'], 'string'],
+            [['security_type'], 'string'],
+            [['shop_id'], 'string'],
+            [['scid'], 'string'],
+            [['isLive'], 'boolean'],
+            [['payment_type'], 'string'],
+        ]);
+    }
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'isLive'         => 'Рабочий режим',
+            'sMerchantPass2' => 'sMerchantPass2',
+        ]);
+    }
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'isLive'       => '',
+            'payment_type' => 'Смотреть https://tech.yandex.ru/money/doc/payment-solution/reference/payment-type-codes-docpage/',
+        ]);
+    }
     /**
-     * Checking the MD5 sign.
-     * @param  array $request payment parameters
-     * @return bool true if MD5 hash is correct
+     * @param ShopOrder $shopOrder
+     * @return $this
      */
-    public function checkRequestMD5($request)
+    public function paymentResponse(ShopOrder $shopOrder)
+    {
+        return \Yii::$app->response->redirect(['shop/yandex-kassa/order-form', 'key' => $shopOrder->key]);;
+    }
+    public function renderConfigForm(ActiveForm $activeForm)
     {
 
-        //return true;
+        echo $activeForm->field($this, 'isLive')->checkbox();
+        echo $activeForm->field($this, 'shop_password');
+        echo $activeForm->field($this, 'security_type');
+        echo $activeForm->field($this, 'shop_id');
+        echo $activeForm->field($this, 'scid');
+        echo $activeForm->field($this, 'payment_type');
 
-        $str = $request['action'] . ";" .
-            $request['orderSumAmount'] . ";" . $request['orderSumCurrencyPaycash'] . ";" .
-            $request['orderSumBankPaycash'] . ";" . $request['shopId'] . ";" .
-            $request['invoiceId'] . ";" . $request['customerNumber'] . ";" . $this->shop_password;
+        echo Alert::widget([
+            'options' => [
+                'class' => 'alert-info',
+            ],
+            'body'    => <<<HTML
+<a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/shop-config/intro-docpage/">Подключение магазина</a><br />
+В настройках вашего магазина на yandex укажите: <br />
+Укажите checkUrl: /shop/yandex-kassa/check-order<br />
+Укажите avisoUrl: /shop/yandex-kassa/payment-aviso<br />
+<hr />
+<a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/examples/examples-test-data-docpage/">Тестовые данные</a><br />
+HTML
+            ,
+        ]);
 
-        \Yii::info("String to md5: " . $str, static::class);
-
-        $md5 = strtoupper(md5($str));
-        if ($md5 != strtoupper($request['md5'])) {
-            \Yii::error("Wait for md5:" . $md5 . ", recieved md5: " . $request['md5'], self::class);
-            return false;
-        }
-        return true;
     }
-
     /**
      * @param $request
      *
@@ -210,7 +175,7 @@ HTML
                     $response = $this->buildResponse($this->action, null, 200);
                     $this->sendResponse($response);
                 }
-                $this->log("Request: " . print_r($request, true));
+                $this->log("Request: ".print_r($request, true));
 
                 //TODO:; make it's
                 \Yii::error('SECURITY_PKCS7 — todo:: not realized', YandexKassaPaySystem::class);
@@ -220,51 +185,39 @@ HTML
         \Yii::info("checkRequest true", YandexKassaPaySystem::class);
         return true;
     }
-
     /**
-     * Building XML response.
-     * @param  string $functionName "checkOrder" or "paymentAviso" string
-     * @param  string $invoiceId transaction number
-     * @param  string $result_code result code
-     * @param  string $message error message. May be null.
-     * @return string                prepared XML response
+     * Checking the MD5 sign.
+     * @param  array $request payment parameters
+     * @return bool true if MD5 hash is correct
      */
-    public function buildResponse($functionName, $invoiceId, $result_code, $message = null)
+    public function checkRequestMD5($request)
     {
-        try {
-            $performedDatetime = self::formatDate(new \DateTime());
-            $response = '<?xml version="1.0" encoding="UTF-8"?><' . $functionName . 'Response performedDatetime="' . $performedDatetime .
-                '" code="' . $result_code . '" ' . ($message != null ? 'message="' . $message . '"' : "") . ' invoiceId="' . $invoiceId . '" shopId="' . $this->shop_id . '"/>';
-            return $response;
-        } catch (\Exception $e) {
-            \Yii::error($e->getMessage(), static::class);
+
+        //return true;
+
+        $str = $request['action'].";".
+            $request['orderSumAmount'].";".$request['orderSumCurrencyPaycash'].";".
+            $request['orderSumBankPaycash'].";".$request['shopId'].";".
+            $request['invoiceId'].";".$request['customerNumber'].";".$this->shop_password;
+
+        \Yii::info("String to md5: ".$str, static::class);
+
+        $md5 = strtoupper(md5($str));
+        if ($md5 != strtoupper($request['md5'])) {
+            \Yii::error("Wait for md5:".$md5.", recieved md5: ".$request['md5'], self::class);
+            return false;
         }
-        return null;
+        return true;
     }
-
-
-    public static function formatDate(\DateTime $date)
-    {
-        $performedDatetime = $date->format("Y-m-d") . "T" . $date->format("H:i:s") . ".000" . $date->format("P");
-        return $performedDatetime;
-    }
-
-    public static function formatDateForMWS(\DateTime $date)
-    {
-        $performedDatetime = $date->format("Y-m-d") . "T" . $date->format("H:i:s") . ".000Z";
-        return $performedDatetime;
-    }
-
-
     /**
      * Checking for sign when XML/PKCS#7 scheme is used.
      * @return array if request is successful, returns key-value array of request params, null otherwise.
      */
     private function verifySign()
     {
-        $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
+        $descriptorspec = [0 => ["pipe", "r"], 1 => ["pipe", "w"], 2 => ["pipe", "w"]];
         $certificate = 'yamoney.pem';
-        $process = proc_open('openssl smime -verify -inform PEM -nointern -certfile ' . $certificate . ' -CAfile ' . $certificate,
+        $process = proc_open('openssl smime -verify -inform PEM -nointern -certfile '.$certificate.' -CAfile '.$certificate,
             $descriptorspec, $pipes);
         if (is_resource($process)) {
             // Getting data from request body.
@@ -277,12 +230,37 @@ HTML
             if ($resCode != 0) {
                 return null;
             } else {
-                $this->log("Row xml: " . $content);
+                $this->log("Row xml: ".$content);
                 $xml = simplexml_load_string($content);
                 $array = json_decode(json_encode($xml), true);
                 return $array["@attributes"];
             }
         }
         return null;
+    }
+    /**
+     * Building XML response.
+     * @param  string $functionName "checkOrder" or "paymentAviso" string
+     * @param  string $invoiceId transaction number
+     * @param  string $result_code result code
+     * @param  string $message error message. May be null.
+     * @return string                prepared XML response
+     */
+    public function buildResponse($functionName, $invoiceId, $result_code, $message = null)
+    {
+        try {
+            $performedDatetime = self::formatDate(new \DateTime());
+            $response = '<?xml version="1.0" encoding="UTF-8"?><'.$functionName.'Response performedDatetime="'.$performedDatetime.
+                '" code="'.$result_code.'" '.($message != null ? 'message="'.$message.'"' : "").' invoiceId="'.$invoiceId.'" shopId="'.$this->shop_id.'"/>';
+            return $response;
+        } catch (\Exception $e) {
+            \Yii::error($e->getMessage(), static::class);
+        }
+        return null;
+    }
+    public static function formatDate(\DateTime $date)
+    {
+        $performedDatetime = $date->format("Y-m-d")."T".$date->format("H:i:s").".000".$date->format("P");
+        return $performedDatetime;
     }
 }

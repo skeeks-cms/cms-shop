@@ -8,24 +8,11 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\components\Cms;
-use skeeks\cms\grid\BooleanColumn;
-use skeeks\cms\grid\CreatedAtColumn;
-use skeeks\cms\grid\CreatedByColumn;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\models\CmsContent;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
-use skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget;
-use skeeks\cms\shop\models\ShopOrderStatus;
-use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopQuantityNoticeEmail;
-use skeeks\cms\shop\models\ShopViewedProduct;
-use skeeks\cms\shop\widgets\AdminBuyerUserWidget;
-use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
 /**
  * Class AdminQuantityNoticeEmailController
@@ -54,12 +41,12 @@ class AdminQuantityNoticeEmailController extends AdminModelEditorController
             [
                 'create' =>
                     [
-                        'isVisible' => false
+                        'isVisible' => false,
                     ],
 
                 'update' =>
                     [
-                        'isVisible' => false
+                        'isVisible' => false,
                     ],
 
             ]

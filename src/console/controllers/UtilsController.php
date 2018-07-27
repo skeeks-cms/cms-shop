@@ -8,12 +8,7 @@
 
 namespace skeeks\cms\shop\console\controllers;
 
-use skeeks\cms\shop\models\ShopFuser;
-use skeeks\cms\shop\models\ShopProductPriceChange;
 use yii\console\Controller;
-use yii\db\Exception;
-use yii\db\Expression;
-use yii\helpers\Console;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>

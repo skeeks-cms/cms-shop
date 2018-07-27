@@ -1,33 +1,33 @@
 <?php
 [
-    "type" => "group",
-    "condition" => "equal",
+    "type"       => "group",
+    "condition"  => "equal",
     "rules_type" => "and",
-    "rules" => [
+    "rules"      => [
         [
-            "type" => "rule",
+            "type"      => "rule",
             "condition" => "equal",
-            "field" => "element.tree",
-            "value" => "1432",
+            "field"     => "element.tree",
+            "value"     => "1432",
         ],
         [
-            "type" => "rule",
+            "type"      => "rule",
             "condition" => "equal",
-            "field" => "element.name",
-            "value" => "Спальни",
+            "field"     => "element.name",
+            "value"     => "Спальни",
         ],
         [
-            "type" => "group",
-            "condition" => "equal",
+            "type"       => "group",
+            "condition"  => "equal",
             "rules_type" => "and",
-            "rules" => [
+            "rules"      => [
                 [
-                    "type" => "rule",
+                    "type"      => "rule",
                     "condition" => "equal",
-                    "field" => "element.name",
-                    "value" => "Спальни",
-                ]
-            ]
+                    "field"     => "element.name",
+                    "value"     => "Спальни",
+                ],
+            ],
         ],
-    ]
+    ],
 ];

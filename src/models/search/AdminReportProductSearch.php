@@ -32,66 +32,11 @@ class AdminReportProductSearch extends Model
     public function attributeLabels()
     {
         return [
-            'from' => \Yii::t('skeeks/shop/app', 'From'),
-            'to' => \Yii::t('skeeks/shop/app', 'To'),
-            'onlyPayed' => \Yii::t('skeeks/shop/app', 'Only prepaid orders')
+            'from'      => \Yii::t('skeeks/shop/app', 'From'),
+            'to'        => \Yii::t('skeeks/shop/app', 'To'),
+            'onlyPayed' => \Yii::t('skeeks/shop/app', 'Only prepaid orders'),
         ];
     }
-
-    public function getColumns()
-    {
-        return [
-            [
-                'attribute' => 'name',
-                'label' => \Yii::t('skeeks/shop/app', 'Name'),
-            ],
-
-            [
-                'attribute' => 'total_quantity',
-                'label' => \Yii::t('skeeks/shop/app', 'Total'),
-            ],
-            /*
-                [
-                    'attribute' => 'total',
-                    'label' => \Yii::t('skeeks/shop/app', 'Number of baskets'),
-                ],*/
-
-            [
-                'attribute' => 'total_in_orders',
-                'label' => \Yii::t('skeeks/shop/app', 'The total number of orders'),
-            ],
-
-            [
-                'attribute' => 'total_orders',
-                'label' => \Yii::t('skeeks/shop/app', 'Number of orders'),
-            ],
-
-
-            [
-                'attribute' => 'total_in_payed_orders',
-                'label' => \Yii::t('skeeks/shop/app', 'Total summ of prepaid orders'),
-            ],
-
-
-            [
-                'attribute' => 'total_payed_orders',
-                'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
-            ],
-
-
-            [
-                'attribute' => 'total_in_carts',
-                'label' => \Yii::t('skeeks/shop/app', 'Total in baskets'),
-            ],
-
-
-            [
-                'attribute' => 'sum_in_payed_orders',
-                'label' => \Yii::t('skeeks/shop/app', 'Price of the prepaid orders'),
-            ],
-        ];
-    }
-
     /**
      * @param array|null $params
      * @return ActiveDataProvider
@@ -102,14 +47,14 @@ class AdminReportProductSearch extends Model
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' =>
+            'sort'  =>
                 [
-                    'attributes' => array_keys(\yii\helpers\ArrayHelper::map($this->getColumns(), 'attribute',
+                    'attributes'   => array_keys(\yii\helpers\ArrayHelper::map($this->getColumns(), 'attribute',
                         'attribute')),
                     'defaultOrder' => [
-                        'total_in_payed_orders' => SORT_DESC
-                    ]
-                ]
+                        'total_in_payed_orders' => SORT_DESC,
+                    ],
+                ],
         ]);
 
         if ($params && ($this->load($params) && $this->validate())) {
@@ -122,7 +67,7 @@ class AdminReportProductSearch extends Model
             $query->where([
                 ">",
                 "b.product_id",
-                0
+                0,
             ]);
 
             //->andHaving([">", "total_payed_orders", "0"])
@@ -136,21 +81,21 @@ class AdminReportProductSearch extends Model
 
             if ($this->from) {
                 $query->andWhere(['>=', 'b.updated_at', (int)$this->from]);
-                $total_in_orders = $total_in_orders . " AND updated_at >= " . (int)$this->from;
-                $total_in_payed_orders = $total_in_payed_orders . " AND inBasket.updated_at >= " . (int)$this->from;
-                $sum_in_payed_orders = $sum_in_payed_orders . " AND inBasket.updated_at >= " . (int)$this->from;
-                $total_orders = $total_orders . " AND shop_basket.updated_at >= " . (int)$this->from;
-                $total_payed_orders = $total_payed_orders . " AND inBasket.updated_at >= " . (int)$this->from;
-                $total_in_carts = $total_in_carts . " AND shop_basket.updated_at >= " . (int)$this->from;
+                $total_in_orders = $total_in_orders." AND updated_at >= ".(int)$this->from;
+                $total_in_payed_orders = $total_in_payed_orders." AND inBasket.updated_at >= ".(int)$this->from;
+                $sum_in_payed_orders = $sum_in_payed_orders." AND inBasket.updated_at >= ".(int)$this->from;
+                $total_orders = $total_orders." AND shop_basket.updated_at >= ".(int)$this->from;
+                $total_payed_orders = $total_payed_orders." AND inBasket.updated_at >= ".(int)$this->from;
+                $total_in_carts = $total_in_carts." AND shop_basket.updated_at >= ".(int)$this->from;
             }
             if ($this->to) {
                 $query->andWhere(['<=', 'b.updated_at', (int)$this->to]);
-                $total_in_orders = $total_in_orders . " AND updated_at <= " . (int)$this->to;
-                $total_in_payed_orders = $total_in_payed_orders . " AND inBasket.updated_at <= " . (int)$this->to;
-                $sum_in_payed_orders = $sum_in_payed_orders . " AND inBasket.updated_at <= " . (int)$this->to;
-                $total_orders = $total_orders . " AND shop_basket.updated_at <= " . (int)$this->to;
-                $total_payed_orders = $total_payed_orders . " AND inBasket.updated_at <= " . (int)$this->to;
-                $total_in_carts = $total_in_carts . " AND shop_basket.updated_at <= " . (int)$this->to;
+                $total_in_orders = $total_in_orders." AND updated_at <= ".(int)$this->to;
+                $total_in_payed_orders = $total_in_payed_orders." AND inBasket.updated_at <= ".(int)$this->to;
+                $sum_in_payed_orders = $sum_in_payed_orders." AND inBasket.updated_at <= ".(int)$this->to;
+                $total_orders = $total_orders." AND shop_basket.updated_at <= ".(int)$this->to;
+                $total_payed_orders = $total_payed_orders." AND inBasket.updated_at <= ".(int)$this->to;
+                $total_in_carts = $total_in_carts." AND shop_basket.updated_at <= ".(int)$this->to;
             }
 
             $query->addSelect([
@@ -187,11 +132,64 @@ class AdminReportProductSearch extends Model
             $query->where([
                 ">",
                 "b.product_id",
-                0
+                0,
             ]);
         }
 
 
         return $dataProvider;
+    }
+    public function getColumns()
+    {
+        return [
+            [
+                'attribute' => 'name',
+                'label'     => \Yii::t('skeeks/shop/app', 'Name'),
+            ],
+
+            [
+                'attribute' => 'total_quantity',
+                'label'     => \Yii::t('skeeks/shop/app', 'Total'),
+            ],
+            /*
+                [
+                    'attribute' => 'total',
+                    'label' => \Yii::t('skeeks/shop/app', 'Number of baskets'),
+                ],*/
+
+            [
+                'attribute' => 'total_in_orders',
+                'label'     => \Yii::t('skeeks/shop/app', 'The total number of orders'),
+            ],
+
+            [
+                'attribute' => 'total_orders',
+                'label'     => \Yii::t('skeeks/shop/app', 'Number of orders'),
+            ],
+
+
+            [
+                'attribute' => 'total_in_payed_orders',
+                'label'     => \Yii::t('skeeks/shop/app', 'Total summ of prepaid orders'),
+            ],
+
+
+            [
+                'attribute' => 'total_payed_orders',
+                'label'     => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
+            ],
+
+
+            [
+                'attribute' => 'total_in_carts',
+                'label'     => \Yii::t('skeeks/shop/app', 'Total in baskets'),
+            ],
+
+
+            [
+                'attribute' => 'sum_in_payed_orders',
+                'label'     => \Yii::t('skeeks/shop/app', 'Price of the prepaid orders'),
+            ],
+        ];
     }
 }

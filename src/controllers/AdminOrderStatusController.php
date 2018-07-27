@@ -8,16 +8,10 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\models\CmsContent;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopOrderStatus;
-use yii\grid\DataColumn;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
 /**
  * Class AdminOrderStatusController

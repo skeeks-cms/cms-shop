@@ -6,28 +6,27 @@ use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
-use Yii;
 
 /**
  * This is the model class for table "{{%shop_buyer}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $name
- * @property integer $cms_user_id
- * @property integer $shop_person_type_id
+ * @property integer             $id
+ * @property integer             $created_by
+ * @property integer             $updated_by
+ * @property integer             $created_at
+ * @property integer             $updated_at
+ * @property string              $name
+ * @property integer             $cms_user_id
+ * @property integer             $shop_person_type_id
  *
- * @property ShopPersonType $shopPersonType
- * @property CmsUser $cmsUser
- * @property CmsUser $createdBy
- * @property CmsUser $updatedBy
+ * @property ShopPersonType      $shopPersonType
+ * @property CmsUser             $cmsUser
+ * @property CmsUser             $createdBy
+ * @property CmsUser             $updatedBy
  * @property ShopBuyerProperty[] $shopBuyerProperties
- * @property ShopOrder[] $shopOrders
+ * @property ShopOrder[]         $shopOrders
  *
- * @property string $email read-only
+ * @property string              $email read-only
  */
 class ShopBuyer extends RelatedElementModel
 {
@@ -50,9 +49,9 @@ class ShopBuyer extends RelatedElementModel
 
             HasRelatedProperties::className() =>
                 [
-                    'class' => HasRelatedProperties::className(),
+                    'class'                           => HasRelatedProperties::className(),
                     'relatedElementPropertyClassName' => ShopBuyerProperty::className(),
-                    'relatedPropertyClassName' => ShopPersonTypeProperty::className(),
+                    'relatedPropertyClassName'        => ShopPersonTypeProperty::className(),
                 ],
 
         ]);
@@ -73,7 +72,7 @@ class ShopBuyer extends RelatedElementModel
                 'default',
                 'value' => function (self $model) {
                     return $this->shopPersonType->name;
-                }
+                },
             ],
         ];
     }
@@ -84,13 +83,13 @@ class ShopBuyer extends RelatedElementModel
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'name' => \Yii::t('skeeks/shop/app', 'The profile name'),
-            'cms_user_id' => \Yii::t('skeeks/shop/app', 'User site'),
+            'id'                  => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'          => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'          => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'          => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'          => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name'                => \Yii::t('skeeks/shop/app', 'The profile name'),
+            'cms_user_id'         => \Yii::t('skeeks/shop/app', 'User site'),
             'shop_person_type_id' => \Yii::t('skeeks/shop/app', 'Profile type'),
         ];
     }

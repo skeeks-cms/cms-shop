@@ -42,7 +42,7 @@ class TinkoffController extends Controller
         }
 
         return $this->render($this->action->id, [
-            'model' => $order
+            'model' => $order,
         ]);
     }
 
@@ -78,7 +78,7 @@ class TinkoffController extends Controller
 
     public function actionNotify()
     {
-        \Yii::info("POST: " . Json::encode(\Yii::$app->request->post()), self::className());
+        \Yii::info("POST: ".Json::encode(\Yii::$app->request->post()), self::className());
 
         try {
             if (!\Yii::$app->request->post('OrderId')) {

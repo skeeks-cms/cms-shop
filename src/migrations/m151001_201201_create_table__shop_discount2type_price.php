@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m151001_201201_create_table__shop_discount2type_price extends Migration
@@ -32,7 +31,7 @@ class m151001_201201_create_table__shop_discount2type_price extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'discount_id' => $this->integer()->notNull(),
+            'discount_id'   => $this->integer()->notNull(),
             'type_price_id' => $this->integer()->notNull(),
         ], $tableOptions);
 

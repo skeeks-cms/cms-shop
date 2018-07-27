@@ -16,24 +16,24 @@
 <? \yii\bootstrap\Alert::begin([
     'options' =>
         [
-            'class' => 'alert-info'
-        ]
+            'class' => 'alert-info',
+        ],
 ]); ?>
 <?= \Yii::t('skeeks/shop/app', 'In this section, you can customize what content you can sell on your site.'); ?>
 <? \yii\bootstrap\Alert::end(); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
     'adminController' => $controller,
-    'columns' => [
+    'columns'         => [
         [
-            'filter' => false,
+            'filter'    => false,
             'attribute' => 'content_id',
-            'class' => \yii\grid\DataColumn::className(),
-            'value' => function (\skeeks\cms\shop\models\ShopContent $model) {
-                return $model->content->name . " ({$model->content->contentType->name})";
-            }
+            'class'     => \yii\grid\DataColumn::className(),
+            'value'     => function (\skeeks\cms\shop\models\ShopContent $model) {
+                return $model->content->name." ({$model->content->contentType->name})";
+            },
         ],
 
         /*[

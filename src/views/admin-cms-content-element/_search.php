@@ -21,7 +21,7 @@ if ($filter->product_type) {
 
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
     //'action' => '/' . \Yii::$app->request->pathInfo,
-    'namespace' => \Yii::$app->controller->uniqueId . "_" . $content_id
+    'namespace' => \Yii::$app->controller->uniqueId."_".$content_id,
 ]); ?>
 
 <?= \yii\helpers\Html::hiddenInput('content_id', $content_id) ?>
@@ -30,20 +30,20 @@ if ($filter->product_type) {
 
 
 <?= $form->field($searchModel, 'q')->textInput([
-    'placeholder' => \Yii::t('skeeks/cms', 'Search name and description')
+    'placeholder' => \Yii::t('skeeks/cms', 'Search name and description'),
 ])->setVisible(); ?>
 
 <?= $form->fieldSelectMulti($filter, 'product_type', \skeeks\cms\shop\models\ShopProduct::possibleProductTypes())->label('Тип товара')->setVisible(); ?>
 
 
 <?= $form->field($searchModel, 'name')->textInput([
-    'placeholder' => \Yii::t('skeeks/cms', 'Search by name')
+    'placeholder' => \Yii::t('skeeks/cms', 'Search by name'),
 ]) ?>
 
 <?= $form->field($searchModel, 'active')->listBox(\yii\helpers\ArrayHelper::merge([
-    '' => ' - '
+    '' => ' - ',
 ], \Yii::$app->cms->booleanFormat()), [
-    'size' => 1
+    'size' => 1,
 ]); ?>
 
 <?= $form->field($searchModel, 'section')->widget(

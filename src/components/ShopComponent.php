@@ -265,7 +265,7 @@ class ShopComponent extends Component
             $shopOrder = new ShopOrder();
             $shopOrder->cms_site_id = \Yii::$app->cms->site->id;
             if (!$shopOrder->save()) {
-                throw new UserException("Заказ-черновик не создан: " . print_r($shopOrder->errors, true));
+                throw new UserException("Заказ-черновик не создан: ".print_r($shopOrder->errors, true));
             }
             $this->_shopCart->shop_order_id = $shopOrder->id;
             $this->_shopCart->save(false);

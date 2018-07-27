@@ -35,14 +35,14 @@ use skeeks\cms\mail\helpers\Html;
     <?= Html::endTag('p'); ?>
 
     <?= Html::beginTag('p'); ?>
-        Сумма: <?= \yii\helpers\Html::tag('b', (string)$model->money); ?>
+    Сумма: <?= \yii\helpers\Html::tag('b', (string)$model->money); ?>
     <?= Html::endTag('p'); ?>
 
     <?= Html::beginTag('p'); ?>
-        Тип оплаты: <?= \yii\helpers\Html::tag('b', (string)$model->shopPaySystem->name); ?>
+    Тип оплаты: <?= \yii\helpers\Html::tag('b', (string)$model->shopPaySystem->name); ?>
     <?= Html::endTag('p'); ?>
 
     <?= Html::beginTag('p'); ?>
-        <?= Html::a("Подробнее о счете", $model->getUrl(true)); ?>
+    <?= Html::a("Подробнее о счете", $model->getUrl(true)); ?>
     <?= Html::endTag('p'); ?>
 </div>

@@ -9,26 +9,8 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
-use skeeks\cms\components\Cms;
-use skeeks\cms\filters\CmsAccessControl;
-use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\shop\models\ShopBasket;
-use skeeks\cms\shop\models\ShopBuyer;
-use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
-use skeeks\cms\shop\models\ShopPersonType;
-use skeeks\cms\shop\models\ShopPersonTypeProperty;
-use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\paySystems\PayPalPaySystem;
-use skeeks\cms\shop\paySystems\robokassa\Merchant;
-use skeeks\cms\shop\paySystems\RobokassaPaySystem;
-use yii\base\Exception;
-use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
-use yii\helpers\Url;
-use yii\web\BadRequestHttpException;
 
 /**
  * Class RobocassaController
@@ -44,8 +26,8 @@ class PayPalController extends Controller
     public function actionIpn()
     {
         $custom = (int)\Yii::$app->request->post('custom');
-        \Yii::info('Ipn post data: ' . serialize(\Yii::$app->request->post()), 'paypal');
-        \Yii::info('Ipn custom: ' . $custom, 'paypal');
+        \Yii::info('Ipn post data: '.serialize(\Yii::$app->request->post()), 'paypal');
+        \Yii::info('Ipn custom: '.$custom, 'paypal');
 
         /*if (!$custom)
         {
@@ -58,10 +40,10 @@ class PayPalController extends Controller
         }
 
         $shopOrder = ShopOrder::findOne($custom);
-        \Yii::info('Ordder id: ' . $shopOrder->id);
+        \Yii::info('Ordder id: '.$shopOrder->id);
 
         if (!$shopOrder) {
-            \Yii::error('Ordder not found: ' . $custom, 'paypal');
+            \Yii::error('Ordder not found: '.$custom, 'paypal');
         }
 
         /**

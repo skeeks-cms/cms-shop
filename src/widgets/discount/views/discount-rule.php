@@ -60,11 +60,11 @@
             <div class="row">
                 <div class="col-md-3">
                     <?
-                        echo \yii\helpers\Html::listBox('condition', \yii\helpers\ArrayHelper::getValue($rule, 'condition'), $widget->availableConditions, [
-                            'size' => 1,
-                            'class' => 'form-control',
-                            'data-no-update' => 'true'
-                        ]);
+                    echo \yii\helpers\Html::listBox('condition', \yii\helpers\ArrayHelper::getValue($rule, 'condition'), $widget->availableConditions, [
+                        'size'           => 1,
+                        'class'          => 'form-control',
+                        'data-no-update' => 'true',
+                    ]);
                     ?>
                 </div>
                 <div class="col-md-3">
@@ -82,7 +82,7 @@
             <div class="col-md-3 sx-field" style="line-height: 34px;">
                 <? $widget->availableConditions; ?>
                 <span class="label label-info" data-field="<?= \yii\helpers\ArrayHelper::getValue($rule, 'field'); ?>">
-                    <?= \yii\helpers\ArrayHelper::getValue($widget->allConditions, \yii\helpers\ArrayHelper::getValue($rule, 'field'), '-- Не задано -- ' . \yii\helpers\ArrayHelper::getValue($rule, 'field')); ?>
+                    <?= \yii\helpers\ArrayHelper::getValue($widget->allConditions, \yii\helpers\ArrayHelper::getValue($rule, 'field'), '-- Не задано -- '.\yii\helpers\ArrayHelper::getValue($rule, 'field')); ?>
                 </span>
             </div>
             <!--<a href="#"><? /*= \yii\helpers\ArrayHelper::getValue($rule, 'condition'); */ ?></a>-->
@@ -102,36 +102,36 @@
 
                 <? if (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.tree_id', 'element.treeIds'])) : ?>
                     <?
-                        echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
-                            'name' => 'value',
-                            'multiple' => true,
-                            'value' => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
-                            'options' => [
-                                'data-no-update' => 'true',
-                                'class' => 'sx-value-element'
-                            ]
-                        ]);
+                    echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
+                        'name'     => 'value',
+                        'multiple' => true,
+                        'value'    => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
+                        'options'  => [
+                            'data-no-update' => 'true',
+                            'class'          => 'sx-value-element',
+                        ],
+                    ]);
                     ?>
                 <? elseif (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.tree_id', 'element.treeIds'])) : ?>
                     <?
-                        echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
-                            'name' => 'value',
-                            'multiple' => true,
-                            'value' => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
-                            'options' => [
-                                'data-no-update' => 'true',
-                                'class' => 'sx-value-element'
-                            ]
-                        ]);
+                    echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
+                        'name'     => 'value',
+                        'multiple' => true,
+                        'value'    => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
+                        'options'  => [
+                            'data-no-update' => 'true',
+                            'class'          => 'sx-value-element',
+                        ],
+                    ]);
                     ?>
                 <? else : ?>
                     <?
                     $value = \yii\helpers\ArrayHelper::getValue($rule, 'value');
                     if (is_string($value)) {
                         echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
-                            'size'  => 1,
-                            'class' => 'form-control sx-value-element',
-                            'data-no-update' => 'true'
+                            'size'           => 1,
+                            'class'          => 'form-control sx-value-element',
+                            'data-no-update' => 'true',
                         ]);
                     } else {
                         print_r($value);
@@ -142,7 +142,7 @@
                             'class' => 'form-control sx-value-element',
                             'data-no-update' => 'true'
                         ]);
-                    */?>
+                    */ ?>
                 <? endif; ?>
 
             </div>

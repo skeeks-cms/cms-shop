@@ -11,7 +11,6 @@ namespace skeeks\cms\shop\paySystems;
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
-use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -62,7 +61,7 @@ class SberbankPaySystem extends PaySystemHandlerComponent
         return ArrayHelper::merge(parent::attributeLabels(), [
             'username' => 'Идентификатор магазина из ЛК',
             'password' => 'Пароль',
-            'isLive' => 'Рабочий режим (не тестовый!)',
+            'isLive'   => 'Рабочий режим (не тестовый!)',
         ]);
     }
 
@@ -72,7 +71,6 @@ class SberbankPaySystem extends PaySystemHandlerComponent
             'isLive' => 'Будет использован url: https://securepayments.sberbank.ru/payment/rest/ (тестовый: https://3dsec.sberbank.ru/payment/rest/)',
         ]);
     }
-
 
 
     /**
@@ -98,14 +96,15 @@ class SberbankPaySystem extends PaySystemHandlerComponent
      * @param $data
      * @return mixed
      */
-    public function gateway($method, $data) {
+    public function gateway($method, $data)
+    {
         $curl = curl_init(); // Инициализируем запрос
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => ($this->isLive?$this->gatewayUrl:$this->gatewayTestUrl).$method, // Полный адрес метода
+        curl_setopt_array($curl, [
+            CURLOPT_URL            => ($this->isLive ? $this->gatewayUrl : $this->gatewayTestUrl).$method, // Полный адрес метода
             CURLOPT_RETURNTRANSFER => true, // Возвращать ответ
-            CURLOPT_POST => true, // Метод POST
-            CURLOPT_POSTFIELDS => http_build_query($data) // Данные в запросе
-        ));
+            CURLOPT_POST           => true, // Метод POST
+            CURLOPT_POSTFIELDS     => http_build_query($data) // Данные в запросе
+        ]);
         $response = curl_exec($curl); // Выполненяем запрос
         $response = json_decode($response, true); // Декодируем из JSON в массив
         curl_close($curl); // Закрываем соединение

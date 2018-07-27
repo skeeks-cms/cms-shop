@@ -6,8 +6,8 @@
  * @date 10.03.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
+use yii\db\Schema;
 
 class m150925_190601_create_table__shop_buyer_property extends Migration
 {
@@ -26,20 +26,20 @@ class m150925_190601_create_table__shop_buyer_property extends Migration
         $this->createTable("{{%shop_buyer_property}}", [
             'id' => Schema::TYPE_PK,
 
-            'created_by' => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER.' NULL',
+            'updated_by' => Schema::TYPE_INTEGER.' NULL',
 
-            'created_at' => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER.' NULL',
+            'updated_at' => Schema::TYPE_INTEGER.' NULL',
 
-            'property_id' => Schema::TYPE_INTEGER . ' NULL',
-            'element_id' => Schema::TYPE_INTEGER . ' NULL',
+            'property_id' => Schema::TYPE_INTEGER.' NULL',
+            'element_id'  => Schema::TYPE_INTEGER.' NULL',
 
-            'value' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'value' => Schema::TYPE_STRING.'(255) NOT NULL',
 
-            'value_enum' => Schema::TYPE_INTEGER . '(11) NULL',
-            'value_num' => 'decimal(18,4) NULL',
-            'description' => Schema::TYPE_STRING . '(255) NULL',
+            'value_enum'  => Schema::TYPE_INTEGER.'(11) NULL',
+            'value_num'   => 'decimal(18,4) NULL',
+            'description' => Schema::TYPE_STRING.'(255) NULL',
 
         ], $tableOptions);
 
@@ -53,7 +53,7 @@ class m150925_190601_create_table__shop_buyer_property extends Migration
         $this->createIndex('shop_buyer_property__value_enum', '{{%shop_buyer_property}}', 'value_enum');
         $this->createIndex('shop_buyer_property__value_num', '{{%shop_buyer_property}}', 'value_num');
         $this->createIndex('shop_buyer_property__description', '{{%shop_buyer_property}}', 'description');
-        
+
         $this->addForeignKey(
             'shop_buyer_property_created_by', "{{%shop_buyer_property}}",
             'created_by', '{{%cms_user}}', 'id', 'SET NULL', 'SET NULL'

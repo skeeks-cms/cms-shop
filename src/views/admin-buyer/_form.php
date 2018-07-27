@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
@@ -16,8 +15,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 ?>
 
 <?php $form = ActiveForm::begin([
-    'id' => 'sx-dynamic-form',
-    'enableAjaxValidation' => false,
+    'id'                     => 'sx-dynamic-form',
+    'enableAjaxValidation'   => false,
     'enableClientValidation' => false,
 ]); ?>
 
@@ -79,13 +78,13 @@ JS
     \yii\helpers\ArrayHelper::map(
         \skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name'
     )), [
-    'size' => 1,
+    'size'             => 1,
     'data-form-reload' => 'true',
 ]); ?>
 
 <? if ($model->relatedProperties) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/cms', 'Settings')
+        'content' => \Yii::t('skeeks/cms', 'Settings'),
     ]); ?>
     <? if ($properties = $model->relatedProperties) : ?>
         <? foreach ($properties as $property) : ?>

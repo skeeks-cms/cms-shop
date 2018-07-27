@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
@@ -30,39 +29,39 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <? if (!$model->isNewRecord) : ?>
     <?= $form->fieldSet('Свойства') ?>
     <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-        'label' => \skeeks\cms\shop\Module::t('app', 'Properties payer'),
-        'hint' => \skeeks\cms\shop\Module::t('app',
+        'label'       => \skeeks\cms\shop\Module::t('app', 'Properties payer'),
+        'hint'        => \skeeks\cms\shop\Module::t('app',
             'Each payer may have its own set of properties that it will ask when ordering.'),
         'parentModel' => $model,
-        'relation' => [
-            'shop_person_type_id' => 'id'
+        'relation'    => [
+            'shop_person_type_id' => 'id',
         ],
 
         'controllerRoute' => '/shop/admin-person-type-property',
         'gridViewOptions' => [
             'sortable' => true,
-            'columns' => [
+            'columns'  => [
                 [
-                    'attribute' => 'name',
-                    'enableSorting' => false
+                    'attribute'     => 'name',
+                    'enableSorting' => false,
                 ],
 
                 [
-                    'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                    'attribute' => 'active',
-                    'falseValue' => \skeeks\cms\components\Cms::BOOL_N,
-                    'trueValue' => \skeeks\cms\components\Cms::BOOL_Y,
-                    'enableSorting' => false
+                    'class'         => \skeeks\cms\grid\BooleanColumn::className(),
+                    'attribute'     => 'active',
+                    'falseValue'    => \skeeks\cms\components\Cms::BOOL_N,
+                    'trueValue'     => \skeeks\cms\components\Cms::BOOL_Y,
+                    'enableSorting' => false,
                 ],
 
                 [
-                    'attribute' => 'code',
-                    'enableSorting' => false
+                    'attribute'     => 'code',
+                    'enableSorting' => false,
                 ],
 
                 [
-                    'attribute' => 'priority',
-                    'enableSorting' => false
+                    'attribute'     => 'priority',
+                    'enableSorting' => false,
                 ],
             ],
         ],

@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
@@ -35,7 +34,7 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
         <?= $form->field($model, 'product_id')->widget(
             \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
-                'dialogRoute' => ['/shop/admin-cms-content-element']
+                'dialogRoute' => ['/shop/admin-cms-content-element'],
             ]
         ); ?>
     </div>

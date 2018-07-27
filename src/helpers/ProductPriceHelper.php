@@ -10,9 +10,9 @@ namespace skeeks\cms\shop\helpers;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\money\Money;
-use skeeks\cms\shop\models\shopOrder;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopDiscount;
+use skeeks\cms\shop\models\shopOrder;
 use skeeks\cms\shop\models\ShopProductPrice;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  *
- * @property ShopOrder         $shopOrder;
+ * @property ShopOrder        $shopOrder;
  *
  * @property ShopProductPrice $basePrice; Базовая цена
  *
@@ -36,55 +36,37 @@ use yii\helpers\ArrayHelper;
 class ProductPriceHelper extends Component
 {
     /**
+     * @var ShopDiscount[]
+     */
+    static protected $_shopDiscounts = false;
+    /**
      * @var ShopCmsContentElement
      */
     public $shopCmsContentElement;
-
-    /**
-     * @var shopOrder
-     */
-    protected $_shopOrder;
-
-
     /**
      * @var ShopProductPrice
      */
     public $price;
-
+    /**
+     * @var shopOrder
+     */
+    protected $_shopOrder;
     /**
      * @var ShopProductPrice
      */
     protected $_minPrice;
-
     /**
      * @var ShopProductPrice
      */
     protected $_basePrice;
-
     /**
      * @var Money
      */
     protected $_minMoney;
-
     /**
      * @var ShopDiscount[]
      */
     protected $_applyedDiscounts;
-
-    /**
-     * @var ShopDiscount[]
-     */
-    static protected $_shopDiscounts = false;
-    
-    static public function getShopDiscounts()
-    {
-        if (self::$_shopDiscounts === false) {
-            self::$_shopDiscounts = ShopDiscount::find()->active()->all();
-        }
-        
-        return self::$_shopDiscounts;
-    }
-
     /**
      *
      */
@@ -110,7 +92,7 @@ class ProductPriceHelper extends Component
          * @var ShopDiscount $shopDiscount
          */
         $shopDiscountsTmp = self::getShopDiscounts();
-      
+
         if ($shopDiscountsTmp) {
             foreach ($shopDiscountsTmp as $shopDiscount) {
                 if (\Yii::$app->authManager->checkAccess($this->shopOrder->cmsUser ? $this->shopOrder->cmsUser->id : null, $shopDiscount->permissionName)) {
@@ -167,8 +149,14 @@ class ProductPriceHelper extends Component
         $this->_minPrice = $price;
         $this->_applyedDiscounts = $applyedShopDiscounts;
     }
+    static public function getShopDiscounts()
+    {
+        if (self::$_shopDiscounts === false) {
+            self::$_shopDiscounts = ShopDiscount::find()->active()->all();
+        }
 
-
+        return self::$_shopDiscounts;
+    }
     /**
      * @return ShopDiscount[]
      */

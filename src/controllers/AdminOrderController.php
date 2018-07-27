@@ -8,43 +8,19 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\components\Cms;
-use skeeks\cms\grid\BooleanColumn;
-use skeeks\cms\grid\CreatedAtColumn;
-use skeeks\cms\grid\SiteColumn;
-use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\models\CmsContent;
-use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorCreateAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelEditAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelUpdateAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
-use skeeks\cms\shop\models\ShopAffiliate;
-use skeeks\cms\shop\models\ShopAffiliatePlan;
 use skeeks\cms\shop\models\ShopBasket;
-use skeeks\cms\shop\models\ShopBuyer;
-use skeeks\cms\shop\models\ShopContent;
-use skeeks\cms\shop\models\ShopExtra;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
-use skeeks\cms\shop\models\ShopOrderStatus;
-use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopProduct;
-use skeeks\cms\shop\models\ShopStore;
-use skeeks\cms\shop\models\ShopTax;
-use skeeks\cms\shop\models\ShopVat;
 use yii\base\Exception;
-use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /**
  * Class AdminExtraController
@@ -80,9 +56,9 @@ class AdminOrderController extends AdminModelEditorController
 
                 'create-order' =>
                     [
-                        'class' => AdminAction::className(),
-                        'name' => \Yii::t('skeeks/shop/app', 'Place your order'),
-                        "icon" => "glyphicon glyphicon-plus",
+                        'class'    => AdminAction::className(),
+                        'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
+                        "icon"     => "glyphicon glyphicon-plus",
                         "callback" => [$this, 'createOrder'],
                     ],
 
@@ -103,7 +79,7 @@ class AdminOrderController extends AdminModelEditorController
     public function view()
     {
         return $this->render($this->action->id, [
-            'model' => $this->model
+            'model' => $this->model,
         ]);
     }
 
@@ -222,16 +198,16 @@ class AdminOrderController extends AdminModelEditorController
             }
 
             $shopBasket = ShopBasket::find()->where([
-                'fuser_id' => $shopFuser->id,
+                'fuser_id'   => $shopFuser->id,
                 'product_id' => $product_id,
-                'order_id' => null,
+                'order_id'   => null,
             ])->one();
 
             if (!$shopBasket) {
                 $shopBasket = new ShopBasket([
-                    'fuser_id' => $shopFuser->id,
+                    'fuser_id'   => $shopFuser->id,
                     'product_id' => $product->id,
-                    'quantity' => 0,
+                    'quantity'   => 0,
                 ]);
             }
 
@@ -281,16 +257,16 @@ class AdminOrderController extends AdminModelEditorController
             }
 
             $shopBasket = ShopBasket::find()->where([
-                'order_id' => $model->id,
+                'order_id'   => $model->id,
                 'product_id' => $product_id,
-                'fuser_id' => null,
+                'fuser_id'   => null,
             ])->one();
 
             if (!$shopBasket) {
                 $shopBasket = new ShopBasket([
-                    'order_id' => $model->id,
+                    'order_id'   => $model->id,
                     'product_id' => $product->id,
-                    'quantity' => 0,
+                    'quantity'   => 0,
                 ]);
             }
 
@@ -364,12 +340,12 @@ class AdminOrderController extends AdminModelEditorController
 
                             } else {
                                 throw new Exception(\Yii::t('skeeks/shop/app',
-                                        'Incorrect data of the new order') . ": " . array_shift($order->getFirstErrors()));
+                                        'Incorrect data of the new order').": ".array_shift($order->getFirstErrors()));
                             }
 
                         } else {
                             throw new Exception(\Yii::t('skeeks/shop/app',
-                                    'Not enogh data for ordering') . ": " . array_shift($model->getFirstErrors()));
+                                    'Not enogh data for ordering').": ".array_shift($model->getFirstErrors()));
                         }
                     } else {
                         throw new Exception(\Yii::t('skeeks/shop/app', 'Could not save'));
@@ -381,11 +357,11 @@ class AdminOrderController extends AdminModelEditorController
             }
 
             return $this->render($this->action->id, [
-                'cmsUser' => $cmsUser,
-                'shopFuser' => $model
+                'cmsUser'   => $cmsUser,
+                'shopFuser' => $model,
             ]);
         } else {
-            return $this->render($this->action->id . "-select-user");
+            return $this->render($this->action->id."-select-user");
         }
     }
 

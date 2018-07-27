@@ -23,5 +23,5 @@ use skeeks\cms\mail\helpers\Html;
 <?= Html::endTag('p'); ?>
 
 <?= Html::beginTag('p'); ?>
-    <?= Html::a(\Yii::t('skeeks/shop/app', 'Go to payment'), $order->payUrl); ?>.
+<?= Html::a(\Yii::t('skeeks/shop/app', 'Go to payment'), $order->payUrl); ?>.
 <?= Html::endTag('p'); ?>

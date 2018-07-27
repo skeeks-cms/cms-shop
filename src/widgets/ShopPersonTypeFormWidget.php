@@ -8,13 +8,9 @@
 
 namespace skeeks\cms\shop\widgets;
 
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\shop\assets\ShopAsset;
 use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopPersonType;
 use yii\base\Widget;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 /**
  * Class ShopGlobalWidget
@@ -63,7 +59,7 @@ class ShopPersonTypeFormWidget extends Widget
     public function run()
     {
         return $this->render($this->viewFile, [
-            'widget' => $this
+            'widget' => $this,
         ]);
     }
 }

@@ -17,7 +17,7 @@ class ShopAsset extends Asset
     public $css = [];
     public $js = [
         'classes/Shop.js',
-        'classes/Cart.js'
+        'classes/Cart.js',
     ];
     public $depends = [
         '\skeeks\sx\assets\Core',

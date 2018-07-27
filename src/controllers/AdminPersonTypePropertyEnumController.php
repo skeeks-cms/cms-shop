@@ -8,12 +8,8 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
-use skeeks\cms\shop\models\ShopPersonTypeProperty;
 use skeeks\cms\shop\models\ShopPersonTypePropertyEnum;
-use yii\helpers\ArrayHelper;
 
 /**
  * Class AdminPersonTypePropertyEnumController

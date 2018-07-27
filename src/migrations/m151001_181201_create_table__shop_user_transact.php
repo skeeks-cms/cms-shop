@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m151001_181201_create_table__shop_user_transact extends Migration
@@ -32,15 +31,15 @@ class m151001_181201_create_table__shop_user_transact extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'cms_user_id' => $this->integer()->notNull(),
+            'cms_user_id'   => $this->integer()->notNull(),
             'shop_order_id' => $this->integer(),
 
-            'amount' => $this->decimal(18, 4)->notNull()->defaultValue(0),
+            'amount'        => $this->decimal(18, 4)->notNull()->defaultValue(0),
             'currency_code' => $this->string(3)->notNull(),
 
-            'debit' => $this->string(1)->notNull()->defaultValue('N'),
+            'debit'       => $this->string(1)->notNull()->defaultValue('N'),
             'description' => $this->string(255)->notNull(),
-            'notes' => $this->text(),
+            'notes'       => $this->text(),
 
 
         ], $tableOptions);

@@ -15,13 +15,13 @@
     padding: 15px 15px 15px 35px;
     border-radius: 5px;
 }
+
 /*
 
 .sx-discount-conditions a {
     text-decoration: none;
     border-bottom: 1px dashed;
 }*/
-
 
 .sx-discount-conditions .sx-rules {
     padding: 10px 0px;
@@ -31,7 +31,7 @@
     display: none;
 }
 
-.sx-discount-conditions .sx-row:hover>.sx-conditions>.row>.sx-remove-wrapper,
-.sx-discount-conditions .sx-row:hover>.row>.sx-remove-wrapper {
+.sx-discount-conditions .sx-row:hover > .sx-conditions > .row > .sx-remove-wrapper,
+.sx-discount-conditions .sx-row:hover > .row > .sx-remove-wrapper {
     display: block;
 }

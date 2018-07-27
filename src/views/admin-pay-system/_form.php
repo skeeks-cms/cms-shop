@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
@@ -14,7 +13,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?php $form = ActiveForm::begin([
-    'id' => 'sx-dynamic-form',
+    'id'                   => 'sx-dynamic-form',
     'enableAjaxValidation' => false,
 ]); ?>
 
@@ -66,15 +65,15 @@ JS
 
 <?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '],
     [
-        \skeeks\cms\shop\paySystems\RobokassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\RobokassaPaySystem())->descriptor->name,
-        \skeeks\cms\shop\paySystems\PayPalPaySystem::className() => (new \skeeks\cms\shop\paySystems\PayPalPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\RobokassaPaySystem::className()   => (new \skeeks\cms\shop\paySystems\RobokassaPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\PayPalPaySystem::className()      => (new \skeeks\cms\shop\paySystems\PayPalPaySystem())->descriptor->name,
         \skeeks\cms\shop\paySystems\YandexKassaPaySystem::className() => (new \skeeks\cms\shop\paySystems\YandexKassaPaySystem())->descriptor->name,
-        \skeeks\cms\shop\paySystems\TinkoffPaySystem::className() => (new \skeeks\cms\shop\paySystems\TinkoffPaySystem())->descriptor->name,
-        \skeeks\cms\shop\paySystems\SberbankPaySystem::className() => (new \skeeks\cms\shop\paySystems\SberbankPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\TinkoffPaySystem::className()     => (new \skeeks\cms\shop\paySystems\TinkoffPaySystem())->descriptor->name,
+        \skeeks\cms\shop\paySystems\SberbankPaySystem::className()    => (new \skeeks\cms\shop\paySystems\SberbankPaySystem())->descriptor->name,
     ]
 ), [
-    'size' => 1,
-    'data-form-reload' => 'true'
+    'size'             => 1,
+    'data-form-reload' => 'true',
 ]);
 ?>
 

@@ -9,9 +9,6 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\Core;
-use skeeks\cms\models\User;
-use skeeks\cms\shop\models\ShopOrder;
-use Yii;
 use yii\base\UserException;
 use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -19,11 +16,11 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%shop_order_status}}".
  *
- * @property string $code
- * @property string $name
- * @property string $description
- * @property integer $priority
- * @property string $color
+ * @property string      $code
+ * @property string      $name
+ * @property string      $description
+ * @property integer     $priority
+ * @property string      $color
  *
  * @property ShopOrder[] $shopOrders
  */
@@ -35,9 +32,15 @@ class ShopOrderStatus extends Core
     static public $protectedStatuses =
         [
             self::STATUS_CODE_START,
-            self::STATUS_CODE_END
+            self::STATUS_CODE_END,
         ];
-
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%shop_order_status}}';
+    }
     /**
      * @inheritdoc
      */
@@ -47,30 +50,12 @@ class ShopOrderStatus extends Core
 
         $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE, [$this, "checkDelete"]);
     }
-
     public function checkDelete()
     {
         if ($this->isProtected()) {
             throw new UserException(\Yii::t('skeeks/shop/app', 'You can not remove this status'));
         }
     }
-
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return '{{%shop_order_status}}';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), []);
-    }
-
     /**
      * Нельзя удалять и редактировать статус?
      * @return bool
@@ -83,18 +68,24 @@ class ShopOrderStatus extends Core
 
         return false;
     }
-
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), []);
+    }
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code' => \Yii::t('skeeks/shop/app', 'Code'),
-            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'code'        => \Yii::t('skeeks/shop/app', 'Code'),
+            'name'        => \Yii::t('skeeks/shop/app', 'Name'),
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
-            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
-            'color' => \Yii::t('skeeks/shop/app', 'Color'),
+            'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
+            'color'       => \Yii::t('skeeks/shop/app', 'Color'),
         ]);
     }
 
@@ -111,7 +102,7 @@ class ShopOrderStatus extends Core
             [['name'], 'string', 'max' => 255],
             [['color'], 'string', 'max' => 32],
             [['code'], 'unique'],
-            [['code'], 'validateCode']
+            [['code'], 'validateCode'],
         ]);
     }
 

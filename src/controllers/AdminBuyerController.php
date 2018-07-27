@@ -8,24 +8,14 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\components\Cms;
-use skeeks\cms\grid\BooleanColumn;
-use skeeks\cms\grid\SiteColumn;
-use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\models\CmsContent;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopBuyer;
-use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
-use skeeks\cms\shop\models\ShopTax;
-use skeeks\cms\shop\models\ShopVat;
-use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -39,7 +29,10 @@ class AdminBuyerController extends AdminModelEditorController
     use AdminModelEditorStandartControllerTrait;
 
     public $notSubmitParam = 'sx-not-submit';
-
+    /**
+     * @var ShopPersonType
+     */
+    protected $_personType = null;
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Buyers');
@@ -48,12 +41,6 @@ class AdminBuyerController extends AdminModelEditorController
 
         parent::init();
     }
-
-    /**
-     * @var ShopPersonType
-     */
-    protected $_personType = null;
-
     public function getPersonType()
     {
         if ($this->_personType !== null) {
@@ -75,7 +62,7 @@ class AdminBuyerController extends AdminModelEditorController
         $permissionName = parent::getPermissionName();
 
         if ($this->personType) {
-            return $permissionName . "-" . $this->personType->id;
+            return $permissionName."-".$this->personType->id;
         }
 
         return $permissionName;
@@ -87,8 +74,8 @@ class AdminBuyerController extends AdminModelEditorController
      */
     public function getUrl()
     {
-        return UrlHelper::construct($this->id . '/' . $this->action->id, [
-            'person_type_id' => \Yii::$app->request->get('person_type_id')
+        return UrlHelper::construct($this->id.'/'.$this->action->id, [
+            'person_type_id' => \Yii::$app->request->get('person_type_id'),
         ])->enableAdmin()->setRoute('index')->normalizeCurrentRoute()->toString();
     }
 
@@ -140,7 +127,8 @@ class AdminBuyerController extends AdminModelEditorController
                 $handler->load(\Yii::$app->request->post());
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handler->validate()) {
+                    && $model->validate() && $handler->validate()
+                ) {
                     $model->save();
                     $handler->save();
 
@@ -158,7 +146,7 @@ class AdminBuyerController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }
@@ -189,7 +177,8 @@ class AdminBuyerController extends AdminModelEditorController
                     $handler->load(\Yii::$app->request->post());
 
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handler->validate()) {
+                        && $model->validate() && $handler->validate()
+                    ) {
                         $model->save();
                         $handler->save();
 
@@ -211,7 +200,7 @@ class AdminBuyerController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }

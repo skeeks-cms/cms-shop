@@ -8,10 +8,8 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Core;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -22,10 +20,10 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $name
- * @property string $description
- * @property string $code
- * @property string $site_code
+ * @property string  $name
+ * @property string  $description
+ * @property string  $code
+ * @property string  $site_code
  *
  * @property CmsSite $site
  */
@@ -50,7 +48,7 @@ class ShopTax extends Core
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
-            [['site_code'], 'string', 'max' => 15]
+            [['site_code'], 'string', 'max' => 15],
         ]);
     }
 
@@ -60,15 +58,15 @@ class ShopTax extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'id'          => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'  => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'  => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'  => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'  => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name'        => \Yii::t('skeeks/shop/app', 'Name'),
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
-            'code' => \Yii::t('skeeks/shop/app', 'Code'),
-            'site_code' => \Yii::t('skeeks/shop/app', 'Site'),
+            'code'        => \Yii::t('skeeks/shop/app', 'Code'),
+            'site_code'   => \Yii::t('skeeks/shop/app', 'Site'),
         ]);
     }
 

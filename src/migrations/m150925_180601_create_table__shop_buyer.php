@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150925_180601_create_table__shop_buyer extends Migration
@@ -34,7 +33,7 @@ class m150925_180601_create_table__shop_buyer extends Migration
 
             'name' => $this->string()->notNull(),
 
-            'cms_user_id' => $this->integer()->notNull(),
+            'cms_user_id'         => $this->integer()->notNull(),
             'shop_person_type_id' => $this->integer()->notNull(),
 
         ], $tableOptions);

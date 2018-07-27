@@ -9,23 +9,11 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
-use skeeks\cms\components\Cms;
 use skeeks\cms\filters\CmsAccessControl;
-use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopBill;
-use skeeks\cms\shop\models\ShopBuyer;
-use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
-use skeeks\cms\shop\models\ShopPersonType;
-use skeeks\cms\shop\models\ShopPersonTypeProperty;
-use skeeks\cms\shop\models\ShopProduct;
-use yii\base\Exception;
 use yii\base\UserException;
-use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -45,12 +33,12 @@ class OrderController extends Controller
 
             'accessToView' => [
                 'class' => CmsAccessControl::className(),
-                'only' => ['view'],
+                'only'  => ['view'],
                 'rules' => [
                     // deny all POST request
                     //
                     [
-                        'allow' => true,
+                        'allow'         => true,
                         'matchCallback' => function ($rule, $action) {
                             $id = \Yii::$app->request->get('id');
                             $shopOrder = ShopOrder::findOne($id);
@@ -64,21 +52,21 @@ class OrderController extends Controller
                             }
 
                             return false;
-                        }
+                        },
                     ],
-                ]
+                ],
             ],
 
             'accessToList' => [
                 'class' => CmsAccessControl::className(),
-                'only' => ['list'],
+                'only'  => ['list'],
                 'rules' => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
@@ -96,7 +84,7 @@ class OrderController extends Controller
      */
     public function actionList()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'My orders') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'My orders').' | '.\Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id);
     }
@@ -106,10 +94,10 @@ class OrderController extends Controller
      */
     public function actionView()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Order').' | '.\Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id, [
-            'model' => ShopOrder::findOne(\Yii::$app->request->get('id'))
+            'model' => ShopOrder::findOne(\Yii::$app->request->get('id')),
         ]);
     }
 
@@ -118,10 +106,10 @@ class OrderController extends Controller
      */
     public function actionFinish()
     {
-        $this->view->title = \Yii::t('skeeks/shop/app', 'Order') . ' | ' . \Yii::t('skeeks/shop/app', 'Shop');
+        $this->view->title = \Yii::t('skeeks/shop/app', 'Order').' | '.\Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id, [
-            'model' => ShopOrder::find()->andWhere(['key' => \Yii::$app->request->get('key')])->one()
+            'model' => ShopOrder::find()->andWhere(['key' => \Yii::$app->request->get('key')])->one(),
         ]);
     }
 
@@ -153,9 +141,9 @@ class OrderController extends Controller
         $shopBill->shop_pay_system_id = $shopOrder->pay_system_id;
         $shopBill->amount = $shopOrder->price;
         $shopBill->currency_code = $shopOrder->currency_code;
-        $shopBill->description = "Оплата по заказу №" . $shopOrder->id;
+        $shopBill->description = "Оплата по заказу №".$shopOrder->id;
         if (!$shopBill->save()) {
-            throw new UserException('Не создался счет: ' . print_r($shopBill->errors, true));
+            throw new UserException('Не создался счет: '.print_r($shopBill->errors, true));
         }
 
         return $shopBill->shopPaySystem->paySystemHandler->actionPaymentResponse($shopBill);
@@ -165,12 +153,9 @@ class OrderController extends Controller
     public function actionPayPal()
     {
         return $this->render($this->action->id, [
-            'model' => ShopOrder::findOne(\Yii::$app->request->get('id'))
+            'model' => ShopOrder::findOne(\Yii::$app->request->get('id')),
         ]);
     }
-
-
-
 
 
     /**

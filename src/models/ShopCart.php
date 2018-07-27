@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\components\Cms;
-use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -18,55 +17,54 @@ use skeeks\cms\models\User;
 use skeeks\cms\money\Money;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
 use yii\db\ActiveQuery;
-use yii\helpers\ArrayHelper;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  *
  * Это объект корзины
  *
- * @property integer              $id
- * @property integer              $created_by
- * @property integer              $updated_by
- * @property integer              $created_at
- * @property integer              $updated_at
- * @property integer              $cms_user_id Пользователь сайта
- * @property integer              $shop_order_id
+ * @property integer           $id
+ * @property integer           $created_by
+ * @property integer           $updated_by
+ * @property integer           $created_at
+ * @property integer           $updated_at
+ * @property integer           $cms_user_id Пользователь сайта
+ * @property integer           $shop_order_id
  *
  * ***
  *
- * @property CmsUser              $cmsUser
+ * @property CmsUser           $cmsUser
  *
- * @property ShopBasket[]         $shopBaskets
- * @property ShopDelivery         $delivery
- * @property ShopBuyer            $buyer
- * @property ShopPaySystem        $paySystem
+ * @property ShopBasket[]      $shopBaskets
+ * @property ShopDelivery      $delivery
+ * @property ShopBuyer         $buyer
+ * @property ShopPaySystem     $paySystem
  *
- * @property ShopPersonType       $personType
- * @property CmsSite              $site
+ * @property ShopPersonType    $personType
+ * @property CmsSite           $site
  *
- * @property int                  $countShopBaskets
- * @property float                $quantity
+ * @property int               $countShopBaskets
+ * @property float             $quantity
  *
- * @property ShopBuyer[]          $shopBuyers
- * @property ShopPaySystem[]      $paySystems
- *
- *
+ * @property ShopBuyer[]       $shopBuyers
+ * @property ShopPaySystem[]   $paySystems
  *
  *
- * @property ShopOrder            $shopOrder
- * @property Money                $money
- * @property Money                $moneyOriginal
- * @property Money                $moneyVat
- * @property Money                $moneyDiscount
- * @property Money                $moneyDelivery
  *
- * @property int                  $weight
- * @property bool                 $isEmpty
  *
- * @property ShopTypePrice        $buyTypePrices
- * @property ShopTypePrice        $viewTypePrices
- * @property CmsContentElement    $store
+ * @property ShopOrder         $shopOrder
+ * @property Money             $money
+ * @property Money             $moneyOriginal
+ * @property Money             $moneyVat
+ * @property Money             $moneyDiscount
+ * @property Money             $moneyDelivery
+ *
+ * @property int               $weight
+ * @property bool              $isEmpty
+ *
+ * @property ShopTypePrice     $buyTypePrices
+ * @property ShopTypePrice     $viewTypePrices
+ * @property CmsContentElement $store
  */
 class ShopCart extends ActiveRecord
 {
@@ -107,8 +105,8 @@ class ShopCart extends ActiveRecord
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'cms_user_id'      => \Yii::t('skeeks/shop/app', 'User site'),
-            'shop_order_id'    => \Yii::t('skeeks/shop/app', 'Заказ'),
+            'cms_user_id'   => \Yii::t('skeeks/shop/app', 'User site'),
+            'shop_order_id' => \Yii::t('skeeks/shop/app', 'Заказ'),
         ]);
     }
 
@@ -156,7 +154,6 @@ class ShopCart extends ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'cms_user_id']);
     }
-
 
 
     /**
@@ -381,7 +378,6 @@ class ShopCart extends ActiveRecord
     }
 
 
-
     /**
      * @return $this
      * @deprecated
@@ -397,10 +393,6 @@ class ShopCart extends ActiveRecord
 
         return $this;*/
     }
-
-
-
-
 
 
     /**
@@ -424,8 +416,8 @@ class ShopCart extends ActiveRecord
     {
         return $this->shopOrder->buyTypePrices;
     }
-    
-    
+
+
     public function getDiscountCoupons()
     {
         return $this->shopOrder->discountCoupons;

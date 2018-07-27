@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150914_190601_create_table__shop_product_price extends Migration
@@ -32,14 +31,14 @@ class m150914_190601_create_table__shop_product_price extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'product_id' => $this->integer()->notNull(),
+            'product_id'    => $this->integer()->notNull(),
             'type_price_id' => $this->integer()->notNull(),
 
-            'price' => $this->decimal(18, 2)->notNull(),
+            'price'         => $this->decimal(18, 2)->notNull(),
             'currency_code' => $this->string(3)->notNull(),
 
             'quantity_from' => $this->integer(),
-            'quantity_to' => $this->integer(),
+            'quantity_to'   => $this->integer(),
 
             'tmp_id' => $this->string(40),
         ], $tableOptions);

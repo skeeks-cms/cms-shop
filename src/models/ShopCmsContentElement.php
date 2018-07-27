@@ -184,6 +184,4 @@ class ShopCmsContentElement extends CmsContentElement
     }
 
 
-
-
 }

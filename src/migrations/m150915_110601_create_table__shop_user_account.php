@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150915_110601_create_table__shop_user_account extends Migration
@@ -35,11 +34,11 @@ class m150915_110601_create_table__shop_user_account extends Migration
             'user_id' => $this->integer()->notNull(),
 
             'current_budget' => $this->decimal(18, 4)->notNull()->defaultValue(0),
-            'currency_code' => $this->string(3)->notNull(),
+            'currency_code'  => $this->string(3)->notNull(),
 
-            'locked' => $this->string(1)->notNull()->defaultValue('N'),
+            'locked'    => $this->string(1)->notNull()->defaultValue('N'),
             'locked_at' => $this->integer(),
-            'notes' => $this->text(),
+            'notes'     => $this->text(),
 
         ], $tableOptions);
 

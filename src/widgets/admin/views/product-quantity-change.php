@@ -14,11 +14,11 @@
         <?= \Yii::t('skeeks/shop/app', 'Changelog'); ?></a>
 
     <? $createModal = \yii\bootstrap\Modal::begin([
-        'id' => 'sx-price-change-' . $widget->id,
-        'size' => \yii\bootstrap\Modal::SIZE_LARGE,
-        'header' => '<b>' . \Yii::t('skeeks/shop/app', 'The history of the availability of product') . '</b>',
+        'id'     => 'sx-price-change-'.$widget->id,
+        'size'   => \yii\bootstrap\Modal::SIZE_LARGE,
+        'header' => '<b>'.\Yii::t('skeeks/shop/app', 'The history of the availability of product').'</b>',
         'footer' => '
-        <button type="button" class="btn btn-default" data-dismiss="modal">' . \Yii::t('skeeks/admin', 'Close') . '</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">'.\Yii::t('skeeks/admin', 'Close').'</button>
     ',
     ]); ?>
     <?
@@ -28,17 +28,17 @@
     ?>
     <?= \yii\grid\GridView::widget([
         'dataProvider' => new \yii\data\ActiveDataProvider([
-            'query' => $widget->product->getShopProductQuantityChanges(),
+            'query'      => $widget->product->getShopProductQuantityChanges(),
             'pagination' => [
-                'pageSize' => 10,
-                'pageParam' => 'page-' . $widget->id,
+                'pageSize'  => 10,
+                'pageParam' => 'page-'.$widget->id,
             ],
         ]),
-        'columns' =>
+        'columns'      =>
             [
                 [
                     'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
-                    'label' => \Yii::t('skeeks/shop/app', 'Date and time changes')
+                    'label' => \Yii::t('skeeks/shop/app', 'Date and time changes'),
                 ],
 
                 'quantity',
@@ -46,17 +46,17 @@
                 'measure_ratio',
 
                 [
-                    'class' => \yii\grid\DataColumn::class,
+                    'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'measure_id',
-                    'value' => function (\skeeks\cms\shop\models\ShopProductQuantityChange $shopProductQuantityChange) {
+                    'value'     => function (\skeeks\cms\shop\models\ShopProductQuantityChange $shopProductQuantityChange) {
                         return $shopProductQuantityChange->measure->name;
-                    }
+                    },
                 ],
 
                 [
-                    'class' => \skeeks\cms\grid\CreatedByColumn::className()
+                    'class' => \skeeks\cms\grid\CreatedByColumn::className(),
                 ],
-            ]
+            ],
     ]); ?>
 
     <?

@@ -22,8 +22,8 @@ if ($filter->id) {
 }
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-    'action' => '/' . \Yii::$app->request->pathInfo,
-    'namespace' => \Yii::$app->controller->uniqueId . ($shopPersonType ? "-{$shopPersonType->id}" : "")
+    'action'    => '/'.\Yii::$app->request->pathInfo,
+    'namespace' => \Yii::$app->controller->uniqueId.($shopPersonType ? "-{$shopPersonType->id}" : ""),
 ]); ?>
 
 <?= $form->field($filter, 'id')->setVisible(); ?>

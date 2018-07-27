@@ -24,16 +24,17 @@ function shopProductsMenu()
 
     if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
         'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id',
-            'content_id')
-    ])->all()) {
+            'content_id'),
+    ])->all()
+    ) {
         /**
          * @var $content \skeeks\cms\models\CmsContent
          */
         foreach ($contents as $content) {
             $itemData = [
-                'label' => $content->name,
-                "img" => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
-                'url' => ["shop/admin-cms-content-element", "content_id" => $content->id],
+                'label'          => $content->name,
+                "img"            => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+                'url'            => ["shop/admin-cms-content-element", "content_id" => $content->id],
                 "activeCallback" => function ($adminMenuItem) use ($content) {
                     return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element');
                 },
@@ -73,12 +74,12 @@ function shopPersonTypes()
          */
         foreach ($personTypes as $personType) {
             $itemData = [
-                'label' => $personType->name,
-                'url' => ["shop/admin-buyer", "person_type_id" => $personType->id],
+                'label'          => $personType->name,
+                'url'            => ["shop/admin-buyer", "person_type_id" => $personType->id],
                 'activeCallback' => function (\skeeks\cms\backend\BackendMenuItem $adminMenuItem) {
                     return (bool)(\Yii::$app->controller->uniqueId == 'shop/admin-buyer' && \yii\helpers\ArrayHelper::getValue($adminMenuItem->urlData,
                             'person_type_id') == \Yii::$app->request->get('person_type_id'));
-                }
+                },
             ];
 
             $result[] = $itemData;
@@ -94,8 +95,8 @@ return [
 
     'shop' =>
         [
-            'label' => \Yii::t('skeeks/shop/app', 'Shop'),
-            "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+            'label'    => \Yii::t('skeeks/shop/app', 'Shop'),
+            "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
             'priority' => 250,
 
             'items' =>
@@ -103,32 +104,32 @@ return [
 
                     [
                         'priority' => 0,
-                        'label' => \Yii::t('skeeks/shop/app', 'Orders'),
-                        "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
+                        'label'    => \Yii::t('skeeks/shop/app', 'Orders'),
+                        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
 
                         'items' =>
                             [
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Orders'),
-                                    "url" => ["shop/admin-order"],
-                                    "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
-                                ]
+                                    "url"   => ["shop/admin-order"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
+                                ],
                             ],
 
                     ],
 
                     [
                         'priority' => 0,
-                        'label' => \Yii::t('skeeks/shop/app', 'Goods'),
-                        "img" => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+                        'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
+                        "img"      => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
 
-                        'items' => shopProductsMenu()
+                        'items' => shopProductsMenu(),
                     ],
 
                     [
                         'priority' => 0,
-                        'label' => \Yii::t('skeeks/shop/app', 'Buyers'),
-                        "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
+                        'label'    => \Yii::t('skeeks/shop/app', 'Buyers'),
+                        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
 
                         'items' =>
                             [
@@ -139,37 +140,37 @@ return [
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Regular customers'),
-                                    "url" => ["shop/admin-buyer-user"],
-                                    "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
+                                    "url"   => ["shop/admin-buyer-user"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Buyers'),
                                     //"url"       => ["shop/admin-buyer"],
-                                    "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
 
-                                    'items' => shopPersonTypes()
+                                    'items' => shopPersonTypes(),
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Accounts'),
-                                    "url" => ["shop/admin-user-account"],
+                                    "url"   => ["shop/admin-user-account"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Baskets'),
-                                    "url" => ["shop/admin-fuser"],
+                                    "url"   => ["shop/admin-fuser"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Notify on receipt (Email)'),
-                                    "url" => ["shop/admin-quantity-notice-email"],
+                                    "url"   => ["shop/admin-quantity-notice-email"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Viewed products'),
-                                    "url" => ["shop/admin-viewed-product"],
-                                ]
+                                    "url"   => ["shop/admin-viewed-product"],
+                                ],
                             ],
 
                     ],
@@ -177,8 +178,8 @@ return [
 
                     [
                         'priority' => 0,
-                        'label' => \Yii::t('skeeks/shop/app', 'Marketing management'),
-                        "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
+                        'label'    => \Yii::t('skeeks/shop/app', 'Marketing management'),
+                        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
                         'items' => [
 
@@ -205,36 +206,36 @@ return [
                                     [
                                         [
                                             "label" => \Yii::t('skeeks/shop/app', 'Discount goods'),
-                                            "url" => ["shop/admin-discount"],
+                                            "url"   => ["shop/admin-discount"],
                                         ],
 
                                         [
                                             "label" => \Yii::t('skeeks/shop/app', 'Discount coupons'),
-                                            "url" => ["shop/admin-discount-coupon"],
-                                        ]
+                                            "url"   => ["shop/admin-discount-coupon"],
+                                        ],
 
-                                    ]
+                                    ],
                             ],
 
                             [
                                 "label" => \Yii::t('skeeks/shop/app', 'Cumulative discounts'),
-                                "url" => ["shop/admin-discsave"],
+                                "url"   => ["shop/admin-discsave"],
                             ],
 
-                        ]
+                        ],
                     ],
 
                     [
                         'priority' => 0,
-                        'label' => \Yii::t('skeeks/shop/app', 'Inventory control'),
-                        "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+                        'label'    => \Yii::t('skeeks/shop/app', 'Inventory control'),
+                        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
 
                         'items' =>
                             [
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Stocks'),
-                                    "url" => ["shop/admin-store"],
-                                    "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+                                    "url"   => ["shop/admin-store"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                                 ],
 
                             ],
@@ -244,19 +245,19 @@ return [
 
                     [
                         'priority' => 0,
-                        'label' => \Yii::t('skeeks/shop/app', 'Reports'),
-                        "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/reports.png'],
+                        'label'    => \Yii::t('skeeks/shop/app', 'Reports'),
+                        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/reports.png'],
 
                         'items' =>
                             [
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Reports on orders'),
-                                    "url" => ["shop/admin-report-order"],
+                                    "url"   => ["shop/admin-report-order"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Reports on products'),
-                                    "url" => ["shop/admin-report-product"],
+                                    "url"   => ["shop/admin-report-product"],
                                 ],
 
                             ],
@@ -266,17 +267,17 @@ return [
 
                     [
                         "label" => \Yii::t('skeeks/shop/app', 'Settings'),
-                        "img" => ['skeeks\cms\assets\CmsAsset', 'images/icons/settings.png'],
+                        "img"   => ['skeeks\cms\assets\CmsAsset', 'images/icons/settings.png'],
 
                         'items' =>
                             [
                                 [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Main settings'),
-                                    "url" => [
+                                    "label"          => \Yii::t('skeeks/shop/app', 'Main settings'),
+                                    "url"            => [
                                         "cms/admin-settings",
-                                        "component" => 'skeeks\cms\shop\components\ShopComponent'
+                                        "component" => 'skeeks\cms\shop\components\ShopComponent',
                                     ],
-                                    "img" => ['skeeks\cms\assets\CmsAsset', 'images/icons/settings.png'],
+                                    "img"            => ['skeeks\cms\assets\CmsAsset', 'images/icons/settings.png'],
                                     "activeCallback" => function ($adminMenuItem) {
                                         return (bool)(\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
                                     },
@@ -284,32 +285,32 @@ return [
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Content settings'),
-                                    "url" => ["shop/admin-content"],
+                                    "url"   => ["shop/admin-content"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Order statuses'),
-                                    "url" => ["shop/admin-order-status"],
+                                    "url"   => ["shop/admin-order-status"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Types of prices'),
-                                    "url" => ["shop/admin-type-price"],
+                                    "url"   => ["shop/admin-type-price"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Types of profiles'),
-                                    "url" => ["shop/admin-person-type"],
+                                    "url"   => ["shop/admin-person-type"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Payment systems'),
-                                    "url" => ["shop/admin-pay-system"],
+                                    "url"   => ["shop/admin-pay-system"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Delivery services'),
-                                    "url" => ["shop/admin-delivery"],
+                                    "url"   => ["shop/admin-delivery"],
                                 ],
 
 
@@ -319,54 +320,50 @@ return [
                                         [
                                             [
                                                 "label" => \Yii::t('skeeks/shop/app', 'List of taxes'),
-                                                "url" => ["shop/admin-tax"],
+                                                "url"   => ["shop/admin-tax"],
                                             ],
 
                                             [
                                                 "label" => \Yii::t('skeeks/shop/app', 'Tax rates'),
-                                                "url" => ["shop/admin-tax-rate"],
+                                                "url"   => ["shop/admin-tax-rate"],
                                             ],
 
                                             [
                                                 "label" => \Yii::t('skeeks/shop/app', 'VAT rates'),
-                                                "url" => ["shop/admin-vat"],
+                                                "url"   => ["shop/admin-vat"],
                                             ],
                                         ],
                                 ],
 
-                                [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Surcharges'),
-                                    "url" => ["shop/admin-extra"],
-                                ],
-                            ]
+                            ],
                     ],
 
 
                     [
                         'priority' => 0,
-                        'label' => \Yii::t('skeeks/shop/app', 'Affiliates'),
-                        "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
+                        'label'    => \Yii::t('skeeks/shop/app', 'Affiliates'),
+                        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
 
                         'items' =>
                             [
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Affiliates'),
-                                    "url" => ["shop/admin-affiliate"],
-                                    "img" => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
+                                    "url"   => ["shop/admin-affiliate"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Plans of Commission'),
-                                    "url" => ["shop/admin-affiliate-plan"],
+                                    "url"   => ["shop/admin-affiliate-plan"],
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Pyramid'),
-                                    "url" => ["shop/admin-affiliate-tier"],
-                                ]
+                                    "url"   => ["shop/admin-affiliate-tier"],
+                                ],
                             ],
 
                     ],
-                ]
-        ]
+                ],
+        ],
 ];

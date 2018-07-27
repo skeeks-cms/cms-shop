@@ -1,6 +1,5 @@
 <?php
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 /* @var $this yii\web\View */

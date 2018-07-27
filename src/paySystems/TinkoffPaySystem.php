@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\paySystems;
 
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopOrder;
-use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 

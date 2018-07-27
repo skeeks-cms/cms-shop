@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\widgets\notice;
 
 use skeeks\cms\shop\models\ShopQuantityNoticeEmail;
 use yii\base\InvalidConfigException;
-use yii\base\Widget;
 use yii\bootstrap\Modal;
 use yii\helpers\ArrayHelper;
 
@@ -43,19 +42,19 @@ class NotifyProductEmailModalWidget extends Modal
         }
 
         $this->toggleButton = ArrayHelper::merge([
-            'label' => \Yii::t('skeeks/shop/app', 'Notify admission')
+            'label' => \Yii::t('skeeks/shop/app', 'Notify admission'),
         ], $this->toggleButton);
 
         parent::init();
 
         $success_modal_id = $this->success_modal_id;
         $this->form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin(ArrayHelper::merge([
-            'action' => \yii\helpers\Url::to('/shop/notify/add'),
-            'validationUrl' => \yii\helpers\Url::to('/shop/notify/add-validate'),
-            'id' => $this->id . "-form",
+            'action'                 => \yii\helpers\Url::to('/shop/notify/add'),
+            'validationUrl'          => \yii\helpers\Url::to('/shop/notify/add-validate'),
+            'id'                     => $this->id."-form",
             'enableClientValidation' => false,
-            'enableAjaxValidation' => true,
-            'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+            'enableAjaxValidation'   => true,
+            'afterValidateCallback'  => new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
             {
                 var success_modal = "{$success_modal_id}";
@@ -107,10 +106,10 @@ JS
 
         if (!$this->view_file) {
             if ($this->footer !== false) {
-                $formId = $this->id . "-form";
+                $formId = $this->id."-form";
                 $this->footer = '
-                    <button class="btn btn-primary" onclick="$(\'#' . $formId . '\').submit(); return false;">' . \Yii::t('skeeks/shop/app',
-                        'Submit') . '</button>
+                    <button class="btn btn-primary" onclick="$(\'#'.$formId.'\').submit(); return false;">'.\Yii::t('skeeks/shop/app',
+                        'Submit').'</button>
 
                 ';
 

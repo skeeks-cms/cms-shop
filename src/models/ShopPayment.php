@@ -53,9 +53,9 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::behaviors(), [
             HasJsonFieldsBehavior::class => [
-                'class' => HasJsonFieldsBehavior::class,
-                'fields' => ['external_data']
-            ]
+                'class'  => HasJsonFieldsBehavior::class,
+                'fields' => ['external_data'],
+            ],
         ]);
     }
 

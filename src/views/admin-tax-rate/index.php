@@ -13,48 +13,48 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'columns' =>
+    'columns'         =>
         [
             'value',
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'value' => function (\skeeks\cms\shop\models\ShopTaxRate $model) {
-                    return $model->tax->name . " (" . $model->tax->site->name . ")";
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function (\skeeks\cms\shop\models\ShopTaxRate $model) {
+                    return $model->tax->name." (".$model->tax->site->name.")";
                 },
-                'attribute' => "tax_id"
+                'attribute' => "tax_id",
             ],
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'value' => function (\skeeks\cms\shop\models\ShopTaxRate $model) {
+                'class'     => \yii\grid\DataColumn::className(),
+                'value'     => function (\skeeks\cms\shop\models\ShopTaxRate $model) {
                     return $model->personType->name;
                 },
-                'attribute' => "person_type_id"
+                'attribute' => "person_type_id",
             ],
 
             [
-                'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute' => "is_in_price"
+                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => "is_in_price",
             ],
 
             [
-                'class' => \skeeks\cms\grid\BooleanColumn::className(),
-                'attribute' => "active"
+                'class'     => \skeeks\cms\grid\BooleanColumn::className(),
+                'attribute' => "active",
             ],
 
             [
-                'attribute' => "priority"
-            ]
-        ]
+                'attribute' => "priority",
+            ],
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

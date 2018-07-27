@@ -62,9 +62,9 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::behaviors(), [
             HasJsonFieldsBehavior::class => [
-                'class' => HasJsonFieldsBehavior::class,
-                'fields' => ['external_data']
-            ]
+                'class'  => HasJsonFieldsBehavior::class,
+                'fields' => ['external_data'],
+            ],
         ]);
     }
     /**
@@ -91,7 +91,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
             ])
                 ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                 ->setTo($this->shopBuyer->email)
-                ->setSubject('Выставлен счет №'.$this->id." от ".\Yii::$app->formatter->asDate($this->created_at) . " по заказу №" . $this->shopOrder->id)
+                ->setSubject('Выставлен счет №'.$this->id." от ".\Yii::$app->formatter->asDate($this->created_at)." по заказу №".$this->shopOrder->id)
                 ->send();
         }
     }
@@ -117,7 +117,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->shopBuyer->email)
-                        ->setSubject('Оплачен счет №'.$this->id." от ".\Yii::$app->formatter->asDate($this->created_at). " по заказу №" . $this->shopOrder->id)
+                        ->setSubject('Оплачен счет №'.$this->id." от ".\Yii::$app->formatter->asDate($this->created_at)." по заказу №".$this->shopOrder->id)
                         ->send();
 
                 } catch (\Exception $e) {

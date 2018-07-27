@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\Core;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -21,10 +20,10 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $name
+ * @property string  $name
  * @property integer $priority
- * @property string $active
- * @property number $rate
+ * @property string  $active
+ * @property number  $rate
  */
 class ShopVat extends Core
 {
@@ -58,15 +57,15 @@ class ShopVat extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'id' => \Yii::t('skeeks/shop/app', 'ID'),
+            'id'         => \Yii::t('skeeks/shop/app', 'ID'),
             'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
             'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
             'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
             'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'name' => \Yii::t('skeeks/shop/app', 'Name'),
-            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active' => \Yii::t('skeeks/shop/app', 'Active'),
-            'rate' => \Yii::t('skeeks/shop/app', 'Bet'),
+            'name'       => \Yii::t('skeeks/shop/app', 'Name'),
+            'priority'   => \Yii::t('skeeks/shop/app', 'Priority'),
+            'active'     => \Yii::t('skeeks/shop/app', 'Active'),
+            'rate'       => \Yii::t('skeeks/shop/app', 'Bet'),
         ]);
     }
 }

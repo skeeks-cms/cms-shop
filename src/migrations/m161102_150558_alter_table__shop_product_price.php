@@ -6,7 +6,6 @@
  * @date 23.07.2016
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m161102_150558_alter_table__shop_product_price extends Migration

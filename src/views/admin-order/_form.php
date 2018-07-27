@@ -6,8 +6,8 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
@@ -80,20 +80,20 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 <?php $form = ActiveForm::begin([
     'pjaxOptions' =>
         [
-            'id' => 'sx-pjax-order-wrapper'
-        ]
+            'id' => 'sx-pjax-order-wrapper',
+        ],
 ]); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'General information')); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Order')
+    'content' => \Yii::t('skeeks/shop/app', 'Order'),
 
 ]) ?>
 
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             /*[                      // the owner name of the model
@@ -109,27 +109,27 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
             ],*/
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Last modified'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Last modified'),
                 'format' => 'raw',
-                'value' => \Yii::$app->formatter->asDatetime($model->updated_at),
+                'value'  => \Yii::$app->formatter->asDatetime($model->updated_at),
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Status'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Status'),
                 'format' => 'raw',
-                'value' => <<<HTML
+                'value'  => <<<HTML
 
                     <a href="#sx-status-change" class="sx-dashed sx-fancybox" style="color: {$model->status->color}">{$model->status->name}</a>
                     <small>({$statusDate})</small>
-HTML
+HTML,
 
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Canceled'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Canceled'),
                 'format' => 'raw',
-                'value' => $this->render('_close-order', [
-                    'model' => $model
+                'value'  => $this->render('_close-order', [
+                    'model' => $model,
                 ]),
             ],
 
@@ -139,154 +139,154 @@ HTML
                 'value' => \Yii::$app->formatter->asDatetime($model->status_at),
             ],*/
 
-        ]
+        ],
 ]) ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Buyer')
+    'content' => \Yii::t('skeeks/shop/app', 'Buyer'),
 ]) ?>
 
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
+                'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'format' => 'raw',
-                'value' => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->user]))->run()
+                'value'  => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->user]))->run(),
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Type payer'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Type payer'),
                 'format' => 'raw',
-                'value' => $model->personType->name,
+                'value'  => $model->personType->name,
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
                 'format' => 'raw',
-                'value' => Html::a($model->buyer->name . " [{$model->buyer->id}]",
+                'value'  => Html::a($model->buyer->name." [{$model->buyer->id}]",
                     \skeeks\cms\helpers\UrlHelper::construct([
                         '/shop/admin-buyer/update',
-                        'pk' => $model->buyer->id
+                        'pk' => $model->buyer->id,
                     ])->enableAdmin(), [
-                        'data-pjax' => 0
+                        'data-pjax' => 0,
                     ]),
             ],
 
 
-        ]
+        ],
 ]) ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Customer data')
+    'content' => \Yii::t('skeeks/shop/app', 'Customer data'),
 ]) ?>
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model->buyer->relatedPropertiesModel,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model->buyer->relatedPropertiesModel,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' => array_keys($model->buyer->relatedPropertiesModel->toArray(
         $model->buyer->relatedPropertiesModel->attributes()
-    ))
+    )),
 
 ]) ?>
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Payment order')
+    'content' => \Yii::t('skeeks/shop/app', 'Payment order'),
 ]) ?>
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Payment method'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Payment method'),
                 'format' => 'raw',
-                'value' => $model->paySystem->name,
+                'value'  => $model->paySystem->name,
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Payed'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Payed'),
                 'format' => 'raw',
-                'value' => $this->render("_payed", [
-                    'model' => $model
-                ])
-            ],
-
-            [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Allow payment'),
-                'format' => 'raw',
-                'value' => $this->render('_payment-allow', [
-                    'model' => $model
+                'value'  => $this->render("_payed", [
+                    'model' => $model,
                 ]),
             ],
 
             [                      // the owner name of the model
-                'label' => "",
+                'label'  => \Yii::t('skeeks/shop/app', 'Allow payment'),
                 'format' => 'raw',
-                'value' => $this->render('_payment', [
-                    'model' => $model
-                ])
-
-            ],
-        ]
-]) ?>
-
-<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Shipping')
-]) ?>
-
-<?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-    'attributes' =>
-        [
-            [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Delivery service'),
-                'format' => 'raw',
-                'value' => $model->delivery ? $model->delivery->name : "",
-            ],
-
-
-            [                      // the owner name of the model
-                'label' => 'Разрешить доставку',
-                'format' => 'raw',
-                'value' => $this->render('_delivery-allow', [
-                    'model' => $model
+                'value'  => $this->render('_payment-allow', [
+                    'model' => $model,
                 ]),
             ],
 
             [                      // the owner name of the model
-                'label' => 'Склад',
+                'label'  => "",
                 'format' => 'raw',
-                'value' => $model->store ? $model->store->name : "",
+                'value'  => $this->render('_payment', [
+                    'model' => $model,
+                ]),
+
             ],
-        ]
+        ],
 ]) ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => 'Комментарий'
+    'content' => \Yii::t('skeeks/shop/app', 'Shipping'),
 ]) ?>
+
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Comment'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Delivery service'),
                 'format' => 'raw',
-                'value' => $this->render('_comment', [
-                    'model' => $model
-                ])
+                'value'  => $model->delivery ? $model->delivery->name : "",
+            ],
+
+
+            [                      // the owner name of the model
+                'label'  => 'Разрешить доставку',
+                'format' => 'raw',
+                'value'  => $this->render('_delivery-allow', [
+                    'model' => $model,
+                ]),
+            ],
+
+            [                      // the owner name of the model
+                'label'  => 'Склад',
+                'format' => 'raw',
+                'value'  => $model->store ? $model->store->name : "",
+            ],
+        ],
+]) ?>
+
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => 'Комментарий',
+]) ?>
+<?= \yii\widgets\DetailView::widget([
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'attributes' =>
+        [
+            [                      // the owner name of the model
+                'label'  => \Yii::t('skeeks/shop/app', 'Comment'),
+                'format' => 'raw',
+                'value'  => $this->render('_comment', [
+                    'model' => $model,
+                ]),
 
             ],
-        ]
+        ],
 ]) ?>
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'The composition of the order')
+    'content' => \Yii::t('skeeks/shop/app', 'The composition of the order'),
 ]) ?>
 
 
@@ -299,7 +299,7 @@ $json = \yii\helpers\Json::encode([
         ])
         ->enableEmptyLayout()
         ->enableNoActions()
-        ->url
+        ->url,
 ]);
 
 $onclick = new \yii\web\JsExpression(<<<JS
@@ -312,22 +312,22 @@ JS
 $addItemText = \Yii::t('skeeks/shop/app', 'Add this item');
 $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
 echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-    'label' => "",
+    'label'       => "",
     'parentModel' => $model,
-    'relation' => [
+    'relation'    => [
         'order_id' => 'id',
     ],
 
     'sort' => [
         'defaultOrder' =>
             [
-                'updated_at' => SORT_DESC
-            ]
+                'updated_at' => SORT_DESC,
+            ],
     ],
 
     'controllerRoute' => 'shop/admin-basket',
     'gridViewOptions' => [
-        'enabledPjax' => false,
+        'enabledPjax'     => false,
         'beforeTableLeft' => <<<HTML
             <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>
                 {$addItemText}
@@ -357,9 +357,9 @@ HTML
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className()
+                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className(),
             ],
-        ]
+        ],
     ],
 ]); ?>
 
@@ -379,46 +379,46 @@ CSS
                 ?>
                 <?=
                 \yii\widgets\DetailView::widget([
-                    'model' => $model,
-                    "template" => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
-                    "options" => ['class' => 'sx-result-table table detail-view'],
+                    'model'      => $model,
+                    "template"   => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
+                    "options"    => ['class' => 'sx-result-table table detail-view'],
                     'attributes' => [
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'The total value of the goods'),
-                            'value' => (string) $model->basketsMoney,
+                            'value' => (string)$model->basketsMoney,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Discount, margin'),
-                            'value' => (string) $model->moneyDiscount,
+                            'value' => (string)$model->moneyDiscount,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Delivery service'),
-                            'value' => (string) $model->moneyDelivery,
+                            'value' => (string)$model->moneyDelivery,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Taxe'),
-                            'value' => (string) $model->moneyVat,
+                            'value' => (string)$model->moneyVat,
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
-                            'value' => $model->weight . " " . \Yii::t('skeeks/shop/app', 'g.'),
+                            'value' => $model->weight." ".\Yii::t('skeeks/shop/app', 'g.'),
                         ],
 
                         [
                             'label' => \Yii::t('skeeks/shop/app', 'Already paid'),
-                            'value' => (string) $model->moneySummPaid,
+                            'value' => (string)$model->moneySummPaid,
                         ],
 
                         [
-                            'label' => \Yii::t('skeeks/shop/app', 'In total'),
+                            'label'  => \Yii::t('skeeks/shop/app', 'In total'),
                             'format' => 'raw',
-                            'value' => Html::tag('b', (string) $model->money),
-                        ]
-                    ]
+                            'value'  => Html::tag('b', (string)$model->money),
+                        ],
+                    ],
                 ])
                 ?>
             </div>
@@ -434,7 +434,7 @@ $shopJson = \yii\helpers\Json::encode([
 
     'backend-add-product' => \skeeks\cms\helpers\UrlHelper::construct([
         '/shop/admin-order/update-order-add-product',
-        'pk' => $model->id
+        'pk' => $model->id,
     ])->enableAdmin()->toString(),
 
 ]);
@@ -487,36 +487,36 @@ JS
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
-        'models' => $model->shopUserTransacts
+        'models' => $model->shopUserTransacts,
     ]),
 
     'columns' =>
         [
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className()
+                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
+                'class'  => \yii\grid\DataColumn::className(),
+                'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
+                'value'  => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
                     return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopUserTransact->cmsUser]))->run();
-                }
+                },
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::className(),
                 'attribute' => 'type',
-                'label' => \Yii::t('skeeks/shop/app', 'Sum'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
-                    return ($shopUserTransact->debit == "Y" ? "+" : "-") . (string) $shopUserTransact->money;
-                }
+                'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
+                'format'    => 'raw',
+                'value'     => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
+                    return ($shopUserTransact->debit == "Y" ? "+" : "-").(string)$shopUserTransact->money;
+                },
             ],
 
-            'descriptionText'
-        ]
+            'descriptionText',
+        ],
 ]); ?>
 
 <?= $form->fieldSetEnd(); ?>
@@ -525,49 +525,49 @@ JS
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
-        'models' => $model->shopOrderChanges
+        'models' => $model->shopOrderChanges,
     ]),
 
     'columns' =>
         [
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className()
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::className(),
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
+                'class'  => \yii\grid\DataColumn::className(),
+                'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
+                'value'  => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
                     if (!$shopOrderChange->createdBy) {
                         return ' - ';
                     }
 
                     return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrderChange->createdBy]))->run();
-                }
+                },
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::className(),
                 'attribute' => 'type',
-                'label' => \Yii::t('skeeks/shop/app', 'Transaction'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
+                'label'     => \Yii::t('skeeks/shop/app', 'Transaction'),
+                'format'    => 'raw',
+                'value'     => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
                     return \skeeks\cms\shop\models\ShopOrderChange::types()[$shopOrderChange->type];
-                }
+                },
             ],
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::className(),
                 'attribute' => 'type',
-                'label' => \Yii::t('skeeks/shop/app', 'Description'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
+                'label'     => \Yii::t('skeeks/shop/app', 'Description'),
+                'format'    => 'raw',
+                'value'     => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
                     return $shopOrderChange->description;
-                }
+                },
             ],
 
 
-        ]
+        ],
 ]); ?>
 
 <?= $form->fieldSetEnd(); ?>
@@ -583,11 +583,11 @@ JS
             <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                 'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/pay-validate',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
+                'action'        => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/pay',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
 
                 'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
@@ -622,11 +622,11 @@ JS
             <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                 'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/pay-validate',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
+                'action'        => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/pay',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
 
                 'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
@@ -667,11 +667,11 @@ JS
             <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                 'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/validate',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
+                'action'        => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/save',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
 
                 'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
@@ -699,11 +699,11 @@ JS
             <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                 'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/validate',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
+                'action'        => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/save',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
 
                 'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
@@ -730,11 +730,11 @@ JS
             <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                 'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/validate',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
+                'action'        => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/save',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
 
                 'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
@@ -766,11 +766,11 @@ JS
             <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                 'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/validate',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
+                'action'        => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/save',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
 
                 'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
@@ -803,11 +803,11 @@ JS
             <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                 'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/validate',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
+                'action'        => \skeeks\cms\helpers\UrlHelper::construct([
                     'shop/admin-order/save',
-                    'pk' => $model->id
+                    'pk' => $model->id,
                 ])->enableAdmin()->toString(),
 
                 'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
@@ -820,7 +820,7 @@ JS
             ]); ?>
 
             <?= $form->field($model, 'comments')->textarea([
-                'rows' => 5
+                'rows' => 5,
             ])->hint(\Yii::t('skeeks/shop/app', 'Internal comment, the customer (buyer) does not see'));
             ?>
 
@@ -835,9 +835,9 @@ JS
     <div style="display: none;">
         <?=
         \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
-            'dialogRoute' => ['/shop/admin-cms-content-element'],
-            'name' => 'sx-add-product',
-            'id' => 'sx-add-product',
+            'dialogRoute'            => ['/shop/admin-cms-content-element'],
+            'name'                   => 'sx-add-product',
+            'id'                     => 'sx-add-product',
             'closeDialogAfterSelect' => false,
         ]);
         ?>

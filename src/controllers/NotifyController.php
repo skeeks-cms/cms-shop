@@ -28,7 +28,7 @@ class NotifyController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class'   => VerbFilter::className(),
                 'actions' => [
                     '*' => ['post'],
                 ],
@@ -54,12 +54,12 @@ class NotifyController extends Controller
 
                             \Yii::$app->mailer->compose('notice-added', [
                                 'model' => $model,
-                                'url' => \Yii::$app->request->referrer,
+                                'url'   => \Yii::$app->request->referrer,
                             ])
-                                ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+                                ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                                 ->setTo($email)
-                                ->setSubject(\Yii::$app->cms->appName . ': ' . \Yii::t('skeeks/shop/app',
-                                        'Notify admission') . ' #' . $model->id)
+                                ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
+                                        'Notify admission').' #'.$model->id)
                                 ->send();
                         }
                     }
@@ -73,7 +73,7 @@ class NotifyController extends Controller
             } else {
                 $errors = Json::encode($model->firstErrors);
                 $rr->success = false;
-                $rr->message = \Yii::t('skeeks/shop/app', 'Please double-check your data') . " :{$errors}";
+                $rr->message = \Yii::t('skeeks/shop/app', 'Please double-check your data')." :{$errors}";
             }
         }
 

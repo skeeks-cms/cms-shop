@@ -29,30 +29,30 @@ class Merchant extends Object
 
         $signature = "{$this->sMerchantLogin}:{$nOutSum}:{$nInvId}:{$this->sMerchantPass1}";
         if (!empty($shp)) {
-            $signature .= ':' . $this->implodeShp($shp);
+            $signature .= ':'.$this->implodeShp($shp);
         }
 
         $sSignatureValue = md5($signature);
 
         $data = [
-            'MrchLogin' => $this->sMerchantLogin,
-            'OutSum' => $nOutSum,
-            'InvId' => $nInvId,
-            'Desc' => $sInvDesc,
+            'MrchLogin'      => $this->sMerchantLogin,
+            'OutSum'         => $nOutSum,
+            'InvId'          => $nInvId,
+            'Desc'           => $sInvDesc,
             'SignatureValue' => $sSignatureValue,
-            'IncCurrLabel' => $sIncCurrLabel,
-            'Email' => $sEmail,
-            'Culture' => $sCulture
+            'IncCurrLabel'   => $sIncCurrLabel,
+            'Email'          => $sEmail,
+            'Culture'        => $sCulture,
         ];
 
         if (!$this->isLive) {
             $data['isTest'] = 1;
         }
 
-        $url .= '?' . http_build_query($data);
+        $url .= '?'.http_build_query($data);
 
         if (!empty($shp) && ($query = http_build_query($shp)) !== '') {
-            $url .= '&' . $query;
+            $url .= '&'.$query;
         }
 
         \Yii::$app->user->setReturnUrl(Yii::$app->request->getUrl());
@@ -63,7 +63,7 @@ class Merchant extends Object
     {
         ksort($shp);
         foreach ($shp as $key => $value) {
-            $shp[$key] = $key . '=' . $value;
+            $shp[$key] = $key.'='.$value;
         }
 
         return implode(':', $shp);
@@ -73,7 +73,7 @@ class Merchant extends Object
     {
         $signature = "{$nOutSum}:{$nInvId}:{$sMerchantPass}";
         if (!empty($shp)) {
-            $signature .= ':' . $this->implodeShp($shp);
+            $signature .= ':'.$this->implodeShp($shp);
         }
         return strtolower(md5($signature)) === strtolower($sSignatureValue);
 

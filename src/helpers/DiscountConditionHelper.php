@@ -18,11 +18,11 @@ use yii\helpers\ArrayHelper;
  * Условия применения скидки
  *
  * $condition = new DiscountConditionHelper([
-        'data' => $conditions,
-        'shopCmsContentElement' => $shopCmsContentElement,
-    ]);
-
-    return $condition->isTrue;
+ * 'data' => $conditions,
+ * 'shopCmsContentElement' => $shopCmsContentElement,
+ * ]);
+ *
+ * return $condition->isTrue;
  *
  *
  * @property bool isTrue
@@ -156,8 +156,7 @@ class DiscountConditionHelper extends Component
 
             $result = false;
 
-            foreach ($value as $val)
-            {
+            foreach ($value as $val) {
                 if (is_array($fieldValue)) {
                     if (in_array((int)$val, $fieldValue)) {
                         return true;

@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150831_140601_create_table__shop_pay_system extends Migration
@@ -32,9 +31,9 @@ class m150831_140601_create_table__shop_pay_system extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'name' => $this->string(255)->notNull()->unique(),
+            'name'     => $this->string(255)->notNull()->unique(),
             'priority' => $this->integer()->notNull()->defaultValue(100),
-            'active' => $this->string(1)->notNull()->defaultValue("Y"),
+            'active'   => $this->string(1)->notNull()->defaultValue("Y"),
 
             'description' => $this->text(),
 
@@ -61,39 +60,39 @@ class m150831_140601_create_table__shop_pay_system extends Migration
 
 
         $this->insert('{{%shop_pay_system}}', [
-            'name' => 'Наличный расчет',
+            'name'     => 'Наличный расчет',
             'priority' => '50',
-            'active' => 'Y',
+            'active'   => 'Y',
         ]);
 
         $this->insert('{{%shop_pay_system}}', [
-            'name' => 'Кредитная карта',
+            'name'     => 'Кредитная карта',
             'priority' => '60',
-            'active' => 'N',
+            'active'   => 'N',
         ]);
 
         $this->insert('{{%shop_pay_system}}', [
-            'name' => 'Оплата в платежной системе Web Money',
+            'name'     => 'Оплата в платежной системе Web Money',
             'priority' => '70',
-            'active' => 'N',
+            'active'   => 'N',
         ]);
 
         $this->insert('{{%shop_pay_system}}', [
-            'name' => 'Оплата в платежной системе Яндекс.Деньги',
+            'name'     => 'Оплата в платежной системе Яндекс.Деньги',
             'priority' => '80',
-            'active' => 'N',
+            'active'   => 'N',
         ]);
 
         $this->insert('{{%shop_pay_system}}', [
-            'name' => 'Сбербанк',
+            'name'     => 'Сбербанк',
             'priority' => '90',
-            'active' => 'N',
+            'active'   => 'N',
         ]);
 
         $this->insert('{{%shop_pay_system}}', [
-            'name' => 'Счет',
+            'name'     => 'Счет',
             'priority' => '100',
-            'active' => 'N',
+            'active'   => 'N',
         ]);
 
     }

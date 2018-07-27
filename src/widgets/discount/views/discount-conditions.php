@@ -26,7 +26,7 @@ JSON;*/
 
         $value = \yii\helpers\Json::decode($value);
     } catch (\Exception $e) {
-//        $value = [];
+        //        $value = [];
         throw $e;
     }
 

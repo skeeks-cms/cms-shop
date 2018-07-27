@@ -46,17 +46,17 @@ if ($shopPersonType) {
 
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider,
-    'shopPersonType' => $shopPersonType
+    'searchModel'    => $searchModel,
+    'dataProvider'   => $dataProvider,
+    'shopPersonType' => $shopPersonType,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'columns' => \yii\helpers\ArrayHelper::merge(
+    'columns'         => \yii\helpers\ArrayHelper::merge(
         [
             /*[
                 'class' => \yii\grid\DataColumn::className(),
@@ -70,12 +70,12 @@ if ($shopPersonType) {
 
             'name',
             [
-                'class' => \skeeks\cms\grid\UserColumnData::className(),
-                'attribute' => 'cms_user_id'
+                'class'     => \skeeks\cms\grid\UserColumnData::className(),
+                'attribute' => 'cms_user_id',
             ],
 
 
-        ], $autoColumns)
+        ], $autoColumns),
 ]); ?>
 
 <? $pjax::end(); ?>

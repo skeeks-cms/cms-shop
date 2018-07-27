@@ -2,20 +2,18 @@
 
 namespace skeeks\cms\shop\models;
 
-use Yii;
-
 /**
  * This is the model class for table "{{%shop_discount2type_price}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $discount_id
- * @property integer $type_price_id
+ * @property integer       $id
+ * @property integer       $created_by
+ * @property integer       $updated_by
+ * @property integer       $created_at
+ * @property integer       $updated_at
+ * @property integer       $discount_id
+ * @property integer       $type_price_id
  *
- * @property ShopDiscount $discount
+ * @property ShopDiscount  $discount
  * @property ShopTypePrice $typePrice
  */
 class ShopDiscount2typePrice extends \skeeks\cms\models\Core
@@ -40,8 +38,8 @@ class ShopDiscount2typePrice extends \skeeks\cms\models\Core
                 ['discount_id', 'type_price_id'],
                 'unique',
                 'targetAttribute' => ['discount_id', 'type_price_id'],
-                'message' => 'The combination of Discount ID and Type Price ID has already been taken.'
-            ]
+                'message'         => 'The combination of Discount ID and Type Price ID has already been taken.',
+            ],
         ];
     }
 
@@ -51,12 +49,12 @@ class ShopDiscount2typePrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'discount_id' => \Yii::t('skeeks/shop/app', 'Discount ID'),
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'discount_id'   => \Yii::t('skeeks/shop/app', 'Discount ID'),
             'type_price_id' => \Yii::t('skeeks/shop/app', 'Type Price ID'),
         ];
     }

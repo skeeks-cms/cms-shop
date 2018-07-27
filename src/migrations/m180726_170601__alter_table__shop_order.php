@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m180726_170601__alter_table__shop_order extends Migration
@@ -16,7 +15,7 @@ class m180726_170601__alter_table__shop_order extends Migration
         $tableName = "shop_order";
 
         $this->addColumn($tableName, "is_created", $this->integer(1)->notNull()->defaultValue(1)->comment('Заказ создан?'));
-        $this->createIndex($tableName . '__is_created', $tableName, 'is_created');
+        $this->createIndex($tableName.'__is_created', $tableName, 'is_created');
     }
 
     public function safeDown()

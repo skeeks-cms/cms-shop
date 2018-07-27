@@ -3,27 +3,26 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\relatedProperties\models\RelatedElementPropertyModel;
-use Yii;
 
 /**
  * This is the model class for table "{{%shop_buyer_property}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $property_id
- * @property integer $element_id
- * @property string $value
- * @property integer $value_enum
- * @property string $value_num
- * @property string $description
+ * @property integer                $id
+ * @property integer                $created_by
+ * @property integer                $updated_by
+ * @property integer                $created_at
+ * @property integer                $updated_at
+ * @property integer                $property_id
+ * @property integer                $element_id
+ * @property string                 $value
+ * @property integer                $value_enum
+ * @property string                 $value_num
+ * @property string                 $description
  *
  * @property ShopPersonTypeProperty $property
- * @property CmsUser $createdBy
- * @property ShopBuyer $element
- * @property CmsUser $updatedBy
+ * @property CmsUser                $createdBy
+ * @property ShopBuyer              $element
+ * @property CmsUser                $updatedBy
  */
 class ShopBuyerProperty extends RelatedElementPropertyModel
 {

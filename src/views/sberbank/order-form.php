@@ -17,16 +17,16 @@ $terminal_key = $tinkoff->terminal_key;
 
 $payData = [
     'TerminalKey' => $tinkoff->terminal_key,
-    'Amount' => $money->getAmount(),
-    'OrderId' => $model->id,
-    'Frame' => false,
+    'Amount'      => $money->getAmount(),
+    'OrderId'     => $model->id,
+    'Frame'       => false,
 ];
 
 $data = [];
 if ($model->user) {
-    $data[] = 'Email=' . $model->user->email;
-    $data[] = 'Phone=' . $model->user->phone;
-    $data[] = 'Name=' . $model->user->displayName;
+    $data[] = 'Email='.$model->user->email;
+    $data[] = 'Phone='.$model->user->phone;
+    $data[] = 'Name='.$model->user->displayName;
 
     $payData['DATA'] = implode('|', $data);
 }

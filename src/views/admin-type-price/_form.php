@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
@@ -25,7 +24,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <? if (!$model->isNewRecord) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \skeeks\cms\shop\Module::t('app', 'Affordable prices')
+        'content' => \skeeks\cms\shop\Module::t('app', 'Affordable prices'),
     ]) ?>
 
     <? \yii\bootstrap\Alert::begin([
@@ -38,16 +37,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     <? \yii\bootstrap\Alert::end() ?>
 
     <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-        'permissionName' => $model->viewPermissionName,
-        'permissionDescription' => \skeeks\cms\shop\Module::t('app', 'Rights to see the prices') . " '{$model->name}'",
-        'label' => \skeeks\cms\shop\Module::t('app', 'User Groups that have permission to view this type of price'),
+        'permissionName'        => $model->viewPermissionName,
+        'permissionDescription' => \skeeks\cms\shop\Module::t('app', 'Rights to see the prices')." '{$model->name}'",
+        'label'                 => \skeeks\cms\shop\Module::t('app', 'User Groups that have permission to view this type of price'),
     ]); ?>
 
     <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-        'permissionName' => $model->buyPermissionName,
+        'permissionName'        => $model->buyPermissionName,
         'permissionDescription' => \skeeks\cms\shop\Module::t('app',
-                'The right to buy at a price') . ": '{$model->name}'",
-        'label' => \skeeks\cms\shop\Module::t('app',
+                'The right to buy at a price').": '{$model->name}'",
+        'label'                 => \skeeks\cms\shop\Module::t('app',
             'Group of users who have the right to purchase on this type of price'),
     ]); ?>
 <? else : ?>
