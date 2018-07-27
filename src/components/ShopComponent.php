@@ -184,12 +184,16 @@ class ShopComponent extends Component
      */
     public function getCart()
     {
+        if (\Yii::$app instanceof \yii\console\Application) {
+            return null;
+        }
+
         if ($this->_shopCart instanceof ShopCart) {
             return $this->_shopCart;
         }
 
-        //Если пользователь гость
         if (isset(\Yii::$app->user) && \Yii::$app->user && \Yii::$app->user->isGuest) {
+            //Если пользователь гость
             //Проверка сессии
             if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
                 $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
@@ -208,10 +212,7 @@ class ShopComponent extends Component
                 $this->_shopCart = $shopCart;
             }
         } else {
-            if (\Yii::$app instanceof \yii\console\Application) {
-                return null;
-            }
-
+            //Если пользователь авторизован
             $this->_shopCart = ShopCart::find()->where(['cms_user_id' => \Yii::$app->user->identity->id])->one();
             //Если у авторизовнного пользоывателя уже есть пользователь корзины
             if ($this->_shopCart) {
@@ -224,7 +225,7 @@ class ShopComponent extends Component
                      * @var $shopCart ShopCart
                      */
                     if ($shopCart) {
-                        $this->_shopCart->addBaskets($shopCart->shopBaskets);
+                        $shopCart->shopOrder->addShopOrderItems($shopCart->shopOrder->shopOrderItems);
                         $shopCart->delete();
                     }
 

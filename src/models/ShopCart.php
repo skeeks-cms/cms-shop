@@ -68,7 +68,6 @@ use yii\db\ActiveQuery;
  */
 class ShopCart extends ActiveRecord
 {
-    const SCENARIO_CREATE_ORDER = 'scentarioCreateOrder';
     /**
      * @inheritdoc
      */
@@ -76,29 +75,7 @@ class ShopCart extends ActiveRecord
     {
         return '{{%shop_cart}}';
     }
-    /**
-     * @param CmsUser $cmsUser
-     * @return array|null|\yii\db\ActiveRecord|static
-     */
-    static public function getInstanceByUser(CmsUser $cmsUser)
-    {
-        $shopFuser = static::find()->where(['cms_user_id' => $cmsUser->id])->one();
 
-        if (!$shopFuser) {
-            $shopFuser = new static();
-            $shopFuser->cms_user_id = $cmsUser->id;
-
-            $shopFuser->save();
-        }
-
-        return $shopFuser;
-    }
-
-    public function loadDefaultValues($skipIfSet = true)
-    {
-        parent::loadDefaultValues($skipIfSet);
-
-    }
     /**
      * @inheritdoc
      */
@@ -110,12 +87,6 @@ class ShopCart extends ActiveRecord
         ]);
     }
 
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_CREATE_ORDER] = $scenarios[self::SCENARIO_DEFAULT];
-        return $scenarios;
-    }
     /**
      * @inheritdoc
      */
@@ -134,11 +105,11 @@ class ShopCart extends ActiveRecord
                 'integer',
             ],
             [['cms_user_id'], 'unique'],
-
-            [['cms_user_id'], 'required', 'on' => self::SCENARIO_CREATE_ORDER],
-
         ]);
     }
+    /**
+     * @return array
+     */
     public function extraFields()
     {
         return [
@@ -166,32 +137,6 @@ class ShopCart extends ActiveRecord
 
 
     /**
-     * Добавить корзины этому пользователю
-     *
-     * @param ShopBasket[] $baskets
-     * @return $this
-     */
-    public function addBaskets($baskets = [])
-    {
-        /**
-         * @var $currentBasket ShopBasket
-         */
-        foreach ($baskets as $basket) {
-            //Если в корзине которую необходимо добавить продукт такой же который уже есть у текущего пользователя, то нужно обновить количество.
-            if ($currentBasket = $this->getShopBaskets()->andWhere(['product_id' => $basket->product_id])->one()) {
-                $currentBasket->quantity = $currentBasket->quantity + $basket->quantity;
-                $currentBasket->save();
-
-                $basket->delete();
-            } else {
-                $basket->fuser_id = $this->id;
-                $basket->save();
-            }
-        }
-
-        return $this;
-    }
-    /**
      * @return \yii\db\ActiveQuery
      * @deprecated
      */
@@ -206,22 +151,20 @@ class ShopCart extends ActiveRecord
      */
     public function getCountShopBaskets()
     {
-        return count($this->shopBaskets);
+        return $this->shopOrder->countShopOrderItems;
     }
     /**
      * @return float
+     * @deprecated
      */
     public function getQuantity()
     {
-        $result = 0;
-
-        if ($this->shopBaskets) {
-            foreach ($this->shopBaskets as $shopBasket) {
-                $result = $shopBasket->quantity + $result;
-            }
-        }
-        return (float)$result;
+        return $this->shopOrder->quantity;
     }
+
+
+
+
     /**
      *
      * Итоговая стоимость корзины с учетом скидок, то что будет платить человек
@@ -274,48 +217,47 @@ class ShopCart extends ActiveRecord
     /**
      *
      * Итоговая стоимость налога
-     *
      * @return Money
      */
     public function getMoneyVat()
     {
-        $money = \Yii::$app->money->newMoney();
+        return $this->shopOrder->moneyVat;
+        /*$money = \Yii::$app->money->newMoney();
 
         foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->moneyVat->multiply($shopBasket->quantity));
         }
 
-        return $money;
+        return $money;*/
     }
     /**
      *
      * Итоговая скидка по всей корзине
      *
      * @return Money
+     * @deprecated
      */
     public function getMoneyDiscount()
     {
+        return $this->shopOrder->moneyDiscount;
+        /*
         $money = \Yii::$app->money->newMoney();
         foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->moneyDiscount->multiply($shopBasket->quantity));
         }
-        return $money;
+        return $money;*/
     }
+
     /**
-     *
-     * Итоговая скидка по всей корзине
-     *
+     * Итоговая сумма доставки
      * @return Money
+     * @deprecated
      */
     public function getMoneyDelivery()
     {
         return $this->shopOrder->moneyDelivery;
-        /*if ($this->delivery) {
-            return $this->delivery->money;
-        }
-
-        return \Yii::$app->money->newMoney();*/
     }
+
     /**
      * @return bool
      */
@@ -328,7 +270,7 @@ class ShopCart extends ActiveRecord
      */
     public function isEmpty()
     {
-        return (bool)$this->shopOrder->countShopOrderItems == 0;
+        return (bool)($this->shopOrder->countShopOrderItems == 0);
     }
 
     /**
@@ -418,6 +360,10 @@ class ShopCart extends ActiveRecord
     }
 
 
+    /**
+     * @return ShopDiscountCoupon[]
+     * @deprecated
+     */
     public function getDiscountCoupons()
     {
         return $this->shopOrder->discountCoupons;

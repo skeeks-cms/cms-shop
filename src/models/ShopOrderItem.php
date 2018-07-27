@@ -50,8 +50,8 @@ use yii\helpers\Url;
  * @property string            $absoluteUrl
  *
  * @property ShopOrder         $shopOrder
- * @property ShopProduct       $shopProduct
- * @property ShopProductPrice  $shopProductPrice
+ * @property shopProduct       $shopProduct
+ * @property shopProductPrice  $shopProductPrice
  *
  * @property MoneyCurrency     $currency
  * @property ShopOrderItemProperty[] $shopOrderItemProperties
@@ -194,14 +194,14 @@ class ShopOrderItem extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopProduct()
+    public function getshopProduct()
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopProductPrice()
+    public function getshopProductPrice()
     {
         return $this->hasOne(ShopProductPrice::class, ['id' => 'shop_product_price_id']);
     }
@@ -249,7 +249,7 @@ class ShopOrderItem extends ActiveRecord
 
         $priceHelper = $this->shopOrder->getProductPriceHelper($this->shopProduct->cmsContentElement);
         /*$priceHelper = new ProductPriceHelper([
-            'shopCmsContentElement' => $this->product->cmsContentElement,
+            'shopCmsContentElement' => $this->shopProduct->cmsContentElement,
             'shopCart' => $this->cart,
         ]);*/
 
@@ -368,12 +368,12 @@ class ShopOrderItem extends ActiveRecord
      */
     public function getUrl()
     {
-        if ($this->product) {
+        if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->product->cmsContentElement->parentContentElement) {
+            if ($parent = $this->shopProduct->cmsContentElement->parentContentElement) {
                 return $parent->url;
             } else {
-                return $this->product->cmsContentElement->url;
+                return $this->shopProduct->cmsContentElement->url;
             }
         }
 
@@ -385,12 +385,12 @@ class ShopOrderItem extends ActiveRecord
      */
     public function getAbsoluteUrl()
     {
-        if ($this->product) {
+        if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->product->cmsContentElement->parentContentElement) {
+            if ($parent = $this->shopProduct->cmsContentElement->parentContentElement) {
                 return $parent->absoluteUrl;
             } else {
-                return $this->product->cmsContentElement->absoluteUrl;
+                return $this->shopProduct->cmsContentElement->absoluteUrl;
             }
         }
 
@@ -402,12 +402,12 @@ class ShopOrderItem extends ActiveRecord
      */
     public function getImage()
     {
-        if ($this->product) {
+        if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->product->cmsContentElement->parentContentElement) {
+            if ($parent = $this->shopProduct->cmsContentElement->parentContentElement) {
                 return $parent->image;
             } else {
-                return $this->product->cmsContentElement->image;
+                return $this->shopProduct->cmsContentElement->image;
             }
         }
 
@@ -416,7 +416,7 @@ class ShopOrderItem extends ActiveRecord
 
 
     /**
-     * @return ShopProduct
+     * @return shopProduct
      * @deprecated
      */
     public function getProduct()

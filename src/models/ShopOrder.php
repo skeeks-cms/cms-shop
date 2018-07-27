@@ -79,14 +79,13 @@ use yii\helpers\Url;
  * @property ShopTypePrice[]            $buyTypePrices
  *
  *
- * @property Money                      $money
- * @property Money                      $moneyVat
- * @property Money                      $moneyDiscount
+ * @property Money                      $money Итоговая цена к оплате
+ * @property Money                      $moneyVat Цена налога
+ * @property Money                      $moneyDiscount Цена скидки
  * @property Money                      $moneyOriginal
  * @property Money                      $moneySummPaid
  * @property Money                      $moneyDelivery
- *
- * @property Money                      $basketsMoney
+ * @property Money                      $moneyItems Сумма всех позиций корзины
  *
  * @property int                        $weight
  *
@@ -222,6 +221,9 @@ class ShopOrder extends \skeeks\cms\models\Core
         //$this->on(self::EVENT_AFTER_INSERT, [$this, "afterInstertCallback"]);
         //$this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterUpdateCallback"]);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeUpdateCallback"]);
+
+
+
     }
     public function afterInstertCallback($e)
     {
@@ -473,6 +475,16 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['code'], 'default', 'value' => \Yii::$app->security->generateRandomString()],
 
             [['is_created'], 'default', 'value' => 0],
+
+
+            [
+                ['shop_person_type_id'],
+                'default',
+                'value' => function () {
+                    $shopPersonType = \Yii::$app->shop->shopPersonTypes[0];
+                    return $shopPersonType->id;
+                },
+            ],
 
             /*['reason_canceled', 'required', 'when' => function($model) {
                 return $model->canceled == Cms::BOOL_Y;
@@ -730,12 +742,11 @@ class ShopOrder extends \skeeks\cms\models\Core
 
 
     /**
-     *
      * Цена всех позиций в заказе, динамически рассчитанная
      *
      * @return Money
      */
-    public function getBasketsMoney()
+    public function getMoneyItems()
     {
         $money = new Money("", $this->currency_code);
 
@@ -744,6 +755,15 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         return $money;
+    }
+
+    /**
+     * @return Money
+     * @deprecated
+     */
+    public function getBasketsMoney()
+    {
+        return $this->moneyItems;
     }
 
     /**
@@ -838,12 +858,24 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function recalculate()
     {
-        $money = $this->basketsMoney;
-        if ($this->moneyDelivery) {
-            $money->add($this->moneyDelivery);
+        $money = $this->moneyItems;
+
+        $moneyDiscount = new Money("", $this->currency_code);
+        $moneyDelivery = new Money("", $this->currency_code);
+
+        if ($this->shopDelivery) {
+            $moneyDelivery->add($this->shopDelivery->money);
+        }
+
+        foreach ($this->shopOrderItems as $shopOrderItem) {
+            $moneyDiscount->add($shopOrderItem->moneyDiscount->multiply($shopOrderItem->quantity));
         }
 
         $this->amount = $money->amount;
+
+        $this->discount_amount = $moneyDiscount->amount;
+        $this->delivery_amount = $moneyDelivery->amount;
+
         return $this;
     }
     /**
@@ -1002,6 +1034,33 @@ class ShopOrder extends \skeeks\cms\models\Core
         return $result;
     }
 
+    /**
+     * Добавить в заказ еще позиции
+     *
+     * @param array $items
+     * @return $this
+     */
+    public function addShopOrderItems($items = [])
+    {
+        /**
+         * @var ShopOrderItem[] $items
+         * @var ShopOrderItem $currentBasket
+         */
+        foreach ($items as $item) {
+            //Если в корзине которую необходимо добавить продукт такой же который уже есть у текущего пользователя, то нужно обновить количество.
+            if ($currentBasket = $this->getShopOrderItems()->andWhere(['shop_product_id' => $item->shop_product_id])->one()) {
+                $currentBasket->quantity = $currentBasket->quantity + $item->quantity;
+                $currentBasket->save();
+
+                $item->delete();
+            } else {
+                $item->shop_order_id = $this->id;
+                $item->save();
+            }
+        }
+
+        return $this;
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
