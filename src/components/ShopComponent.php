@@ -225,7 +225,7 @@ class ShopComponent extends Component
                      * @var $shopCart ShopCart
                      */
                     if ($shopCart) {
-                        $shopCart->shopOrder->addShopOrderItems($shopCart->shopOrder->shopOrderItems);
+                        $this->_shopCart->shopOrder->addShopOrderItems($shopCart->shopOrder->shopOrderItems);
                         $shopCart->delete();
                     }
 

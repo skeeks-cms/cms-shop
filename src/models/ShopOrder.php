@@ -519,8 +519,8 @@ class ShopOrder extends \skeeks\cms\models\Core
         $transaction->description = ShopUserTransact::ORDER_PAY;
         $transaction->save();*/
 
-        $this->payed = "Y";
-        $this->save();
+        /*$this->payed = "Y";
+        $this->save();*/
 
         return $this;
     }
@@ -936,6 +936,8 @@ class ShopOrder extends \skeeks\cms\models\Core
             'shopOrderItems',
             'quantity',
             'countShopOrderItems',
+
+            'countShopBaskets',
         ];
     }
 
@@ -1075,5 +1077,15 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         return null;
+    }
+
+
+    /**
+     * @return int
+     * @deprecated
+     */
+    public function getCountShopBaskets()
+    {
+        return $this->countShopOrderItems;
     }
 }
