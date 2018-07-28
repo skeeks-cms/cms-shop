@@ -732,6 +732,25 @@ class ShopOrder extends \skeeks\cms\models\Core
 
 
 
+    /**
+     * Итоговая стоимость заказа с учетом скидок, доставок, наценок, то что будет платить человек
+     * @return Money
+     */
+    public function getMoney()
+    {
+        return new Money($this->amount, $this->currency_code);
+    }
+
+    /**
+     * Итоговая стоимость заказа с учетом скидок, доставок, наценок, то что будет платить человек
+     * Рассчитанная динамически
+     * @return Money
+     */
+    public function getCalMoney()
+    {
+        return new Money($this->amount, $this->currency_code);
+    }
+
 
     /**
      * Цена всех позиций в заказе, динамически рассчитанная
@@ -758,15 +777,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         return $this->moneyItems;
     }
 
-    /**
-     * Итоговая стоимость заказа
-     *
-     * @return Money
-     */
-    public function getMoney()
-    {
-        return new Money($this->amount, $this->currency_code);
-    }
+
 
     /**
      * Налог
