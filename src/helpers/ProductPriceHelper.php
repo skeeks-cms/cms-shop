@@ -101,8 +101,8 @@ class ProductPriceHelper extends Component
             }
         }
 
-        if ($this->shopOrder->discountCoupons) {
-            foreach ($this->shopOrder->discountCoupons as $discountCoupon) {
+        if ($this->shopOrder->shopDiscountCoupons) {
+            foreach ($this->shopOrder->shopDiscountCoupons as $discountCoupon) {
                 $shopDiscounts[$discountCoupon->shopDiscount->id] = $discountCoupon->shopDiscount;
             }
         }

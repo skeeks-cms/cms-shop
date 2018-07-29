@@ -24,7 +24,7 @@ $order->refresh();
     <?=
     \yii\grid\GridView::widget([
         'dataProvider' => new \yii\data\ArrayDataProvider([
-            'allModels'  => $order->shopBaskets,
+            'allModels'  => $order->shopOrderItems,
             'pagination' => [
                 'pageSize'      => 200,
                 'pageSizeLimit' => [1, 200],
@@ -40,7 +40,7 @@ $order->refresh();
                 [
                     'class'  => \yii\grid\DataColumn::class,
                     'format' => 'raw',
-                    'value'  => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                    'value'  => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         if ($shopBasket->image) {
                             return Html::img($shopBasket->image->absoluteSrc, ['width' => 80]);
                         }
@@ -50,7 +50,7 @@ $order->refresh();
                     'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'name',
                     'format'    => 'raw',
-                    'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         if ($shopBasket->url) {
                             return Html::a($shopBasket->name, $shopBasket->absoluteUrl, [
                                 'target'    => '_blank',
@@ -67,7 +67,7 @@ $order->refresh();
                 [
                     'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'quantity',
-                    'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         return $shopBasket->quantity." ".$shopBasket->measure_name;
                     },
                 ],
@@ -77,7 +77,7 @@ $order->refresh();
                     'label'     => \Yii::t('skeeks/shop/app', 'Price'),
                     'attribute' => 'price',
                     'format'    => 'raw',
-                    'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         if ($shopBasket->discount_value) {
                             return "<span style='text-decoration: line-through;'>".(string)$shopBasket->moneyOriginal."</span><br />".Html::tag('small',
                                     $shopBasket->notes)."<br />".(string)$shopBasket->money."<br />".Html::tag('small',
@@ -94,7 +94,7 @@ $order->refresh();
                     'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
                     'attribute' => 'price',
                     'format'    => 'raw',
-                    'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         $money = $shopBasket->money;
                         return (string)$money->mul($shopBasket->quantity);
                     },
@@ -112,23 +112,23 @@ $order->refresh();
 
     <?
     $attributes = [];
-    if ($order->buyer->relatedPropertiesModel->toArray()) {
-        foreach ($order->buyer->relatedPropertiesModel->toArray() as $key => $value) {
+    if ($order->shopBuyer->relatedPropertiesModel->toArray()) {
+        foreach ($order->shopBuyer->relatedPropertiesModel->toArray() as $key => $value) {
             $attributes[] = [
                 'attribute' => $key,
-                'value'     => $order->buyer->relatedPropertiesModel->getSmartAttribute($key),
+                'value'     => $order->shopBuyer->relatedPropertiesModel->getSmartAttribute($key),
             ];
         }
     }
     ?>
     <?=
     \yii\widgets\DetailView::widget([
-        'model'      => $order->buyer->relatedPropertiesModel,
+        'model'      => $order->shopBuyer->relatedPropertiesModel,
         'attributes' => $attributes,
     ]);
     ?>
 
-    <? if ($order->pay_system_id) : ?>
+    <? if ($order->shop_pay_system_id) : ?>
         <?= Html::beginTag('h3'); ?>
         Оплата:
         <?= Html::endTag('h3'); ?>
@@ -138,13 +138,13 @@ $order->refresh();
             'model'      => $order,
             'attributes' => [
                 [
-                    'attribute' => 'pay_system_id',
-                    'value'     => $order->paySystem->name,
+                    'attribute' => 'shop_pay_system_id',
+                    'value'     => $order->shopPaySystem->name,
                 ],
                 [
-                    'attribute' => 'payed',
+                    'attribute' => 'payed_at',
                     'label'     => 'Статус оплаты',
-                    'value'     => $order->payed == 'Y' ? "оплачен" : "не оплачен",
+                    'value'     => $order->payed_at ? "оплачен" : "не оплачен",
                 ],
             ],
         ]);
@@ -152,7 +152,7 @@ $order->refresh();
 
     <? endif; ?>
 
-    <? if ($order->delivery_id) : ?>
+    <? if ($order->shop_delivery_id) : ?>
         <?= Html::beginTag('h3'); ?>
         Доставка:
         <?= Html::endTag('h3'); ?>
@@ -163,7 +163,7 @@ $order->refresh();
             'attributes' => [
                 [
                     'attribute' => 'delivery_id',
-                    'value'     => $order->delivery->name,
+                    'value'     => $order->shopDelivery->name,
                 ],
             ],
         ]);
@@ -177,7 +177,7 @@ $order->refresh();
     <?= Html::endTag('h3'); ?>
 
     <?= Html::beginTag('p'); ?>
-    Стоимость товаров: <?= Html::tag('b', (string)$order->moneyOriginal); ?><br/>
+    Стоимость товаров: <?= Html::tag('b', (string)$order->calcMoneyItems); ?><br/>
     Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
     Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
     К оплате: <?= Html::tag('b', (string)$order->money); ?>

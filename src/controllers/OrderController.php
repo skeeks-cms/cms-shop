@@ -109,7 +109,7 @@ class OrderController extends Controller
         $this->view->title = \Yii::t('skeeks/shop/app', 'Order').' | '.\Yii::t('skeeks/shop/app', 'Shop');
 
         return $this->render($this->action->id, [
-            'model' => ShopOrder::find()->andWhere(['key' => \Yii::$app->request->get('key')])->one(),
+            'model' => ShopOrder::find()->andWhere(['code' => \Yii::$app->request->get('code')])->one(),
         ]);
     }
 
@@ -125,8 +125,8 @@ class OrderController extends Controller
         /**
          * @var $shopOrder ShopOrder
          */
-        if (\Yii::$app->request->get('key')) {
-            $shopOrder = ShopOrder::find()->where(['key' => \Yii::$app->request->get('key')])->one();
+        if (\Yii::$app->request->get('code')) {
+            $shopOrder = ShopOrder::find()->where(['code' => \Yii::$app->request->get('code')])->one();
         } else {
             $shopOrder = ShopOrder::findOne(\Yii::$app->request->get('id'));
         }
@@ -168,8 +168,8 @@ class OrderController extends Controller
         /**
          * @var $shopOrder ShopOrder
          */
-        if (\Yii::$app->request->get('key')) {
-            $shopOrder = ShopOrder::find()->where(['key' => \Yii::$app->request->get('key')])->one();
+        if (\Yii::$app->request->get('code')) {
+            $shopOrder = ShopOrder::find()->where(['code' => \Yii::$app->request->get('code')])->one();
         } else {
             $shopOrder = ShopOrder::findOne(\Yii::$app->request->get('id'));
         }

@@ -173,7 +173,9 @@ class ShopCart extends ActiveRecord
      */
     public function getMoney()
     {
-        $money = \Yii::$app->money->newMoney();
+        return $this->shopOrder->calcMoney;
+
+        /*$money = \Yii::$app->money->newMoney();
 
         foreach ($this->shopBaskets as $shopBasket) {
             $money = $money->add($shopBasket->money->multiply($shopBasket->quantity));
@@ -183,23 +185,16 @@ class ShopCart extends ActiveRecord
             $money = $money->add($this->moneyDelivery);
         }
 
-        return $money;
+        return $money;*/
     }
+
     /**
-     *
      * Итоговая стоимость корзины, без учета скидок
-     *
      * @return Money
      */
     public function getMoneyOriginal()
     {
-        $money = \Yii::$app->money->newMoney();
-
-        foreach ($this->shopBaskets as $shopBasket) {
-            $money = $money->add($shopBasket->moneyOriginal->multiply($shopBasket->quantity));
-        }
-
-        return $money;
+        return $this->shopOrder->calcMoneyItems;
     }
     /**
      * @return int
@@ -221,7 +216,7 @@ class ShopCart extends ActiveRecord
      */
     public function getMoneyVat()
     {
-        return $this->shopOrder->moneyVat;
+        return $this->shopOrder->calcMoneyVat;
         /*$money = \Yii::$app->money->newMoney();
 
         foreach ($this->shopBaskets as $shopBasket) {
@@ -239,7 +234,7 @@ class ShopCart extends ActiveRecord
      */
     public function getMoneyDiscount()
     {
-        return $this->shopOrder->moneyDiscount;
+        return $this->shopOrder->calcMoneyDiscount;
         /*
         $money = \Yii::$app->money->newMoney();
         foreach ($this->shopBaskets as $shopBasket) {
@@ -255,7 +250,7 @@ class ShopCart extends ActiveRecord
      */
     public function getMoneyDelivery()
     {
-        return $this->shopOrder->moneyDelivery;
+        return $this->shopOrder->calcMoneyDelivery;
     }
 
     /**
@@ -366,7 +361,7 @@ class ShopCart extends ActiveRecord
      */
     public function getDiscountCoupons()
     {
-        return $this->shopOrder->discountCoupons;
+        return $this->shopOrder->shopDiscountCoupons;
     }
 
 }

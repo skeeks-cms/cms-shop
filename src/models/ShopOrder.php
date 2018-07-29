@@ -10,6 +10,7 @@ use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
 use skeeks\cms\shop\Module;
+use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
@@ -73,18 +74,22 @@ use yii\helpers\Url;
  *
  * @property ShopOrderChange[]          $shopOrderChanges
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
- * @property ShopDiscountCoupon[]       $discountCoupons
+ * @property ShopDiscountCoupon[]       $shopDiscountCoupons
  *
  * @property ShopTypePrice[]            $buyTypePrices
  *
  *
  * @property Money                      $money Итоговая цена к оплате
+ * @property Money                      $moneyDelivery Цена доставки
  * @property Money                      $moneyVat Цена налога
  * @property Money                      $moneyDiscount Цена скидки
- * @property Money                      $moneyOriginal
- * @property Money                      $moneySummPaid
- * @property Money                      $moneyDelivery
- * @property Money                      $moneyItems Сумма всех позиций корзины
+ * @property Money                      $moneyPaid
+ *
+ * @property Money                      $calcMoney          Итоговая цена к оплате
+ * @property Money                      $calcMoneyItems     Сумма всех позиций корзины
+ * @property Money                      $calcMoneyDelivery  Цена доставки
+ * @property Money                      $calcMoneyVat  Цена налога
+ * @property Money                      $calcMoneyDiscount  Цена скидки
  *
  * @property int                        $weight
  *
@@ -105,96 +110,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return '{{%shop_order}}';
     }
-    /**
-     * @param ShopFuser $shopFuser
-     * @return static
-     */
-    static public function createOrderByFuser(ShopFuser $shopFuser, $isNotify = true)
-    {
-        $order = static::createByFuser($shopFuser);
 
-        if ($order->save()) {
-            foreach ($shopFuser->shopBaskets as $basket) {
-                $basket->unlink('fuser', $shopFuser);
-                $basket->link('order', $order);
-            }
-
-            if ($shopFuser->discountCoupons) {
-                foreach ($shopFuser->discountCoupons as $discountCoupon) {
-                    $shopOrder2discountCoupon = new ShopOrder2discountCoupon();
-                    $shopOrder2discountCoupon->order_id = $order->id;
-                    $shopOrder2discountCoupon->discount_coupon_id = $discountCoupon->id;
-
-                    if (!$shopOrder2discountCoupon->save()) {
-                        print_r($shopOrder2discountCoupon->errors);
-                        die;
-                    }
-                }
-
-                $shopFuser->discount_coupons = [];
-                $shopFuser->save(false);
-            }
-
-            //Notify admins
-            if (\Yii::$app->shop->notifyEmails) {
-                foreach (\Yii::$app->shop->notifyEmails as $email) {
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
-
-                    \Yii::$app->mailer->compose('create-order', [
-                        'order' => $order,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo($email)
-                        ->setSubject(\Yii::t('skeeks/shop/app',
-                                'New order').' #'.$order->id)
-                        ->send();
-                }
-            }
-
-            //Письмо тому кто заказывает
-            if ($order->email && $isNotify) {
-                $order->notifyNew();
-            }
-        }
-
-        return $order;
-    }
-    /**
-     * @param ShopFuser $shopFuser
-     * @return static
-     */
-    static public function createByFuser(ShopFuser $shopFuser)
-    {
-        $order = new static();
-
-        $order->cms_site_id = $shopFuser->site->id;
-        $order->shop_person_type_id = $shopFuser->shop_person_type_id;
-        $order->shop_buyer_id = $shopFuser->shop_buyer_id;
-        $order->user_id = $shopFuser->user_id;
-
-        $order->price = $shopFuser->money ? ($shopFuser->money->amount) : "";
-        $order->currency_code = $shopFuser->money ? $shopFuser->money->currency->code : "";
-        if ($shopFuser->paySystem) {
-            $order->shop_pay_system_id = $shopFuser->paySystem->id;
-        }
-
-        if ($shopFuser->moneyVat) {
-            $order->tax_amount = $shopFuser->moneyVat->getValue();
-        }
-
-        if ($shopFuser->moneyDiscount) {
-            $order->discount_amount = $shopFuser->moneyDiscount->getValue();
-        }
-
-        $order->shop_delivery_id = $shopFuser->shop_delivery_id;
-        $order->store_id = $shopFuser->store_id;
-
-        if ($shopFuser->delivery) {
-            $order->delivery_amount = $shopFuser->delivery->money->amount;
-        }
-
-        return $order;
-    }
     public function notifyNew()
     {
         if ($this->email) {
@@ -219,11 +135,41 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         //$this->on(self::EVENT_AFTER_INSERT, [$this, "afterInstertCallback"]);
         //$this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterUpdateCallback"]);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeUpdateCallback"]);
-
+        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "_afterUpdateCallback"]);
+        //$this->on(self::EVENT_BEFORE_UPDATE, [$this, "beforeUpdateCallback"]);
 
 
     }
+    public function _afterUpdateCallback(AfterSaveEvent $event)
+    {
+        //Заказ создан
+        if (in_array("is_created", array_keys($event->changedAttributes)) && $this->is_created) {
+
+
+            //Notify admins
+            if (\Yii::$app->shop->notifyEmails) {
+                foreach (\Yii::$app->shop->notifyEmails as $email) {
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                    \Yii::$app->mailer->compose('create-order', [
+                        'order' => $this,
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                        ->setTo($email)
+                        ->setSubject(\Yii::t('skeeks/shop/app',
+                                'New order').' #'.$this->id)
+                        ->send();
+                }
+            }
+
+            //Письмо тому кто заказывает
+            if ($this->email) {
+                $this->notifyNew();
+            }
+
+        }
+    }
+
     public function afterInstertCallback($e)
     {
         (new ShopOrderChange([
@@ -231,6 +177,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'shop_order_id' => $this->id,
         ]))->save();
     }
+
     public function beforeUpdateCallback($e)
     {
         if ($this->isAttributeChanged('canceled')) {
@@ -602,14 +549,14 @@ class ShopOrder extends \skeeks\cms\models\Core
             return $this->_email;
         }
 
-        if ($this->buyer) {
-            if ($this->buyer->email) {
-                return $this->buyer->email;
+        if ($this->shopBuyer) {
+            if ($this->shopBuyer->email) {
+                return $this->shopBuyer->email;
             }
         }
 
-        if ($this->user && $this->user->email) {
-            return $this->user->email;
+        if ($this->cmsUser && $this->cmsUser->email) {
+            return $this->cmsUser->email;
         }
 
         return null;
@@ -695,15 +642,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopBuyer::class, ['id' => 'shop_buyer_id']);
     }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopOrderItems()
-    {
-        return $this->hasMany(ShopOrderItem::class, ['shop_order_id' => 'id']);
-    }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -712,7 +650,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         return $this->hasMany(ShopOrderChange::class,
             ['shop_order_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -720,18 +657,14 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopOrder2discountCoupon::class, ['order_id' => 'id']);
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDiscountCoupons()
+    public function getShopDiscountCoupons()
     {
         return $this->hasMany(ShopDiscountCoupon::class, ['id' => 'discount_coupon_id'])
             ->via('shopOrder2discountCoupons');
     }
-
-
-
     /**
      * Итоговая стоимость заказа с учетом скидок, доставок, наценок, то что будет платить человек
      * @return Money
@@ -740,24 +673,27 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return new Money($this->amount, $this->currency_code);
     }
-
     /**
      * Итоговая стоимость заказа с учетом скидок, доставок, наценок, то что будет платить человек
      * Рассчитанная динамически
+     *
      * @return Money
      */
-    public function getCalMoney()
+    public function getCalcMoney()
     {
-        return new Money($this->amount, $this->currency_code);
+        $money = $this->calcMoneyItems;
+        $money->add($this->calcMoneyDelivery);
+        return $money;
     }
 
 
     /**
-     * Цена всех позиций в заказе, динамически рассчитанная
+     * Цена всех позиций в заказе
+     * Динамически рассчитанная
      *
      * @return Money
      */
-    public function getMoneyItems()
+    public function getCalcMoneyItems()
     {
         $money = new Money("", $this->currency_code);
 
@@ -769,17 +705,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
     /**
-     * @return Money
-     * @deprecated
-     */
-    public function getBasketsMoney()
-    {
-        return $this->moneyItems;
-    }
-
-
-
-    /**
      * Налог
      *
      * @return Money
@@ -788,6 +713,22 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return new Money($this->tax_amount, $this->currency_code);
     }
+    /**
+     * Налог
+     *
+     * @return Money
+     */
+    public function getCalcMoneyVat()
+    {
+        $money = new Money("", $this->currency_code);
+
+        foreach ($this->shopOrderItems as $shopOrderItem) {
+            $money = $money->add($shopOrderItem->moneyVat->multiply($shopOrderItem->quantity));
+        }
+
+        return $money;
+    }
+
 
     /**
      * Скидка наценка
@@ -800,29 +741,55 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
     /**
+     * Налог
+     *
+     * @return Money
+     */
+    public function getCalcMoneyDiscount()
+    {
+        $money = new Money("", $this->currency_code);
+
+        foreach ($this->shopOrderItems as $shopOrderItem) {
+            $money = $money->add($shopOrderItem->moneyDiscount->multiply($shopOrderItem->quantity));
+        }
+
+        return $money;
+    }
+
+
+    /**
      * Итоговая стоимость позиции без скидок и наценок
      * Цена товара в момент укладки товара в корзину
      *
      * @return Money
+     * @deprecated
      */
     public function getMoneyOriginal()
     {
         return new Money((string)($this->amount + $this->discount_amount), $this->currency_code);
     }
 
+
     /**
      * Уже оплачено по заказу
      *
      * @return Money
      */
-    public function getMoneySummPaid()
+    public function getMoneyPaid()
     {
         return new Money($this->paid_amount, $this->currency_code);
+    }
+    /**
+     * @return Money
+     * @deprecated
+     */
+    public function getMoneySummPaid()
+    {
+        return $this->moneySumPaid;
     }
 
     /**
      * Стоимость доставки
-     *
      * @return Money
      */
     public function getMoneyDelivery()
@@ -830,6 +797,18 @@ class ShopOrder extends \skeeks\cms\models\Core
         return new Money($this->delivery_amount, $this->currency_code);
     }
 
+    /**
+     * Стоимость доставки
+     * @return Money
+     */
+    public function getCalcMoneyDelivery()
+    {
+        if ($this->shopDelivery) {
+            return $this->shopDelivery->money;
+        }
+
+        return new Money("", $this->currency_code);
+    }
 
     /**
      * @return int
@@ -844,8 +823,6 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $result;
     }
-
-
     /**
      * Доступные платежные системы
      *
@@ -855,29 +832,15 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->shopPersonType->getPaySystems()->andWhere([ShopPaySystem::tableName().".active" => Cms::BOOL_Y]);
     }
-
     /**
      * @return $this
      */
     public function recalculate()
     {
-        $money = $this->moneyItems;
-
-        $moneyDiscount = new Money("", $this->currency_code);
-        $moneyDelivery = new Money("", $this->currency_code);
-
-        if ($this->shopDelivery) {
-            $moneyDelivery->add($this->shopDelivery->money);
-        }
-
-        foreach ($this->shopOrderItems as $shopOrderItem) {
-            $moneyDiscount->add($shopOrderItem->moneyDiscount->multiply($shopOrderItem->quantity));
-        }
-
-        $this->amount = $money->amount;
-
-        $this->discount_amount = $moneyDiscount->amount;
-        $this->delivery_amount = $moneyDelivery->amount;
+        $this->tax_amount = $this->calcMoneyVat->amount;
+        $this->amount = $this->calcMoney->amount;
+        $this->discount_amount = $this->calcMoneyDiscount->amount;
+        $this->delivery_amount = $this->calcMoneyDelivery->amount;
 
         return $this;
     }
@@ -913,8 +876,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             $options
         ), $scheme);
     }
-
-
     /**
      *
      * Массив для json ответа, используется при обновлении корзины, добавлении позиций и т.д.
@@ -937,7 +898,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             ]),
         ]);
     }
-
     /**
      * @return array
      */
@@ -951,7 +911,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             'countShopBaskets',
         ];
     }
-
     /**
      * Количество позиций в корзине
      *
@@ -961,7 +920,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return count($this->shopOrderItems);
     }
-
     /**
      * @return float
      */
@@ -976,8 +934,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
         return (float)$result;
     }
-
-
     /**
      * @param ShopCmsContentElement $shopCmsContentElement
      * @return ProductPriceHelper
@@ -1016,8 +972,6 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $minPh;
     }
-
-
     /**
      *
      * Доступные цены для покупки на сайте
@@ -1038,7 +992,6 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $result;
     }
-
     /**
      * Добавить в заказ еще позиции
      *
@@ -1049,7 +1002,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         /**
          * @var ShopOrderItem[] $items
-         * @var ShopOrderItem $currentBasket
+         * @var ShopOrderItem   $currentBasket
          */
         foreach ($items as $item) {
             //Если в корзине которую необходимо добавить продукт такой же который уже есть у текущего пользователя, то нужно обновить количество.
@@ -1065,6 +1018,13 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         return $this;
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrderItems()
+    {
+        return $this->hasMany(ShopOrderItem::class, ['shop_order_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
@@ -1098,5 +1058,15 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getCountShopBaskets()
     {
         return $this->countShopOrderItems;
+    }
+
+
+    /**
+     * @return Money
+     * @deprecated
+     */
+    public function getBasketsMoney()
+    {
+        return $this->calcMoneyItems;
     }
 }
