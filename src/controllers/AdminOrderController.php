@@ -8,13 +8,15 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\DateTimeColumnData;
+use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\actions\AdminAction;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
@@ -26,10 +28,8 @@ use yii\helpers\ArrayHelper;
  * Class AdminExtraController
  * @package skeeks\cms\shop\controllers
  */
-class AdminOrderController extends AdminModelEditorController
+class AdminOrderController extends BackendModelStandartController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Orders');
@@ -44,36 +44,180 @@ class AdminOrderController extends AdminModelEditorController
      */
     public function actions()
     {
-        $view = $this->view;
+        return ArrayHelper::merge(parent::actions(), [
 
-        return ArrayHelper::merge(parent::actions(),
-            [
-
-                'create' =>
-                    [
-                        'isVisible' => false,
+            "index" => [
+                "filters" => [
+                    "visibleFilters" => [
+                        'id',
+                    ],
+                ],
+                'grid'    => [
+                    'defaultOrder' => [
+                        'is_created' => SORT_DESC,
+                        'updated_at' => SORT_DESC,
                     ],
 
-                'create-order' =>
-                    [
-                        'class'    => AdminAction::class,
-                        'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
-                        "icon"     => "glyphicon glyphicon-plus",
-                        "callback" => [$this, 'createOrder'],
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        'id',
+
+                        'updated_at',
+
+                        'shop_order_status_id',
+
+                        'payed_at',
+                        'canceled_at',
+
+                        'shop_buyer_id',
+                        'shop_pay_system_id',
+                        'shop_delivery_id',
+
+                        'items',
+
+                        'amount',
+                        'is_created',
+                        'go',
+                    ],
+                    'columns'        => [
+                        'is_created'           => [
+                            'class' => BooleanColumn::class,
+                        ],
+                        'payed_at'             => [
+                            'class' => DateTimeColumnData::class,
+                        ],
+                        'go'                   => [
+                            'format' => "raw",
+                            'value'  => function (ShopOrder $shopOrder) {
+                                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $shopOrder->url, [
+                                    'target'    => '_blank',
+                                    'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                                    'data-pjax' => '0',
+                                    'class'     => 'btn btn-default btn-sm',
+                                ]);
+                            },
+                        ],
+                        'canceled_at'          => [
+                            'value' => function (ShopOrder $shopOrder, $key) {
+                                $reuslt = "<div>";
+                                if ($shopOrder->canceled_at) {
+                                    $this->view->registerJs(<<<JS
+$('tr[data-key={$key}]').addClass('sx-tr-red');
+JS
+                                    );
+
+                                    $this->view->registerCss(<<<CSS
+tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
+{
+background: #FFECEC !important;
+}
+CSS
+                                    );
+                                    $reuslt = "<div style='color: red;'>";
+                                }
+
+                                $reuslt .= $shopOrder->canceled_at ? \Yii::$app->formatter->asDatetime($shopOrder->canceled_at) : "-";
+                                $reuslt .= "</div>";
+                                return $reuslt;
+                            },
+                        ],
+                        'payed_at'             => [
+                            'value' => function (ShopOrder $shopOrder, $key) {
+                                $reuslt = "<div>";
+                                if ($shopOrder->payed_at) {
+                                    $this->view->registerJs(<<<JS
+$('tr[data-key={$key}]').addClass('sx-tr-green');
+JS
+                                    );
+
+                                    $this->view->registerCss(<<<CSS
+tr.sx-tr-green, tr.sx-tr-green:nth-of-type(odd), tr.sx-tr-green td
+{
+background: #d5ffd5 !important;
+}
+CSS
+                                    );
+                                    $reuslt = "<div style='color: green;'>";
+                                }
+
+                                $reuslt .= $shopOrder->payed_at ? \Yii::$app->formatter->asDatetime($shopOrder->payed_at) : "-";
+                                $reuslt .= "</div>";
+                                return $reuslt;
+                            },
+                        ],
+                        'updated_at'           => [
+                            'class' => DateTimeColumnData::class,
+                        ],
+                        'items'                => [
+                            'label'  => "Товары",
+                            'format' => "raw",
+                            'value'  => function (ShopOrder $shopOrder) {
+                                if ($shopOrder->shopOrderItems) {
+
+                                    $result = [];
+
+                                    foreach ($shopOrder->shopOrderItems as $shopBasket) {
+                                        $result[] =
+
+                                            \yii\helpers\Html::img(Image::getSrc($shopBasket->image ? $shopBasket->image->src : null), [
+                                                'height' => "50",
+                                            ])
+                                            .
+                                            \yii\helpers\Html::a($shopBasket->name, $shopBasket->url, [
+                                                'target'    => '_blank',
+                                                'data-pjax' => '0',
+                                            ])
+                                            .
+                                            <<<HTML
+                 — $shopBasket->quantity $shopBasket->measure_name
+HTML;
+
+                                    }
+
+                                    return implode('<hr style="margin: 0px;"/>', $result);
+                                }
+                            },
+                        ],
+                        'shop_order_status_id' => [
+                            'value' => function (ShopOrder $shopOrder) {
+                                if (!$shopOrder->shopOrderStatus) {
+                                    return "-";
+                                }
+                                return \yii\helpers\Html::label($shopOrder->shopOrderStatus->asText, null, [
+                                        'style' => "background: {$shopOrder->shopOrderStatus->color}",
+                                        'class' => "label",
+                                    ])."<br />".
+                                    \yii\helpers\Html::tag("small",
+                                        \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
+                            },
+                        ],
+                        'amount' => [
+                            'value' => function (ShopOrder $shopOrder) {
+                                $result = [];
+                                $result[] = "Доставка:&nbsp;" . $shopOrder->moneyDelivery;
+                                $result[] = "Скидка:&nbsp;" . $shopOrder->moneyDiscount;
+                                $result[] = "Налог:&nbsp;" . $shopOrder->moneyVat;
+                                return "К&nbsp;оплате:&nbsp;<b>" . $shopOrder->money . "</b><hr style='margin: 0px; padding: 0px;'/>" . implode("<br />", $result);
+                            },
+                        ],
                     ],
 
+                ],
+            ],
 
-                /*"view" =>
-                [
-                    'class'         => AdminOneModelEditAction::class,
-                    "name"         => \Yii::t('skeeks/shop/app',"Информация"),
-                    "icon"          => "glyphicon glyphicon-eye-open",
-                    "priority"      => 5,
-                    "callback"      => [$this, 'view'],
-                ],*/
+            'create' => [
+                'isVisible' => false,
+            ],
 
-            ]
-        );
+            'create-order' => [
+                'class'    => AdminAction::class,
+                'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
+                "icon"     => "glyphicon glyphicon-plus",
+                "callback" => [$this, 'createOrder'],
+            ],
+
+        ]);
     }
 
     public function view()

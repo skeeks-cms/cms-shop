@@ -361,7 +361,7 @@ class ShopCart extends ActiveRecord
      */
     public function getDiscountCoupons()
     {
-        return $this->shopOrder->shopDiscountCoupons;
+        return ($this->shopOrder && $this->shopOrder->shopDiscountCoupons ? $this->shopOrder->shopDiscountCoupons : []);
     }
 
 }

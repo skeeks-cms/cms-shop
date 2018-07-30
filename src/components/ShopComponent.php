@@ -14,6 +14,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
 use yii\base\UserException;
@@ -44,6 +45,18 @@ class ShopComponent extends Component
      * @var string Email отдела продаж
      */
     public $email = "";
+
+    /**
+     * Начальный статус после создания заказа
+     * @var string
+     */
+    public $start_order_status_id = "";
+    /**
+     * Конечный статус заказа
+     * @var string
+     */
+    public $end_order_status_id = "";
+
     /**
      * Максимальное допустимое количество товаров
      * @var float
@@ -112,6 +125,14 @@ class ShopComponent extends Component
         //echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
 
         echo $form->field($this, 'notify_emails')->textarea(['rows' => 3]);
+        echo $form->field($this, 'start_order_status_id')->listBox(
+            ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
+            ['size' => 1]
+        );
+        echo $form->field($this, 'end_order_status_id')->listBox(
+            ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
+            ['size' => 1]
+        );
 
         echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
         echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '],
@@ -125,13 +146,19 @@ class ShopComponent extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['email'], 'string'],
             [['payAfterConfirmation'], 'string'],
+            [['start_order_status_id'], 'integer'],
+            [['end_order_status_id'], 'integer'],
             [['storeCmsContentId'], 'integer'],
             ['notify_emails', 'string'],
+            ['start_order_status_id', 'required'],
+            ['end_order_status_id', 'required'],
         ]);
     }
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
+            'start_order_status_id'                => 'Начальный статус заказа',
+            'end_order_status_id'                => 'Конечный статус заказа',
             'email'                => 'Email',
             'payAfterConfirmation' => \Yii::t('skeeks/shop/app',
                 'Include payment orders only after the manager approval'),
@@ -142,6 +169,8 @@ class ShopComponent extends Component
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'start_order_status_id' => "Статус, который присваивается заказу сразу после его оформления",
+            'end_order_status_id' => "Статус, который присваивается заказу после завершения работы с ним",
             'notify_emails' => \Yii::t('skeeks/shop/app',
                 'Enter email addresses, separated by commas, they will come on new orders information'),
         ]);

@@ -16,7 +16,6 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%shop_order_status}}".
  *
- * @property string      $code
  * @property string      $name
  * @property string      $description
  * @property integer     $priority
@@ -26,14 +25,6 @@ use yii\helpers\ArrayHelper;
  */
 class ShopOrderStatus extends Core
 {
-    const STATUS_CODE_START = "N";
-    const STATUS_CODE_END = "F";
-
-    static public $protectedStatuses =
-        [
-            self::STATUS_CODE_START,
-            self::STATUS_CODE_END,
-        ];
     /**
      * @inheritdoc
      */
@@ -48,7 +39,7 @@ class ShopOrderStatus extends Core
     {
         parent::init();
 
-        $this->on(BaseActiveRecord::EVENT_BEFORE_DELETE, [$this, "checkDelete"]);
+        //$this->on(BaseActiveRecord::EVENT_BEFORE_DELETE, [$this, "checkDelete"]);
     }
     public function checkDelete()
     {
@@ -56,18 +47,7 @@ class ShopOrderStatus extends Core
             throw new UserException(\Yii::t('skeeks/shop/app', 'You can not remove this status'));
         }
     }
-    /**
-     * Нельзя удалять и редактировать статус?
-     * @return bool
-     */
-    public function isProtected()
-    {
-        if (in_array($this->code, (array)static::$protectedStatuses)) {
-            return true;
-        }
 
-        return false;
-    }
     /**
      * @inheritdoc
      */
@@ -81,7 +61,6 @@ class ShopOrderStatus extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code'        => \Yii::t('skeeks/shop/app', 'Code'),
             'name'        => \Yii::t('skeeks/shop/app', 'Name'),
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
             'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
@@ -96,23 +75,11 @@ class ShopOrderStatus extends Core
     {
         return array_merge(parent::rules(), [
             [['priority'], 'integer'],
-            [['code', 'name'], 'required'],
+            [['name'], 'required'],
             [['description'], 'string'],
-            [['code'], 'string', 'max' => 2],
             [['name'], 'string', 'max' => 255],
             [['color'], 'string', 'max' => 32],
-            [['code'], 'unique'],
-            [['code'], 'validateCode'],
         ]);
-    }
-
-
-    public function validateCode($attribute)
-    {
-        if (!preg_match('/^[A-Z]$/', $this->$attribute)) {
-            $this->addError($attribute,
-                \Yii::t('skeeks/shop/app', 'Use only uppercase letters of the Latin alphabet.'));
-        }
     }
 
 
@@ -121,6 +88,6 @@ class ShopOrderStatus extends Core
      */
     public function getShopOrders()
     {
-        return $this->hasMany(ShopOrder::class, ['status_code' => 'code']);
+        return $this->hasMany(ShopOrder::class, ['shop_order_status_id' => 'id']);
     }
 }
