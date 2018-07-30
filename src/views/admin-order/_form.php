@@ -121,7 +121,8 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 
                     <a href="#sx-status-change" class="sx-dashed sx-fancybox" style="color: {$model->status->color}">{$model->status->name}</a>
                     <small>({$statusDate})</small>
-HTML,
+HTML
+,
 
             ],
 
@@ -154,13 +155,13 @@ HTML,
             [                      // the owner name of the model
                 'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'format' => 'raw',
-                'value'  => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->user]))->run(),
+                'value'  => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->cmsUser]))->run(),
             ],
 
             [                      // the owner name of the model
                 'label'  => \Yii::t('skeeks/shop/app', 'Type payer'),
                 'format' => 'raw',
-                'value'  => $model->personType->name,
+                'value'  => $model->shopPersonType->name,
             ],
 
             [                      // the owner name of the model
@@ -245,7 +246,7 @@ HTML,
             [                      // the owner name of the model
                 'label'  => \Yii::t('skeeks/shop/app', 'Delivery service'),
                 'format' => 'raw',
-                'value'  => $model->delivery ? $model->delivery->name : "",
+                'value'  => $model->shopDelivery ? $model->shopDelivery->name : "",
             ],
 
 
@@ -257,11 +258,11 @@ HTML,
                 ]),
             ],
 
-            [                      // the owner name of the model
+            /*[
                 'label'  => 'Склад',
                 'format' => 'raw',
                 'value'  => $model->store ? $model->store->name : "",
-            ],
+            ],*/
         ],
 ]) ?>
 
@@ -295,7 +296,7 @@ HTML,
 $json = \yii\helpers\Json::encode([
     'createUrl' => \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/shop/admin-basket/create'])
         ->merge([
-            'order_id' => $model->id,
+            'shop_order_id' => $model->id,
         ])
         ->enableEmptyLayout()
         ->enableNoActions()
@@ -311,11 +312,12 @@ JS
 <?
 $addItemText = \Yii::t('skeeks/shop/app', 'Add this item');
 $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
+
 echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
     'label'       => "",
     'parentModel' => $model,
     'relation'    => [
-        'order_id' => 'id',
+        'shop_order_id' => 'id',
     ],
 
     'sort' => [
@@ -482,10 +484,10 @@ JS
 <?= $form->fieldSetEnd(); ?>
 
 
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Transactions by order')); ?>
 <!--
---><?/*= \skeeks\cms\modules\admin\widgets\GridView::widget([
+<?/*= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Transactions by order')); */?>
+
+<?/*= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
         'models' => $model->shopUserTransacts,
     ]),
@@ -519,7 +521,7 @@ JS
         ],
 ]); */?>
 
-<?= $form->fieldSetEnd(); ?>
+--><?/*= $form->fieldSetEnd(); */?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'History of changes')); ?>
 
@@ -599,15 +601,15 @@ JS
 
             ]); ?>
 
-            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
+            <?= $form->fieldSelect($model, 'shop_order_status_id', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'id', 'name'
             )); ?>
 
-            <?= $form->field($model, 'pay_voucher_num'); ?>
-            <?= $form->field($model, 'pay_voucher_at')->widget(
+            <?/*= $form->field($model, 'pay_voucher_num'); */?><!--
+            --><?/*= $form->field($model, 'pay_voucher_at')->widget(
                 \kartik\datecontrol\DateControl::class, [
                 'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
+            ]); */?>
 
             <button class="btn btn-primary">Сохранить</button>
 
@@ -638,15 +640,15 @@ JS
 
             ]); ?>
 
-            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
+            <?= $form->fieldSelect($model, 'shop_order_status_id', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'id', 'name'
             )); ?>
 
-            <?= $form->field($model, 'pay_voucher_num'); ?>
-            <?= $form->field($model, 'pay_voucher_at')->widget(
+            <?/*= $form->field($model, 'pay_voucher_num'); */?><!--
+            --><?/*= $form->field($model, 'pay_voucher_at')->widget(
                 \kartik\datecontrol\DateControl::class, [
                 'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
+            ]); */?>
 
             <p>
                 <?= Html::checkbox('payment-close', false, ['label' => 'Отменить оплату']); ?>
@@ -683,8 +685,8 @@ JS
 
             ]); ?>
 
-            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
+            <?= $form->fieldSelect($model, 'shop_order_status_id', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'id', 'name'
             )); ?>
 
             <button class="btn btn-primary">Сохранить</button>
@@ -747,7 +749,7 @@ JS
             ]); ?>
 
             <?=
-            $form->fieldSelect($model, 'pay_system_id', \yii\helpers\ArrayHelper::map(
+            $form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
                 $model->paySystems, 'id', 'name'
             ));
             ?>
@@ -783,7 +785,7 @@ JS
             ]); ?>
 
             <?=
-            $form->fieldSelect($model, 'delivery_id', \yii\helpers\ArrayHelper::map(
+            $form->fieldSelect($model, 'shop_delivery_id', \yii\helpers\ArrayHelper::map(
                 \skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'
             ));
             ?>

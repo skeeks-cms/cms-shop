@@ -84,13 +84,14 @@ use yii\helpers\Url;
  * @property Money                      $moneyDelivery Цена доставки
  * @property Money                      $moneyVat Цена налога
  * @property Money                      $moneyDiscount Цена скидки
+ * @property Money                      $moneyItems Цена всех товаров без скидки
  * @property Money                      $moneyPaid
  *
  * @property Money                      $calcMoney          Итоговая цена к оплате
- * @property Money                      $calcMoneyItems     Сумма всех позиций корзины
  * @property Money                      $calcMoneyDelivery  Цена доставки
  * @property Money                      $calcMoneyVat  Цена налога
  * @property Money                      $calcMoneyDiscount  Цена скидки
+ * @property Money                      $calcMoneyItems     Сумма всех позиций корзины
  *
  * @property int                        $weight
  *
@@ -694,12 +695,13 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $money = $this->calcMoneyItems;
         $money->add($this->calcMoneyDelivery);
+        $money->sub($this->moneyDiscount);
         return $money;
     }
 
 
     /**
-     * Цена всех позиций в заказе
+     * Цена всех позиций в заказе без скидок
      * Динамически рассчитанная
      *
      * @return Money
@@ -709,8 +711,22 @@ class ShopOrder extends \skeeks\cms\models\Core
         $money = new Money("", $this->currency_code);
 
         foreach ($this->shopOrderItems as $shopOrderItem) {
-            $money = $money->add($shopOrderItem->money->multiply($shopOrderItem->quantity));
+            $money = $money->add($shopOrderItem->moneyOriginal->multiply($shopOrderItem->quantity));
         }
+
+        return $money;
+    }
+
+    /**
+     * @return Money
+     */
+    public function getMoneyItems()
+    {
+        $money = new Money("", $this->currency_code);
+
+        $money->add($this->money);
+        $money->sub($this->moneyDelivery);
+        $money->add($this->moneyDiscount);
 
         return $money;
     }
@@ -777,7 +793,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneyOriginal()
     {
-        return new Money((string)($this->amount + $this->discount_amount), $this->currency_code);
+        return $this->moneyItems;
     }
 
 
@@ -796,7 +812,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getMoneySummPaid()
     {
-        return $this->moneySumPaid;
+        return $this->moneyPaid;
     }
 
     /**

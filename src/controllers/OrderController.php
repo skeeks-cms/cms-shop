@@ -137,9 +137,9 @@ class OrderController extends Controller
 
         $shopBill = new ShopBill();
         $shopBill->shop_order_id = $shopOrder->id;
-        $shopBill->shop_buyer_id = $shopOrder->buyer_id;
-        $shopBill->shop_pay_system_id = $shopOrder->pay_system_id;
-        $shopBill->amount = $shopOrder->price;
+        $shopBill->shop_buyer_id = $shopOrder->shop_buyer_id;
+        $shopBill->shop_pay_system_id = $shopOrder->shop_pay_system_id;
+        $shopBill->amount = $shopOrder->amount;
         $shopBill->currency_code = $shopOrder->currency_code;
         $shopBill->description = "Оплата по заказу №".$shopOrder->id;
         if (!$shopBill->save()) {
