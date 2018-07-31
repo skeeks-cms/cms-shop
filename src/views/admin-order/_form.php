@@ -374,6 +374,23 @@ HTML
 .sx-result
 {
     background-color: #ecf2d3;
+    padding: 10px;
+}
+.sx-result .table tbody tr:last-child
+{
+    background: #dbe3b9;
+    font-weight: bold;
+}
+.sx-result .table tbody tr:last-child > th,
+.sx-result .table tbody tr:last-child > th
+{
+    font-weight: bold;
+}
+.sx-result .table tbody > tr > th,
+.sx-result .table tbody > tr > td
+{
+    border-top: none;
+    font-weight: normal;
 }
 CSS
                 );
