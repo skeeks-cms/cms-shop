@@ -495,7 +495,7 @@ JS
     'columns' =>
         [
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,k;
             ],
 
             [
