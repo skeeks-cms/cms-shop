@@ -34,7 +34,7 @@ class AdminOrderChangeController extends BackendModelStandartController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(), [
+        $result = ArrayHelper::merge(parent::actions(), [
 
             "index" => [
                 "filters" => [
@@ -74,45 +74,13 @@ class AdminOrderChangeController extends BackendModelStandartController
                     ],
                 ]
             ]
-            /*"index" => [
-                "filters" => [
-                    "visibleFilters" => [
-                        'id',
-                        'name',
-                    ],
-                ],
-                'grid'    => [
-                    'defaultOrder' => [
-                        'priority' => SORT_ASC,
-                    ],
-
-                    'visibleColumns' => [
-                        'checkbox',
-                        'actions',
-                        'id',
-
-                        'name',
-
-                        'description',
-
-                        'priority',
-                        'color',
-
-                    ],
-                    'columns'        => [
-                        'name'           => [
-                            'value' => function (ShopOrderStatus $shopOrderStatus) {
-                                return \yii\helpers\Html::label($shopOrderStatus->name, null, [
-                                    'style' => "background: {$shopOrderStatus->color}",
-                                    'class' => "label",
-                                ]);
-                            },
-                        ],
-                    ],
-
-                ],
-            ],*/
-
         ]);
+
+        ArrayHelper::remove($result, "create");
+        ArrayHelper::remove($result, "update");
+        ArrayHelper::remove($result, "delete");
+        ArrayHelper::remove($result, "delete-multi");
+
+        return $result;
     }
 }

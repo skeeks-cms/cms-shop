@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
@@ -21,6 +22,7 @@ use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopProduct;
+use yii\base\Event;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
@@ -67,7 +69,7 @@ class AdminOrderController extends BackendModelStandartController
 
                         'shop_order_status_id',
 
-                        'payed_at',
+                        'paid_at',
                         'canceled_at',
 
                         'shop_buyer_id',
@@ -84,7 +86,7 @@ class AdminOrderController extends BackendModelStandartController
                         'is_created'           => [
                             'class' => BooleanColumn::class,
                         ],
-                        'payed_at'             => [
+                        'paid_at'             => [
                             'class' => DateTimeColumnData::class,
                         ],
                         'go'                   => [
@@ -122,10 +124,10 @@ CSS
                                 return $reuslt;
                             },
                         ],
-                        'payed_at'             => [
+                        'paid_at'             => [
                             'value' => function (ShopOrder $shopOrder, $key) {
                                 $reuslt = "<div>";
-                                if ($shopOrder->payed_at) {
+                                if ($shopOrder->paid_at) {
                                     $this->view->registerJs(<<<JS
 $('tr[data-key={$key}]').addClass('sx-tr-green');
 JS
@@ -141,7 +143,7 @@ CSS
                                     $reuslt = "<div style='color: green;'>";
                                 }
 
-                                $reuslt .= $shopOrder->payed_at ? \Yii::$app->formatter->asDatetime($shopOrder->payed_at) : "-";
+                                $reuslt .= $shopOrder->paid_at ? \Yii::$app->formatter->asDatetime($shopOrder->paid_at) : "-";
                                 $reuslt .= "</div>";
                                 return $reuslt;
                             },
@@ -216,6 +218,28 @@ HTML;
                 'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
                 "icon"     => "glyphicon glyphicon-plus",
                 "callback" => [$this, 'createOrder'],
+            ],
+
+            'payments' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Платежи',
+                'priority' => 400,
+                'callback' => [$this, 'payments'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+            'bills' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Счета',
+                'priority' => 400,
+                'callback' => [$this, 'bills'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+            'changes' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Изменения по заказу',
+                'priority' => 400,
+                'callback' => [$this, 'changes'],
+                'icon'     => 'fas fa-credit-card',
             ],
 
         ]);
@@ -508,6 +532,196 @@ HTML;
         } else {
             return $this->render($this->action->id."-select-user");
         }
+    }
+
+
+
+
+
+
+    public function payments()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-payment')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_order_id' => $this->model->id,
+                    ]);
+                };
+
+
+                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
+                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                        /**
+                         * @var $createAction BackendModelCreateAction
+                         */
+                        $createAction->url = ArrayHelper::merge($createAction->urlData, ['shop_order_id' => $this->model->id]);
+
+                        $event->data = ContextMenuControllerActionsWidget::widget([
+                                'actions'         => [$createAction],
+                                'isOpenNewWindow' => true,
+                                'button'          => [
+                                    'class' => 'btn btn-primary',
+                                    //'style' => 'font-size: 11px; cursor: pointer;',
+                                    'tag'   => 'a',
+                                    'label' => 'Добавить',
+                                ],
+                            ])."<br><br>";
+                    }
+
+                });
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
+
+
+    public function bills()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-bill')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_order_id' => $this->model->id,
+                    ]);
+                };
+
+
+                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
+                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                        /**
+                         * @var $createAction BackendModelCreateAction
+                         */
+                        $createAction->url = ArrayHelper::merge($createAction->urlData, ['shop_order_id' => $this->model->id]);
+
+                        $event->data = ContextMenuControllerActionsWidget::widget([
+                                'actions'         => [$createAction],
+                                'isOpenNewWindow' => true,
+                                'button'          => [
+                                    'class' => 'btn btn-primary',
+                                    //'style' => 'font-size: 11px; cursor: pointer;',
+                                    'tag'   => 'a',
+                                    'label' => 'Добавить',
+                                ],
+                            ])."<br><br>";
+                    }
+
+                });
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
+    public function changes()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-order-change')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_order_id' => $this->model->id,
+                    ]);
+                };
+
+
+                $indexAction->on('beforeRender', function (Event $event) use ($controller) {
+                    if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                        /**
+                         * @var $createAction BackendModelCreateAction
+                         */
+                        $createAction->url = ArrayHelper::merge($createAction->urlData, ['shop_order_id' => $this->model->id]);
+
+                        $event->data = ContextMenuControllerActionsWidget::widget([
+                                'actions'         => [$createAction],
+                                'isOpenNewWindow' => true,
+                                'button'          => [
+                                    'class' => 'btn btn-primary',
+                                    //'style' => 'font-size: 11px; cursor: pointer;',
+                                    'tag'   => 'a',
+                                    'label' => 'Добавить',
+                                ],
+                            ])."<br><br>";
+                    }
+
+                });
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
     }
 
 }

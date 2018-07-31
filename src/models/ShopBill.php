@@ -165,7 +165,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
             'shop_payment_id'    => Yii::t('skeeks/shop/app', 'Платеж'),
             'closed_at'          => Yii::t('skeeks/shop/app', 'Дата отмены'),
             'reason_closed'      => Yii::t('skeeks/shop/app', 'Причина отмены'),
-            'amount'             => Yii::t('skeeks/shop/app', 'Amount'),
+            'amount'             => Yii::t('skeeks/shop/app', 'Сумма'),
             'currency_code'      => Yii::t('skeeks/shop/app', 'Currency Code'),
             'description'        => Yii::t('skeeks/shop/app', 'Description'),
             'code'               => Yii::t('skeeks/shop/app', 'Уникальный код счета'),

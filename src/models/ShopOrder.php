@@ -25,7 +25,7 @@ use yii\helpers\Url;
  * @property integer                    $updated_at
  * @property integer                    $cms_site_id
  * @property integer                    $shop_person_type_id
- * @property integer                    $payed_at
+ * @property integer                    $paid_at
  * @property integer                    $shop_buyer_id
  * @property integer                    $canceled_at
  * @property string                     $reason_canceled
@@ -224,7 +224,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             }
         }
 
-        if ($this->isAttributeChanged('payed_at') && $this->payed_at) {
+        if ($this->isAttributeChanged('paid_at') && $this->paid_at) {
             (new ShopOrderChange([
                 'type'          => ShopOrderChange::ORDER_PAYED,
                 'shop_order_id' => $this->id,
@@ -357,7 +357,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'created_at',
                     'updated_at',
                     'shop_person_type_id',
-                    'payed_at',
+                    'paid_at',
                     'canceled_at',
                     'status_at',
                     'allow_delivery_at',
@@ -509,7 +509,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'cms_site_id'         => \Yii::t('skeeks/shop/app', 'Site'),
             'shop_person_type_id' => \Yii::t('skeeks/shop/app', 'Person Type ID'),
             'payed'               => \Yii::t('skeeks/shop/app', 'Оплачен'),
-            'payed_at'            => \Yii::t('skeeks/shop/app', 'Оплачен'),
+            'paid_at'            => \Yii::t('skeeks/shop/app', 'Оплачен'),
             'canceled'            => \Yii::t('skeeks/shop/app', 'Canceled'),
             'canceled_at'         => \Yii::t('skeeks/shop/app', 'Canceled'),
             'reason_canceled'     => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
@@ -1112,7 +1112,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getPayed()
     {
-        return $this->payed_at ? "Y" : "N";
+        return $this->paid_at ? "Y" : "N";
     }
 
     /**

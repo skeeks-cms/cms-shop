@@ -14,18 +14,19 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrderChange;
 use skeeks\cms\shop\models\ShopOrderStatus;
+use skeeks\cms\shop\models\ShopPayment;
 use yii\helpers\ArrayHelper;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminBillController extends BackendModelStandartController
+class AdminPaymentController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = \Yii::t('skeeks/shop/app', 'Счета по заказам');
+        $this->name = \Yii::t('skeeks/shop/app', 'Платежи по заказам');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopBill::class;
+        $this->modelClassName = ShopPayment::class;
 
         parent::init();
     }
@@ -51,8 +52,8 @@ class AdminBillController extends BackendModelStandartController
                     ],
 
                     'visibleColumns' => [
-                        'checkbox',
-                        'actions',
+                        //'checkbox',
+                        //'actions',
                         'id',
 
                         'created_at',
@@ -62,41 +63,13 @@ class AdminBillController extends BackendModelStandartController
 
                         'shop_pay_system_id',
 
-                        'paid_at',
-                        'closed_at',
-
                         'amount',
 
-                        'description',
-                        'go',
+                        'comment',
 
                     ],
-
                     'columns'        => [
-                        'paid_at'           => [
-                            'value' => function (ShopBill $shopBill, $key) {
-                                $reuslt = "<div>";
-                                if ($shopBill->paid_at) {
-                                    $this->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-green');
-JS
-                                    );
 
-                                    $this->view->registerCss(<<<CSS
-tr.sx-tr-green, tr.sx-tr-green:nth-of-type(odd), tr.sx-tr-green td
-{
-background: #d5ffd5 !important;
-}
-CSS
-                                    );
-                                    $reuslt = "<div style='color: green;'>";
-                                }
-
-                                $reuslt .= $shopBill->paid_at ? \Yii::$app->formatter->asDatetime($shopBill->paid_at) : "-";
-                                $reuslt .= "</div>";
-                                return $reuslt;
-                            },
-                        ],
                         'created_at'           => [
                             'class' => DateTimeColumnData::class,
                         ],
@@ -104,26 +77,52 @@ CSS
                             'class' => DateTimeColumnData::class,
                         ],
                         'amount'           => [
-                            'value' => function(ShopBill $shopBill) {
-                                return $shopBill->money;
+                            'value' => function(ShopPayment $shopPayment) {
+                                return $shopPayment->money;
                             },
                         ],
-
-                        'go'                   => [
-                            'format' => "raw",
-                            'value'  => function (ShopBill $shopBill) {
-                                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $shopBill->url, [
-                                    'target'    => '_blank',
-                                    'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                                    'data-pjax' => '0',
-                                    'class'     => 'btn btn-default btn-sm',
-                                ]);
-                            },
-                        ],
-
                     ],
                 ]
             ]
+            /*"index" => [
+                "filters" => [
+                    "visibleFilters" => [
+                        'id',
+                        'name',
+                    ],
+                ],
+                'grid'    => [
+                    'defaultOrder' => [
+                        'priority' => SORT_ASC,
+                    ],
+
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        'id',
+
+                        'name',
+
+                        'description',
+
+                        'priority',
+                        'color',
+
+                    ],
+                    'columns'        => [
+                        'name'           => [
+                            'value' => function (ShopOrderStatus $shopOrderStatus) {
+                                return \yii\helpers\Html::label($shopOrderStatus->name, null, [
+                                    'style' => "background: {$shopOrderStatus->color}",
+                                    'class' => "label",
+                                ]);
+                            },
+                        ],
+                    ],
+
+                ],
+            ],*/
+
         ]);
 
         ArrayHelper::remove($result, "create");

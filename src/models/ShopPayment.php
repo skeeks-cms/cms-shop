@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\money\models\MoneyCurrency;
+use skeeks\cms\money\Money;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -38,6 +39,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopBuyer     $shopBuyer
  * @property ShopOrder     $shopOrder
  * @property ShopPaySystem $shopPaySystem
+ * @property Money         $money
  */
 class ShopPayment extends \skeeks\cms\base\ActiveRecord
 {
@@ -139,4 +141,15 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     {
         return $this->hasOne(ShopPaySystem::class, ['id' => 'shop_pay_system_id']);
     }
+
+
+    /**
+     * @return Money
+     */
+    public function getMoney()
+    {
+        return new Money($this->amount, (string)$this->currency_code);
+    }
+
+
 }
