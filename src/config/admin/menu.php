@@ -114,6 +114,23 @@ return [
                                     "url"   => ["shop/admin-order"],
                                     "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
                                 ],
+
+                                [
+                                    "label" => \Yii::t('skeeks/shop/app', 'История изменения'),
+                                    "url"   => ["shop/admin-order-change"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
+                                ],
+
+                                [
+                                    "label" => \Yii::t('skeeks/shop/app', 'Счета'),
+                                    "url"   => ["shop/admin-bill"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
+                                ],
+                                [
+                                    "label" => \Yii::t('skeeks/shop/app', 'Платежи'),
+                                    "url"   => ["shop/admin-payment"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
+                                ],
                             ],
 
                     ],
@@ -152,10 +169,10 @@ return [
                                     'items' => shopPersonTypes(),
                                 ],
 
-                                [
+                                /*[
                                     "label" => \Yii::t('skeeks/shop/app', 'Accounts'),
                                     "url"   => ["shop/admin-user-account"],
-                                ],
+                                ],*/
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Baskets'),

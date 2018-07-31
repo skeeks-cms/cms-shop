@@ -17,6 +17,9 @@ use yii\helpers\ArrayHelper;
  * @property string    $type
  * @property string    $data
  *
+ * ***
+ *
+ * @property string    $typeAsText
  * @property ShopOrder $shopOrder
  */
 class ShopOrderChange extends \skeeks\cms\models\Core
@@ -35,19 +38,6 @@ class ShopOrderChange extends \skeeks\cms\models\Core
     const BASKET_REMOVED = "BASKET_REMOVED";
     const BASKET_PRICE_CHANGED = "BASKET_PRICE_CHANGED";
     const BASKET_QUANTITY_CHANGED = "BASKET_QUANTITY_CHANGED";
-
-
-    static public function types()
-    {
-        return [
-            self::ORDER_ADDED          => \Yii::t('skeeks/shop/app', 'Create Order'),
-            self::ORDER_CANCELED       => \Yii::t('skeeks/shop/app', 'Cancellations'),
-            self::ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Changing status'),
-            self::ORDER_ALLOW_PAYMENT  => \Yii::t('skeeks/shop/app', 'Payment agreement'),
-            self::ORDER_ALLOW_DELIVERY => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
-            self::ORDER_PAYED          => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
-        ];
-    }
     /**
      * @inheritdoc
      */
@@ -88,7 +78,6 @@ class ShopOrderChange extends \skeeks\cms\models\Core
 
         ]);
     }
-
     /**
      * @inheritdoc
      */
@@ -101,7 +90,6 @@ class ShopOrderChange extends \skeeks\cms\models\Core
             [['type'], 'string', 'max' => 255],
         ];
     }
-
     /**
      * @inheritdoc
      */
@@ -113,18 +101,39 @@ class ShopOrderChange extends \skeeks\cms\models\Core
             'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
             'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
             'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'shop_order_id' => \Yii::t('skeeks/shop/app', 'Shop Order ID'),
-            'type'          => \Yii::t('skeeks/shop/app', 'Type'),
-            'data'          => \Yii::t('skeeks/shop/app', 'Data'),
+            'shop_order_id' => \Yii::t('skeeks/shop/app', 'Заказ'),
+            'type'          => \Yii::t('skeeks/shop/app', 'Тип действия'),
+            'data'          => \Yii::t('skeeks/shop/app', 'Данные'),
         ];
     }
-
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopOrder()
     {
         return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
+    }
+    /**
+     * @return string
+     */
+    public function getTypeAsText()
+    {
+        return (string)ArrayHelper::getValue(self::types(), $this->type);
+    }
+
+    /**
+     * @return array
+     */
+    static public function types()
+    {
+        return [
+            self::ORDER_ADDED          => \Yii::t('skeeks/shop/app', 'Create Order'),
+            self::ORDER_CANCELED       => \Yii::t('skeeks/shop/app', 'Cancellations'),
+            self::ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Changing status'),
+            self::ORDER_ALLOW_PAYMENT  => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::ORDER_ALLOW_DELIVERY => \Yii::t('skeeks/shop/app', 'Shipping is permitted'),
+            self::ORDER_PAYED          => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
+        ];
     }
 
 }

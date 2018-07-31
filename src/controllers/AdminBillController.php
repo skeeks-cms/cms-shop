@@ -9,23 +9,23 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
+use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopOrderChange;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class AdminOrderStatusController
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminOrderStatusController extends BackendModelStandartController
+class AdminBillController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = \Yii::t('skeeks/shop/app', 'Order statuses');
+        $this->name = \Yii::t('skeeks/shop/app', 'Счета по заказам');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopOrderStatus::class;
+        $this->modelClassName = ShopBill::class;
 
         parent::init();
     }
@@ -38,6 +38,40 @@ class AdminOrderStatusController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
 
             "index" => [
+                "filters" => [
+                    "visibleFilters" => [
+                        //'id',
+                        'shop_order_id'
+                    ]
+                ],
+
+                'grid'    => [
+                    'defaultOrder' => [
+                        'created_at' => SORT_DESC,
+                    ],
+
+                    /*'visibleColumns' => [
+                        'checkbox',
+                        'actions',
+                        //'id',
+
+                        'created_at',
+
+                        'shop_order_id',
+
+                        'type',
+
+                    ],*/
+
+                    'columns'        => [
+                        'created_at'           => [
+                            'class' => DateTimeColumnData::class,
+                        ],
+
+                    ],
+                ]
+            ]
+            /*"index" => [
                 "filters" => [
                     "visibleFilters" => [
                         'id',
@@ -74,7 +108,7 @@ class AdminOrderStatusController extends BackendModelStandartController
                     ],
 
                 ],
-            ],
+            ],*/
 
         ]);
     }

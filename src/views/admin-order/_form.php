@@ -574,11 +574,9 @@ JS
 
 <?= $form->fieldSetEnd(); ?>
 
-<? /*= $form->buttonsCreateOrUpdate($model); */ ?>
-<?php ActiveForm::end(); ?>
 
 
-    <div style="display: none;">
+<div style="display: none;">
         <div id="sx-payment-container" style="min-width: 500px; max-width: 500px;">
             <h2>Оплата заказа:</h2>
             <hr/>
@@ -844,6 +842,13 @@ JS
         ]);
         ?>
     </div>
+
+
+<? /*= $form->buttonsCreateOrUpdate($model); */ ?>
+<?php ActiveForm::end(); ?>
+
+
+
 
 <?
 

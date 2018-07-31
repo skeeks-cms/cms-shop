@@ -79,16 +79,16 @@ class AdminReportOrderSearch extends Model
 
                 $query->addSelect([
                     "count(*) as total_orders",
-                    "sum(price) as sum_price",
+                    "sum(amount) as sum_price",
 
                     "FROM_UNIXTIME(created_at, '{$format}') as groupType",
 
-                    "(SELECT count(*) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
-                    "(SELECT sum(price) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
+                    "(SELECT count(*) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
+                    "(SELECT sum(amount) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
 
 
-                    "(SELECT count(*) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
-                    "(SELECT sum(price) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
+                    "(SELECT count(*) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
+                    "(SELECT sum(amount) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
                 ]);
 
                 if ($this->from) {
@@ -126,16 +126,16 @@ class AdminReportOrderSearch extends Model
 
                 $query->addSelect([
                     "count(*) as total_orders",
-                    "sum(price) as sum_price",
+                    "sum(amount) as sum_price",
 
                     "FROM_UNIXTIME(created_at, '{$format}') as groupType",
 
-                    "(SELECT count(*) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
-                    "(SELECT sum(price) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
+                    "(SELECT count(*) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
+                    "(SELECT sum(amount) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
 
 
-                    "(SELECT count(*) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
-                    "(SELECT sum(price) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
+                    "(SELECT count(*) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
+                    "(SELECT sum(amount) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
                 ]);
             }
 

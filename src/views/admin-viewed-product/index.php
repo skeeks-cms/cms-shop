@@ -33,7 +33,7 @@
                 'format' => 'raw',
                 'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'value'  => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
-                    return $shopViewedProduct->shopFuser->user ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopViewedProduct->shopFuser->user]))->run() : \Yii::t('skeeks/shop/app',
+                    return $shopViewedProduct->shopFuser->cmsUser ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopViewedProduct->shopFuser->cmsUser]))->run() : \Yii::t('skeeks/shop/app',
                         'Not authorized');
                 },
             ],

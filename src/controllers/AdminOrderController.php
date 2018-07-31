@@ -161,7 +161,7 @@ CSS
                                         $result[] =
 
                                             \yii\helpers\Html::img(Image::getSrc($shopBasket->image ? $shopBasket->image->src : null), [
-                                                'height' => "50",
+                                                'style' => "max-height: 50px; max-width: 50px;",
                                             ])
                                             .
                                             \yii\helpers\Html::a($shopBasket->name, $shopBasket->url, [

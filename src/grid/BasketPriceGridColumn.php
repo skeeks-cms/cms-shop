@@ -17,7 +17,7 @@ use yii\helpers\Html;
  */
 class BasketPriceGridColumn extends DataColumn
 {
-    public $attribute = "price";
+    public $attribute = "amount";
     public $format = "raw";
 
     /**

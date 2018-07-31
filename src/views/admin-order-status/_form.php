@@ -16,7 +16,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
 
-<?= $form->field($model, 'code')->textInput(['maxlength' => 2]); ?>
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>

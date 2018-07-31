@@ -16,7 +16,7 @@ use yii\grid\DataColumn;
  */
 class BasketSumGridColumn extends DataColumn
 {
-    public $attribute = "price";
+    public $attribute = "amount";
     public $format = "raw";
 
     /**

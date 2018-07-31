@@ -11,12 +11,8 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopBasket */
 
-if (\Yii::$app->request->get('order_id') && $model->isNewRecord) {
-    $model->order_id = \Yii::$app->request->get('order_id');
-}
-
-if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
-    $model->fuser_id = \Yii::$app->request->get('fuser_id');
+if (\Yii::$app->request->get('shop_order_id') && $model->isNewRecord) {
+    $model->shop_order_id = \Yii::$app->request->get('shop_order_id');
 }
 
 ?>
@@ -26,12 +22,11 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
 <? if ($model->isNewRecord) : ?>
-    <?= $form->field($model, 'order_id')->hiddenInput()->label(false); ?>
-    <?= $form->field($model, 'fuser_id')->hiddenInput()->label(false); ?>
+    <?= $form->field($model, 'shop_order_id')->hiddenInput()->label(false); ?>
 <? endif; ?>
 
     <div style="display: none;">
-        <?= $form->field($model, 'product_id')->widget(
+        <?= $form->field($model, 'shop_product_id')->widget(
             \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
                 'dialogRoute' => ['/shop/admin-cms-content-element'],
@@ -56,7 +51,7 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
 
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($model, 'price')->textInput(); ?>
+            <?= $form->field($model, 'amount')->textInput(); ?>
 
         </div>
 
