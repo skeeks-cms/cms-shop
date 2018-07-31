@@ -11,7 +11,13 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
+?>
 
+<?
+\skeeks\cms\widgets\Pjax::begin(['id' => "sx-pjax-order-wrapper"]);
+?>
+
+<?
 $this->registerCss(<<<CSS
 
 .sx-dashed
@@ -31,6 +37,7 @@ $this->registerCss(<<<CSS
 }
 CSS
 );
+
 
 
 $this->registerJs(<<<JS
@@ -74,17 +81,9 @@ JS
 $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 ?>
 
-    <h1 style="text-align: center;">Просмотр заказа № <?= $model->id ?>,
+    <h1 style="text-align: center;">Заказ №<?= $model->id ?>
         от <?= \Yii::$app->formatter->asDatetime($model->created_at); ?></h1>
 
-<?php $form = ActiveForm::begin([
-    'pjaxOptions' =>
-        [
-            'id' => 'sx-pjax-order-wrapper',
-        ],
-]); ?>
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'General information')); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/shop/app', 'Order'),
@@ -481,100 +480,6 @@ JS
 
 ?>
 
-<?= $form->fieldSetEnd(); ?>
-
-
-<!--
-<?/*= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Transactions by order')); */?>
-
-<?/*= \skeeks\cms\modules\admin\widgets\GridView::widget([
-    'dataProvider' => new \yii\data\ArrayDataProvider([
-        'models' => $model->shopUserTransacts,
-    ]),
-
-    'columns' =>
-        [
-            [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::class,k;
-            ],
-
-            [
-                'class'  => \yii\grid\DataColumn::class,
-                'label'  => \Yii::t('skeeks/shop/app', 'User'),
-                'format' => 'raw',
-                'value'  => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
-                    return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopUserTransact->cmsUser]))->run();
-                },
-            ],
-
-            [
-                'class'     => \yii\grid\DataColumn::class,
-                'attribute' => 'type',
-                'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
-                'format'    => 'raw',
-                'value'     => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
-                    return ($shopUserTransact->debit == "Y" ? "+" : "-").(string)$shopUserTransact->money;
-                },
-            ],
-
-            'descriptionText',
-        ],
-]); */?>
-
---><?/*= $form->fieldSetEnd(); */?>
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'History of changes')); ?>
-
-<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-    'dataProvider' => new \yii\data\ArrayDataProvider([
-        'models' => $model->shopOrderChanges,
-    ]),
-
-    'columns' =>
-        [
-            [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
-            ],
-
-            [
-                'class'  => \yii\grid\DataColumn::class,
-                'label'  => \Yii::t('skeeks/shop/app', 'User'),
-                'format' => 'raw',
-                'value'  => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
-                    if (!$shopOrderChange->createdBy) {
-                        return ' - ';
-                    }
-
-                    return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrderChange->createdBy]))->run();
-                },
-            ],
-
-            [
-                'class'     => \yii\grid\DataColumn::class,
-                'attribute' => 'type',
-                'label'     => \Yii::t('skeeks/shop/app', 'Transaction'),
-                'format'    => 'raw',
-                'value'     => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
-                    return \skeeks\cms\shop\models\ShopOrderChange::types()[$shopOrderChange->type];
-                },
-            ],
-            [
-                'class'     => \yii\grid\DataColumn::class,
-                'attribute' => 'type',
-                'label'     => \Yii::t('skeeks/shop/app', 'Description'),
-                'format'    => 'raw',
-                'value'     => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
-                    return $shopOrderChange->description;
-                },
-            ],
-
-
-        ],
-]); ?>
-
-<?= $form->fieldSetEnd(); ?>
-
-
 
 <div style="display: none;">
         <div id="sx-payment-container" style="min-width: 500px; max-width: 500px;">
@@ -845,7 +750,6 @@ JS
 
 
 <? /*= $form->buttonsCreateOrUpdate($model); */ ?>
-<?php ActiveForm::end(); ?>
 
 
 
@@ -873,4 +777,8 @@ $this->registerJs(<<<JS
 })(sx, sx.$, sx._);
 JS
 );
+?>
+
+<?
+\skeeks\cms\widgets\Pjax::end();
 ?>
