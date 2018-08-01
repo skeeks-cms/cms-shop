@@ -227,7 +227,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
      */
     public function getUrl($scheme = false)
     {
-        return Url::to(['/shop/bill', 'code' => $this->code], $scheme);
+        return Url::to(['/shop/shop-bill/view', 'code' => $this->code], $scheme);
     }
     /**
      * @param bool $scheme
@@ -235,6 +235,6 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
      */
     public function getPayUrl($scheme = false)
     {
-        return Url::to(['/shop/bill/go', 'code' => $this->code], $scheme);
+        return Url::to(['/shop/shop-bill/go', 'code' => $this->code], $scheme);
     }
 }
