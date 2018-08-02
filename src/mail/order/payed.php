@@ -20,7 +20,7 @@ $url = $order->getPublicUrl();
 <?=
 \yii\grid\GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
-        'allModels'  => $order->shopBaskets,
+        'allModels'  => $order->shopOrderItems,
         'pagination' => [
             'pageSize'      => 200,
             'pageSizeLimit' => [1, 200],
@@ -36,7 +36,7 @@ $url = $order->getPublicUrl();
             [
                 'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
-                'value'  => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                'value'  => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                     if ($shopBasket->image) {
                         return Html::img($shopBasket->image->absoluteSrc, ['width' => 80]);
                     }
@@ -46,7 +46,7 @@ $url = $order->getPublicUrl();
                 'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'name',
                 'format'    => 'raw',
-                'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                     if ($shopBasket->url) {
                         return Html::a($shopBasket->name, $shopBasket->absoluteUrl, [
                             'target'    => '_blank',
@@ -63,7 +63,7 @@ $url = $order->getPublicUrl();
             [
                 'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'quantity',
-                'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                     return $shopBasket->quantity." ".$shopBasket->measure_name;
                 },
             ],
@@ -73,7 +73,7 @@ $url = $order->getPublicUrl();
                 'label'     => \Yii::t('skeeks/shop/app', 'Price'),
                 'attribute' => 'price',
                 'format'    => 'raw',
-                'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                     if ($shopBasket->discount_value) {
                         return "<span style='text-decoration: line-through;'>".(string)$shopBasket->moneyOriginal."</span><br />".Html::tag('small',
                                 $shopBasket->notes)."<br />".(string)$shopBasket->money."<br />".Html::tag('small',
@@ -90,7 +90,7 @@ $url = $order->getPublicUrl();
                 'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
                 'attribute' => 'price',
                 'format'    => 'raw',
-                'value'     => function (\skeeks\cms\shop\models\ShopBasket $shopBasket) {
+                'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                     $shopBasket->money->multiply($shopBasket->quantity);
                     return (string)$shopBasket->money;
                 },

@@ -73,10 +73,10 @@ class AdminReportProductSearch extends Model
             //->andHaving([">", "total_payed_orders", "0"])
 
             $total_in_orders = "SELECT sum(quantity) FROM shop_order_item WHERE shop_product_id = b.shop_product_id AND shop_order_id != ''";
-            $total_in_payed_orders = "SELECT sum(quantity) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.payed_at IS NOT NULL";
-            $sum_in_payed_orders = "SELECT sum(inBasket.amount) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.payed_at IS NOT NULL";
+            $total_in_payed_orders = "SELECT sum(quantity) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.paid_at IS NOT NULL";
+            $sum_in_payed_orders = "SELECT sum(inBasket.amount) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.paid_at IS NOT NULL";
             $total_orders = "SELECT count(*) FROM shop_order_item WHERE shop_product_id = b.shop_product_id AND shop_order_id != ''";
-            $total_payed_orders = "SELECT count(*) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.payed_at IS NOT NULL";
+            $total_payed_orders = "SELECT count(*) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.paid_at IS NOT NULL";
             $total_in_carts = "SELECT sum(quantity) FROM shop_order_item WHERE shop_product_id = b.shop_product_id";
 
             if ($this->from) {
@@ -109,7 +109,7 @@ class AdminReportProductSearch extends Model
 
             if ($this->onlyPayed) {
                 $query->leftJoin('shop_order as ord', 'ord.id = b.shop_order_id');
-                $query->andWhere(['!=', 'ord.payed_at' => null]);
+                $query->andWhere(['!=', 'ord.paid_at' => null]);
             }
             return $dataProvider;
 
@@ -119,12 +119,12 @@ class AdminReportProductSearch extends Model
                 "sum(quantity) as total_quantity",
 
                 "(SELECT sum(quantity) FROM shop_order_item WHERE shop_product_id = b.shop_product_id AND shop_order_id != '') as total_in_orders",
-                "(SELECT sum(quantity) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.payed_at IS NOT NULL) as total_in_payed_orders",
-                "(SELECT sum(inBasket.amount) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.payed_at IS NOT NULL) as sum_in_payed_orders",
+                "(SELECT sum(quantity) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.paid_at IS NOT NULL) as total_in_payed_orders",
+                "(SELECT sum(inBasket.amount) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.paid_at IS NOT NULL) as sum_in_payed_orders",
 
                 "(SELECT count(*) FROM shop_order_item WHERE shop_product_id = b.shop_product_id AND shop_order_id != '' ) as total_orders",
 
-                "(SELECT count(*) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.payed_at IS NOT NULL) as total_payed_orders",
+                "(SELECT count(*) FROM shop_order_item as inBasket LEFT JOIN shop_order as o on o.id = inBasket.shop_order_id WHERE inBasket.shop_product_id = b.shop_product_id AND inBasket.shop_order_id != '' AND o.paid_at IS NOT NULL) as total_payed_orders",
 
                 "(SELECT sum(quantity) FROM shop_order_item WHERE shop_product_id = b.shop_product_id) as total_in_carts",
             ]);

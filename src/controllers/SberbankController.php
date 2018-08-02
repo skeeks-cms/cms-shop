@@ -194,7 +194,7 @@ class SberbankController extends Controller
                     throw new Exception("Не обновился счет: ".print_r($payment->errors, true));
                 }
 
-                $bill->shopOrder->payed = "Y";
+                $bill->shopOrder->paid_at = time();
                 $bill->shopOrder->save();
 
                 $transaction->commit();

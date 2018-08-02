@@ -144,7 +144,7 @@ $order->refresh();
                 [
                     'attribute' => 'payed_at',
                     'label'     => 'Статус оплаты',
-                    'value'     => $order->payed_at ? "оплачен" : "не оплачен",
+                    'value'     => $order->paid_at ? "оплачен" : "не оплачен",
                 ],
             ],
         ]);
@@ -162,7 +162,7 @@ $order->refresh();
             'model'      => $order,
             'attributes' => [
                 [
-                    'attribute' => 'delivery_id',
+                    'attribute' => 'shop_delivery_id',
                     'value'     => $order->shopDelivery->name,
                 ],
             ],

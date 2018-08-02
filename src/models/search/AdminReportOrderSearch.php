@@ -83,8 +83,8 @@ class AdminReportOrderSearch extends Model
 
                     "FROM_UNIXTIME(created_at, '{$format}') as groupType",
 
-                    "(SELECT count(*) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
-                    "(SELECT sum(amount) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
+                    "(SELECT count(*) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
+                    "(SELECT sum(amount) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
 
 
                     "(SELECT count(*) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
@@ -130,8 +130,8 @@ class AdminReportOrderSearch extends Model
 
                     "FROM_UNIXTIME(created_at, '{$format}') as groupType",
 
-                    "(SELECT count(*) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
-                    "(SELECT sum(amount) FROM shop_order WHERE payed_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
+                    "(SELECT count(*) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
+                    "(SELECT sum(amount) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
 
 
                     "(SELECT count(*) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
