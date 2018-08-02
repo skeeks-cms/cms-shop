@@ -105,7 +105,7 @@ class SberbankController extends Controller
          */
         //	$response = $module->gateway('registerPreAuth.do', $data);
         if (isset($response['errorCode'])) { // В случае ошибки вывести ее
-            return $this->redirect(Url::toRoute(['/shop/sberbank/fail', 'response' => Json::encode($response)], true));
+            return $this->redirect(Url::toRoute(['/shop/sberbank/fail', 'code' => $code, 'response' => Json::encode($response)], true));
         } else { // В случае успеха перенаправить пользователя на плетжную форму
             $bill->external_data = $response;
             if (!$bill->save()) {
@@ -209,7 +209,7 @@ class SberbankController extends Controller
 
         }
 
-        return $this->redirect(Url::toRoute(['/shop/sberbank/fail', 'response' => Json::encode($response)], true));
+        return $this->redirect(Url::toRoute(['/shop/sberbank/fail', 'code' => $code, 'response' => Json::encode($response)], true));
 
         /*$orderId = \Yii::$app->request->get('OrderId');
         if (!$orderId) {
