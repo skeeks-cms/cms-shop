@@ -10,7 +10,7 @@
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
 ?>
 
-<? if ($model->payed == 'Y') : ?>
+<? if ($model->paid_at) : ?>
     <span style="color: green">
         <?= \Yii::$app->formatter->asBoolean(($model->payed == \skeeks\cms\components\Cms::BOOL_Y)); ?>
     </span>

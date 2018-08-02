@@ -10,9 +10,9 @@
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
 ?>
 
-<? if ($model->payed == 'Y') : ?>
-<a href="#sx-payment-container-close" class="btn btn-primary sx-fancybox">Изменить<a>
-        <? else : ?>
-        <a href="#sx-payment-container" class="btn btn-primary sx-fancybox">Оплатить<a>
-                <? endif; ?>
+<? if ($model->paid_at) : ?>
+<a href="#" data-toggle="modal" data-target="#sx-payment-container-close" class="btn btn-primary">Изменить<a>
+<? else : ?>
+<a href="#" data-toggle="modal" data-target="#sx-payment-container" class="btn btn-primary">Оплатить<a>
+<? endif; ?>
 

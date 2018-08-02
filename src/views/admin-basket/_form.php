@@ -24,15 +24,15 @@ if (\Yii::$app->request->get('shop_order_id') && $model->isNewRecord) {
 <? if ($model->isNewRecord) : ?>
     <?= $form->field($model, 'shop_order_id')->hiddenInput()->label(false); ?>
 <? endif; ?>
-
-    <div style="display: none;">
-        <?= $form->field($model, 'shop_product_id')->widget(
-            \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-            [
-                'dialogRoute' => ['/shop/admin-cms-content-element'],
-            ]
-        ); ?>
-    </div>
+<!--
+<div style="display: none;">
+    <?/*= $form->field($model, 'shop_product_id')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+        [
+            'dialogRoute' => ['/shop/admin-cms-content-element'],
+        ]
+    ); */?>
+</div>-->
 
 <?= $form->field($model, 'name'); ?>
 
@@ -79,18 +79,18 @@ if (\Yii::$app->request->get('shop_order_id') && $model->isNewRecord) {
 $this->registerJs(<<<JS
 _.each(sx.components, function(Component, key)
 {
-    if (Component instanceof sx.classes.SelectModelDialog)
+    /*if (Component instanceof sx.classes.SelectModelDialog)
     {
         Component.bind('change', function(e, data)
         {
             $('#shopbasket-name').val(data.name);
             $('#shopbasket-quantity').val(1);
-            $('#shopbasket-price').val(data.basePrice.price);
+            $('#shopbasket-amount').val(data.basePrice.amount);
             $('#shopbasket-currency_code').val(data.basePrice.currency_code);
             $('#shopbasket-notes').val(data.basePriceType.name);
             $('#shopbasket-measure_name').val(data.measure.symbol_rus);
         });
-    }
+    }*/
 });
 JS
 );

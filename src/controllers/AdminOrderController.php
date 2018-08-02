@@ -426,15 +426,14 @@ HTML;
             }
 
             $shopBasket = ShopBasket::find()->where([
-                'order_id'   => $model->id,
-                'product_id' => $product_id,
-                'fuser_id'   => null,
+                'shop_order_id'   => $model->id,
+                'shop_product_id' => $product_id,
             ])->one();
 
             if (!$shopBasket) {
                 $shopBasket = new ShopBasket([
-                    'order_id'   => $model->id,
-                    'product_id' => $product->id,
+                    'shop_order_id'   => $model->id,
+                    'shop_product_id' => $product->id,
                     'quantity'   => 0,
                 ]);
             }
