@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
@@ -17,12 +18,7 @@ use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiDialogModelEditAction;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
-use skeeks\cms\shop\models\searchs\ShopCmsContentElementSearch;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
@@ -44,18 +40,13 @@ use yii\web\Application;
  * Class AdminCmsContentTypeController
  * @package skeeks\cms\controllers
  */
-class AdminCmsContentElementController extends AdminModelEditorController
+class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsContentElementController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public $notSubmitParam = 'sx-not-submit';
 
-    protected $_modelClassName = ShopCmsContentElement::class;
-    protected $_modelShowAttribute = "name";
-    /**
-     * @var CmsContent
-     */
-    protected $_content = null;
+    public $modelClassName = ShopCmsContentElement::class;
+    public $modelShowAttribute = "name";
+
     static public function getSorts(ActiveQuery $activeQuery)
     {
         $activeQuery->joinWith('shopProduct as sp');
@@ -92,223 +83,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return $sorts;
     }
-    /**
-     * @param CmsContent $model
-     * @return array
-     */
-    static public function getColumns($cmsContent = null, $dataProvider = null)
-    {
-        return \yii\helpers\ArrayHelper::merge(
-            static::getDefaultColumns($cmsContent),
-            static::getColumnsByContent($cmsContent, $dataProvider)
-        );
-    }
-    /**
-     * @param CmsContent $cmsContent
-     * @return array
-     */
-    static public function getDefaultColumns($cmsContent = null)
-    {
-        $columns = [
 
-            [
-                'class' => \skeeks\cms\grid\ImageColumn2::class,
-            ],
-
-            'name',
-            ['class' => \skeeks\cms\grid\UpdatedAtColumn::class],
-
-            [
-                'class'     => \yii\grid\DataColumn::class,
-                'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
-                    if (!$model->cmsTree) {
-                        return null;
-                    }
-
-                    $path = [];
-
-                    if ($model->cmsTree->parents) {
-                        foreach ($model->cmsTree->parents as $parent) {
-                            if ($parent->isRoot()) {
-                                $path[] = "[".$parent->site->name."] ".$parent->name;
-                            } else {
-                                $path[] = $parent->name;
-                            }
-                        }
-                    }
-                    $path = implode(" / ", $path);
-                    return "<small><a href='{$model->cmsTree->url}' target='_blank' data-pjax='0'>{$path} / {$model->cmsTree->name}</a></small>";
-                },
-                'format'    => 'raw',
-                'filter'    => false,
-                //'filter' => \skeeks\cms\helpers\TreeOptions::getAllMultiOptions(),
-                'attribute' => 'tree_id',
-            ],
-
-            [
-                'class'  => \yii\grid\DataColumn::class,
-                'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
-                    $result = [];
-
-                    if ($model->cmsContentElementTrees) {
-                        foreach ($model->cmsContentElementTrees as $contentElementTree) {
-                            $site = $contentElementTree->tree->site;
-                            $result[] = "<small><a href='{$contentElementTree->tree->url}' target='_blank' data-pjax='0'>[{$site->name}]/.../{$contentElementTree->tree->name}</a></small>";
-
-                        }
-                    }
-
-                    return implode('<br />', $result);
-
-                },
-                'format' => 'raw',
-                'label'  => \Yii::t('skeeks/shop/app', 'Advanced Topics'),
-            ],
-
-            [
-                'attribute' => 'active',
-                'class'     => \skeeks\cms\grid\BooleanColumn::class,
-            ],
-
-
-            /*[
-                'label' => \Yii::t('skeeks/shop/app', 'Base price'),
-                'class' => \yii\grid\DataColumn::class,
-                'attribute' => 'baseProductPrice',
-                'value' => function(\skeeks\cms\models\CmsContentElement $model)
-                {
-                    $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
-                    if ($shopProduct && $shopProduct->baseProductPrice)
-                    {
-                        return \Yii::$app->money->intlFormatter()->format($shopProduct->baseProductPrice->money);
-                    }
-
-                    return null;
-                }
-            ],*/
-
-            [
-                'class'  => \yii\grid\DataColumn::class,
-                'value'  => function (\skeeks\cms\models\CmsContentElement $model) {
-
-                    return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->absoluteUrl,
-                        [
-                            'target'    => '_blank',
-                            'title'     => \Yii::t('skeeks/shop/app', 'View online (opens new window)'),
-                            'data-pjax' => '0',
-                            'class'     => 'btn btn-default btn-sm',
-                        ]);
-
-                },
-                'format' => 'raw',
-            ],
-        ];
-
-        if (\Yii::$app->shop->shopTypePrices) {
-            foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
-                $columns[] = [
-                    'label'     => $shopTypePrice->name,
-                    'class'     => \yii\grid\DataColumn::class,
-                    'attribute' => 'price.'.$shopTypePrice->id,
-                    'value'     => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
-                        $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
-                        if ($shopProduct) {
-                            if ($shopProductPrice = $shopProduct->getShopProductPrices()
-                                ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
-                            ) {
-                                return (string)$shopProductPrice->money;
-                            }
-                        }
-
-                        return null;
-                    },
-                ];
-            }
-        }
-
-        $typeColumn = //TODO: показывать только для контента с предложениями
-            [
-                'class' => \yii\grid\DataColumn::class,
-                'label' => 'Тип товара',
-                'value' => function (\skeeks\cms\shop\models\ShopCmsContentElement $shopCmsContentElement) {
-                    if ($shopCmsContentElement->shopProduct) {
-                        return \yii\helpers\ArrayHelper::getValue(\skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
-                            $shopCmsContentElement->shopProduct->product_type);
-                    }
-                },
-            ];
-
-        if ($cmsContent) {
-            /**
-             * @var $shopContent \skeeks\cms\shop\models\ShopContent
-             */
-            $shopContent = \skeeks\cms\shop\models\ShopContent::findOne(['content_id' => $cmsContent->id]);
-            if ($shopContent) {
-                if ($shopContent->childrenContent) {
-                    $columns = \yii\helpers\ArrayHelper::merge([$typeColumn], $columns);
-                }
-            }
-
-        }
-        return $columns;
-    }
-    /**
-     * @param CmsContent $cmsContent
-     * @return array
-     */
-    static public function getColumnsByContent($cmsContent = null, $dataProvider = null)
-    {
-        $autoColumns = [];
-
-        if (!$cmsContent) {
-            return [];
-        }
-
-        $model = null;
-        //$model = CmsContentElement::find()->where(['content_id' => $cmsContent->id])->limit(1)->one();
-
-        if (!$model) {
-            $model = new CmsContentElement([
-                'content_id' => $cmsContent->id,
-            ]);
-        }
-
-        if (is_array($model) || is_object($model)) {
-            foreach ($model->toArray() as $name => $value) {
-                $autoColumns[] = [
-                    'attribute' => $name,
-                    'visible'   => false,
-                    'format'    => 'raw',
-                    'class'     => \yii\grid\DataColumn::class,
-                    'value'     => function ($model, $key, $index) use ($name) {
-                        if (is_array($model->{$name})) {
-                            return implode(",", $model->{$name});
-                        } else {
-                            return $model->{$name};
-                        }
-                    },
-                ];
-            }
-
-            $searchRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchRelatedPropertiesModel();
-            $searchRelatedPropertiesModel->initProperties($cmsContent->cmsContentProperties);
-            $searchRelatedPropertiesModel->load(\Yii::$app->request->get());
-            if ($dataProvider) {
-                $searchRelatedPropertiesModel->search($dataProvider);
-            }
-
-            /**
-             * @var $model \skeeks\cms\models\CmsContentElement
-             */
-            if ($model->relatedPropertiesModel) {
-                $autoColumns = ArrayHelper::merge($autoColumns,
-                    GridViewStandart::getColumnsByRelatedPropertiesModel($model->relatedPropertiesModel,
-                        $searchRelatedPropertiesModel));
-            }
-        }
-
-        return $autoColumns;
-    }
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Elements');
@@ -321,13 +96,8 @@ class AdminCmsContentElementController extends AdminModelEditorController
     {
         $actions = ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
-                    [
-                        "modelSearchClassName" => ShopCmsContentElementSearch::class,
-                    ],
-
-                "create" => ["callback" => [$this, 'create']],
-                "update" => ["callback" => [$this, 'update']],
+                /*"create" => ["callback" => [$this, 'create']],
+                "update" => ["callback" => [$this, 'update']],*/
 
 
                 "copy" => [
@@ -384,63 +154,23 @@ class AdminCmsContentElementController extends AdminModelEditorController
                     },
                 ],
 
-                "activate-multi" =>
-                    [
-                        'class'        => AdminMultiModelEditAction::class,
-                        "name"         => \Yii::t('skeeks/shop/app', 'Activate'),
-                        "eachCallback" => [$this, 'eachMultiActivate'],
-                    ],
 
-                "inActivate-multi" =>
-                    [
-                        'class'        => AdminMultiModelEditAction::class,
-                        "name"         => \Yii::t('skeeks/shop/app', 'Deactivate'),
-                        "eachCallback" => [$this, 'eachMultiInActivate'],
+                "to-offer" => [
+                    'class'        => BackendModelMultiDialogEditAction::class,
+                    "name"         => "Привязать к общему",
+                    "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/to-offer",
+                    "eachCallback" => [
+                        $this,
+                        'eachToOffer',
                     ],
-
-                "change-tree-multi" =>
-                    [
-                        'class'        => AdminMultiDialogModelEditAction::class,
-                        "name"         => \Yii::t('skeeks/shop/app', 'The main section'),
-                        "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/change-tree-form",
-                        "eachCallback" => [
-                            \Yii::$app->createController('/cms/admin-cms-content-element')[0],
-                            'eachMultiChangeTree',
-                        ],
-                    ],
-
-                "change-trees-multi" =>
-                    [
-                        'class'        => AdminMultiDialogModelEditAction::class,
-                        "name"         => \Yii::t('skeeks/shop/app', 'Related topics'),
-                        "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/change-trees-form",
-                        "eachCallback" => [
-                            \Yii::$app->createController('/cms/admin-cms-content-element')[0],
-                            'eachMultiChangeTrees',
-                        ],
-                    ],
-
-                "rp" =>
-                    [
-                        'class'        => AdminMultiDialogModelEditAction::class,
-                        "name"         => \Yii::t('skeeks/shop/app', 'Properties'),
-                        "viewDialog"   => "@skeeks/cms/views/admin-cms-content-element/multi-rp",
-                        "eachCallback" => [
-                            \Yii::$app->createController('/cms/admin-cms-content-element')[0],
-                            'eachRelatedProperties',
-                        ],
-                    ],
-
-                "to-offer" =>
-                    [
-                        'class'        => AdminMultiDialogModelEditAction::class,
-                        "name"         => "Привязать к общему",
-                        "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/to-offer",
-                        "eachCallback" => [
-                            $this,
-                            'eachToOffer',
-                        ],
-                    ],
+                    'on init'      => function ($e) {
+                        $action = $e->sender;
+                        /**
+                         * @var BackendGridModelAction $action
+                         */
+                        $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                    },
+                ],
             ]
         );
 
@@ -451,6 +181,60 @@ class AdminCmsContentElementController extends AdminModelEditorController
         if (isset($actions['shop'])) {
             unset($actions['shop']);
         }
+
+
+
+        $shopColumns = [];
+
+        $shopColumns["shop.product_type"] = [
+            'attribute' => "shop.product_type",
+            'label'  => 'Тип товара [магазин]',
+            'format' => 'raw',
+            'value'  => function ($shopCmsContentElement) {
+                if ($shopCmsContentElement->shopProduct) {
+                    return \yii\helpers\ArrayHelper::getValue(\skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
+                        $shopCmsContentElement->shopProduct->product_type);
+                }
+            },
+        ];
+
+        $shopColumns["shop.quantity"] = [
+            'attribute' => "shop.quantity",
+            'label'  => 'Количество [магазин]',
+            'format' => 'raw',
+            'value'  => function (ShopCmsContentElement $shopCmsContentElement) {
+                return $shopCmsContentElement->shopProduct->quantity . " " . $shopCmsContentElement->shopProduct->measure->symbol_rus;
+            },
+        ];
+
+
+        if (\Yii::$app->shop->shopTypePrices) {
+            foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+                $shopColumns["shop.price{$shopTypePrice->id}"] = [
+                    'label'     => $shopTypePrice->name . " [магазин]",
+                    'attribute' => 'shop.price'.$shopTypePrice->id,
+                    'value'     => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
+                        $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
+                        if ($shopProduct) {
+                            if ($shopProductPrice = $shopProduct->getShopProductPrices()
+                                ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
+                            ) {
+                                return (string)$shopProductPrice->money;
+                            }
+                        }
+
+                        return null;
+                    },
+                ];
+            }
+        }
+
+        if ($shopColumns) {
+
+            $actions['index']['grid']['columns'] = ArrayHelper::merge($actions['index']['grid']['columns'], $shopColumns);
+        }
+
+
 
         return $actions;
     }
@@ -709,48 +493,7 @@ class AdminCmsContentElementController extends AdminModelEditorController
 
         return $unique;
     }
-    /**
-     * @return CmsContent|static
-     */
-    public function getContent()
-    {
-        if ($this->_content === null) {
-            if ($this->model) {
-                $this->_content = $this->model->cmsContent;
-                return $this->_content;
-            }
 
-            if (\Yii::$app instanceof Application && \Yii::$app->request->get('content_id')) {
-                $content_id = \Yii::$app->request->get('content_id');
-
-                $dependency = new TagDependency([
-                    'tags' =>
-                        [
-                            (new CmsContent())->getTableCacheTag(),
-                        ],
-                ]);
-
-                $this->_content = CmsContent::getDb()->cache(function ($db) use ($content_id) {
-                    return CmsContent::find()->where([
-                        "id" => $content_id,
-                    ])->one();
-                }, null, $dependency);
-
-                return $this->_content;
-            }
-        }
-
-        return $this->_content;
-    }
-    /**
-     * @param $content
-     * @return $this
-     */
-    public function setContent($content)
-    {
-        $this->_content = $content;
-        return $this;
-    }
     public function beforeAction($action)
     {
         if ($content_id = \Yii::$app->request->get('content_id')) {
