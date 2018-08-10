@@ -18,7 +18,6 @@ use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
-use skeeks\cms\modules\admin\widgets\GridViewStandart;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
@@ -28,13 +27,11 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\DynamicModel;
 use yii\base\Event;
-use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use yii\web\Application;
 
 /**
  * @property CmsContent $content
@@ -88,6 +85,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
     public function init()
     {
+        \Yii::info('test');
         $this->name = \Yii::t('skeeks/shop/app', 'Elements');
         parent::init();
     }
@@ -96,8 +94,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
      */
     public function actions()
     {
-        $actions = ArrayHelper::merge(parent::actions(),
-            [
+        \Yii::info('test');
+
+        $actions = ArrayHelper::merge(parent::actions(), [
                 /*"create" => ["callback" => [$this, 'create']],
                 "update" => ["callback" => [$this, 'update']],*/
 
@@ -184,6 +183,13 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             unset($actions['shop']);
         }
 
+        return $actions;
+    }
+
+    public function initGridData($action, $content)
+    {
+        parent::initGridData($action, $content);
+
 
 
         $sortAttributes = [];
@@ -194,12 +200,11 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         $filterFieldsRules = [];
 
 
-
         $shopColumns["shop.product_type"] = [
             'attribute' => "shop.product_type",
-            'label'  => 'Тип товара [магазин]',
-            'format' => 'raw',
-            'value'  => function ($shopCmsContentElement) {
+            'label'     => 'Тип товара [магазин]',
+            'format'    => 'raw',
+            'value'     => function ($shopCmsContentElement) {
                 if ($shopCmsContentElement->shopProduct) {
                     return \yii\helpers\ArrayHelper::getValue(\skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
                         $shopCmsContentElement->shopProduct->product_type);
@@ -209,10 +214,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
         $shopColumns["shop.quantity"] = [
             'attribute' => "shop.quantity",
-            'label'  => 'Количество [магазин]',
-            'format' => 'raw',
-            'value'  => function (ShopCmsContentElement $shopCmsContentElement) {
-                return $shopCmsContentElement->shopProduct->quantity . " " . $shopCmsContentElement->shopProduct->measure->symbol_rus;
+            'label'     => 'Количество [магазин]',
+            'format'    => 'raw',
+            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
+                return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol_rus;
             },
         ];
         $sortAttributes["shop.quantity"] = [
@@ -227,7 +232,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         if (\Yii::$app->shop->shopTypePrices) {
             foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
                 $shopColumns["shop.price{$shopTypePrice->id}"] = [
-                    'label'     => $shopTypePrice->name . " [магазин]",
+                    'label'     => $shopTypePrice->name." [магазин]",
                     'attribute' => 'shop.price'.$shopTypePrice->id,
                     'value'     => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
@@ -257,11 +262,11 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
 
         $filterFields['shop_product_type'] = [
-            'class'      => SelectField::class,
-            'items'      => \skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
-            'label'      => 'Тип товара [магазин]',
-            'multiple'      => true,
-            'on apply'   => function (QueryFiltersEvent $e) {
+            'class'    => SelectField::class,
+            'items'    => \skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
+            'label'    => 'Тип товара [магазин]',
+            'multiple' => true,
+            'on apply' => function (QueryFiltersEvent $e) {
                 /**
                  * @var $query ActiveQuery
                  */
@@ -278,20 +283,21 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
         //Мерж колонок и сортировок
         if ($shopColumns) {
-            $actions['index']['grid']['columns'] = ArrayHelper::merge($actions['index']['grid']['columns'], $shopColumns);
-            $actions['index']['grid']['sortAttributes'] = ArrayHelper::merge((array) ArrayHelper::getValue($actions, ['index', 'grid', 'sortAttributes']), $sortAttributes);
-            $actions['index']['grid']['visibleColumns'] = ArrayHelper::merge((array) ArrayHelper::getValue($actions, ['index', 'grid', 'visibleColumns']), $visibleColumns);
+            $action->grid['columns'] = ArrayHelper::merge($action->grid['columns'], $shopColumns);
+            $action->grid['sortAttributes'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->grid, ['sortAttributes']), $sortAttributes);
+            $action->grid['visibleColumns'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->grid, ['visibleColumns']), $visibleColumns);
 
-            $actions['index']['filters']['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'fields']), $filterFields);
-            $actions['index']['filters']['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'attributeDefines']), array_keys($filterFields));
-            $actions['index']['filters']['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'attributeLabels']), $filterFieldsLabels);
-            $actions['index']['filters']['filtersModel']['rules'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'rules']), $filterFieldsRules);
+            $action->filters['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'fields']), $filterFields);
+            $action->filters['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'attributeDefines']),
+                array_keys($filterFields));
+            $action->filters['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'attributeLabels']), $filterFieldsLabels);
+            $action->filters['filtersModel']['rules'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'rules']), $filterFieldsRules);
 
-            $actions['index']['filters']['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'visibleFilters']), array_keys($filterFieldsLabels));
+            $action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), array_keys($filterFieldsLabels));
         }
 
         //Приджоивание магазинных данных
-        $actions['index']['grid']['on init'] = function (Event $event) {
+        $action->grid['on init'] = function (Event $event) {
             /**
              * @var $query ActiveQuery
              */
@@ -311,10 +317,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 }
             }
         };
-
-
-
-        return $actions;
     }
     /**
      * @param CmsContentElement $model
