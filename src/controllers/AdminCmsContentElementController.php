@@ -19,11 +19,13 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\modules\admin\widgets\GridViewStandart;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\SelectField;
 use yii\base\DynamicModel;
 use yii\base\Event;
 use yii\caching\TagDependency;
@@ -184,7 +186,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
 
 
+        $sortAttributes = [];
         $shopColumns = [];
+        $visibleColumns = [];
+        $filterFields = [];
+        $filterFieldsLabels = [];
+        $filterFieldsRules = [];
+
+
 
         $shopColumns["shop.product_type"] = [
             'attribute' => "shop.product_type",
@@ -206,7 +215,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 return $shopCmsContentElement->shopProduct->quantity . " " . $shopCmsContentElement->shopProduct->measure->symbol_rus;
             },
         ];
+        $sortAttributes["shop.quantity"] = [
+            'asc'  => ['sp.quantity' => SORT_ASC],
+            'desc' => ['sp.quantity' => SORT_DESC],
+            'name' => 'Количество [магазин]',
+        ];
 
+        $visibleColumns[] = "shop.product_type";
+        $visibleColumns[] = "shop.quantity";
 
         if (\Yii::$app->shop->shopTypePrices) {
             foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
@@ -226,13 +242,75 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         return null;
                     },
                 ];
+
+
+                $visibleColumns[] = 'shop.price'.$shopTypePrice->id;
+
+                $sortAttributes['shop.price'.$shopTypePrice->id] = [
+                    'asc'     => ["p{$shopTypePrice->id}.price" => SORT_ASC],
+                    'desc'    => ["p{$shopTypePrice->id}.price" => SORT_DESC],
+                    'label'   => $shopTypePrice->name,
+                    'default' => SORT_ASC,
+                ];
             }
         }
 
-        if ($shopColumns) {
 
+        $filterFields['shop_product_type'] = [
+            'class'      => SelectField::class,
+            'items'      => \skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
+            'label'      => 'Тип товара [магазин]',
+            'multiple'      => true,
+            'on apply'   => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+
+                if ($e->field->value) {
+                    $query->andWhere(['sp.product_type' => $e->field->value]);
+                }
+            },
+        ];
+
+        $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
+        $filterFieldsRules[] = ['shop_product_type', 'safe'];
+
+        //Мерж колонок и сортировок
+        if ($shopColumns) {
             $actions['index']['grid']['columns'] = ArrayHelper::merge($actions['index']['grid']['columns'], $shopColumns);
+            $actions['index']['grid']['sortAttributes'] = ArrayHelper::merge((array) ArrayHelper::getValue($actions, ['index', 'grid', 'sortAttributes']), $sortAttributes);
+            $actions['index']['grid']['visibleColumns'] = ArrayHelper::merge((array) ArrayHelper::getValue($actions, ['index', 'grid', 'visibleColumns']), $visibleColumns);
+
+            $actions['index']['filters']['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'fields']), $filterFields);
+            $actions['index']['filters']['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'attributeDefines']), array_keys($filterFields));
+            $actions['index']['filters']['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'attributeLabels']), $filterFieldsLabels);
+            $actions['index']['filters']['filtersModel']['rules'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'filtersModel', 'rules']), $filterFieldsRules);
+
+            $actions['index']['filters']['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($actions, ['index', 'filters', 'visibleFilters']), array_keys($filterFieldsLabels));
         }
+
+        //Приджоивание магазинных данных
+        $actions['index']['grid']['on init'] = function (Event $event) {
+            /**
+             * @var $query ActiveQuery
+             */
+            $query = $event->sender->dataProvider->query;
+            if ($this->content) {
+                $query->andWhere(['content_id' => $this->content->id]);
+            }
+
+            $query->joinWith('shopProduct as sp');
+
+            if (\Yii::$app->shop->shopTypePrices) {
+                foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+                    $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
+                        "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
+                        "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
+                    ]);
+                }
+            }
+        };
 
 
 
