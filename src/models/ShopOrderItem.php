@@ -194,14 +194,14 @@ class ShopOrderItem extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getshopProduct()
+    public function getShopProduct()
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getshopProductPrice()
+    public function getShopProductPrice()
     {
         return $this->hasOne(ShopProductPrice::class, ['id' => 'shop_product_price_id']);
     }
@@ -322,7 +322,7 @@ class ShopOrderItem extends ActiveRecord
                     if (!$this->getShopOrderItemProperties()->andWhere(['code' => $code])->count() && $value) {
                         $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
 
-                        $basketProperty = new ShopBasketProps();
+                        $basketProperty = new ShopOrderItemProperty();
                         $basketProperty->shop_order_item_id = $this->id;
                         $basketProperty->code = $code;
                         $basketProperty->value = $product->cmsContentElement->relatedPropertiesModel->getSmartAttribute($code);

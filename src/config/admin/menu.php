@@ -218,11 +218,11 @@ return [
                             ],*/
 
                             [
-                                "label" => \Yii::t('skeeks/shop/app', 'Discount goods'),
+                                "label" => \Yii::t('skeeks/shop/app', 'Discounts'),
                                 'items' =>
                                     [
                                         [
-                                            "label" => \Yii::t('skeeks/shop/app', 'Discount goods'),
+                                            "label" => \Yii::t('skeeks/shop/app', 'Discounts'),
                                             "url"   => ["shop/admin-discount"],
                                         ],
 

@@ -47,6 +47,31 @@ class TinkoffController extends Controller
     }
 
 
+    /**
+     * Payment form
+     *
+     * @throws Exception
+     */
+    public function actionBillForm()
+    {
+        /**
+         * @var $bill ShopBill
+         */
+
+        if (!$code = \Yii::$app->request->get('code')) {
+            throw new Exception('Bill not found');
+        }
+
+        if (!$bill = ShopBill::find()->where(['code' => $code])->one()) {
+            throw new Exception('Bill not found');
+        }
+        
+        return $this->render($this->action->id, [
+            'model' => $bill,
+        ]);
+        
+    }
+    
     public function actionSuccess()
     {
         $orderId = \Yii::$app->request->get('OrderId');

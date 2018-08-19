@@ -22,6 +22,7 @@ $action = $this->context->action;
     \skeeks\cms\models\CmsSite::find()->all(), 'id', 'name'
 ), ['size' => 1]); ?>
 
+<?= $form->field($model, 'assignment_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(), ['size' => 1]); ?>
 <?= $form->field($model, 'value_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getValueTypes(), ['size' => 1]); ?>
 <?= $form->field($model, 'value')->textInput(); ?>
 

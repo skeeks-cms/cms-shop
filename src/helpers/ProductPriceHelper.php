@@ -139,7 +139,15 @@ class ProductPriceHelper extends Component
                             break;
                         }
                     } elseif ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
+                        $discountMoney = new Money($shopDiscount->value, "RUB");
 
+                        $money->sub($discountMoney);
+                        $applyedShopDiscounts[] = $shopDiscount;
+
+                        //Нужно остановится и не применять другие скидки
+                        if ($shopDiscount->last_discount === Cms::BOOL_Y) {
+                            break;
+                        }
                     }
                 }
             }
@@ -152,7 +160,7 @@ class ProductPriceHelper extends Component
     static public function getShopDiscounts()
     {
         if (self::$_shopDiscounts === false) {
-            self::$_shopDiscounts = ShopDiscount::find()->active()->all();
+            self::$_shopDiscounts = ShopDiscount::find()->active()->andWhere(['assignment_type' => ShopDiscount::ASSIGNMENT_TYPE_PRODUCT])->all();
         }
 
         return self::$_shopDiscounts;

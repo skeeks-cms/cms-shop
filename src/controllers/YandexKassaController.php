@@ -8,7 +8,9 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\shop\paySystems\YandexKassaPaySystem;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
@@ -41,11 +43,11 @@ class YandexKassaController extends Controller
         \Yii::info("{$action->id} REQUEST2: ".print_r($request, true), YandexKassaPaySystem::class);
 
         try {
-            $shopOrder = $this->getOrder($request);
+            $shopOrder = $this->getBill($request);
             /**
              * @var $yandexKassa YandexKassaPaySystem
              */
-            $yandexKassa = $shopOrder->paySystem->handler;
+            $yandexKassa = $shopOrder->shopPaySystem->handler;
             if (!$yandexKassa->checkRequest($request)) {
                 $response = $yandexKassa->buildResponse("checkOrder", $request['invoiceId'], 1);
                 return $response;
@@ -74,6 +76,12 @@ class YandexKassaController extends Controller
         \Yii::info("Response actionCheckOrder: ".$response, YandexKassaPaySystem::class);
         return $response;
     }
+    /**
+     * @param $request
+     * @return ShopOrder
+     * @throws Exception
+     * @deprecated
+     */
     public function getOrder($request)
     {
         if (!$orderNumber = ArrayHelper::getValue($request, 'orderNumber')) {
@@ -98,6 +106,34 @@ class YandexKassaController extends Controller
         return $shopOrder;
     }
     /**
+     * @param $request
+     * @return ShopBill
+     * @throws Exception
+     */
+    public function getBill($request)
+    {
+        if (!$orderNumber = ArrayHelper::getValue($request, 'orderNumber')) {
+            throw new Exception('Некорректный запрос от банка. Не указан orderNumber.');
+        }
+
+        /**
+         * @var $shopOrder ShopBill
+         */
+        if (!$shopOrder = ShopBill::findOne($orderNumber)) {
+            throw new Exception('Заказ не найден в базе.');
+        }
+
+        if ($shopOrder->id != $orderNumber) {
+            throw new Exception('Не совпадает номер заказа.');
+        }
+
+        if ((float)$shopOrder->money->amount != (float)ArrayHelper::getValue($request, 'orderSumAmount')) {
+            throw new Exception('Не совпадает сумма заказа.');
+        }
+
+        return $shopOrder;
+    }
+    /**
      * @return array|string
      */
     public function actionPaymentAviso()
@@ -106,11 +142,11 @@ class YandexKassaController extends Controller
         \Yii::info("{$this->action->id} REQUEST2: ".print_r($request, true), YandexKassaPaySystem::class);
 
         try {
-            $shopOrder = $this->getOrder($request);
+            $bill = $this->getBill($request);
             /**
              * @var $yandexKassa YandexKassaPaySystem
              */
-            $yandexKassa = $shopOrder->paySystem->handler;
+            $yandexKassa = $bill->shopPaySystem->handler;
             if (!$yandexKassa->checkRequest($request)) {
                 $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 1);
                 return $response;
@@ -123,7 +159,52 @@ class YandexKassaController extends Controller
         }
 
         \Yii::info("Успешный платеж", YandexKassaPaySystem::class);
-        $shopOrder->processNotePayment();
+
+
+        //$shopOrder->processNotePayment();
+
+
+
+
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        try {
+
+            $payment = new ShopPayment();
+            $payment->shop_buyer_id = $bill->shop_buyer_id;
+            $payment->shop_pay_system_id = $bill->shop_pay_system_id;
+            $payment->shop_order_id = $bill->shop_order_id;
+            $payment->amount = $bill->amount;
+            $payment->currency_code = $bill->currency_code;
+            $payment->comment = "Оплата по счету №{$bill->id} от ".\Yii::$app->formatter->asDate($bill->created_at);
+            $payment->external_data = $response;
+
+            if (!$payment->save()) {
+                throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
+            }
+
+            $bill->paid_at = time();
+            $bill->shop_payment_id = $payment->id;
+
+            if (!$bill->save()) {
+                throw new Exception("Не обновился счет: ".print_r($payment->errors, true));
+            }
+
+            $bill->shopOrder->paid_at = time();
+            $bill->shopOrder->save();
+
+            $transaction->commit();
+
+            return $this->redirect($bill->shopOrder->url);
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
+            throw $e;
+        }
+
+
+
 
         $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 0);
 
@@ -136,13 +217,13 @@ class YandexKassaController extends Controller
      *
      * @throws Exception
      */
-    public function actionOrderForm()
+    public function actionBillForm()
     {
-        if (!$key = \Yii::$app->request->get('key')) {
+        if (!$code = \Yii::$app->request->get('code')) {
             throw new Exception('Order not found');
         }
 
-        if (!$order = ShopOrder::find()->where(['key' => $key])->one()) {
+        if (!$order = ShopBill::find()->where(['code' => $code])->one()) {
             throw new Exception('Order not found');
         }
 

@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\paySystems;
 
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
@@ -130,6 +131,16 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     {
         return \Yii::$app->response->redirect(['shop/yandex-kassa/order-form', 'key' => $shopOrder->key]);;
     }
+
+    /**
+     * @param ShopOrder $shopOrder
+     * @return $this
+     */
+    public function actionPaymentResponse(ShopBill $shopBill)
+    {
+        return \Yii::$app->response->redirect(['shop/yandex-kassa/bill-form', 'code' => $shopBill->code]);;
+    }
+
     public function renderConfigForm(ActiveForm $activeForm)
     {
 

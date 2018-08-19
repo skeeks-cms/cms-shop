@@ -695,7 +695,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $money = $this->calcMoneyItems;
         $money->add($this->calcMoneyDelivery);
-        $money->sub($this->moneyDiscount);
+        $money->sub($this->calcMoneyDiscount);
         return $money;
     }
 
@@ -776,9 +776,31 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $money = new Money("", $this->currency_code);
 
+        //Товарные скидки
         foreach ($this->shopOrderItems as $shopOrderItem) {
             $money = $money->add($shopOrderItem->moneyDiscount->multiply($shopOrderItem->quantity));
         }
+
+        //Скидка на корзину
+        if ($this->shopDiscountCoupons) {
+            foreach ($this->shopDiscountCoupons as $shopDiscountCoupon)
+            {
+                $shopDiscount = $shopDiscountCoupon->shopDiscount;
+                if ($shopDiscountCoupon->shopDiscount->assignment_type == ShopDiscount::ASSIGNMENT_TYPE_CART) {
+
+                    if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
+                        $discountMoney = new Money($shopDiscount->value, $shopDiscount->currency_code);
+                        $money->add($discountMoney);
+                    }
+
+                    if ($shopDiscount->isLast) {
+                        break;
+                    }
+
+                }
+            }
+        }
+
 
         return $money;
     }

@@ -53,6 +53,7 @@ use yii\helpers\Json;
  * @property string                   $conditions
  * @property string                   $unpack
  * @property integer                  $version
+ * @property string                   $assignment_type Тип назначения скидки (на товар, на корзину)
  *
  * @property string                   $permissionName
  *
@@ -60,12 +61,17 @@ use yii\helpers\Json;
  * @property CmsSite                  $site
  * @property ShopDiscount2typePrice[] $shopDiscount2typePrices
  * @property ShopTypePrice[]          $typePrices
+ *
+ * @property bool                     $isLast
  */
 class ShopDiscount extends \skeeks\cms\models\Core
 {
     CONST VALUE_TYPE_P = "P";
     CONST VALUE_TYPE_F = "F";
     CONST VALUE_TYPE_S = "S";
+
+    CONST ASSIGNMENT_TYPE_PRODUCT = "product";
+    CONST ASSIGNMENT_TYPE_CART = "cart";
 
     const TYPE_DEFAULT = 0;
     const TYPE_DISCOUNT_SAVE = 1; //накопительная скидка
@@ -76,6 +82,14 @@ class ShopDiscount extends \skeeks\cms\models\Core
             self::VALUE_TYPE_P => \Yii::t('skeeks/shop/app', 'In percentages'),
             self::VALUE_TYPE_F => \Yii::t('skeeks/shop/app', 'Fixed amount'),
             self::VALUE_TYPE_S => \Yii::t('skeeks/shop/app', 'Set the price for the goods'),
+        ];
+    }
+
+    static public function getAssignmentTypes()
+    {
+        return [
+            self::ASSIGNMENT_TYPE_PRODUCT => "Скидка на товар",
+            self::ASSIGNMENT_TYPE_CART => "Скидка на корзину",
         ];
     }
 
@@ -125,6 +139,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
             [['max_discount', 'value', 'min_order_sum'], 'number'],
             [['currency_code', 'name'], 'required'],
             [['conditions', 'unpack'], 'string'],
+            [['assignment_type'], 'string'],
             [
                 ['active', 'renewal', 'value_type', 'count_period', 'count_type', 'action_type', 'last_discount'],
                 'string',
@@ -136,6 +151,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
             [['active', 'last_discount'], 'default', 'value' => Cms::BOOL_Y],
             [['type'], 'default', 'value' => self::TYPE_DEFAULT],
             [['value_type'], 'default', 'value' => self::VALUE_TYPE_P],
+            [['assignment_type'], 'default', 'value' => self::ASSIGNMENT_TYPE_PRODUCT],
             [['value'], 'default', 'value' => 0],
             [['priority'], 'default', 'value' => 1],
             ['typePrices', 'safe'], // allow set permissions with setAttributes()
@@ -184,6 +200,7 @@ class ShopDiscount extends \skeeks\cms\models\Core
             'unpack'        => \Yii::t('skeeks/shop/app', 'Unpack'),
             'version'       => \Yii::t('skeeks/shop/app', 'Version'),
             'typePrices'    => \Yii::t('skeeks/shop/app', 'Types of prices, to which the discount is applicable'),
+            'assignment_type'    => "Назначение скидки",
         ];
     }
 
@@ -251,6 +268,11 @@ class ShopDiscount extends \skeeks\cms\models\Core
             }
         }
 
+        //Назначение скидки - товарная скидка
+        if ($this->assignment_type != ShopDiscount::ASSIGNMENT_TYPE_PRODUCT) {
+            return false;
+        }
+
         return $this->isTrueConditions($shopCmsContentElement, $shopProductPrice);
     }
 
@@ -280,5 +302,10 @@ class ShopDiscount extends \skeeks\cms\models\Core
         ]);
 
         return $condition->isTrue;
+    }
+
+    public function getIsLast()
+    {
+        return ($this->last_discount == "Y");
     }
 }

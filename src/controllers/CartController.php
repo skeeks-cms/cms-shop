@@ -18,6 +18,7 @@ use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
 use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopOrder2discountCoupon;
 use skeeks\cms\shop\models\ShopOrderItem;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopPersonTypeProperty;
@@ -265,17 +266,8 @@ class CartController extends Controller
                 }
 
 
-                $newValue = [];
-                $discount_coupons = \Yii::$app->shop->cart->discount_coupons;
-                if ($discount_coupons) {
-                    foreach ($discount_coupons as $id) {
-                        if ($id != $couponId) {
-                            $newValue[] = $id;
-                        }
-                    }
-                }
-                \Yii::$app->shop->cart->discount_coupons = $newValue;
-                \Yii::$app->shop->cart->save();
+                ShopOrder2discountCoupon::deleteAll(['discount_coupon_id' => $couponId, 'order_id' => \Yii::$app->shop->cart->shopOrder->id]);
+
                 \Yii::$app->shop->cart->recalculate()->save();
 
                 $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
@@ -319,12 +311,21 @@ class CartController extends Controller
                     throw new Exception(\Yii::t('skeeks/shop/app', 'Coupon does not exist or is not active'));
                 }
 
-                $discount_coupons = \Yii::$app->shop->cart->discount_coupons;
+                /*$discount_coupons = [];
+                if (\Yii::$app->shop->cart->shopOrder->shopDiscountCoupons) {
+                    $discount_coupons = ArrayHelper::map(\Yii::$app->shop->cart->shopOrder->shopDiscountCoupons, 'id', 'id');
+                }
                 $discount_coupons[] = $applyShopDiscountCoupon->id;
-                array_unique($discount_coupons);
-                \Yii::$app->shop->cart->discount_coupons = $discount_coupons;
-                \Yii::$app->shop->cart->save();
-                \Yii::$app->shop->cart->recalculate()->save();
+                array_unique($discount_coupons);*/
+
+                $map = new ShopOrder2discountCoupon();
+                $map->order_id = \Yii::$app->shop->cart->shopOrder->id;
+                $map->discount_coupon_id = $applyShopDiscountCoupon->id;
+
+                $map->save();
+                //\Yii::$app->shop->cart->shopOrder->shopDiscountCoupons = $discount_coupons;
+                //\Yii::$app->shop->cart->shopOrder->save();
+                \Yii::$app->shop->cart->shopOrder->recalculate()->save();
 
                 $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
                 $rr->success = true;
