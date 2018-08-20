@@ -171,6 +171,21 @@ $order->refresh();
 
     <? endif; ?>
 
+    <? if ($order->shopDiscountCoupons) : ?>
+        <?= Html::beginTag('h3'); ?>
+        <?= count($order->shopDiscountCoupons) == 1 ? "Скидочный купон:" : "Скидочные купоны:" ;?>
+        <?= Html::endTag('h3'); ?>
+
+
+        <? foreach ($order->shopDiscountCoupons as $shopDiscountCoupon) : ?>
+            <b><?= $shopDiscountCoupon->coupon ?></b> -
+                <? if ($shopDiscountCoupon->shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_F) : ?>
+                    <?= new \skeeks\cms\money\Money($shopDiscountCoupon->shopDiscount->value, $order->currency_code); ?>
+                <? else: ?>
+                <? endif; ?>
+        <? endforeach; ?>
+    <? endif; ?>
+
 
     <?= Html::beginTag('h3'); ?>
     Итого:

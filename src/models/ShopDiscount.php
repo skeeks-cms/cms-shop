@@ -12,6 +12,7 @@ use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\money\models\MoneyCurrency;
+use skeeks\cms\money\Money;
 use skeeks\cms\shop\helpers\DiscountConditionHelper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
