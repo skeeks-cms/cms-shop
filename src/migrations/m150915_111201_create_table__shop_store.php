@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150915_111201_create_table__shop_store extends Migration
@@ -34,22 +33,22 @@ class m150915_111201_create_table__shop_store extends Migration
 
             'name' => $this->string(255)->notNull(),
 
-            'active' => $this->string(1)->notNull()->defaultValue("Y"),
-            'address' => $this->string(255)->notNull(),
+            'active'      => $this->string(1)->notNull()->defaultValue("Y"),
+            'address'     => $this->string(255)->notNull(),
             'description' => $this->text(),
-            'gps_n' => $this->string(15)->notNull()->defaultValue(0),
-            'gps_s' => $this->string(15)->notNull()->defaultValue(0),
+            'gps_n'       => $this->string(15)->notNull()->defaultValue(0),
+            'gps_s'       => $this->string(15)->notNull()->defaultValue(0),
 
-            'image_id' => $this->integer(),
+            'image_id'    => $this->integer(),
             'location_id' => $this->integer(),
 
-            'phone' => $this->string(255),
+            'phone'    => $this->string(255),
             'schedule' => $this->string(255),
-            'xml_id' => $this->string(255),
+            'xml_id'   => $this->string(255),
             'priority' => $this->integer()->notNull()->defaultValue(100),
-            'email' => $this->string(255),
+            'email'    => $this->string(255),
 
-            'issuing_center' => $this->string(1)->notNull()->defaultValue('Y'),
+            'issuing_center'  => $this->string(1)->notNull()->defaultValue('Y'),
             'shipping_center' => $this->string(1)->notNull()->defaultValue('Y'),
 
             'site_code' => $this->string(15),

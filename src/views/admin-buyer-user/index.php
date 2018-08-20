@@ -12,7 +12,7 @@
 
 $query = $dataProvider->query;
 
-$query->groupBy([\skeeks\cms\models\CmsUser::tableName() . '.id']);
+$query->groupBy([\skeeks\cms\models\CmsUser::tableName().'.id']);
 $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.user_id = cms_user.id');
 
 ?>
@@ -20,38 +20,39 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'columns' =>
+    'columns'         =>
         [
             [
-                'class' => \skeeks\cms\grid\UserColumnData::className(),
+                'class'     => \skeeks\cms\grid\UserColumnData::class,
                 'attribute' => 'id',
-                'label' => \Yii::t('skeeks/shop/app', 'Buyer')
+                'label'     => \Yii::t('skeeks/shop/app', 'Buyer'),
             ],
 
             'email',
             'phone',
 
             [
-                'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+                'class'     => \skeeks\cms\grid\DateTimeColumnData::class,
                 'attribute' => 'created_at',
-                'label' => \Yii::t('skeeks/shop/app', 'Date of registration'),
+                'label'     => \Yii::t('skeeks/shop/app', 'Date of registration'),
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'Date of last order'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     if ($order = \skeeks\cms\shop\models\ShopOrder::find()->where(['user_id' => $model->id])
-                        ->orderBy(['created_at' => SORT_DESC])->one()) {
+                        ->orderBy(['created_at' => SORT_DESC])->one()
+                    ) {
                         return \Yii::$app->formatter->asDatetime($order->created_at);
                     }
 
@@ -60,27 +61,27 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     return \skeeks\cms\shop\models\ShopOrder::find()->where([
                         'user_id' => $model->id,
-                        'payed' => \skeeks\cms\components\Cms::BOOL_Y
+                        'payed'   => \skeeks\cms\components\Cms::BOOL_Y,
                     ])->count();
                 },
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class' => \yii\grid\DataColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     return \skeeks\cms\shop\models\ShopOrder::find()->where([
                         'user_id' => $model->id,
-                        'payed' => \skeeks\cms\components\Cms::BOOL_Y
+                        'payed'   => \skeeks\cms\components\Cms::BOOL_Y,
                     ])->count();
                 },
             ],
-        ]
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

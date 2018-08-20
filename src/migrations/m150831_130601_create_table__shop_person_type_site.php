@@ -6,7 +6,6 @@
  * @date 31.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150831_130601_create_table__shop_person_type_site extends Migration
@@ -26,7 +25,7 @@ class m150831_130601_create_table__shop_person_type_site extends Migration
         $this->createTable("{{%shop_person_type_site}}", [
 
             'person_type_id' => $this->integer()->notNull(),
-            'site_code' => "CHAR(15) NOT NULL",
+            'site_code'      => "CHAR(15) NOT NULL",
 
         ], $tableOptions);
 
@@ -50,7 +49,7 @@ class m150831_130601_create_table__shop_person_type_site extends Migration
             foreach ($persons as $person) {
                 $this->insert('{{%shop_person_type_site}}', [
                     'person_type_id' => $person->id,
-                    'site_code' => $site->code,
+                    'site_code'      => $site->code,
                 ]);
             }
         }

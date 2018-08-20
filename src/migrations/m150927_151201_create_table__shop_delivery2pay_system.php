@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150927_151201_create_table__shop_delivery2pay_system extends Migration
@@ -33,7 +32,7 @@ class m150927_151201_create_table__shop_delivery2pay_system extends Migration
             'updated_at' => $this->integer(),
 
             'pay_system_id' => $this->integer()->notNull(),
-            'delivery_id' => $this->integer()->notNull(),
+            'delivery_id'   => $this->integer()->notNull(),
 
         ], $tableOptions);
 
@@ -46,7 +45,6 @@ class m150927_151201_create_table__shop_delivery2pay_system extends Migration
 
         $this->createIndex('shop_delivery2pay_system__shop_delivery2pay_system', '{{%shop_delivery2pay_system}}',
             ['pay_system_id', 'delivery_id'], true);
-
 
 
         $this->addForeignKey(

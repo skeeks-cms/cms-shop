@@ -1,35 +1,36 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link http://skeeks.com/
- * @copyright 2010 SkeekS (СкикС)
- * @date 28.08.2015
  */
 
-use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-
 /* @var $this yii\web\View */
+/* @var $action \skeeks\cms\backend\actions\BackendModelUpdateAction */
+$action = $this->context->action;
 ?>
 
-<?php $form = ActiveForm::begin(); ?>
-
+<?php $form = $action->beginDynamicActiveForm(); ?>
+<?= $form->errorSummary($model); ?>
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
 <?= $form->fieldCheckboxBoolean($model, 'active'); ?>
 <?= $form->field($model, 'name')->textInput(); ?>
 
-<?= $form->fieldSelect($model, 'site_id', \yii\helpers\ArrayHelper::map(
+<?= $form->field($model, 'site_id')->listBox(\yii\helpers\ArrayHelper::map(
     \skeeks\cms\models\CmsSite::find()->all(), 'id', 'name'
-)); ?>
+), ['size' => 1]); ?>
 
-<?= $form->fieldSelect($model, 'value_type', \skeeks\cms\shop\models\ShopDiscount::getValueTypes()); ?>
+<?= $form->field($model, 'assignment_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(), ['size' => 1]); ?>
+<?= $form->field($model, 'value_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getValueTypes(), ['size' => 1]); ?>
 <?= $form->field($model, 'value')->textInput(); ?>
-<?= $form->field($model, 'max_discount')->textInput(); ?>
 
-<?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
-    \skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'
-)); ?>
+<?= $form->field($model, 'currency_code')->listBox(\yii\helpers\ArrayHelper::map(
+    \skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(), 'code', 'code'
+), ['size' => 1]); ?>
+
+<?= $form->field($model, 'max_discount')->textInput(); ?>
 
 <?= $form->fieldInputInt($model, 'priority'); ?>
 <?= $form->fieldCheckboxBoolean($model, 'last_discount'); ?>
@@ -38,6 +39,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Conditions')); ?>
+
+<?= $form->field($model, 'conditions')->widget(
+    \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class,
+    [
+        'options' => [
+            $action->reloadFieldParam => 'true',
+        ],
+    ]
+); ?>
+
 <?= $form->fieldSetEnd(); ?>
 
 
@@ -58,18 +69,16 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <? \yii\bootstrap\Alert::end() ?>
 
 <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-    'permissionName' => $model->permissionName,
-    'notClosedRoles' => [],
+    'permissionName'        => $model->permissionName,
+    'notClosedRoles'        => [],
     'permissionDescription' => \Yii::t('skeeks/shop/app',
-            'Groups of users who can benefit from discounted rates') . ": '{$model->name}'",
-    'label' => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
+            'Groups of users who can benefit from discounted rates').": '{$model->name}'",
+    'label'                 => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
 ]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Coupons')); ?>
-<?= $form->fieldSetEnd(); ?>
-
 <?= $form->buttonsCreateOrUpdate($model); ?>
-<?php ActiveForm::end(); ?>
+<?= $form->errorSummary($model); ?>
+<?php $action->endActiveForm(); ?>

@@ -8,18 +8,13 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\models\CmsContent;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
-use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPaySystem;
-use skeeks\cms\shop\models\ShopPersonType;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
@@ -37,7 +32,7 @@ class AdminPaySystemController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Payment systems');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopPaySystem::className();
+        $this->modelClassName = ShopPaySystem::class;
 
         parent::init();
     }
@@ -55,9 +50,9 @@ class AdminPaySystemController extends AdminModelEditorController
                             [
                                 'settingsData' =>
                                     [
-                                        'order' => SORT_ASC,
+                                        'order'   => SORT_ASC,
                                         'orderBy' => "priority",
-                                    ]
+                                    ],
                             ],
 
                         "columns" => [
@@ -65,18 +60,18 @@ class AdminPaySystemController extends AdminModelEditorController
                             'priority',
 
                             [
-                                'class' => DataColumn::className(),
+                                'class'     => DataColumn::class,
                                 'attribute' => "personTypeIds",
-                                'filter' => false,
-                                'value' => function (ShopPaySystem $model) {
+                                'filter'    => false,
+                                'value'     => function (ShopPaySystem $model) {
                                     return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
-                                }
+                                },
                             ],
 
                             [
-                                'class' => BooleanColumn::className(),
-                                'attribute' => "active"
-                            ]
+                                'class'     => BooleanColumn::class,
+                                'attribute' => "active",
+                            ],
                         ],
                     ],
 
@@ -129,7 +124,8 @@ class AdminPaySystemController extends AdminModelEditorController
 
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handlerValid) {
+                    && $model->validate() && $handlerValid
+                ) {
                     $model->save();
 
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
@@ -146,7 +142,7 @@ class AdminPaySystemController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }
@@ -181,7 +177,8 @@ class AdminPaySystemController extends AdminModelEditorController
                     }
 
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handlerValid) {
+                        && $model->validate() && $handlerValid
+                    ) {
                         $model->save();
 
                         \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Saved'));
@@ -202,7 +199,7 @@ class AdminPaySystemController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }

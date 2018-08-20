@@ -36,25 +36,25 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
         if (!$model) {
             $model = new ShopProduct([
-                'id' => $contentElement->id
+                'id' => $contentElement->id,
             ]);
         } else {
             if ($typePrices = ShopTypePrice::find()->where(['!=', 'def', Cms::BOOL_Y])->all()) {
                 foreach ($typePrices as $typePrice) {
                     $productPrice = ShopProductPrice::find()->where([
-                        'product_id' => $model->id,
-                        'type_price_id' => $typePrice->id
+                        'product_id'    => $model->id,
+                        'type_price_id' => $typePrice->id,
                     ])->one();
 
                     if (!$productPrice) {
                         $productPrice = new ShopProductPrice([
-                            'product_id' => $model->id,
-                            'type_price_id' => $typePrice->id
+                            'product_id'    => $model->id,
+                            'type_price_id' => $typePrice->id,
                         ]);
                     }
 
                     if ($post = \Yii::$app->request->post()) {
-                        $data = ArrayHelper::getValue($post, 'prices.' . $typePrice->id);
+                        $data = ArrayHelper::getValue($post, 'prices.'.$typePrice->id);
                         $productPrice->load($data, "");
                     }
 
@@ -105,8 +105,8 @@ class AdminContentElementShopAction extends AdminOneModelEditAction
 
         $this->viewParams =
             [
-                'model' => $model,
-                'productPrices' => $productPrices
+                'model'         => $model,
+                'productPrices' => $productPrices,
             ];
 
         return parent::run();

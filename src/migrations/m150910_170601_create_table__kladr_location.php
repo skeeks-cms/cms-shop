@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150910_170601_create_table__kladr_location extends Migration
@@ -32,21 +31,21 @@ class m150910_170601_create_table__kladr_location extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'name' => $this->string(255)->notNull(),
+            'name'       => $this->string(255)->notNull(),
             'name_short' => $this->string(255),
-            'name_full' => $this->string(255),
+            'name_full'  => $this->string(255),
 
             'zip' => $this->string(20),
 
             'okato' => $this->string(20),
-            'type' => $this->string(10)->notNull(),
+            'type'  => $this->string(10)->notNull(),
 
             'kladr_api_id' => $this->string(20),
 
             'active' => $this->string(1)->notNull()->defaultValue("Y"),
 
             'parent_id' => $this->integer(),
-            'sort' => $this->integer(),
+            'sort'      => $this->integer(),
 
         ], $tableOptions);
 

@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m170103_120601_create_table__shop_discount_coupon extends Migration
@@ -33,13 +32,13 @@ class m170103_120601_create_table__shop_discount_coupon extends Migration
             'updated_at' => $this->integer(),
 
             'shop_discount_id' => $this->integer()->notNull(),
-            'is_active' => $this->integer(1)->notNull()->defaultValue(1),
+            'is_active'        => $this->integer(1)->notNull()->defaultValue(1),
 
             'active_from' => $this->integer(),
-            'active_to' => $this->integer(),
+            'active_to'   => $this->integer(),
 
-            'coupon' => $this->string(32)->notNull(),
-            'max_use' => $this->integer()->notNull()->defaultValue(1),
+            'coupon'    => $this->string(32)->notNull(),
+            'max_use'   => $this->integer()->notNull()->defaultValue(1),
             'use_count' => $this->integer()->notNull()->defaultValue(0),
 
             'cms_user_id' => $this->integer(),
@@ -48,19 +47,19 @@ class m170103_120601_create_table__shop_discount_coupon extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex($tableName . '__updated_by', $tableName, 'updated_by');
-        $this->createIndex($tableName . '__created_by', $tableName, 'created_by');
-        $this->createIndex($tableName . '__created_at', $tableName, 'created_at');
-        $this->createIndex($tableName . '__updated_at', $tableName, 'updated_at');
+        $this->createIndex($tableName.'__updated_by', $tableName, 'updated_by');
+        $this->createIndex($tableName.'__created_by', $tableName, 'created_by');
+        $this->createIndex($tableName.'__created_at', $tableName, 'created_at');
+        $this->createIndex($tableName.'__updated_at', $tableName, 'updated_at');
 
-        $this->createIndex($tableName . '__shop_discount_id', $tableName, 'shop_discount_id');
-        $this->createIndex($tableName . '__is_active', $tableName, 'is_active');
-        $this->createIndex($tableName . '__active_from', $tableName, 'active_from');
-        $this->createIndex($tableName . '__active_to', $tableName, 'active_to');
-        $this->createIndex($tableName . '__coupon', $tableName, 'coupon');
-        $this->createIndex($tableName . '__max_use', $tableName, 'max_use');
-        $this->createIndex($tableName . '__use_count', $tableName, 'use_count');
-        $this->createIndex($tableName . '__cms_user_id', $tableName, 'cms_user_id');
+        $this->createIndex($tableName.'__shop_discount_id', $tableName, 'shop_discount_id');
+        $this->createIndex($tableName.'__is_active', $tableName, 'is_active');
+        $this->createIndex($tableName.'__active_from', $tableName, 'active_from');
+        $this->createIndex($tableName.'__active_to', $tableName, 'active_to');
+        $this->createIndex($tableName.'__coupon', $tableName, 'coupon');
+        $this->createIndex($tableName.'__max_use', $tableName, 'max_use');
+        $this->createIndex($tableName.'__use_count', $tableName, 'use_count');
+        $this->createIndex($tableName.'__cms_user_id', $tableName, 'cms_user_id');
 
         $this->addCommentOnTable($tableName, '');
 

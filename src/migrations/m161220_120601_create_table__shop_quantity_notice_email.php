@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m161220_120601_create_table__shop_quantity_notice_email extends Migration
@@ -33,7 +32,7 @@ class m161220_120601_create_table__shop_quantity_notice_email extends Migration
             'updated_at' => $this->integer(),
 
             'shop_product_id' => $this->integer()->notNull(),
-            'email' => $this->string()->notNull(),
+            'email'           => $this->string()->notNull(),
 
             'name' => $this->string()->null(),
 
@@ -45,16 +44,16 @@ class m161220_120601_create_table__shop_quantity_notice_email extends Migration
         ], $tableOptions);
 
 
-        $this->createIndex($tableName . '__updated_by', $tableName, 'updated_by');
-        $this->createIndex($tableName . '__created_by', $tableName, 'created_by');
-        $this->createIndex($tableName . '__created_at', $tableName, 'created_at');
-        $this->createIndex($tableName . '__updated_at', $tableName, 'updated_at');
-        $this->createIndex($tableName . '__shop_product_id', $tableName, 'shop_product_id');
-        $this->createIndex($tableName . '__email', $tableName, 'email');
-        $this->createIndex($tableName . '__name', $tableName, 'name');
-        $this->createIndex($tableName . '__shop_fuser_id', $tableName, 'shop_fuser_id');
-        $this->createIndex($tableName . '__is_notified', $tableName, 'is_notified');
-        $this->createIndex($tableName . '__notified_at', $tableName, 'notified_at');
+        $this->createIndex($tableName.'__updated_by', $tableName, 'updated_by');
+        $this->createIndex($tableName.'__created_by', $tableName, 'created_by');
+        $this->createIndex($tableName.'__created_at', $tableName, 'created_at');
+        $this->createIndex($tableName.'__updated_at', $tableName, 'updated_at');
+        $this->createIndex($tableName.'__shop_product_id', $tableName, 'shop_product_id');
+        $this->createIndex($tableName.'__email', $tableName, 'email');
+        $this->createIndex($tableName.'__name', $tableName, 'name');
+        $this->createIndex($tableName.'__shop_fuser_id', $tableName, 'shop_fuser_id');
+        $this->createIndex($tableName.'__is_notified', $tableName, 'is_notified');
+        $this->createIndex($tableName.'__notified_at', $tableName, 'notified_at');
 
         $this->addCommentOnTable($tableName, 'Subscribers to the notice of receipt product');
 

@@ -8,10 +8,7 @@
 
 namespace skeeks\cms\shop\grid;
 
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsContentElement;
 use yii\grid\DataColumn;
-use yii\helpers\Html;
 
 /**
  * Class BasketNameGridColumn
@@ -25,11 +22,11 @@ class BasketQuantityGridColumn extends DataColumn
     /**
      * @param mixed $model
      * @param mixed $key
-     * @param int $index
+     * @param int   $index
      * @return string
      */
     protected function renderDataCellContent($model, $key, $index)
     {
-        return $model->quantity . " " . $model->measure_name;
+        return $model->quantity." ".$model->measure_name;
     }
 }

@@ -8,8 +8,6 @@
 
 namespace skeeks\cms\shop\grid;
 
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsContentElement;
 use yii\grid\DataColumn;
 use yii\helpers\Html;
 
@@ -19,24 +17,24 @@ use yii\helpers\Html;
  */
 class BasketPriceGridColumn extends DataColumn
 {
-    public $attribute = "price";
+    public $attribute = "amount";
     public $format = "raw";
 
     /**
      * @param mixed $model
      * @param mixed $key
-     * @param int $index
+     * @param int   $index
      * @return string
      */
     protected function renderDataCellContent($model, $key, $index)
     {
         $shopBasket = $model;
         if ($shopBasket->discount_value) {
-            return "<span style='text-decoration: line-through;'>" . \Yii::$app->money->intlFormatter()->format($shopBasket->moneyOriginal) . "</span><br />" . Html::tag('small',
-                    $shopBasket->notes) . "<br />" . \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small',
-                    $shopBasket->discount_name . ": " . $shopBasket->discount_value);
+            return "<span style='text-decoration: line-through;'>".(string)$shopBasket->moneyOriginal."</span><br />".Html::tag('small',
+                    $shopBasket->notes)."<br />".(string)$shopBasket->money."<br />".Html::tag('small',
+                    $shopBasket->discount_name.": ".$shopBasket->discount_value);
         } else {
-            return \Yii::$app->money->intlFormatter()->format($shopBasket->money) . "<br />" . Html::tag('small',
+            return (string)$shopBasket->money."<br />".Html::tag('small',
                     $shopBasket->notes);
         }
     }

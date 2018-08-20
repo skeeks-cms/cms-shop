@@ -29,11 +29,11 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all()) {
     ]); */ ?>
 
 <?= $form->field($model, 'searchModelAttributes')->dropDownList([
-    'image' => \Yii::t('skeeks/shop/app', 'Filter by photo'),
-    'hasQuantity' => \Yii::t('skeeks/shop/app', 'Filter by availability')
+    'image'       => \Yii::t('skeeks/shop/app', 'Filter by photo'),
+    'hasQuantity' => \Yii::t('skeeks/shop/app', 'Filter by availability'),
 ], [
     'multiple' => true,
-    'size' => 4
+    'size'     => 4,
 ]); ?>
 
 <? if ($model->cmsContent) : ?>
@@ -53,7 +53,7 @@ if ($contentTypes = \skeeks\cms\models\CmsContentType::find()->all()) {
 <?= $form->fieldSelect($model, 'type_price_id', \yii\helpers\ArrayHelper::map(
     \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
 ), [
-    'allowDeselect' => true
+    'allowDeselect' => true,
 ]); ?>
 
 <?= $form->fieldSetEnd(); ?>

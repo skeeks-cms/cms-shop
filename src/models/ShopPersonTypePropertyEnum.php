@@ -3,26 +3,25 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\relatedProperties\models\RelatedPropertyEnumModel;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_person_type_property_enum}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $property_id
- * @property string $value
- * @property string $def
- * @property string $code
- * @property integer $priority
+ * @property integer                $id
+ * @property integer                $created_by
+ * @property integer                $updated_by
+ * @property integer                $created_at
+ * @property integer                $updated_at
+ * @property integer                $property_id
+ * @property string                 $value
+ * @property string                 $def
+ * @property string                 $code
+ * @property integer                $priority
  *
  * @property ShopPersonTypeProperty $property
- * @property CmsUser $createdBy
- * @property CmsUser $updatedBy
+ * @property CmsUser                $createdBy
+ * @property CmsUser                $updatedBy
  *
  */
 class ShopPersonTypePropertyEnum extends RelatedPropertyEnumModel
@@ -45,7 +44,7 @@ class ShopPersonTypePropertyEnum extends RelatedPropertyEnumModel
             [['value', 'code'], 'required'],
             [['value'], 'string', 'max' => 255],
             [['def'], 'string', 'max' => 1],
-            [['code'], 'string', 'max' => 32]
+            [['code'], 'string', 'max' => 32],
         ]);
     }
 
@@ -55,16 +54,16 @@ class ShopPersonTypePropertyEnum extends RelatedPropertyEnumModel
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::rules(), [
-            'id' => \Yii::t('skeeks/shop/app', 'Person type ID'),
-            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'id'          => \Yii::t('skeeks/shop/app', 'Person type ID'),
+            'created_by'  => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'  => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'  => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'  => \Yii::t('skeeks/shop/app', 'Updated At'),
             'property_id' => \Yii::t('skeeks/shop/app', 'Property ID'),
-            'value' => \Yii::t('skeeks/shop/app', 'Value'),
-            'def' => \Yii::t('skeeks/shop/app', 'Def'),
-            'code' => \Yii::t('skeeks/shop/app', 'Code'),
-            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
+            'value'       => \Yii::t('skeeks/shop/app', 'Value'),
+            'def'         => \Yii::t('skeeks/shop/app', 'Def'),
+            'code'        => \Yii::t('skeeks/shop/app', 'Code'),
+            'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
         ]);
     }
 
@@ -73,7 +72,7 @@ class ShopPersonTypePropertyEnum extends RelatedPropertyEnumModel
      */
     public function getProperty()
     {
-        return $this->hasOne(ShopPersonTypeProperty::className(), ['id' => 'property_id']);
+        return $this->hasOne(ShopPersonTypeProperty::class, ['id' => 'property_id']);
     }
 
 

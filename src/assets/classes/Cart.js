@@ -4,8 +4,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 03.04.2015
  */
-(function(sx, $, _)
-{
+(function (sx, $, _) {
     sx.createNamespace('classes.shop', sx);
 
     /**
@@ -19,38 +18,33 @@
      */
     sx.classes.shop._Cart = sx.classes.Component.extend({
 
-        construct: function (Shop, id, opts)
-        {
+        construct: function (Shop, id, opts) {
             var self = this;
             opts = opts || {};
 
-            if (!Shop instanceof sx.classes.shop._App)
-            {
+            if (!Shop instanceof sx.classes.shop._App) {
                 throw new Error("Shop object not found");
             }
 
-            this.id             = String(id);
-            this.Shop           = Shop;
+            this.id = String(id);
+            this.Shop = Shop;
             this.Shop.registerCart(this);
 
             //this.parent.construct(opts);
             this.applyParentMethod(sx.classes.Component, 'construct', [opts]); // TODO: make a workaround for magic parent calling
         },
 
-        _init: function()
-        {
+        _init: function () {
             var self = this;
 
-            this.Shop.bind('change', function(e, data)
-            {
+            this.Shop.bind('change', function (e, data) {
                 self.update();
             });
         },
 
-        update: function()
-        {
+        update: function () {
             this.trigger('beforeUpdate', {
-                'Cart' : this
+                'Cart': this
             });
             //throw new Error("Not implemented this method");
             return this;
@@ -60,8 +54,7 @@
          * @returns {*|HTMLElement}
          * @constructor
          */
-        JWrapper: function()
-        {
+        JWrapper: function () {
             return $('#' + this.id);
         }
     });
@@ -76,15 +69,14 @@
      */
     sx.classes.shop.CartPjax = sx.classes.shop.Cart.extend({
 
-        _init: function()
-        {
+        _init: function () {
             this.applyParentMethod(sx.classes.shop.Cart, '_init', []);
 
             var self = this;
 
-            self.JWrapper().on('pjax:complete', function() {
+            self.JWrapper().on('pjax:complete', function () {
                 self.trigger('update', {
-                    'Cart' : this
+                    'Cart': this
                 });
             });
         },
@@ -92,18 +84,16 @@
         /**
          * @returns {sx.classes.shop.CartPjax}
          */
-        update: function()
-        {
+        update: function () {
             var self = this;
 
             this.trigger('beforeUpdate', {
-                'Cart' : this
+                'Cart': this
             });
 
-            _.delay(function()
-            {
+            _.delay(function () {
                 $.pjax.reload({container: self.JWrapper().selector});
-            }, Number(this.get('delay', 0)) );
+            }, Number(this.get('delay', 0)));
 
             return this;
         },

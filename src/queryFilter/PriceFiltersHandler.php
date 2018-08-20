@@ -18,7 +18,6 @@ use skeeks\yii2\queryfilter\IQueryFilterHandler;
 use v3p\aff\models\V3pShopCmsContentElement;
 use v3project\yii2\productfilter\EavFiltersHandler;
 use v3project\yii2\productfilter\IFiltersHandler;
-use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
@@ -28,8 +27,8 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * @property float $minValue
- * @property float $maxValue
+ * @property float       $minValue
+ * @property float       $maxValue
  * @property ActiveQuery $baseQuery
  *
  * Class AvailabilityFiltersHandler
@@ -46,23 +45,19 @@ class PriceFiltersHandler extends Model
      * @var int
      */
     public $type_price_id;
+    public $cms_content_element_ids = [];
+    public $from;
+    public $to;
+    public $formName = 'price';
     /**
      * @var ActiveQuery
      */
     protected $_baseQuery;
-
-    public $cms_content_element_ids = [];
-
-    public $from;
-    public $to;
-
-    public $formName = 'price';
-
+    protected $_min_max_data = null;
     public function formName()
     {
-        return $this->formName . $this->type_price_id;
+        return $this->formName.$this->type_price_id;
     }
-
     public function init()
     {
         parent::init();
@@ -78,7 +73,13 @@ class PriceFiltersHandler extends Model
             throw new InvalidConfigException('Need parametr price_type_id');
         }
     }
-
+    /**
+     * @return ActiveQuery
+     */
+    public function getBaseQuery()
+    {
+        return $this->_baseQuery;
+    }
     /**
      * @param QueryInterface $baseQuery
      * @return $this
@@ -88,15 +89,6 @@ class PriceFiltersHandler extends Model
         $this->_baseQuery = clone $baseQuery;
         return $this;
     }
-
-    /**
-     * @return ActiveQuery
-     */
-    public function getBaseQuery()
-    {
-        return $this->_baseQuery;
-    }
-
     /**
      * @return array
      */
@@ -104,20 +96,25 @@ class PriceFiltersHandler extends Model
     {
         return [
             'from' => 'Цена от',
-            'to' => 'Цена до',
+            'to'   => 'Цена до',
         ];
     }
-
     public function rules()
     {
         return [
             [['from'], 'number'],
-            [['to'], 'number']
+            [['to'], 'number'],
         ];
     }
+    public function getMinValue()
+    {
+        $data = $this->_getMinMaxPriceFromQuery();
+        if (isset($data[0])) {
+            return $data[0];
+        }
 
-    protected $_min_max_data = null;
-
+        return 0;
+    }
     /**
      * @return array
      */
@@ -140,7 +137,7 @@ class PriceFiltersHandler extends Model
         $query->joinWith('shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
-        $query->andWhere('cms_content_element.id IN (' . $this->cms_content_element_ids . ")");
+        $query->andWhere('cms_content_element.id IN ('.$this->cms_content_element_ids.")");
 
         $data = $query->select(['min(price) as min', 'max(price) as max'])->createCommand()->queryOne();
         $this->_min_max_data = [
@@ -150,20 +147,23 @@ class PriceFiltersHandler extends Model
 
         return $this->_min_max_data;
     }
-
-    public function getMinValue()
-    {
-        $data = $this->_getMinMaxPriceFromQuery();
-        return $data[0];
-    }
-
-
     public function getMaxValue()
     {
         $data = $this->_getMinMaxPriceFromQuery();
-        return $data[1];
-    }
+        if (isset($data[1])) {
+            return $data[1];
+        }
 
+        return 0;
+    }
+    /**
+     * @param DataProviderInterface $dataProvider
+     * @return $this
+     */
+    public function applyToDataProvider(DataProviderInterface $dataProvider)
+    {
+        return $this->applyToQuery($dataProvider->query);
+    }
     /**
      * @param QueryInterface $activeQuery
      * @return $this
@@ -181,7 +181,7 @@ class PriceFiltersHandler extends Model
 
             $query->select([
                 'cms_content_element.*',
-                'realPrice' => '( currency.course * prices.price )'
+                'realPrice' => '( currency.course * prices.price )',
             ]);
 
             /*$query->leftJoin('shop_product', 'shop_product.id = cms_content_element.id');
@@ -208,29 +208,19 @@ class PriceFiltersHandler extends Model
 
         return $this;
     }
-
-    /**
-     * @param DataProviderInterface $dataProvider
-     * @return $this
-     */
-    public function applyToDataProvider(DataProviderInterface $dataProvider)
-    {
-        return $this->applyToQuery($dataProvider->query);
-    }
-
     public function render(ActiveForm $form)
     {
         return \Yii::$app->view->render($this->viewFile, [
-            'form' => $form,
-            'handler' => $this
+            'form'    => $form,
+            'handler' => $this,
         ]);
     }
 
     public function renderVisible(ActiveForm $form = null)
     {
         return \Yii::$app->view->render($this->viewFileVisible, [
-            'form' => $form,
-            'handler' => $this
+            'form'    => $form,
+            'handler' => $this,
         ]);
     }
 }

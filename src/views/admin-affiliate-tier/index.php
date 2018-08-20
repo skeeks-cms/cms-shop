@@ -13,20 +13,20 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'columns' =>
+    'columns'         =>
         [
             [
                 'attribute' => 'site_code',
-                'class' => \skeeks\cms\grid\SiteColumn::className(),
+                'class'     => \skeeks\cms\grid\SiteColumn::class,
             ],
 
             'rate1',
@@ -34,7 +34,7 @@
             'rate3',
             'rate4',
             'rate5',
-        ]
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

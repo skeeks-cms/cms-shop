@@ -10,7 +10,7 @@
 $widget = $this->context;
 ?>
 <?= $widget->form->field($widget->model, 'email')->textInput([
-    'type' => 'email',
+    'type'        => 'email',
     'placeholder' => 'email',
 ]); ?>
 <div style="display: none">

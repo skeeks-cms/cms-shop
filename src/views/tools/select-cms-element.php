@@ -9,8 +9,6 @@
 
 /* @var $model \yii\db\ActiveRecord */
 
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-
 ?>
 
 <?
@@ -79,11 +77,11 @@ $content_id = \Yii::$app->request->get('content_id');
     <?
 
     $dataProvider = new \yii\data\ActiveDataProvider([
-        'query' => \skeeks\cms\models\CmsContentElement::find()
+        'query' => \skeeks\cms\models\CmsContentElement::find(),
     ]);
 
 
-    $search = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsContentElement::className());
+    $search = new \skeeks\cms\models\Search(\skeeks\cms\models\CmsContentElement::class);
     $dataProvider = $search->search(\Yii::$app->request->queryParams);
     $searchModel = $search->loadedModel;
 
@@ -105,10 +103,10 @@ $content_id = \Yii::$app->request->get('content_id');
         foreach ($model as $name => $value) {
             $autoColumns[] = [
                 'attribute' => $name,
-                'visible' => false,
-                'format' => 'raw',
-                'class' => \yii\grid\DataColumn::className(),
-                'value' => function ($model, $key, $index) use ($name) {
+                'visible'   => false,
+                'format'    => 'raw',
+                'class'     => \yii\grid\DataColumn::class,
+                'value'     => function ($model, $key, $index) use ($name) {
                     if (is_array($model->{$name})) {
                         return implode(",", $model->{$name});
                     } else {
@@ -135,7 +133,7 @@ $content_id = \Yii::$app->request->get('content_id');
                 if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
                     $propertyType = $property->handler;
                     $options = \skeeks\cms\models\CmsContentElement::find()->active()->andWhere([
-                        'content_id' => $propertyType->content_id
+                        'content_id' => $propertyType->content_id,
                     ])->all();
 
                     $items = \yii\helpers\ArrayHelper::merge(['' => ''], \yii\helpers\ArrayHelper::map(
@@ -157,20 +155,20 @@ $content_id = \Yii::$app->request->get('content_id');
                     } else {
                         if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
                             $filter = \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel, $name, [
-                                'class' => 'form-control'
+                                'class' => 'form-control',
                             ]);
                         } else {
                             if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) {
-                                $filter = "<div class='row'><div class='col-md-6'>" . \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel,
+                                $filter = "<div class='row'><div class='col-md-6'>".\yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel,
                                         $searchRelatedPropertiesModel->getAttributeNameRangeFrom($name), [
-                                            'class' => 'form-control',
-                                            'placeholder' => 'от'
-                                        ]) . "</div><div class='col-md-6'>" .
+                                            'class'       => 'form-control',
+                                            'placeholder' => 'от',
+                                        ])."</div><div class='col-md-6'>".
                                     \yii\helpers\Html::activeTextInput($searchRelatedPropertiesModel,
                                         $searchRelatedPropertiesModel->getAttributeNameRangeTo($name), [
-                                            'class' => 'form-control',
-                                            'placeholder' => 'до'
-                                        ]) . "</div></div>";
+                                            'class'       => 'form-control',
+                                            'placeholder' => 'до',
+                                        ])."</div></div>";
                             }
                         }
                     }
@@ -179,13 +177,13 @@ $content_id = \Yii::$app->request->get('content_id');
 
                 $autoColumns[] = [
                     'attribute' => $name,
-                    'label' => \yii\helpers\ArrayHelper::getValue($model->relatedPropertiesModel->attributeLabels(),
+                    'label'     => \yii\helpers\ArrayHelper::getValue($model->relatedPropertiesModel->attributeLabels(),
                         $name),
-                    'visible' => false,
-                    'format' => 'raw',
-                    'filter' => $filter,
-                    'class' => \yii\grid\DataColumn::className(),
-                    'value' => function ($model, $key, $index) use ($name) {
+                    'visible'   => false,
+                    'format'    => 'raw',
+                    'filter'    => $filter,
+                    'class'     => \yii\grid\DataColumn::class,
+                    'value'     => function ($model, $key, $index) use ($name) {
                         /**
                          * @var $model \skeeks\cms\models\CmsContentElement
                          */
@@ -202,22 +200,22 @@ $content_id = \Yii::$app->request->get('content_id');
 
 
     }
-    $userColumns = include_once __DIR__ . "/_columns-select-cms-element.php";
+    $userColumns = include_once __DIR__."/_columns-select-cms-element.php";
 
     $columns = \yii\helpers\ArrayHelper::merge($userColumns, $autoColumns);
 
     ?>
 
     <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        'dataProvider'    => $dataProvider,
+        'filterModel'     => $searchModel,
         'enabledCheckbox' => false,
-        'autoColumns' => false,
-        'settingsData' =>
+        'autoColumns'     => false,
+        'settingsData'    =>
             [
-                'namespace' => \Yii::$app->controller->action->getUniqueId() . $content_id
+                'namespace' => \Yii::$app->controller->action->getUniqueId().$content_id,
             ],
-        'columns' => $columns
+        'columns'         => $columns,
     ]); ?>
 
 

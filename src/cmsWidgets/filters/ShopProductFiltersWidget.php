@@ -23,9 +23,9 @@ use yii\widgets\ActiveForm;
 
 /**
  * @property ShopTypePrice $typePrice;
- * @property CmsContent $cmsContent;
- * @property ShopContent $shopContent;
- * @property CmsContent $offerCmsContent;
+ * @property CmsContent    $cmsContent;
+ * @property ShopContent   $shopContent;
+ * @property CmsContent    $offerCmsContent;
  * @property []                 $childrenElementIds;
  *
  * Class ShopProductFiltersWidget
@@ -115,11 +115,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         return array_merge(parent::attributeLabels(),
             [
-                'content_id' => \Yii::t('skeeks/shop/app', 'Content'),
-                'searchModelAttributes' => \Yii::t('skeeks/shop/app', 'Fields'),
-                'realatedProperties' => \Yii::t('skeeks/shop/app', 'Properties'),
+                'content_id'             => \Yii::t('skeeks/shop/app', 'Content'),
+                'searchModelAttributes'  => \Yii::t('skeeks/shop/app', 'Fields'),
+                'realatedProperties'     => \Yii::t('skeeks/shop/app', 'Properties'),
                 'offerRelatedProperties' => \Yii::t('skeeks/shop/app', 'Offer properties'),
-                'type_price_id' => \Yii::t('skeeks/shop/app', 'Types of prices'),
+                'type_price_id'          => \Yii::t('skeeks/shop/app', 'Types of prices'),
             ]);
     }
 
@@ -137,9 +137,9 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
     public function renderConfigForm(ActiveForm $form)
     {
-        echo \Yii::$app->view->renderFile(__DIR__ . '/_form.php', [
-            'form' => $form,
-            'model' => $this
+        echo \Yii::$app->view->renderFile(__DIR__.'/_form.php', [
+            'form'  => $form,
+            'model' => $this,
         ], $this);
     }
 
@@ -184,7 +184,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
     public function getChildrenElementIds()
     {
         return array_keys(CmsContentElement::find()->andWhere([
-            'parent_content_element_id' => $this->elementIds
+            'parent_content_element_id' => $this->elementIds,
         ])->asArray()->indexBy('id')->all());
     }
 
@@ -271,7 +271,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
         if (in_array($property->property_type, [
             \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
-            \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+            \skeeks\cms\relatedProperties\PropertyType::CODE_LIST,
         ])) {
             $options = $this->getRelatedPropertyOptions($property);
             if (count($options) > 1) {
@@ -294,7 +294,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
     {
         $options = [];
 
-        $cacheKey = $this->cacheKey . "_rp_options_{$property->id}";
+        $cacheKey = $this->cacheKey."_rp_options_{$property->id}";
         $options = \Yii::$app->cache->get($cacheKey);
         if ($this->enableCache && $options) {
             return $options;
@@ -313,7 +313,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
             $propertyType = $property->handler;
 
             $options = \skeeks\cms\models\CmsContentElementProperty::find()->from([
-                'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
+                'map' => \skeeks\cms\models\CmsContentElementProperty::tableName(),
             ])
                 ->leftJoin(['e' => CmsContentElement::tableName()], 'e.id = map.value_enum')
                 ->select(['e.id as key', 'e.name as value', 'map.value_enum'])
@@ -322,6 +322,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 ->andWhere(['map.element_id' => $this->elementIds])
                 ->andWhere(['map.property_id' => $property->id])
                 ->andWhere(['>', 'map.value_enum', 0])
+                ->andWhere(['>', 'e.id', 0])
                 ->andWhere(['is not', 'map.value_enum', null])
                 ->asArray()
                 ->all();
@@ -337,7 +338,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
         } elseif ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
 
             $options = \skeeks\cms\models\CmsContentElementProperty::find()->from([
-                'map' => \skeeks\cms\models\CmsContentElementProperty::tableName()
+                'map' => \skeeks\cms\models\CmsContentElementProperty::tableName(),
             ])
                 ->leftJoin(['enum' => CmsContentPropertyEnum::tableName()], 'enum.id = map.value_enum')
                 //->leftJoin(['p' => CmsContentProperty::tableName()], 'p.id = enum.property_id')
@@ -347,6 +348,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
                 ->andWhere(['map.element_id' => $this->elementIds])
                 ->andWhere(['map.property_id' => $property->id])
                 ->andWhere(['>', 'map.value_enum', 0])
+                ->andWhere(['>', 'enum.id', 0])
                 ->andWhere(['is not', 'map.value_enum', null])
                 ->asArray()
                 ->all();
@@ -423,7 +425,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function getMaxValue($property)
     {
-        $cacheKey = $this->cacheKey . "_max_{$property->id}";
+        $cacheKey = $this->cacheKey."_max_{$property->id}";
         $value = \Yii::$app->cache->get($cacheKey);
         if (!$this->enableCache) {
             $value = null;
@@ -459,7 +461,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
      */
     public function getMinValue($property)
     {
-        $cacheKey = $this->cacheKey . "_min_{$property->id}";
+        $cacheKey = $this->cacheKey."_min_{$property->id}";
         $value = \Yii::$app->cache->get($cacheKey);
         if (!$this->enableCache) {
             $value = null;
@@ -503,7 +505,7 @@ class ShopProductFiltersWidget extends WidgetRenderable
 
         if (in_array($property->property_type, [
             \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT,
-            \skeeks\cms\relatedProperties\PropertyType::CODE_LIST
+            \skeeks\cms\relatedProperties\PropertyType::CODE_LIST,
         ])) {
             $options = $this->getOfferRelatedPropertyOptions($property);
             if (count($options) > 1) {

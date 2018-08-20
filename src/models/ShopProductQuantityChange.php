@@ -9,19 +9,19 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%shop_product_quantity_change}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $shop_product_id
- * @property double $quantity
- * @property double $quantity_reserved
- * @property integer $measure_id
- * @property double $measure_ratio
+ * @property integer     $id
+ * @property integer     $created_by
+ * @property integer     $updated_by
+ * @property integer     $created_at
+ * @property integer     $updated_at
+ * @property integer     $shop_product_id
+ * @property double      $quantity
+ * @property double      $quantity_reserved
+ * @property integer     $measure_id
+ * @property double      $measure_ratio
  *
  * @property ShopProduct $shopProduct
- * @property Measure $measure
+ * @property Measure     $measure
  */
 class ShopProductQuantityChange extends \skeeks\cms\models\Core
 {
@@ -45,9 +45,9 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
             [
                 ['measure_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Measure::className(),
-                'targetAttribute' => ['measure_id' => 'id']
+                'skipOnError'     => true,
+                'targetClass'     => Measure::class,
+                'targetAttribute' => ['measure_id' => 'id'],
             ],
         ]);
     }
@@ -58,12 +58,12 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::rules(), [
-            'id' => Yii::t('skeeks/shop/app', 'ID'),
-            'shop_product_id' => Yii::t('skeeks/shop/app', 'Shop Product ID'),
-            'quantity' => Yii::t('skeeks/shop/app', 'Available quantity'),
+            'id'                => Yii::t('skeeks/shop/app', 'ID'),
+            'shop_product_id'   => Yii::t('skeeks/shop/app', 'Shop Product ID'),
+            'quantity'          => Yii::t('skeeks/shop/app', 'Available quantity'),
             'quantity_reserved' => Yii::t('skeeks/shop/app', 'Reserved quantity'),
-            'measure_id' => Yii::t('skeeks/shop/app', 'Unit of measurement'),
-            'measure_ratio' => Yii::t('skeeks/shop/app', 'The coefficient unit'),
+            'measure_id'        => Yii::t('skeeks/shop/app', 'Unit of measurement'),
+            'measure_ratio'     => Yii::t('skeeks/shop/app', 'The coefficient unit'),
         ]);
     }
 
@@ -72,7 +72,7 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
      */
     public function getMeasure()
     {
-        return $this->hasOne(Measure::className(), ['id' => 'measure_id']);
+        return $this->hasOne(Measure::class, ['id' => 'measure_id']);
     }
 
     /**
@@ -80,6 +80,6 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
      */
     public function getShopProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'shop_product_id']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
 }

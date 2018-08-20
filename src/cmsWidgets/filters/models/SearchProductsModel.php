@@ -8,22 +8,9 @@
 
 namespace skeeks\cms\shop\cmsWidgets\filters\models;
 
-use skeeks\cms\base\Widget;
-use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\models\CmsContentElementTree;
-use skeeks\cms\models\Search;
-use skeeks\cms\models\Tree;
-use skeeks\cms\shop\cmsWidgets\filters\ShopProductFiltersWidget;
-use yii\base\InvalidParamException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\helpers\Json;
 
 /**
  * Class SearchProductsModel
@@ -54,11 +41,11 @@ class SearchProductsModel extends Model
     public function attributeLabels()
     {
         return [
-            'image' => \skeeks\cms\shop\Module::t('app', 'With photo'),
-            'price_from' => \skeeks\cms\shop\Module::t('app', 'Price from'),
-            'price_to' => \skeeks\cms\shop\Module::t('app', 'Price to'),
+            'image'         => \skeeks\cms\shop\Module::t('app', 'With photo'),
+            'price_from'    => \skeeks\cms\shop\Module::t('app', 'Price from'),
+            'price_to'      => \skeeks\cms\shop\Module::t('app', 'Price to'),
             'type_price_id' => \skeeks\cms\shop\Module::t('app', 'Price type'),
-            'hasQuantity' => \skeeks\cms\shop\Module::t('app', 'In stock')
+            'hasQuantity'   => \skeeks\cms\shop\Module::t('app', 'In stock'),
         ];
     }
 
@@ -96,7 +83,7 @@ class SearchProductsModel extends Model
 
             $query->select([
                 'cms_content_element.*',
-                'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = shop_product_price.currency_code) * shop_product_price.price )'
+                'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = shop_product_price.currency_code) * shop_product_price.price )',
             ]);
 
             $query->andWhere(['shop_product_price.type_price_id' => $this->type_price_id]);

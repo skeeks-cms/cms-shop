@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150901_170601_create_table__shop_tax_rate extends Migration
@@ -32,15 +31,15 @@ class m150901_170601_create_table__shop_tax_rate extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'tax_id' => $this->integer()->notNull(),
+            'tax_id'         => $this->integer()->notNull(),
             'person_type_id' => $this->integer()->notNull(),
 
             'value' => $this->decimal(18, 4)->notNull()->defaultValue(0),
 
-            'currency' => $this->string(3),
-            'is_percent' => $this->string(1)->notNull()->defaultValue('Y'),
+            'currency'    => $this->string(3),
+            'is_percent'  => $this->string(1)->notNull()->defaultValue('Y'),
             'is_in_price' => $this->string(1)->notNull()->defaultValue('N'),
-            'priority' => $this->integer(1)->notNull()->defaultValue(100),
+            'priority'    => $this->integer(1)->notNull()->defaultValue(100),
 
             'active' => $this->string(1)->notNull()->defaultValue("Y"),
 

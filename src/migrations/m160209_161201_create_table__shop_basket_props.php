@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m160209_161201_create_table__shop_basket_props extends Migration
@@ -34,9 +33,9 @@ class m160209_161201_create_table__shop_basket_props extends Migration
 
             'shop_basket_id' => $this->integer()->notNull(),
 
-            'name' => $this->string(255)->notNull(),
-            'value' => $this->string(255),
-            'code' => $this->string(255),
+            'name'     => $this->string(255)->notNull(),
+            'value'    => $this->string(255),
+            'code'     => $this->string(255),
             'priority' => $this->integer()->notNull()->defaultValue(100),
 
         ], $tableOptions);

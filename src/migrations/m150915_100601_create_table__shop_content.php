@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150915_100601_create_table__shop_content extends Migration
@@ -35,7 +34,7 @@ class m150915_100601_create_table__shop_content extends Migration
             'content_id' => $this->integer()->notNull()->unique(),
 
             'yandex_export' => $this->string(1)->notNull()->defaultValue("N"),
-            'subscription' => $this->string(1)->notNull()->defaultValue("N"),
+            'subscription'  => $this->string(1)->notNull()->defaultValue("N"),
 
             'vat_id' => $this->integer(),
 

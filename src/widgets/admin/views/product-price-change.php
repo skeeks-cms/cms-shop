@@ -14,12 +14,12 @@
         <?= \Yii::t('skeeks/shop/app', 'Changelog'); ?></a>
 
     <? $createModal = \yii\bootstrap\Modal::begin([
-        'id' => 'sx-price-change-' . $widget->id,
-        'size' => \yii\bootstrap\Modal::SIZE_LARGE,
-        'header' => '<b>' . \Yii::t('skeeks/shop/app',
-                'The history of price changes') . ": " . (($widget->productPrice && $widget->productPrice->typePrice) ? $widget->productPrice->typePrice->name : "Базовая цена") . '</b>',
+        'id'     => 'sx-price-change-'.$widget->id,
+        'size'   => \yii\bootstrap\Modal::SIZE_LARGE,
+        'header' => '<b>'.\Yii::t('skeeks/shop/app',
+                'The history of price changes').": ".(($widget->productPrice && $widget->productPrice->typePrice) ? $widget->productPrice->typePrice->name : "Базовая цена").'</b>',
         'footer' => '
-        <button type="button" class="btn btn-default" data-dismiss="modal">' . \Yii::t('skeeks/admin', 'Close') . '</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">'.\Yii::t('skeeks/admin', 'Close').'</button>
     ',
     ]); ?>
     <?
@@ -29,31 +29,31 @@
     ?>
     <?= \yii\grid\GridView::widget([
         'dataProvider' => new \yii\data\ActiveDataProvider([
-            'query' => $widget->productPrice->getShopProductPriceChanges(),
+            'query'      => $widget->productPrice->getShopProductPriceChanges(),
             'pagination' => [
-                'pageSize' => 10,
-                'pageParam' => 'page-' . $widget->id,
+                'pageSize'  => 10,
+                'pageParam' => 'page-'.$widget->id,
             ],
         ]),
-        'columns' =>
+        'columns'      =>
             [
                 [
-                    'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
-                    'label' => \Yii::t('skeeks/shop/app', 'Date and time changes')
+                    'class' => \skeeks\cms\grid\CreatedAtColumn::class,
+                    'label' => \Yii::t('skeeks/shop/app', 'Date and time changes'),
                 ],
 
                 [
-                    'class' => \yii\grid\DataColumn::className(),
+                    'class' => \yii\grid\DataColumn::class,
                     'label' => \Yii::t('skeeks/shop/app', 'Price'),
                     'value' => function (\skeeks\cms\shop\models\ShopProductPriceChange $model) {
-                        return \Yii::$app->money->intlFormatter()->format($model->money);
-                    }
+                        return (string)$model->money;
+                    },
                 ],
 
                 [
-                    'class' => \skeeks\cms\grid\CreatedByColumn::className()
+                    'class' => \skeeks\cms\grid\CreatedByColumn::class,
                 ],
-            ]
+            ],
     ]); ?>
 
     <?

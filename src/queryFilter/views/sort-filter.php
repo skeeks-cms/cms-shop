@@ -20,5 +20,5 @@ JS
 );
 ?>
 <?= $form->field($handler, 'value')->listBox($handler->getSortOptions(), [
-    'size' => 1
+    'size' => 1,
 ]); ?>

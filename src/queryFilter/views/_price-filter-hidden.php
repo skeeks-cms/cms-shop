@@ -12,9 +12,9 @@ $widget = $this->context;
 ?>
 <div class="sx-hidden-filters">
     <?= $form->field($handler, 'from')->textInput([
-        'data-value' => 'sx-price-from'
+        'data-value' => 'sx-price-from',
     ]) ?>
     <?= $form->field($handler, 'to')->textInput([
-        'data-value' => 'sx-price-from'
+        'data-value' => 'sx-price-from',
     ]) ?>
 </div>

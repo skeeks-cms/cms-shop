@@ -14,18 +14,18 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'settingsData' =>
+    'settingsData'    =>
         [
-            'order' => SORT_ASC,
+            'order'   => SORT_ASC,
             'orderBy' => "priority",
         ],
 
@@ -35,24 +35,24 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
 
             [
                 'attribute' => 'name',
-                'label' => \Yii::t('skeeks/shop/app', 'Name of the program'),
+                'label'     => \Yii::t('skeeks/shop/app', 'Name of the program'),
             ],
 
             [
                 'attribute' => 'active',
-                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedByColumn::className()
+                'class' => \skeeks\cms\grid\UpdatedByColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className()
+                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
             ],
 
             'priority',
-        ]
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

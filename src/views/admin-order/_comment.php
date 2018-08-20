@@ -6,12 +6,10 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
-
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
 ?>
 
 <p><?= $model->comments; ?></p>
-<a href="#sx-comment" class="btn btn-default btn-xs sx-fancybox"><?= \Yii::t('skeeks/shop/app', 'Change') ?><a>
+<a  href="#" data-toggle="modal" data-target="#sx-comment" class="sx-dashed" class="btn btn-default btn-xs"><?= \Yii::t('skeeks/shop/app', 'Change') ?><a>
 

@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150927_100558_alter_table__shop_fuser extends Migration
@@ -19,7 +18,7 @@ class m150927_100558_alter_table__shop_fuser extends Migration
         $this->addColumn('{{%shop_fuser}}', 'delivery_code', $this->string(50));
         $this->addColumn('{{%shop_fuser}}', 'buyer_id', $this->integer());
         $this->addColumn('{{%shop_fuser}}', 'pay_system_id', $this->integer());
-       
+
         $this->addForeignKey(
             'shop_fuser__pay_system_id', "{{%shop_fuser}}",
             'pay_system_id', '{{%shop_pay_system}}', 'id', 'SET NULL', 'SET NULL'

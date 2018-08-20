@@ -36,12 +36,12 @@ class ShopGlobalWidget extends Widget
     public function baseClientOptions()
     {
         return [
-            'backend-add-product' => UrlHelper::construct('shop/cart/add-product')->toString(),
-            'backend-remove-basket' => UrlHelper::construct('shop/cart/remove-basket')->toString(),
-            'backend-update-basket' => UrlHelper::construct('shop/cart/update-basket')->toString(),
-            'backend-clear-cart' => UrlHelper::construct('shop/cart/clear')->toString(),
+            'backend-add-product'            => UrlHelper::construct('shop/cart/add-product')->toString(),
+            'backend-remove-basket'          => UrlHelper::construct('shop/cart/remove-basket')->toString(),
+            'backend-update-basket'          => UrlHelper::construct('shop/cart/update-basket')->toString(),
+            'backend-clear-cart'             => UrlHelper::construct('shop/cart/clear')->toString(),
             'backend-remove-discount-coupon' => UrlHelper::construct('shop/cart/remove-discount-coupon')->toString(),
-            'backend-add-discount-coupon' => UrlHelper::construct('shop/cart/add-discount-coupon')->toString(),
+            'backend-add-discount-coupon'    => UrlHelper::construct('shop/cart/add-discount-coupon')->toString(),
         ];
     }
 
@@ -54,7 +54,7 @@ class ShopGlobalWidget extends Widget
         if (static::$isRegisteredAssets === false) {
             ShopAsset::register($this->getView());
             $options = (array)$this->clientOptions;
-            $options['cartData'] = \Yii::$app->shop->shopFuser->jsonSerialize();
+            $options['cartData'] = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
 
             $options = Json::encode($options);
 

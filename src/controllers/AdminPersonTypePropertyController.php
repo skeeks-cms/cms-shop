@@ -10,9 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsTreeTypeProperty;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
 use skeeks\cms\shop\models\ShopPersonTypeProperty;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -29,7 +27,7 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Control of properties payer');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopPersonTypeProperty::className();
+        $this->modelClassName = ShopPersonTypeProperty::class;
 
         parent::init();
 
@@ -81,7 +79,8 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
                 $handler->load(\Yii::$app->request->post());
 
                 if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handler->validate()) {
+                    && $model->validate() && $handler->validate()
+                ) {
                     $model->save();
 
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
@@ -92,14 +91,14 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
                             ->toString()
                     );
                 } else {
-                    \Yii::error(Json::encode($model->errors), self::className());
+                    \Yii::error(Json::encode($model->errors), self::class);
                     \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms', 'Could not save'));
                 }
             }
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }
@@ -129,7 +128,8 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
                     $handler->load(\Yii::$app->request->post());
 
                     if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handler->validate()) {
+                        && $model->validate() && $handler->validate()
+                    ) {
                         $model->save();
 
                         \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
@@ -150,7 +150,7 @@ class AdminPersonTypePropertyController extends AdminModelEditorController
         }
 
         return $this->render('_form', [
-            'model' => $model,
+            'model'   => $model,
             'handler' => $handler,
         ]);
     }

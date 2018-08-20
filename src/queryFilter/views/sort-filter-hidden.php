@@ -12,6 +12,6 @@ $widget = $this->context;
 ?>
 <div class="sx-hidden-filters">
     <?= $form->field($handler, 'value')->textInput([
-        'data-value' => 'sx-sort'
+        'data-value' => 'sx-sort',
     ]) ?>
 </div>

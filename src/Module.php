@@ -18,6 +18,6 @@ class Module extends \yii\base\Module
 
     public static function t($category, $message, $params = [], $language = null)
     {
-        return \Yii::t('skeeks/shop/' . $category, $message, $params, $language);
+        return \Yii::t('skeeks/shop/'.$category, $message, $params, $language);
     }
 }

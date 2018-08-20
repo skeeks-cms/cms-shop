@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
@@ -28,7 +27,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Currency amount paid orders and discounts')); ?>
 <?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
-    \skeeks\modules\cms\money\models\Currency::find()->active()->all(), 'code', 'code'
+    \skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(), 'code', 'code'
 )); ?>
 
 <?= $form->fieldSetEnd(); ?>
@@ -52,10 +51,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 <? \yii\bootstrap\Alert::end() ?>
 
 <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-    'permissionName' => $model->permissionName,
+    'permissionName'        => $model->permissionName,
     'permissionDescription' => \Yii::t('skeeks/shop/app',
-            'Groups of users who can benefit from discounted rates') . ": '{$model->name}'",
-    'label' => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
+            'Groups of users who can benefit from discounted rates').": '{$model->name}'",
+    'label'                 => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
 ]); ?>
 
 <?= $form->fieldSetEnd(); ?>

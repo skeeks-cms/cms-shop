@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m161220_110601_create_table__shop_product_quantity_change extends Migration
@@ -34,22 +33,22 @@ class m161220_110601_create_table__shop_product_quantity_change extends Migratio
 
             'shop_product_id' => $this->integer()->notNull(),
 
-            'quantity' => $this->double()->notNull()->defaultValue(0),
+            'quantity'          => $this->double()->notNull()->defaultValue(0),
             'quantity_reserved' => $this->double()->notNull()->defaultValue(0),
-            'measure_id' => $this->integer(),
-            'measure_ratio' => $this->double()->notNull()->defaultValue(1),
+            'measure_id'        => $this->integer(),
+            'measure_ratio'     => $this->double()->notNull()->defaultValue(1),
 
         ], $tableOptions);
 
 
-        $this->createIndex($tableName . '__updated_by', $tableName, 'updated_by');
-        $this->createIndex($tableName . '__created_by', $tableName, 'created_by');
-        $this->createIndex($tableName . '__created_at', $tableName, 'created_at');
-        $this->createIndex($tableName . '__updated_at', $tableName, 'updated_at');
-        $this->createIndex($tableName . '__quantity', $tableName, 'quantity');
-        $this->createIndex($tableName . '__quantity_reserved', $tableName, 'quantity_reserved');
-        $this->createIndex($tableName . '__measure_ratio', $tableName, 'measure_ratio');
-        $this->createIndex($tableName . '__measure_id', $tableName, 'measure_id');
+        $this->createIndex($tableName.'__updated_by', $tableName, 'updated_by');
+        $this->createIndex($tableName.'__created_by', $tableName, 'created_by');
+        $this->createIndex($tableName.'__created_at', $tableName, 'created_at');
+        $this->createIndex($tableName.'__updated_at', $tableName, 'updated_at');
+        $this->createIndex($tableName.'__quantity', $tableName, 'quantity');
+        $this->createIndex($tableName.'__quantity_reserved', $tableName, 'quantity_reserved');
+        $this->createIndex($tableName.'__measure_ratio', $tableName, 'measure_ratio');
+        $this->createIndex($tableName.'__measure_id', $tableName, 'measure_id');
 
         $this->addCommentOnTable($tableName, 'Changes in the quantity of products');
 

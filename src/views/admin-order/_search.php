@@ -22,13 +22,13 @@ if ($filter->id) {
 }
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\filters\AdminFiltersForm::begin([
-    'action' => '/' . \Yii::$app->request->pathInfo,
+    'action' => '/'.\Yii::$app->request->pathInfo,
 ]); ?>
 
 <?= $form->field($filter, 'id')->setVisible(); ?>
 
 <?= $form->field($searchModel, 'canceled')->listBox([
-    '' => null,
+    ''  => null,
     'Y' => \Yii::t('skeeks/shop/app', 'Yes'),
     'N' => \Yii::t('skeeks/shop/app', 'No'),
 ], ['size' => 1]); ?>

@@ -3,9 +3,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
-use Yii;
 use yii\base\Event;
-use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -16,15 +14,18 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $code
- * @property string $name
- * @property string $description
+ * @property string  $code
+ * @property string  $name
+ * @property string  $description
  * @property integer $priority
- * @property string $def
- * @property string $xml_id
+ * @property string  $def
+ * @property string  $xml_id
  *
- * @property string $buyPermissionName
- * @property string $viewPermissionName
+ * ***
+ *
+ * @property string  $isDefault
+ * @property string  $buyPermissionName
+ * @property string  $viewPermissionName
  */
 class ShopTypePrice extends \skeeks\cms\models\Core
 {
@@ -56,7 +57,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
         if ($this->def == Cms::BOOL_Y) {
             static::updateAll(
                 [
-                    'def' => Cms::BOOL_N
+                    'def' => Cms::BOOL_N,
                 ],
                 ['!=', 'id', $this->id]
             );
@@ -73,7 +74,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
         //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
         if ($this->def == Cms::BOOL_Y) {
             static::updateAll([
-                'def' => Cms::BOOL_N
+                'def' => Cms::BOOL_N,
             ]);
         }
     }
@@ -91,7 +92,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             [['name'], 'string', 'max' => 255],
             [['xml_id'], 'string', 'max' => 255],
             [['def'], 'string', 'max' => 1],
-            [['code'], 'unique']
+            [['code'], 'unique'],
         ]);
     }
 
@@ -101,11 +102,11 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code' => \Yii::t('skeeks/shop/app', 'Code'),
-            'name' => \Yii::t('skeeks/shop/app', 'Name'),
+            'code'        => \Yii::t('skeeks/shop/app', 'Code'),
+            'name'        => \Yii::t('skeeks/shop/app', 'Name'),
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
-            'priority' => \Yii::t('skeeks/shop/app', 'Priority'),
-            'def' => \Yii::t('skeeks/shop/app', 'Default'),
+            'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
+            'def'         => \Yii::t('skeeks/shop/app', 'Default'),
         ]);
     }
 
@@ -115,7 +116,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
      */
     public function getViewPermissionName()
     {
-        return "view-shop-type-price-" . $this->id;
+        return "view-shop-type-price-".$this->id;
     }
 
     /**
@@ -123,6 +124,14 @@ class ShopTypePrice extends \skeeks\cms\models\Core
      */
     public function getBuyPermissionName()
     {
-        return "view-shop-type-price-" . $this->id;
+        return "view-shop-type-price-".$this->id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsDefault()
+    {
+        return (bool)($this->def == 'Y');
     }
 }

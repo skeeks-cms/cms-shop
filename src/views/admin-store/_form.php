@@ -1,10 +1,8 @@
 <?php
 
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-use skeeks\cms\models\Tree;
-use skeeks\cms\modules\admin\widgets\Pjax;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\models\CmsContentElement */
@@ -66,13 +64,13 @@ if ($model->isNewRecord) {
 <?= $form->fieldRadioListBoolean($model, 'active'); ?>
 <div class="row">
     <div class="col-md-3">
-        <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::classname(), [
+        <?= $form->field($model, 'published_at')->widget(\kartik\datecontrol\DateControl::class, [
             //'displayFormat' => 'php:d-M-Y H:i:s',
             'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
         ]); ?>
     </div>
     <div class="col-md-3">
-        <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::classname(), [
+        <?= $form->field($model, 'published_to')->widget(\kartik\datecontrol\DateControl::class, [
             //'displayFormat' => 'php:d-M-Y H:i:s',
             'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
         ]); ?>
@@ -88,14 +86,14 @@ if ($model->isNewRecord) {
     <?= $form->field($model, 'parent_content_element_id')->widget(
         \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
         [
-            'content_id' => $contentModel->parent_content_id
+            'content_id' => $contentModel->parent_content_id,
         ]
     )->label($contentModel->parentContent->name_one) ?>
 <? endif; ?>
 
 <? if ($model->relatedProperties) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/cms', 'Additional properties')
+        'content' => \Yii::t('skeeks/cms', 'Additional properties'),
     ]); ?>
     <? if ($properties = $model->relatedProperties) : ?>
         <? foreach ($properties as $property) : ?>
@@ -120,11 +118,11 @@ if ($model->isNewRecord) {
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Announcement')); ?>
 <?= $form->field($model, 'image_id')->widget(
-    \skeeks\cms\widgets\formInputs\StorageImage::className()
+    \skeeks\cms\widgets\formInputs\StorageImage::class
 ); ?>
 
 <?= $form->field($model, 'description_short')->widget(
-    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::class,
     [
         'modelAttributeSaveType' => 'description_short_type',
     ]);
@@ -135,11 +133,11 @@ if ($model->isNewRecord) {
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'In detal')); ?>
 
 <?= $form->field($model, 'image_full_id')->widget(
-    \skeeks\cms\widgets\formInputs\StorageImage::className()
+    \skeeks\cms\widgets\formInputs\StorageImage::class
 ); ?>
 
 <?= $form->field($model, 'description_full')->widget(
-    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::className(),
+    \skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget::class,
     [
         'modelAttributeSaveType' => 'description_full_type',
     ]);
@@ -155,7 +153,7 @@ if ($model->isNewRecord) {
     <? if ($contentModel->is_allow_change_tree == \skeeks\cms\components\Cms::BOOL_Y) : ?>
         <?= $form->fieldSelect($model, 'tree_id',
             \skeeks\cms\helpers\TreeOptions::getAllMultiOptions($contentModel->root_tree_id), [
-                'allowDeselect' => true
+                'allowDeselect' => true,
             ]
         );
         ?>
@@ -173,10 +171,10 @@ if ($model->isNewRecord) {
     }
     ?>
     <?= $form->field($model, 'treeIds')->label(\Yii::t('skeeks/shop/app', 'Sections of the site'))->widget(
-        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::className(),
+        \skeeks\cms\widgets\formInputs\selectTree\SelectTree::class,
         [
             "attributeMulti" => "treeIds",
-            "mode" => $mode
+            "mode"           => $mode,
         ])->hint(\Yii::t('skeeks/shop/app', 'Specify sections of the site, which would like to see this publication'));
     ?>
 <? endif; ?>
@@ -197,11 +195,11 @@ if ($model->isNewRecord) {
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Images/Files')); ?>
 
 <?= $form->field($model, 'images')->widget(
-    \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    \skeeks\cms\widgets\formInputs\ModelStorageFiles::class
 ); ?>
 
 <?= $form->field($model, 'files')->widget(
-    \skeeks\cms\widgets\formInputs\ModelStorageFiles::className()
+    \skeeks\cms\widgets\formInputs\ModelStorageFiles::class
 ); ?>
 
 <?= $form->fieldSetEnd() ?>
@@ -219,9 +217,9 @@ if ($model->isNewRecord) {
     <? if ($model->cmsContent->access_check_element == "Y") : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-            'permissionName' => $model->permissionName,
-            'permissionDescription' => \Yii::t('skeeks/shop/app', 'Access to this member') . ': ' . $model->name,
-            'label' => \Yii::t('skeeks/shop/app', 'Access to this member'),
+            'permissionName'        => $model->permissionName,
+            'permissionDescription' => \Yii::t('skeeks/shop/app', 'Access to this member').': '.$model->name,
+            'label'                 => \Yii::t('skeeks/shop/app', 'Access to this member'),
         ]); ?>
         <?= $form->fieldSetEnd() ?>
     <? endif; ?>

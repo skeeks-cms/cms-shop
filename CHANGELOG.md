@@ -1,8 +1,27 @@
 Changelog
 ==============
 
-2.0.1.pre
+2.2.1
 -----------------
+ * Promocodes
+ 
+2.2.0
+-----------------
+ * Updated
+ 
+2.1.1
+-----------------
+ * Fixed delivery
+ 
+2.1.0
+-----------------
+ * New module money
+ * Update filters widget
+ 
+2.0.1
+-----------------
+ * Copy elements
+ * Link on page with item
  * Fixed update price parent content element 
  
 2.0.1-alpha10

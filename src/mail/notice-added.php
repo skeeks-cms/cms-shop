@@ -19,16 +19,16 @@ use skeeks\cms\mail\helpers\Html;
 <?= Html::beginTag('p'); ?>
 
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
+    'model'      => $model,
     'attributes' =>
         [
             [
                 'attribute' => 'created_at',
-                'value' => \Yii::$app->formatter->asDatetime($model->created_at)
+                'value'     => \Yii::$app->formatter->asDatetime($model->created_at),
             ],
             'email',
             'name',
-        ]
+        ],
 ]); ?>
 <?= Html::endTag('p'); ?>
 
@@ -41,50 +41,50 @@ use skeeks\cms\mail\helpers\Html;
 <?=
 \yii\grid\GridView::widget([
     'dataProvider' => new \yii\data\ArrayDataProvider([
-        'allModels' => $model->getShopProduct()->all()
+        'allModels' => $model->getShopProduct()->all(),
     ]),
-    'layout' => "{items}",
-    'columns' =>
+    'layout'       => "{items}",
+    'columns'      =>
         [
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
+                'value'  => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
                     if ($shopProduct->cmsContentElement->image) {
                         return Html::img($shopProduct->cmsContentElement->image->absoluteSrc, ['width' => 80]);
                     }
-                }
+                },
             ],
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'name',
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
+                'format'    => 'raw',
+                'value'     => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
                     if ($shopProduct->cmsContentElement->absoluteUrl) {
                         return Html::a($shopProduct->cmsContentElement->name,
                             $shopProduct->cmsContentElement->absoluteUrl, [
-                                'target' => '_blank',
-                                'titla' => "Смотреть на сайте",
-                                'data-pjax' => 0
+                                'target'    => '_blank',
+                                'titla'     => "Смотреть на сайте",
+                                'data-pjax' => 0,
                             ]);
                     } else {
                         return $shopProduct->cmsContentElement->name;
                     }
 
-                }
+                },
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \Yii::t('skeeks/shop/app', 'Price'),
+                'class'     => \yii\grid\DataColumn::class,
+                'label'     => \Yii::t('skeeks/shop/app', 'Price'),
                 'attribute' => 'price',
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
-                    return \Yii::$app->money->intlFormatter()->format($shopProduct->baseProductPrice->money) . "<br />";
-                }
+                'format'    => 'raw',
+                'value'     => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
+                    return (string)$shopProduct->baseProductPrice->money."<br />";
+                },
             ],
-        ]
+        ],
 ])
 ?>
 <?= Html::endTag('p'); ?>

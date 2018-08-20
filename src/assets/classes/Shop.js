@@ -4,8 +4,7 @@
  * @copyright 2010 SkeekS (СкикС)
  * @date 03.04.2015
  */
-(function(sx, $, _)
-{
+(function (sx, $, _) {
     sx.createNamespace('classes.shop', sx);
 
     /**
@@ -31,15 +30,13 @@
      */
     sx.classes.shop._App = sx.classes.Component.extend({
 
-        _init: function()
-        {
+        _init: function () {
             var self = this;
             this.carts = [];
 
-            this.bind('removeBasket addProduct updateBasket clearCart addDiscountCoupon removeDiscountCoupon', function(e, data)
-            {
+            this.bind('removeBasket addProduct updateBasket clearCart addDiscountCoupon removeDiscountCoupon', function (e, data) {
                 self.trigger('change', {
-                    'Shop' : this
+                    'Shop': this
                 });
             });
         },
@@ -47,26 +44,20 @@
         /**
          * @returns {sx.classes.AjaxQuery}
          */
-        ajaxQuery: function()
-        {
+        ajaxQuery: function () {
             return sx.ajax.preparePostQuery('/');
         },
 
         /**
          * @param Cart
          */
-        registerCart: function(Cart)
-        {
-            if (!Cart instanceof sx.classes.shop._Cart)
-            {
+        registerCart: function (Cart) {
+            if (!Cart instanceof sx.classes.shop._Cart) {
                 throw new Error("Cart object must be instanceof sx.classes.shop._Cart");
             }
 
             this.carts.push(Cart);
         },
-
-
-
 
 
         /**
@@ -75,8 +66,7 @@
          * @param coupon_code
          * @returns {sx.classes.shop._App}
          */
-        addDiscountCoupon: function(coupon_code)
-        {
+        addDiscountCoupon: function (coupon_code) {
             this.createAjaxAddDiscountCoupon().execute();
             return this;
         },
@@ -87,37 +77,31 @@
          * @param coupon_code
          * @returns {*|sx.classes.AjaxQuery}
          */
-        createAjaxAddDiscountCoupon: function(coupon_code)
-        {
+        createAjaxAddDiscountCoupon: function (coupon_code) {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-add-discount-coupon'));
 
             ajax.setData({
-                'coupon_code'    : coupon_code,
+                'coupon_code': coupon_code,
             });
 
-            ajax.onBeforeSend(function(e, data)
-            {
+            ajax.onBeforeSend(function (e, data) {
                 self.trigger('beforeAddDiscountCoupon', {
-                    'coupon_code'    : coupon_code,
+                    'coupon_code': coupon_code,
                 });
             });
 
-            ajax.onSuccess(function(e, data)
-            {
+            ajax.onSuccess(function (e, data) {
                 self.set('cartData', data.response.data);
 
                 self.trigger('addDiscountCoupon', {
-                    'coupon_code'    : coupon_code,
-                    'response'      : data.response,
+                    'coupon_code': coupon_code,
+                    'response': data.response,
                 });
             });
 
             return ajax;
         },
-
-
-
 
 
         /**
@@ -126,8 +110,7 @@
          * @param coupon_code
          * @returns {sx.classes.shop._App}
          */
-        removeDiscountCoupon: function(coupon_id)
-        {
+        removeDiscountCoupon: function (coupon_id) {
             this.createAjaxRemoveDiscountCoupon(coupon_id).execute();
             return this;
         },
@@ -138,37 +121,31 @@
          * @param coupon_code
          * @returns {*|sx.classes.AjaxQuery}
          */
-        createAjaxRemoveDiscountCoupon: function(coupon_id)
-        {
+        createAjaxRemoveDiscountCoupon: function (coupon_id) {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-remove-discount-coupon'));
 
             ajax.setData({
-                'coupon_id'    : coupon_id,
+                'coupon_id': coupon_id,
             });
 
-            ajax.onBeforeSend(function(e, data)
-            {
+            ajax.onBeforeSend(function (e, data) {
                 self.trigger('beforeRemoveDiscountCoupon', {
-                    'coupon_id'    : coupon_id,
+                    'coupon_id': coupon_id,
                 });
             });
 
-            ajax.onSuccess(function(e, data)
-            {
+            ajax.onSuccess(function (e, data) {
                 self.set('cartData', data.response.data);
 
                 self.trigger('removeDiscountCoupon', {
-                    'coupon_id'    : coupon_id,
-                    'response'      : data.response,
+                    'coupon_id': coupon_id,
+                    'response': data.response,
                 });
             });
 
             return ajax;
         },
-
-
-
 
 
         /**
@@ -179,45 +156,41 @@
          * @param additional
          * @returns {*|sx.classes.AjaxQuery}
          */
-        createAjaxAddProduct: function(product_id, quantity, additional)
-        {
+        createAjaxAddProduct: function (product_id, quantity, additional) {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-add-product'));
 
             additional = additional || {};
             quantity = quantity || 0;
 
-            product_id  = Number(product_id);
-            quantity    = Number(quantity);
+            product_id = Number(product_id);
+            quantity = Number(quantity);
 
-            if (quantity <= 0)
-            {
+            if (quantity <= 0) {
                 quantity = 1;
             }
 
 
             ajax.setData({
-                'product_id'    : product_id,
-                'quantity'      : quantity,
-                'additional'    : additional,
+                'product_id': product_id,
+                'quantity': quantity,
+                'additional': additional,
             });
 
-            ajax.onBeforeSend(function(e, data)
-            {
+            ajax.onBeforeSend(function (e, data) {
                 self.trigger('beforeAddProduct', {
-                    'product_id'    : product_id,
-                    'quantity'      : quantity,
+                    'product_id': product_id,
+                    'quantity': quantity,
                 });
             });
 
-            ajax.onSuccess(function(e, data)
-            {
+            ajax.onSuccess(function (e, data) {
                 self.set('cartData', data.response.data);
 
                 self.trigger('addProduct', {
-                    'product_id'    : product_id,
-                    'quantity'      : quantity,
-                    'response'      : data.response,
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'response': data.response,
                 });
             });
 
@@ -232,13 +205,10 @@
          * @param additional
          * @returns {sx.classes.shop._App}
          */
-        addProduct: function(product_id, quantity, additional)
-        {
+        addProduct: function (product_id, quantity, additional) {
             this.createAjaxAddProduct(product_id, quantity, additional).execute();
             return this;
         },
-
-
 
 
         /**
@@ -247,8 +217,7 @@
          * @param basket_id
          * @returns {sx.classes.shop._App}
          */
-        removeBasket: function(basket_id)
-        {
+        removeBasket: function (basket_id) {
             this.createAjaxRemoveBasket(basket_id).execute();
             return this;
         },
@@ -259,29 +228,26 @@
          * @param basket_id
          * @returns {*|sx.classes.AjaxQuery}
          */
-        createAjaxRemoveBasket: function(basket_id)
-        {
+        createAjaxRemoveBasket: function (basket_id) {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-remove-basket'));
 
             ajax.setData({
-                'basket_id' : Number(basket_id),
+                'basket_id': Number(basket_id),
             });
 
-            ajax.onBeforeSend(function(e, data)
-            {
+            ajax.onBeforeSend(function (e, data) {
                 self.trigger('beforeRemoveBasket', {
-                    'basket_id' : basket_id,
+                    'basket_id': basket_id,
                 });
             });
 
-            ajax.onSuccess(function(e, data)
-            {
+            ajax.onSuccess(function (e, data) {
                 self.set('cartData', data.response.data);
 
                 self.trigger('removeBasket', {
-                    'basket_id'    : basket_id,
-                    'response'     : data.response,
+                    'basket_id': basket_id,
+                    'response': data.response,
                 });
             });
 
@@ -294,35 +260,32 @@
          * @param basket_id
          * @returns {*|sx.classes.AjaxQuery}
          */
-        createAjaxUpdateBasket: function(basket_id, quantity, additional)
-        {
+        createAjaxUpdateBasket: function (basket_id, quantity, additional) {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-update-basket'));
 
             additional = additional || {};
 
             ajax.setData({
-                'basket_id'     : Number(basket_id),
-                'quantity'      : Number(quantity),
-                'additional'    : additional,
+                'basket_id': Number(basket_id),
+                'quantity': Number(quantity),
+                'additional': additional,
             });
 
-            ajax.onBeforeSend(function(e, data)
-            {
+            ajax.onBeforeSend(function (e, data) {
                 self.trigger('beforeUpdateBasket', {
-                    'basket_id'     : basket_id,
-                    'quantity'      : quantity,
+                    'basket_id': basket_id,
+                    'quantity': quantity,
                 });
             });
 
-            ajax.onSuccess(function(e, data)
-            {
+            ajax.onSuccess(function (e, data) {
                 self.set('cartData', data.response.data);
 
                 self.trigger('updateBasket', {
-                    'basket_id'     : basket_id,
-                    'quantity'      : quantity,
-                    'response'      : data.response,
+                    'basket_id': basket_id,
+                    'quantity': quantity,
+                    'response': data.response,
                 });
             });
 
@@ -337,8 +300,7 @@
          * @param additional
          * @returns {sx.classes.shop._App}
          */
-        updateBasket: function(basket_id, quantity, additional)
-        {
+        updateBasket: function (basket_id, quantity, additional) {
             this.createAjaxUpdateBasket(basket_id, quantity, additional).execute();
             return this;
         },
@@ -349,22 +311,19 @@
          *
          * @returns {*|sx.classes.AjaxQuery}
          */
-        createAjaxClearCart: function()
-        {
+        createAjaxClearCart: function () {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-clear-cart'));
 
-            ajax.onBeforeSend(function(e, data)
-            {
+            ajax.onBeforeSend(function (e, data) {
                 self.trigger('beforeClearCart');
             });
 
-            ajax.onSuccess(function(e, data)
-            {
+            ajax.onSuccess(function (e, data) {
                 self.set('cartData', data.response.data);
 
                 self.trigger('clearCart', {
-                    'response'      : data.response,
+                    'response': data.response,
                 });
             });
 
@@ -377,12 +336,10 @@
          *
          * @returns {sx.classes.shop._App}
          */
-        clearCart: function()
-        {
+        clearCart: function () {
             this.createAjaxClearCart().execute();
             return this;
         },
-
 
 
         /**
@@ -390,8 +347,7 @@
          *
          * @returns {Number|number}
          */
-        getCountShopBaskets: function()
-        {
+        getCountShopBaskets: function () {
             return Number(this.get('cartData').countShopBaskets);
         },
 
@@ -403,21 +359,19 @@
          *
          * @param buyer
          */
-        saveBuyer: function(buyer)
-        {
+        saveBuyer: function (buyer) {
             var self = this;
 
             this.trigger('beforeSaveBuyer');
 
             var ajax = this.ajaxQuery().setUrl(this.get('backend-update-buyer'));
             ajax.setData({
-                'buyer' : buyer
+                'buyer': buyer
             });
 
-            ajax.onSuccess(function(e, data)
-            {
+            ajax.onSuccess(function (e, data) {
                 self.trigger('saveBuyer', {
-                    'response'      : data.response,
+                    'response': data.response,
                 });
             });
 

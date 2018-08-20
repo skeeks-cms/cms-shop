@@ -6,18 +6,13 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopBasket */
 
-if (\Yii::$app->request->get('order_id') && $model->isNewRecord) {
-    $model->order_id = \Yii::$app->request->get('order_id');
-}
-
-if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
-    $model->fuser_id = \Yii::$app->request->get('fuser_id');
+if (\Yii::$app->request->get('shop_order_id') && $model->isNewRecord) {
+    $model->shop_order_id = \Yii::$app->request->get('shop_order_id');
 }
 
 ?>
@@ -27,18 +22,17 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
 <? if ($model->isNewRecord) : ?>
-    <?= $form->field($model, 'order_id')->hiddenInput()->label(false); ?>
-    <?= $form->field($model, 'fuser_id')->hiddenInput()->label(false); ?>
+    <?= $form->field($model, 'shop_order_id')->hiddenInput()->label(false); ?>
 <? endif; ?>
-
-    <div style="display: none;">
-        <?= $form->field($model, 'product_id')->widget(
-            \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-            [
-                'dialogRoute' => ['/shop/admin-cms-content-element']
-            ]
-        ); ?>
-    </div>
+<!--
+<div style="display: none;">
+    <?/*= $form->field($model, 'shop_product_id')->widget(
+        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+        [
+            'dialogRoute' => ['/shop/admin-cms-content-element'],
+        ]
+    ); */?>
+</div>-->
 
 <?= $form->field($model, 'name'); ?>
 
@@ -57,13 +51,13 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
 
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($model, 'price')->textInput(); ?>
+            <?= $form->field($model, 'amount')->textInput(); ?>
 
         </div>
 
         <div class="col-md-2">
             <?= $form->field($model, 'currency_code')->listBox(
-                \yii\helpers\ArrayHelper::map(\skeeks\modules\cms\money\models\Currency::find()->active()->all(),
+                \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(),
                     'code', 'code')
                 , ['size' => 1]
             ); ?>
@@ -85,18 +79,18 @@ if (\Yii::$app->request->get('fuser_id') && $model->isNewRecord) {
 $this->registerJs(<<<JS
 _.each(sx.components, function(Component, key)
 {
-    if (Component instanceof sx.classes.SelectModelDialog)
+    /*if (Component instanceof sx.classes.SelectModelDialog)
     {
         Component.bind('change', function(e, data)
         {
             $('#shopbasket-name').val(data.name);
             $('#shopbasket-quantity').val(1);
-            $('#shopbasket-price').val(data.basePrice.price);
+            $('#shopbasket-amount').val(data.basePrice.amount);
             $('#shopbasket-currency_code').val(data.basePrice.currency_code);
             $('#shopbasket-notes').val(data.basePriceType.name);
             $('#shopbasket-measure_name').val(data.measure.symbol_rus);
         });
-    }
+    }*/
 });
 JS
 );

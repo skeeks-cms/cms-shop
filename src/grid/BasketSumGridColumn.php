@@ -8,10 +8,7 @@
 
 namespace skeeks\cms\shop\grid;
 
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsContentElement;
 use yii\grid\DataColumn;
-use yii\helpers\Html;
 
 /**
  * Class BasketNameGridColumn
@@ -19,13 +16,13 @@ use yii\helpers\Html;
  */
 class BasketSumGridColumn extends DataColumn
 {
-    public $attribute = "price";
+    public $attribute = "amount";
     public $format = "raw";
 
     /**
      * @param mixed $model
      * @param mixed $key
-     * @param int $index
+     * @param int   $index
      * @return string
      */
     protected function renderDataCellContent($model, $key, $index)
@@ -34,6 +31,6 @@ class BasketSumGridColumn extends DataColumn
             $this->label = \Yii::t('skeeks/shop/app', 'Sum');
         }
 
-        return \Yii::$app->money->intlFormatter()->format($model->money->multiply($model->quantity));
+        return (string)$model->money->multiply($model->quantity);
     }
 }
