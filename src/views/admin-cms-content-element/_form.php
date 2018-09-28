@@ -239,8 +239,8 @@ JS
 
     <div class="sx-offer">
 
-
-        <?= $form->field($model, 'parent_content_element_id')->widget(
+        <? if ($shopContent->childrenContent) : ?>
+            <?= $form->field($model, 'parent_content_element_id')->widget(
             \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
                 'content_id'  => $shopContent->childrenContent->id,
@@ -254,6 +254,10 @@ JS
         )
             ->label('Общий товар с предложениями');
         ?>
+            
+        <? endif; ?>
+
+        
     </div>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
