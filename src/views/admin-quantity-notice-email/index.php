@@ -13,38 +13,38 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'columns' =>
+    'columns'         =>
         [
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
 
             'email',
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
-                'label' => \Yii::t('skeeks/shop/app', 'Good'),
-                'value' => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
+                'label'  => \Yii::t('skeeks/shop/app', 'Good'),
+                'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
                     if ($shopQuantityNoticeEmail->shopProduct) {
                         return (new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-                                'image' => $shopQuantityNoticeEmail->shopProduct->cmsContentElement->image,
-                                'maxWidth' => "25px"
-                            ]))->run() . " " . \yii\helpers\Html::a($shopQuantityNoticeEmail->shopProduct->cmsContentElement->name,
+                                'image'    => $shopQuantityNoticeEmail->shopProduct->cmsContentElement->image,
+                                'maxWidth' => "25px",
+                            ]))->run()." ".\yii\helpers\Html::a($shopQuantityNoticeEmail->shopProduct->cmsContentElement->name,
                                 $shopQuantityNoticeEmail->shopProduct->cmsContentElement->url, [
-                                    'target' => "_blank",
+                                    'target'    => "_blank",
                                     'data-pjax' => 0,
-                                ]) . "<br /><small>" . \Yii::t('skeeks/shop/app',
-                                'In stock') . ": " . $shopQuantityNoticeEmail->shopProduct->quantity . "</small>";
+                                ])."<br /><small>".\Yii::t('skeeks/shop/app',
+                                'In stock').": ".$shopQuantityNoticeEmail->shopProduct->quantity."</small>";
                     }
 
                     return null;
@@ -54,27 +54,27 @@
             'name',
 
             [
-                'class' => \skeeks\cms\grid\BooleanColumn::class,
-                'attribute' => 'is_notified',
-                'trueValue' => true,
+                'class'      => \skeeks\cms\grid\BooleanColumn::class,
+                'attribute'  => 'is_notified',
+                'trueValue'  => true,
                 'falseValue' => false,
             ],
 
             [
-                'class' => \skeeks\cms\grid\DateTimeColumnData::class,
+                'class'     => \skeeks\cms\grid\DateTimeColumnData::class,
                 'attribute' => 'notified_at',
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
-                'value' => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
+                'label'  => \Yii::t('skeeks/shop/app', 'User'),
+                'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
                     return ($shopQuantityNoticeEmail->shopFuser && $shopQuantityNoticeEmail->shopFuser->user ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopQuantityNoticeEmail->shopFuser->user]))->run() : \Yii::t('skeeks/shop/app',
                         'Not authorized'));
                 },
             ],
-        ]
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

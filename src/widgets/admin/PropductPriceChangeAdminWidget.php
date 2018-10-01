@@ -8,9 +8,6 @@
 
 namespace skeeks\cms\shop\widgets\admin;
 
-use skeeks\cms\mail\helpers\Html;
-use skeeks\cms\models\CmsUser;
-use skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget;
 use skeeks\cms\shop\models\ShopProductPrice;
 use yii\base\Widget;
 
@@ -32,7 +29,7 @@ class PropductPriceChangeAdminWidget extends Widget
     public function run()
     {
         return $this->render('product-price-change', [
-            'widget' => $this
+            'widget' => $this,
         ]);
     }
 

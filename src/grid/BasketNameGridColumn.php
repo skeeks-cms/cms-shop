@@ -8,8 +8,6 @@
 
 namespace skeeks\cms\shop\grid;
 
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\shop\models\ShopBasket;
 use yii\grid\DataColumn;
 use yii\helpers\Html;
@@ -25,8 +23,8 @@ class BasketNameGridColumn extends DataColumn
 
     /**
      * @param ShopBasket $model
-     * @param mixed $key
-     * @param int $index
+     * @param mixed      $key
+     * @param int        $index
      * @return string
      */
     protected function renderDataCellContent($model, $key, $index)
@@ -35,9 +33,9 @@ class BasketNameGridColumn extends DataColumn
 
         if ($model->url) {
             $content = Html::a($model->name, $model->url, [
-                'target' => '_blank',
-                'title' => \Yii::t('skeeks/shop/app', 'Watch Online (opens new window)'),
-                'data-pjax' => 0
+                'target'    => '_blank',
+                'title'     => \Yii::t('skeeks/shop/app', 'Watch Online (opens new window)'),
+                'data-pjax' => 0,
             ]);
 
             if ($model->product && $model->product->measure_ratio != 1) {

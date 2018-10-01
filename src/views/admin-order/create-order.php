@@ -6,8 +6,8 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $cmsUser \skeeks\cms\models\CmsUser */
@@ -33,8 +33,8 @@ CSS
 ?>
 
 <?php $form = ActiveForm::begin([
-    'id' => 'sx-change-user',
-    'method' => 'get',
+    'id'      => 'sx-change-user',
+    'method'  => 'get',
     'usePjax' => false,
 ]); ?>
 <h1 style="text-align: center;">Новый заказ для покупателя: <a href="#"
@@ -43,7 +43,7 @@ CSS
 
 <div style="display: none;">
     <?= \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::widget([
-        'id' => 'cmsUserId',
+        'id'   => 'cmsUserId',
         'name' => 'cmsUserId',
     ]); ?>
 </div>
@@ -66,17 +66,17 @@ JS
 <?php ActiveForm::end(); ?>
 
 <?php $form = ActiveForm::begin([
-    'id' => 'sx-create-order',
+    'id'          => 'sx-create-order',
     'pjaxOptions' =>
         [
-            'id' => 'sx-pjax-order-wrapper'
-        ]
+            'id' => 'sx-pjax-order-wrapper',
+        ],
 ]); ?>
 
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \skeeks\cms\shop\Module::t('app', 'Buyer')
+    'content' => \skeeks\cms\shop\Module::t('app', 'Buyer'),
 ]) ?>
 
 
@@ -93,18 +93,18 @@ JS
 
 <?=
 $form->field($shopFuser, 'buyer_id')->widget(
-    \skeeks\cms\widgets\formInputs\EditedSelect::className(),
+    \skeeks\cms\widgets\formInputs\EditedSelect::class,
     [
         'items' => \yii\helpers\ArrayHelper::map(
             $shopFuser->shopBuyers, 'id', 'name'
         ),
 
         'controllerRoute' => '/shop/admin-buyer',
-        'additionalData' => [
-            'cms_user_id' => $shopFuser->user->id
+        'additionalData'  => [
+            'cms_user_id' => $shopFuser->user->id,
         ],
-        'updateAction' => 'related-properties',
-        'allowDeselect' => false
+        'updateAction'    => 'related-properties',
+        'allowDeselect'   => false,
     ]
 );
 ?>
@@ -112,38 +112,38 @@ $form->field($shopFuser, 'buyer_id')->widget(
 
 <? if ($shopFuser->buyer) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \skeeks\cms\shop\Module::t('app', 'Customer data')
+        'content' => \skeeks\cms\shop\Module::t('app', 'Customer data'),
     ]) ?>
 
     <?= \yii\widgets\DetailView::widget([
-        'model' => $shopFuser,
-        'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+        'model'      => $shopFuser,
+        'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
         'attributes' =>
             [
                 [                      // the owner name of the model
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Type payer'),
+                    'label'  => \skeeks\cms\shop\Module::t('app', 'Type payer'),
                     'format' => 'raw',
-                    'value' => $shopFuser->personType->name,
+                    'value'  => $shopFuser->personType->name,
                 ],
 
                 [                      // the owner name of the model
-                    'label' => \skeeks\cms\shop\Module::t('app', 'Profile of buyer'),
+                    'label'  => \skeeks\cms\shop\Module::t('app', 'Profile of buyer'),
                     'format' => 'raw',
-                    'value' => Html::a($shopFuser->buyer->name . " [{$shopFuser->buyer->id}]",
+                    'value'  => Html::a($shopFuser->buyer->name." [{$shopFuser->buyer->id}]",
                         \skeeks\cms\helpers\UrlHelper::construct([
                             '/shop/admin-buyer/update',
-                            'pk' => $shopFuser->buyer->id
+                            'pk' => $shopFuser->buyer->id,
                         ])->enableAdmin(), [
-                            'data-pjax' => 0
+                            'data-pjax' => 0,
                         ]),
                 ],
-            ]
+            ],
     ]); ?>
 
     <?= \yii\widgets\DetailView::widget([
-        'model' => $shopFuser->buyer->relatedPropertiesModel,
-        'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-        'attributes' => $shopFuser->buyer->relatedPropertiesModel->attributes()
+        'model'      => $shopFuser->buyer->relatedPropertiesModel,
+        'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+        'attributes' => $shopFuser->buyer->relatedPropertiesModel->attributes(),
     ]) ?>
 
     <? /* elseif ($shopFuser->personType) : */ ?>
@@ -162,7 +162,7 @@ $form->field($shopFuser, 'buyer_id')->widget(
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \skeeks\cms\shop\Module::t('app', 'Payment order')
+    'content' => \skeeks\cms\shop\Module::t('app', 'Payment order'),
 ]) ?>
 
 <?=
@@ -173,7 +173,7 @@ $form->fieldSelect($shopFuser, 'pay_system_id', \yii\helpers\ArrayHelper::map(
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \skeeks\cms\shop\Module::t('app', 'Shipping')
+    'content' => \skeeks\cms\shop\Module::t('app', 'Shipping'),
 ]) ?>
 
 <?=
@@ -186,7 +186,7 @@ $form->fieldSelect($shopFuser, 'delivery_id', \yii\helpers\ArrayHelper::map(
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \skeeks\cms\shop\Module::t('app', 'The composition of the order')
+    'content' => \skeeks\cms\shop\Module::t('app', 'The composition of the order'),
 ]) ?>
 
 
@@ -198,7 +198,7 @@ $json = \yii\helpers\Json::encode([
         ->merge([
             'fuser_id' => $shopFuser->id,
         ])
-        ->enableEmptyLayout()->enableNoActions()->url
+        ->enableEmptyLayout()->enableNoActions()->url,
 ]);
 
 $onclick = new \yii\web\JsExpression(<<<JS
@@ -207,22 +207,22 @@ JS
 );
 ?>
 <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-    'label' => "",
+    'label'       => "",
     'parentModel' => $shopFuser,
-    'relation' => [
+    'relation'    => [
         'fuser_id' => 'id',
     ],
 
     'sort' => [
         'defaultOrder' =>
             [
-                'updated_at' => SORT_DESC
-            ]
+                'updated_at' => SORT_DESC,
+            ],
     ],
 
     'controllerRoute' => 'shop/admin-basket',
     'gridViewOptions' => [
-        'enabledPjax' => false,
+        'enabledPjax'     => false,
         'beforeTableLeft' => <<<HTML
     <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>Добавить товар</a>
     <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i>Добавить позицию</a>
@@ -232,26 +232,26 @@ HTML
         'columns' => [
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::class,
             ],
 
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className()
+                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::class,
             ],
-        ]
+        ],
     ],
 ]); ?>
 
@@ -274,41 +274,41 @@ CSS
             ?>
             <?=
             \yii\widgets\DetailView::widget([
-                'model' => $model,
-                "template" => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
-                "options" => ['class' => 'sx-result-table table detail-view'],
+                'model'      => $model,
+                "template"   => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
+                "options"    => ['class' => 'sx-result-table table detail-view'],
                 'attributes' => [
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'The total value of the goods'),
-                        'value' => (string) $model->money,
+                        'value' => (string)$model->money,
                     ],
 
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'Discount, margin'),
-                        'value' => (string) $model->moneyDiscount,
+                        'value' => (string)$model->moneyDiscount,
                     ],
 
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'Delivery service'),
-                        'value' => (string) $model->moneyDelivery,
+                        'value' => (string)$model->moneyDelivery,
                     ],
 
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'Taxe'),
-                        'value' => (string) $model->moneyVat,
+                        'value' => (string)$model->moneyVat,
                     ],
 
                     [
                         'label' => \skeeks\cms\shop\Module::t('app', 'Weight (gramm)'),
-                        'value' => $model->weight . " " . \skeeks\cms\shop\Module::t('app', 'g.'),
+                        'value' => $model->weight." ".\skeeks\cms\shop\Module::t('app', 'g.'),
                     ],
 
                     [
-                        'label' => \skeeks\cms\shop\Module::t('app', 'In total'),
+                        'label'  => \skeeks\cms\shop\Module::t('app', 'In total'),
                         'format' => 'raw',
-                        'value' => Html::tag('b', (string) $model->money),
-                    ]
-                ]
+                        'value'  => Html::tag('b', (string)$model->money),
+                    ],
+                ],
             ])
             ?>
         </div>
@@ -327,7 +327,7 @@ $clientData = \yii\helpers\Json::encode([
 
     'backendFuserSave' => \skeeks\cms\helpers\UrlHelper::construct([
         '/shop/admin-order/create-order-fuser-save',
-        'shopFuserId' => $shopFuser->id
+        'shopFuserId' => $shopFuser->id,
     ])->enableAdmin()->toString(),
 
 ]);
@@ -336,7 +336,7 @@ $shopJson = \yii\helpers\Json::encode([
 
     'backend-add-product' => \skeeks\cms\helpers\UrlHelper::construct([
         '/shop/admin-order/create-order-add-product',
-        'shopFuserId' => $shopFuser->id
+        'shopFuserId' => $shopFuser->id,
     ])->enableAdmin()->toString(),
 
 ]);
@@ -470,9 +470,9 @@ JS
 <div style="display: none;">
     <?=
     \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
-        'dialogRoute' => ['/shop/admin-cms-content-element'],
-        'name' => 'sx-add-product',
-        'id' => 'sx-add-product',
+        'dialogRoute'            => ['/shop/admin-cms-content-element'],
+        'name'                   => 'sx-add-product',
+        'id'                     => 'sx-add-product',
         'closeDialogAfterSelect' => false,
     ]);
     ?>

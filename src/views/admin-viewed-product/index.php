@@ -13,44 +13,44 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
-    'columns' =>
+    'columns'         =>
         [
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'Date views'),
             ],
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
-                'value' => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
-                    return $shopViewedProduct->shopFuser->user ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopViewedProduct->shopFuser->user]))->run() : \Yii::t('skeeks/shop/app',
+                'label'  => \Yii::t('skeeks/shop/app', 'User'),
+                'value'  => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
+                    return $shopViewedProduct->shopFuser->cmsUser ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopViewedProduct->shopFuser->cmsUser]))->run() : \Yii::t('skeeks/shop/app',
                         'Not authorized');
                 },
             ],
 
             [
-                'class' => \yii\grid\DataColumn::className(),
+                'class'  => \yii\grid\DataColumn::class,
                 'format' => 'raw',
-                'label' => \Yii::t('skeeks/shop/app', 'Good'),
-                'value' => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
+                'label'  => \Yii::t('skeeks/shop/app', 'Good'),
+                'value'  => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
                     if ($shopViewedProduct->shopProduct) {
 
                         return (new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
-                                'image' => $shopViewedProduct->shopProduct->cmsContentElement->image,
-                                'maxWidth' => "25px"
-                            ]))->run() . " " . \yii\helpers\Html::a($shopViewedProduct->shopProduct->cmsContentElement->name,
+                                'image'    => $shopViewedProduct->shopProduct->cmsContentElement->image,
+                                'maxWidth' => "25px",
+                            ]))->run()." ".\yii\helpers\Html::a($shopViewedProduct->shopProduct->cmsContentElement->name,
                                 $shopViewedProduct->shopProduct->cmsContentElement->url, [
-                                    'target' => "_blank",
+                                    'target'    => "_blank",
                                     'data-pjax' => 0,
                                 ]);
                     }
@@ -59,7 +59,7 @@
                 },
             ],
 
-        ]
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

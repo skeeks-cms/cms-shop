@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150901_180601_create_table__shop_extra extends Migration
@@ -32,7 +31,7 @@ class m150901_180601_create_table__shop_extra extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'name' => $this->string(50)->notNull(),
+            'name'  => $this->string(50)->notNull(),
             'value' => $this->decimal(18, 2)->notNull(),
 
         ], $tableOptions);

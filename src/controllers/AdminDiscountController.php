@@ -13,8 +13,6 @@ use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopDiscount;
 use yii\helpers\ArrayHelper;
 
@@ -63,7 +61,7 @@ class AdminDiscountController extends BackendModelStandartController
 
                     'filtersModel' => [
                         'fields' => [
-                            'name'     => [
+                            'name' => [
                                 'isAllowChangeMode' => false,
                             ],
                         ],
@@ -72,10 +70,10 @@ class AdminDiscountController extends BackendModelStandartController
 
                 "grid" => [
                     //'on init'       => function (Event $e) {
-                        /**
-                         * @var $dataProvider ActiveDataProvider
-                         * @var $query ActiveQuery
-                         */
+                    /**
+                     * @var $dataProvider ActiveDataProvider
+                     * @var $query ActiveQuery
+                     */
                     /*    $query = $e->sender->dataProvider->query;
                         $dataProvider = $e->sender->dataProvider;
 
@@ -95,8 +93,8 @@ class AdminDiscountController extends BackendModelStandartController
                             'default' => SORT_ASC
                         ]
                     ],*/
-                    'defaultOrder' => [
-                        'priority' => SORT_ASC
+                    'defaultOrder'   => [
+                        'priority' => SORT_ASC,
                     ],
                     'visibleColumns' => [
                         'checkbox',
@@ -113,20 +111,20 @@ class AdminDiscountController extends BackendModelStandartController
                         'priority',
                     ],
                     'columns'        => [
-                        'active'   => [
+                        'active'        => [
                             'class' => BooleanColumn::class,
                         ],
-                        'last_discount'      => [
+                        'last_discount' => [
                             'class' => BooleanColumn::class,
                         ],
 
-                        'value'      => [
+                        'value' => [
                             'value' => function (\skeeks\cms\shop\models\ShopDiscount $shopDiscount) {
                                 if ($shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_P) {
                                     return \Yii::$app->formatter->asPercent($shopDiscount->value / 100);
                                 } else {
                                     $money = new \skeeks\cms\money\Money((string)$shopDiscount->value, $shopDiscount->currency_code);
-                                    return (string) $money;
+                                    return (string)$money;
                                 }
                             },
                         ],

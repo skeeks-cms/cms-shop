@@ -4,7 +4,7 @@ use skeeks\cms\mail\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $order \skeeks\cms\shop\models\ShopOrder */
-$url = \yii\helpers\Url::to(['/shop/order/view', 'id' => $order->id], true);
+$url = $order->url;
 ?>
 
 <?= Html::beginTag('h1'); ?>

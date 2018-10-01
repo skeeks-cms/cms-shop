@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150828_110559_create_table__shop_order_status extends Migration
@@ -34,9 +33,9 @@ class m150828_110559_create_table__shop_order_status extends Migration
 
             'code' => $this->string(2)->notNull()->unique(),
 
-            'name' => $this->string(255)->notNull(),
+            'name'        => $this->string(255)->notNull(),
             'description' => $this->text(),
-            'priority' => $this->integer()->notNull()->defaultValue(100),
+            'priority'    => $this->integer()->notNull()->defaultValue(100),
 
             'color' => $this->string(32),
 
@@ -64,19 +63,19 @@ class m150828_110559_create_table__shop_order_status extends Migration
 
 
         $this->insert('{{%shop_order_status}}', [
-            'code' => 'F',
-            'name' => 'Выполнен',
+            'code'        => 'F',
+            'name'        => 'Выполнен',
             'description' => 'Заказ доставлен и оплачен',
-            'priority' => '100',
-            'color' => 'green',
+            'priority'    => '100',
+            'color'       => 'green',
         ]);
 
         $this->insert('{{%shop_order_status}}', [
-            'code' => 'N',
-            'name' => 'Принят',
+            'code'        => 'N',
+            'name'        => 'Принят',
             'description' => 'Заказ принят, но пока не обрабатывается (например, заказ только что создан или ожидается оплата заказа)',
-            'priority' => '200',
-            'color' => 'orange',
+            'priority'    => '200',
+            'color'       => 'orange',
         ]);
 
     }

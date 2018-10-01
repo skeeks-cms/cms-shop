@@ -8,8 +8,8 @@
 
 namespace skeeks\cms\shop\components;
 
-use skeeks\cms\base\Component;
 use skeeks\cms\base\ConfigFormInterface;
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use yii\base\Model;
 use yii\widgets\ActiveForm;
@@ -22,17 +22,24 @@ class PaySystemHandlerComponent extends Model implements ConfigFormInterface
 {
     use HasComponentDescriptorTrait;
 
+    static public function logError($message, $group = "")
+    {
+        \Yii::error($message, static::class."::".$group);
+    }
+    static public function logInfo($message, $group = "")
+    {
+        \Yii::info($message, static::class."::".$group);
+    }
     public function renderConfigForm(ActiveForm $activeForm)
     {
     }
-
-    static public function logError($message, $group = "")
+    /**
+     * @param ShopBill $shopBill
+     * @return bool
+     */
+    public function actionPaymentResponse(ShopBill $shopBill)
     {
-        \Yii::error($message, static::className() . "::" . $group);
-    }
-
-    static public function logInfo($message, $group = "")
-    {
-        \Yii::info($message, static::className() . "::" . $group);
+        return true;
+        //return \Yii::$app->response->redirect(['shop/sberbank/order-form', 'key' => $shopOrder->key]);;
     }
 }

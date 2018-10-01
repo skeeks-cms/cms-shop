@@ -9,11 +9,8 @@
 namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\shop\models\ShopFuser;
-use skeeks\cms\shop\models\ShopProductPriceChange;
 use yii\console\Controller;
-use yii\db\Exception;
 use yii\db\Expression;
-use yii\helpers\Console;
 
 /**
  * Module shop agents
@@ -37,9 +34,9 @@ class AgentsController extends Controller
             ['shop_fuser.delivery_id' => null],
             ['shop_fuser.buyer_id' => null],
             new Expression(<<<SQL
-            (SELECT count(id) as count FROM shop_basket WHERE shop_basket.fuser_id = shop_fuser.id) = 0
+            (SELECT count(id) as count FROM shop_order_item WHERE shop_order_item.fuser_id = shop_fuser.id) = 0
 SQL
-            )
+            ),
         ]);
         /*
         $query = ShopFuser::find()
@@ -72,7 +69,7 @@ SQL
         
                 Console::endProgress();*/
 
-        $this->stdout("Removed empty baskets: " . $deleted . "\n");
-        \Yii::info("Removed empty baskets: " . $deleted);
+        $this->stdout("Removed empty baskets: ".$deleted."\n");
+        \Yii::info("Removed empty baskets: ".$deleted);
     }
 }

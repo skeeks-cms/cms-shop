@@ -28,8 +28,9 @@ class FlushController extends Controller
         if ($count = ShopProductPriceChange::find()->where([
             '<=',
             'created_at',
-            time() - 3600 * 24 * $countDay
-        ])->count()) {
+            time() - 3600 * 24 * $countDay,
+        ])->count()
+        ) {
             $this->stdout("Total price changes for delete: {$count}\n", Console::BOLD);
             $totalDeleted = ShopProductPriceChange::deleteAll(['<=', 'created_at', time() - 3600 * 24 * $countDay]);
             $this->stdout("Total deleted: {$totalDeleted}\n");

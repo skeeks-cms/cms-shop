@@ -14,16 +14,16 @@ use Yii;
 /**
  * This is the model class for table "{{%shop_order2discount_coupon}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property integer $discount_coupon_id
- * @property integer $order_id
+ * @property integer            $id
+ * @property integer            $created_by
+ * @property integer            $updated_by
+ * @property integer            $created_at
+ * @property integer            $updated_at
+ * @property integer            $discount_coupon_id
+ * @property integer            $order_id
  *
  * @property ShopDiscountCoupon $discountCoupon
- * @property ShopOrder $order
+ * @property ShopOrder          $order
  */
 class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
 {
@@ -46,30 +46,30 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
             [
                 ['created_by'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => CmsUser::className(),
-                'targetAttribute' => ['created_by' => 'id']
+                'skipOnError'     => true,
+                'targetClass'     => CmsUser::class,
+                'targetAttribute' => ['created_by' => 'id'],
             ],
             [
                 ['discount_coupon_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => ShopDiscountCoupon::className(),
-                'targetAttribute' => ['discount_coupon_id' => 'id']
+                'skipOnError'     => true,
+                'targetClass'     => ShopDiscountCoupon::class,
+                'targetAttribute' => ['discount_coupon_id' => 'id'],
             ],
             [
                 ['order_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => ShopOrder::className(),
-                'targetAttribute' => ['order_id' => 'id']
+                'skipOnError'     => true,
+                'targetClass'     => ShopOrder::class,
+                'targetAttribute' => ['order_id' => 'id'],
             ],
             [
                 ['updated_by'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => CmsUser::className(),
-                'targetAttribute' => ['updated_by' => 'id']
+                'skipOnError'     => true,
+                'targetClass'     => CmsUser::class,
+                'targetAttribute' => ['updated_by' => 'id'],
             ],
         ];
     }
@@ -80,13 +80,13 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => Yii::t('skeeks/shop/app', 'Updated At'),
+            'id'                 => Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'         => Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'         => Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'         => Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'         => Yii::t('skeeks/shop/app', 'Updated At'),
             'discount_coupon_id' => Yii::t('skeeks/shop/app', 'Discount Coupon ID'),
-            'order_id' => Yii::t('skeeks/shop/app', 'Order ID'),
+            'order_id'           => Yii::t('skeeks/shop/app', 'Order ID'),
         ];
     }
 
@@ -95,7 +95,7 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
      */
     public function getDiscountCoupon()
     {
-        return $this->hasOne(ShopDiscountCoupon::className(), ['id' => 'discount_coupon_id']);
+        return $this->hasOne(ShopDiscountCoupon::class, ['id' => 'discount_coupon_id']);
     }
 
     /**
@@ -103,7 +103,7 @@ class ShopOrder2discountCoupon extends \skeeks\cms\models\Core
      */
     public function getOrder()
     {
-        return $this->hasOne(ShopOrder::className(), ['id' => 'order_id']);
+        return $this->hasOne(ShopOrder::class, ['id' => 'order_id']);
     }
 
 }

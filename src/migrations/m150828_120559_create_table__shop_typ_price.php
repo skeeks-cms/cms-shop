@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150828_120559_create_table__shop_typ_price extends Migration
@@ -32,12 +31,12 @@ class m150828_120559_create_table__shop_typ_price extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'code' => $this->string(32)->notNull()->unique(),
+            'code'   => $this->string(32)->notNull()->unique(),
             'xml_id' => $this->string(255),
 
-            'name' => $this->string(255)->notNull(),
+            'name'        => $this->string(255)->notNull(),
             'description' => $this->text(),
-            'priority' => $this->integer()->notNull()->defaultValue(100),
+            'priority'    => $this->integer()->notNull()->defaultValue(100),
 
             'def' => $this->string(1)->notNull()->defaultValue('N'),
 
@@ -66,27 +65,27 @@ class m150828_120559_create_table__shop_typ_price extends Migration
 
 
         $this->insert('{{%shop_type_price}}', [
-            'code' => 'BASE',
-            'name' => 'Базовая цена',
+            'code'        => 'BASE',
+            'name'        => 'Базовая цена',
             'description' => '',
-            'priority' => '100',
-            'def' => 'Y',
+            'priority'    => '100',
+            'def'         => 'Y',
         ]);
 
 
         $this->insert('{{%shop_type_price}}', [
-            'code' => 'WHOLESALE',
-            'name' => 'Розничная цена',
+            'code'        => 'WHOLESALE',
+            'name'        => 'Розничная цена',
             'description' => '',
-            'priority' => '200',
-            'def' => 'N',
+            'priority'    => '200',
+            'def'         => 'N',
         ]);
         $this->insert('{{%shop_type_price}}', [
-            'code' => 'RETAIL',
-            'name' => 'Оптовая цена',
+            'code'        => 'RETAIL',
+            'name'        => 'Оптовая цена',
             'description' => '',
-            'priority' => '300',
-            'def' => 'N',
+            'priority'    => '300',
+            'def'         => 'N',
         ]);
     }
 

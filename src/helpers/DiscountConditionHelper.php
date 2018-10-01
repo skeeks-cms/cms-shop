@@ -18,11 +18,11 @@ use yii\helpers\ArrayHelper;
  * Условия применения скидки
  *
  * $condition = new DiscountConditionHelper([
-        'data' => $conditions,
-        'shopCmsContentElement' => $shopCmsContentElement,
-    ]);
-
-    return $condition->isTrue;
+ * 'data' => $conditions,
+ * 'shopCmsContentElement' => $shopCmsContentElement,
+ * ]);
+ *
+ * return $condition->isTrue;
  *
  *
  * @property bool isTrue
@@ -116,29 +116,74 @@ class DiscountConditionHelper extends Component
 
         } else {
 
-            if (strpos("element.", $this->field) != -1) {
+            if ($this->field && strpos("element.", $this->field) != -1) {
                 $field = str_replace("element.", "", $this->field);
+
+                return $this->isTrue($this->value, $this->shopCmsContentElement->{$field});
 
                 if (isset($this->shopCmsContentElement->{$field})) {
 
-                    if (is_array($this->shopCmsContentElement->{$field})) {
-                        if (in_array((int)$this->value, $this->shopCmsContentElement->{$field})) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+
+                    if (is_array($this->value)) {
+
                     } else {
-                        if ($this->shopCmsContentElement->{$field} == $this->value) {
-                            return true;
+                        if (is_array($this->shopCmsContentElement->{$field})) {
+                            if (in_array((int)$this->value, $this->shopCmsContentElement->{$field})) {
+                                return true;
+                            } else {
+                                return false;
+                            }
                         } else {
-                            return false;
+                            if ($this->shopCmsContentElement->{$field} == $this->value) {
+                                return true;
+                            } else {
+                                return false;
+                            }
                         }
                     }
-
                 }
             }
 
             return true;
+        }
+
+        return true;
+    }
+
+    public function isTrue($value, $fieldValue)
+    {
+        if (is_array($value)) {
+
+            $result = false;
+
+            foreach ($value as $val) {
+                if (is_array($fieldValue)) {
+                    if (in_array((int)$val, $fieldValue)) {
+                        return true;
+                    }
+                } else {
+                    if ($val == $fieldValue) {
+                        return true;
+                    }
+                }
+            }
+
+            return $result;
+
+        } else {
+            if (is_array($fieldValue)) {
+                if (in_array((int)$value, $fieldValue)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                if ($value == $fieldValue) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
 
         return true;

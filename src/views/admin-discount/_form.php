@@ -6,9 +6,6 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 
-use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
-
 /* @var $this yii\web\View */
 /* @var $action \skeeks\cms\backend\actions\BackendModelUpdateAction */
 $action = $this->context->action;
@@ -21,16 +18,17 @@ $action = $this->context->action;
 <?= $form->fieldCheckboxBoolean($model, 'active'); ?>
 <?= $form->field($model, 'name')->textInput(); ?>
 
-<?= $form->fieldSelect($model, 'site_id', \yii\helpers\ArrayHelper::map(
+<?= $form->field($model, 'site_id')->listBox(\yii\helpers\ArrayHelper::map(
     \skeeks\cms\models\CmsSite::find()->all(), 'id', 'name'
-)); ?>
+), ['size' => 1]); ?>
 
-<?= $form->fieldSelect($model, 'value_type', \skeeks\cms\shop\models\ShopDiscount::getValueTypes()); ?>
+<?= $form->field($model, 'assignment_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(), ['size' => 1]); ?>
+<?= $form->field($model, 'value_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getValueTypes(), ['size' => 1]); ?>
 <?= $form->field($model, 'value')->textInput(); ?>
 
-<?= $form->fieldSelect($model, 'currency_code', \yii\helpers\ArrayHelper::map(
+<?= $form->field($model, 'currency_code')->listBox(\yii\helpers\ArrayHelper::map(
     \skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(), 'code', 'code'
-)); ?>
+), ['size' => 1]); ?>
 
 <?= $form->field($model, 'max_discount')->textInput(); ?>
 
@@ -46,8 +44,8 @@ $action = $this->context->action;
     \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class,
     [
         'options' => [
-            $action->reloadFieldParam => 'true'
-        ]
+            $action->reloadFieldParam => 'true',
+        ],
     ]
 ); ?>
 
@@ -71,11 +69,11 @@ $action = $this->context->action;
 <? \yii\bootstrap\Alert::end() ?>
 
 <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-    'permissionName' => $model->permissionName,
-    'notClosedRoles' => [],
+    'permissionName'        => $model->permissionName,
+    'notClosedRoles'        => [],
     'permissionDescription' => \Yii::t('skeeks/shop/app',
-            'Groups of users who can benefit from discounted rates') . ": '{$model->name}'",
-    'label' => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
+            'Groups of users who can benefit from discounted rates').": '{$model->name}'",
+    'label'                 => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
 ]); ?>
 
 <?= $form->fieldSetEnd(); ?>

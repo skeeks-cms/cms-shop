@@ -31,10 +31,10 @@ CSS
     <div class="sx-report-order">
 
         <? $form = \yii\bootstrap\ActiveForm::begin([
-            'method' => 'get',
-            'options' =>
+            'method'               => 'get',
+            'options'              =>
                 [
-                    'data-pjax' => '1'
+                    'data-pjax' => '1',
                 ],
             'enableAjaxValidation' => false,
         ]); ?>
@@ -42,17 +42,17 @@ CSS
             <div class="col-md-3">
                 <?= $form->field($search,
                     'groupType')->listBox(\skeeks\cms\shop\models\search\AdminReportOrderSearch::getGroupTypes(), [
-                    'size' => 1
+                    'size' => 1,
                 ]); ?>
             </div>
             <div class="col-md-3">
-                <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::classname(), [
+                <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::class, [
                     //'displayFormat' => 'php:d-M-Y H:i:s',
                     'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
                 ]); ?>
             </div>
             <div class="col-md-3">
-                <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::classname(), [
+                <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::class, [
                     //'displayFormat' => 'php:d-M-Y H:i:s',
                     'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
                 ]); ?>
@@ -71,8 +71,8 @@ CSS
 
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
             'dataProvider' => $dataProvider,
-            'filterModel' => $search,
-            'columns' => $search->getColumns(),
+            'filterModel'  => $search,
+            'columns'      => $search->getColumns(),
         ]); ?>
 
     </div>

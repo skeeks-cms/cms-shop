@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
@@ -27,8 +26,8 @@ CSS
 );
 ?>
 <?php $form = ActiveForm::begin([
-    'id' => 'sx-change-user',
-    'method' => 'get',
+    'id'      => 'sx-change-user',
+    'method'  => 'get',
     'usePjax' => false,
 ]); ?>
     <h1 style="text-align: center;">Новый заказ для покупателя: <a href="#" class="sx-change-user">выбрать</a> или <a
@@ -41,7 +40,7 @@ CSS
     </div>
     <div style="display: none;">
         <?= \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::widget([
-            'id' => 'cmsUserId',
+            'id'   => 'cmsUserId',
             'name' => 'cmsUserId',
         ]); ?>
     </div>

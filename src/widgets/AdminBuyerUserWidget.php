@@ -35,13 +35,13 @@ class AdminBuyerUserWidget extends Widget
         }
 
         return (new AdminImagePreviewWidget([
-                'image' => $this->user ? $this->user->image : null,
-                'maxWidth' => "25px"
-            ]))->run() . " " . Html::a($this->user->displayName, \skeeks\cms\helpers\UrlHelper::construct([
+                'image'    => $this->user ? $this->user->image : null,
+                'maxWidth' => "25px",
+            ]))->run()." ".Html::a($this->user->displayName, \skeeks\cms\helpers\UrlHelper::construct([
                 '/shop/admin-buyer-user/update',
-                'pk' => $this->user->id
+                'pk' => $this->user->id,
             ])->enableAdmin(), [
-                'data-pjax' => 0
+                'data-pjax' => 0,
             ]);
     }
 

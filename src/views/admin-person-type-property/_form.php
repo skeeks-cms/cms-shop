@@ -1,9 +1,7 @@
 <?php
 
-use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use skeeks\cms\models\Tree;
-use skeeks\cms\modules\admin\widgets\Pjax;
+use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model Tree */
@@ -11,7 +9,7 @@ use skeeks\cms\modules\admin\widgets\Pjax;
 
 
 <?php $form = ActiveForm::begin([
-    'id' => 'sx-dynamic-form',
+    'id'                   => 'sx-dynamic-form',
     'enableAjaxValidation' => false,
 ]); ?>
 
@@ -59,8 +57,8 @@ JS
 
 <?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '],
     \Yii::$app->cms->relatedHandlersDataForSelect), [
-    'size' => 1,
-    'data-form-reload' => 'true'
+    'size'             => 1,
+    'data-form-reload' => 'true',
 ])
     ->label(\Yii::t('skeeks/cms', "Property type"));
 ?>
@@ -95,8 +93,8 @@ JS
 <? else: ?>
 
     <?= $form->field($model, 'shop_person_type_id')->label(\skeeks\cms\shop\Module::t('app', 'Type payer'))->widget(
-        \skeeks\cms\widgets\formInputs\EditedSelect::className(), [
-        'items' => \yii\helpers\ArrayHelper::map(
+        \skeeks\cms\widgets\formInputs\EditedSelect::class, [
+        'items'           => \yii\helpers\ArrayHelper::map(
             \skeeks\cms\shop\models\ShopPersonType::find()->all(),
             "id",
             "name"

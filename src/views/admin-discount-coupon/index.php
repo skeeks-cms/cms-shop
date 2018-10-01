@@ -13,14 +13,14 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
-    'pjax' => $pjax,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
+    'pjax'            => $pjax,
     'adminController' => \Yii::$app->controller,
 
     'columns' =>
@@ -32,17 +32,17 @@
             ],
 
             [
-                'filter' => (array)\yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopDiscount::find()->all(),
+                'filter'    => (array)\yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopDiscount::find()->all(),
                     'id', 'name'),
                 'attribute' => 'shop_discount_id',
-                'value' => function (\skeeks\cms\shop\models\ShopDiscountCoupon $shopDiscountCoupon) {
+                'value'     => function (\skeeks\cms\shop\models\ShopDiscountCoupon $shopDiscountCoupon) {
                     return $shopDiscountCoupon->shopDiscount->name;
                 },
             ],
             /*
                         [
                             'attribute'     => 'value',
-                            'class'         => \yii\grid\DataColumn::className(),
+                            'class'         => \yii\grid\DataColumn::class,
                             'value' => function(\skeeks\cms\shop\models\ShopDiscount $shopDiscount)
                             {
                                 if ($shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_P)
@@ -58,23 +58,23 @@
 
             [
                 'attribute' => 'is_active',
-                'class' => \skeeks\cms\grid\BooleanColumn::className(),
+                'class'     => \skeeks\cms\grid\BooleanColumn::class,
             ],
 
             [
                 'attribute' => 'active_from',
-                'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+                'class'     => \skeeks\cms\grid\DateTimeColumnData::class,
             ],
 
             [
                 'attribute' => 'active_to',
-                'class' => \skeeks\cms\grid\DateTimeColumnData::className(),
+                'class'     => \skeeks\cms\grid\DateTimeColumnData::class,
             ],
 
             [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className()
+                'class' => \skeeks\cms\grid\CreatedAtColumn::class,
             ],
-        ]
+        ],
 ]); ?>
 
 <? $pjax::end(); ?>

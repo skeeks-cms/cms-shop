@@ -1,6 +1,5 @@
 <?php
 
-use yii\helpers\Html;
 use skeeks\cms\modules\admin\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -12,7 +11,7 @@ use skeeks\cms\modules\admin\widgets\ActiveForm;
     <?= $form->field($model, 'property_id')->hiddenInput(['value' => $form_id])->label(false); ?>
 <? else: ?>
     <?= $form->field($model, 'property_id')->widget(
-        \skeeks\widget\chosen\Chosen::className(), [
+        \skeeks\widget\chosen\Chosen::class, [
         'items' => \yii\helpers\ArrayHelper::map(
             \skeeks\cms\models\CmsTreeTypeProperty::find()->all(),
             "id",

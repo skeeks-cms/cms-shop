@@ -9,7 +9,7 @@
 namespace skeeks\cms\shop\widgets\discount;
 
 use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\shop\widgets\discount\assets\DiscountConditionsWidgetAsset;
+use skeeks\cms\models\CmsContentProperty;
 use yii\helpers\Html;
 use yii\widgets\InputWidget;
 
@@ -20,6 +20,8 @@ use yii\widgets\InputWidget;
  */
 class DiscountConditionsWidget extends InputWidget
 {
+    public static $autoIdPrefix = 'DiscountConditionsWidget';
+
     /**
      * @var array
      */
@@ -29,7 +31,7 @@ class DiscountConditionsWidget extends InputWidget
      * @var array
      */
     public $wrapperOptions = [];
-
+    public $allConditions = [];
     public function run()
     {
         $this->clientOptions['id'] = $this->id;
@@ -40,14 +42,10 @@ class DiscountConditionsWidget extends InputWidget
         $element = Html::activeTextarea($this->model, $this->attribute, $this->options);
 
 
-
         return $this->render('discount-conditions', [
-            'element' => $element
+            'element' => $element,
         ]);
     }
-
-    public $allConditions = [];
-
     /**
      * @return array
      */
@@ -61,13 +59,34 @@ class DiscountConditionsWidget extends InputWidget
         $fields['group'] = "Группа условий";
 
         $elementOptions = [];
-        foreach ($element->attributeLabels() as $key => $name)
-        {
-            $elementOptions['element.' . $key] = $name;
-            $this->allConditions['element.' . $key] = $name;
+        foreach ($element->attributeLabels() as $key => $name) {
+            if (in_array($key, [
+                'tree_id',
+                'treeIds',
+                'id',
+                'created_by',
+                'name',
+            ])) {
+                $elementOptions['element.'.$key] = $name;
+                $this->allConditions['element.'.$key] = $name;
+            }
         }
 
         $fields["Основные свойства"] = $elementOptions;
+
+        $props = CmsContentProperty::find()->all();
+        $propsOptions = [];
+        /**
+         * @var $props CmsContentProperty[]
+         */
+        if ($props) {
+            foreach ($props as $prop) {
+                $propsOptions['rp.'.$prop->code] = $prop->name;
+                $this->allConditions['rp.'.$prop->code] = $prop->name;
+            }
+        }
+
+        $fields["Свойства"] = $propsOptions;
 
         return $fields;
     }

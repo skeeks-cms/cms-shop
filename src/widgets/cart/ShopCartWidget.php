@@ -9,12 +9,9 @@
 namespace skeeks\cms\shop\widgets\cart;
 
 use skeeks\cms\base\WidgetRenderable;
-use skeeks\cms\helpers\UrlHelper;
-use skeeks\cms\shop\assets\ShopAsset;
 use skeeks\cms\shop\widgets\ShopGlobalWidget;
 use skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 /**
  * Class ShopCartWidget

@@ -6,8 +6,8 @@
  * @date 10.03.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
+use yii\db\Schema;
 
 class m150925_133220_create_table__shop_person_type_property_enum extends Migration
 {
@@ -26,21 +26,21 @@ class m150925_133220_create_table__shop_person_type_property_enum extends Migrat
         $this->createTable("{{%shop_person_type_property_enum}}", [
             'id' => Schema::TYPE_PK,
 
-            'created_by' => Schema::TYPE_INTEGER . ' NULL',
-            'updated_by' => Schema::TYPE_INTEGER . ' NULL',
+            'created_by' => Schema::TYPE_INTEGER.' NULL',
+            'updated_by' => Schema::TYPE_INTEGER.' NULL',
 
-            'created_at' => Schema::TYPE_INTEGER . ' NULL',
-            'updated_at' => Schema::TYPE_INTEGER . ' NULL',
+            'created_at' => Schema::TYPE_INTEGER.' NULL',
+            'updated_at' => Schema::TYPE_INTEGER.' NULL',
 
-            'property_id' => Schema::TYPE_INTEGER . ' NULL',
+            'property_id' => Schema::TYPE_INTEGER.' NULL',
 
-            'value' => Schema::TYPE_STRING . '(255) NOT NULL',
-            'def' => "CHAR(1) NOT NULL DEFAULT 'N'",
-            'code' => Schema::TYPE_STRING . '(32) NOT NULL',
-            'priority' => Schema::TYPE_INTEGER . "(11) NOT NULL DEFAULT '500'",
+            'value'    => Schema::TYPE_STRING.'(255) NOT NULL',
+            'def'      => "CHAR(1) NOT NULL DEFAULT 'N'",
+            'code'     => Schema::TYPE_STRING.'(32) NOT NULL',
+            'priority' => Schema::TYPE_INTEGER."(11) NOT NULL DEFAULT '500'",
 
         ], $tableOptions);
-        
+
         $this->createIndex('shop_person_type_property_enum__updated_by', '{{%shop_person_type_property_enum}}', 'updated_by');
         $this->createIndex('shop_person_type_property_enum__created_by', '{{%shop_person_type_property_enum}}', 'created_by');
         $this->createIndex('shop_person_type_property_enum__created_at', '{{%shop_person_type_property_enum}}', 'created_at');

@@ -17,37 +17,37 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
     'adminController' => $controller,
-    'pjax' => $pjax,
-    'settingsData' =>
+    'pjax'            => $pjax,
+    'settingsData'    =>
         [
-            'order' => SORT_ASC,
+            'order'   => SORT_ASC,
             'orderBy' => "priority",
         ],
-    'columns' => [
+    'columns'         => [
         'name',
         'priority',
 
         [
-            'class' => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => "personTypeIds",
-            'filter' => false,
-            'value' => function (\skeeks\cms\shop\models\ShopPaySystem $model) {
+            'filter'    => false,
+            'value'     => function (\skeeks\cms\shop\models\ShopPaySystem $model) {
                 return implode(", ", \yii\helpers\ArrayHelper::map($model->personTypes, 'id', 'name'));
-            }
+            },
         ],
 
         [
-            'class' => \skeeks\cms\grid\BooleanColumn::className(),
-            'attribute' => "active"
-        ]
+            'class'     => \skeeks\cms\grid\BooleanColumn::class,
+            'attribute' => "active",
+        ],
     ],
 ]); ?>
 

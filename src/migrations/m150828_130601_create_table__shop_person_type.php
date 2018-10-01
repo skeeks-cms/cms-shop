@@ -6,7 +6,6 @@
  * @date 28.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150828_130601_create_table__shop_person_type extends Migration
@@ -32,9 +31,9 @@ class m150828_130601_create_table__shop_person_type extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'name' => $this->string(255)->notNull()->unique(),
+            'name'     => $this->string(255)->notNull()->unique(),
             'priority' => $this->integer()->notNull()->defaultValue(100),
-            'active' => $this->string(1)->notNull()->defaultValue("Y"),
+            'active'   => $this->string(1)->notNull()->defaultValue("Y"),
 
         ], $tableOptions);
 
@@ -59,15 +58,15 @@ class m150828_130601_create_table__shop_person_type extends Migration
 
 
         $this->insert('{{%shop_person_type}}', [
-            'name' => 'Физическое лицо',
+            'name'     => 'Физическое лицо',
             'priority' => '100',
-            'active' => 'Y',
+            'active'   => 'Y',
         ]);
 
         $this->insert('{{%shop_person_type}}', [
-            'name' => 'Юридическое лицо',
+            'name'     => 'Юридическое лицо',
             'priority' => '200',
-            'active' => 'Y',
+            'active'   => 'Y',
         ]);
     }
 

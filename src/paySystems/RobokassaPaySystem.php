@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\paySystems;
 
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopOrder;
-use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -55,7 +54,7 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'isLive' => 'Is live',
+            'isLive'         => 'Is live',
             'sMerchantLogin' => 'sMerchantLogin',
             'sMerchantPass1' => 'sMerchantPass1',
             'sMerchantPass2' => 'sMerchantPass2',
@@ -68,7 +67,15 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
             'isLive' => 'If is live used: https://auth.robokassa.ru/Merchant/Index.aspx else http://test.robokassa.ru/Index.aspx',
         ]);
     }
-
+    /**
+     * @param ShopOrder $shopOrder
+     * @return $this
+     */
+    public function paymentResponse(ShopOrder $shopOrder)
+    {
+        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id,
+            \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopOrder->user->email);
+    }
     /**
      * @return \skeeks\cms\shop\paySystems\robokassa\Merchant
      * @throws \yii\base\InvalidConfigException
@@ -81,26 +88,15 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
         $merchant = \Yii::createObject(ArrayHelper::merge($this->toArray([
             'sMerchantLogin',
             'sMerchantPass1',
-            'sMerchantPass2'
+            'sMerchantPass2',
         ]), [
-            'class' => '\skeeks\cms\shop\paySystems\robokassa\Merchant',
+            'class'   => '\skeeks\cms\shop\paySystems\robokassa\Merchant',
             'baseUrl' => $this->baseUrl,
-            'isLive' => (bool)$this->isLive,
+            'isLive'  => (bool)$this->isLive,
         ]));
 
         return $merchant;
     }
-
-    /**
-     * @param ShopOrder $shopOrder
-     * @return $this
-     */
-    public function paymentResponse(ShopOrder $shopOrder)
-    {
-        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id,
-            \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopOrder->user->email);
-    }
-
     public function renderConfigForm(ActiveForm $activeForm)
     {
         echo $activeForm->field($this, 'isLive')->checkbox();

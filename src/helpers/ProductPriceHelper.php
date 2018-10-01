@@ -10,9 +10,9 @@ namespace skeeks\cms\shop\helpers;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\money\Money;
-use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopDiscount;
+use skeeks\cms\shop\models\shopOrder;
 use skeeks\cms\shop\models\ShopProductPrice;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  *
- * @property ShopCart         $shopCart;
+ * @property ShopOrder        $shopOrder;
  *
  * @property ShopProductPrice $basePrice; Базовая цена
  *
@@ -36,36 +36,37 @@ use yii\helpers\ArrayHelper;
 class ProductPriceHelper extends Component
 {
     /**
+     * @var ShopDiscount[]
+     */
+    static protected $_shopDiscounts = false;
+    /**
      * @var ShopCmsContentElement
      */
     public $shopCmsContentElement;
-
     /**
-     * @var ShopCart
+     * @var ShopProductPrice
      */
-    protected $_shopCart;
-
-
+    public $price;
+    /**
+     * @var shopOrder
+     */
+    protected $_shopOrder;
     /**
      * @var ShopProductPrice
      */
     protected $_minPrice;
-
     /**
      * @var ShopProductPrice
      */
     protected $_basePrice;
-
     /**
      * @var Money
      */
     protected $_minMoney;
-
     /**
      * @var ShopDiscount[]
      */
     protected $_applyedDiscounts;
-
     /**
      *
      */
@@ -77,7 +78,11 @@ class ProductPriceHelper extends Component
             throw new InvalidConfigException("Не заполнены обязательные данные");
         }
 
-        $price = $this->shopCmsContentElement->shopProduct->baseProductPrice;
+        if (!$this->price) {
+            throw new InvalidConfigException("Не заполнены обязательные данные");
+        }
+
+        $price = $this->price;
         $money = clone $price->money;
 
         $applyedShopDiscounts = [];
@@ -86,31 +91,18 @@ class ProductPriceHelper extends Component
         /**
          * @var ShopDiscount $shopDiscount
          */
-        $shopDiscountsTmp = ShopDiscount::find()
-            ->active()
-            ->orderBy(['shop_discount.priority' => SORT_ASC])
-            ->leftJoin('shop_discount2type_price', 'shop_discount2type_price.discount_id = shop_discount.id')
-            ->andWhere([
-                'or',
-                ['shop_discount.site_id' => ""],
-                ['shop_discount.site_id' => null],
-                ['shop_discount.site_id' => \Yii::$app->cms->site->id],
-            ])
-            ->andWhere([
-                'shop_discount2type_price.type_price_id' => $price->typePrice->id,
-            ])
-            ->all();
+        $shopDiscountsTmp = self::getShopDiscounts();
 
         if ($shopDiscountsTmp) {
             foreach ($shopDiscountsTmp as $shopDiscount) {
-                if (\Yii::$app->authManager->checkAccess($this->shopCart->user ? $this->shopCart->id : null, $shopDiscount->permissionName)) {
+                if (\Yii::$app->authManager->checkAccess($this->shopOrder->cmsUser ? $this->shopOrder->cmsUser->id : null, $shopDiscount->permissionName)) {
                     $shopDiscounts[$shopDiscount->id] = $shopDiscount;
                 }
             }
         }
 
-        if ($this->shopCart->discountCoupons) {
-            foreach ($this->shopCart->discountCoupons as $discountCoupon) {
+        if ($this->shopOrder->shopDiscountCoupons) {
+            foreach ($this->shopOrder->shopDiscountCoupons as $discountCoupon) {
                 $shopDiscounts[$discountCoupon->shopDiscount->id] = $discountCoupon->shopDiscount;
             }
         }
@@ -125,7 +117,7 @@ class ProductPriceHelper extends Component
 
             foreach ($shopDiscounts as $shopDiscount) {
 
-                if ($shopDiscount->isTrueConditions($this->shopCmsContentElement)) {
+                if ($shopDiscount->isTrue($this->shopCmsContentElement, $price)) {
                     if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
 
                         $percent = $shopDiscount->value / 100;
@@ -147,7 +139,15 @@ class ProductPriceHelper extends Component
                             break;
                         }
                     } elseif ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
+                        $discountMoney = new Money($shopDiscount->value, "RUB");
 
+                        $money->sub($discountMoney);
+                        $applyedShopDiscounts[] = $shopDiscount;
+
+                        //Нужно остановится и не применять другие скидки
+                        if ($shopDiscount->last_discount === Cms::BOOL_Y) {
+                            break;
+                        }
                     }
                 }
             }
@@ -157,8 +157,14 @@ class ProductPriceHelper extends Component
         $this->_minPrice = $price;
         $this->_applyedDiscounts = $applyedShopDiscounts;
     }
+    static public function getShopDiscounts()
+    {
+        if (self::$_shopDiscounts === false) {
+            self::$_shopDiscounts = ShopDiscount::find()->active()->andWhere(['assignment_type' => ShopDiscount::ASSIGNMENT_TYPE_PRODUCT])->all();
+        }
 
-
+        return self::$_shopDiscounts;
+    }
     /**
      * @return ShopDiscount[]
      */
@@ -184,24 +190,24 @@ class ProductPriceHelper extends Component
     }
 
     /**
-     * @return ShopCart
+     * @return ShopOrder
      */
-    public function getShopCart()
+    public function getshopOrder()
     {
-        if (!$this->_shopCart) {
-            $this->_shopCart = \Yii::$app->shop->shopFuser;
+        if (!$this->_shopOrder) {
+            $this->_shopOrder = \Yii::$app->shop->cart->shopOrder;
         }
 
-        return $this->_shopCart;
+        return $this->_shopOrder;
     }
 
     /**
-     * @param ShopCart $shopCart
+     * @param shopOrder $shopOrder
      * @return $this
      */
-    public function setShopCart(ShopCart $shopCart)
+    public function setshopOrder(ShopOrder $shopOrder)
     {
-        $this->_shopCart = $shopCart;
+        $this->_shopOrder = $shopOrder;
         return $this;
     }
 

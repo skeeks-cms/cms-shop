@@ -17,8 +17,14 @@ class AdminReportOrderSearch extends Model
     public $to;
 
     public $groupType = "d";
-
-
+    static public function getGroupTypes()
+    {
+        return [
+            'd' => \Yii::t('skeeks/shop/app', 'days'),
+            'm' => \Yii::t('skeeks/shop/app', 'months'),
+            'Y' => \Yii::t('skeeks/shop/app', 'years'),
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -29,61 +35,14 @@ class AdminReportOrderSearch extends Model
             [['groupType'], 'safe'],
         ];
     }
-
     public function attributeLabels()
     {
         return [
-            'from' => \Yii::t('skeeks/shop/app', 'From'),
-            'to' => \Yii::t('skeeks/shop/app', 'To'),
-            'groupType' => \Yii::t('skeeks/shop/app', 'Group by')
+            'from'      => \Yii::t('skeeks/shop/app', 'From'),
+            'to'        => \Yii::t('skeeks/shop/app', 'To'),
+            'groupType' => \Yii::t('skeeks/shop/app', 'Group by'),
         ];
     }
-
-    static public function getGroupTypes()
-    {
-        return [
-            'd' => \Yii::t('skeeks/shop/app', 'days'),
-            'm' => \Yii::t('skeeks/shop/app', 'months'),
-            'Y' => \Yii::t('skeeks/shop/app', 'years'),
-        ];
-    }
-
-    public function getColumns()
-    {
-        return
-            [
-                [
-                    'attribute' => 'groupType',
-                    'label' => \Yii::t('skeeks/shop/app', 'Date'),
-                    'filter' => false,
-                ],
-                [
-                    'attribute' => 'total_orders',
-                    'label' => \Yii::t('skeeks/shop/app', 'Total'),
-                ],
-                [
-                    'attribute' => 'total_payed',
-                    'label' => \Yii::t('skeeks/shop/app', 'Number of paid'),
-                ],
-                [
-                    'attribute' => 'total_canceled',
-                    'label' => \Yii::t('skeeks/shop/app', 'Number of canceled'),
-                ],
-                [
-                    'attribute' => 'sum_price',
-                    'label' => \Yii::t('skeeks/shop/app', 'Cost of'),
-                ],
-                [
-                    'attribute' => 'sum_payed',
-                    'label' => \Yii::t('skeeks/shop/app', 'Cost of paid'),
-                ],
-                [
-                    'attribute' => 'sum_canceled',
-                    'label' => \Yii::t('skeeks/shop/app', 'Cost of canceled'),
-                ],
-            ];
-    }
-
     /**
      * @param array|null $params
      * @return ActiveDataProvider
@@ -94,14 +53,14 @@ class AdminReportOrderSearch extends Model
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' =>
+            'sort'  =>
                 [
-                    'attributes' => array_keys(\yii\helpers\ArrayHelper::map($this->getColumns(), 'attribute',
+                    'attributes'   => array_keys(\yii\helpers\ArrayHelper::map($this->getColumns(), 'attribute',
                         'attribute')),
                     'defaultOrder' => [
-                        'groupType' => SORT_DESC
-                    ]
-                ]
+                        'groupType' => SORT_DESC,
+                    ],
+                ],
         ]);
 
         if ($params && ($this->load($params) && $this->validate())) {
@@ -120,23 +79,23 @@ class AdminReportOrderSearch extends Model
 
                 $query->addSelect([
                     "count(*) as total_orders",
-                    "sum(price) as sum_price",
+                    "sum(amount) as sum_price",
 
                     "FROM_UNIXTIME(created_at, '{$format}') as groupType",
 
-                    "(SELECT count(*) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
-                    "(SELECT sum(price) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
+                    "(SELECT count(*) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
+                    "(SELECT sum(amount) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
 
 
-                    "(SELECT count(*) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
-                    "(SELECT sum(price) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
+                    "(SELECT count(*) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
+                    "(SELECT sum(amount) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
                 ]);
 
                 if ($this->from) {
                     $query->andWhere([
                         '>=',
                         'o.created_at',
-                        $this->from
+                        $this->from,
                     ]);
                 }
 
@@ -144,7 +103,7 @@ class AdminReportOrderSearch extends Model
                     $query->andWhere([
                         '<=',
                         'o.created_at',
-                        $this->to
+                        $this->to,
                     ]);
                 }
             }
@@ -167,21 +126,56 @@ class AdminReportOrderSearch extends Model
 
                 $query->addSelect([
                     "count(*) as total_orders",
-                    "sum(price) as sum_price",
+                    "sum(amount) as sum_price",
 
                     "FROM_UNIXTIME(created_at, '{$format}') as groupType",
 
-                    "(SELECT count(*) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
-                    "(SELECT sum(price) FROM shop_order WHERE payed = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
+                    "(SELECT count(*) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_payed",
+                    "(SELECT sum(amount) FROM shop_order WHERE paid_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_payed",
 
 
-                    "(SELECT count(*) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
-                    "(SELECT sum(price) FROM shop_order WHERE canceled = 'Y' AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
+                    "(SELECT count(*) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as total_canceled",
+                    "(SELECT sum(amount) FROM shop_order WHERE canceled_at IS NOT NULL AND FROM_UNIXTIME(created_at, '{$format}') = groupType) as sum_canceled",
                 ]);
             }
 
         }
 
         return $dataProvider;
+    }
+    public function getColumns()
+    {
+        return
+            [
+                [
+                    'attribute' => 'groupType',
+                    'label'     => \Yii::t('skeeks/shop/app', 'Date'),
+                    'filter'    => false,
+                ],
+                [
+                    'attribute' => 'total_orders',
+                    'label'     => \Yii::t('skeeks/shop/app', 'Total'),
+                ],
+                [
+                    'attribute' => 'total_payed',
+                    'label'     => \Yii::t('skeeks/shop/app', 'Number of paid'),
+                ],
+                [
+                    'attribute' => 'total_canceled',
+                    'label'     => \Yii::t('skeeks/shop/app', 'Number of canceled'),
+                ],
+                [
+                    'attribute' => 'sum_price',
+                    'label'     => \Yii::t('skeeks/shop/app', 'Cost of'),
+                ],
+                [
+                    'attribute' => 'sum_payed',
+                    'label'     => \Yii::t('skeeks/shop/app', 'Cost of paid'),
+                ],
+                [
+                    'attribute' => 'sum_canceled',
+                    'label'     => \Yii::t('skeeks/shop/app', 'Cost of canceled'),
+                ],
+            ];
     }
 }

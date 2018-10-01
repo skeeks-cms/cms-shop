@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150928_161201_create_table__shop_viewed_product extends Migration
@@ -32,13 +31,13 @@ class m150928_161201_create_table__shop_viewed_product extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'shop_fuser_id' => $this->integer()->notNull(),
+            'shop_fuser_id'   => $this->integer()->notNull(),
             'shop_product_id' => $this->integer()->notNull(),
 
             'site_id' => $this->integer()->notNull(),
 
             'name' => $this->string(255),
-            'url' => $this->string(255),
+            'url'  => $this->string(255),
 
         ], $tableOptions);
 

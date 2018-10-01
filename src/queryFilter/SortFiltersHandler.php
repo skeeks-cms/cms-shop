@@ -17,12 +17,9 @@ use common\models\V3pProduct;
 use skeeks\yii2\queryfilter\IQueryFilterHandler;
 use v3project\yii2\productfilter\EavFiltersHandler;
 use v3project\yii2\productfilter\IFiltersHandler;
-use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
-use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
@@ -46,7 +43,8 @@ class SortFiltersHandler extends Model
         return $this->formName;
     }
 
-    public function init() {
+    public function init()
+    {
         parent::init();
 
         if (!$this->type_price_id) {
@@ -70,29 +68,35 @@ class SortFiltersHandler extends Model
     public function rules()
     {
         return [
-            [['value'], 'string']
+            [['value'], 'string'],
         ];
     }
 
-    public function getSortOptions() {
+    public function getSortOptions()
+    {
         return [
             '-popular' => 'Популярные',
-            'price' => 'Сначала дешевые',
-            '-price' => 'Сначала дорогие',
-            '-new' => 'Сначала новые',
+            'price'    => 'Сначала дешевые',
+            '-price'   => 'Сначала дорогие',
+            '-new'     => 'Сначала новые',
         ];
     }
-
+    /**
+     * @param DataProviderInterface $dataProvider
+     * @return $this
+     */
+    public function applyToDataProvider(DataProviderInterface $dataProvider)
+    {
+        return $this->applyToQuery($dataProvider->query);
+    }
     /**
      * @param QueryInterface $activeQuery
      * @return $this
      */
     public function applyToQuery(QueryInterface $query)
     {
-        if ($this->value)
-        {
-            switch($this->value)
-            {
+        if ($this->value) {
+            switch ($this->value) {
                 case ('-popular'):
                     $query->orderBy(['show_counter' => SORT_DESC]);
                     break;
@@ -113,7 +117,7 @@ class SortFiltersHandler extends Model
 
                         $query->select([
                             'cms_content_element.*',
-                            'realPrice' => '( currency.course * prices.price )'
+                            'realPrice' => '( currency.course * prices.price )',
                         ]);
 
                         $query->orderBy(['realPrice' => SORT_ASC]);
@@ -153,7 +157,7 @@ class SortFiltersHandler extends Model
 
                         $query->select([
                             'cms_content_element.*',
-                            'realPrice' => '( currency.course * prices.price )'
+                            'realPrice' => '( currency.course * prices.price )',
                         ]);
 
                         $query->orderBy(['realPrice' => SORT_DESC]);
@@ -166,16 +170,6 @@ class SortFiltersHandler extends Model
 
         return $this;
     }
-
-    /**
-     * @param DataProviderInterface $dataProvider
-     * @return $this
-     */
-    public function applyToDataProvider(DataProviderInterface $dataProvider)
-    {
-        return $this->applyToQuery($dataProvider->query);
-    }
-
     public function getSelected()
     {
         return [];
@@ -184,16 +178,16 @@ class SortFiltersHandler extends Model
     public function render(ActiveForm $form)
     {
         return \Yii::$app->view->render($this->viewFile, [
-            'form' => $form,
-            'handler' => $this
+            'form'    => $form,
+            'handler' => $this,
         ]);
     }
 
     public function renderVisible(ActiveForm $form = null)
     {
         return \Yii::$app->view->render($this->viewFileVisible, [
-            'form' => $form,
-            'handler' => $this
+            'form'    => $form,
+            'handler' => $this,
         ]);
     }
 }

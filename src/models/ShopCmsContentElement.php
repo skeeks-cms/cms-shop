@@ -92,7 +92,7 @@ class ShopCmsContentElement extends CmsContentElement
         }
 
         return $this
-            ->hasMany(static::className(), ['parent_content_element_id' => 'id'])
+            ->hasMany(static::class, ['parent_content_element_id' => 'id'])
             ->andWhere(["content_id" => $childContentId])
             ->orderBy(['priority' => SORT_ASC]);
     }
@@ -101,21 +101,21 @@ class ShopCmsContentElement extends CmsContentElement
      */
     public function getShopProduct()
     {
-        return $this->hasOne(ShopProduct::className(), ['id' => 'id'])->from(['shopProduct' => ShopProduct::tableName()]);
+        return $this->hasOne(ShopProduct::class, ['id' => 'id'])->from(['shopProduct' => ShopProduct::tableName()]);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopViewedProducts()
     {
-        return $this->hasMany(ShopViewedProduct::className(), ['shop_product_id' => 'id']);
+        return $this->hasMany(ShopViewedProduct::class, ['shop_product_id' => 'id']);
     }
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopContent()
     {
-        return $this->hasOne(ShopContent::className(), ['content_id' => 'content_id']);
+        return $this->hasOne(ShopContent::class, ['content_id' => 'content_id']);
     }
     /**
      * @return CmsContentElement|static
@@ -182,8 +182,6 @@ class ShopCmsContentElement extends CmsContentElement
         return $model;
 
     }
-
-
 
 
 }

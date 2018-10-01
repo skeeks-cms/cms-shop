@@ -7,11 +7,16 @@
  */
 
 use yii\helpers\Html;
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
+?>
 
+<?
+\skeeks\cms\widgets\Pjax::begin(['id' => "sx-pjax-order-wrapper"]);
+?>
+
+<?
 $this->registerCss(<<<CSS
 
 .sx-dashed
@@ -61,8 +66,10 @@ $this->registerJs(<<<JS
 
             handler.bind('success', function(response)
             {
-                $.pjax.reload('#sx-pjax-order-wrapper', {});
-                $.fancybox.close();
+                jForm.closest(".modal").find(".close").click();
+                _.delay(function() {
+                    $.pjax.reload('#sx-pjax-order-wrapper', {});
+                }, 200);
             });
         }
     });
@@ -74,26 +81,18 @@ JS
 $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 ?>
 
-    <h1 style="text-align: center;">Просмотр заказа № <?= $model->id ?>,
-        от <?= \Yii::$app->formatter->asDatetime($model->created_at); ?></h1>
+<h1 style="text-align: center;">Заказ №<?= $model->id ?>
+    от <?= \Yii::$app->formatter->asDatetime($model->created_at); ?></h1>
 
-<?php $form = ActiveForm::begin([
-    'pjaxOptions' =>
-        [
-            'id' => 'sx-pjax-order-wrapper'
-        ]
-]); ?>
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'General information')); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Order')
+    'content' => \Yii::t('skeeks/shop/app', 'Order'),
 
 ]) ?>
 
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             /*[                      // the owner name of the model
@@ -109,27 +108,28 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
             ],*/
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Last modified'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Last modified'),
                 'format' => 'raw',
-                'value' => \Yii::$app->formatter->asDatetime($model->updated_at),
+                'value'  => \Yii::$app->formatter->asDatetime($model->updated_at),
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Status'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Status'),
                 'format' => 'raw',
-                'value' => <<<HTML
+                'value'  => <<<HTML
 
-                    <a href="#sx-status-change" class="sx-dashed sx-fancybox" style="color: {$model->status->color}">{$model->status->name}</a>
+                    <a href="#" data-toggle="modal" data-target="#sx-status-change" class="sx-dashed" style="color: {$model->status->color}">{$model->status->name}</a>
                     <small>({$statusDate})</small>
 HTML
+                ,
 
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Canceled'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Canceled'),
                 'format' => 'raw',
-                'value' => $this->render('_close-order', [
-                    'model' => $model
+                'value'  => $this->render('_close-order', [
+                    'model' => $model,
                 ]),
             ],
 
@@ -139,154 +139,158 @@ HTML
                 'value' => \Yii::$app->formatter->asDatetime($model->status_at),
             ],*/
 
-        ]
+        ],
 ]) ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Buyer')
+    'content' => \Yii::t('skeeks/shop/app', 'Buyer'),
 ]) ?>
 
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
+                'label'  => \Yii::t('skeeks/shop/app', 'User'),
                 'format' => 'raw',
-                'value' => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->user]))->run()
+                'value'  => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->cmsUser]))->run(),
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Type payer'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Type payer'),
                 'format' => 'raw',
-                'value' => $model->personType->name,
+                'value'  => $model->shopPersonType->name,
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
                 'format' => 'raw',
-                'value' => Html::a($model->buyer->name . " [{$model->buyer->id}]",
+                'value'  => Html::a($model->buyer->name." [{$model->buyer->id}]",
                     \skeeks\cms\helpers\UrlHelper::construct([
                         '/shop/admin-buyer/update',
-                        'pk' => $model->buyer->id
+                        'pk' => $model->buyer->id,
                     ])->enableAdmin(), [
-                        'data-pjax' => 0
+                        'data-pjax' => 0,
                     ]),
             ],
 
 
-        ]
+        ],
 ]) ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Customer data')
+    'content' => \Yii::t('skeeks/shop/app', 'Customer data'),
 ]) ?>
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model->buyer->relatedPropertiesModel,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model->buyer->relatedPropertiesModel,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' => array_keys($model->buyer->relatedPropertiesModel->toArray(
         $model->buyer->relatedPropertiesModel->attributes()
-    ))
+    )),
 
 ]) ?>
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Payment order')
+    'content' => \Yii::t('skeeks/shop/app', 'Payment order'),
 ]) ?>
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Payment method'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Payment method'),
                 'format' => 'raw',
-                'value' => $model->paySystem->name,
+                'value'  => $model->paySystem->name,
             ],
 
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Payed'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Payed'),
                 'format' => 'raw',
-                'value' => $this->render("_payed", [
-                    'model' => $model
-                ])
-            ],
-
-            [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Allow payment'),
-                'format' => 'raw',
-                'value' => $this->render('_payment-allow', [
-                    'model' => $model
+                'value'  => $this->render("_payed", [
+                    'model' => $model,
                 ]),
             ],
 
             [                      // the owner name of the model
-                'label' => "",
+                'label'  => \Yii::t('skeeks/shop/app', 'Allow payment'),
                 'format' => 'raw',
-                'value' => $this->render('_payment', [
-                    'model' => $model
-                ])
-
-            ],
-        ]
-]) ?>
-
-<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Shipping')
-]) ?>
-
-<?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-    'attributes' =>
-        [
-            [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Delivery service'),
-                'format' => 'raw',
-                'value' => $model->delivery ? $model->delivery->name : "",
-            ],
-
-
-            [                      // the owner name of the model
-                'label' => 'Разрешить доставку',
-                'format' => 'raw',
-                'value' => $this->render('_delivery-allow', [
-                    'model' => $model
+                'value'  => $this->render('_payment-allow', [
+                    'model' => $model,
                 ]),
             ],
 
             [                      // the owner name of the model
-                'label' => 'Склад',
+                'label'  => "",
                 'format' => 'raw',
-                'value' => $model->store ? $model->store->name : "",
+                'value'  => $this->render('_payment', [
+                    'model' => $model,
+                ]),
+
             ],
-        ]
+        ],
 ]) ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => 'Комментарий'
+    'content' => \Yii::t('skeeks/shop/app', 'Shipping'),
 ]) ?>
+
 <?= \yii\widgets\DetailView::widget([
-    'model' => $model,
-    'template' => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
     'attributes' =>
         [
             [                      // the owner name of the model
-                'label' => \Yii::t('skeeks/shop/app', 'Comment'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Delivery service'),
                 'format' => 'raw',
-                'value' => $this->render('_comment', [
-                    'model' => $model
-                ])
+                'value'  => Html::a($model->shopDelivery ? $model->shopDelivery->name : "нет", "#", [
+                    "data-toggle" => "modal",
+                    "data-target" => "#sx-allow-delivery",
+                    "class"       => "sx-dashed",
+                ]),
+            ],
+
+
+            /*[                      // the owner name of the model
+                'label'  => 'Разрешить доставку',
+                'format' => 'raw',
+                'value'  => $this->render('_delivery-allow', [
+                    'model' => $model,
+                ]),
+            ],*/
+
+            /*[
+                'label'  => 'Склад',
+                'format' => 'raw',
+                'value'  => $model->store ? $model->store->name : "",
+            ],*/
+        ],
+]) ?>
+
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+    'content' => 'Комментарий',
+]) ?>
+<?= \yii\widgets\DetailView::widget([
+    'model'      => $model,
+    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+    'attributes' =>
+        [
+            [                      // the owner name of the model
+                'label'  => \Yii::t('skeeks/shop/app', 'Comment'),
+                'format' => 'raw',
+                'value'  => $this->render('_comment', [
+                    'model' => $model,
+                ]),
 
             ],
-        ]
+        ],
 ]) ?>
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'The composition of the order')
+    'content' => \Yii::t('skeeks/shop/app', 'The composition of the order'),
 ]) ?>
 
 
@@ -295,11 +299,11 @@ HTML
 $json = \yii\helpers\Json::encode([
     'createUrl' => \skeeks\cms\backend\helpers\BackendUrlHelper::createByParams(['/shop/admin-basket/create'])
         ->merge([
-            'order_id' => $model->id,
+            'shop_order_id' => $model->id,
         ])
         ->enableEmptyLayout()
         ->enableNoActions()
-        ->url
+        ->url,
 ]);
 
 $onclick = new \yii\web\JsExpression(<<<JS
@@ -308,28 +312,37 @@ JS
 );
 ?>
 
+
+
 <?
+
+
 $addItemText = \Yii::t('skeeks/shop/app', 'Add this item');
 $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
+/*<a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>
+                {$addItemText}
+            </a>*/
+
+
 echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-    'label' => "",
+    'label'       => "",
     'parentModel' => $model,
-    'relation' => [
-        'order_id' => 'id',
+    'relation'    => [
+        'shop_order_id' => 'id',
     ],
 
     'sort' => [
         'defaultOrder' =>
             [
-                'updated_at' => SORT_DESC
-            ]
+                'updated_at' => SORT_DESC,
+            ],
     ],
 
     'controllerRoute' => 'shop/admin-basket',
     'gridViewOptions' => [
-        'enabledPjax' => false,
+        'enabledPjax'     => false,
         'beforeTableLeft' => <<<HTML
-            <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-default btn-sm sx-btn-create-dialog" href="#"><i class="glyphicon glyphicon-plus"></i>
                 {$addItemText}
             </a>
             <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i>
@@ -341,89 +354,106 @@ HTML
         'columns' => [
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketImageGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketNameGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketQuantityGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::className(),
+                'class' => \skeeks\cms\shop\grid\BasketPriceGridColumn::class,
             ],
 
             [
-                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::className()
+                'class' => \skeeks\cms\shop\grid\BasketSumGridColumn::class,
             ],
-        ]
+        ],
     ],
 ]); ?>
 
 
-    <div class="row">
-        <div class="col-md-8"></div>
-        <div class="col-md-4">
-            <div class="sx-result">
-                <?
-                $this->registerCss(<<<CSS
+<div class="row">
+    <div class="col-md-8"></div>
+    <div class="col-md-4">
+        <div class="sx-result">
+            <?
+            $this->registerCss(<<<CSS
 .sx-result
 {
     background-color: #ecf2d3;
+    padding: 10px;
+}
+.sx-result .table tbody tr:last-child
+{
+    background: #dbe3b9;
+    font-weight: bold;
+}
+.sx-result .table tbody tr:last-child > th,
+.sx-result .table tbody tr:last-child > th
+{
+    font-weight: bold;
+}
+.sx-result .table tbody > tr > th,
+.sx-result .table tbody > tr > td
+{
+    border-top: none;
+    font-weight: normal;
 }
 CSS
-                );
-                ?>
-                <?=
-                \yii\widgets\DetailView::widget([
-                    'model' => $model,
-                    "template" => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
-                    "options" => ['class' => 'sx-result-table table detail-view'],
-                    'attributes' => [
-                        [
-                            'label' => \Yii::t('skeeks/shop/app', 'The total value of the goods'),
-                            'value' => (string) $model->basketsMoney,
-                        ],
+            );
+            ?>
+            <?=
+            \yii\widgets\DetailView::widget([
+                'model'      => $model,
+                "template"   => "<tr><th>{label}</th><td style='text-align: right;'>{value}</td></tr>",
+                "options"    => ['class' => 'sx-result-table table detail-view'],
+                'attributes' => [
+                    [
+                        'label' => \Yii::t('skeeks/shop/app', 'The total value of the goods'),
+                        'value' => (string)$model->basketsMoney,
+                    ],
 
-                        [
-                            'label' => \Yii::t('skeeks/shop/app', 'Discount, margin'),
-                            'value' => (string) $model->moneyDiscount,
-                        ],
+                    [
+                        'label' => \Yii::t('skeeks/shop/app', 'Discount, margin'),
+                        'value' => (string)$model->moneyDiscount,
+                    ],
 
-                        [
-                            'label' => \Yii::t('skeeks/shop/app', 'Delivery service'),
-                            'value' => (string) $model->moneyDelivery,
-                        ],
+                    [
+                        'label' => \Yii::t('skeeks/shop/app', 'Delivery service'),
+                        'value' => (string)$model->moneyDelivery,
+                    ],
 
-                        [
-                            'label' => \Yii::t('skeeks/shop/app', 'Taxe'),
-                            'value' => (string) $model->moneyVat,
-                        ],
+                    [
+                        'label' => \Yii::t('skeeks/shop/app', 'Taxe'),
+                        'value' => (string)$model->moneyVat,
+                    ],
 
-                        [
-                            'label' => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
-                            'value' => $model->weight . " " . \Yii::t('skeeks/shop/app', 'g.'),
-                        ],
+                    [
+                        'label' => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
+                        'value' => $model->weight." ".\Yii::t('skeeks/shop/app', 'g.'),
+                    ],
 
-                        [
-                            'label' => \Yii::t('skeeks/shop/app', 'Already paid'),
-                            'value' => (string) $model->moneySummPaid,
-                        ],
+                    [
+                        'label' => \Yii::t('skeeks/shop/app', 'Already paid'),
+                        'value' => (string)$model->moneySummPaid,
+                    ],
 
-                        [
-                            'label' => \Yii::t('skeeks/shop/app', 'In total'),
-                            'format' => 'raw',
-                            'value' => Html::tag('b', (string) $model->money),
-                        ]
-                    ]
-                ])
-                ?>
-            </div>
+                    [
+                        'label'  => \Yii::t('skeeks/shop/app', 'In total'),
+                        'format' => 'raw',
+                        'value'  => Html::tag('b', (string)$model->money),
+                    ],
+                ],
+            ])
+            ?>
         </div>
     </div>
+</div>
 
 
 <?
@@ -434,22 +464,29 @@ $shopJson = \yii\helpers\Json::encode([
 
     'backend-add-product' => \skeeks\cms\helpers\UrlHelper::construct([
         '/shop/admin-order/update-order-add-product',
-        'pk' => $model->id
+        'pk' => $model->id,
     ])->enableAdmin()->toString(),
 
 ]);
 
 
 $this->registerJs(<<<JS
-
     sx.classes.SelectProduct = sx.classes.Component.extend({
-
-        open: function()
+        _onDomReady: function()
         {
-            $('#sx-add-product .sx-btn-create').click()
-            return this;
-        }
+            $(".sx-btn-create-dialog").on("click", function() {
+                $('#sx-add-product-wrapper .sx-btn-create').click();
+                return false;
+            });
+            
+            $("#sx-add-product").on("change", function() {
+                sx.AdminShop.addProduct($(this).val());
+                return false;
+            });
+        },
     });
+
+    new sx.classes.SelectProduct();
 
     sx.classes.AdminShop = sx.classes.shop.App.extend({});
     sx.AdminShop = new sx.classes.AdminShop({$shopJson});
@@ -479,369 +516,303 @@ JS
 
 ?>
 
-<?= $form->fieldSetEnd(); ?>
 
-
-
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Transactions by order')); ?>
-
-<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-    'dataProvider' => new \yii\data\ArrayDataProvider([
-        'models' => $model->shopUserTransacts
-    ]),
-
-    'columns' =>
-        [
-            [
-                'class' => \skeeks\cms\grid\CreatedAtColumn::className()
-            ],
-
-            [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
-                    return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopUserTransact->cmsUser]))->run();
-                }
-            ],
-
-            [
-                'class' => \yii\grid\DataColumn::className(),
-                'attribute' => 'type',
-                'label' => \Yii::t('skeeks/shop/app', 'Sum'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopUserTransact $shopUserTransact) {
-                    return ($shopUserTransact->debit == "Y" ? "+" : "-") . (string) $shopUserTransact->money;
-                }
-            ],
-
-            'descriptionText'
-        ]
+<? \yii\bootstrap\Modal::begin([
+    'id'     => 'sx-close-order',
+    'header' => 'Отмена заказа',
 ]); ?>
 
-<?= $form->fieldSetEnd(); ?>
+<?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/validate',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/save',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'History of changes')); ?>
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
+JS
+    ),
 
-<?= \skeeks\cms\modules\admin\widgets\GridView::widget([
-    'dataProvider' => new \yii\data\ArrayDataProvider([
-        'models' => $model->shopOrderChanges
-    ]),
-
-    'columns' =>
-        [
-            [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::className()
-            ],
-
-            [
-                'class' => \yii\grid\DataColumn::className(),
-                'label' => \Yii::t('skeeks/shop/app', 'User'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
-                    if (!$shopOrderChange->createdBy) {
-                        return ' - ';
-                    }
-
-                    return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrderChange->createdBy]))->run();
-                }
-            ],
-
-            [
-                'class' => \yii\grid\DataColumn::className(),
-                'attribute' => 'type',
-                'label' => \Yii::t('skeeks/shop/app', 'Transaction'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
-                    return \skeeks\cms\shop\models\ShopOrderChange::types()[$shopOrderChange->type];
-                }
-            ],
-            [
-                'class' => \yii\grid\DataColumn::className(),
-                'attribute' => 'type',
-                'label' => \Yii::t('skeeks/shop/app', 'Description'),
-                'format' => 'raw',
-                'value' => function (\skeeks\cms\shop\models\ShopOrderChange $shopOrderChange) {
-                    return $shopOrderChange->description;
-                }
-            ],
-
-
-        ]
 ]); ?>
 
-<?= $form->fieldSetEnd(); ?>
+<?= $form->fieldRadioListBoolean($model, 'canceled'); ?>
+<?= $form->field($model, 'reason_canceled')->textarea(['rows' => 5]) ?>
+
+<button class="btn btn-primary">Сохранить</button>
+
+<?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+<? \yii\bootstrap\Modal::end(); ?>
+
+
+
+<? \yii\bootstrap\Modal::begin([
+    'id'     => 'sx-status-change',
+    'header' => 'Изменение статуса',
+]); ?>
+<?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/validate',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/save',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+            function(jForm, ajax){
+                new sx.classes.OrderCallback(jForm, ajax);
+            };
+JS
+    ),
+
+]); ?>
+
+<?= $form->fieldSelect($model, 'shop_order_status_id', \yii\helpers\ArrayHelper::map(
+    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'id', 'name'
+)); ?>
+
+<button class="btn btn-primary">Сохранить</button>
+
+<?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+<? \yii\bootstrap\Modal::end(); ?>
+
+
+
+
+<? \yii\bootstrap\Modal::begin([
+    'id'     => 'sx-allow-payment',
+    'header' => 'Разрешение оплаты',
+]); ?>
+
+<?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/validate',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/save',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
+JS
+    ),
+
+]); ?>
+
+<?=
+$form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
+    $model->paySystems, 'id', 'name'
+));
+?>
+
+<?= $form->field($model, 'is_allowed_payment')->checkbox(); ?>
+
+<button class="btn btn-primary">Сохранить</button>
+
+<?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+<? \yii\bootstrap\Modal::end(); ?>
+
+<? \yii\bootstrap\Modal::begin([
+    'id'     => 'sx-payment-container',
+    'header' => 'Оплата заказа',
+]); ?>
+<?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/pay-validate',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/pay',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+            function(jForm, ajax){
+                new sx.classes.OrderCallback(jForm, ajax);
+            };
+JS
+    ),
+
+]); ?>
+
+<?= $form->fieldSelect($model, 'shop_order_status_id', \yii\helpers\ArrayHelper::map(
+    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'id', 'name'
+)); ?>
+
+<? /*= $form->field($model, 'pay_voucher_num'); */ ?><!--
+        --><? /*= $form->field($model, 'pay_voucher_at')->widget(
+            \kartik\datecontrol\DateControl::class, [
+            'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+        ]); */ ?>
+
+<button class="btn btn-primary">Сохранить</button>
+
+<?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+<? \yii\bootstrap\Modal::end(); ?>
+
+
+
+
+
+<? \yii\bootstrap\Modal::begin([
+    'id'     => 'sx-payment-container-close',
+    'header' => 'Изменение данных по оплате',
+]); ?>
+
+<?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/pay-validate',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/pay',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
+JS
+    ),
+
+]); ?>
+
+<?= $form->fieldSelect($model, 'shop_order_status_id', \yii\helpers\ArrayHelper::map(
+    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'id', 'name'
+)); ?>
+
+<? /*= $form->field($model, 'pay_voucher_num'); */ ?><!--
+            --><? /*= $form->field($model, 'pay_voucher_at')->widget(
+                \kartik\datecontrol\DateControl::class, [
+                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
+            ]); */ ?>
+
+<p>
+    <?= Html::checkbox('payment-close', false, ['label' => 'Отменить оплату']); ?>
+</p>
+<p>
+    <?= Html::checkbox('payment-close-on-client', false,
+        ['label' => 'Вернуть средства на внутренний счет']); ?>
+</p>
+<button class="btn btn-primary">Сохранить</button>
+
+<?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+<? \yii\bootstrap\Modal::end(); ?>
+
+<? \yii\bootstrap\Modal::begin([
+    'id'     => 'sx-allow-delivery',
+    'header' => 'Доставка',
+]); ?>
+
+<?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/validate',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/save',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+                function(jForm, ajax){
+                    new sx.classes.OrderCallback(jForm, ajax);
+                };
+JS
+    ),
+
+]); ?>
+
+<?=
+$form->fieldSelect($model, 'shop_delivery_id', \yii\helpers\ArrayHelper::map(
+    \skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'
+));
+?>
+
+<? /*= $form->fieldRadioListBoolean($model, 'allow_delivery'); */ ?>
+
+<button class="btn btn-primary">Сохранить</button>
+
+<?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+
+<? \yii\bootstrap\Modal::end(); ?>
+
+
+
+
+<? \yii\bootstrap\Modal::begin([
+    'id'     => 'sx-comment',
+    'header' => 'Комментарий',
+]); ?>
+<?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/validate',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+        'shop/admin-order/save',
+        'pk' => $model->id,
+    ])->enableAdmin()->toString(),
+
+    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+            function(jForm, ajax){
+                new sx.classes.OrderCallback(jForm, ajax);
+            };
+JS
+    ),
+
+]); ?>
+
+<?= $form->field($model, 'comments')->textarea([
+    'rows' => 5,
+])->hint(\Yii::t('skeeks/shop/app', 'Internal comment, the customer (buyer) does not see'));
+?>
+
+<button class="btn btn-primary">Сохранить</button>
+
+<?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
+<? \yii\bootstrap\Modal::end(); ?>
+
+
+<div style="display: none;">
+    <?=
+    \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
+        'dialogRoute'            => ['/shop/admin-cms-content-element'],
+        'name'                   => 'sx-add-product',
+        'id'                     => 'sx-add-product',
+        'closeDialogAfterSelect' => false,
+    ]);
+    ?>
+
+
+    <? /*=
+\skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
+    'id' => 'sx-add-product',
+    'name' => 'test',
+    'multiple' => true,
+    'dialogRoute' => ['/shop/admin-cms-content-element']
+]);
+*/ ?>
+</div>
+
 
 <? /*= $form->buttonsCreateOrUpdate($model); */ ?>
-<?php ActiveForm::end(); ?>
 
 
-    <div style="display: none;">
-        <div id="sx-payment-container" style="min-width: 500px; max-width: 500px;">
-            <h2>Оплата заказа:</h2>
-            <hr/>
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/pay-validate',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/pay',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
 
-                'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
-JS
-                ),
-
-            ]); ?>
-
-            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
-            )); ?>
-
-            <?= $form->field($model, 'pay_voucher_num'); ?>
-            <?= $form->field($model, 'pay_voucher_at')->widget(
-                \kartik\datecontrol\DateControl::classname(), [
-                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
-
-            <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-
-
-        <div id="sx-payment-container-close" style="min-width: 500px; max-width: 500px;">
-            <h2>Изменение данных по оплате:</h2>
-            <hr/>
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/pay-validate',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/pay',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-
-                'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
-JS
-                ),
-
-            ]); ?>
-
-            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
-            )); ?>
-
-            <?= $form->field($model, 'pay_voucher_num'); ?>
-            <?= $form->field($model, 'pay_voucher_at')->widget(
-                \kartik\datecontrol\DateControl::classname(), [
-                'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-            ]); ?>
-
-            <p>
-                <?= Html::checkbox('payment-close', false, ['label' => 'Отменить оплату']); ?>
-            </p>
-            <p>
-                <?= Html::checkbox('payment-close-on-client', false,
-                    ['label' => 'Вернуть средства на внутренний счет']); ?>
-            </p>
-            <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-
-        <div id="sx-status-change" style="min-width: 500px; max-width: 500px;">
-            <h2>Изменение статуса:</h2>
-            <hr/>
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/validate',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/save',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-
-                'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
-JS
-                ),
-
-            ]); ?>
-
-            <?= $form->fieldSelect($model, 'status_code', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code', 'name'
-            )); ?>
-
-            <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-
-        <div id="sx-close-order" style="min-width: 500px; max-width: 500px;">
-            <h2>Отмена заказа:</h2>
-            <hr/>
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/validate',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/save',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-
-                'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
-JS
-                ),
-
-            ]); ?>
-
-            <?= $form->fieldRadioListBoolean($model, 'canceled'); ?>
-            <?= $form->field($model, 'reason_canceled')->textarea(['rows' => 5]) ?>
-
-            <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-
-        <div id="sx-allow-payment" style="min-width: 500px; max-width: 500px;">
-            <h2>Разрешение оплаты:</h2>
-            <hr/>
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/validate',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/save',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-
-                'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
-JS
-                ),
-
-            ]); ?>
-
-            <?=
-            $form->fieldSelect($model, 'pay_system_id', \yii\helpers\ArrayHelper::map(
-                $model->paySystems, 'id', 'name'
-            ));
-            ?>
-
-            <?= $form->fieldRadioListBoolean($model, 'allow_payment'); ?>
-
-            <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-
-        <div id="sx-allow-delivery" style="min-width: 500px; max-width: 500px;">
-            <h2>Доставка:</h2>
-            <hr/>
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/validate',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/save',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-
-                'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
-JS
-                ),
-
-            ]); ?>
-
-            <?=
-            $form->fieldSelect($model, 'delivery_id', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'
-            ));
-            ?>
-
-            <?= $form->fieldRadioListBoolean($model, 'allow_delivery'); ?>
-
-            <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-
-
-        <div id="sx-comment" style="min-width: 500px; max-width: 500px;">
-            <h2>Комментарий:</h2>
-            <hr/>
-            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/validate',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-                'action' => \skeeks\cms\helpers\UrlHelper::construct([
-                    'shop/admin-order/save',
-                    'pk' => $model->id
-                ])->enableAdmin()->toString(),
-
-                'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
-JS
-                ),
-
-            ]); ?>
-
-            <?= $form->field($model, 'comments')->textarea([
-                'rows' => 5
-            ])->hint(\Yii::t('skeeks/shop/app', 'Internal comment, the customer (buyer) does not see'));
-            ?>
-
-            <button class="btn btn-primary">Сохранить</button>
-
-            <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-
-        </div>
-    </div>
-
-
-    <div style="display: none;">
-        <?=
-        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
-            'dialogRoute' => ['/shop/admin-cms-content-element'],
-            'name' => 'sx-add-product',
-            'id' => 'sx-add-product',
-            'closeDialogAfterSelect' => false,
-        ]);
-        ?>
-    </div>
 
 <?
 
@@ -850,7 +821,7 @@ $this->registerJs(<<<JS
 {
     _.each(sx.components, function(Component, key)
     {
-        if (Component instanceof sx.classes.SelectModelDialog)
+        /*if (Component instanceof sx.classes.SelectModelDialog)
         {
             Component.bind('change', function(e, data)
             {
@@ -861,9 +832,13 @@ $this->registerJs(<<<JS
             {
                 sx.AdminShop.addProduct(data.id);
             });
-        }
+        }*/
     });
 })(sx, sx.$, sx._);
 JS
 );
+?>
+
+<?
+\skeeks\cms\widgets\Pjax::end();
 ?>

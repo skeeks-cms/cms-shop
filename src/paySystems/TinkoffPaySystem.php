@@ -9,8 +9,8 @@
 namespace skeeks\cms\shop\paySystems;
 
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
-use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
@@ -59,12 +59,22 @@ class TinkoffPaySystem extends PaySystemHandlerComponent
     /**
      * @param ShopOrder $shopOrder
      * @return $this
+     * @deprecated 
      */
     public function paymentResponse(ShopOrder $shopOrder)
     {
         return \Yii::$app->response->redirect(['shop/tinkoff/order-form', 'key' => $shopOrder->key]);;
     }
 
+    /**
+     * @param ShopOrder $shopOrder
+     * @return $this
+     */
+    public function actionPaymentResponse(ShopBill $shopBill)
+    {
+        return \Yii::$app->response->redirect(['shop/tinkoff/bill-form', 'code' => $shopBill->code]);;
+    }
+    
     public function renderConfigForm(ActiveForm $activeForm)
     {
         echo $activeForm->field($this, 'terminal_key');

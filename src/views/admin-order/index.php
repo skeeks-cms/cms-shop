@@ -17,52 +17,52 @@
 <? $pjax = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 <?php echo $this->render('_search', [
-    'searchModel' => $searchModel,
-    'dataProvider' => $dataProvider
+    'searchModel'  => $searchModel,
+    'dataProvider' => $dataProvider,
 ]); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
-    'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
+    'dataProvider'    => $dataProvider,
+    'filterModel'     => $searchModel,
     'adminController' => $controller,
-    'pjax' => $pjax,
-    'columns' => [
+    'pjax'            => $pjax,
+    'columns'         => [
 
         [
-            'class' => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => 'id',
-            'format' => 'raw',
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $order) {
+            'format'    => 'raw',
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $order) {
                 return \yii\helpers\Html::a($order->id, $order->publicUrl, [
                     'data-pjax' => 0,
-                    'target' => '_blank'
+                    'target'    => '_blank',
                 ]);
-            }
+            },
         ],
 
 
         [
-            'class' => \skeeks\cms\grid\CreatedAtColumn::className(),
+            'class' => \skeeks\cms\grid\CreatedAtColumn::class,
         ],
 
         [
-            'class' => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => 'status_code',
-            'format' => 'raw',
-            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code',
+            'format'    => 'raw',
+            'filter'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'code',
                 'name'),
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $order) {
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $order) {
                 return \yii\helpers\Html::label($order->status->name, null, [
                         'style' => "background: {$order->status->color}",
-                        'class' => "label"
-                    ]) . "<br />" .
+                        'class' => "label",
+                    ])."<br />".
                     \yii\helpers\Html::tag("small",
-                        \Yii::$app->formatter->asDatetime($order->status_at) . " (" . \Yii::$app->formatter->asRelativeTime($order->status_at) . ")");
-            }
+                        \Yii::$app->formatter->asDatetime($order->status_at)." (".\Yii::$app->formatter->asRelativeTime($order->status_at).")");
+            },
         ],
 
         /*[
-            'class'     => DataColumn::className(),
+            'class'     => DataColumn::class,
             'attribute' => 'buyer_id',
             'format'    => 'raw',
             'value'     => function(ShopOrder $model)
@@ -77,16 +77,16 @@
         ],*/
 
         [
-            'class' => \skeeks\cms\grid\BooleanColumn::className(),
+            'class'     => \skeeks\cms\grid\BooleanColumn::class,
             'attribute' => 'payed',
-            'format' => 'raw',
+            'format'    => 'raw',
         ],
 
         [
-            'class' => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => "canceled",
-            'format' => "raw",
-            'filter' => [
+            'format'    => "raw",
+            'filter'    => [
                 'Y' => \Yii::t('skeeks/shop/app', 'Yes'),
                 'N' => \Yii::t('skeeks/shop/app', 'No'),
             ],
@@ -113,34 +113,34 @@ CSS
                     'No');
                 $reuslt .= "</div>";
                 return $reuslt;
-            }
+            },
         ],
 
 
         [
-            'class' => \yii\grid\DataColumn::className(),
+            'class'     => \yii\grid\DataColumn::class,
             'attribute' => "user_id",
-            'label' => \Yii::t('skeeks/shop/app', 'Buyer'),
-            'format' => "raw",
-            'filter' => false,
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $shopOrder) {
+            'label'     => \Yii::t('skeeks/shop/app', 'Buyer'),
+            'format'    => "raw",
+            'filter'    => false,
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $shopOrder) {
                 return (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopOrder->user]))->run();
             },
         ],
 
         [
-            'class' => \yii\grid\DataColumn::className(),
+            'class'  => \yii\grid\DataColumn::class,
             'filter' => false,
             'format' => 'raw',
-            'label' => \Yii::t('skeeks/shop/app', 'Good'),
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
+            'label'  => \Yii::t('skeeks/shop/app', 'Good'),
+            'value'  => function (\skeeks\cms\shop\models\ShopOrder $model) {
                 if ($model->shopBaskets) {
                     $result = [];
                     foreach ($model->shopBaskets as $shopBasket) {
                         $result[] = \yii\helpers\Html::a($shopBasket->name, $shopBasket->url, [
-                                'target' => '_blank',
-                                'data-pjax' => '0'
-                            ]) . <<<HTML
+                                'target'    => '_blank',
+                                'data-pjax' => '0',
+                            ]).<<<HTML
  — $shopBasket->quantity $shopBasket->measure_name
 HTML;
 
@@ -151,42 +151,42 @@ HTML;
         ],
 
         [
-            'class' => \yii\grid\DataColumn::className(),
-            'format' => 'raw',
-            'filter' => false,
-            'visible' => true,
+            'class'     => \yii\grid\DataColumn::class,
+            'format'    => 'raw',
+            'filter'    => false,
+            'visible'   => true,
             'attribute' => '',
-            'label' => 'Смотреть',
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
+            'label'     => 'Смотреть',
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $model) {
                 return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $model->publicUrl, [
-                    'target' => '_blank',
-                    'title' => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                    'target'    => '_blank',
+                    'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
                     'data-pjax' => '0',
-                    'class' => 'btn btn-default btn-sm'
+                    'class'     => 'btn btn-default btn-sm',
                 ]);
             },
         ],
 
 
         [
-            'class' => \yii\grid\DataColumn::className(),
-            'format' => 'raw',
-            'filter' => false,
-            'visible' => false,
+            'class'     => \yii\grid\DataColumn::class,
+            'format'    => 'raw',
+            'filter'    => false,
+            'visible'   => false,
             'attribute' => 'price',
-            'label' => \Yii::t('skeeks/shop/app', 'Sum'),
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
-                $result = (string) $model->money;
+            'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $model) {
+                $result = (string)$model->money;
 
 
                 if ($model->moneyDiscount->getValue()) {
-                    $result .= "<br /><small>" . \Yii::t('skeeks/shop/app',
-                            'Discount') . ":" . (string) $model->moneyDiscount . "</small>";
+                    $result .= "<br /><small>".\Yii::t('skeeks/shop/app',
+                            'Discount').":".(string)$model->moneyDiscount."</small>";
                 }
 
                 if ($model->moneyDelivery->getValue()) {
-                    $result .= "<br /><small>" . \Yii::t('skeeks/shop/app',
-                            'Delivery') . ":" . (string) $model->moneyDelivery . "</small>";
+                    $result .= "<br /><small>".\Yii::t('skeeks/shop/app',
+                            'Delivery').":".(string)$model->moneyDelivery."</small>";
                 }
 
                 return $result;
@@ -195,30 +195,30 @@ HTML;
 
 
         [
-            'class' => \yii\grid\DataColumn::className(),
-            'format' => 'raw',
-            'filter' => false,
-            'visible' => false,
+            'class'     => \yii\grid\DataColumn::class,
+            'format'    => 'raw',
+            'filter'    => false,
+            'visible'   => false,
             'attribute' => 'discount_value',
-            'label' => \Yii::t('skeeks/shop/app', 'Discount'),
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
-                return (string) $model->moneyDiscount;
+            'label'     => \Yii::t('skeeks/shop/app', 'Discount'),
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $model) {
+                return (string)$model->moneyDiscount;
             },
         ],
 
         [
-            'class' => \yii\grid\DataColumn::className(),
+            'class'  => \yii\grid\DataColumn::class,
             'format' => 'raw',
             'filter' => false,
             //'visible'        => false,
-            'label' => \Yii::t('skeeks/shop/app', 'Discount coupons'),
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
+            'label'  => \Yii::t('skeeks/shop/app', 'Discount coupons'),
+            'value'  => function (\skeeks\cms\shop\models\ShopOrder $model) {
                 $result = null;
 
                 if ($model->discountCoupons) {
                     foreach ($model->discountCoupons as $discountCoupon) {
                         $result .= \yii\helpers\Html::a($discountCoupon->coupon, '#', [
-                            'title' => $discountCoupon->description . " " . $discountCoupon->shopDiscount->name
+                            'title' => $discountCoupon->description." ".$discountCoupon->shopDiscount->name,
                         ]);
                     }
                 }
@@ -228,25 +228,25 @@ HTML;
         ],
 
         [
-            'class' => \yii\grid\DataColumn::className(),
-            'filter' => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsSite::find()->active()->all(), 'id',
+            'class'     => \yii\grid\DataColumn::class,
+            'filter'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsSite::find()->active()->all(), 'id',
                 'name'),
             'attribute' => 'site_id',
-            'format' => 'raw',
-            'visible' => false,
-            'label' => \Yii::t('skeeks/shop/app', 'Site'),
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
-                return $model->site->name . " [{$model->site->code}]";
+            'format'    => 'raw',
+            'visible'   => false,
+            'label'     => \Yii::t('skeeks/shop/app', 'Site'),
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $model) {
+                return $model->site->name." [{$model->site->code}]";
             },
         ],
 
         [
-            'filter' => \yii\helpers\ArrayHelper::map(\Yii::$app->shop->stores, 'id', 'name'),
+            'filter'    => \yii\helpers\ArrayHelper::map(\Yii::$app->shop->stores, 'id', 'name'),
             'attribute' => 'store_id',
-            'format' => 'raw',
-            'visible' => false,
-            'label' => \Yii::t('skeeks/shop/app', 'Store'),
-            'value' => function (\skeeks\cms\shop\models\ShopOrder $model) {
+            'format'    => 'raw',
+            'visible'   => false,
+            'label'     => \Yii::t('skeeks/shop/app', 'Store'),
+            'value'     => function (\skeeks\cms\shop\models\ShopOrder $model) {
                 return $model->store->name;
             },
         ],

@@ -4,27 +4,29 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\relatedProperties\models\RelatedElementModel;
-use Yii;
 
 /**
  * This is the model class for table "{{%shop_buyer}}".
  *
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
- * @property string $name
- * @property integer $cms_user_id
- * @property integer $shop_person_type_id
+ * @property integer             $id
+ * @property integer             $created_by
+ * @property integer             $updated_by
+ * @property integer             $created_at
+ * @property integer             $updated_at
+ * @property string              $name
+ * @property integer             $cms_user_id
+ * @property integer             $shop_person_type_id
  *
- * @property ShopPersonType $shopPersonType
- * @property CmsUser $cmsUser
- * @property CmsUser $createdBy
- * @property CmsUser $updatedBy
+ * @property ShopPersonType      $shopPersonType
+ * @property CmsUser             $cmsUser
+ * @property CmsUser             $createdBy
+ * @property CmsUser             $updatedBy
  * @property ShopBuyerProperty[] $shopBuyerProperties
- * @property ShopOrder[] $shopOrders
+ * @property ShopOrder[]         $shopOrders
+ *
+ * @property string              $email read-only
  */
 class ShopBuyer extends RelatedElementModel
 {
@@ -45,11 +47,11 @@ class ShopBuyer extends RelatedElementModel
     {
         return array_merge(parent::behaviors(), [
 
-            HasRelatedProperties::className() =>
+            HasRelatedProperties::class =>
                 [
-                    'class' => HasRelatedProperties::className(),
-                    'relatedElementPropertyClassName' => ShopBuyerProperty::className(),
-                    'relatedPropertyClassName' => ShopPersonTypeProperty::className(),
+                    'class'                           => HasRelatedProperties::class,
+                    'relatedElementPropertyClassName' => ShopBuyerProperty::class,
+                    'relatedPropertyClassName'        => ShopPersonTypeProperty::class,
                 ],
 
         ]);
@@ -70,7 +72,7 @@ class ShopBuyer extends RelatedElementModel
                 'default',
                 'value' => function (self $model) {
                     return $this->shopPersonType->name;
-                }
+                },
             ],
         ];
     }
@@ -81,13 +83,13 @@ class ShopBuyer extends RelatedElementModel
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by' => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by' => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at' => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'name' => \Yii::t('skeeks/shop/app', 'The profile name'),
-            'cms_user_id' => \Yii::t('skeeks/shop/app', 'User site'),
+            'id'                  => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'          => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'          => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'          => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'          => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'name'                => \Yii::t('skeeks/shop/app', 'The profile name'),
+            'cms_user_id'         => \Yii::t('skeeks/shop/app', 'User site'),
             'shop_person_type_id' => \Yii::t('skeeks/shop/app', 'Profile type'),
         ];
     }
@@ -97,7 +99,7 @@ class ShopBuyer extends RelatedElementModel
      */
     public function getShopPersonType()
     {
-        return $this->hasOne(ShopPersonType::className(), ['id' => 'shop_person_type_id']);
+        return $this->hasOne(ShopPersonType::class, ['id' => 'shop_person_type_id']);
     }
 
     /**
@@ -105,7 +107,7 @@ class ShopBuyer extends RelatedElementModel
      */
     public function getCmsUser()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'cms_user_id']);
+        return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']);
     }
 
     /**
@@ -113,7 +115,7 @@ class ShopBuyer extends RelatedElementModel
      */
     public function getCreatedBy()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'created_by']);
+        return $this->hasOne(CmsUser::class, ['id' => 'created_by']);
     }
 
     /**
@@ -121,7 +123,7 @@ class ShopBuyer extends RelatedElementModel
      */
     public function getUpdatedBy()
     {
-        return $this->hasOne(CmsUser::className(), ['id' => 'updated_by']);
+        return $this->hasOne(CmsUser::class, ['id' => 'updated_by']);
     }
 
     /**
@@ -129,7 +131,7 @@ class ShopBuyer extends RelatedElementModel
      */
     public function getShopBuyerProperties()
     {
-        return $this->hasMany(ShopBuyerProperty::className(), ['element_id' => 'id']);
+        return $this->hasMany(ShopBuyerProperty::class, ['element_id' => 'id']);
     }
 
     /**
@@ -137,7 +139,7 @@ class ShopBuyer extends RelatedElementModel
      */
     public function getShopOrders()
     {
-        return $this->hasMany(ShopOrder::className(), ['buyer_id' => 'id']);
+        return $this->hasMany(ShopOrder::class, ['buyer_id' => 'id']);
     }
 
 
@@ -150,7 +152,35 @@ class ShopBuyer extends RelatedElementModel
     public function getRelatedProperties()
     {
         //return $this->shopPersonType->getShopPersonTypeProperties();
-        return $this->hasMany(ShopPersonTypeProperty::className(), ['shop_person_type_id' => 'id'])
+        return $this->hasMany(ShopPersonTypeProperty::class, ['shop_person_type_id' => 'id'])
             ->via('shopPersonType')->orderBy(['priority' => SORT_ASC]);
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getEmail()
+    {
+        $this->relatedPropertiesModel->initAllProperties();
+        if ($properties = $this->relatedPropertiesModel->properties) {
+            /**
+             * @var $property ShopPersonTypeProperty
+             */
+            foreach ($properties as $property) {
+                if ($property->is_user_email == "Y") {
+                    $value = $this->relatedPropertiesModel->getAttribute($property->code);
+                    if ($value) {
+                        return (string)$value;
+                    }
+                }
+            }
+        }
+
+        if ($this->cmsUser && $this->cmsUser->email) {
+            return $this->cmsUser->email;
+        }
+
+        return null;
     }
 }

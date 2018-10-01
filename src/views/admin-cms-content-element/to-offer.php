@@ -17,16 +17,19 @@ $model = new \skeeks\cms\shop\models\ShopCmsContentElement();
 
 <? if ($cmsContent) : ?>
     <?= $form->field($model, 'parent_content_element_id')->widget(
-                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-            [
-                    'content_id' => $cmsContent->parent_content_id,
-                    'dialogRoute' => ['/shop/admin-cms-content-element', 'DynamicModel' => [
-                        'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS]
-                    ]]
-            ]
-        )
-                ->label('Общий товар с предложениями');
-        ?>
+        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+        [
+            'content_id'  => $cmsContent->parent_content_id,
+            'dialogRoute' => [
+                '/shop/admin-cms-content-element',
+                'DynamicModel' => [
+                    'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS],
+                ],
+            ],
+        ]
+    )
+        ->label('Общий товар с предложениями');
+    ?>
 <? endif; ?>
 
 

@@ -8,16 +8,10 @@
 
 namespace skeeks\cms\shop\console\controllers;
 
-use skeeks\cms\shop\models\ShopCmsContentElement;
-use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopProduct;
-use skeeks\cms\shop\models\ShopProductPrice;
-use skeeks\cms\shop\models\ShopProductPriceChange;
 use skeeks\cms\shop\models\ShopProductQuantityChange;
 use skeeks\cms\shop\models\ShopQuantityNoticeEmail;
 use yii\console\Controller;
-use yii\db\Exception;
-use yii\db\Expression;
 use yii\helpers\Console;
 
 /**
@@ -42,7 +36,7 @@ class NotifyController extends Controller
             $this->stdout("Уведомить некого\n", Console::BOLD);
             return;
         }
-        $this->stdout("Количество клиентов для уведомлений: " . $countEmails . "\n", Console::BOLD);
+        $this->stdout("Количество клиентов для уведомлений: ".$countEmails."\n", Console::BOLD);
 
 
         //Самый старый запрос на уведомление, начинаем искать изменения от него
@@ -51,7 +45,7 @@ class NotifyController extends Controller
             ->orderBy(['created_at' => SORT_ASC])
             ->one();
 
-        $this->stdout("\tСамый старый запрос на уведомление: " . \Yii::$app->formatter->asDatetime($shopQuantityNoticeEmail->created_at) . "\n");
+        $this->stdout("\tСамый старый запрос на уведомление: ".\Yii::$app->formatter->asDatetime($shopQuantityNoticeEmail->created_at)."\n");
 
         $productIds = ShopQuantityNoticeEmail::find()
             ->andWhere(['is_notified' => 0])
@@ -65,7 +59,7 @@ class NotifyController extends Controller
         if (!$productIds) {
             $this->stdout("\tТоваров не найдено\n");
         }
-        $this->stdout("\tНужно проверить изменения по товарам на которые подписались: " . count($productIds) . "\n");
+        $this->stdout("\tНужно проверить изменения по товарам на которые подписались: ".count($productIds)."\n");
 
         $productIds = array_keys($productIds);
 
@@ -83,7 +77,7 @@ class NotifyController extends Controller
             $this->stdout("\tНе было изменений по товарам\n");
         }
         $productIds = array_keys($productIds);
-        $this->stdout("\tИзменилось товаров: " . count($productIds) . "\n");
+        $this->stdout("\tИзменилось товаров: ".count($productIds)."\n");
         /**
          * @var ShopProduct $product
          */
@@ -128,10 +122,10 @@ class NotifyController extends Controller
         \Yii::$app->mailer->compose('client-quantity-notice', [
             'model' => $noticeEmail,
         ])
-            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName . ''])
+            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
             ->setTo($noticeEmail->email)
             ->setSubject(\Yii::t('skeeks/shop/app',
-                    "We've got the goods interesting you") . " (" . $noticeEmail->shopProduct->cmsContentElement->name . ")")
+                    "We've got the goods interesting you")." (".$noticeEmail->shopProduct->cmsContentElement->name.")")
             ->send();
 
         $noticeEmail->notified_at = \Yii::$app->formatter->asTimestamp(time());
@@ -145,8 +139,8 @@ class NotifyController extends Controller
             'notified_at' => \Yii::$app->formatter->asTimestamp(time()),
         ], [
             'shop_product_id' => $noticeEmail->shop_product_id,
-            'email' => $noticeEmail->email,
-            'is_notified' => 0,
+            'email'           => $noticeEmail->email,
+            'is_notified'     => 0,
         ]);
 
         /*} catch (\Exception $e)

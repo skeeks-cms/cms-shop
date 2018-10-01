@@ -6,7 +6,6 @@
  * @date 17.09.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150926_131201_create_table__shop_basket extends Migration
@@ -32,49 +31,49 @@ class m150926_131201_create_table__shop_basket extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'fuser_id' => $this->integer(),
-            'order_id' => $this->integer(),
-            'product_id' => $this->integer(),
+            'fuser_id'         => $this->integer(),
+            'order_id'         => $this->integer(),
+            'product_id'       => $this->integer(),
             'product_price_id' => $this->integer(),
 
-            'price' => $this->decimal(18, 2)->notNull(),
+            'price'         => $this->decimal(18, 2)->notNull(),
             'currency_code' => $this->string(3)->notNull(),
 
-            'weight' => $this->decimal(18, 2),
+            'weight'   => $this->decimal(18, 2),
             'quantity' => $this->decimal(18, 2)->notNull()->defaultValue(0),
 
             'site_id' => $this->integer(),
 
             'delay' => $this->string(1)->notNull()->defaultValue('N'),
-            'name' => $this->string(255)->notNull(),
+            'name'  => $this->string(255)->notNull(),
 
-            'can_buy' => $this->string(1)->notNull()->defaultValue('Y'),
-            'callback_func' => $this->string(255),
-            'notes' => $this->string(255),
+            'can_buy'             => $this->string(1)->notNull()->defaultValue('Y'),
+            'callback_func'       => $this->string(255),
+            'notes'               => $this->string(255),
             'order_callback_func' => $this->string(255),
-            'detail_page_url' => $this->string(255),
+            'detail_page_url'     => $this->string(255),
 
-            'discount_price' => $this->decimal(18, 2)->notNull()->defaultValue(0),
+            'discount_price'       => $this->decimal(18, 2)->notNull()->defaultValue(0),
             'cancel_callback_func' => $this->string(255),
-            'pay_callback_func' => $this->string(255),
+            'pay_callback_func'    => $this->string(255),
 
             'catalog_xml_id' => $this->string(100),
             'product_xml_id' => $this->string(100),
 
-            'discount_name' => $this->string(255),
-            'discount_value' => $this->string(32),
+            'discount_name'   => $this->string(255),
+            'discount_value'  => $this->string(32),
             'discount_coupon' => $this->string(32),
 
-            'vat_rate' => $this->decimal(18, 2)->notNull()->defaultValue(0),
-            'subscribe' => $this->string(1)->notNull()->defaultValue('N'),
-            'barcode_multi' => $this->string(1)->notNull()->defaultValue('N'),
-            'reserved' => $this->string(1)->notNull()->defaultValue('N'),
+            'vat_rate'         => $this->decimal(18, 2)->notNull()->defaultValue(0),
+            'subscribe'        => $this->string(1)->notNull()->defaultValue('N'),
+            'barcode_multi'    => $this->string(1)->notNull()->defaultValue('N'),
+            'reserved'         => $this->string(1)->notNull()->defaultValue('N'),
             'reserve_quantity' => $this->double(),
 
-            'deducted' => $this->string(1)->notNull()->defaultValue('N'),
-            'custom_price' => $this->string(1)->notNull()->defaultValue('N'),
-            'dimensions' => $this->string(255),
-            'type' => $this->integer(),
+            'deducted'      => $this->string(1)->notNull()->defaultValue('N'),
+            'custom_price'  => $this->string(1)->notNull()->defaultValue('N'),
+            'dimensions'    => $this->string(255),
+            'type'          => $this->integer(),
             'set_parent_id' => $this->integer(),
 
             'measure_name' => $this->string(50),

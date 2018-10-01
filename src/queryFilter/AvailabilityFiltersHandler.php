@@ -17,12 +17,9 @@ use common\models\V3pProduct;
 use skeeks\yii2\queryfilter\IQueryFilterHandler;
 use v3project\yii2\productfilter\EavFiltersHandler;
 use v3project\yii2\productfilter\IFiltersHandler;
-use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
-use yii\db\ActiveQuery;
 use yii\db\QueryInterface;
-use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
@@ -57,11 +54,17 @@ class AvailabilityFiltersHandler extends Model
     public function rules()
     {
         return [
-            [['value'], 'integer']
+            [['value'], 'integer'],
         ];
     }
-
-
+    /**
+     * @param DataProviderInterface $dataProvider
+     * @return $this
+     */
+    public function applyToDataProvider(DataProviderInterface $dataProvider)
+    {
+        return $this->applyToQuery($dataProvider->query);
+    }
     /**
      * @param QueryInterface $activeQuery
      * @return $this
@@ -75,22 +78,12 @@ class AvailabilityFiltersHandler extends Model
 
         return $this;
     }
-
-    /**
-     * @param DataProviderInterface $dataProvider
-     * @return $this
-     */
-    public function applyToDataProvider(DataProviderInterface $dataProvider)
-    {
-        return $this->applyToQuery($dataProvider->query);
-    }
-
     public function getSelected()
     {
 
         if ($this->value == 1) {
             return [
-                'availability' => "В наличии"
+                'availability' => "В наличии",
             ];
         }
 
@@ -100,16 +93,16 @@ class AvailabilityFiltersHandler extends Model
     public function render(ActiveForm $form)
     {
         return \Yii::$app->view->render($this->viewFile, [
-            'form' => $form,
-            'handler' => $this
+            'form'    => $form,
+            'handler' => $this,
         ]);
     }
 
     public function renderVisible(ActiveForm $form = null)
     {
         return \Yii::$app->view->render($this->viewFileVisible, [
-            'form' => $form,
-            'handler' => $this
+            'form'    => $form,
+            'handler' => $this,
         ]);
     }
 }

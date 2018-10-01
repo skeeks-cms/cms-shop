@@ -6,15 +6,13 @@
  * @date 28.08.2015
  */
 
-use yii\helpers\Html;
-
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
 ?>
 
-<? if ($model->allow_payment == 'Y') : ?>
-<a href="#sx-allow-payment" class="sx-dashed sx-fancybox">Да<a>
+<? if ($model->is_allowed_payment) : ?>
+<a href="#" data-toggle="modal" data-target="#sx-allow-payment"  class="sx-dashed">Да<a>
         <? else : ?>
-        <a href="#sx-allow-payment" class="sx-dashed sx-fancybox">Нет<a>
+        <a href="#" data-toggle="modal" data-target="#sx-allow-payment"  class="sx-dashed">Нет<a>
                 <? endif; ?>
 

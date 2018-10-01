@@ -6,7 +6,6 @@
  * @date 31.08.2015
  */
 
-use yii\db\Schema;
 use yii\db\Migration;
 
 class m150831_150601_create_table__shop_pay_system_person_type extends Migration
@@ -25,7 +24,7 @@ class m150831_150601_create_table__shop_pay_system_person_type extends Migration
 
         $this->createTable("{{%shop_pay_system_person_type}}", [
 
-            'pay_system_id' => $this->integer()->notNull(),
+            'pay_system_id'  => $this->integer()->notNull(),
             'person_type_id' => $this->integer()->notNull(),
 
         ], $tableOptions);
