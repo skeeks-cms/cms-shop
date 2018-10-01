@@ -34,7 +34,7 @@ class AgentsController extends Controller
             ['shop_fuser.delivery_id' => null],
             ['shop_fuser.buyer_id' => null],
             new Expression(<<<SQL
-            (SELECT count(id) as count FROM shop_basket WHERE shop_basket.fuser_id = shop_fuser.id) = 0
+            (SELECT count(id) as count FROM shop_order_item WHERE shop_order_item.fuser_id = shop_fuser.id) = 0
 SQL
             ),
         ]);
