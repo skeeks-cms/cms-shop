@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.2.2.1
+-----------------
+ * Update yandex kassa
+ 
 2.2.2
 -----------------
  * Update yandex kassa

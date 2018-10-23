@@ -225,6 +225,9 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         if ($this->isAttributeChanged('paid_at') && $this->paid_at) {
+
+            \Yii::info(print_r($this->toArray(), true), self::class);
+
             (new ShopOrderChange([
                 'type'          => ShopOrderChange::ORDER_PAYED,
                 'shop_order_id' => $this->id,

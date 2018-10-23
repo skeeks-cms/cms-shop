@@ -291,14 +291,20 @@ class YandexKassaController extends Controller
 
     public function actionPaymentListener()
     {
-        \Yii::info(print_r($_SERVER, true), self::class);
+        \Yii::info(__METHOD__, self::class);
+        /*\Yii::info(print_r($_SERVER, true), self::class);
         \Yii::info(print_r(\Yii::$app->request->post(), true), self::class);
         \Yii::info(print_r($_GET, true), self::class);
         \Yii::info(print_r($_POST, true), self::class);
-        \Yii::info(print_r($_REQUEST, true), self::class);
+        \Yii::info(print_r($_REQUEST, true), self::class);*/
 
+        //todo: fix it
+        /**
+         * @var $shopBill ShopBill
+         */
         $shopBill = ShopBill::find()->orderBy(['id' => SORT_DESC])->limit(1)->one();
-        \Yii::info(print_r($shopBill->toArray(), true), self::class);
+
+        \Yii::info("Счет: " . print_r($shopBill->toArray(), true), self::class);
 
         /* @var $yandexKassa \skeeks\cms\shop\paySystems\YandexKassaPaySystem */
         /* @var $model \skeeks\cms\shop\models\ShopBill */
@@ -306,19 +312,27 @@ class YandexKassaController extends Controller
         $model = $shopBill;
         $yandexKassa = $model->shopPaySystem->paySystemHandler;
 
-        \Yii::info(print_r($model->shopPaySystem, true), self::class);
-        \Yii::info(print_r($yandexKassa, true), self::class);
+        if ($shopBill->paid_at) {
+            \Yii::info("Счет: " . $shopBill->id . " уже оплаечен", self::class);
+            return "Ok";
+        }
+
+        //\Yii::info(print_r($model->shopPaySystem, true), self::class);
+        //\Yii::info(print_r($yandexKassa, true), self::class);
 
         if ($paymentId = ArrayHelper::getValue($shopBill->external_data, 'id')) {
-            \Yii::info("Информация о платеже: " . print_r([
+
+            \Yii::info("Запрос информации о платеже: " . print_r([
                 'shop_id' => $yandexKassa->shop_id,
                 'shop_password' => $yandexKassa->shop_password,
                 ], true), self::class);
+
+
             $client = new Client();
             $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);
             $payment = $client->getPaymentInfo($paymentId);
 
-            \Yii::info("Информация о платеже: " . print_r($payment, true), self::class);
+            \Yii::info("Информация о платеже в yandex kassa: " . print_r($payment, true), self::class);
 
             if ($payment->status == "waiting_for_capture") {
 
