@@ -12,6 +12,7 @@ use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\shop\paySystems\YandexKassaPaySystem;
+use YandexCheckout\Client;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -223,12 +224,174 @@ class YandexKassaController extends Controller
             throw new Exception('Order not found');
         }
 
-        if (!$order = ShopBill::find()->where(['code' => $code])->one()) {
+        if (!$bill = ShopBill::find()->where(['code' => $code])->one()) {
             throw new Exception('Order not found');
         }
 
-        return $this->render($this->action->id, [
-            'model' => $order,
-        ]);
+        /*return $this->render($this->action->id, [
+            'model' => $bill,
+        ]);*/
+
+
+        /* @var $yandexKassa \skeeks\cms\shop\paySystems\YandexKassaPaySystem */
+        /* @var $model \skeeks\cms\shop\models\ShopBill */
+
+        $model = $bill;
+        $yandexKassa = $model->shopPaySystem->paySystemHandler;
+        $money = $model->money->convertToCurrency("RUB");
+        $returnUrl = $model->getUrl(true);
+
+        $client = new Client();
+        $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);
+        $payment = $client->createPayment(
+            array(
+                'amount' => array(
+                    'value' => $money->amount,
+                    'currency' => 'RUB',
+                ),
+                'confirmation' => array(
+                    'type' => 'redirect',
+                    'return_url' => $returnUrl,
+                ),
+                'description' => 'Заказ №' . $model->shop_order_id,
+            ),
+            uniqid('', true)
+        );
+
+        \Yii::info(print_r($payment, true), self::class);
+
+        if (!$payment->id) {
+            throw new Exception('Yandex kassa payment id not found');
+        }
+
+        $model->external_data = [
+            'id' => $payment->id
+        ];
+        $model->save();
+
+
+
+        /*$paymentId = $payment->id;
+        $idempotenceKey = uniqid('', true);
+        $response = $client->capturePayment(
+          array(
+              'amount' => array(
+                  'value' => '2.00',
+                  'currency' => 'RUB',
+              ),
+          ),
+          $paymentId,
+          $idempotenceKey
+        );*/
+
+        return $this->redirect($payment->confirmation->getConfirmationUrl());
+    }
+
+    public $enableCsrfValidation = false;
+
+    public function actionPaymentListener()
+    {
+        \Yii::info(print_r($_SERVER, true), self::class);
+        \Yii::info(print_r(\Yii::$app->request->post(), true), self::class);
+        \Yii::info(print_r($_GET, true), self::class);
+        \Yii::info(print_r($_POST, true), self::class);
+        \Yii::info(print_r($_REQUEST, true), self::class);
+
+        $shopBill = ShopBill::find()->orderBy(['id' => SORT_DESC])->limit(1)->one();
+        \Yii::info(print_r($shopBill->toArray(), true), self::class);
+
+        /* @var $yandexKassa \skeeks\cms\shop\paySystems\YandexKassaPaySystem */
+        /* @var $model \skeeks\cms\shop\models\ShopBill */
+
+        $model = $shopBill;
+        $yandexKassa = $model->shopPaySystem->paySystemHandler;
+
+        \Yii::info(print_r($model->shopPaySystem, true), self::class);
+        \Yii::info(print_r($yandexKassa, true), self::class);
+
+        if ($paymentId = ArrayHelper::getValue($shopBill->external_data, 'id')) {
+            \Yii::info("Информация о платеже: " . print_r([
+                'shop_id' => $yandexKassa->shop_id,
+                'shop_password' => $yandexKassa->shop_password,
+                ], true), self::class);
+            $client = new Client();
+            $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);
+            $payment = $client->getPaymentInfo($paymentId);
+
+            \Yii::info("Информация о платеже: " . print_r($payment, true), self::class);
+
+            if ($payment->status == "waiting_for_capture") {
+
+                $money = $model->money->convertToCurrency("RUB");
+
+                $idempotenceKey = uniqid('', true);
+                $response = $client->capturePayment(
+                    array(
+                        'amount' => array(
+                          'value' => $money->amount,
+                          'currency' => 'RUB',
+                        ),
+                    ),
+                    $paymentId,
+                    $idempotenceKey
+                );
+
+                \Yii::info("Подтверждение оплаты: " . print_r($response, true), self::class);
+            }
+
+            $payment = $client->getPaymentInfo($paymentId);
+
+            if ($payment->status == "succeeded") {
+
+
+
+                $transaction = \Yii::$app->db->beginTransaction();
+
+                try {
+
+                    $payment = new ShopPayment();
+                    $payment->shop_buyer_id = $shopBill->shop_buyer_id;
+                    $payment->shop_pay_system_id = $shopBill->shop_pay_system_id;
+                    $payment->shop_order_id = $shopBill->shop_order_id;
+                    $payment->amount = $shopBill->amount;
+                    $payment->currency_code = $shopBill->currency_code;
+                    $payment->comment = "Оплата по счету №{$shopBill->id} от ".\Yii::$app->formatter->asDate($shopBill->created_at);
+                    $payment->external_data = $response;
+
+                    if (!$payment->save()) {
+                        throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
+                    }
+
+                    $shopBill->paid_at = time();
+                    $shopBill->shop_payment_id = $payment->id;
+
+                    if (!$shopBill->save()) {
+                        throw new Exception("Не обновился счет: ".print_r($payment->errors, true));
+                    }
+
+                    $shopBill->shopOrder->paid_at = time();
+                    $shopBill->shopOrder->save();
+
+                    $transaction->commit();
+
+                    return $this->redirect($shopBill->shopOrder->url);
+
+                } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
+                    throw $e;
+                }
+
+
+
+
+
+            }
+        }
+        /*$client = new Client();
+        $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);
+        $client->getPaymentInfo()*/
+
+        return "Ok";
     }
 }

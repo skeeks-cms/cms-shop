@@ -114,6 +114,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
         return ArrayHelper::merge(parent::attributeLabels(), [
             'isLive'         => 'Рабочий режим',
             'sMerchantPass2' => 'sMerchantPass2',
+            'shop_password' => 'Секретный ключ',
         ]);
     }
     public function attributeHints()
@@ -144,24 +145,21 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     public function renderConfigForm(ActiveForm $activeForm)
     {
 
-        echo $activeForm->field($this, 'isLive')->checkbox();
+        //echo $activeForm->field($this, 'isLive')->checkbox();
         echo $activeForm->field($this, 'shop_password');
-        echo $activeForm->field($this, 'security_type');
+        //echo $activeForm->field($this, 'security_type');
         echo $activeForm->field($this, 'shop_id');
-        echo $activeForm->field($this, 'scid');
-        echo $activeForm->field($this, 'payment_type');
+        //echo $activeForm->field($this, 'scid');
+        //echo $activeForm->field($this, 'payment_type');
 
         echo Alert::widget([
             'options' => [
                 'class' => 'alert-info',
             ],
             'body'    => <<<HTML
-<a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/shop-config/intro-docpage/">Подключение магазина</a><br />
-В настройках вашего магазина на yandex укажите: <br />
-Укажите checkUrl: /shop/yandex-kassa/check-order<br />
-Укажите avisoUrl: /shop/yandex-kassa/payment-aviso<br />
-<hr />
-<a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/examples/examples-test-data-docpage/">Тестовые данные</a><br />
+<a target="_blank" href="https://kassa.yandex.ru/docs/guides/#bystryj-start">Подключение магазина</a><br />
+В настройках вашего магазина на yandex укажите удрес для уведомлений: <br />
+Укажите https://printberi.ru/shop/yandex-kassa/payment-listener<br />
 HTML
             ,
         ]);
