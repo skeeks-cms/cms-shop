@@ -85,7 +85,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
     public function init()
     {
-        \Yii::info('test');
         $this->name = \Yii::t('skeeks/shop/app', 'Elements');
         parent::init();
     }
@@ -94,8 +93,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
      */
     public function actions()
     {
-        \Yii::info('test');
-
         $actions = ArrayHelper::merge(parent::actions(), [
                 /*"create" => ["callback" => [$this, 'create']],
                 "update" => ["callback" => [$this, 'update']],*/

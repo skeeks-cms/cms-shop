@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.2.2.2
+-----------------
+ * Removed admin logs 
+ 
 2.2.2.1
 -----------------
  * Update yandex kassa
