@@ -1,6 +1,9 @@
 Changelog
 ==============
 
+2.2.3
+ * New ViewRenderEvent
+
 2.2.2.2
 -----------------
  * Removed admin logs 
