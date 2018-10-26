@@ -577,7 +577,7 @@ HTML;
                          */
                         $createAction->url = ArrayHelper::merge($createAction->urlData, ['shop_order_id' => $this->model->id]);
 
-                        $event->data = ContextMenuControllerActionsWidget::widget([
+                        $event->content = ContextMenuControllerActionsWidget::widget([
                                 'actions'         => [$createAction],
                                 'isOpenNewWindow' => true,
                                 'button'          => [
@@ -640,7 +640,7 @@ HTML;
                          */
                         $createAction->url = ArrayHelper::merge($createAction->urlData, ['shop_order_id' => $this->model->id]);
 
-                        $event->data = ContextMenuControllerActionsWidget::widget([
+                        $event->content = ContextMenuControllerActionsWidget::widget([
                                 'actions'         => [$createAction],
                                 'isOpenNewWindow' => true,
                                 'button'          => [
@@ -701,7 +701,7 @@ HTML;
                          */
                         $createAction->url = ArrayHelper::merge($createAction->urlData, ['shop_order_id' => $this->model->id]);
 
-                        $event->data = ContextMenuControllerActionsWidget::widget([
+                        $event->content = ContextMenuControllerActionsWidget::widget([
                                 'actions'         => [$createAction],
                                 'isOpenNewWindow' => true,
                                 'button'          => [
