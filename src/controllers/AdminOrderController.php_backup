@@ -58,7 +58,7 @@ class AdminOrderController extends AdminModelEditorController
                     [
                         'class'    => AdminAction::class,
                         'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
-                        "icon"     => "glyphicon glyphicon-plus",
+                        "icon"     => "fa fa-plus",
                         "callback" => [$this, 'createOrder'],
                     ],
 
@@ -67,7 +67,7 @@ class AdminOrderController extends AdminModelEditorController
                 [
                     'class'         => AdminOneModelEditAction::class,
                     "name"         => \Yii::t('skeeks/shop/app',"Информация"),
-                    "icon"          => "glyphicon glyphicon-eye-open",
+                    "icon"          => "fa fa-eye",
                     "priority"      => 5,
                     "callback"      => [$this, 'view'],
                 ],*/

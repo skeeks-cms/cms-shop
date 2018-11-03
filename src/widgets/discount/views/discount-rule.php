@@ -41,7 +41,7 @@
                 </div>
                 <div class="col-md-6 sx-remove-wrapper">
                     <a href="#" class="btn btn-xs sx-remove pull-right" title="Удалить группу условий">
-                        <i class="glyphicon glyphicon-remove"></i>
+                        <i class="fa fa-times"></i>
                     </a>
                 </div>
             </div>
@@ -149,7 +149,7 @@
 
             <div class="col-md-1 sx-remove-wrapper">
                 <a href="#" class="btn btn-xs sx-remove pull-right" title="Удалить условие">
-                    <i class="glyphicon glyphicon-remove"></i>
+                    <i class="fa fa-times"></i>
                 </a>
             </div>
         </div>

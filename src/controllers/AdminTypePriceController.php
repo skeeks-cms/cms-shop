@@ -44,7 +44,7 @@ class AdminTypePriceController extends AdminModelEditorController
                     [
                         'class'        => AdminMultiModelEditAction::class,
                         "name"         => \Yii::t('skeeks/shop/app', 'Default'),
-                        //"icon"              => "glyphicon glyphicon-trash",
+                        //"icon"              => "fa fa-trash",
                         "eachCallback" => [$this, 'eachMultiDef'],
                         "priority"     => 0,
                     ],

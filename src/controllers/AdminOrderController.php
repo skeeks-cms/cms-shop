@@ -216,7 +216,7 @@ HTML;
             'create-order' => [
                 'class'    => AdminAction::class,
                 'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
-                "icon"     => "glyphicon glyphicon-plus",
+                "icon"     => "fa fa-plus",
                 "callback" => [$this, 'createOrder'],
             ],
 

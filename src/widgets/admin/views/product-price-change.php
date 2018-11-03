@@ -10,7 +10,7 @@
 ?>
 <? if ($widget->productPrice && $widget->productPrice->shopProductPriceChanges) : ?>
     <a href="#" data-toggle="modal" data-target="#sx-price-change-<?= $widget->id; ?>" class="btn btn-default"><i
-                class="glyphicon glyphicon-eye-open"></i>
+                class="fa fa-eye"></i>
         <?= \Yii::t('skeeks/shop/app', 'Changelog'); ?></a>
 
     <? $createModal = \yii\bootstrap\Modal::begin([

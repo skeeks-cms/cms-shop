@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.2.4
+-----------------
+ * Update icons to fontawesome for bootstrap4
+ 
 2.2.3
 -----------------
  * New ViewRenderEvent

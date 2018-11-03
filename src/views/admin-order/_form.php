@@ -319,7 +319,7 @@ JS
 
 $addItemText = \Yii::t('skeeks/shop/app', 'Add this item');
 $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
-/*<a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>
+/*<a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="fa fa-plus"></i>
                 {$addItemText}
             </a>*/
 
@@ -342,10 +342,10 @@ echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
     'gridViewOptions' => [
         'enabledPjax'     => false,
         'beforeTableLeft' => <<<HTML
-            <a class="btn btn-default btn-sm sx-btn-create-dialog" href="#"><i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-default btn-sm sx-btn-create-dialog" href="#"><i class="fa fa-plus"></i>
                 {$addItemText}
             </a>
-            <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i>
+            <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="fa fa-plus"></i>
                 {$addPosition}
             </a>
 HTML

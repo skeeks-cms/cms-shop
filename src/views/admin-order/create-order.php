@@ -224,8 +224,8 @@ JS
     'gridViewOptions' => [
         'enabledPjax'     => false,
         'beforeTableLeft' => <<<HTML
-    <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="glyphicon glyphicon-plus"></i>Добавить товар</a>
-    <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="glyphicon glyphicon-plus"></i>Добавить позицию</a>
+    <a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="fa fa-plus"></i>Добавить товар</a>
+    <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="fa fa-plus"></i>Добавить позицию</a>
 HTML
         ,
 
