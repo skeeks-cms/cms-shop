@@ -12,6 +12,7 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrderStatus;
@@ -27,6 +28,7 @@ use yii\widgets\ActiveForm;
  * @property ShopTypePrice    $baseTypePrice
  * @property ShopPersonType[] $shopPersonTypes
  * @property ShopTypePrice[]  $shopTypePrices
+ * @property ShopTypePrice[]  $canBuyTypePrices
  *
  * @property ShopCart         $cart
  *
@@ -208,6 +210,31 @@ class ShopComponent extends Component
 
         return $this->_shopTypePrices;
     }
+
+    /**
+     * Типы цен по которым можно купить товар на сайте пользователю
+     *
+     * @param null|CmsUser $user
+     * @return array
+     */
+    public function getCanBuyTypePrices($user = null)
+    {
+        $result = [];
+
+        if (!$user) {
+            $user = \Yii::$app->user->identity;
+        }
+
+        foreach ($this->shopTypePrices as $typePrice) {
+            if (\Yii::$app->authManager->checkAccess($user ? $user->id : null, $typePrice->buyPermissionName)
+                || $typePrice->isDefault
+            ) {
+                $result[$typePrice->id] = $typePrice;
+            }
+        }
+
+        return $result;
+    }
     /**
      * @return array|null|ShopCart
      */
@@ -235,9 +262,8 @@ class ShopComponent extends Component
 
             if (!$this->_shopCart) {
                 $shopCart = new ShopCart();
-                $shopCart->save();
-
-                \Yii::$app->getSession()->set($this->sessionFuserName, $shopCart->id);
+                //$shopCart->save();
+                //\Yii::$app->getSession()->set($this->sessionFuserName, $shopCart->id);
                 $this->_shopCart = $shopCart;
             }
         } else {
@@ -291,7 +317,7 @@ class ShopComponent extends Component
         /**
          * Если у корзины нет заказа, нужно его создать
          */
-        if (!$this->_shopCart->shop_order_id) {
+        /*if (!$this->_shopCart->shop_order_id) {
             $shopOrder = new ShopOrder();
             $shopOrder->cms_site_id = \Yii::$app->cms->site->id;
             if (!$shopOrder->save()) {
@@ -299,7 +325,7 @@ class ShopComponent extends Component
             }
             $this->_shopCart->shop_order_id = $shopOrder->id;
             $this->_shopCart->save(false);
-        }
+        }*/
 
         return $this->_shopCart;
     }

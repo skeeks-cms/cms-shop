@@ -109,6 +109,11 @@ class CartController extends Controller
                 }
             }
 
+            if (\Yii::$app->shop->cart->isNewRecord) {
+                \Yii::$app->shop->cart->save();
+                \Yii::$app->getSession()->set(\Yii::$app->shop->sessionFuserName, \Yii::$app->shop->cart->id);
+            }
+
             $shopBasket = ShopOrderItem::find()->where([
                 'shop_order_id'   => \Yii::$app->shop->cart->shopOrder->id,
                 'shop_product_id' => $product_id,

@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\User;
 use skeeks\cms\money\Money;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
+use yii\base\UserException;
 use yii\db\ActiveQuery;
 
 /**
@@ -100,11 +101,23 @@ class ShopCart extends ActiveRecord
                     'created_at',
                     'updated_at',
                     'cms_user_id',
-                    'shop_order_id',
+                    //'shop_order_id',
                 ],
                 'integer',
             ],
             [['cms_user_id'], 'unique'],
+
+            [['shop_order_id'], 'default', 'value' => function(self $model) {
+                $shopOrder = $this->shopOrder;
+
+                if ($shopOrder->isNewRecord) {
+                    if (!$shopOrder->save()) {
+                        throw new UserException("Заказ-черновик не создан: ".print_r($shopOrder->errors, true));
+                    }
+                }
+
+                return $shopOrder->id;
+            }],
         ]);
     }
     /**
@@ -128,10 +141,31 @@ class ShopCart extends ActiveRecord
 
 
     /**
+     * @var null|ShopOrder
+     */
+    protected $_newShopOrder = null;
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getShopOrder()
     {
+        if ($this->isNewRecord) {
+
+            if (!$this->_newShopOrder) {
+                $this->_newShopOrder = new ShopOrder();
+
+                if (\Yii::$app->cms->site) {
+                    $this->_newShopOrder->cms_site_id = \Yii::$app->cms->site->id;
+                }
+
+                //Для того чтобы применились default rules
+                $this->_newShopOrder->validate();
+            }
+
+            return $this->_newShopOrder;
+        }
+
         return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
 
@@ -351,7 +385,7 @@ class ShopCart extends ActiveRecord
      */
     public function getBuyTypePrices()
     {
-        return $this->shopOrder->buyTypePrices;
+        return $this->shopOrder ? $this->shopOrder->buyTypePrices : \Yii::$app->shop->canBuyTypePrices;
     }
 
 

@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.2.5
+-----------------
+ * Fixed always create orders
+ 
 2.2.4
 -----------------
  * Update icons to fontawesome for bootstrap4

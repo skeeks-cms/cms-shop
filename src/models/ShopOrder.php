@@ -1032,9 +1032,9 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getBuyTypePrices()
     {
-        $result = [];
+        return \Yii::$app->shop->getCanBuyTypePrices($this->cmsUser);
 
-        foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
+        /*foreach (\Yii::$app->shop->shopTypePrices as $typePrice) {
             if (\Yii::$app->authManager->checkAccess($this->cmsUser ? $this->cmsUser->id : null, $typePrice->buyPermissionName)
                 || $typePrice->isDefault
             ) {
@@ -1042,7 +1042,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             }
         }
 
-        return $result;
+        return $result;*/
     }
     /**
      * Добавить в заказ еще позиции
