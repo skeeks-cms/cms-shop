@@ -995,7 +995,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $ids = ArrayHelper::map($this->buyTypePrices, 'id', 'id');
         $minPh = null;
 
-        if ($shopCmsContentElement->shopProduct->shopProductPrices) {
+        if ($shopCmsContentElement->shopProduct && $shopCmsContentElement->shopProduct->shopProductPrices) {
             foreach ($shopCmsContentElement->shopProduct->shopProductPrices as $price) {
 
 
