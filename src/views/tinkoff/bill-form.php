@@ -23,10 +23,17 @@ $payData = [
 ];
 
 $data = [];
-if ($model->user) {
-    $data[] = 'Email='.$model->user->email;
-    $data[] = 'Phone='.$model->user->phone;
-    $data[] = 'Name='.$model->user->displayName;
+
+if ($model->shopBuyer) {
+    if ($model->shopBuyer->email) {
+        $data[] = 'Email='.$model->shopBuyer->email;
+    }
+
+    if ($model->shopBuyer->name) {
+        $data[] = 'Name='.$model->shopBuyer->name;
+    }
+    //$data[] = 'Phone='.$model->buyer->phone;
+
 
     $payData['DATA'] = implode('|', $data);
 }

@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\User;
 use skeeks\cms\money\Money;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
+use yii\base\Exception;
 use yii\base\UserException;
 use yii\db\ActiveQuery;
 
@@ -164,12 +165,32 @@ class ShopCart extends ActiveRecord
             }
 
             return $this->_newShopOrder;
+        } elseif (!$this->shop_order_id) {
+            //todo: добавить транзакцию
+            $order = new ShopOrder();
+
+            if (\Yii::$app->cms->site) {
+                $order->cms_site_id = \Yii::$app->cms->site->id;
+            }
+
+                //Для того чтобы применились default rules
+            if (!$order->save()) {
+                throw new Exception("Заказ черновик не создан");
+            }
+
+            $this->shop_order_id = $order->id;
+            if (!$this->save()) {
+                throw new Exception("Заказ черновик не создан");
+            }
+
+            return $order;
         }
+
 
         return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
 
-
+OrderController
     /**
      * @return \yii\db\ActiveQuery
      * @deprecated
