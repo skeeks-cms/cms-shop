@@ -795,6 +795,13 @@ class ShopOrder extends \skeeks\cms\models\Core
                         $discountMoney = new Money($shopDiscount->value, $shopDiscount->currency_code);
                         $money->add($discountMoney);
                     }
+                    
+                    if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
+                        $moneyOrderItems = $this->calcMoneyItems;
+                        $moneyValue = $moneyOrderItems->amount * $shopDiscount->value / 100;
+                        $discountMoney = new Money($moneyValue, $moneyOrderItems->currency);
+                        $money->add($discountMoney);
+                    }
 
                     if ($shopDiscount->isLast) {
                         break;
