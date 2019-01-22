@@ -190,7 +190,6 @@ class ShopCart extends ActiveRecord
         return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
 
-OrderController
     /**
      * @return \yii\db\ActiveQuery
      * @deprecated
