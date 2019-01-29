@@ -188,7 +188,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         parent::initGridData($action, $content);
 
 
-
         $sortAttributes = [];
         $shopColumns = [];
         $visibleColumns = [];
@@ -214,7 +213,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'label'     => 'Количество [магазин]',
             'format'    => 'raw',
             'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
-                return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol_rus;
+                if ($shopCmsContentElement->shopProduct) {
+                    return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol_rus;
+                }
+                return "—";
             },
         ];
         $sortAttributes["shop.quantity"] = [
