@@ -100,6 +100,21 @@ $url = $order->getPublicUrl();
 ?>
 <?= Html::endTag('p'); ?>
 
+<? if ($order->shopDiscountCoupons) : ?>
+    <?= Html::beginTag('h3'); ?>
+    <?= count($order->shopDiscountCoupons) == 1 ? "Скидочный купон:" : "Скидочные купоны:" ;?>
+    <?= Html::endTag('h3'); ?>
+
+
+    <? foreach ($order->shopDiscountCoupons as $shopDiscountCoupon) : ?>
+        <b><?= $shopDiscountCoupon->coupon ?></b> -
+        <? if ($shopDiscountCoupon->shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_F) : ?>
+            <?= new \skeeks\cms\money\Money($shopDiscountCoupon->shopDiscount->value, $order->currency_code); ?>
+        <? else: ?>
+        <? endif; ?>
+    <? endforeach; ?>
+<? endif; ?>
+
 <?= Html::beginTag('h2'); ?>
     Итого:
 <?= Html::endTag('h2'); ?>
@@ -107,6 +122,7 @@ $url = $order->getPublicUrl();
 <?= Html::beginTag('p'); ?>
     Стоимость товаров: <?= Html::tag('b', (string)$order->basketsMoney); ?><br/>
     Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
+    Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
     Оплачено: <?= Html::tag('b', (string)$order->money); ?>
 <?= Html::endTag('p'); ?>
 
