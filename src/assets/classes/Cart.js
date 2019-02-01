@@ -92,7 +92,9 @@
             });
 
             _.delay(function () {
-                $.pjax.reload({container: self.JWrapper().selector});
+                $.pjax.reload(self.JWrapper().selector, {
+                    push: false
+                });
             }, Number(this.get('delay', 0)));
 
             return this;
