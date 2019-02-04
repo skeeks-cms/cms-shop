@@ -13,7 +13,7 @@
 $query = $dataProvider->query;
 
 $query->groupBy([\skeeks\cms\models\CmsUser::tableName().'.id']);
-$query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.user_id = cms_user.id');
+$query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.shop_buyer_id = cms_user.id');
 
 ?>
 
@@ -50,7 +50,7 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
                 'class' => \yii\grid\DataColumn::class,
                 'label' => \Yii::t('skeeks/shop/app', 'Date of last order'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
-                    if ($order = \skeeks\cms\shop\models\ShopOrder::find()->where(['user_id' => $model->id])
+                    if ($order = \skeeks\cms\shop\models\ShopOrder::find()->where(['shop_buyer_id' => $model->id])
                         ->orderBy(['created_at' => SORT_DESC])->one()
                     ) {
                         return \Yii::$app->formatter->asDatetime($order->created_at);
@@ -65,8 +65,8 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
                 'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     return \skeeks\cms\shop\models\ShopOrder::find()->where([
-                        'user_id' => $model->id,
-                        'payed'   => \skeeks\cms\components\Cms::BOOL_Y,
+                        'shop_buyer_id' => $model->id])
+                        ->andWhere (['IS NOT', 'paid_at', NULL
                     ])->count();
                 },
             ],
@@ -76,8 +76,8 @@ $query->leftJoin(\skeeks\cms\shop\models\ShopOrder::tableName(), 'shop_order.use
                 'label' => \Yii::t('skeeks/shop/app', 'The amount paid orders'),
                 'value' => function (\skeeks\cms\models\CmsUser $model) {
                     return \skeeks\cms\shop\models\ShopOrder::find()->where([
-                        'user_id' => $model->id,
-                        'payed'   => \skeeks\cms\components\Cms::BOOL_Y,
+                        'shop_buyer_id' => $model->id])
+                        ->andWhere (['IS NOT', 'paid_at', NULL
                     ])->count();
                 },
             ],

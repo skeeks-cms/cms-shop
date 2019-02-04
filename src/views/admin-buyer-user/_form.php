@@ -72,9 +72,9 @@ $roles = implode(', ', $result);
 $money = \Yii::$app->money->newMoney();
 
 $payedOrders = \skeeks\cms\shop\models\ShopOrder::find()->where([
-    'user_id' => $model->id,
-    'payed'   => \skeeks\cms\components\Cms::BOOL_Y,
-])->all();
+    'shop_buyer_id' => $model->id])
+    ->andWhere (['IS NOT', 'paid_at', NULL])
+    ->all();
 
 if ($payedOrders) {
     foreach ($payedOrders as $shopOrder) {
@@ -87,10 +87,10 @@ if ($payedOrders) {
 
 
 $userStatistics = [
-    'total'      => \skeeks\cms\shop\models\ShopOrder::find()->where(['user_id' => $model->id])->count(),
+    'total'      => \skeeks\cms\shop\models\ShopOrder::find()->where(['shop_buyer_id' => $model->id])->count(),
     'totalPayed' => \skeeks\cms\shop\models\ShopOrder::find()->where([
-        'user_id' => $model->id,
-        'payed'   => \skeeks\cms\components\Cms::BOOL_Y,
+        'shop_buyer_id' => $model->id])
+        ->andWhere (['IS NOT', 'paid_at', NULL
     ])->count(),
 ];
 
@@ -195,7 +195,7 @@ if (\yii\helpers\ArrayHelper::getValue($userStatistics, 'totalPayed')) {
 $view = $this;
 ?>
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Orders')." (".\skeeks\cms\shop\models\ShopOrder::find()->where([
-        'user_id' => $model->id,
+        'shop_buyer_id' => $model->id,
     ])->count().")"); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -205,7 +205,7 @@ $view = $this;
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ActiveDataProvider([
         'query' => \skeeks\cms\shop\models\ShopOrder::find()->where([
-            'user_id' => $model->id,
+            'shop_buyer_id' => $model->id,
         ]),
 
         'sort' =>
@@ -329,10 +329,10 @@ HTML;
 
 <?
 $countBaskets = 0;
-$fuser = \skeeks\cms\shop\models\ShopFuser::getInstanceByUser($model);
+$fuser = $model;
 if ($fuser) {
     $countBaskets = \skeeks\cms\shop\models\ShopBasket::find()->where([
-        'fuser_id' => $fuser->id,
+        'shop_order_id' => $fuser->id,
     ])->count();
 }
 ?>
@@ -346,7 +346,7 @@ if ($fuser) {
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ActiveDataProvider([
         'query' => \skeeks\cms\shop\models\ShopBasket::find()->where([
-            'fuser_id' => $fuser->id,
+            'shop_order_id' => $fuser->id,
         ]),
     ]),
     'columns'      =>
