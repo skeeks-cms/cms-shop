@@ -559,19 +559,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'baseProductPrice' => $shopProduct->getBaseProductPrice()->one(),
         ]);
     }
-    /**
-     * @return string
-     */
-    public function getPermissionName()
-    {
-        $unique = parent::getPermissionName();
-
-        if ($content = $this->content) {
-            $unique = $unique."__".$content->id;
-        }
-
-        return $unique;
-    }
+    
 
     public function beforeAction($action)
     {
