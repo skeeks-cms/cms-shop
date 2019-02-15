@@ -497,14 +497,13 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
-
         }
 
         if ($rr->isRequestPjaxPost()) {
             if (!\Yii::$app->request->post($this->notSubmitParam)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
-                $shopProduct->load(\Yii::$app->request->post());
+
 
                 if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
 
