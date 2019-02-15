@@ -377,6 +377,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['purchasing_currency'], 'default', 'value' => Yii::$app->money->currencyCode],
 
             [['baseProductPriceValue'], 'number'],
+            [['baseProductPriceValue'], 'default', 'value' => 0.00 ],
             [['baseProductPriceCurrency'], 'string', 'max' => 3],
 
             [['vat_included'], 'default', 'value' => Cms::BOOL_Y],
