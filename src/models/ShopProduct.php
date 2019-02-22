@@ -230,7 +230,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function _afterSaveEvent(AfterSaveEvent $event)
     {
         //Prices update
-        if ($this->_baseProductPriceCurrency || $this->_baseProductPriceValue) {
+        if ($this->_baseProductPriceCurrency !== null || $this->_baseProductPriceValue !== null) {
             /**
              * @var $baseProductPrice ShopProductPrice
              */
@@ -255,7 +255,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             } else {
                 $isChanged = false;
                 //Установка и сохранение только если что то изменилось
-                if ($this->_baseProductPriceValue && $this->_baseProductPriceValue != $baseProductPrice->price) {
+                if ($this->_baseProductPriceValue !== null && $this->_baseProductPriceValue != $baseProductPrice->price) {
                     $baseProductPrice->price = $this->_baseProductPriceValue;
                     $isChanged = true;
                 }
@@ -378,6 +378,13 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['baseProductPriceValue'], 'number'],
             [['baseProductPriceValue'], 'default', 'value' => 0.00 ],
+            [['baseProductPriceValue'], function() {
+                if ($this->baseProductPriceValue == "0") {
+                    $this->baseProductPriceValue = 0.00;
+                }
+            }],
+
+
             [['baseProductPriceCurrency'], 'string', 'max' => 3],
 
             [['vat_included'], 'default', 'value' => Cms::BOOL_Y],
@@ -587,7 +594,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getBaseProductPriceValue()
     {
-        if ($this->_baseProductPriceValue) {
+        if ($this->_baseProductPriceValue !== null) {
             return $this->_baseProductPriceValue;
         } else {
             $this->_baseProductPriceValue = $this->baseProductPrice ? $this->baseProductPrice->price : null;
