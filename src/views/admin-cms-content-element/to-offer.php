@@ -38,10 +38,10 @@ $model = new \skeeks\cms\shop\models\ShopCmsContentElement();
 <? \skeeks\cms\modules\admin\widgets\ActiveForm::end(); ?>
 
 
-<? \yii\bootstrap\Alert::begin([
+<? $alert = \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-info',
     ],
 ]) ?>
 
-<? \yii\bootstrap\Alert::end(); ?>
+<? $alert::end(); ?>
