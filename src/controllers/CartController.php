@@ -309,8 +309,10 @@ class CartController extends Controller
 
                 $applyShopDiscountCoupon = ShopDiscountCoupon::find()
                     ->where(['coupon' => $couponCode])
-                    //->andWhere(['is_active' => 1])
+                    ->andWhere(['is_active' => 1])
+                    ->andWhere(['>','active_to', time()])
                     ->one();
+
 
                 if (!$applyShopDiscountCoupon) {
                     throw new Exception(\Yii::t('skeeks/shop/app', 'Coupon does not exist or is not active'));
