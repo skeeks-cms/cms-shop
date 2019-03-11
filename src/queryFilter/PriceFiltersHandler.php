@@ -14,6 +14,7 @@ use common\models\V3pFeature;
 use common\models\V3pFeatureValue;
 use common\models\V3pFtSoption;
 use common\models\V3pProduct;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\yii2\queryfilter\IQueryFilterHandler;
 use v3p\aff\models\V3pShopCmsContentElement;
 use v3project\yii2\productfilter\EavFiltersHandler;
@@ -125,19 +126,19 @@ class PriceFiltersHandler extends Model
             return $this->_min_max_data;
         }
 
-        /*$query = clone $this->baseQuery;
+        $query = clone $this->baseQuery;
         $query->joinWith('shopProduct as shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
         $query->orderBy = [];
         $query->groupBy = [];
-        $query->with = [];*/
+        $query->with = [];
 
-        $query = V3pShopCmsContentElement::find();
+        /*$query = ShopCmsContentElement::find();
         $query->joinWith('shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
-        $query->andWhere('cms_content_element.id IN ('.$this->cms_content_element_ids.")");
+        $query->andWhere('cms_content_element.id IN ('.$this->cms_content_element_ids.")");*/
 
         $data = $query->select(['min(price) as min', 'max(price) as max'])->createCommand()->queryOne();
         $this->_min_max_data = [
