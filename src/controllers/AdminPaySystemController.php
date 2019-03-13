@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -15,6 +16,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopPaySystem;
+use skeeks\yii2\form\fields\FieldSet;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
@@ -22,7 +24,7 @@ use yii\helpers\ArrayHelper;
  * Class AdminPaySystemController
  * @package skeeks\cms\shop\controllers
  */
-class AdminPaySystemController extends AdminModelEditorController
+class AdminPaySystemController extends BackendModelStandartController
 {
     public $notSubmitParam = 'sx-not-submit';
 
@@ -45,15 +47,27 @@ class AdminPaySystemController extends AdminModelEditorController
         return ArrayHelper::merge(parent::actions(),
             [
                 'index' =>
-                    [
-                        "gridConfig" =>
-                            [
-                                'settingsData' =>
-                                    [
-                                        'order'   => SORT_ASC,
-                                        'orderBy' => "priority",
-                                    ],
-                            ],
+                [
+                    "filters" => [
+                        'visibleFilters' => [
+                            'id',
+                            'name',
+                        ],
+                    ],
+
+                    'grid'    => [
+                        'defaultOrder'   => [
+                            'priority' => SORT_ASC,
+                        ],
+
+                        'visibleColumns' => [
+                            'checkbox',
+                            'actions',
+                            'id',
+                            'name',
+                            'active',
+                            'priority',
+                        ],
 
                         "columns" => [
                             'name',
@@ -74,6 +88,7 @@ class AdminPaySystemController extends AdminModelEditorController
                             ],
                         ],
                     ],
+                ],
 
                 'create' =>
                     [

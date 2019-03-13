@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\Serialize;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\Core;
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use yii\helpers\ArrayHelper;
@@ -23,6 +24,7 @@ use yii\helpers\ArrayHelper;
  * @property string                    $description
  * @property string                    $component
  * @property string                    $component_settings
+ * @property integer                   $cms_site_id
  *
  * @property ShopPaySystemPersonType[] $shopPaySystemPersonTypes
  * @property ShopPersonType[]          $personTypes
@@ -104,7 +106,7 @@ class ShopPaySystem extends Core
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority','cms_site_id'], 'integer'],
             [['name'], 'required'],
             [['description'], 'string'],
             [['component_settings'], 'safe'],
@@ -128,6 +130,7 @@ class ShopPaySystem extends Core
             'description'   => \Yii::t('skeeks/shop/app', 'Description'),
             'personTypeIds' => \Yii::t('skeeks/shop/app', 'Payers'),
             'component'     => \Yii::t('skeeks/shop/app', 'Handler'),
+            'cms_site_id'   => \Yii::t('skeeks/shop/app', 'Site'),
         ]);
     }
     /**
@@ -194,5 +197,13 @@ class ShopPaySystem extends Core
         }
 
         return null;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSite()
+    {
+        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
     }
 }
