@@ -112,7 +112,6 @@ class ShopPaySystem extends Core
             [['component_settings'], 'safe'],
             [['name', 'component'], 'string', 'max' => 255],
             [['active'], 'string', 'max' => 1],
-            [['name'], 'unique'],
             [['personTypeIds'], 'safe'],
             [['priority'], 'default', 'value' => 100],
             [['active'], 'default', 'value' => Cms::BOOL_Y],
@@ -202,7 +201,7 @@ class ShopPaySystem extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSite()
+    public function getCmsSite()
     {
         return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
     }
