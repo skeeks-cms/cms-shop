@@ -19,6 +19,7 @@ class m190313_101301__update_table__shop_pay_system extends Migration
             "{$tableName}__cms_site_id", $tableName,
             'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
         );
+        $this->dropIndex('name', $tableName);
     }
 
     public function safeDown()

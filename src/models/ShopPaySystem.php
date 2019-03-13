@@ -112,7 +112,6 @@ class ShopPaySystem extends Core
             [['component_settings'], 'safe'],
             [['name', 'component'], 'string', 'max' => 255],
             [['active'], 'string', 'max' => 1],
-            [['name'], 'unique'],
             [['personTypeIds'], 'safe'],
             [['priority'], 'default', 'value' => 100],
             [['active'], 'default', 'value' => Cms::BOOL_Y],
