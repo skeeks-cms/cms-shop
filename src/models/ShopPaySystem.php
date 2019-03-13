@@ -202,7 +202,7 @@ class ShopPaySystem extends Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSite()
+    public function getCmsSite()
     {
         return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
     }
