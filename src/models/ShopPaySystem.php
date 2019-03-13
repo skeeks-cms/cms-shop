@@ -31,6 +31,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property PaySystemHandlerComponent $paySystemHandler
  * @property PaySystemHandlerComponent $handler
+ *
+ * @property CmsSite                   $сmsSite
  */
 class ShopPaySystem extends Core
 {
