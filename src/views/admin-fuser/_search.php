@@ -25,7 +25,7 @@ if ($filter->id) {
     'action' => '/'.\Yii::$app->request->pathInfo,
 ]); ?>
 
-<?= $form->field($searchModel, 'user_id')->widget(
+<?= $form->field($searchModel, 'cms_user_id')->widget(
     \skeeks\cms\backend\widgets\SelectModelDialogUserWidget::class
 )->setVisible(); ?>
 

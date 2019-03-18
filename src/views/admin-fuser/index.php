@@ -13,7 +13,7 @@ $query = $dataProvider->query;
 /**
  * @var \yii\db\ActiveQuery $query
  */
-$query->groupBy(['shop_fuser.id']);
+$query->groupBy(['shop_cart.id']);
 
 $query->with('user');
 $query->with('personType');
@@ -26,13 +26,13 @@ $query->andWhere(
     [
         'or',
         ['>=', 'sb.id', 0],
-        ['>=', 'shop_fuser.user_id', 0],
-        ['>=', 'shop_fuser.person_type_id', 0],
-        ['>=', 'shop_fuser.buyer_id', 0],
+        ['>=', 'shop_cart.cms_user_id', 0],
+        //['>=', 'shop_cart.person_type_id', 0],
+        //['>=', 'shop_cart.buyer_id', 0],
     ]
 );
 
-$query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
+$query->orderBy(['shop_cart.updated_at' => SORT_DESC]);
 
 ?>
 
@@ -81,7 +81,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
                 },
             ],
 
-            [
+            /*[
                 'class'     => \yii\grid\DataColumn::class,
                 'filter'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopPersonType::find()->active()->all(),
                     'id', 'name'),
@@ -90,7 +90,7 @@ $query->orderBy(['shop_fuser.updated_at' => SORT_DESC]);
                 'value'     => function (\skeeks\cms\shop\models\ShopFuser $model) {
                     return $model->personType ? $model->personType->name : "";
                 },
-            ],
+            ],*/
 
             [
                 'class'  => \yii\grid\DataColumn::class,
