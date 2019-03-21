@@ -92,7 +92,16 @@
             });
 
             _.delay(function () {
-                $.pjax.reload(self.JWrapper().selector, {
+                var selector = '';
+                
+                if (self.JWrapper().get(0).id) {
+                    selector = "#" + self.JWrapper().get(0).id;
+                } else {
+                    //todo depricated в jquery > 1.8
+                    selector = self.JWrapper().selector;
+                }
+                
+                $.pjax.reload(selector, {
                     push: false
                 });
             }, Number(this.get('delay', 0)));
