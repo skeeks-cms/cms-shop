@@ -370,9 +370,14 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'shop_affiliate_id',
                     'delivery_doc_at',
                     'shop_order_status_id',
-                    'is_created',
                 ],
                 'integer',
+            ],
+            [
+                [
+                    'is_created',
+                ],
+                'boolean',
             ],
             [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
             [['comments'], 'string'],
