@@ -68,6 +68,8 @@ use yii\helpers\ArrayHelper;
  * @property ShopQuantityNoticeEmail[]   $shopQuantityNoticeEmails
  *
  * @property ShopCmsContentElement       $tradeOffers
+ * @property ShopOrderItem[] $shopOrderItems
+ * @property ShopOrder[] $shopOrders
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -645,6 +647,22 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function isTradeOffers()
     {
         return (bool)($this->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrderItems()
+    {
+        return $this->hasMany(ShopOrderItem::className(), ['shop_product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrders()
+    {
+        return $this->hasMany(ShopOrder::className(), ['id' => 'shop_order_id'])->via('shopOrderItems');
     }
 
 }
