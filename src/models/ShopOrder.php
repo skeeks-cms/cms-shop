@@ -146,31 +146,42 @@ class ShopOrder extends \skeeks\cms\models\Core
         //Заказ создан
         if (in_array("is_created", array_keys($event->changedAttributes)) && $this->is_created) {
 
+            \Yii::info($this->id . " is_created!", self::class);
+            
             (new ShopOrderChange([
                 'type'          => ShopOrderChange::ORDER_ADDED,
                 'shop_order_id' => $this->id,
             ]))->save();
 
-            //Notify admins
-            if (\Yii::$app->shop->notifyEmails) {
-                foreach (\Yii::$app->shop->notifyEmails as $email) {
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+            try {
+                //Notify admins
+                if (\Yii::$app->shop->notifyEmails) {
+                    foreach (\Yii::$app->shop->notifyEmails as $email) {
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-                    \Yii::$app->mailer->compose('create-order', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo($email)
-                        ->setSubject(\Yii::t('skeeks/shop/app',
-                                'New order').' #'.$this->id)
-                        ->send();
+                        \Yii::$app->mailer->compose('create-order', [
+                            'order' => $this,
+                        ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                            ->setTo($email)
+                            ->setSubject(\Yii::t('skeeks/shop/app',
+                                    'New order').' #'.$this->id)
+                            ->send();
+                    }
                 }
+            } catch (\Exception $e) {
+                \Yii::error("Email seinding error: " . $e->getMessage(), self::class);
+            }
+            
+            try {
+                //Письмо тому кто заказывает
+                if ($this->email) {
+                    $this->notifyNew();
+                }
+            } catch (\Exception $e) {
+                \Yii::error("Email client seinding error: " . $e->getMessage(), self::class);
             }
 
-            //Письмо тому кто заказывает
-            if ($this->email) {
-                $this->notifyNew();
-            }
         }
     }
 
