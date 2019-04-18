@@ -1,6 +1,10 @@
 Changelog
 ==============
 
+2.2.7
+-----------------
+ * Fixed tinkoff api
+ 
 2.2.5
 -----------------
  * Fixed always create orders

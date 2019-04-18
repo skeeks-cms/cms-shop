@@ -17,7 +17,7 @@ $terminal_key = $tinkoff->terminal_key;
 
 $payData = [
     'TerminalKey' => $tinkoff->terminal_key,
-    'Amount'      => $money->amount,
+    'Amount'      => $money->amount * $money->currency->getSubUnit(),
     'OrderId'     => $model->id,
     'Frame'       => false,
 ];
