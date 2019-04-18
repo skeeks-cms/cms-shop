@@ -8,16 +8,15 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\base\Controller;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Exception;
 use yii\helpers\Json;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 /**
- * Class TinkoffController
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class TinkoffController extends Controller
 {
