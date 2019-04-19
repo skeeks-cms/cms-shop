@@ -157,6 +157,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 //Notify admins
                 if (\Yii::$app->shop->notifyEmails) {
                     foreach (\Yii::$app->shop->notifyEmails as $email) {
+
                         \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                         \Yii::$app->mailer->compose('create-order', [
@@ -176,10 +177,11 @@ class ShopOrder extends \skeeks\cms\models\Core
             try {
                 //Письмо тому кто заказывает
                 if ($this->email) {
+                    $this->email = trim($this->email);
                     $this->notifyNew();
                 }
             } catch (\Exception $e) {
-                \Yii::error("Email client seinding error: " . $e->getMessage(), self::class);
+                \Yii::error("Email client seinding error '{$this->email}': " . $e->getMessage(), self::class);
             }
 
         }
