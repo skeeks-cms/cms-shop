@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopPayment;
 use yii\base\Exception;
 use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
@@ -65,13 +66,13 @@ class TinkoffController extends Controller
         if (!$bill = ShopBill::find()->where(['code' => $code])->one()) {
             throw new Exception('Bill not found');
         }
-        
+
         return $this->render($this->action->id, [
             'model' => $bill,
         ]);
-        
+
     }
-    
+
     public function actionSuccess()
     {
         $orderId = \Yii::$app->request->get('OrderId');
@@ -103,35 +104,82 @@ class TinkoffController extends Controller
 
     public function actionNotify()
     {
-        \Yii::info("POST: ".Json::encode(\Yii::$app->request->post()), self::class);
+        \Yii::info("actionNotify", self::class);
+
+        $json = file_get_contents('php://input');
+        \Yii::info("JSON: ".$json, self::class);
 
         try {
-            if (!\Yii::$app->request->post('OrderId')) {
-                throw new Exception('Некорректны запрос от банка.');
+
+            if (!$json) {
+                throw new Exception('От банка не пришли данные json.');
+            }
+
+            $data = Json::decode($json);
+
+            if (!isset($data['OrderId']) && !$data['OrderId']) {
+                throw new Exception('Некорректны запрос от банка нет order id.');
             }
 
             /**
-             * @var $shopOrder ShopOrder
+             * @var $shopBill ShopBill
              */
-            if (!$shopOrder = ShopOrder::findOne(\Yii::$app->request->post('OrderId'))) {
+            if (!$shopBill = ShopBill::findOne($data['OrderId'])) {
                 throw new Exception('Заказ не найден в базе.');
             }
 
-            if ($shopOrder->id != \Yii::$app->request->post('OrderId')) {
+            if ($shopBill->id != $data['OrderId']) {
                 throw new Exception('Не совпадает номер заказа.');
             }
 
-            if ($shopOrder->money->getAmount() != \Yii::$app->request->post('Amount')) {
+            $amount = $shopBill->money->amount * $shopBill->money->currency->subUnit;
+            if ($amount != $data['Amount']) {
                 throw new Exception('Не совпадает сумма заказа.');
             }
 
-            if (\Yii::$app->request->post('Status') == "CONFIRMED") {
+            if ($data['Status'] == "CONFIRMED") {
                 \Yii::info("Успешный платеж", self::class);
-                $shopOrder->processNotePayment();
+
+                $transaction = \Yii::$app->db->beginTransaction();
+
+                try {
+
+                    $payment = new ShopPayment();
+                    $payment->shop_buyer_id = $shopBill->shop_buyer_id;
+                    $payment->shop_pay_system_id = $shopBill->shop_pay_system_id;
+                    $payment->shop_order_id = $shopBill->shop_order_id;
+                    $payment->amount = $shopBill->amount;
+                    $payment->currency_code = $shopBill->currency_code;
+                    $payment->comment = "Оплата по счету №{$shopBill->id} от ".\Yii::$app->formatter->asDate($shopBill->created_at);
+                    $payment->external_data = $data;
+
+                    if (!$payment->save()) {
+                        throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
+                    }
+
+                    $shopBill->paid_at = time();
+                    $shopBill->shop_payment_id = $payment->id;
+
+                    if (!$shopBill->save()) {
+                        throw new Exception("Не обновился счет: ".print_r($shopBill->errors, true));
+                    }
+
+                    $shopBill->shopOrder->paid_at = time();
+                    $shopBill->shopOrder->save();
+
+
+                    $transaction->commit();
+                } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    \Yii::error($e->getMessage(), self::class);
+                    return $e->getMessage();
+                }
+
             }
 
         } catch (\Exception $e) {
             \Yii::error($e->getMessage(), self::class);
+            return $e->getMessage();
         }
 
         $this->layout = false;
