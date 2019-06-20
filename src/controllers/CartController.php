@@ -273,7 +273,10 @@ class CartController extends Controller
 
                 ShopOrder2discountCoupon::deleteAll(['discount_coupon_id' => $couponId, 'order_id' => \Yii::$app->shop->cart->shopOrder->id]);
 
-                \Yii::$app->shop->cart->recalculate()->save();
+                foreach (\Yii::$app->shop->cart->shopOrder->shopOrderItems as $orderItem)
+                {
+                    $orderItem->recalculate()->save();
+                };
 
                 $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
                 $rr->success = true;
@@ -310,7 +313,11 @@ class CartController extends Controller
                 $applyShopDiscountCoupon = ShopDiscountCoupon::find()
                     ->where(['coupon' => $couponCode])
                     ->andWhere(['is_active' => 1])
-                    ->andWhere(['>','active_to', time()])
+                    ->andWhere([
+                        'or',
+                        ['>','active_to', time()],
+                        ['active_to' => null]
+                    ])
                     ->one();
 
 
@@ -332,7 +339,13 @@ class CartController extends Controller
                 $map->save();
                 //\Yii::$app->shop->cart->shopOrder->shopDiscountCoupons = $discount_coupons;
                 //\Yii::$app->shop->cart->shopOrder->save();
-                \Yii::$app->shop->cart->shopOrder->recalculate()->save();
+                /*$order = \Yii::$app->shop->cart->shopOrder;
+                $order->refresh();*/
+                foreach (\Yii::$app->shop->cart->shopOrder->shopOrderItems as $orderItem)
+                {
+                    $orderItem->recalculate()->save();
+                };
+                //\Yii::$app->shop->cart->shopOrder->recalculate()->save();
 
                 $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
                 $rr->success = true;

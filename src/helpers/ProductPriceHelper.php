@@ -107,6 +107,8 @@ class ProductPriceHelper extends Component
             }
         }
 
+        //print_r($shopDiscounts);die;
+
         if ($shopDiscounts) {
             ArrayHelper::multisort($shopDiscounts, 'priority');
         }
@@ -118,6 +120,7 @@ class ProductPriceHelper extends Component
             foreach ($shopDiscounts as $shopDiscount) {
 
                 if ($shopDiscount->isTrue($this->shopCmsContentElement, $price)) {
+                    //print_r($shopDiscount);die;
                     if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
 
                         $percent = $shopDiscount->value / 100;
@@ -138,6 +141,7 @@ class ProductPriceHelper extends Component
                         if ($shopDiscount->last_discount === Cms::BOOL_Y) {
                             break;
                         }
+
                     } elseif ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
                         $discountMoney = new Money($shopDiscount->value, "RUB");
 
