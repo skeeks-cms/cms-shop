@@ -59,5 +59,5 @@
     <?
     \skeeks\cms\widgets\Pjax::end();
     ?>
-    <? \yii\bootstrap\Modal::end(); ?>
+    <? $createModal::end(); ?>
 <? endif; ?>
