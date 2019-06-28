@@ -233,6 +233,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 $shopColumns["shop.price{$shopTypePrice->id}"] = [
                     'label'     => $shopTypePrice->name." [магазин]",
                     'attribute' => 'shop.price'.$shopTypePrice->id,
+                    'format' => 'raw',
                     'value'     => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
                         if ($shopProduct) {
