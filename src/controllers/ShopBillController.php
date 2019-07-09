@@ -42,4 +42,29 @@ class ShopBillController extends Controller
             'model' => $bill
         ]);
     }
+    /**
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionGo()
+    {
+
+        if (!$code = \Yii::$app->request->get('code')) {
+            throw new NotFoundHttpException('');
+        }
+
+        if (!$shopBill = ShopBill::find()->where(['code' => $code])->one()) {
+            throw new NotFoundHttpException('');
+        }
+
+        if (!$shopOrder = ShopOrder::find()->where(['id' => $shopBill->shop_order_id])->one()) {
+            throw new NotFoundHttpException('');
+        }
+
+        /**
+         * @var $shopOrder ShopOrder
+         */
+
+        return $this->redirect($shopOrder->payUrl);
+    }
 }
