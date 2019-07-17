@@ -102,6 +102,17 @@ class ShopComponent extends Component
      * @var ShopCart
      */
     private $_shopCart = null;
+
+    /**
+     * @var bool
+     */
+    public $is_show_product_no_price = 1;
+
+    /**
+     * @var bool
+     */
+    public $is_show_button_no_price = 1;
+
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -140,6 +151,8 @@ class ShopComponent extends Component
         echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '],
             CmsContent::getDataForSelect()), ['size' => 1]);
 
+        echo $form->field($this, 'is_show_product_no_price')->radioList(\Yii::$app->formatter->booleanFormat);
+        echo $form->field($this, 'is_show_button_no_price')->radioList(\Yii::$app->formatter->booleanFormat);
 
         echo $form->fieldSetEnd();
     }
@@ -154,6 +167,13 @@ class ShopComponent extends Component
             ['notify_emails', 'string'],
             ['start_order_status_id', 'required'],
             ['end_order_status_id', 'required'],
+            [
+                [
+                    'is_show_product_no_price',
+                    'is_show_button_no_price',
+                ],
+                'boolean',
+            ],
         ]);
     }
     public function attributeLabels()
@@ -166,6 +186,8 @@ class ShopComponent extends Component
                 'Include payment orders only after the manager approval'),
             'storeCmsContentId'    => \Yii::t('skeeks/shop/app', 'Content storage'),
             'notify_emails'        => \Yii::t('skeeks/shop/app', 'Email notification address'),
+            'is_show_product_no_price' => "Показывать товары с нулевыми ценами?",
+            'is_show_button_no_price'  => "Показывать кнопку купить для товаров с нулевыми ценами?",
         ]);
     }
     public function attributeHints()
@@ -175,6 +197,7 @@ class ShopComponent extends Component
             'end_order_status_id' => "Статус, который присваивается заказу после завершения работы с ним",
             'notify_emails' => \Yii::t('skeeks/shop/app',
                 'Enter email addresses, separated by commas, they will come on new orders information'),
+            'is_show_button_no_price'   => "Если выбрана опция - показывать товары с нулевыми ценами"
         ]);
     }
     /**
