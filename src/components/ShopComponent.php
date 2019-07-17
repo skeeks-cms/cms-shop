@@ -151,8 +151,8 @@ class ShopComponent extends Component
         echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '],
             CmsContent::getDataForSelect()), ['size' => 1]);
 
-        echo $form->field($this, 'is_show_product_no_price')->radioList([0 => 'Нет', 1 => 'Да']);
-        echo $form->field($this, 'is_show_button_no_price')->radioList([0 => 'Нет', 1 => 'Да']);
+        echo $form->field($this, 'is_show_product_no_price')->radioList(\Yii::$app->formatter->booleanFormat);
+        echo $form->field($this, 'is_show_button_no_price')->radioList(\Yii::$app->formatter->booleanFormat);
 
         echo $form->fieldSetEnd();
     }
