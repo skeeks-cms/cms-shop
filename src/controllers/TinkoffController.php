@@ -32,27 +32,6 @@ class TinkoffController extends Controller
      *
      * @throws Exception
      */
-    public function actionOrderForm()
-    {
-        if (!$key = \Yii::$app->request->get('key')) {
-            throw new Exception('Order not found');
-        }
-
-        if (!$order = ShopOrder::find()->where(['key' => $key])->one()) {
-            throw new Exception('Order not found');
-        }
-
-        return $this->render($this->action->id, [
-            'model' => $order,
-        ]);
-    }
-
-
-    /**
-     * Payment form
-     *
-     * @throws Exception
-     */
     public function actionBillForm()
     {
         /**
@@ -75,39 +54,54 @@ class TinkoffController extends Controller
 
     public function actionSuccess()
     {
-        $orderId = \Yii::$app->request->get('OrderId');
-        if (!$orderId) {
-            throw new NotFoundHttpException('!!!');
+        \Yii::info("Tinkoff success: " . print_r(\Yii::$app->request->get(), true), static::class);
+
+        /**
+         * @var $bill ShopBill
+         */
+        if (!$orderId = \Yii::$app->request->get('OrderId')) {
+            throw new Exception('Bill not found');
         }
 
-        if (!$shopOrder = ShopOrder::findOne($orderId)) {
-            throw new NotFoundHttpException('!!!');
+        if (!$bill = ShopBill::find()->where(['id' => $orderId])->one()) {
+            throw new Exception('Bill not found');
         }
 
-        return $this->redirect($shopOrder->getPublicUrl(\Yii::$app->request->get()));
+        return $this->redirect($bill->shopOrder->getUrl(\Yii::$app->request->get()));
     }
+
 
 
     public function actionFail()
     {
-        $orderId = \Yii::$app->request->get('OrderId');
-        if (!$orderId) {
-            throw new NotFoundHttpException('!!!');
+        \Yii::warning("Tinkoff fail: " . print_r(\Yii::$app->request->get(), true), static::class);
+
+        /**
+         * @var $bill ShopBill
+         */
+        if (!$orderId = \Yii::$app->request->get('OrderId')) {
+            throw new Exception('Bill not found');
         }
 
-        if (!$shopOrder = ShopOrder::findOne($orderId)) {
-            throw new NotFoundHttpException('!!!');
+        if (!$bill = ShopBill::find()->where(['id' => $orderId])->one()) {
+            throw new Exception('Bill not found');
         }
+
+        print_r(\Yii::$app->request->get());
+        die;
 
         return $this->redirect($shopOrder->getPublicUrl(\Yii::$app->request->get()));
     }
 
+
+
+
     public function actionNotify()
     {
-        \Yii::info("actionNotify", self::class);
+        \Yii::info("actionNotify", static::class);
 
         $json = file_get_contents('php://input');
-        \Yii::info("JSON: ".$json, self::class);
+        \Yii::info("JSON: ".$json, static::class);
 
         try {
 
@@ -138,7 +132,7 @@ class TinkoffController extends Controller
             }
 
             if ($data['Status'] == "CONFIRMED") {
-                \Yii::info("Успешный платеж", self::class);
+                \Yii::info("Успешный платеж", static::class);
 
                 $transaction = \Yii::$app->db->beginTransaction();
 
@@ -171,14 +165,14 @@ class TinkoffController extends Controller
                     $transaction->commit();
                 } catch (\Exception $e) {
                     $transaction->rollBack();
-                    \Yii::error($e->getMessage(), self::class);
+                    \Yii::error($e->getMessage(), static::class);
                     return $e->getMessage();
                 }
 
             }
 
         } catch (\Exception $e) {
-            \Yii::error($e->getMessage(), self::class);
+            \Yii::error($e->getMessage(), static::class);
             return $e->getMessage();
         }
 

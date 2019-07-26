@@ -36,7 +36,7 @@ JS
         <input class="tinkoffPayRow" type="hidden" name="terminalkey" value="<?= $tinkoff->terminal_key; ?>">
         <input class="tinkoffPayRow" type="hidden" name="frame" value="false">
         <input class="tinkoffPayRow" type="hidden" name="language" value="ru">
-        <input class="tinkoffPayRow" type="text" placeholder="Сумма заказа" name="amount" value="<?= $money->amount * $money->currency->getSubUnit(); ?>" required>
+        <input class="tinkoffPayRow" type="text" placeholder="Сумма заказа" name="amount" value="<?= $money->amount; ?>" required>
         <input class="tinkoffPayRow" type="text" placeholder="Номер заказа" name="order" value="<?= $model->id; ?>">
         <input class="tinkoffPayRow" type="text" placeholder="Описание заказа" name="description" value="<?= $model->description; ?>">
 
