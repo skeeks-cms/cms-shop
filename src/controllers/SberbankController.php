@@ -187,6 +187,7 @@ class SberbankController extends Controller
                     throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
                 }
 
+                $bill->isNotifyUpdate = false;
                 $bill->paid_at = time();
                 $bill->shop_payment_id = $payment->id;
 

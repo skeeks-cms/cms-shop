@@ -151,6 +151,7 @@ class TinkoffController extends Controller
                         throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
                     }
 
+                    $shopBill->isNotifyUpdate = false;
                     $shopBill->paid_at = time();
                     $shopBill->shop_payment_id = $payment->id;
 

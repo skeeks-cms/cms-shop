@@ -141,6 +141,7 @@ class OrderController extends Controller
         $shopBill->shop_pay_system_id = $shopOrder->shop_pay_system_id;
         $shopBill->amount = $shopOrder->amount;
         $shopBill->currency_code = $shopOrder->currency_code;
+        $shopBill->isNotifyCreate = false;
         $shopBill->description = "Оплата по заказу №".$shopOrder->id;
         if (!$shopBill->save()) {
             throw new UserException('Не создался счет: '.print_r($shopBill->errors, true));

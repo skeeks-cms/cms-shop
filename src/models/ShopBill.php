@@ -51,6 +51,12 @@ use yii\helpers\Url;
 class ShopBill extends \skeeks\cms\base\ActiveRecord
 {
     /**
+     * @var bool
+     */
+    public $isNotifyCreate = true;
+    public $isNotifyUpdate = true;
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()
@@ -82,7 +88,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
      */
     public function _notifyCreate()
     {
-        if ($this->shopBuyer && $this->shopBuyer->email) {
+        if ($this->shopBuyer && $this->shopBuyer->email && $this->isNotifyCreate) {
 
             \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/bill';
 
@@ -102,7 +108,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
      */
     public function _notifyUpdate(AfterSaveEvent $event)
     {
-        if ($this->shopBuyer && $this->shopBuyer->email) {
+        if ($this->shopBuyer && $this->shopBuyer->email && $this->isNotifyUpdate) {
 
             //Если счет стал оплаченым
             if (in_array("paid_at", array_keys($event->changedAttributes)) && $this->paid_at) {
