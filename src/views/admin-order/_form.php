@@ -166,13 +166,13 @@ HTML
             [                      // the owner name of the model
                 'label'  => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
                 'format' => 'raw',
-                'value'  => Html::a($model->buyer->name." [{$model->buyer->id}]",
+                'value'  => $model->buyer ? Html::a($model->buyer->name." [{$model->buyer->id}]",
                     \skeeks\cms\helpers\UrlHelper::construct([
                         '/shop/admin-buyer/update',
                         'pk' => $model->buyer->id,
                     ])->enableAdmin(), [
                         'data-pjax' => 0,
-                    ]),
+                    ]) : '-',
             ],
 
 
@@ -182,14 +182,16 @@ HTML
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/shop/app', 'Customer data'),
 ]) ?>
-<?= \yii\widgets\DetailView::widget([
-    'model'      => $model->buyer->relatedPropertiesModel,
-    'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
-    'attributes' => array_keys($model->buyer->relatedPropertiesModel->toArray(
-        $model->buyer->relatedPropertiesModel->attributes()
-    )),
+<? if ($model->buyer) : ?>
+    <?= \yii\widgets\DetailView::widget([
+        'model'      => $model->buyer->relatedPropertiesModel,
+        'template'   => "<tr><th style='width: 50%; text-align: right;'>{label}</th><td>{value}</td></tr>",
+        'attributes' => array_keys($model->buyer->relatedPropertiesModel->toArray(
+            $model->buyer->relatedPropertiesModel->attributes()
+        )),
 
-]) ?>
+    ]) ?>
+<? endif; ?>
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -203,7 +205,7 @@ HTML
             [                      // the owner name of the model
                 'label'  => \Yii::t('skeeks/shop/app', 'Payment method'),
                 'format' => 'raw',
-                'value'  => $model->paySystem->name,
+                'value'  => $model->paySystem ? $model->paySystem->name : 'Платежная система не выбрана',
             ],
 
             [                      // the owner name of the model
