@@ -219,7 +219,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         return $this
             ->hasMany(ShopCmsContentElement::class, ['parent_content_element_id' => 'id'])
-            ->andWhere(["content_id" => $childContentId])
+            ->andWhere([ShopCmsContentElement::tableName() . ".content_id" => $childContentId])
             //->joinWith('cmsContentElement')
             //->joinWith('cmsContentElement.cmsContent')
             //->andWhere(["content.id" => $this->cmsContentElement->cmsContent->parent_content_id])
