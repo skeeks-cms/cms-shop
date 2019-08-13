@@ -12,14 +12,19 @@ use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopCart;
-use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
-use yii\base\UserException;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextareaField;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /**
@@ -114,6 +119,24 @@ class ShopComponent extends Component
     public $is_show_button_no_price = 1;
 
     /**
+     * Какие фильтры показывать на сайте?
+     * @var array
+     */
+    public $show_filter_property_ids = [];
+
+    /**
+     * Показывать фильтры если есть подкатегории?
+     * @var bool
+     */
+    public $is_show_filters_has_subtree = 1;
+
+    /**
+     * Показывать товары только в наличии?
+     * @var int
+     */
+    public $is_show_product_only_quantity = 1;
+
+    /**
      * Можно задать название и описание компонента
      * @return array
      */
@@ -131,34 +154,93 @@ class ShopComponent extends Component
     {
         return $this->cart;
     }
-    public function renderConfigForm(ActiveForm $form)
+
+
+    public function getConfigFormFields()
     {
-        echo $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main'));
+        return [
+            'main' => [
+                'class' => FieldSet::class,
+                'name'  => \Yii::t('skeeks/shop/app', 'Main'),
 
-        //echo $form->field($this, 'email')->textInput()->hint(\Yii::t('skeeks/shop/app', 'Email of sales department'));
+                'fields' => [
 
-        echo $form->field($this, 'notify_emails')->textarea(['rows' => 3]);
-        echo $form->field($this, 'start_order_status_id')->listBox(
-            ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
-            ['size' => 1]
-        );
-        echo $form->field($this, 'end_order_status_id')->listBox(
-            ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
-            ['size' => 1]
-        );
 
-        echo $form->fieldRadioListBoolean($this, 'payAfterConfirmation');
-        echo $form->field($this, 'storeCmsContentId')->listBox(array_merge(['' => ' - '],
-            CmsContent::getDataForSelect()), ['size' => 1]);
+                    'notify_emails' => [
+                        'class' => TextareaField::class,
+                    ],
+                    'start_order_status_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
+                    ],
+                    'end_order_status_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
+                    ],
+                    'payAfterConfirmation' => [
+                        'class' => BoolField::class,
+                        'trueValue' => "Y",
+                        'falseValue' => "N",
+                    ],
 
-        echo $form->field($this, 'is_show_product_no_price')->radioList(\Yii::$app->formatter->booleanFormat);
-        echo $form->field($this, 'is_show_button_no_price')->radioList(\Yii::$app->formatter->booleanFormat);
 
-        echo $form->fieldSetEnd();
+
+                ],
+            ],
+
+            'catalog' => [
+                'class' => FieldSet::class,
+                'name'  => \Yii::t('skeeks/shop/app', 'Каталог'),
+
+                'fields' => [
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => Html::tag('h3', 'Каталог'),
+                    ],
+
+                    'is_show_product_no_price' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
+                    'is_show_product_only_quantity' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
+                    'is_show_button_no_price' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
+
+
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => Html::tag('h3', 'Фильтры'),
+                    ],
+
+                    'is_show_filters_has_subtree' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
+
+                    'show_filter_property_ids' => [
+                        'class' => SelectField::class,
+                        'multiple' => true,
+                        'items' => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                    ],
+                ]
+            ]
+        ];
     }
+
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            [['show_filter_property_ids'], 'safe'],
             [['email'], 'string'],
             [['payAfterConfirmation'], 'string'],
             [['start_order_status_id'], 'integer'],
@@ -171,6 +253,8 @@ class ShopComponent extends Component
                 [
                     'is_show_product_no_price',
                     'is_show_button_no_price',
+                    'is_show_product_only_quantity',
+                    'is_show_filters_has_subtree',
                 ],
                 'boolean',
             ],
@@ -179,25 +263,32 @@ class ShopComponent extends Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'start_order_status_id'                => 'Начальный статус заказа',
-            'end_order_status_id'                => 'Конечный статус заказа',
-            'email'                => 'Email',
-            'payAfterConfirmation' => \Yii::t('skeeks/shop/app',
+            'start_order_status_id'    => 'Начальный статус заказа',
+            'end_order_status_id'      => 'Конечный статус заказа',
+            'email'                    => 'Email',
+            'payAfterConfirmation'     => \Yii::t('skeeks/shop/app',
                 'Include payment orders only after the manager approval'),
-            'storeCmsContentId'    => \Yii::t('skeeks/shop/app', 'Content storage'),
-            'notify_emails'        => \Yii::t('skeeks/shop/app', 'Email notification address'),
+            'storeCmsContentId'        => \Yii::t('skeeks/shop/app', 'Content storage'),
+            'notify_emails'            => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price' => "Показывать товары с нулевыми ценами?",
-            'is_show_button_no_price'  => "Показывать кнопку купить для товаров с нулевыми ценами?",
+            'is_show_button_no_price'  => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
+            'is_show_product_only_quantity'  => "Показывать товары только в наличии на сайте?",
+            'show_filter_property_ids'  => "Какие фильтры разрешено показывать на сайте?",
+            'is_show_filters_has_subtree'  => "Показывать фильтры если есть подкатегории?",
         ]);
     }
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'start_order_status_id' => "Статус, который присваивается заказу сразу после его оформления",
-            'end_order_status_id' => "Статус, который присваивается заказу после завершения работы с ним",
-            'notify_emails' => \Yii::t('skeeks/shop/app',
+            'start_order_status_id'   => "Статус, который присваивается заказу сразу после его оформления",
+            'end_order_status_id'     => "Статус, который присваивается заказу после завершения работы с ним",
+            'notify_emails'           => \Yii::t('skeeks/shop/app',
                 'Enter email addresses, separated by commas, they will come on new orders information'),
-            'is_show_button_no_price'   => "Если выбрана опция - показывать товары с нулевыми ценами"
+            'is_show_product_no_price' => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
+            'is_show_button_no_price' => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
+            'show_filter_property_ids' => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
+            'is_show_filters_has_subtree' => "Если каталог большой то лучше для производительности не показывать фильтры в категориях где есть подкатегории",
+            'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
         ]);
     }
     /**
