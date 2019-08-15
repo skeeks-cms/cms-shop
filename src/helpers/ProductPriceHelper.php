@@ -247,11 +247,17 @@ class ProductPriceHelper extends Component
     }
 
     /**
-     * @return bool
+     * @return float|int
      */
     public function getPercent()
     {
-        return ($this->basePrice->money->amount - $this->minMoney->amount) / $this->basePrice->money->amount;
+        $val = 0;
+            
+        if ((float) $this->basePrice->money->amount > 0) {
+            $val = ($this->basePrice->money->amount - $this->minMoney->amount) / (float) $this->basePrice->money->amount;
+        }
+        
+        return $val;
     }
 
     /**
