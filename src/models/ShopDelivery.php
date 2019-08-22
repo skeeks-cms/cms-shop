@@ -34,6 +34,7 @@ use Yii;
  * @property string                   $description
  * @property integer                  $logo_id
  * @property string                   $store
+ * @property string                   $name
  *
  * @property Money                    $money
  * @property CmsSite                  $site

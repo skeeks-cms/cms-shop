@@ -211,7 +211,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'shop_order_id' => $this->id,
                 'data'          =>
                 [
-                    'status' => $this->shopOrderStatus->name,
+                    'status' => $this->shopOrderStatus ? $this->shopOrderStatus->name : '',
                 ],
             ]))->save();
 
