@@ -18,6 +18,8 @@ use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\queryfilters\filters\FilterField;
+use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
@@ -169,6 +171,22 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     },
                 ],
+
+                "shop-properties" => [
+                    'class'        => BackendModelMultiDialogEditAction::class,
+                    "name"         => "Свойства товара",
+                    "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/_shop-properties",
+                    "eachCallback" => [$this, 'eachShopProperties'],
+                    'on init'      => function ($e) {
+                        $action = $e->sender;
+                        /**
+                         * @var BackendGridModelAction $action
+                         */
+                        if ($this->content) {
+                            $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                        }
+                    },
+                ],
             ]
         );
 
@@ -181,6 +199,54 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         }
 
         return $actions;
+    }
+
+    public function eachShopProperties($model, $action)
+    {
+        /**
+         * @var $model ShopCmsContentElement
+         */
+        try {
+            $formData = [];
+            parse_str(\Yii::$app->request->post('formData'), $formData);
+
+            if (!$formData) {
+                return false;
+            }
+
+            if (!$content_id = ArrayHelper::getValue($formData, 'content_id')) {
+                return false;
+            }
+
+            if (!$fields = ArrayHelper::getValue($formData, 'fields')) {
+                return false;
+            }
+
+
+            /**
+             * @var CmsContent $content
+             */
+            $content = CmsContent::findOne($content_id);
+            if (!$content) {
+                return false;
+            }
+
+
+            $tmpProduct = new ShopProduct();
+            $tmpProduct->load($formData);
+
+            $shopProduct = $model->shopProduct;
+
+            foreach ((array)ArrayHelper::getValue($formData, 'fields') as $code) {
+                if ($shopProduct->hasAttribute($code)) {
+                    $shopProduct->setAttribute($code, $tmpProduct->{$code});
+                }
+            }
+
+            return $shopProduct->save(false);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function initGridData($action, $content)
@@ -278,8 +344,26 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             },
         ];
 
+        $filterFields['shop_quantity'] = [
+            'class'    => NumberFilterField::class,
+            'label'    => 'Количество [магазин]',
+            'filterAttribute'    => 'sp.quantity',
+            /*'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                $query = $e->dataProvider->query;
+
+                if ($e->field->value) {
+                    $query->andWhere(['sp.product_type' => $e->field->value]);
+                }
+            },*/
+        ];
+
         $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
+        $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
+
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
+        $filterFieldsRules[] = ['shop_quantity', 'safe'];
 
         //Мерж колонок и сортировок
         if ($shopColumns) {
