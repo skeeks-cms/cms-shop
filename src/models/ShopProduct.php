@@ -570,6 +570,13 @@ class ShopProduct extends \skeeks\cms\models\Core
             $shopFuser = \Yii::$app->shop->cart;
         }
 
+
+        if (!$shopFuser) {
+            $basPriceTypes = [\Yii::$app->shop->baseTypePrice->id];
+        } else {
+            $basPriceTypes = $shopFuser->buyTypePrices;
+        }
+
         return $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
         ])
@@ -581,7 +588,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             ->orWhere([
                 'and',
                 ['>', 'price', 0],
-                ['type_price_id' => ArrayHelper::map($shopFuser->buyTypePrices, 'id', 'id')],
+                ['type_price_id' => ArrayHelper::map($basPriceTypes, 'id', 'id')],
             ])
             ->orWhere(
                 ['type_price_id' => \Yii::$app->shop->baseTypePrice->id]
