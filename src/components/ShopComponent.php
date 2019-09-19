@@ -137,6 +137,13 @@ class ShopComponent extends Component
     public $is_show_product_only_quantity = 1;
 
     /**
+     * Показывать у товаров оставшееся количество на складе? Актуально для агрегаторов
+     * @var int
+     */
+    public $is_show_quantity_product = 1;
+
+
+    /**
      * Можно задать название и описание компонента
      * @return array
      */
@@ -213,6 +220,11 @@ class ShopComponent extends Component
                         'allowNull' => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
+                    'is_show_quantity_product' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
 
 
                     [
@@ -255,6 +267,7 @@ class ShopComponent extends Component
                     'is_show_button_no_price',
                     'is_show_product_only_quantity',
                     'is_show_filters_has_subtree',
+                    'is_show_quantity_product'
                 ],
                 'boolean',
             ],
@@ -275,6 +288,7 @@ class ShopComponent extends Component
             'is_show_product_only_quantity'  => "Показывать товары только в наличии на сайте?",
             'show_filter_property_ids'  => "Какие фильтры разрешено показывать на сайте?",
             'is_show_filters_has_subtree'  => "Показывать фильтры если есть подкатегории?",
+            'is_show_quantity_product'  => "Показывать оставшееся количество товаров на складе?",
         ]);
     }
     public function attributeHints()
@@ -289,8 +303,10 @@ class ShopComponent extends Component
             'show_filter_property_ids' => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
             'is_show_filters_has_subtree' => "Если каталог большой то лучше для производительности не показывать фильтры в категориях где есть подкатегории",
             'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
+            'is_show_quantity_product' => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
         ]);
     }
+
     /**
      *
      * Тип цены по умолчанию
