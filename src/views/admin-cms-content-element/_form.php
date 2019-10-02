@@ -473,7 +473,6 @@ JS
 
 
 
-
 <? if (!$model->isNewRecord) : ?>
     <? /*= $form->fieldSet(\Yii::t('skeeks/shop/app','Additionally')); */ ?><!--
         <? /*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */ ?>
@@ -496,7 +495,6 @@ JS
         $shopContent->childrenContent->id,
     ])->all()
 ) : ?>
-    <? print_r($shopContent->children_content_id); ?>
     <? $childContents = $model->cmsContent->getChildrenContents()->andWhere([
         '!=',
         'id',
@@ -548,9 +546,6 @@ JS
 <? endif; ?>
 
 
-
-
 <?= $form->buttonsStandart($model); ?>
-
 <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
 <?php ActiveForm::end(); ?>
