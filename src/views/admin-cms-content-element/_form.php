@@ -85,6 +85,35 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
     'enableClientValidation' => false,
 ]); ?>
 
+
+
+<? if ($is_saved && @$is_create) : ?>
+    <?php $this->registerJs(<<<JS
+    sx.Window.openerWidgetTriggerEvent('model-create', {
+        'submitBtn' : '{$submitBtn}'
+    });
+JS
+    ); ?>
+
+<? elseif ($is_saved) : ?>
+    <?php $this->registerJs(<<<JS
+sx.Window.openerWidgetTriggerEvent('model-update', {
+        'submitBtn' : '{$submitBtn}'
+    });
+JS
+    ); ?>
+<? endif; ?>
+
+<? if (@$redirect) : ?>
+    <?php $this->registerJs(<<<JS
+window.location.href = '{$redirect}';
+console.log('window.location.href');
+console.log('{$redirect}');
+JS
+    ); ?>
+<? endif; ?>
+
+
 <? $this->registerJs(<<<JS
 
 (function(sx, $, _)

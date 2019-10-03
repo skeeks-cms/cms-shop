@@ -516,6 +516,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     }
     public function update($adminAction)
     {
+        $is_saved = false;
+        $redirect = "";
+
         /**
          * @var $model CmsContentElement
          */
@@ -605,15 +608,15 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                     }
 
+                    $is_saved = true;
 
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                     if (\Yii::$app->request->post('submit-btn') == 'apply') {
                     } else {
 
-                        return $this->redirect(
-                            $this->url
-                        );
+                        $redirect = $this->url;
+
                     }
 
                     $model->refresh();
@@ -641,6 +644,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'shopProduct'      => $shopProduct,
             'productPrices'    => $productPrices,
             'baseProductPrice' => $shopProduct->getBaseProductPrice()->one(),
+
+            'is_saved' => $is_saved,
+            'submitBtn' => \Yii::$app->request->post('submit-btn'),
+            'redirect' => $redirect,
         ]);
     }
     
