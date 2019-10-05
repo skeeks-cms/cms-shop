@@ -519,7 +519,7 @@ JS
 ?>
 
 
-<? \yii\bootstrap\Modal::begin([
+<? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-close-order',
     'header' => 'Отмена заказа',
 ]); ?>
@@ -549,11 +549,11 @@ JS
 <button class="btn btn-primary">Сохранить</button>
 
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-<? \yii\bootstrap\Modal::end(); ?>
+<? $modal::end(); ?>
 
 
 
-<? \yii\bootstrap\Modal::begin([
+<? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-status-change',
     'header' => 'Изменение статуса',
 ]); ?>
@@ -583,12 +583,12 @@ JS
 <button class="btn btn-primary">Сохранить</button>
 
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-<? \yii\bootstrap\Modal::end(); ?>
+<? $modal::end(); ?>
 
 
 
 
-<? \yii\bootstrap\Modal::begin([
+<? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-allow-payment',
     'header' => 'Разрешение оплаты',
 ]); ?>
@@ -623,9 +623,9 @@ $form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
 <button class="btn btn-primary">Сохранить</button>
 
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-<? \yii\bootstrap\Modal::end(); ?>
+<? $modal::end(); ?>
 
-<? \yii\bootstrap\Modal::begin([
+<? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-payment-container',
     'header' => 'Оплата заказа',
 ]); ?>
@@ -661,13 +661,13 @@ JS
 <button class="btn btn-primary">Сохранить</button>
 
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-<? \yii\bootstrap\Modal::end(); ?>
+<? $modal::end(); ?>
 
 
 
 
 
-<? \yii\bootstrap\Modal::begin([
+<? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-payment-container-close',
     'header' => 'Изменение данных по оплате',
 ]); ?>
@@ -712,9 +712,9 @@ JS
 
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
 
-<? \yii\bootstrap\Modal::end(); ?>
+<? $modal::end(); ?>
 
-<? \yii\bootstrap\Modal::begin([
+<? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-allow-delivery',
     'header' => 'Доставка',
 ]); ?>
@@ -750,12 +750,12 @@ $form->fieldSelect($model, 'shop_delivery_id', \yii\helpers\ArrayHelper::map(
 
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
 
-<? \yii\bootstrap\Modal::end(); ?>
+<? $modal::end(); ?>
 
 
 
 
-<? \yii\bootstrap\Modal::begin([
+<? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-comment',
     'header' => 'Комментарий',
 ]); ?>
@@ -786,7 +786,7 @@ JS
 <button class="btn btn-primary">Сохранить</button>
 
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
-<? \yii\bootstrap\Modal::end(); ?>
+<? $modal::end(); ?>
 
 
 <div style="display: none;">

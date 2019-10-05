@@ -67,7 +67,7 @@ CSS
         </div>
 
 
-        <? \yii\bootstrap\ActiveForm::end(); ?>
+        <? $form::end(); ?>
 
         <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
             'dataProvider' => $dataProvider,
