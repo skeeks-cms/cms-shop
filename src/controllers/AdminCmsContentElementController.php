@@ -165,6 +165,12 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     ],
                     'on init'      => function ($e) {
                         $action = $e->sender;
+                        if (!$action) {
+                            return $this;
+                        }
+                        if (!$this->content) {
+                            return $this;
+                        }
                         /**
                          * @var BackendGridModelAction $action
                          */
