@@ -92,7 +92,7 @@ class AdminOrderController extends BackendModelStandartController
                         'go'                   => [
                             'format' => "raw",
                             'value'  => function (ShopOrder $shopOrder) {
-                                return \yii\helpers\Html::a('<i class="glyphicon glyphicon-arrow-right"></i>', $shopOrder->url, [
+                                return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $shopOrder->url, [
                                     'target'    => '_blank',
                                     'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
                                     'data-pjax' => '0',
@@ -188,7 +188,7 @@ HTML;
                                 }
                                 return \yii\helpers\Html::label($shopOrder->shopOrderStatus->asText, null, [
                                         'style' => "background: {$shopOrder->shopOrderStatus->color}",
-                                        'class' => "label",
+                                        'class' => "label u-label",
                                     ])."<br />".
                                     \yii\helpers\Html::tag("small",
                                         \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
