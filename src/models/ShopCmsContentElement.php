@@ -169,6 +169,25 @@ class ShopCmsContentElement extends CmsContentElement
                 }
             }
 
+            if ($sp->tradeOffers) {
+                $spNew->product_type = ShopProduct::TYPE_OFFERS;
+                $spNew->save();
+
+                /**
+                 * @var $offer ShopCmsContentElement
+                 */
+                foreach ($sp->tradeOffers as $offer) {
+                    $newOffer = $offer->copy();
+                    $newOffer->parent_content_element_id = $model->id;
+                    $newOffer->save();
+
+
+                }
+
+                $spNew->product_type = ShopProduct::TYPE_OFFERS;
+                $spNew->save();
+            }
+
             $transaction->commit();
 
 
