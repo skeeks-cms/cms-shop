@@ -59,14 +59,14 @@ $action = $this->context->action;
 ))->hint(\Yii::t('skeeks/shop/app', 'if nothing is selected, it means all')); ?>
 
 
-<? \yii\bootstrap\Alert::begin([
+<? $alert = \yii\bootstrap\Alert::begin([
     'options' => [
         'class' => 'alert-warning',
     ],
 ]); ?>
 <?= \Yii::t('skeeks/shop/app',
     '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
-<? \yii\bootstrap\Alert::end() ?>
+<? $alert::end() ?>
 
 <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
     'permissionName'        => $model->permissionName,
