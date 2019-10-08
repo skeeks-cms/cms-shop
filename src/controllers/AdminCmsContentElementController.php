@@ -481,6 +481,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
     public function create($adminAction)
     {
+        $is_saved = false;
+        $redirect = "";
+
         $productPrices = [];
 
         $modelClassName = $this->modelClassName;
@@ -542,16 +545,15 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
+                    $is_saved = true;
+
                     if (\Yii::$app->request->post('submit-btn') == 'apply') {
-                        return $this->redirect(
-                            UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                            $redirect = UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
                                 ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                                ->toString()
-                        );
+                                ->toString();
                     } else {
-                        return $this->redirect(
-                            $this->url
-                        );
+                        $redirect = $this->url;
+
                     }
 
                 }
@@ -565,6 +567,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'shopProduct'      => $shopProduct,
             'productPrices'    => $productPrices,
             'baseProductPrice' => $baseProductPrice,
+
+            'is_saved' => $is_saved,
+            'submitBtn' => \Yii::$app->request->post('submit-btn'),
+            'redirect' => $redirect,
         ]);
     }
     public function update($adminAction)
