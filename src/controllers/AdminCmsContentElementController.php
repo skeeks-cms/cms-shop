@@ -301,7 +301,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         $visibleColumns[] = "shop.quantity";
 
         if (\Yii::$app->shop->shopTypePrices) {
+
             foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+
                 $shopColumns["shop.price{$shopTypePrice->id}"] = [
                     'label'     => $shopTypePrice->name." [магазин]",
                     'attribute' => 'shop.price'.$shopTypePrice->id,
@@ -321,15 +323,60 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ];
 
 
-                $visibleColumns[] = 'shop.price'.$shopTypePrice->id;
+                /*$visibleColumns[] = 'shop.price'.$shopTypePrice->id;
 
                 $sortAttributes['shop.price'.$shopTypePrice->id] = [
                     'asc'     => ["p{$shopTypePrice->id}.price" => SORT_ASC],
                     'desc'    => ["p{$shopTypePrice->id}.price" => SORT_DESC],
                     'label'   => $shopTypePrice->name,
                     'default' => SORT_ASC,
-                ];
+                ];*/
             }
+
+
+            $defaultId = '';
+
+            $shopColumns["shop.priceDefult"] = [
+                'label'     => "Все цены [магазин]",
+                'attribute' => 'shop.priceDefult',
+                'format' => 'raw',
+                'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
+                    $result = [];
+                    foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice)
+                    {
+                        if ($shopTypePrice->isDefault) {
+                            $defaultId = $shopTypePrice->id;
+                        }
+                        $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
+                        if ($shopProduct) {
+                            if ($shopProductPrice = $shopProduct->getShopProductPrices()
+                                ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
+                            ) {
+                                $result[] = "<span title='{$shopTypePrice->name}'>" . (string)$shopProductPrice->money . "</span>";
+                            } else {
+                                $result[] = "<span title='{$shopTypePrice->name}'>" . " — " . "</span>";;
+                            }
+                        }
+                    }
+
+
+                    return implode("<br />", $result);
+                },
+            ];
+
+            $visibleColumns[] = 'shop.priceDefult';
+
+            if ($defaultId) {
+                $sortAttributes['shop.priceDefult'] = [
+                    'asc'     => ["p{$defaultId}.price" => SORT_ASC],
+                    'desc'    => ["p{$defaultId}.price" => SORT_DESC],
+                    //'label'   => $shopTypePrice->name,
+                    'default' => SORT_ASC,
+                ];
+
+            }
+
+
         }
 
 

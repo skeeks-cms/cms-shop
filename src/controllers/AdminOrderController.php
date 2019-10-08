@@ -160,10 +160,10 @@ CSS
                                     $result = [];
 
                                     foreach ($shopOrder->shopOrderItems as $shopBasket) {
-                                        $result[] =
+                                        $result[] = "<div style='min-width: 300px;'>" .
 
                                             \yii\helpers\Html::img(Image::getSrc($shopBasket->image ? $shopBasket->image->src : null), [
-                                                'style' => "max-height: 50px; max-width: 50px;",
+                                                'style' => "max-height: 30px; max-width: 30px; border-radius: 50%;",
                                             ])
                                             .
                                             \yii\helpers\Html::a($shopBasket->name, $shopBasket->url, [
@@ -172,7 +172,7 @@ CSS
                                             ])
                                             .
                                             <<<HTML
-                 — $shopBasket->quantity $shopBasket->measure_name
+                 — $shopBasket->quantity $shopBasket->measure_name</div>
 HTML;
 
                                     }
