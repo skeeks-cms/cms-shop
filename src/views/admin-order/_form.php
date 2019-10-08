@@ -81,9 +81,6 @@ JS
 $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 ?>
 
-<h1 style="text-align: center;">Заказ №<?= $model->id ?>
-    от <?= \Yii::$app->formatter->asDatetime($model->created_at); ?></h1>
-
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/shop/app', 'Order'),

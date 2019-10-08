@@ -25,6 +25,7 @@ use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * Class AdminExtraController
@@ -35,8 +36,21 @@ class AdminOrderController extends BackendModelStandartController
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Orders');
-        $this->modelShowAttribute = "id";
+        $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopOrder::class;
+
+        $this->modelHeader = function () {
+            /**
+             * @var $model ShopOrder
+             */
+            $model = $this->model;
+            $date = \Yii::$app->formatter->asDatetime($model->created_at);
+            return Html::tag('h1', "Заказ №{$model->id} от {$date}" . Html::a('<i class="fas fa-external-link-alt"></i>', $model->getPublicUrl(), [
+                'target' => "_blank",
+                'class' => "g-ml-20",
+                'title' => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+            ]));
+        };
 
         parent::init();
     }
@@ -163,7 +177,7 @@ CSS
                                         $result[] = "<div style='min-width: 300px;'>" .
 
                                             \yii\helpers\Html::img(Image::getSrc($shopBasket->image ? $shopBasket->image->src : null), [
-                                                'style' => "max-height: 30px; max-width: 30px; border-radius: 50%;",
+                                                'style' => "max-height: 30px; max-width: 30px; border-radius: 5px;",
                                             ])
                                             .
                                             \yii\helpers\Html::a($shopBasket->name, $shopBasket->url, [
