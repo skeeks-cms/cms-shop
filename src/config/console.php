@@ -12,4 +12,12 @@ return [
             'controllerNamespace' => 'skeeks\cms\shop\console\controllers',
         ],
     ],
+
+    'controllerMap' => [
+        'migrate' => [
+            'migrationPath' => [
+                '@skeeks/cms/shop/migrations',
+            ],
+        ],
+    ]
 ];
