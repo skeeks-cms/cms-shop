@@ -13,14 +13,14 @@
 
 ?>
 
-<? \yii\bootstrap\Alert::begin([
+<? $alert = \yii\bootstrap\Alert::begin([
     'options' =>
         [
             'class' => 'alert-info',
         ],
 ]); ?>
 <?= \Yii::t('skeeks/shop/app', 'In this section, you can customize what content you can sell on your site.'); ?>
-<? \yii\bootstrap\Alert::end(); ?>
+<? $alert::end(); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridViewStandart::widget([
     'dataProvider'    => $dataProvider,
