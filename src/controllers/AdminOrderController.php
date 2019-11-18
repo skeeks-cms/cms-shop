@@ -24,6 +24,8 @@ use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Event;
 use yii\base\Exception;
+use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -38,6 +40,8 @@ class AdminOrderController extends BackendModelStandartController
         $this->name = \Yii::t('skeeks/shop/app', 'Orders');
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopOrder::class;
+        
+        $this->generateAccessActions = false;
 
         $this->modelHeader = function () {
             /**
@@ -45,11 +49,11 @@ class AdminOrderController extends BackendModelStandartController
              */
             $model = $this->model;
             $date = \Yii::$app->formatter->asDatetime($model->created_at);
-            return Html::tag('h1', "Заказ №{$model->id} от {$date}" . Html::a('<i class="fas fa-external-link-alt"></i>', $model->getPublicUrl(), [
-                'target' => "_blank",
-                'class' => "g-ml-20",
-                'title' => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-            ]));
+            return Html::tag('h1', "Заказ №{$model->id} от {$date}".Html::a('<i class="fas fa-external-link-alt"></i>', $model->getPublicUrl(), [
+                    'target' => "_blank",
+                    'class'  => "g-ml-20",
+                    'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
+                ]));
         };
 
         parent::init();
@@ -69,8 +73,44 @@ class AdminOrderController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $query->andWhere(['is_created' => 1]);
+                        /*$paymentsQuery = CrmPayment::find()->select(['count(*)'])->where([
+                            'or',
+                            ['sender_crm_contractor_id' => new Expression(CrmContractor::tableName().".id")],
+                            ['receiver_crm_contractor_id' => new Expression(CrmContractor::tableName().".id")],
+                        ]);
+
+                        $contactsQuery = CrmContractorMap::find()->select(['count(*)'])->where([
+                            'crm_company_id' => new Expression(CrmContractor::tableName().".id"),
+                        ]);
+
+                        $senderQuery = CrmPayment::find()->select(['sum(amount) as amount'])->where([
+                            'sender_crm_contractor_id' => new Expression(CrmContractor::tableName().".id"),
+                        ]);
+
+                        $receiverQuery = CrmPayment::find()->select(['sum(amount) as amount'])->where([
+                            'receiver_crm_contractor_id' => new Expression(CrmContractor::tableName().".id"),
+                        ]);
+
+                        $query->select([
+                            CrmContractor::tableName().'.*',
+                            'count_payemnts'      => $paymentsQuery,
+                            'count_contacts'      => $contactsQuery,
+                            'sum_send_amount'     => $senderQuery,
+                            'sum_receiver_amount' => $receiverQuery,
+                        ]);*/
+                    },
+
+
                     'defaultOrder' => [
-                        'is_created' => SORT_DESC,
+                        //'is_created' => SORT_DESC,
                         'updated_at' => SORT_DESC,
                     ],
 
@@ -93,14 +133,24 @@ class AdminOrderController extends BackendModelStandartController
                         'items',
 
                         'amount',
-                        'is_created',
+                        //'is_created',
                         'go',
                     ],
                     'columns'        => [
+
+                        /*'id' => [
+                            'value' => function (ShopOrder $shopOrder) {
+                                $result = [];
+
+                                $result[] = $shopOrder->asText; 
+                                return implode("<br />", $result);
+                            },
+                        ],*/
+
                         'is_created'           => [
                             'class' => BooleanColumn::class,
                         ],
-                        'paid_at'             => [
+                        'paid_at'              => [
                             'class' => DateTimeColumnData::class,
                         ],
                         'go'                   => [
@@ -138,7 +188,7 @@ CSS
                                 return $reuslt;
                             },
                         ],
-                        'paid_at'             => [
+                        'paid_at'              => [
                             'value' => function (ShopOrder $shopOrder, $key) {
                                 $reuslt = "<div>";
                                 if ($shopOrder->paid_at) {
@@ -174,7 +224,7 @@ CSS
                                     $result = [];
 
                                     foreach ($shopOrder->shopOrderItems as $shopBasket) {
-                                        $result[] = "<div style='min-width: 300px;'>" .
+                                        $result[] = "<div style='min-width: 300px;'>".
 
                                             \yii\helpers\Html::img(Image::getSrc($shopBasket->image ? $shopBasket->image->src : null), [
                                                 'style' => "max-height: 30px; max-width: 30px; border-radius: 5px;",
@@ -208,14 +258,14 @@ HTML;
                                         \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
                             },
                         ],
-                        'amount' => [
+                        'amount'               => [
                             'value' => function (ShopOrder $shopOrder) {
                                 $result = [];
-                                $result[] = "Товары:&nbsp;" . $shopOrder->moneyItems;
-                                $result[] = "Доставка:&nbsp;" . $shopOrder->moneyDelivery;
-                                $result[] = "Скидка:&nbsp;" . $shopOrder->moneyDiscount;
-                                $result[] = "Налог:&nbsp;" . $shopOrder->moneyVat;
-                                return "К&nbsp;оплате:&nbsp;<b>" . $shopOrder->money . "</b><hr style='margin: 0px; padding: 0px;'/>" . implode("<br />", $result);
+                                $result[] = "Товары:&nbsp;".$shopOrder->moneyItems;
+                                $result[] = "Доставка:&nbsp;".$shopOrder->moneyDelivery;
+                                $result[] = "Скидка:&nbsp;".$shopOrder->moneyDiscount;
+                                $result[] = "Налог:&nbsp;".$shopOrder->moneyVat;
+                                return "К&nbsp;оплате:&nbsp;<b>".$shopOrder->money."</b><hr style='margin: 0px; padding: 0px;'/>".implode("<br />", $result);
                             },
                         ],
                     ],
@@ -241,14 +291,14 @@ HTML;
                 'callback' => [$this, 'payments'],
                 'icon'     => 'fas fa-credit-card',
             ],
-            'bills' => [
+            'bills'    => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Счета',
                 'priority' => 400,
                 'callback' => [$this, 'bills'],
                 'icon'     => 'fas fa-credit-card',
             ],
-            'changes' => [
+            'changes'  => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Изменения по заказу',
                 'priority' => 400,
@@ -448,7 +498,7 @@ HTML;
                 $shopBasket = new ShopBasket([
                     'shop_order_id'   => $model->id,
                     'shop_product_id' => $product->id,
-                    'quantity'   => 0,
+                    'quantity'        => 0,
                 ]);
             }
 
@@ -548,10 +598,6 @@ HTML;
     }
 
 
-
-
-
-
     public function payments()
     {
         if ($controller = \Yii::$app->createController('/shop/admin-payment')) {
@@ -612,7 +658,6 @@ HTML;
 
         return '1';
     }
-
 
 
     public function bills()

@@ -176,7 +176,7 @@ return [
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Baskets'),
-                                    "url"   => ["shop/admin-fuser"],
+                                    "url"   => ["shop/admin-cart"],
                                 ],
 
                                 [

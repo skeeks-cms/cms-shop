@@ -50,6 +50,33 @@ return [
             ],
         ],
 
+        'authManager' => [
+            'config' => [
+                'roles' => [
+                    [
+                        'name'  => \skeeks\cms\rbac\CmsManager::ROLE_ADMIN,
+                        'child' => [
+                            //Есть доступ к системе администрирования
+                            'permissions' => [
+                                "shop/admin-order",
+                                "shop/admin-cart",
+                            ],
+                        ],
+                    ],
+                    [
+                        'name'  => \skeeks\cms\rbac\CmsManager::ROLE_MANGER,
+                        'child' => [
+                            //Есть доступ к системе администрирования
+                            'permissions' => [
+                                "shop/admin-order",
+                                "shop/admin-cart",
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        
     ],
 
     'modules' => [
