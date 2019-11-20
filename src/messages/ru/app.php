@@ -425,4 +425,5 @@ return
         "Coupon does not exist or is not active" => 'Купон не существует или не активен',
         "Coupon successfully installed"          => 'Купон успешно установлен',
         "Discounts"          => 'Скидки',
+        "Marketing"          => 'Маркетинг',
     ];

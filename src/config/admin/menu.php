@@ -195,7 +195,7 @@ return [
 
                     [
                         'priority' => 0,
-                        'label'    => \Yii::t('skeeks/shop/app', 'Marketing management'),
+                        'label'    => \Yii::t('skeeks/shop/app', 'Marketing'),
                         "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
                         'items' => [
@@ -244,14 +244,14 @@ return [
 
                     [
                         'priority' => 0,
-                        'label'    => \Yii::t('skeeks/shop/app', 'Inventory control'),
+                        'label'    => \Yii::t('skeeks/shop/app', 'Поставщики/Склады'),
                         "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
 
                         'items' =>
                             [
                                 [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Stocks'),
-                                    "url"   => ["shop/admin-store"],
+                                    "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
+                                    "url"   => ["shop/admin-shop-supplier"],
                                     "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                                 ],
 
