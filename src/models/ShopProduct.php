@@ -25,23 +25,11 @@ use yii\helpers\ArrayHelper;
  * @property integer                     $created_at
  * @property integer                     $updated_at
  * @property double                      $quantity
- * @property string                      $quantity_trace
  * @property double                      $weight
- * @property string                      $price_type
  * @property string                      $measure_ratio
- * @property integer                     $recur_scheme_length
- * @property string                      $recur_scheme_type
- * @property integer                     $trial_price_id
- * @property string                      $without_order
- * @property string                      $select_best_price
  * @property integer                     $vat_id
  * @property string                      $vat_included
- * @property string                      $tmp_id
- * @property string                      $can_buy_zero
- * @property string                      $negative_amount_trace
  * @property string                      $barcode_multi
- * @property string                      $purchasing_price
- * @property string                      $purchasing_currency
  * @property double                      $quantity_reserved
  * @property integer                     $measure_id
  * @property double                      $width
@@ -333,8 +321,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'updated_by',
                     'created_at',
                     'updated_at',
-                    'recur_scheme_length',
-                    'trial_price_id',
                     'vat_id',
                     'measure_id',
                 ],
@@ -344,7 +330,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                 [
                     'quantity',
                     'weight',
-                    'purchasing_price',
                     'quantity_reserved',
                     'width',
                     'length',
@@ -355,28 +340,14 @@ class ShopProduct extends \skeeks\cms\models\Core
             ],
             [
                 [
-                    'quantity_trace',
-                    'price_type',
-                    'recur_scheme_type',
-                    'without_order',
-                    'select_best_price',
                     'vat_included',
-                    'can_buy_zero',
-                    'negative_amount_trace',
-                    'barcode_multi',
-                    'subscribe',
                 ],
                 'string',
                 'max' => 1,
             ],
-            [['tmp_id'], 'string', 'max' => 40],
-            [['purchasing_currency'], 'string', 'max' => 3],
-            [['quantity_trace', 'can_buy_zero', 'negative_amount_trace'], 'default', 'value' => Cms::BOOL_N],
-            [['weight', 'width', 'length', 'height', 'purchasing_price'], 'default', 'value' => 0],
-            [['subscribe'], 'default', 'value' => Cms::BOOL_Y],
+            [['weight', 'width', 'length', 'height'], 'default', 'value' => 0],
             [['measure_ratio'], 'default', 'value' => 1],
             [['measure_ratio'], 'number', 'min' => 0.0001, 'max' => 9999999],
-            [['purchasing_currency'], 'default', 'value' => Yii::$app->money->currencyCode],
 
             [['baseProductPriceValue'], 'number'],
             [['baseProductPriceValue'], 'default', 'value' => 0.00 ],
@@ -427,29 +398,15 @@ class ShopProduct extends \skeeks\cms\models\Core
             'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
             'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
             'quantity'              => \Yii::t('skeeks/shop/app', 'Available quantity'),
-            'quantity_trace'        => \Yii::t('skeeks/shop/app', 'Include quantitative account'),
             'weight'                => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
-            'price_type'            => \Yii::t('skeeks/shop/app', 'Price Type'),
-            'recur_scheme_length'   => \Yii::t('skeeks/shop/app', 'Recur Scheme Length'),
-            'recur_scheme_type'     => \Yii::t('skeeks/shop/app', 'Recur Scheme Type'),
-            'trial_price_id'        => \Yii::t('skeeks/shop/app', 'Trial Price ID'),
-            'without_order'         => \Yii::t('skeeks/shop/app', 'Without Order'),
-            'select_best_price'     => \Yii::t('skeeks/shop/app', 'Select Best Price'),
             'vat_id'                => \Yii::t('skeeks/shop/app', 'VAT rate'),
             'vat_included'          => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
-            'tmp_id'                => \Yii::t('skeeks/shop/app', 'Tmp ID'),
-            'can_buy_zero'          => \Yii::t('skeeks/shop/app', 'Allow purchase if product is absent'),
-            'negative_amount_trace' => \Yii::t('skeeks/shop/app', 'Allow negative quantity'),
-            'barcode_multi'         => \Yii::t('skeeks/shop/app', 'Barcode Multi'),
-            'purchasing_price'      => \Yii::t('skeeks/shop/app', 'Purchase price'),
-            'purchasing_currency'   => \Yii::t('skeeks/shop/app', 'Currency purchase price'),
             'quantity_reserved'     => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
             'measure_id'            => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
             'measure_ratio'         => \Yii::t('skeeks/shop/app', 'The coefficient unit'),
             'width'                 => \Yii::t('skeeks/shop/app', 'Width (mm)'),
             'length'                => \Yii::t('skeeks/shop/app', 'Length (mm)'),
             'height'                => \Yii::t('skeeks/shop/app', 'Height (mm)'),
-            'subscribe'             => \Yii::t('skeeks/shop/app', 'Allow subscription without explanation'),
             'product_type'          => \Yii::t('skeeks/shop/app', 'Product type'),
         ];
     }
@@ -487,13 +444,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopCmsContentElement::class, ['id' => 'id']);
     }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTrialPrice()
-    {
-        return $this->hasOne(ShopTypePrice::class, ['id' => 'trial_price_id']);
-    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -501,13 +452,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopVat::class, ['id' => 'vat_id']);
     }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPurchasingCurrency()
-    {
-        return $this->hasOne(Currency::class, ['code' => 'purchasing_currency']);
-    }
+   
     /**
      * @return \yii\db\ActiveQuery
      */

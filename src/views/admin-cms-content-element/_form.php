@@ -281,18 +281,6 @@ JS
         'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
     ]) ?>
 
-    <!--<div class="row">
-        <div class="col-md-3">
-            <? /*= $form->field($shopProduct, 'purchasing_price')->textInput(); */ ?>
-        </div>
-        <div class="col-md-2">
-            <? /*= $form->fieldSelect($shopProduct, 'purchasing_currency', \yii\helpers\ArrayHelper::map(
-                \Yii::$app->money->activeCurrencies, 'code', 'code'
-            )); */ ?>
-        </div>
-    </div>-->
-
-
     <div class="row">
         <div class="col-md-3">
             <?= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
@@ -433,16 +421,6 @@ JS
             <?= $form->fieldRadioListBoolean($shopProduct, 'vat_included'); ?>
         </div>
     </div>
-
-
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Options'),
-    ]); ?>
-
-    <?= $form->fieldRadioListBoolean($shopProduct, 'quantity_trace'); ?>
-    <?= $form->fieldRadioListBoolean($shopProduct, 'can_buy_zero'); ?>
-    <?= $form->fieldRadioListBoolean($shopProduct, 'negative_amount_trace'); ?>
-    <?= $form->fieldRadioListBoolean($shopProduct, 'subscribe'); ?>
 </div>
 
 <? if ($shopContent->childrenContent) : ?>
