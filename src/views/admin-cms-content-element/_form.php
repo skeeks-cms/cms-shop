@@ -258,23 +258,23 @@ JS
 
         <? if ($shopContent->childrenContent) : ?>
             <?= $form->field($model, 'parent_content_element_id')->widget(
-            \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-            [
-                'content_id'  => $shopContent->childrenContent->id,
-                'dialogRoute' => [
-                    '/shop/admin-cms-content-element',
-                    'DynamicModel' => [
-                        'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS],
+                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+                [
+                    'content_id'  => $shopContent->childrenContent->id,
+                    'dialogRoute' => [
+                        '/shop/admin-cms-content-element',
+                        'DynamicModel' => [
+                            'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS],
+                        ],
                     ],
-                ],
-            ]
-        )
-            ->label('Общий товар с предложениями');
-        ?>
-            
+                ]
+            )
+                ->label('Общий товар с предложениями');
+            ?>
+
         <? endif; ?>
 
-        
+
     </div>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -307,28 +307,31 @@ JS
                 'content' => \Yii::t('skeeks/shop/app', 'Additional costs')
             ])*/ ?>
 
-        <hr/>
 
         <? foreach ($productPrices as $productPrice) : ?>
 
             <div class="row">
                 <div class="col-md-3">
-                    <label><?= $productPrice->typePrice->name; ?></label>
-                    <?= Html::textInput("prices[".$productPrice->typePrice->id."][price]", $productPrice->price, [
-                        'class' => 'form-control',
-                    ]); ?>
+                    <div class="form-group">
+                        <label><?= $productPrice->typePrice->name; ?></label>
+                        <?= Html::textInput("prices[".$productPrice->typePrice->id."][price]", $productPrice->price, [
+                            'class' => 'form-control',
+                        ]); ?>
+                    </div>
                 </div>
                 <div class="col-md-2">
-                    <label>Валюта</label>
+                    <div class="form-group">
+                        <label>Валюта</label>
 
-                    <?= \skeeks\widget\chosen\Chosen::widget([
-                        'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
-                        'value'         => $productPrice->currency_code,
-                        'allowDeselect' => false,
-                        'items'         => \yii\helpers\ArrayHelper::map(
-                            \Yii::$app->money->activeCurrencies, 'code', 'code'
-                        ),
-                    ]) ?>
+                        <?= \skeeks\widget\chosen\Chosen::widget([
+                            'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
+                            'value'         => $productPrice->currency_code,
+                            'allowDeselect' => false,
+                            'items'         => \yii\helpers\ArrayHelper::map(
+                                \Yii::$app->money->activeCurrencies, 'code', 'code'
+                            ),
+                        ]) ?>
+                    </div>
                 </div>
 
                 <div class="col-md-2">
