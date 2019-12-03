@@ -9,9 +9,10 @@
 /* @var $widget \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget */
 ?>
 <? if ($widget->productPrice && $widget->productPrice->shopProductPriceChanges) : ?>
+<div>
     <a href="#" data-toggle="modal" data-target="#sx-price-change-<?= $widget->id; ?>" class="btn btn-default"><i
                 class="fa fa-eye"></i>
-        <?= \Yii::t('skeeks/shop/app', 'Changelog'); ?></a>
+        <?= \Yii::t('skeeks/shop/app', 'Changelog'); ?></a></div>
 
     <? $createModal = \yii\bootstrap\Modal::begin([
         'id'     => 'sx-price-change-'.$widget->id,

@@ -313,7 +313,7 @@ JS
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label><?= $productPrice->typePrice->name; ?></label>
+                        <label class="control-label"><?= $productPrice->typePrice->name; ?></label>
                         <?= Html::textInput("prices[".$productPrice->typePrice->id."][price]", $productPrice->price, [
                             'class' => 'form-control',
                         ]); ?>
@@ -321,7 +321,7 @@ JS
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label>Валюта</label>
+                        <label class="control-label">Валюта</label>
 
                         <?= \skeeks\widget\chosen\Chosen::widget([
                             'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
