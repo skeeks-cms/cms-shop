@@ -18,12 +18,9 @@ use yii\helpers\ArrayHelper;
  * @property string  $name
  * @property string  $description
  * @property integer $priority
- * @property string  $def
- * @property string  $xml_id
  *
  * ***
  *
- * @property string  $isDefault
  * @property string  $buyPermissionName
  * @property string  $viewPermissionName
  */
@@ -37,47 +34,6 @@ class ShopTypePrice extends \skeeks\cms\models\Core
         return '{{%shop_type_price}}';
     }
 
-    //TODO: надо вынести в трейт
-    public function init()
-    {
-        parent::init();
-
-        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'beforeInsertChecks']);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'beforeUpdateChecks']);
-
-    }
-
-    /**
-     * @param Event $e
-     * @throws Exception
-     */
-    public function beforeUpdateChecks(Event $e)
-    {
-        //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y) {
-            static::updateAll(
-                [
-                    'def' => Cms::BOOL_N,
-                ],
-                ['!=', 'id', $this->id]
-            );
-        }
-
-    }
-
-    /**
-     * @param Event $e
-     * @throws Exception
-     */
-    public function beforeInsertChecks(Event $e)
-    {
-        //Если этот элемент по умолчанию выбран, то все остальны нужно сбросить.
-        if ($this->def == Cms::BOOL_Y) {
-            static::updateAll([
-                'def' => Cms::BOOL_N,
-            ]);
-        }
-    }
 
     /**
      * @inheritdoc
@@ -86,13 +42,9 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     {
         return ArrayHelper::merge(parent::rules(), [
             [['priority'], 'integer'],
-            [['code', 'name'], 'required'],
+            [['name'], 'required'],
             [['description'], 'string'],
-            [['code'], 'string', 'max' => 32],
             [['name'], 'string', 'max' => 255],
-            [['xml_id'], 'string', 'max' => 255],
-            [['def'], 'string', 'max' => 1],
-            [['code'], 'unique'],
         ]);
     }
 
@@ -102,11 +54,9 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'code'        => \Yii::t('skeeks/shop/app', 'Code'),
             'name'        => \Yii::t('skeeks/shop/app', 'Name'),
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
             'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
-            'def'         => \Yii::t('skeeks/shop/app', 'Default'),
         ]);
     }
 
@@ -128,10 +78,11 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     }
 
     /**
+     * @deprecated
      * @return bool
      */
     public function getIsDefault()
     {
-        return (bool)($this->def == 'Y');
+        return (bool)($this->id == \Yii::$app->shop->baseTypePrice->id);
     }
 }

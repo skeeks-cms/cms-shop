@@ -16,8 +16,6 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main')); ?>
 
-<?= $form->fieldRadioListBoolean($model, 'def'); ?>
-<?= $form->field($model, 'code')->textInput(['maxlength' => 32]); ?>
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
 <?= $form->fieldInputInt($model, 'priority'); ?>
@@ -27,14 +25,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
         'content' => \skeeks\cms\shop\Module::t('app', 'Affordable prices'),
     ]) ?>
 
-    <? \yii\bootstrap\Alert::begin([
+    <? $alert = \yii\bootstrap\Alert::begin([
         'options' => [
             'class' => 'alert-warning',
         ],
     ]); ?>
     <?= \skeeks\cms\shop\Module::t('app',
         '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
-    <? \yii\bootstrap\Alert::end() ?>
+    <? $alert::end() ?>
 
     <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
         'permissionName'        => $model->viewPermissionName,
@@ -50,14 +48,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
             'Group of users who have the right to purchase on this type of price'),
     ]); ?>
 <? else : ?>
-    <? \yii\bootstrap\Alert::begin([
+    <? $alert = \yii\bootstrap\Alert::begin([
         'options' => [
             'class' => 'alert-info',
         ],
     ]); ?>
     <?= \skeeks\cms\shop\Module::t('app', 'After saving can be set up to whom this type available price'); ?>
 
-    <? \yii\bootstrap\Alert::end() ?>
+    <? $alert::end() ?>
 
 <? endif; ?>
 <?= $form->fieldSetEnd(); ?>

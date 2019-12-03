@@ -60,6 +60,9 @@ return [
                             'permissions' => [
                                 "shop/admin-order",
                                 "shop/admin-cart",
+                                
+                                "shop/admin-order-status",
+                                "shop/admin-type-price",
                             ],
                         ],
                     ],

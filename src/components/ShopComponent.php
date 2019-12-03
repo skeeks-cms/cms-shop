@@ -144,6 +144,22 @@ class ShopComponent extends Component
 
 
     /**
+     * @var null Закпочная цена
+     */
+    public $type_price_purchase_id = null;
+
+    /**
+     * @var null Розничная цена
+     */
+    public $type_price_retail_id = null;
+
+    /**
+     * @var null Минимальная розничная
+     */
+    public $type_price_mrc_id = null;
+
+
+    /**
      * Можно задать название и описание компонента
      * @return array
      */
@@ -191,6 +207,19 @@ class ShopComponent extends Component
                     ],
 
 
+                    
+                    'type_price_purchase_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                    ],
+                    'type_price_retail_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                    ],
+                    'type_price_mrc_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                    ],
 
                 ],
             ],
@@ -258,6 +287,11 @@ class ShopComponent extends Component
             [['start_order_status_id'], 'integer'],
             [['end_order_status_id'], 'integer'],
             [['storeCmsContentId'], 'integer'],
+            
+            [['type_price_purchase_id'], 'integer'],
+            [['type_price_retail_id'], 'integer'],
+            [['type_price_mrc_id'], 'integer'],
+            
             ['notify_emails', 'string'],
             ['start_order_status_id', 'required'],
             ['end_order_status_id', 'required'],
@@ -289,6 +323,9 @@ class ShopComponent extends Component
             'show_filter_property_ids'  => "Какие фильтры разрешено показывать на сайте?",
             'is_show_filters_has_subtree'  => "Показывать фильтры если есть подкатегории?",
             'is_show_quantity_product'  => "Показывать оставшееся количество товаров на складе?",
+            'type_price_purchase_id'  => "Закпочная цена",
+            'type_price_retail_id'  => "Розничная цена",
+            'type_price_mrc_id'  => "Минимальная розничная цена",
         ]);
     }
     public function attributeHints()
@@ -316,11 +353,22 @@ class ShopComponent extends Component
     public function getBaseTypePrice()
     {
         if (!$this->_baseTypePrice) {
-            $this->_baseTypePrice = ShopTypePrice::find()->def()->one();
+            if ($this->type_price_retail_id) {
+                $typePrice = ShopTypePrice::find()->where(['id' => $this->type_price_retail_id])->limit(1)->one();
+                if (!$typePrice) {
+                    $typePrice = ShopTypePrice::find()->orderBy(["priority" => SORT_ASC])->limit(1)->one();
+                }
+                $this->_baseTypePrice = $typePrice;
+            } else {
+                $typePrice = ShopTypePrice::find()->orderBy(["priority" => SORT_ASC])->limit(1)->one();
+                $this->_baseTypePrice = $typePrice;
+            }
         }
 
         return $this->_baseTypePrice;
     }
+    
+  
     /**
      * @return ShopPersonType[]
      */
@@ -335,7 +383,7 @@ class ShopComponent extends Component
     public function getShopTypePrices()
     {
         if (!$this->_shopTypePrices) {
-            $this->_shopTypePrices = ShopTypePrice::find()->all();
+            $this->_shopTypePrices = ShopTypePrice::find()->orderBy(["priority" => SORT_ASC])->all();
         }
 
         return $this->_shopTypePrices;

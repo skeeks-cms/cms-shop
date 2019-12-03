@@ -48,7 +48,7 @@ class SortFiltersHandler extends Model
         parent::init();
 
         if (!$this->type_price_id) {
-            $typePrice = \skeeks\cms\shop\models\ShopTypePrice::find()->andWhere(['def' => 'Y'])->one();
+            $typePrice = \Yii::$app->shop->baseTypePrice;
             if ($typePrice) {
                 $this->type_price_id = $typePrice->id;
             }

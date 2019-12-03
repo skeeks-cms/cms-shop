@@ -27,6 +27,8 @@ class AdminOrderStatusController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopOrderStatus::class;
 
+        $this->generateAccessActions = false;
+        
         parent::init();
     }
 
@@ -59,7 +61,6 @@ class AdminOrderStatusController extends BackendModelStandartController
                         'description',
 
                         'priority',
-                        'color',
 
                     ],
                     'columns'        => [
@@ -67,7 +68,7 @@ class AdminOrderStatusController extends BackendModelStandartController
                             'value' => function (ShopOrderStatus $shopOrderStatus) {
                                 return \yii\helpers\Html::label($shopOrderStatus->name, null, [
                                     'style' => "background: {$shopOrderStatus->color}",
-                                    'class' => "label",
+                                    'class' => "label g-pl-5 g-pr-5",
                                 ]);
                             },
                         ],

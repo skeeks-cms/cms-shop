@@ -281,26 +281,26 @@ JS
         'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
     ]) ?>
 
-    <div class="row">
+    <!--<div class="row">
         <div class="col-md-3">
-            <?= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
-                ->label($baseProductPrice->typePrice->name); ?>
+            <?/*= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
+                ->label($baseProductPrice->typePrice->name); */?>
         </div>
         <div class="col-md-2">
-            <?= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
+            <?/*= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
                 \Yii::$app->money->activeCurrencies, 'code', 'code'
-            ))->label(\Yii::t('skeeks/shop/app', 'Currency base price')); ?>
+            ))->label(\Yii::t('skeeks/shop/app', 'Currency base price')); */?>
         </div>
 
         <div class="col-md-2">
             <label>&nbsp;</label>
             <p>
-                <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
+                <?/*= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
                     'productPrice' => $shopProduct->baseProductPrice,
-                ]) ?>
+                ]) */?>
             </p>
         </div>
-    </div>
+    </div>-->
 
     <? if ($productPrices) : ?>
         <? /*= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([

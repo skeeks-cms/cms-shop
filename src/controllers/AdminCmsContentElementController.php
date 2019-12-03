@@ -597,7 +597,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
         } else {
             if ($typePrices = ShopTypePrice::find()
-                ->where(['!=', 'def', Cms::BOOL_Y])
+                //->where(['!=', 'def', Cms::BOOL_Y])
                 ->orderBy(['priority' => SORT_ASC])->all()
             ) {
                 foreach ($typePrices as $typePrice) {
