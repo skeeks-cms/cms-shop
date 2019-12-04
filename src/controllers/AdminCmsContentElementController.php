@@ -286,7 +286,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'format'    => 'raw',
             'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
                 if ($shopCmsContentElement->shopProduct) {
-                    return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol_rus;
+                    return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
                 }
                 return "—";
             },

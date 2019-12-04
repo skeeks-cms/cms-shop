@@ -66,7 +66,7 @@ use skeeks\cms\mail\helpers\Html;
                 'class'     => \yii\grid\DataColumn::class,
                 'attribute' => 'quantity',
                 'value'     => function (\skeeks\cms\shop\models\ShopProduct $shopProduct) {
-                    return $shopProduct->quantity." ".$shopProduct->measure->symbol_rus;
+                    return $shopProduct->quantity." ".$shopProduct->measure->symbol;
                 },
             ],
 

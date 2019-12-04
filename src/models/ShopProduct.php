@@ -9,9 +9,9 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
-use skeeks\cms\measure\models\Measure;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
+use skeeks\yii2\measureClassifier\models\Measure;
 use Yii;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
@@ -31,7 +31,7 @@ use yii\helpers\ArrayHelper;
  * @property string                      $vat_included
  * @property string                      $barcode_multi
  * @property double                      $quantity_reserved
- * @property integer                     $measure_id
+ * @property string                     $measure_code
  * @property double                      $width
  * @property double                      $length
  * @property double                      $height
@@ -141,7 +141,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         $log->shop_product_id = $this->id;
         $log->quantity = $this->quantity;
         $log->quantity_reserved = $this->quantity_reserved;
-        $log->measure_id = $this->measure_id;
+        $log->measure_code = $this->measure_code;
         $log->measure_ratio = $this->measure_ratio;
 
         $log->save();
@@ -152,7 +152,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         if (
             ($this->isAttributeChanged('quantity', false)
                 || $this->isAttributeChanged('quantity_reserved', false)
-                || $this->isAttributeChanged('measure_id', false)
+                || $this->isAttributeChanged('measure_code', false)
                 || $this->isAttributeChanged('measure_ratio', false))
             ||
             !$this->shopProductQuantityChanges
@@ -162,7 +162,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             $log->shop_product_id = $this->id;
             $log->quantity = $this->quantity;
             $log->quantity_reserved = $this->quantity_reserved;
-            $log->measure_id = $this->measure_id;
+            $log->measure_code = $this->measure_code;
             $log->measure_ratio = $this->measure_ratio;
 
             $log->save();
@@ -322,7 +322,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'created_at',
                     'updated_at',
                     'vat_id',
-                    'measure_id',
+                    'measure_code',
                 ],
                 'integer',
             ],
@@ -362,7 +362,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['vat_included'], 'default', 'value' => Cms::BOOL_Y],
             [
-                ['measure_id'],
+                ['measure_code'],
                 'default',
                 'value' => function () {
                     return (int)Measure::find()->def()->one()->id;
@@ -402,7 +402,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'vat_id'                => \Yii::t('skeeks/shop/app', 'VAT rate'),
             'vat_included'          => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
             'quantity_reserved'     => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
-            'measure_id'            => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
+            'measure_code'            => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
             'measure_ratio'         => \Yii::t('skeeks/shop/app', 'The coefficient unit'),
             'width'                 => \Yii::t('skeeks/shop/app', 'Width (mm)'),
             'length'                => \Yii::t('skeeks/shop/app', 'Length (mm)'),
@@ -430,12 +430,13 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         return $shopViewdProduct->save();
     }
+
     /**
-     * @return \yii\db\ActiveQuery
+     * @return \skeeks\yii2\measureClassifier\models\Measure|null
      */
     public function getMeasure()
     {
-        return $this->hasOne(Measure::class, ['id' => 'measure_id']);
+        return \Yii::$app->measureClassifier->getMeasureByCode($this->measure_code);
     }
     /**
      * @return \yii\db\ActiveQuery

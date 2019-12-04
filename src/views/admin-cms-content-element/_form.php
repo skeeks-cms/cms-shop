@@ -360,8 +360,8 @@ JS
             <?= $form->field($shopProduct, 'quantity_reserved')->textInput(); ?>
         </div>
         <div class="col-md-3">
-            <?= $form->fieldSelect($shopProduct, 'measure_id', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\measure\models\Measure::find()->all(), 'id', 'name'
+            <?= $form->fieldSelect($shopProduct, 'measure_code', \yii\helpers\ArrayHelper::map(
+                \Yii::$app->measure->activeMeasures, 'code', "asText"
             )); ?>
         </div>
         <div class="col-md-3">

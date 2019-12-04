@@ -47,7 +47,7 @@
 
                 [
                     'class'     => \yii\grid\DataColumn::class,
-                    'attribute' => 'measure_id',
+                    'attribute' => 'measure_code',
                     'value'     => function (\skeeks\cms\shop\models\ShopProductQuantityChange $shopProductQuantityChange) {
                         return $shopProductQuantityChange->measure->name;
                     },

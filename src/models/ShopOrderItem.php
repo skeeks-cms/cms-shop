@@ -260,7 +260,7 @@ class ShopOrderItem extends ActiveRecord
         $productPrice = $product->minProductPrice;
         $productPriceMoney = $productPrice->money->convertToCurrency(\Yii::$app->money->currencyCode);
 
-        $this->measure_name = $product->measure->symbol_rus;
+        $this->measure_name = $product->measure->symbol;
         $this->measure_code = $product->measure->code;
         $this->shop_product_price_id = $productPrice->id;
         $this->notes = $productPrice->typePrice->name;

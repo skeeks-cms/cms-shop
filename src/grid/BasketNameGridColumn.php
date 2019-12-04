@@ -40,7 +40,7 @@ class BasketNameGridColumn extends DataColumn
 
             if ($model->product && $model->product->measure_ratio != 1) {
                 $content .= <<<HTML
-<p><small>Товар продается по: {$model->product->measure_ratio} {$model->product->measure->symbol_rus}</small></p>
+<p><small>Товар продается по: {$model->product->measure_ratio} {$model->product->measure->symbol}</small></p>
 HTML;
             }
 
