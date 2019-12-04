@@ -8,7 +8,7 @@
 
 use yii\db\Migration;
 
-class m191119_140601__create_table__shop_store extends Migration
+class m191118_160601__alter_table__shop_product_quantity_change extends Migration
 {
     public function safeUp()
     {
