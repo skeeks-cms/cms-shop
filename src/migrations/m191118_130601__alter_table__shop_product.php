@@ -38,7 +38,6 @@ class m191118_130601__alter_table__shop_product extends Migration
         $this->dropColumn($tableName, "purchasing_price");
         $this->dropColumn($tableName, "purchasing_currency");
         $this->dropColumn($tableName, "subscribe");
-        $this->dropColumn($tableName, "recur_scheme_type");
 
 
     }
