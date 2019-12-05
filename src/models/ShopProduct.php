@@ -365,7 +365,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                 ['measure_code'],
                 'default',
                 'value' => function () {
-                    return (int)Measure::find()->def()->one()->id;
+                    return \Yii::$app->measure->default_measure_code;
                 },
             ],
 

@@ -73,7 +73,7 @@ class ShopProductQuantityChange extends \skeeks\cms\models\Core
      */
     public function getMeasure()
     {
-        return $this->hasOne(Measure::class, ['code' => 'measure_code']);
+        return \Yii::$app->measureClassifier->getMeasureByCode($this->measure_code);
     }
 
     /**
