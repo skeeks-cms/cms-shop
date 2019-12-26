@@ -255,6 +255,12 @@ return [
                                     "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                                 ],
 
+                                [
+                                    "label" => \Yii::t('skeeks/shop/app', 'Склады'),
+                                    "url"   => ["shop/admin-shop-store"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+                                ],
+
                             ],
 
                     ],

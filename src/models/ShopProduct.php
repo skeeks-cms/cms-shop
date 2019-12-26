@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\yii2\measureClassifier\models\Measure;
@@ -29,14 +30,15 @@ use yii\helpers\ArrayHelper;
  * @property string                      $measure_ratio
  * @property integer                     $vat_id
  * @property string                      $vat_included
- * @property string                      $barcode_multi
  * @property double                      $quantity_reserved
- * @property string                     $measure_code
+ * @property string                      $measure_code
  * @property double                      $width
  * @property double                      $length
  * @property double                      $height
- * @property string                      $subscribe
  * @property string                      $product_type
+ * @property integer|null                $shop_supplier_id
+ * @property string|null                 $supplier_external_id
+ * @property array|null                  $supplier_external_jsondata
  *
  * @property Measure                     $measure
  * @property ShopCmsContentElement       $cmsContentElement
@@ -54,10 +56,11 @@ use yii\helpers\ArrayHelper;
  * @property ShopProductPrice[]          $viewProductPrices
  * @property ShopProductQuantityChange[] $shopProductQuantityChanges
  * @property ShopQuantityNoticeEmail[]   $shopQuantityNoticeEmails
+ * @property ShopStoreProduct[]          $shopStoreProducts
  *
  * @property ShopCmsContentElement       $tradeOffers
- * @property ShopOrderItem[] $shopOrderItems
- * @property ShopOrder[] $shopOrders
+ * @property ShopOrderItem[]             $shopOrderItems
+ * @property ShopOrder[]                 $shopOrders
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -73,6 +76,20 @@ class ShopProduct extends \skeeks\cms\models\Core
     public static function tableName()
     {
         return '{{%shop_product}}';
+    }
+
+    public function behaviors()
+    {
+        $behaviors = ArrayHelper::merge(parent::behaviors(), [
+            HasJsonFieldsBehavior::class => [
+                'class' => HasJsonFieldsBehavior::class,
+                'fields' => [
+                    'supplier_external_jsondata'
+                ]
+            ]
+        ]);
+
+        return $behaviors;
     }
     /**
      * @return array
@@ -207,7 +224,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         return $this
             ->hasMany(ShopCmsContentElement::class, ['parent_content_element_id' => 'id'])
-            ->andWhere([ShopCmsContentElement::tableName() . ".content_id" => $childContentId])
+            ->andWhere([ShopCmsContentElement::tableName().".content_id" => $childContentId])
             //->joinWith('cmsContentElement')
             //->joinWith('cmsContentElement.cmsContent')
             //->andWhere(["content.id" => $this->cmsContentElement->cmsContent->parent_content_id])
@@ -322,7 +339,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'created_at',
                     'updated_at',
                     'vat_id',
-                    'measure_code',
                 ],
                 'integer',
             ],
@@ -350,22 +366,34 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['measure_ratio'], 'number', 'min' => 0.0001, 'max' => 9999999],
 
             [['baseProductPriceValue'], 'number'],
-            [['baseProductPriceValue'], 'default', 'value' => 0.00 ],
-            [['baseProductPriceValue'], function() {
-                if ($this->baseProductPriceValue == "0") {
-                    $this->baseProductPriceValue = 0.00;
-                }
-            }],
+            [['baseProductPriceValue'], 'default', 'value' => 0.00],
+            [
+                ['baseProductPriceValue'],
+                function () {
+                    if ($this->baseProductPriceValue == "0") {
+                        $this->baseProductPriceValue = 0.00;
+                    }
+                },
+            ],
 
 
             [['baseProductPriceCurrency'], 'string', 'max' => 3],
 
             [['vat_included'], 'default', 'value' => Cms::BOOL_Y],
+
+            [['measure_code'], 'string'],
             [
                 ['measure_code'],
                 'default',
                 'value' => function () {
                     return \Yii::$app->measure->default_measure_code;
+                },
+            ],
+            [
+                ['measure_code'], function ($model) {
+                    if (!\Yii::$app->measureClassifier->getMeasureByCode($this->measure_code)) {
+                        $this->addError("measure_code", "Указан код валюты которой нет в базе.");
+                    }
                 },
             ],
 
@@ -384,6 +412,18 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['quantity'], 'default', 'value' => 1],
             [['quantity_reserved'], 'default', 'value' => 0],
+
+
+            [['shop_supplier_id'], 'integer'],
+            [['shop_supplier_id'], 'default', 'value' => null],
+
+            [['supplier_external_id'], 'string'],
+            [['supplier_external_id'], 'default', 'value' => null],
+
+            [['supplier_external_jsondata'], 'safe'],
+            [['supplier_external_jsondata'], 'default', 'value' => null],
+
+            [['shop_supplier_id', 'supplier_external_id'], 'unique', 'targetAttribute' => ['shop_supplier_id', 'supplier_external_id']],
         ];
     }
     /**
@@ -392,22 +432,33 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                    => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'            => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'            => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'            => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'            => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'quantity'              => \Yii::t('skeeks/shop/app', 'Available quantity'),
-            'weight'                => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
-            'vat_id'                => \Yii::t('skeeks/shop/app', 'VAT rate'),
-            'vat_included'          => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
-            'quantity_reserved'     => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
-            'measure_code'            => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
-            'measure_ratio'         => \Yii::t('skeeks/shop/app', 'The coefficient unit'),
-            'width'                 => \Yii::t('skeeks/shop/app', 'Width (mm)'),
-            'length'                => \Yii::t('skeeks/shop/app', 'Length (mm)'),
-            'height'                => \Yii::t('skeeks/shop/app', 'Height (mm)'),
-            'product_type'          => \Yii::t('skeeks/shop/app', 'Product type'),
+            'id'                => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'        => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'        => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'        => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'        => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'quantity'          => \Yii::t('skeeks/shop/app', 'Available quantity'),
+            'weight'            => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
+            'vat_id'            => \Yii::t('skeeks/shop/app', 'VAT rate'),
+            'vat_included'      => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
+            'quantity_reserved' => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
+            'measure_code'      => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
+            'measure_ratio'     => \Yii::t('skeeks/shop/app', 'The coefficient unit'),
+            'width'             => \Yii::t('skeeks/shop/app', 'Width (mm)'),
+            'length'            => \Yii::t('skeeks/shop/app', 'Length (mm)'),
+            'height'            => \Yii::t('skeeks/shop/app', 'Height (mm)'),
+            'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
+
+            'shop_supplier_id'      => \Yii::t('skeeks/shop/app', 'Поставщик'),
+            'supplier_external_id'      => \Yii::t('skeeks/shop/app', 'Идентификатор поставщика'),
+            'supplier_external_jsondata'      => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
+        ];
+    }
+
+    public function attributeHints()
+    {
+        return [
+            'supplier_external_id'                => \Yii::t('skeeks/shop/app', 'Уникальный идентификатор в системе поставщика'),
         ];
     }
     /**
@@ -436,6 +487,10 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getMeasure()
     {
+        if (!\Yii::$app->measureClassifier->getMeasureByCode($this->measure_code)) {
+            return \Yii::$app->measureClassifier->getMeasureByCode(\Yii::$app->measure->default_measure_code);
+        }
+
         return \Yii::$app->measureClassifier->getMeasureByCode($this->measure_code);
     }
     /**
@@ -445,7 +500,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopCmsContentElement::class, ['id' => 'id']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -453,7 +508,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopVat::class, ['id' => 'vat_id']);
     }
-   
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -476,6 +531,15 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasMany(ShopProductQuantityChange::class,
             ['shop_product_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopStoreProducts()
+    {
+        return $this->hasMany(ShopStoreProduct::class, ['shop_product_id' => 'id']);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

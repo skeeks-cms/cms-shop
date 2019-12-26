@@ -19,7 +19,7 @@ class m191118_150601__alter_table__shop_product extends Migration
         }*/
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB AUTO_INCREMENT=1001';
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->dropForeignKey("shop_product_measure", $tableName);

@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
-use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
@@ -18,25 +17,41 @@ use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property string         $name
- * @property string         $description
- * @property int            $cms_image_id
- * @property bool           $is_active
- * @property bool           $shop_supplier_id
+ * @property integer|null $created_at
+ * @property integer|null $updated_at
+ * @property integer|null $created_by
+ * @property integer|null $updated_by
+ * @property string       $name
+ * @property string|null  $description
+ * @property integer|null $cms_image_id
+ * @property integer      $is_active
  *
- * @property CmsStorageFile $cmsImage
- * @property ShopSupplier   $shopSupplier
+ * @property StorageFile  $cmsImage
+ * @property ShopStore[]  $shopStores
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class ShopStore extends \skeeks\cms\base\ActiveRecord
+class ShopSupplier extends \skeeks\cms\base\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{%shop_store}}';
+        return '{{%shop_supplier}}';
+    }
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            HasStorageFile::class => [
+                'class'  => HasStorageFile::class,
+                'fields' => ['cms_image_id'],
+            ],
+        ]);
     }
 
     /**
@@ -56,8 +71,6 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['is_active'], 'integer'],
 
             [['cms_image_id'], 'safe'],
-            [['shop_supplier_id'], 'integer'],
-
         ]);
     }
 
@@ -67,12 +80,10 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-
-            'name'             => "Название",
-            'description'      => "Описание",
-            'cms_image_id'     => "Изображение",
-            'shop_supplier_id' => "Поставщик",
-            'is_active'        => "Активность",
+            'name'         => "Название",
+            'description'  => "Описание",
+            'cms_image_id' => "Изображение",
+            'is_active'    => "Активность",
         ]);
     }
 
@@ -88,9 +99,8 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopSupplier()
+    public function getShopStores()
     {
-        return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
+        return $this->hasMany(ShopStore::class, ['shop_store_id' => 'id']);
     }
-
 }

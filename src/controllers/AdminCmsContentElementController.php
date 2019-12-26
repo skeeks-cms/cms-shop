@@ -24,6 +24,8 @@ use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
+use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
@@ -307,7 +309,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 $shopColumns["shop.price{$shopTypePrice->id}"] = [
                     'label'     => $shopTypePrice->name." [магазин]",
                     'attribute' => 'shop.price'.$shopTypePrice->id,
-                    'format' => 'raw',
+                    'format'    => 'raw',
                     'value'     => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
                         if ($shopProduct) {
@@ -339,11 +341,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             $shopColumns["shop.priceDefult"] = [
                 'label'     => "Все цены [магазин]",
                 'attribute' => 'shop.priceDefult',
-                'format' => 'raw',
+                'format'    => 'raw',
                 'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
                     $result = [];
-                    foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice)
-                    {
+                    foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
                         if ($shopTypePrice->isDefault) {
                             $defaultId = $shopTypePrice->id;
                         }
@@ -352,9 +353,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
                                 ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
                             ) {
-                                $result[] = "<span title='{$shopTypePrice->name}'>" . (string)$shopProductPrice->money . "</span>";
+                                $result[] = "<span title='{$shopTypePrice->name}'>".(string)$shopProductPrice->money."</span>";
                             } else {
-                                $result[] = "<span title='{$shopTypePrice->name}'>" . " — " . "</span>";;
+                                $result[] = "<span title='{$shopTypePrice->name}'>"." — "."</span>";;
                             }
                         }
                     }
@@ -398,9 +399,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         ];
 
         $filterFields['shop_quantity'] = [
-            'class'    => NumberFilterField::class,
-            'label'    => 'Количество [магазин]',
-            'filterAttribute'    => 'sp.quantity',
+            'class'           => NumberFilterField::class,
+            'label'           => 'Количество [магазин]',
+            'filterAttribute' => 'sp.quantity',
             /*'on apply' => function (QueryFiltersEvent $e) {
                 /**
                  * @var $query ActiveQuery
@@ -485,6 +486,36 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         $redirect = "";
 
         $productPrices = [];
+        $shopStoreProducts = [];
+
+        if ($typePrices = ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all()) {
+            foreach ($typePrices as $typePrice) {
+
+                $productPrice = new ShopProductPrice([
+                    'type_price_id' => $typePrice->id,
+                ]);
+
+                $productPrices[] = $productPrice;
+            }
+        }
+
+        /**
+         * @var ShopSupplier $shopSupplier ;
+         */
+        if ($shopSuppliers = \skeeks\cms\shop\models\ShopSupplier::find()->all()) {
+            foreach ($shopSuppliers as $key => $shopSupplier) {
+                if ($shopSupplier->shopStores) {
+                    foreach ($shopSupplier->shopStores as $shopStore) {
+                        $shopStoreProduct = new ShopStoreProduct([
+                            'shop_store_id' => $shopStore->id,
+                        ]);
+
+                        $shopStoreProducts[] = $shopStoreProduct;
+                    }
+                }
+            }
+        }
+
 
         $modelClassName = $this->modelClassName;
         $model = new $modelClassName();
@@ -501,12 +532,12 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
         $shopProduct->loadDefaultValues();
 
-        $baseProductPrice = new ShopProductPrice([
+        /*$baseProductPrice = new ShopProductPrice([
             'type_price_id' => \Yii::$app->shop->baseTypePrice->id,
             'currency_code' => \Yii::$app->money->currencyCode,
         ]);
 
-        $shopProduct->baseProductPriceCurrency = \Yii::$app->money->currencyCode;
+        $shopProduct->baseProductPriceCurrency = \Yii::$app->money->currencyCode;*/
 
         $rr = new RequestResponse();
 
@@ -539,68 +570,88 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     $shopProduct->id = $model->id;
                     $shopProduct->save();
 
-                    $shopProduct->getBaseProductPriceValue();
 
-                    $baseProductPrice = $shopProduct->baseProductPrice;
+                    $savedPrice = $shopProduct->getBaseProductPrice()->one();
+                    foreach ($productPrices as $productPrice) {
+                        if ($savedPrice->type_price_id == $productPrice->type_price_id) {
+                            $productPrice = $savedPrice;
+                            $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                            $productPrice->load($data, "");
+                            $productPrice->save();
+                        } else {
+                            $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                            $productPrice->load($data, "");
+                            $productPrice->product_id = $shopProduct->id;
+                            $productPrice->save();
+                        }
+                    }
+
+                    foreach ($shopStoreProducts as $shopStoreProduct) {
+                        $data = ArrayHelper::getValue($post, 'stores.'.$shopStoreProduct->shop_store_id);
+                        $shopStoreProduct->load($data, "");
+                        $shopStoreProduct->shop_product_id = $shopProduct->id;
+                        $shopStoreProduct->save();
+                    }
+                    /*$shopProduct->getBaseProductPriceValue();
+                    $baseProductPrice = $shopProduct->baseProductPrice;*/
 
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                     $is_saved = true;
 
                     if (\Yii::$app->request->post('submit-btn') == 'apply') {
-                            $redirect = UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                                ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                                ->toString();
+                        $redirect = UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
+                            ->toString();
                     } else {
                         $redirect = $this->url;
-
                     }
-
                 }
             }
 
         }
 
         return $this->render('_form', [
-            'model'            => $model,
-            'relatedModel'     => $relatedModel,
-            'shopProduct'      => $shopProduct,
-            'productPrices'    => $productPrices,
-            'baseProductPrice' => $baseProductPrice,
+            'model'             => $model,
+            'relatedModel'      => $relatedModel,
+            'shopProduct'       => $shopProduct,
+            'productPrices'     => $productPrices,
+            'shopStoreProducts' => $shopStoreProducts,
+            //'baseProductPrice' => $baseProductPrice,
 
-            'is_saved' => $is_saved,
+            'is_saved'  => $is_saved,
             'submitBtn' => \Yii::$app->request->post('submit-btn'),
-            'redirect' => $redirect,
+            'redirect'  => $redirect,
         ]);
     }
+
     public function update($adminAction)
     {
         $is_saved = false;
         $redirect = "";
 
         /**
-         * @var $model CmsContentElement
+         * @var $model ShopCmsContentElement
          */
         $model = $this->model;
         $relatedModel = $model->relatedPropertiesModel;
-        $shopProduct = ShopProduct::find()->where(['id' => $model->id])->one();
+        $shopProduct = $model->shopProduct;
 
-        $productPrices = [];
 
-        if (!$shopProduct) {
+        try {
+            if (!$shopProduct) {
+                $shopProduct = new ShopProduct([
+                    'id' => $model->id,
+                ]);
 
-            $shopProduct = new ShopProduct([
-                'id' => $model->id,
-            ]);
+                $shopProduct->save();
+            }
 
-            $shopProduct->save();
 
-        } else {
-            if ($typePrices = ShopTypePrice::find()
-                //->where(['!=', 'def', Cms::BOOL_Y])
-                ->orderBy(['priority' => SORT_ASC])->all()
-            ) {
+            $productPrices = [];
+            if ($typePrices = ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all()) {
                 foreach ($typePrices as $typePrice) {
+
                     $productPrice = ShopProductPrice::find()->where([
                         'product_id'    => $shopProduct->id,
                         'type_price_id' => $typePrice->id,
@@ -621,95 +672,145 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     $productPrices[] = $productPrice;
                 }
             }
-        }
 
 
-        $rr = new RequestResponse();
+            $shopStoreProducts = [];
+            /**
+             * @var ShopSupplier $shopSupplier ;
+             */
+            if ($shopSuppliers = \skeeks\cms\shop\models\ShopSupplier::find()->all()) {
+                foreach ($shopSuppliers as $key => $shopSupplier) {
+                    if ($shopSupplier->shopStores) {
+                        foreach ($shopSupplier->shopStores as $shopStore) {
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $shopProduct->load(\Yii::$app->request->post());
+                            $shopStoreProduct = ShopStoreProduct::find()->where([
+                                'shop_product_id' => $shopProduct->id,
+                                'shop_store_id'   => $shopStore->id,
+                            ])->one();
+
+                            if (!$shopStoreProduct) {
+                                $shopStoreProduct = new ShopStoreProduct([
+                                    'shop_product_id' => $shopProduct->id,
+                                    'shop_store_id'   => $shopStore->id,
+                                ]);
+
+                            }
+
+                            if ($post = \Yii::$app->request->post()) {
+                                $data = ArrayHelper::getValue($post, 'stores.'.$shopStore->id);
+                                $shopStoreProduct->load($data, "");
+                            }
 
 
-            return \yii\widgets\ActiveForm::validateMultiple([
-                $model,
-                $relatedModel,
-                $shopProduct,
-            ]);
-        }
-
-        if ($post = \Yii::$app->request->post()) {
-
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $shopProduct->load(\Yii::$app->request->post());
-        }
-
-        if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
-                $model->load(\Yii::$app->request->post());
-                $relatedModel->load(\Yii::$app->request->post());
-
-
-                if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
-
-                    /**
-                     * @var $productPrice ShopProductPrice
-                     */
-                    foreach ($productPrices as $productPrice) {
-                        if ($productPrice->save()) {
-
-                        } else {
-                            \Yii::$app->getSession()->setFlash('error',
-                                \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
+                            $shopStoreProducts[] = $shopStoreProduct;
                         }
-
                     }
-
-                    $is_saved = true;
-
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
-
-                    if (\Yii::$app->request->post('submit-btn') == 'apply') {
-                    } else {
-
-                        $redirect = $this->url;
-
-                    }
-
-                    $model->refresh();
-
                 }
             }
 
-        }
+
+            $rr = new RequestResponse();
+
+            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+                $shopProduct->load(\Yii::$app->request->post());
 
 
-        if (!$shopProduct->baseProductPrice) {
-            $baseProductPrice = new ShopProductPrice([
-                'type_price_id' => \Yii::$app->shop->baseTypePrice->id,
-                'currency_code' => \Yii::$app->money->currencyCode,
-                'product_id'    => $model->id,
-            ]);
+                return \yii\widgets\ActiveForm::validateMultiple([
+                    $model,
+                    $relatedModel,
+                    $shopProduct,
+                ]);
+            }
 
-            $baseProductPrice->save();
+            if ($post = \Yii::$app->request->post()) {
+
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+                $shopProduct->load(\Yii::$app->request->post());
+            }
+
+            if ($rr->isRequestPjaxPost()) {
+                if (!\Yii::$app->request->post($this->notSubmitParam)) {
+                    $model->load(\Yii::$app->request->post());
+                    $relatedModel->load(\Yii::$app->request->post());
+
+
+                    if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
+
+                        /**
+                         * @var $productPrice ShopProductPrice
+                         */
+                        foreach ($productPrices as $productPrice) {
+                            if ($productPrice->save()) {
+
+                            } else {
+                                \Yii::$app->getSession()->setFlash('error',
+                                    \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
+                            }
+
+                        }
+                        /**
+                         * @var $productPrice ShopProductPrice
+                         */
+                        foreach ($shopStoreProducts as $shopStoreProduct) {
+                            if ($shopStoreProduct->save()) {
+
+                            } else {
+                                \Yii::$app->getSession()->setFlash('error',
+                                    \Yii::t('skeeks/shop/app', 'Check the correctness of the stores: '.print_r($shopStoreProduct->errors, true)));
+                            }
+
+                        }
+
+                        $is_saved = true;
+
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
+
+                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
+                        } else {
+
+                            $redirect = $this->url;
+
+                        }
+
+                        $model->refresh();
+
+                    }
+                }
+
+            }
+
+
+            if (!$shopProduct->baseProductPrice) {
+                $baseProductPrice = new ShopProductPrice([
+                    'type_price_id' => \Yii::$app->shop->baseTypePrice->id,
+                    'currency_code' => \Yii::$app->money->currencyCode,
+                    'product_id'    => $model->id,
+                ]);
+
+                $baseProductPrice->save();
+            }
+        } catch (\Exception $e) {
+            $model->addError('name', $e->getMessage());
         }
 
 
         return $this->render('_form', [
-            'model'            => $model,
-            'relatedModel'     => $relatedModel,
-            'shopProduct'      => $shopProduct,
-            'productPrices'    => $productPrices,
-            'baseProductPrice' => $shopProduct->getBaseProductPrice()->one(),
+            'model'             => $model,
+            'relatedModel'      => $relatedModel,
+            'shopProduct'       => $shopProduct,
+            'productPrices'     => $productPrices,
+            'shopStoreProducts' => $shopStoreProducts,
+            'baseProductPrice'  => $shopProduct->getBaseProductPrice()->one(),
 
-            'is_saved' => $is_saved,
+            'is_saved'  => $is_saved,
             'submitBtn' => \Yii::$app->request->post('submit-btn'),
-            'redirect' => $redirect,
+            'redirect'  => $redirect,
         ]);
     }
-    
+
 
     public function beforeAction($action)
     {

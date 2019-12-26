@@ -13,6 +13,8 @@ use yii\helpers\Html;
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 /* @var $model \skeeks\cms\models\CmsLang */
+/* @var $shopStoreProducts \skeeks\cms\shop\models\ShopStoreProduct[] */
+
 $controller = $this->context;
 $action = $controller->action;
 ?>
@@ -277,27 +279,38 @@ JS
 
     </div>
 
+    <div class="row">
+    <div class="col">
+            <?= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
+                'allowDeselect' => true
+            ]); ?>
+    </div>
+    <div class="col">
+        <?= $form->field($shopProduct, "supplier_external_id"); ?>
+    </div>
+    </div>
+
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
         'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
     ]) ?>
 
     <!--<div class="row">
         <div class="col-md-3">
-            <?/*= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
-                ->label($baseProductPrice->typePrice->name); */?>
+            <? /*= $form->field($shopProduct, 'baseProductPriceValue')->textInput()
+                ->label($baseProductPrice->typePrice->name); */ ?>
         </div>
         <div class="col-md-2">
-            <?/*= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
+            <? /*= $form->fieldSelect($shopProduct, 'baseProductPriceCurrency', \yii\helpers\ArrayHelper::map(
                 \Yii::$app->money->activeCurrencies, 'code', 'code'
-            ))->label(\Yii::t('skeeks/shop/app', 'Currency base price')); */?>
+            ))->label(\Yii::t('skeeks/shop/app', 'Currency base price')); */ ?>
         </div>
 
         <div class="col-md-2">
             <label>&nbsp;</label>
             <p>
-                <?/*= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
+                <? /*= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
                     'productPrice' => $shopProduct->baseProductPrice,
-                ]) */?>
+                ]) */ ?>
             </p>
         </div>
     </div>-->
@@ -354,31 +367,77 @@ JS
 
     <div class="row">
         <div class="col-md-3">
-            <?= $form->field($shopProduct, 'quantity')->textInput(); ?>
-        </div>
-        <div class="col-md-3">
-            <?= $form->field($shopProduct, 'quantity_reserved')->textInput(); ?>
-        </div>
-        <div class="col-md-3">
             <?= $form->fieldSelect($shopProduct, 'measure_code', \yii\helpers\ArrayHelper::map(
                 \Yii::$app->measure->activeMeasures, 'code', "asText"
             )); ?>
         </div>
-        <div class="col-md-3">
-            <?= $form->field($shopProduct, 'measure_ratio')->textInput(); ?>
-        </div>
+    </div>
 
-        <? if ($shopProduct->shopProductQuantityChanges) : ?>
-            <div class="col-md-12" style="margin-bottom: 20px;">
-                <div style="text-align: center;">
-                    <?= \skeeks\cms\shop\widgets\admin\PropductQuantityChangeAdminWidget::widget([
-                        'product' => $shopProduct,
-                    ]); ?>
+    <?= $form->field($shopProduct, "quantity"); ?>
+    
+    <? if ($shopStoreProducts) : ?>
+
+        <?
+        /**
+         * @var $shopSuppliers \skeeks\cms\shop\models\ShopSupplier[]
+         */
+        $shopSuppliers = \skeeks\cms\shop\models\ShopSupplier::find()->all(); ?>
+        <? if ($shopSuppliers) : ?>
+            <? foreach ($shopSuppliers as $shopSupplier) : ?>
+                <div class="col-md-12">
+                    <h4><?= $shopSupplier->name; ?></h4>
                 </div>
-            </div>
+                <? foreach ($shopSupplier->shopStores as $shopStore) : ?>
+
+                    <? foreach ($shopStoreProducts as $shopStoreProduct) : ?>
+                        <? if ($shopStoreProduct->shop_store_id == $shopStore->id) : ?>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="control-label"><?= $shopStore->name; ?> (количество)</label>
+                                        <?= Html::textInput("stores[".$shopStore->id."][quantity]", $shopStoreProduct->quantity, [
+                                            'class' => 'form-control',
+                                        ]); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <? endif; ?>
+                    <? endforeach; ?>
+                <? endforeach; ?>
+
+            <? endforeach; ?>
         <? endif; ?>
 
-    </div>
+    <? endif; ?>
+
+
+    <? /*= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('skeeks/shop/app', 'The number and account'),
+    ]); */ ?><!--
+
+    <div class="row">
+        <div class="col-md-3">
+            <? /*= $form->field($shopProduct, 'quantity')->textInput(); */ ?>
+        </div>
+        <div class="col-md-3">
+            <? /*= $form->field($shopProduct, 'quantity_reserved')->textInput(); */ ?>
+        </div>
+
+        <div class="col-md-3">
+            <? /*= $form->field($shopProduct, 'measure_ratio')->textInput(); */ ?>
+        </div>
+
+        <? /* if ($shopProduct->shopProductQuantityChanges) : */ ?>
+            <div class="col-md-12" style="margin-bottom: 20px;">
+                <div style="text-align: center;">
+                    <? /*= \skeeks\cms\shop\widgets\admin\PropductQuantityChangeAdminWidget::widget([
+                        'product' => $shopProduct,
+                    ]); */ ?>
+                </div>
+            </div>
+        <? /* endif; */ ?>
+
+    </div>-->
 
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
@@ -425,6 +484,15 @@ JS
         </div>
     </div>
 </div>
+
+<? if ($shopProduct->supplier_external_jsondata) : ?>
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('skeeks/shop/app', 'Данные от поставщика'),
+    ]); ?>
+<pre>
+    <?= print_r($shopProduct->supplier_external_jsondata, true); ?>
+</pre>
+<? endif; ?>
 
 <? if ($shopContent->childrenContent) : ?>
     <div id="sx-shop-product-tradeOffers">
