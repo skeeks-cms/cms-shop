@@ -144,7 +144,7 @@ class ShopComponent extends Component
 
 
     /**
-     * @var null Закпочная цена
+     * @var null Закупочная цена
      */
     public $type_price_purchase_id = null;
 
@@ -323,7 +323,7 @@ class ShopComponent extends Component
             'show_filter_property_ids'  => "Какие фильтры разрешено показывать на сайте?",
             'is_show_filters_has_subtree'  => "Показывать фильтры если есть подкатегории?",
             'is_show_quantity_product'  => "Показывать оставшееся количество товаров на складе?",
-            'type_price_purchase_id'  => "Закпочная цена",
+            'type_price_purchase_id'  => "Закупочная цена",
             'type_price_retail_id'  => "Розничная цена",
             'type_price_mrc_id'  => "Минимальная розничная цена",
         ]);
