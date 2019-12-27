@@ -101,6 +101,6 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
      */
     public function getShopStores()
     {
-        return $this->hasMany(ShopStore::class, ['shop_store_id' => 'id']);
+        return $this->hasMany(ShopStore::class, ['shop_supplier_id' => 'id']);
     }
 }
