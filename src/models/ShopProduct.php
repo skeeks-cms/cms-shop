@@ -13,7 +13,6 @@ use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
 use skeeks\yii2\measureClassifier\models\Measure;
-use Yii;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 
@@ -61,6 +60,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopCmsContentElement       $tradeOffers
  * @property ShopOrderItem[]             $shopOrderItems
  * @property ShopOrder[]                 $shopOrders
+ * @property ShopSupplier                $shopSupplier
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -82,11 +82,11 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         $behaviors = ArrayHelper::merge(parent::behaviors(), [
             HasJsonFieldsBehavior::class => [
-                'class' => HasJsonFieldsBehavior::class,
+                'class'  => HasJsonFieldsBehavior::class,
                 'fields' => [
-                    'supplier_external_jsondata'
-                ]
-            ]
+                    'supplier_external_jsondata',
+                ],
+            ],
         ]);
 
         return $behaviors;
@@ -390,7 +390,8 @@ class ShopProduct extends \skeeks\cms\models\Core
                 },
             ],
             [
-                ['measure_code'], function ($model) {
+                ['measure_code'],
+                function ($model) {
                     if (!\Yii::$app->measureClassifier->getMeasureByCode($this->measure_code)) {
                         $this->addError("measure_code", "Указан код валюты которой нет в базе.");
                     }
@@ -449,16 +450,16 @@ class ShopProduct extends \skeeks\cms\models\Core
             'height'            => \Yii::t('skeeks/shop/app', 'Height (mm)'),
             'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
 
-            'shop_supplier_id'      => \Yii::t('skeeks/shop/app', 'Поставщик'),
-            'supplier_external_id'      => \Yii::t('skeeks/shop/app', 'Идентификатор поставщика'),
-            'supplier_external_jsondata'      => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
+            'shop_supplier_id'           => \Yii::t('skeeks/shop/app', 'Поставщик'),
+            'supplier_external_id'       => \Yii::t('skeeks/shop/app', 'Идентификатор поставщика'),
+            'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
         ];
     }
 
     public function attributeHints()
     {
         return [
-            'supplier_external_id'                => \Yii::t('skeeks/shop/app', 'Уникальный идентификатор в системе поставщика'),
+            'supplier_external_id' => \Yii::t('skeeks/shop/app', 'Уникальный идентификатор в системе поставщика'),
         ];
     }
     /**
@@ -499,6 +500,13 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getCmsContentElement()
     {
         return $this->hasOne(ShopCmsContentElement::class, ['id' => 'id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplier()
+    {
+        return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
     }
 
     /**

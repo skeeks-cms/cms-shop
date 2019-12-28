@@ -35,6 +35,7 @@ use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
@@ -282,13 +283,53 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             },
         ];
 
+        $shopColumns["shop.shop_supplier_id"] = [
+            'attribute' => "shop.shop_supplier_id",
+            'label'     => 'Поставщик [магазин]',
+            'format'    => 'raw',
+            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
+                if ($shopCmsContentElement->shopProduct && $shopCmsContentElement->shopProduct->shopSupplier) {
+                    return $shopCmsContentElement->shopProduct->shopSupplier->asText;
+                }
+            }
+        ];
+
+        $shopColumns["shop.supplier_external_id"] = [
+            'attribute' => "shop.supplier_external_id",
+            'label'     => 'Идентификатор поставщика [магазин]',
+            'format'    => 'raw',
+            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
+                if ($shopCmsContentElement->shopProduct) {
+                    return $shopCmsContentElement->shopProduct->supplier_external_id;
+                }
+            }
+        ];
+
         $shopColumns["shop.quantity"] = [
             'attribute' => "shop.quantity",
             'label'     => 'Количество [магазин]',
             'format'    => 'raw',
             'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
                 if ($shopCmsContentElement->shopProduct) {
-                    return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
+                    $result = $shopCmsContentElement->shopProduct->quantity . " " . $shopCmsContentElement->shopProduct->measure->symbol;
+                    if ($shopCmsContentElement->shopProduct->shopStoreProducts) {
+                        $storesQuantity = [];
+                        foreach ($shopCmsContentElement->shopProduct->shopStoreProducts as $shopStoreProduct)
+                        {
+                            if ($shopStoreProduct->quantity > 0) {
+                                $storesQuantity[] = Html::tag('span', $shopStoreProduct->quantity, [
+                                    'title' => $shopStoreProduct->shopStore->shopSupplier->name . " - " . $shopStoreProduct->shopStore->name
+                                ]);
+                            }
+
+                        }
+
+                        if ($storesQuantity) {
+                            $result .= "<hr>" . implode("<br>", $storesQuantity);
+                        }
+                    }
+
+                    return $result;
                 }
                 return "—";
             },
@@ -297,6 +338,12 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'asc'  => ['sp.quantity' => SORT_ASC],
             'desc' => ['sp.quantity' => SORT_DESC],
             'name' => 'Количество [магазин]',
+        ];
+
+        $sortAttributes["shop.supplier_external_id"] = [
+            'asc'  => ['sp.supplier_external_id' => SORT_ASC],
+            'desc' => ['sp.supplier_external_id' => SORT_DESC],
+            'name' => 'Идентификатор поставщика [магазин]',
         ];
 
         $visibleColumns[] = "shop.product_type";
