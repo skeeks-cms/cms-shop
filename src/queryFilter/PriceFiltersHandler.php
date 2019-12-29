@@ -130,6 +130,9 @@ class PriceFiltersHandler extends Model
         $query->joinWith('shopProduct as shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
+        if (!\Yii::$app->shop->is_show_product_no_price) {
+            $query->andWhere(['>', 'prices.price',  0]);
+        }
         $query->orderBy = [];
         $query->groupBy = [];
         $query->with = [];
@@ -140,10 +143,21 @@ class PriceFiltersHandler extends Model
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
         $query->andWhere('cms_content_element.id IN ('.$this->cms_content_element_ids.")");*/
 
-        $data = $query->select(['min(price) as min', 'max(price) as max'])->createCommand()->queryOne();
+        $query->joinWith('shopProduct.shopProductPrices.currency as currency');
+        $query->select([
+            //'min(price) as min', 'max(price) as max',
+            'min(currency.course * prices.price) as min', 'max(currency.course * prices.price) as max',
+            //'realPrice' => '( currency.course * prices.price )',
+            //'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = prices.currency_code) * prices.price )',
+        ])
+            ;
+        
+        //echo $query->createCommand()->rawSql;die;
+        $data = $query->createCommand()->queryOne();
+        
         $this->_min_max_data = [
-            ArrayHelper::getValue($data, 'min'),
-            ArrayHelper::getValue($data, 'max'),
+            round(ArrayHelper::getValue($data, 'min'), 2),
+            round(ArrayHelper::getValue($data, 'max'), 2),
         ];
 
         return $this->_min_max_data;
