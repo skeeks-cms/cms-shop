@@ -445,6 +445,22 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             },
         ];
 
+        $filterFields['shop_supplier_id'] = [
+            'class'    => FilterField::class,
+            'label'    => 'Поставщик',
+            'filterAttribute'    => 'sp.shop_supplier_id',
+            /*'multiple' => true,
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                $query = $e->dataProvider->query;
+
+                if ($e->field->value) {
+                    $query->andWhere(['sp.shop_supplier_id' => $e->field->value]);
+                }
+            },*/
+        ];
+
         $filterFields['shop_quantity'] = [
             'class'           => NumberFilterField::class,
             'label'           => 'Количество [магазин]',
@@ -462,9 +478,11 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
         $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
         $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
+        $filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
 
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
+        $filterFieldsRules[] = ['shop_supplier_id', 'safe'];
 
         //Мерж колонок и сортировок
         if ($shopColumns) {
