@@ -49,7 +49,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
             [['name'], 'string', 'max' => 255],
             [['name'], 'required'],
-            [['name'], 'unique'],
+            [['name', 'shop_supplier_id'], 'unique'],
 
             [['description'], 'string'],
 

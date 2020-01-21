@@ -9,11 +9,8 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\components\Cms;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\actions\modelEditor\AdminMultiModelEditAction;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopTypePrice;
 use yii\helpers\ArrayHelper;
 
@@ -65,12 +62,8 @@ class AdminTypePriceController extends BackendModelStandartController
 
                     ],
                     'columns'        => [
-                        'name'           => [
-                            'value' => function (ShopTypePrice $shopTypePrice) {
-                                return \yii\helpers\Html::a($shopTypePrice->name, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);
-                            },
+                        'name' => [
+                            'class' => DefaultActionColumn::class,
                         ],
                     ],
 

@@ -63,6 +63,11 @@ return [
                                 
                                 "shop/admin-order-status",
                                 "shop/admin-type-price",
+
+                                "shop/admin-shop-supplier",
+                                "shop/admin-shop-store",
+                                
+                                "shop/admin-content",
                             ],
                         ],
                     ],

@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\models\CmsAgent;
@@ -33,9 +34,11 @@ class AdminShopStoreController extends BackendModelStandartController
     public function init()
     {
         $this->name = "Склады";
-        $this->modelShowAttribute = "name";
+        $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopStore::class;
 
+        $this->generateAccessActions = false;
+        
         parent::init();
     }
 
@@ -50,6 +53,8 @@ class AdminShopStoreController extends BackendModelStandartController
                 "filters" => [
                     'visibleFilters' => [
                         'id',
+                        'name',
+                        'shop_supplier_id',
                     ],
                 ],
                 'grid'    => [
@@ -61,7 +66,7 @@ class AdminShopStoreController extends BackendModelStandartController
                         'checkbox',
                         'actions',
 
-                        'id',
+                        //'id',
                         'name',
                         'shop_supplier_id',
 
@@ -73,6 +78,11 @@ class AdminShopStoreController extends BackendModelStandartController
                             'trueValue'  => 1,
                             'falseValue' => 1,
                         ],
+                        
+                        'name'           => [
+                            'class' => DefaultActionColumn::class,
+                        ],
+                        
                     ],
                 ],
             ],
