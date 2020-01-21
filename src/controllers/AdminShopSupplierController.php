@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
@@ -18,6 +19,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
+use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
@@ -88,6 +90,31 @@ class AdminShopSupplierController extends BackendModelStandartController
             "update" => [
                 'fields' => [$this, 'updateFields'],
             ],
+
+
+
+            "stores" => [
+                'class' => BackendGridModelRelatedAction::class,
+                'accessCallback' => true,
+                'name'            => "Склады",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-shop-store",
+                'relation'        => ['shop_supplier_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'        => function($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_supplier_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
         ]);
     }
 
@@ -107,8 +134,23 @@ class AdminShopSupplierController extends BackendModelStandartController
             ],
             'name',
             'description'  => [
-                'class'      => TextareaField::class,
+                'class'        => WidgetField::class,
+                'widgetClass'  => CKEditorWidget::class,
+                'widgetConfig' => [
+                    'preset'        => false,
+                    'clientOptions' => [
+                        'enterMode'      => 2,
+                        'height'         => 300,
+                        'allowedContent' => true,
+                        'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
+                        'toolbar'        => [
+                            ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
+                        ],
+                    ],
+
+                ],
             ],
+
 
         ];
     }

@@ -23,7 +23,7 @@ class AdminTypePriceController extends BackendModelStandartController
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Types of prices');
-        $this->modelShowAttribute = "name";
+        $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopTypePrice::class;
 
         $this->generateAccessActions = false;
@@ -54,7 +54,7 @@ class AdminTypePriceController extends BackendModelStandartController
                         'checkbox',
                         'actions',
 
-                        'id',
+                        ///'id',
 
                         'name',
 

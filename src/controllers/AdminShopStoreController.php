@@ -19,6 +19,7 @@ use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
+use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
@@ -97,6 +98,8 @@ class AdminShopStoreController extends BackendModelStandartController
 
     public function updateFields($action)
     {
+        $action->model->load(\Yii::$app->request->get());
+        
         return [
             'shop_supplier_id' => [
                 'class'        => SelectField::class,
@@ -121,7 +124,21 @@ class AdminShopStoreController extends BackendModelStandartController
             ],
             'name',
             'description'  => [
-                'class'      => TextareaField::class,
+                'class'        => WidgetField::class,
+                'widgetClass'  => CKEditorWidget::class,
+                'widgetConfig' => [
+                    'preset'        => false,
+                    'clientOptions' => [
+                        'enterMode'      => 2,
+                        'height'         => 300,
+                        'allowedContent' => true,
+                        'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
+                        'toolbar'        => [
+                            ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
+                        ],
+                    ],
+
+                ],
             ],
 
         ];
