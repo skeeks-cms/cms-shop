@@ -190,6 +190,8 @@ class AdminShopSupplierController extends BackendModelStandartController
 
                 ],
             ],
+            
+            'external_id',
 
 
         ];

@@ -8,13 +8,8 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
-use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
-use skeeks\cms\money\models\MoneyCurrency;
-use skeeks\cms\money\Money;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -23,6 +18,7 @@ use yii\helpers\ArrayHelper;
  * @property int            $cms_image_id
  * @property bool           $is_active
  * @property bool           $shop_supplier_id
+ * @property string|null    $external_id
  *
  * @property CmsStorageFile $cmsImage
  * @property ShopSupplier   $shopSupplier
@@ -58,6 +54,10 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['cms_image_id'], 'safe'],
             [['shop_supplier_id'], 'integer'],
 
+            [['external_id', 'shop_supplier_id'], 'unique'],
+            [['external_id'], 'string'],
+            [['external_id'], 'default', 'value' => null],
+
         ]);
     }
 
@@ -73,6 +73,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'cms_image_id'     => "Изображение",
             'shop_supplier_id' => "Поставщик",
             'is_active'        => "Активность",
+            'external_id'      => "ID из внешней системы",
         ]);
     }
 

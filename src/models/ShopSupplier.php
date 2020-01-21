@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null  $description_internal
  * @property integer|null $cms_image_id
  * @property integer      $is_active
+ * @property string|null      $external_id
  *
  * @property StorageFile  $cmsImage
  * @property ShopStore[]  $shopStores
@@ -72,6 +73,10 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
 
             [['is_active'], 'integer'],
 
+            [['external_id'], 'unique'],
+            [['external_id'], 'string'],
+            [['external_id'], 'default', 'value' => null],
+            
             [['cms_image_id'], 'safe'],
         ]);
     }
@@ -87,6 +92,7 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
             'description_internal'  => "Описание (внутреннее)",
             'cms_image_id' => "Изображение",
             'is_active'    => "Активность",
+            'external_id'    => "ID из внешней системы",
         ]);
     }
     /**

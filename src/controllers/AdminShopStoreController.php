@@ -123,6 +123,7 @@ class AdminShopStoreController extends BackendModelStandartController
                 'class'      => BoolField::class,
             ],
             'name',
+
             'description'  => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => CKEditorWidget::class,
@@ -140,6 +141,8 @@ class AdminShopStoreController extends BackendModelStandartController
 
                 ],
             ],
+
+            'external_id',
 
         ];
     }
