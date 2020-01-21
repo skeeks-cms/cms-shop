@@ -362,7 +362,7 @@ return [
                     ],
 
 
-                    [
+                    /*[
                         'priority' => 0,
                         'label'    => \Yii::t('skeeks/shop/app', 'Affiliates'),
                         "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/affiliate.png'],
@@ -386,7 +386,7 @@ return [
                                 ],
                             ],
 
-                    ],
+                    ],*/
                 ],
         ],
 ];

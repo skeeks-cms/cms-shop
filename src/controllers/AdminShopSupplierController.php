@@ -115,6 +115,29 @@ class AdminShopSupplierController extends BackendModelStandartController
                 },
             ],
 
+
+            "prices" => [
+                'class' => BackendGridModelRelatedAction::class,
+                'accessCallback' => true,
+                'name'            => "Цены",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-type-price",
+                'relation'        => ['shop_supplier_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'        => function($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_supplier_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
         ]);
     }
 
@@ -134,6 +157,23 @@ class AdminShopSupplierController extends BackendModelStandartController
             ],
             'name',
             'description'  => [
+                'class'        => WidgetField::class,
+                'widgetClass'  => CKEditorWidget::class,
+                'widgetConfig' => [
+                    'preset'        => false,
+                    'clientOptions' => [
+                        'enterMode'      => 2,
+                        'height'         => 300,
+                        'allowedContent' => true,
+                        'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
+                        'toolbar'        => [
+                            ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
+                        ],
+                    ],
+
+                ],
+            ],
+            'description_internal'  => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => CKEditorWidget::class,
                 'widgetConfig' => [

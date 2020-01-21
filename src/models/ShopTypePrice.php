@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
  * @property string  $name
  * @property string  $description
  * @property integer $priority
+ * @property integer|null $shop_supplier_id
  *
  * ***
  *
@@ -42,6 +43,8 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     {
         return ArrayHelper::merge(parent::rules(), [
             [['priority'], 'integer'],
+            [['shop_supplier_id'], 'integer'],
+            [['shop_supplier_id'], 'default', 'value' => null],
             [['name'], 'required'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
@@ -57,6 +60,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             'name'        => \Yii::t('skeeks/shop/app', 'Name'),
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
             'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
+            'shop_supplier_id'    => \Yii::t('skeeks/shop/app', 'Поставщик'),
         ]);
     }
 

@@ -23,6 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property integer|null $updated_by
  * @property string       $name
  * @property string|null  $description
+ * @property string|null  $description_internal
  * @property integer|null $cms_image_id
  * @property integer      $is_active
  *
@@ -66,6 +67,7 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
             [['name'], 'required'],
             [['name'], 'unique'],
 
+            [['description_internal'], 'string'],
             [['description'], 'string'],
 
             [['is_active'], 'integer'],
@@ -82,8 +84,18 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'name'         => "Название",
             'description'  => "Описание",
+            'description_internal'  => "Описание (внутреннее)",
             'cms_image_id' => "Изображение",
             'is_active'    => "Активность",
+        ]);
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'description_internal'  => "Это описание не видят клиенты",
         ]);
     }
 
