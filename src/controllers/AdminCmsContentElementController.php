@@ -389,9 +389,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 'label'     => "Все цены [магазин]",
                 'attribute' => 'shop.priceDefult',
                 'format'    => 'raw',
-                'value'     => function (\skeeks\cms\models\CmsContentElement $model) {
+                'value'     => function (ShopCmsContentElement $model) {
                     $result = [];
-                    foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+                    foreach ($model->shopProduct->shopTypePrices as $shopTypePrice) {
                         if ($shopTypePrice->isDefault) {
                             $defaultId = $shopTypePrice->id;
                         }
@@ -553,16 +553,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         $productPrices = [];
         $shopStoreProducts = [];
 
-        if ($typePrices = ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all()) {
-            foreach ($typePrices as $typePrice) {
 
-                $productPrice = new ShopProductPrice([
-                    'type_price_id' => $typePrice->id,
-                ]);
-
-                $productPrices[] = $productPrice;
-            }
-        }
 
         /**
          * @var ShopSupplier $shopSupplier ;
@@ -622,6 +613,24 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             $model->load(\Yii::$app->request->post());
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
+        }
+
+        $productPrices = [];
+        $productPriceQuery = ShopTypePrice::find()->andWhere(['shop_supplier_id' => null])->orderBy(['priority' => SORT_ASC]);
+        if ($shopProduct->shop_supplier_id) {
+            $productPriceQuery->orWhere(['in', 'shop_supplier_id', $shopProduct->shop_supplier_id]);
+        }
+
+
+        if ($typePrices = $productPriceQuery->all()) {
+            foreach ($typePrices as $typePrice) {
+
+                $productPrice = new ShopProductPrice([
+                    'type_price_id' => $typePrice->id,
+                ]);
+
+                $productPrices[] = $productPrice;
+            }
         }
 
 
@@ -713,30 +722,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             }
 
 
-            $productPrices = [];
-            if ($typePrices = ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all()) {
-                foreach ($typePrices as $typePrice) {
 
-                    $productPrice = ShopProductPrice::find()->where([
-                        'product_id'    => $shopProduct->id,
-                        'type_price_id' => $typePrice->id,
-                    ])->one();
-
-                    if (!$productPrice) {
-                        $productPrice = new ShopProductPrice([
-                            'product_id'    => $shopProduct->id,
-                            'type_price_id' => $typePrice->id,
-                        ]);
-                    }
-
-                    if ($post = \Yii::$app->request->post()) {
-                        $data = ArrayHelper::getValue($post, 'prices.'.$typePrice->id);
-                        $productPrice->load($data, "");
-                    }
-
-                    $productPrices[] = $productPrice;
-                }
-            }
 
 
             $shopStoreProducts = [];
@@ -794,6 +780,36 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
                 $shopProduct->load(\Yii::$app->request->post());
+            }
+
+
+            $productPrices = [];
+            $productPriceQuery = ShopTypePrice::find()->andWhere(['shop_supplier_id' => null])->orderBy(['priority' => SORT_ASC]);
+            if ($shopProduct->shop_supplier_id) {
+                $productPriceQuery->orWhere(['in', 'shop_supplier_id', $shopProduct->shop_supplier_id]);
+            }
+            if ($typePrices = $productPriceQuery->all()) {
+                foreach ($typePrices as $typePrice) {
+
+                    $productPrice = ShopProductPrice::find()->where([
+                        'product_id'    => $shopProduct->id,
+                        'type_price_id' => $typePrice->id,
+                    ])->one();
+
+                    if (!$productPrice) {
+                        $productPrice = new ShopProductPrice([
+                            'product_id'    => $shopProduct->id,
+                            'type_price_id' => $typePrice->id,
+                        ]);
+                    }
+
+                    if ($post = \Yii::$app->request->post()) {
+                        $data = ArrayHelper::getValue($post, 'prices.'.$typePrice->id);
+                        $productPrice->load($data, "");
+                    }
+
+                    $productPrices[] = $productPrice;
+                }
             }
 
             if ($rr->isRequestPjaxPost()) {

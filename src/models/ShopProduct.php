@@ -61,6 +61,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopOrderItem[]             $shopOrderItems
  * @property ShopOrder[]                 $shopOrders
  * @property ShopSupplier                $shopSupplier
+ * @property ShopTypePrice               $shopTypePrices
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -690,4 +691,18 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasMany(ShopOrder::className(), ['id' => 'shop_order_id'])->via('shopOrderItems');
     }
 
+    /**
+     * @return \skeeks\cms\query\CmsActiveQuery
+     */
+    public function getShopTypePrices()
+    {
+        $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
+
+        if ($this->shop_supplier_id) {
+            $query->orWhere(['shop_supplier_id' => $this->shop_supplier_id]);
+        }
+
+        $query->multiple = true;
+        return $query;
+    }
 }

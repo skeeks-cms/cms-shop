@@ -282,7 +282,10 @@ JS
     <div class="row">
     <div class="col">
             <?= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
-                'allowDeselect' => true
+                'allowDeselect' => true,
+                'options' => [
+                    'data-form-reload' => "true",
+                ]
             ]); ?>
     </div>
     <div class="col">
@@ -375,13 +378,17 @@ JS
 
     <?= $form->field($shopProduct, "quantity"); ?>
     
-    <? if ($shopStoreProducts) : ?>
+    <? if ($shopStoreProducts && $shopProduct->shop_supplier_id) : ?>
 
         <?
         /**
          * @var $shopSuppliers \skeeks\cms\shop\models\ShopSupplier[]
          */
-        $shopSuppliers = \skeeks\cms\shop\models\ShopSupplier::find()->all(); ?>
+        $querySuppliers = \skeeks\cms\shop\models\ShopSupplier::find();
+        $querySuppliers->andWhere(['id' => $shopProduct->shop_supplier_id]);
+
+
+        $shopSuppliers = $querySuppliers->all(); ?>
         <? if ($shopSuppliers) : ?>
             <? foreach ($shopSuppliers as $shopSupplier) : ?>
                 <div class="col-md-12">
