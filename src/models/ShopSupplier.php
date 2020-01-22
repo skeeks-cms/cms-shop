@@ -30,6 +30,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property StorageFile  $cmsImage
  * @property ShopStore[]  $shopStores
+ * @property ShopTypePrice[]  $shopTypePrices
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -120,5 +121,13 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
     public function getShopStores()
     {
         return $this->hasMany(ShopStore::class, ['shop_supplier_id' => 'id']);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopTypePrices()
+    {
+        return $this->hasMany(ShopTypePrice::class, ['shop_supplier_id' => 'id']);
     }
 }

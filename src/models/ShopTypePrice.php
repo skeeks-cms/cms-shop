@@ -14,7 +14,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_by
  * @property integer $created_at
  * @property integer $updated_at
- * @property string  $code
+ * @property string|null  $external_id
  * @property string  $name
  * @property string  $description
  * @property integer $priority
@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  *
  * ***
  *
+ * @property ShopSupplier  $shopSupplier
  * @property string  $buyPermissionName
  * @property string  $viewPermissionName
  */
@@ -48,6 +49,10 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             [['name'], 'required'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
+            
+            [['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
+            [['external_id'], 'string'],
+            [['external_id'], 'default', 'value' => null],
         ]);
     }
 
@@ -61,6 +66,7 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
             'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
             'shop_supplier_id'    => \Yii::t('skeeks/shop/app', 'Поставщик'),
+            'external_id'      => "ID из внешней системы",
         ]);
     }
 
@@ -88,5 +94,13 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function getIsDefault()
     {
         return (bool)($this->id == \Yii::$app->shop->baseTypePrice->id);
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplier()
+    {
+        return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
     }
 }

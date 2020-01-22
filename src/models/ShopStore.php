@@ -45,7 +45,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
             [['name'], 'string', 'max' => 255],
             [['name'], 'required'],
-            [['name', 'shop_supplier_id'], 'unique'],
+            [['name', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['name', 'shop_supplier_id']],
 
             [['description'], 'string'],
 
@@ -54,7 +54,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['cms_image_id'], 'safe'],
             [['shop_supplier_id'], 'integer'],
 
-            [['external_id', 'shop_supplier_id'], 'unique'],
+            [['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
             [['external_id'], 'string'],
             [['external_id'], 'default', 'value' => null],
 

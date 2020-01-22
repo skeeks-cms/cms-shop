@@ -109,6 +109,7 @@ class AdminTypePriceController extends BackendModelStandartController
                 'class' => TextareaField::class,
             ],
             'priority',
+            'external_id',
         ];
 
         if ($model->isNewRecord) {
