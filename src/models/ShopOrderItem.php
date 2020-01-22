@@ -291,15 +291,14 @@ class ShopOrderItem extends ActiveRecord
 
         $this->currency_code = $productPriceMoney->currency->code;
 
-
         //Проверка скидок
         $this->discount_amount = 0;
         $this->discount_value = "";
         $this->discount_name = "";
-        $this->amount = $priceHelper->minMoney->amount;
+        $this->amount = $priceHelper->minMoney->convertToCurrency(\Yii::$app->money->currencyCode)->amount;
 
         if ($priceHelper->hasDiscount) {
-            $this->discount_amount = $priceHelper->discountMoney->amount;
+            $this->discount_amount = $priceHelper->discountMoney->convertToCurrency(\Yii::$app->money->currencyCode)->amount;
             $this->discount_name = implode(" + ", ArrayHelper::map($priceHelper->applyedDiscounts, 'id', 'name'));
             $this->discount_value = \Yii::$app->formatter->asPercent($priceHelper->percent);
         }

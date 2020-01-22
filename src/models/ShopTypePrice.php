@@ -50,9 +50,9 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
             
-            [['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
-            [['external_id'], 'string'],
             [['external_id'], 'default', 'value' => null],
+            //[['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
+            [['external_id'], 'string'],
         ]);
     }
 

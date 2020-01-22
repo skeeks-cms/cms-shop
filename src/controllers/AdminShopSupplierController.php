@@ -18,7 +18,9 @@ use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopSupplier;
+use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
@@ -71,9 +73,14 @@ class AdminShopSupplierController extends BackendModelStandartController
                         $query = $e->sender->dataProvider->query;
                         $dataProvider = $e->sender->dataProvider;
 
-                        $query->joinWith('shopStores as shopStores');
-                        $query->joinWith('shopTypePrices as shopTypePrices');
 
+                        $shopTypePricesQuery = ShopTypePrice::find()->select(['count(*)'])->where([
+                            'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
+                        ]);
+                        
+                        $shopStoreQuery = ShopStore::find()->select(['count(*)'])->where([
+                            'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
+                        ]);
                         $shopProductQuery = ShopProduct::find()->select(['count(*)'])->where([
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
@@ -82,8 +89,8 @@ class AdminShopSupplierController extends BackendModelStandartController
 
                         $query->select([
                             ShopSupplier::tableName() . '.*',
-                            'countShopStores' => new Expression("count(*)"),
-                            'countShopTypePrices' => new Expression("count(*)"),
+                            'countShopStores' => $shopStoreQuery,
+                            'countShopTypePrices' => $shopTypePricesQuery,
                             'countShopProducts' => $shopProductQuery
                         ]);
                     },
