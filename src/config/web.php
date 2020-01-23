@@ -24,6 +24,23 @@ return [
                 '~shop-order/<_a>'              => 'shop/order/<_a>',
             ],
         ],
-        
+
+        'upaBackend' => [
+            'menu' => [
+                'data' => [
+                    'shop' => [
+                        'name' => ['skeeks/shop/app', 'Shop'],
+                        'icon' => 'fas fa-shopping-cart',
+                        'items' => [
+                            [
+                                'name' => ['skeeks/shop/app', 'Orders'],
+                                'url' => ['/shop/upa-order'],
+                                'icon' => 'fas fa-cart-arrow-down',
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ],
 ];
