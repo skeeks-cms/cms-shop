@@ -370,9 +370,7 @@ JS
 
     <div class="row">
         <div class="col-md-3">
-            <?= $form->fieldSelect($shopProduct, 'measure_code', \yii\helpers\ArrayHelper::map(
-                \Yii::$app->measure->activeMeasures, 'code', "asText"
-            )); ?>
+            <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect()); ?>
         </div>
     </div>
 
