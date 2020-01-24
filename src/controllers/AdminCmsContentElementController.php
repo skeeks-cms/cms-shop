@@ -391,6 +391,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 'format'    => 'raw',
                 'value'     => function (ShopCmsContentElement $model) {
                     $result = [];
+                    if (!$model->shopProduct) {
+                        return "";
+                    }
                     foreach ($model->shopProduct->shopTypePrices as $shopTypePrice) {
                         if ($shopTypePrice->isDefault) {
                             $defaultId = $shopTypePrice->id;

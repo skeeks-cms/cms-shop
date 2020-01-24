@@ -228,14 +228,24 @@ class AdminShopSupplierController extends BackendModelStandartController
                 'name'            => "Товары",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/shop/admin-cms-content-element",
-                'relation'        => ['shopProduct.shop_supplier_id' => 'id'],
+                //'relation'        => ['shopProduct.shop_supplier_id' => 'id'],
                 'priority'        => 600,
                 'on gridInit'        => function($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
-                    $action->relatedIndexAction->backendShowings = false;
+                    
+                    $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                        /**
+                         * @var $querAdminCmsContentElementControllery ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $query->joinWith("shopProduct as shopProduct");
+                        $query->andWhere(['shopProduct.shop_supplier_id' => $this->model->id]);
+                    };
+                    
+                    //$action->relatedIndexAction->backendShowings = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
                     ArrayHelper::removeValue($visibleColumns, 'shop_supplier_id');
