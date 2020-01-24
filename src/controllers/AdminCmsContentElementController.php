@@ -10,7 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\IHasUrl;
@@ -291,7 +291,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 if ($shopCmsContentElement->shopProduct && $shopCmsContentElement->shopProduct->shopSupplier) {
                     return $shopCmsContentElement->shopProduct->shopSupplier->asText;
                 }
-            }
+            },
         ];
 
         $shopColumns["shop.supplier_external_id"] = [
@@ -302,7 +302,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 if ($shopCmsContentElement->shopProduct) {
                     return $shopCmsContentElement->shopProduct->supplier_external_id;
                 }
-            }
+            },
         ];
 
         $shopColumns["shop.quantity"] = [
@@ -311,21 +311,20 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'format'    => 'raw',
             'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
                 if ($shopCmsContentElement->shopProduct) {
-                    $result = $shopCmsContentElement->shopProduct->quantity . " " . $shopCmsContentElement->shopProduct->measure->symbol;
+                    $result = $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
                     if ($shopCmsContentElement->shopProduct->shopStoreProducts) {
                         $storesQuantity = [];
-                        foreach ($shopCmsContentElement->shopProduct->shopStoreProducts as $shopStoreProduct)
-                        {
+                        foreach ($shopCmsContentElement->shopProduct->shopStoreProducts as $shopStoreProduct) {
                             if ($shopStoreProduct->quantity > 0) {
                                 $storesQuantity[] = Html::tag('span', $shopStoreProduct->quantity, [
-                                    'title' => $shopStoreProduct->shopStore->shopSupplier->name . " - " . $shopStoreProduct->shopStore->name
+                                    'title' => $shopStoreProduct->shopStore->shopSupplier->name." - ".$shopStoreProduct->shopStore->name,
                                 ]);
                             }
 
                         }
 
                         if ($storesQuantity) {
-                            $result .= "<hr>" . implode("<br>", $storesQuantity);
+                            $result .= "<hr>".implode("<br>", $storesQuantity);
                         }
                     }
 
@@ -384,6 +383,54 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
 
             $defaultId = '';
+
+            $shopColumns["custom"] = [
+                'attribute' => 'id',
+                'format'    => 'raw',
+                'value'     => function (ShopCmsContentElement $model) {
+
+                    $data = [];
+
+                    $data[] = "<span style='max-width: 300px;'>" . Html::a($model->asText, "#", [
+                        'class' => 'sx-trigger-action',
+                        'title' => $model->asText,
+                        //'style' => 'white-space: nowrap; '
+                    ]) . "</span>";
+
+                    if ($model->tree_id) {
+                        $data[] = '<i class="far fa-folder"></i> ' . Html::a($model->cmsTree->name, $model->cmsTree->url, [
+                            'data-pjax' => '0',
+                            'target'    => '_blank',
+                            'title'    => $model->cmsTree->fullName,
+                            'style'     => 'color: #333; max-width: 200px;',
+                        ]);
+                    }
+
+                    if ($model->cmsTrees) {
+                        foreach ($model->cmsTrees as $cmsTree) {
+                            $data[] = Html::a($cmsTree->name, $cmsTree->url, [
+                                'data-pjax' => '0',
+                                'target'    => '_blank',
+                                'title'    => $cmsTree->fullName,
+                                'style'     => 'color: #333; max-width: 200px; ',
+                            ]);
+                        }
+                    }
+
+                    if ($model->shopProduct && $model->shopProduct->shop_supplier_id) {
+                        $data[] = '<i class="fas fa-truck"></i> ' . $model->shopProduct->shopSupplier->asText;
+                    }
+                    $info = implode("<br />", $data);
+
+                    return "<div class='row no-gutters'>
+                                                <div style='margin-left: 5px;'>
+                                                <div class='sx-trigger-action' style='width: 50px; margin-right: 10px; float: left;'>
+                                                    <a href='#' style='text-decoration: none; border-bottom: 0;'>
+                                                        <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
+                                                    </a>
+                                                </div>".$info."</div></div>";;
+                },
+            ];
 
             $shopColumns["shop.priceDefult"] = [
                 'label'     => "Все цены [магазин]",
@@ -449,9 +496,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         ];
 
         $filterFields['shop_supplier_id'] = [
-            'class'    => FilterField::class,
-            'label'    => 'Поставщик',
-            'filterAttribute'    => 'sp.shop_supplier_id',
+            'class'           => FilterField::class,
+            'label'           => 'Поставщик',
+            'filterAttribute' => 'sp.shop_supplier_id',
             /*'multiple' => true,
             'on apply' => function (QueryFiltersEvent $e) {
                 /**
@@ -555,7 +602,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
         $productPrices = [];
         $shopStoreProducts = [];
-
 
 
         /**
@@ -723,9 +769,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                 $shopProduct->save();
             }
-
-
-
 
 
             $shopStoreProducts = [];
