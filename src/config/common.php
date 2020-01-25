@@ -81,29 +81,24 @@ return [
                             ],
                         ],
                     ],
+
+                    'roles' => [
+                         [
+                            'name'        => \skeeks\cms\rbac\CmsManager::ROLE_USER,
+
+                            //Есть доступ к системе администрирования
+                            'child'       => [
+                                'permissions' => [
+                                    'shop/upa-order'
+                                ],
+                            ],
+
+                        ],
+                    ]
                 ],
             ],
         ],
 
-
-        'authManager' => [
-            'config' => [
-
-                'roles' => [
-                     [
-                        'name'        => \skeeks\cms\rbac\CmsManager::ROLE_USER,
-
-                        //Есть доступ к системе администрирования
-                        'child'       => [
-                            'permissions' => [
-                                'shop/upa-order'
-                            ],
-                        ],
-
-                    ],
-                ]
-            ]
-        ]
         
     ],
 

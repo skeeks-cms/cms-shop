@@ -126,7 +126,8 @@ class AdminOrderController extends BackendModelStandartController
                         'paid_at',
                         'canceled_at',
 
-                        'shop_buyer_id',
+                        //'shop_buyer_id',
+                        'buyer',
                         'shop_pay_system_id',
                         'shop_delivery_id',
 
@@ -163,6 +164,41 @@ class AdminOrderController extends BackendModelStandartController
                                     'class'     => 'btn btn-default btn-sm',
                                 ]);
                             },
+                            'headerOptions'  => [
+                                'style' => 'max-width: 40px; width: 40px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'max-width: 40px; width: 40px;',
+                            ],
+                        ],
+
+                        'buyer'                   => [
+                            'format' => "raw",
+                            'label' => "Покупатель",
+                            'value'  => function (ShopOrder $shopOrder) {
+                                $data = [];
+                                if ($shopOrder->shopBuyer) {
+                                    $data[] = $shopOrder->shopBuyer->asText;
+
+                                    if ($shopOrder->shopBuyer->cmsUser) {
+                                        $data[] = '<i class="fas fa-user"></i> ' . $shopOrder->shopBuyer->cmsUser->asText;
+                                    } else {
+                                        $data[] = '<i class="fas fa-user"></i> Неавторизован';
+                                    }
+
+                                } else {
+                                    if ($shopOrder->shopCart && $shopOrder->shopCart->cmsUser) {
+                                        $data[] = '<i class="fas fa-user"></i> ' . $shopOrder->shopCart->cmsUser->asText;
+                                    } else {
+                                        $data[] = '<i class="fas fa-user"></i> ' . "Неавторизован";
+                                    }
+                                }
+
+
+
+                                return implode("<br />", $data);
+                            },
+
                         ],
                         'canceled_at'          => [
                             'value' => function (ShopOrder $shopOrder, $key) {

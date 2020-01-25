@@ -9,12 +9,10 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\components\CartComponent;
-use skeeks\cms\shop\models\ShopFuser;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
+use yii\helpers\UnsetArrayValue;
 
 /**
  * Class AdminFuserController
@@ -35,7 +33,7 @@ class AdminCartController extends AdminOrderController
     public function actions()
     {
         $actions = parent::actions();
-        
+
         $actions = ArrayHelper::merge($actions, [
             'index' => [
                 'grid' => [
@@ -48,9 +46,30 @@ class AdminCartController extends AdminOrderController
 
                         $query->andWhere(['is_created' => 0]);
                     },
-                ]
-            ] 
+                ],
+            ],
+
+            'create' => new UnsetArrayValue(),
+            'create-order' => new UnsetArrayValue(),
         ]);
+
+        $actions['index']['grid']['visibleColumns'] = [
+            'checkbox',
+            'actions',
+            'id',
+
+            'updated_at',
+
+            'buyer',
+            'shop_pay_system_id',
+            'shop_delivery_id',
+
+            'items',
+
+            'amount',
+            //'is_created',
+            'go',
+        ];
 
         return $actions;
     }
