@@ -68,6 +68,9 @@ return [
                                 "shop/admin-shop-store",
                                 
                                 "shop/admin-content",
+
+                                "shop/admin-viewed-product",
+                                "shop/admin-quantity-notice-email",
                             ],
                         ],
                     ],
@@ -78,6 +81,9 @@ return [
                             'permissions' => [
                                 "shop/admin-order",
                                 "shop/admin-cart",
+
+                                "shop/admin-viewed-product",
+                                "shop/admin-quantity-notice-email",
                             ],
                         ],
                     ],

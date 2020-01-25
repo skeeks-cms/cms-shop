@@ -8,18 +8,21 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopQuantityNoticeEmail;
 use yii\helpers\ArrayHelper;
+use yii\helpers\UnsetArrayValue;
 
 /**
  * Class AdminQuantityNoticeEmailController
  *
  * @package skeeks\cms\shop\controllers
  */
-class AdminQuantityNoticeEmailController extends AdminModelEditorController
+class AdminQuantityNoticeEmailController extends BackendModelStandartController
 {
     use AdminModelEditorStandartControllerTrait;
 
@@ -29,6 +32,8 @@ class AdminQuantityNoticeEmailController extends AdminModelEditorController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopQuantityNoticeEmail::class;
 
+        $this->generateAccessActions = false;
+
         parent::init();
     }
 
@@ -37,20 +42,81 @@ class AdminQuantityNoticeEmailController extends AdminModelEditorController
      */
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),
-            [
-                'create' =>
-                    [
-                        'isVisible' => false,
-                    ],
+        return ArrayHelper::merge(parent::actions(), [
 
-                'update' =>
-                    [
-                        'isVisible' => false,
+            "index" => [
+                "filters" => [
+                    "visibleFilters" => [
+                        'id',
                     ],
+                ],
+                'grid'    => [
+                    'defaultOrder'   => [
+                        //'is_created' => SORT_DESC,
+                        'created_at' => SORT_DESC,
+                    ],
+                    'visibleColumns' => [
+                        'checkbox',
+                        'actions',
 
-            ]
-        );
+                        'created_at',
+
+                        'email',
+                        'name',
+                        'good',
+
+                        'is_notified',
+
+                        'notified_at',
+                        'user',
+                    ],
+                    'columns'        => [
+                        'created_at'  => [
+                            'class' => DateTimeColumnData::class,
+                        ],
+                        'notified_at' => [
+                            'class' => DateTimeColumnData::class,
+                        ],
+
+                        'is_notified' => [
+                            'class' => BooleanColumn::class,
+                        ],
+
+                        'good' => [
+                            'format' => 'raw',
+                            'label'  => \Yii::t('skeeks/shop/app', 'Good'),
+                            'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
+                                if ($shopQuantityNoticeEmail->shopProduct) {
+                                    return (new \skeeks\cms\modules\admin\widgets\AdminImagePreviewWidget([
+                                            'image'    => $shopQuantityNoticeEmail->shopProduct->cmsContentElement->image,
+                                            'maxWidth' => "25px",
+                                        ]))->run()." ".\yii\helpers\Html::a($shopQuantityNoticeEmail->shopProduct->cmsContentElement->name,
+                                            $shopQuantityNoticeEmail->shopProduct->cmsContentElement->url, [
+                                                'target'    => "_blank",
+                                                'data-pjax' => 0,
+                                            ])."<br /><small>".\Yii::t('skeeks/shop/app',
+                                            'In stock').": ".$shopQuantityNoticeEmail->shopProduct->quantity."</small>";
+                                }
+
+                                return null;
+                            },
+                        ],
+                        'user' => [
+                            'format' => 'raw',
+                            'label'  => \Yii::t('skeeks/shop/app', 'User'),
+                            'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
+                                return ($shopQuantityNoticeEmail->shopFuser && $shopQuantityNoticeEmail->shopFuser->cmsUser ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopQuantityNoticeEmail->shopFuser->cmsUser]))->run() : \Yii::t('skeeks/shop/app',
+                                    'Not authorized'));
+                            },
+                        ],
+
+                    ],
+                ],
+            ],
+
+            'create' => new UnsetArrayValue(),
+            'update' => new UnsetArrayValue(),
+        ]);
     }
 
 }
