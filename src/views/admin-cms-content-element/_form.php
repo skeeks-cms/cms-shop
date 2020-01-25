@@ -490,14 +490,7 @@ JS
     </div>
 </div>
 
-<? if ($shopProduct->supplier_external_jsondata) : ?>
-<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Данные от поставщика'),
-    ]); ?>
-<pre>
-    <?= print_r($shopProduct->supplier_external_jsondata, true); ?>
-</pre>
-<? endif; ?>
+
 
 <? if ($shopContent->childrenContent) : ?>
     <div id="sx-shop-product-tradeOffers">
@@ -537,6 +530,16 @@ JS
         <? endif; ?>
 
     </div>
+<? endif; ?>
+
+
+<? if ($shopProduct->supplier_external_jsondata) : ?>
+<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('skeeks/shop/app', 'Данные от поставщика'),
+    ]); ?>
+<pre>
+    <?= print_r($shopProduct->supplier_external_jsondata, true); ?>
+</pre>
 <? endif; ?>
 
 
