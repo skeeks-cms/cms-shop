@@ -177,16 +177,20 @@ return [
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Baskets'),
                                     "url"   => ["shop/admin-cart"],
+                                    'icon'  => 'fas fa-cart-arrow-down',
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Notify on receipt (Email)'),
                                     "url"   => ["shop/admin-quantity-notice-email"],
+                                    'icon'  => 'far fa-envelope',
+
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Viewed products'),
                                     "url"   => ["shop/admin-viewed-product"],
+                                    'icon'  => 'far fa-eye',
                                 ],
                             ],
 

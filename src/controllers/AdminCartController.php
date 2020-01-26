@@ -68,7 +68,7 @@ class AdminCartController extends AdminOrderController
 
             'amount',
             //'is_created',
-            'go',
+            //'go',
         ];
 
         return $actions;

@@ -7,6 +7,10 @@
  */
 return
     [
+        'In orders'                                                                                                                                        => 'В заказах',
+        'In baskets'                                                                                                                                       => 'В корзинах',
+        'Looked'                                                                                                                                           => 'Посмотрели',
+        'Waiting for receipt'                                                                                                                              => 'Ждут поступления',
         'Access to this member'                                                                                                                            => 'Доступ к этому элементу',
         'Account customer'                                                                                                                                 => 'Счета покупателей',
         'Order successfully paid'                                                                                                                          => 'Заказ успешно оплачен',
@@ -424,6 +428,6 @@ return
         "Not set coupon code"                    => 'Не указан код купона',
         "Coupon does not exist or is not active" => 'Купон не существует или не активен',
         "Coupon successfully installed"          => 'Купон успешно установлен',
-        "Discounts"          => 'Скидки',
-        "Marketing"          => 'Маркетинг',
+        "Discounts"                              => 'Скидки',
+        "Marketing"                              => 'Маркетинг',
     ];

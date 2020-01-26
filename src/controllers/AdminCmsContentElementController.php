@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\helpers\Image;
@@ -196,6 +197,118 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         }
                     },
                 ],
+
+
+                "viewed-products" => [
+                    'class' => BackendGridModelRelatedAction::class,
+                    'accessCallback' => true,
+                    'name'            => ['skeeks/shop/app', 'Looked'],
+                    'icon'            => 'far fa-eye',
+                    'controllerRoute' => "/shop/admin-viewed-product",
+                    'relation'        => ['shop_product_id' => 'id'],
+                    'priority'        => 600,
+                    'on gridInit'        => function($e) {
+                        /**
+                         * @var $action BackendGridModelRelatedAction
+                         */
+                        $action = $e->sender;
+                        $action->relatedIndexAction->backendShowings = false;
+                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                        ArrayHelper::removeValue($visibleColumns, 'shop_product_id');
+                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                    },
+                ],
+
+                "quantity-notice-emails" => [
+                    'class' => BackendGridModelRelatedAction::class,
+                    'accessCallback' => true,
+                    'name'            => ['skeeks/shop/app', 'Waiting for receipt'],
+                    'icon'            => 'far fa-envelope',
+                    'controllerRoute' => "/shop/admin-quantity-notice-email",
+                    'relation'        => ['shop_product_id' => 'id'],
+                    'priority'        => 600,
+                    'on gridInit'        => function($e) {
+                        /**
+                         * @var $action BackendGridModelRelatedAction
+                         */
+                        $action = $e->sender;
+                        $action->relatedIndexAction->backendShowings = false;
+                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                        ArrayHelper::removeValue($visibleColumns, 'good');
+                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                    },
+                ],
+
+                "carts" => [
+                    'class' => BackendGridModelRelatedAction::class,
+                    'accessCallback' => true,
+                    'name'            => ['skeeks/shop/app', 'In baskets'],
+                    'icon'            => 'fas fa-cart-arrow-down',
+                    'controllerRoute' => "/shop/admin-cart",
+                    'relation'        => ['shop_product_id' => 'id'],
+                    'priority'        => 600,
+                    'on gridInit'        => function($e) {
+                        /**
+                         * @var $action BackendGridModelRelatedAction
+                         */
+                        $action = $e->sender;
+                        $action->relatedIndexAction->backendShowings = false;
+                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                        $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                            /**
+                             * @var $querAdminCmsContentElementControllery ActiveQuery
+                             */
+                            $query = $e->sender->dataProvider->query;
+                            $query->joinWith("shopOrderItems as shopOrderItems");
+                            $query->joinWith("shopOrderItems.shopProduct as shopProduct");
+                            $query->andWhere(['shopProduct.id' => $this->model->id]);
+                            $query->andWhere(['is_created' => 0]);
+                        };
+
+                        ArrayHelper::removeValue($visibleColumns, 'goods');
+                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                    },
+                ],
+
+                "orders" => [
+                    'class' => BackendGridModelRelatedAction::class,
+                    'accessCallback' => true,
+                    'name'            => ['skeeks/shop/app', 'In orders'],
+                    'icon'            => 'fas fa-cart-arrow-down',
+                    'controllerRoute' => "/shop/admin-order",
+                    'relation'        => ['shop_product_id' => 'id'],
+                    'priority'        => 600,
+                    'on gridInit'        => function($e) {
+                        /**
+                         * @var $action BackendGridModelRelatedAction
+                         */
+                        $action = $e->sender;
+                        $action->relatedIndexAction->backendShowings = false;
+                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                        $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                            /**
+                             * @var $querAdminCmsContentElementControllery ActiveQuery
+                             */
+                            $query = $e->sender->dataProvider->query;
+                            $query->joinWith("shopOrderItems as shopOrderItems");
+                            $query->joinWith("shopOrderItems.shopProduct as shopProduct");
+                            $query->andWhere(['shopProduct.id' => $this->model->id]);
+                            $query->andWhere(['is_created' => 1]);
+                        };
+
+                        ArrayHelper::removeValue($visibleColumns, 'goods');
+                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                    },
+                ],
+
             ]
         );
 
