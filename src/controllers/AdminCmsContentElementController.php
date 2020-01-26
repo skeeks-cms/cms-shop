@@ -50,7 +50,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public $notSubmitParam = 'sx-not-submit';
 
     public $modelClassName = ShopCmsContentElement::class;
-    public $modelShowAttribute = "name";
+    public $modelShowAttribute = "asText";
 
     static public function getSorts(ActiveQuery $activeQuery)
     {

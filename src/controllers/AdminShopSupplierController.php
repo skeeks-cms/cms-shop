@@ -74,14 +74,14 @@ class AdminShopSupplierController extends BackendModelStandartController
                         $dataProvider = $e->sender->dataProvider;
 
 
-                        $shopTypePricesQuery = ShopTypePrice::find()->select(['count(*)'])->where([
+                        $shopTypePricesQuery = ShopTypePrice::find()->select(['count(*) as inner_count'])->where([
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
                         
-                        $shopStoreQuery = ShopStore::find()->select(['count(*)'])->where([
+                        $shopStoreQuery = ShopStore::find()->select(['count(*) as inner_count'])->where([
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
-                        $shopProductQuery = ShopProduct::find()->select(['count(*)'])->where([
+                        $shopProductQuery = ShopProduct::find()->select(['count(*) as inner_count'])->where([
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
 
