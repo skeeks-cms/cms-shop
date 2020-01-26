@@ -23,6 +23,7 @@ use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -38,8 +39,6 @@ use yii\widgets\ActiveForm;
  * @property ShopCart         $cart
  *
  * @property CmsContent       $shopContents
- * @property CmsContent       $storeContent
- * @property CmsContent       $stores
  *
  * @property array            $notifyEmails
  *
@@ -79,10 +78,6 @@ class ShopComponent extends Component
      * @var string
      */
     public $payAfterConfirmation = Cms::BOOL_N;
-    /**
-     * @var Контент который будет использоваться в качестве складов
-     */
-    public $storeCmsContentId;
     /**
      * @var Кого уведомить о новых товарах
      */
@@ -286,8 +281,7 @@ class ShopComponent extends Component
             [['payAfterConfirmation'], 'string'],
             [['start_order_status_id'], 'integer'],
             [['end_order_status_id'], 'integer'],
-            [['storeCmsContentId'], 'integer'],
-            
+
             [['type_price_purchase_id'], 'integer'],
             [['type_price_retail_id'], 'integer'],
             [['type_price_mrc_id'], 'integer'],
@@ -315,7 +309,6 @@ class ShopComponent extends Component
             'email'                    => 'Email',
             'payAfterConfirmation'     => \Yii::t('skeeks/shop/app',
                 'Include payment orders only after the manager approval'),
-            'storeCmsContentId'        => \Yii::t('skeeks/shop/app', 'Content storage'),
             'notify_emails'            => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price' => "Показывать товары с нулевыми ценами?",
             'is_show_button_no_price'  => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
@@ -565,29 +558,7 @@ class ShopComponent extends Component
     }
 
 
-    /**
-     * @return CmsContent
-     */
-    public function getStoreContent()
-    {
-        if (!$contentId = (int)$this->storeCmsContentId) {
-            return null;
-        }
 
-        return CmsContent::findOne($contentId);
-    }
-
-    /**
-     * @return array
-     */
-    public function getStores()
-    {
-        if ($this->storeContent) {
-            return $this->storeContent->getCmsContentElements()->all();
-        }
-
-        return [];
-    }
 
 
     /**
@@ -605,5 +576,48 @@ class ShopComponent extends Component
         }
 
         return $emailsAll;
+    }
+
+
+    /**
+     *
+     * Фильтрация базового запроса на выборку товаров с учетом настроек магазина.
+     *
+     * @param ActiveQuery $activeQuery
+     * @return $this
+     */
+    public function filterBaseContentElementQuery(ActiveQuery $activeQuery)
+    {
+        $activeQuery->joinWith("shopProduct");
+
+        $activeQuery->andWhere([
+            '!=',
+            'shopProduct.product_type',
+            \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
+        ]);
+
+        $activeQuery->andWhere([
+            'shopProduct.shop_supplier_id' => null
+        ]);
+
+        return $this;
+    }
+
+
+    /**
+     *
+     * Фильтрация базового запроса на выборку товаров с учетом настроек магазина.
+     *
+     * @param ActiveQuery $activeQuery
+     * @return $this
+     */
+    public function filterByPriceContentElementQuery(ActiveQuery $activeQuery)
+    {
+        if (!$this->is_show_product_no_price) {
+            $activeQuery->joinWith('shopProduct.shopProductPrices as pricesFilter');
+            $activeQuery->andWhere(['>', '`pricesFilter`.price', 0]);
+        }
+
+        return $this;
     }
 }

@@ -34,7 +34,7 @@ use yii\helpers\ArrayHelper;
  * @property double                      $width
  * @property double                      $length
  * @property double                      $height
- * @property integer|null                      $main_pid
+ * @property integer|null                $main_pid
  * @property string                      $product_type
  * @property integer|null                $shop_supplier_id
  * @property string|null                 $supplier_external_id
@@ -63,7 +63,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopOrder[]                 $shopOrders
  * @property ShopSupplier                $shopSupplier
  * @property ShopTypePrice               $shopTypePrices
- * @property ShopProduct               $shopMainProduct
+ * @property ShopProduct                 $shopMainProduct
  * @property ShopProduct[]               $shopSupplierProducts
  */
 class ShopProduct extends \skeeks\cms\models\Core
@@ -431,20 +431,23 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['shop_supplier_id', 'supplier_external_id'], 'unique', 'targetAttribute' => ['shop_supplier_id', 'supplier_external_id']],
 
             ['main_pid', 'integer'],
-            [['main_pid'], function (ShopProduct $model) {
-                $shopProduct = ShopProduct::find()->where(['id' => $model->main_pid])->one();
-                if (!in_array($shopProduct, [
-                    self::TYPE_SIMPLE,
-                    self::TYPE_OFFER
-                ])) {
-                    $this->addError("main_pid", "Родительский товар должен быть простым или предложением.");
-                }
-                
-                if (!$this->shop_supplier_id) {
-                    $this->addError("main_pid", "Для привязки необходимо задать поставщика для привязываемого товара.");
-                }
-                
-            }]
+            [
+                ['main_pid'],
+                function (ShopProduct $model) {
+                    $shopProduct = ShopProduct::find()->where(['id' => $model->main_pid])->one();
+                    if (!in_array($shopProduct, [
+                        self::TYPE_SIMPLE,
+                        self::TYPE_OFFER,
+                    ])) {
+                        $this->addError("main_pid", "Родительский товар должен быть простым или предложением.");
+                    }
+
+                    if (!$this->shop_supplier_id) {
+                        $this->addError("main_pid", "Для привязки необходимо задать поставщика для привязываемого товара.");
+                    }
+
+                },
+            ],
         ];
     }
     /**
@@ -469,7 +472,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'length'            => \Yii::t('skeeks/shop/app', 'Length (mm)'),
             'height'            => \Yii::t('skeeks/shop/app', 'Height (mm)'),
             'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
-            'main_pid'      => \Yii::t('skeeks/shop/app', 'Главный товар'),
+            'main_pid'          => \Yii::t('skeeks/shop/app', 'Главный товар'),
 
             'shop_supplier_id'           => \Yii::t('skeeks/shop/app', 'Поставщик'),
             'supplier_external_id'       => \Yii::t('skeeks/shop/app', 'Идентификатор поставщика'),
@@ -529,7 +532,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
