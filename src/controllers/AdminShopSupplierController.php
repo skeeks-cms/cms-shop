@@ -307,6 +307,12 @@ class AdminShopSupplierController extends BackendModelStandartController
                 ],
             ],
             
+            
+            'is_main'  => [
+                'class'      => BoolField::class,
+                'allowNull'      => false,
+            ],
+            
             'external_id',
 
 

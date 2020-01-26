@@ -26,6 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null  $description_internal
  * @property integer|null $cms_image_id
  * @property integer      $is_active
+ * @property integer      $is_main
  * @property string|null      $external_id
  *
  * @property StorageFile  $cmsImage
@@ -74,6 +75,7 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
             [['description'], 'string'],
 
             [['is_active'], 'integer'],
+            [['is_main'], 'integer'],
 
             [['external_id'], 'unique'],
             [['external_id'], 'string'],
@@ -95,6 +97,7 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
             'cms_image_id' => "Изображение",
             'is_active'    => "Активность",
             'external_id'    => "ID из внешней системы",
+            'is_main'    => "Основной поставщик?",
         ]);
     }
     /**
@@ -104,6 +107,7 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeHints(), [
             'description_internal'  => "Это описание не видят клиенты",
+            'is_main'  => "Товары основного поставщика показываются и продаются на сайте, если же поставщик не основной, то его товары необходимо привязывать к товаров основного поставщика.",
         ]);
     }
 
