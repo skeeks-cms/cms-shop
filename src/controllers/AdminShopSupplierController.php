@@ -8,15 +8,11 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
-use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
-use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopSupplier;
@@ -24,15 +20,13 @@ use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
-use skeeks\yii2\form\fields\FieldSet;
-use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -46,7 +40,7 @@ class AdminShopSupplierController extends BackendModelStandartController
         $this->modelClassName = ShopSupplier::class;
 
         $this->generateAccessActions = false;
-        
+
         parent::init();
     }
 
@@ -65,7 +59,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
-                    'on init'       => function (Event $e) {
+                    'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
                          * @var $query ActiveQuery
@@ -77,7 +71,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                         $shopTypePricesQuery = ShopTypePrice::find()->select(['count(*) as inner_count'])->where([
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
-                        
+
                         $shopStoreQuery = ShopStore::find()->select(['count(*) as inner_count'])->where([
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
@@ -85,39 +79,48 @@ class AdminShopSupplierController extends BackendModelStandartController
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
 
-                        $query->groupBy(ShopSupplier::tableName() . ".id");
+                        $shopProductConnectedQuery = ShopProduct::find()->joinWith('shopSupplier')->select(['count(*) as inner_count'])->where([
+                            'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
+                        ])->andWhere([
+                            'is not',
+                            'main_pid',
+                            null,
+                        ]);
+
+                        $query->groupBy(ShopSupplier::tableName().".id");
 
                         $query->select([
-                            ShopSupplier::tableName() . '.*',
-                            'countShopStores' => $shopStoreQuery,
-                            'countShopTypePrices' => $shopTypePricesQuery,
-                            'countShopProducts' => $shopProductQuery
+                            ShopSupplier::tableName().'.*',
+                            'countShopStores'            => $shopStoreQuery,
+                            'countShopTypePrices'        => $shopTypePricesQuery,
+                            'countShopProducts'          => $shopProductQuery,
+                            'countShopProductsConnected' => $shopProductConnectedQuery,
                         ]);
                     },
 
-                    'defaultOrder'   => [
+                    'defaultOrder' => [
                         'id' => SORT_DESC,
                     ],
 
                     'sortAttributes' => [
-                        'countShopStores' => [
-                            'asc' => ['countShopStores' => SORT_ASC],
-                            'desc' => ['countShopStores' => SORT_DESC],
-                            'label' => 'Количество складов',
-                            'default' => SORT_ASC
+                        'countShopStores'     => [
+                            'asc'     => ['countShopStores' => SORT_ASC],
+                            'desc'    => ['countShopStores' => SORT_DESC],
+                            'label'   => 'Количество складов',
+                            'default' => SORT_ASC,
                         ],
                         'countShopTypePrices' => [
-                            'asc' => ['countShopTypePrices' => SORT_ASC],
-                            'desc' => ['countShopTypePrices' => SORT_DESC],
-                            'label' => 'Количество типов цен',
-                            'default' => SORT_ASC
+                            'asc'     => ['countShopTypePrices' => SORT_ASC],
+                            'desc'    => ['countShopTypePrices' => SORT_DESC],
+                            'label'   => 'Количество типов цен',
+                            'default' => SORT_ASC,
                         ],
-                        'countShopProducts' => [
-                            'asc' => ['countShopProducts' => SORT_ASC],
-                            'desc' => ['countShopProducts' => SORT_DESC],
-                            'label' => 'Количество товаров',
-                            'default' => SORT_ASC
-                        ]
+                        'countShopProducts'   => [
+                            'asc'     => ['countShopProducts' => SORT_ASC],
+                            'desc'    => ['countShopProducts' => SORT_DESC],
+                            'label'   => 'Количество товаров',
+                            'default' => SORT_ASC,
+                        ],
                     ],
 
                     'visibleColumns' => [
@@ -139,31 +142,41 @@ class AdminShopSupplierController extends BackendModelStandartController
                             'trueValue'  => 1,
                             'falseValue' => 1,
                         ],
-                        
-                        'name'           => [
+
+                        'name' => [
                             'class' => DefaultActionColumn::class,
                         ],
 
-                        'countShopProducts' => [
-                            'value' => function(ShopSupplier $cmsSite) {
-                                return $cmsSite->raw_row['countShopProducts'];
+                        'countShopProducts'   => [
+                            'format' => 'raw',
+                            'value'     => function (ShopSupplier $cmsSite) {
+
+                                if ($cmsSite->is_main) {
+                                    return $cmsSite->raw_row['countShopProducts'];
+                                } else {
+                                    return $cmsSite->raw_row['countShopProducts']."/".Html::tag('span', $cmsSite->raw_row['countShopProductsConnected'], [
+                                            'title' => 'Количество привязанных/продаваемых товаров',
+                                            'style' => 'color: green;',
+                                        ]);
+                                }
+
                             },
                             'attribute' => 'countShopProducts',
-                            'label' => 'Количество товаров'
+                            'label'     => 'Количество товаров',
                         ],
-                        'countShopStores' => [
-                            'value' => function(ShopSupplier $cmsSite) {
+                        'countShopStores'     => [
+                            'value'     => function (ShopSupplier $cmsSite) {
                                 return $cmsSite->raw_row['countShopStores'];
                             },
                             'attribute' => 'countShopStores',
-                            'label' => 'Количество складов'
+                            'label'     => 'Количество складов',
                         ],
                         'countShopTypePrices' => [
-                            'value' => function(ShopSupplier $cmsSite) {
+                            'value'     => function (ShopSupplier $cmsSite) {
                                 return $cmsSite->raw_row['countShopTypePrices'];
                             },
                             'attribute' => 'countShopTypePrices',
-                            'label' => 'Количество типов цен'
+                            'label'     => 'Количество типов цен',
                         ],
                     ],
                 ],
@@ -176,16 +189,15 @@ class AdminShopSupplierController extends BackendModelStandartController
             ],
 
 
-
             "stores" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Склады",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/shop/admin-shop-store",
                 'relation'        => ['shop_supplier_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -201,14 +213,14 @@ class AdminShopSupplierController extends BackendModelStandartController
 
 
             "prices" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Цены",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/shop/admin-type-price",
                 'relation'        => ['shop_supplier_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -223,19 +235,19 @@ class AdminShopSupplierController extends BackendModelStandartController
             ],
 
             "products" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Товары",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/shop/admin-cms-content-element",
                 //'relation'        => ['shopProduct.shop_supplier_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
-                    
+
                     $action->relatedIndexAction->grid['on init'] = function (Event $e) {
                         /**
                          * @var $querAdminCmsContentElementControllery ActiveQuery
@@ -244,7 +256,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                         $query->joinWith("shopProduct as shopProduct");
                         $query->andWhere(['shopProduct.shop_supplier_id' => $this->model->id]);
                     };
-                    
+
                     //$action->relatedIndexAction->backendShowings = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
@@ -260,7 +272,7 @@ class AdminShopSupplierController extends BackendModelStandartController
     public function updateFields($action)
     {
         return [
-            'cms_image_id' => [
+            'cms_image_id'         => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => AjaxFileUploadWidget::class,
                 'widgetConfig' => [
@@ -268,11 +280,11 @@ class AdminShopSupplierController extends BackendModelStandartController
                     'multiple' => false,
                 ],
             ],
-            'is_active'  => [
-                'class'      => BoolField::class,
+            'is_active'            => [
+                'class' => BoolField::class,
             ],
             'name',
-            'description'  => [
+            'description'          => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => CKEditorWidget::class,
                 'widgetConfig' => [
@@ -289,7 +301,7 @@ class AdminShopSupplierController extends BackendModelStandartController
 
                 ],
             ],
-            'description_internal'  => [
+            'description_internal' => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => CKEditorWidget::class,
                 'widgetConfig' => [
@@ -306,13 +318,13 @@ class AdminShopSupplierController extends BackendModelStandartController
 
                 ],
             ],
-            
-            
-            'is_main'  => [
-                'class'      => BoolField::class,
-                'allowNull'      => false,
+
+
+            'is_main' => [
+                'class'     => BoolField::class,
+                'allowNull' => false,
             ],
-            
+
             'external_id',
 
 
