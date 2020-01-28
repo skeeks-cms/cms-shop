@@ -22,7 +22,7 @@ class m200126_100601__alter_table__shop_supplier extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        //$this->addColumn($tableName, "is_main", $this->integer(1)->notNull()->defaultValue(0));
+        $this->addColumn($tableName, "is_main", $this->integer(1)->notNull()->defaultValue(0));
 
         $this->createIndex($tableName.'__is_main', $tableName, 'is_main');
     }
