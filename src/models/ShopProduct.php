@@ -26,7 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                     $updated_at
  * @property double                      $quantity
  * @property double                      $weight
- * @property string                      $measure_ratio
+ * @property double                      $measure_ratio
  * @property integer                     $vat_id
  * @property string                      $vat_included
  * @property double                      $quantity_reserved
@@ -40,6 +40,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null                 $supplier_external_id
  * @property array|null                  $supplier_external_jsondata
  *
+ * @property string                     $productTypeAsText
  * @property Measure                     $measure
  * @property ShopCmsContentElement       $cmsContentElement
  * @property ShopTypePrice               $trialPrice
@@ -94,6 +95,11 @@ class ShopProduct extends \skeeks\cms\models\Core
         ]);
 
         return $behaviors;
+    }
+
+    public function getProductTypeAsText()
+    {
+        return ArrayHelper::getValue(self::possibleProductTypes(), $this->product_type);
     }
     /**
      * @return array

@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\helpers\Image;
@@ -103,6 +104,30 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 /*"create" => ["callback" => [$this, 'create']],
                 "update" => ["callback" => [$this, 'update']],*/
 
+
+                /*"view" => [
+                    'class'          => BackendModelAction::class,
+                    "name"           => "Посмотреть",
+                ],*/
+
+                "connect-to-main" => [
+                    'class'          => BackendModelAction::class,
+                    "name"           => "Привязать к главному",
+                    'priority'       => 110,
+                    'accessCallback' => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        if (!$model) {
+                            return false;
+                        }
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        if ($model->shopProduct->shop_supplier_id) {
+                            return true;
+                        }
+                    },
+                ],
 
                 "copy" => [
                     'class'          => BackendModelUpdateAction::class,
@@ -200,14 +225,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
 
                 "viewed-products" => [
-                    'class' => BackendGridModelRelatedAction::class,
-                    'accessCallback' => true,
+                    'class'           => BackendGridModelRelatedAction::class,
+                    'accessCallback'  => true,
                     'name'            => ['skeeks/shop/app', 'Looked'],
                     'icon'            => 'far fa-eye',
                     'controllerRoute' => "/shop/admin-viewed-product",
                     'relation'        => ['shop_product_id' => 'id'],
                     'priority'        => 600,
-                    'on gridInit'        => function($e) {
+                    'on gridInit'     => function ($e) {
                         /**
                          * @var $action BackendGridModelRelatedAction
                          */
@@ -222,14 +247,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],
 
                 "quantity-notice-emails" => [
-                    'class' => BackendGridModelRelatedAction::class,
-                    'accessCallback' => true,
+                    'class'           => BackendGridModelRelatedAction::class,
+                    'accessCallback'  => true,
                     'name'            => ['skeeks/shop/app', 'Waiting for receipt'],
                     'icon'            => 'far fa-envelope',
                     'controllerRoute' => "/shop/admin-quantity-notice-email",
                     'relation'        => ['shop_product_id' => 'id'],
                     'priority'        => 600,
-                    'on gridInit'        => function($e) {
+                    'on gridInit'     => function ($e) {
                         /**
                          * @var $action BackendGridModelRelatedAction
                          */
@@ -244,14 +269,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],
 
                 "carts" => [
-                    'class' => BackendGridModelRelatedAction::class,
-                    'accessCallback' => true,
+                    'class'           => BackendGridModelRelatedAction::class,
+                    'accessCallback'  => true,
                     'name'            => ['skeeks/shop/app', 'In baskets'],
                     'icon'            => 'fas fa-cart-arrow-down',
                     'controllerRoute' => "/shop/admin-cart",
                     'relation'        => ['shop_product_id' => 'id'],
                     'priority'        => 600,
-                    'on gridInit'        => function($e) {
+                    'on gridInit'     => function ($e) {
                         /**
                          * @var $action BackendGridModelRelatedAction
                          */
@@ -277,14 +302,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],
 
                 "orders" => [
-                    'class' => BackendGridModelRelatedAction::class,
-                    'accessCallback' => true,
+                    'class'           => BackendGridModelRelatedAction::class,
+                    'accessCallback'  => true,
                     'name'            => ['skeeks/shop/app', 'In orders'],
                     'icon'            => 'fas fa-cart-arrow-down',
                     'controllerRoute' => "/shop/admin-order",
                     'relation'        => ['shop_product_id' => 'id'],
                     'priority'        => 600,
-                    'on gridInit'        => function($e) {
+                    'on gridInit'     => function ($e) {
                         /**
                          * @var $action BackendGridModelRelatedAction
                          */
@@ -504,19 +529,19 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                     $data = [];
 
-                    $data[] = "<span style='max-width: 300px;'>" . Html::a($model->asText, "#", [
-                        'class' => 'sx-trigger-action',
-                        'title' => $model->asText,
-                        //'style' => 'white-space: nowrap; '
-                    ]) . "</span>";
+                    $data[] = "<span style='max-width: 300px;'>".Html::a($model->asText, "#", [
+                            'class' => 'sx-trigger-action',
+                            'title' => $model->asText,
+                            //'style' => 'white-space: nowrap; '
+                        ])."</span>";
 
                     if ($model->tree_id) {
-                        $data[] = '<i class="far fa-folder"></i> ' . Html::a($model->cmsTree->name, $model->cmsTree->url, [
-                            'data-pjax' => '0',
-                            'target'    => '_blank',
-                            'title'    => $model->cmsTree->fullName,
-                            'style'     => 'color: #333; max-width: 200px;',
-                        ]);
+                        $data[] = '<i class="far fa-folder"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
+                                'data-pjax' => '0',
+                                'target'    => '_blank',
+                                'title'     => $model->cmsTree->fullName,
+                                'style'     => 'color: #333; max-width: 200px;',
+                            ]);
                     }
 
                     if ($model->cmsTrees) {
@@ -524,14 +549,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             $data[] = Html::a($cmsTree->name, $cmsTree->url, [
                                 'data-pjax' => '0',
                                 'target'    => '_blank',
-                                'title'    => $cmsTree->fullName,
+                                'title'     => $cmsTree->fullName,
                                 'style'     => 'color: #333; max-width: 200px; ',
                             ]);
                         }
                     }
 
                     if ($model->shopProduct && $model->shopProduct->shop_supplier_id) {
-                        $data[] = '<i class="fas fa-truck"></i> ' . $model->shopProduct->shopSupplier->asText;
+                        $data[] = '<i class="fas fa-truck"></i> '.$model->shopProduct->shopSupplier->asText;
                     }
                     $info = implode("<br />", $data);
 

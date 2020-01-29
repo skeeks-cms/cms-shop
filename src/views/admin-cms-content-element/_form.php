@@ -159,17 +159,15 @@ JS
     'model'        => $model,
 ]); ?>
 
-<?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
-    'form'         => $form,
-    'contentModel' => $contentModel,
-    'model'        => $model,
-]); ?>
 
-<?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
-    'form'         => $form,
-    'contentModel' => $contentModel,
-    'model'        => $model,
-]); ?>
+<? if ($contentModel->is_have_page) : ?>
+    <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-description', [
+        'form'         => $form,
+        'contentModel' => $contentModel,
+        'model'        => $model,
+    ]); ?>
+<? endif; ?>
+
 
 <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
     'form'         => $form,
@@ -183,17 +181,13 @@ JS
     'model'        => $model,
 ]); ?>
 
-<?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
+<?/*= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
     'form'         => $form,
     'contentModel' => $contentModel,
     'model'        => $model,
-]); ?>
+]); */?>
 
-<?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
-    'form'         => $form,
-    'contentModel' => $contentModel,
-    'model'        => $model,
-]); ?>
+
 
 
 
@@ -371,6 +365,9 @@ JS
     <div class="row">
         <div class="col-md-3">
             <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect()); ?>
+        </div>
+        <div class="col-md-3">
+            <?= $form->field($shopProduct, 'measure_ratio'); ?>
         </div>
     </div>
 
@@ -552,7 +549,7 @@ JS
         <? /*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */ ?>
     --><? /*= $form->fieldSetEnd() */ ?>
 
-    <? if ($model->cmsContent->access_check_element == "Y") : ?>
+    <? if ($model->cmsContent->is_access_check_element) : ?>
         <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
         <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
             'permissionName'        => $model->permissionName,
@@ -620,6 +617,15 @@ JS
     <? endforeach; ?>
 <? endif; ?>
 
+
+
+
+
+<?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
+    'form'         => $form,
+    'contentModel' => $contentModel,
+    'model'        => $model,
+]); ?>
 
 <?= $form->buttonsStandart($model); ?>
 <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
