@@ -13,22 +13,16 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopPaySystem;
-use skeeks\yii2\form\fields\FieldSet;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class AdminPaySystemController
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminPaySystemController extends BackendModelStandartController
 {
     public $notSubmitParam = 'sx-not-submit';
-
-    use AdminModelEditorStandartControllerTrait;
 
     public function init()
     {
@@ -47,48 +41,48 @@ class AdminPaySystemController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(),
             [
                 'index' =>
-                [
-                    "filters" => [
-                        'visibleFilters' => [
-                            'id',
-                            'name',
-                        ],
-                    ],
-
-                    'grid'    => [
-                        'defaultOrder'   => [
-                            'priority' => SORT_ASC,
-                        ],
-
-                        'visibleColumns' => [
-                            'checkbox',
-                            'actions',
-                            'id',
-                            'name',
-                            'active',
-                            'priority',
-                        ],
-
-                        "columns" => [
-                            'name',
-                            'priority',
-
-                            [
-                                'class'     => DataColumn::class,
-                                'attribute' => "personTypeIds",
-                                'filter'    => false,
-                                'value'     => function (ShopPaySystem $model) {
-                                    return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
-                                },
-                            ],
-
-                            [
-                                'class'     => BooleanColumn::class,
-                                'attribute' => "active",
+                    [
+                        "filters" => [
+                            'visibleFilters' => [
+                                'id',
+                                'name',
                             ],
                         ],
+
+                        'grid' => [
+                            'defaultOrder' => [
+                                'priority' => SORT_ASC,
+                            ],
+
+                            'visibleColumns' => [
+                                'checkbox',
+                                'actions',
+                                'id',
+                                'name',
+                                'active',
+                                'priority',
+                            ],
+
+                            "columns" => [
+                                'name',
+                                'priority',
+
+                                [
+                                    'class'     => DataColumn::class,
+                                    'attribute' => "personTypeIds",
+                                    'filter'    => false,
+                                    'value'     => function (ShopPaySystem $model) {
+                                        return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
+                                    },
+                                ],
+
+                                [
+                                    'class'     => BooleanColumn::class,
+                                    'attribute' => "active",
+                                ],
+                            ],
+                        ],
                     ],
-                ],
 
                 'create' =>
                     [

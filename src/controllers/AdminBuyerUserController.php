@@ -11,16 +11,12 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 
 /**
- * Class AdminBuyerUserController
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminBuyerUserController extends AdminModelEditorController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Buyers');

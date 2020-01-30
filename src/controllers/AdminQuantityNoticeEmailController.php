@@ -12,20 +12,15 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopQuantityNoticeEmail;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
 
 /**
- * Class AdminQuantityNoticeEmailController
- *
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminQuantityNoticeEmailController extends BackendModelStandartController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Notification of receipt products by email');

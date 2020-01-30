@@ -13,7 +13,6 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminOneModelRelatedPropertiesAction;
 use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopPersonType;
 use yii\helpers\ArrayHelper;
@@ -21,13 +20,10 @@ use yii\helpers\ArrayHelper;
 /**
  * @property ShopPersonType $personType
  *
- * Class AdminTaxController
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminBuyerController extends AdminModelEditorController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public $notSubmitParam = 'sx-not-submit';
     /**
      * @var ShopPersonType

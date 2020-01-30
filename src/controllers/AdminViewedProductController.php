@@ -11,20 +11,15 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopViewedProduct;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
 
 /**
- * Class AdminOrderStatusController
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminViewedProductController extends BackendModelStandartController
 {
-    use AdminModelEditorStandartControllerTrait;
-
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Viewed products');
@@ -50,7 +45,7 @@ class AdminViewedProductController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
-                    'defaultOrder' => [
+                    'defaultOrder'   => [
                         //'is_created' => SORT_DESC,
                         'created_at' => SORT_DESC,
                     ],
@@ -62,10 +57,10 @@ class AdminViewedProductController extends BackendModelStandartController
                         'shop_product_id',
                     ],
                     'columns'        => [
-                        'created_at' => [
-                            'class' => DateTimeColumnData::class
+                        'created_at'      => [
+                            'class' => DateTimeColumnData::class,
                         ],
-                        'shop_fuser_id' => [
+                        'shop_fuser_id'   => [
                             'format' => 'raw',
                             'label'  => \Yii::t('skeeks/shop/app', 'User'),
                             'value'  => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
@@ -93,12 +88,12 @@ class AdminViewedProductController extends BackendModelStandartController
                             },
                         ],
 
-                    ]
-                ]
+                    ],
+                ],
             ],
 
             'create' => new UnsetArrayValue(),
-            'update' => new UnsetArrayValue()
+            'update' => new UnsetArrayValue(),
         ]);
     }
 

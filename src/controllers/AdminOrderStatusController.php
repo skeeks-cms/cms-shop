@@ -10,14 +10,11 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
-use skeeks\cms\modules\admin\traits\AdminModelEditorStandartControllerTrait;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class AdminOrderStatusController
- * @package skeeks\cms\shop\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AdminOrderStatusController extends BackendModelStandartController
 {
@@ -28,7 +25,7 @@ class AdminOrderStatusController extends BackendModelStandartController
         $this->modelClassName = ShopOrderStatus::class;
 
         $this->generateAccessActions = false;
-        
+
         parent::init();
     }
 
@@ -64,7 +61,7 @@ class AdminOrderStatusController extends BackendModelStandartController
 
                     ],
                     'columns'        => [
-                        'name'           => [
+                        'name' => [
                             'value' => function (ShopOrderStatus $shopOrderStatus) {
                                 return \yii\helpers\Html::label($shopOrderStatus->name, null, [
                                     'style' => "background: {$shopOrderStatus->color}",
