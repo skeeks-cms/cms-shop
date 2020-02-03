@@ -808,7 +808,7 @@ JS
 </div>
 
 
-<? /*= $form->buttonsCreateOrUpdate($model); */ ?>
+<? /*= $form->buttonsStandart($model); */ ?>
 
 
 

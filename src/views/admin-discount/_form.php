@@ -79,6 +79,6 @@ $action = $this->context->action;
 <?= $form->fieldSetEnd(); ?>
 
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 <?= $form->errorSummary($model); ?>
 <?php $action->endActiveForm(); ?>

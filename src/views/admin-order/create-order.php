@@ -316,7 +316,7 @@ CSS
 </div>
 
 
-<?= $form->buttonsCreateOrUpdate($shopFuser); ?>
+<?= $form->buttonsStandart($shopFuser); ?>
 
 
 

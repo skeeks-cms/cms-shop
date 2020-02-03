@@ -70,7 +70,7 @@ if (\Yii::$app->request->get('shop_order_id') && $model->isNewRecord) {
 
 <?= $form->fieldSetEnd(); ?>
 
-<?= $form->buttonsCreateOrUpdate($model); ?>
+<?= $form->buttonsStandart($model); ?>
 <?php ActiveForm::end(); ?>
 
 <?
