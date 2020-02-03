@@ -21,6 +21,15 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\queryfilters\filters\FilterField;
+use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
+use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
+use skeeks\cms\queryfilters\filters\modes\FilterModeGt;
+use skeeks\cms\queryfilters\filters\modes\FilterModeGte;
+use skeeks\cms\queryfilters\filters\modes\FilterModeLike;
+use skeeks\cms\queryfilters\filters\modes\FilterModeLt;
+use skeeks\cms\queryfilters\filters\modes\FilterModeLte;
+use skeeks\cms\queryfilters\filters\modes\FilterModeNe;
+use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopCmsContentElement;
@@ -636,6 +645,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             'class'           => FilterField::class,
             'label'           => 'Поставщик',
             'filterAttribute' => 'sp.shop_supplier_id',
+            'modes' => [
+                FilterModeEmpty::class,
+                FilterModeNotEmpty::class,
+
+                FilterModeEq::class,
+                FilterModeNe::class,
+            ],
+            //'multiple' => true,
             /*'multiple' => true,
             'on apply' => function (QueryFiltersEvent $e) {
                 /**
