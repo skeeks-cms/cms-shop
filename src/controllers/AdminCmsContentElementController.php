@@ -48,7 +48,7 @@ use yii\helpers\Url;
  */
 class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsContentElementController
 {
-    public $notSubmitParam = 'sx-not-submit';
+    public $notSubmitParam = 'sx-reload-form';
 
     public $modelClassName = ShopCmsContentElement::class;
     public $modelShowAttribute = "asText";
@@ -56,7 +56,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     static public function getSorts(ActiveQuery $activeQuery)
     {
         $activeQuery->joinWith('shopProduct as sp');
-
 
         $sorts = [
             'quantity' => [

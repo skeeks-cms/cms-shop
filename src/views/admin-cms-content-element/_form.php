@@ -69,7 +69,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 ?>
 
 
-<?php $form = $action->beginActiveForm([
+<?php $form = $action->beginDynamicActiveForm([
     'id'                     => 'sx-dynamic-form',
     'enableAjaxValidation'   => false,
     'enableClientValidation' => false,
@@ -102,41 +102,6 @@ console.log('{$redirect}');
 JS
     ); ?>
 <? endif; ?>
-
-
-<? $this->registerJs(<<<JS
-
-(function(sx, $, _)
-{
-    sx.classes.DynamicForm = sx.classes.Component.extend({
-
-        _onDomReady: function()
-        {
-            var self = this;
-
-            $("[data-form-reload=true]").on('change', function()
-            {
-                self.update();
-            });
-        },
-
-        update: function()
-        {
-            _.delay(function()
-            {
-                var jForm = $("#sx-dynamic-form");
-                jForm.append($('<input>', {'type': 'hidden', 'name' : 'sx-not-submit', 'value': 'true'}));
-                jForm.submit();
-            }, 200);
-        }
-    });
-
-    sx.DynamicForm = new sx.classes.DynamicForm();
-})(sx, sx.$, sx._);
-
-
-JS
-); ?>
 
 
 <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
