@@ -40,7 +40,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null                 $supplier_external_id
  * @property array|null                  $supplier_external_jsondata
  *
- * @property string                     $productTypeAsText
+ * @property string                      $productTypeAsText
  * @property Measure                     $measure
  * @property ShopCmsContentElement       $cmsContentElement
  * @property ShopTypePrice               $trialPrice
@@ -66,6 +66,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopTypePrice               $shopTypePrices
  * @property ShopProduct                 $shopMainProduct
  * @property ShopProduct[]               $shopSupplierProducts
+ * @property boolean                     $isSubProduct
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -436,12 +437,16 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['shop_supplier_id', 'supplier_external_id'], 'unique', 'targetAttribute' => ['shop_supplier_id', 'supplier_external_id']],
 
-            ['main_pid', 'integer'],
+            [['main_pid'], 'integer'],
             [
                 ['main_pid'],
-                function (ShopProduct $model) {
-                    $shopProduct = ShopProduct::find()->where(['id' => $model->main_pid])->one();
-                    if (!in_array($shopProduct, [
+                function ($attribute) {
+
+                    /**
+                     * @var $shopProduct ShopProduct
+                     */
+                    $shopProduct = ShopProduct::find()->where(['id' => $this->main_pid])->one();
+                    if (!in_array($shopProduct->product_type, [
                         self::TYPE_SIMPLE,
                         self::TYPE_OFFER,
                     ])) {
@@ -451,7 +456,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                     if (!$this->shop_supplier_id) {
                         $this->addError("main_pid", "Для привязки необходимо задать поставщика для привязываемого товара.");
                     }
-
                 },
             ],
         ];
@@ -750,4 +754,23 @@ class ShopProduct extends \skeeks\cms\models\Core
         $query->multiple = true;
         return $query;
     }
+
+
+    /**
+     * Является второстепенным товаром?
+     * То есть не продается на главном сайте.
+     *
+     * @return bool
+     */
+    public function getIsSubProduct()
+    {
+        if ($this->shop_supplier_id) {
+            if (!$this->shopSupplier->is_main) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

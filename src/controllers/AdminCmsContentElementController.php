@@ -12,6 +12,8 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\events\ViewRenderEvent;
+use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -23,11 +25,6 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\queryfilters\filters\FilterField;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
-use skeeks\cms\queryfilters\filters\modes\FilterModeGt;
-use skeeks\cms\queryfilters\filters\modes\FilterModeGte;
-use skeeks\cms\queryfilters\filters\modes\FilterModeLike;
-use skeeks\cms\queryfilters\filters\modes\FilterModeLt;
-use skeeks\cms\queryfilters\filters\modes\FilterModeLte;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNe;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
@@ -39,7 +36,9 @@ use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
 use yii\db\ActiveQuery;
@@ -119,19 +118,81 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],*/
 
                 "connect-to-main" => [
-                    'class'          => BackendModelAction::class,
-                    "name"           => "Привязать к главному",
-                    'priority'       => 110,
-                    'accessCallback' => function (BackendModelAction $action) {
+                    /*'on afterRender' => function(ViewRenderEvent $viewRenderEvent) {
+                    if (!$this->action->model->shopProduct->main_pid) {
+                        $viewRenderEvent->content = <<<HTML
+<div class="text-center g-ma-20">
+<a href="#" class="btn btn-xxl btn-primary">Создать главный товар</a>
+</div>
+HTML
+                            ;
+                    }
+
+                    },*/
+                    'class'    => BackendModelUpdateAction::class,
+                    "name"     => "Привязать к главному",
+                    "icon"     => "fas fa-link",
+                    'priority' => 90,
+
+                    'on initFormModels' => function (Event $e) {
+                        $model = $e->sender->model;
+                        $e->sender->formModels['shopProduct'] = $model->shopProduct;
+                    },
+
+
+                    'fields'         => function (BackendModelUpdateAction $action) {
                         $model = $action->model;
+
+                        $result = [
+                            'shopProduct.main_pid' => [
+                                'class'        => WidgetField::class,
+                                'widgetClass'  => SelectModelDialogContentElementWidget::class,
+                                'widgetConfig' => [
+                                    'content_id'  => $model->content_id,
+                                    'options'       => [
+                                        'data-form-reload' => "true",
+                                    ],
+                                    'dialogRoute' => [
+                                        '/shop/admin-cms-content-element',
+                                        'w3-submit-key' => "1",
+                                        'findex'        => [
+                                            'shop_supplier_id' => [
+                                                'mode' => 'empty',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ];
+
+                        if (!$model->shopProduct->main_pid) {
+                            $url = Url::to(['/shop/admin-cms-content-element/create', 'content_id' => $model->content_id, 'shop_sub_product_id' => $model->id]);
+                            $result[] = [
+                                'class' => HtmlBlock::class,
+                                'content' => <<<HTML
+<div class="text-center g-ma-20">
+<a href="{$url}" data-pjax='0' class="btn btn-xxl btn-primary">Создать главный товар</a>
+</div>
+HTML
+
+                            ];
+                        }
+
+                        return $result;
+                    },
+                    'accessCallback' => function (BackendModelAction $action) {
+
+                        $model = $action->model;
+
                         if (!$model) {
                             return false;
                         }
+
                         if (!$model->shopProduct) {
                             return false;
                         }
 
-                        if ($model->shopProduct->shop_supplier_id) {
+                        if ($model->shopProduct->isSubProduct) {
                             return true;
                         }
                     },
@@ -564,8 +625,19 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     }
 
                     if ($model->shopProduct && $model->shopProduct->shop_supplier_id) {
-                        $data[] = '<i class="fas fa-truck"></i> '.$model->shopProduct->shopSupplier->asText;
+                        $data[] = '<i class="fas fa-truck" title="Поставщик"></i> '.$model->shopProduct->shopSupplier->asText;
                     }
+
+
+                    if ($model->shopProduct->isSubProduct) {
+                        if ($model->shopProduct->main_pid) {
+                            $data[] = '<span style="color: green;"><i class="fas fa-link" title="Привязан к главному товару"></i> '.$model->shopProduct->shopMainProduct->cmsContentElement->asText."</span>";
+                        } else {
+                            $data[] = '<span style="color: red;"><i class="fas fa-link" title="Привязан к главному товару"></i> Не привязан к главному товару!</span>';
+                        }
+                    }
+
+
                     $info = implode("<br />", $data);
 
                     return "<div class='row no-gutters'>
@@ -643,9 +715,19 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
         $filterFields['shop_supplier_id'] = [
             'class'           => FilterField::class,
+            'field'           => [
+                'class' => SelectField::class,
+                'items' => function () {
+                    return ArrayHelper::map(
+                        ShopSupplier::find()->all(),
+                        'id',
+                        'asText'
+                    );
+                },
+            ],
             'label'           => 'Поставщик',
             'filterAttribute' => 'sp.shop_supplier_id',
-            'modes' => [
+            'modes'           => [
                 FilterModeEmpty::class,
                 FilterModeNotEmpty::class,
 
@@ -680,9 +762,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             },*/
         ];
 
-        $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
-        $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
-        $filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
+        //$filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
+        //$filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
+        //$filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
 
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
@@ -714,6 +796,13 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
             }
 
             $query->joinWith('shopProduct as sp');
+            $query->joinWith('shopProduct.shopSupplier as shopSupplier');
+
+            $query->andWhere([
+                'or',
+                ['shopSupplier.id' => null],
+                ['shopSupplier.is_main' => 1],
+            ]);
 
             if (\Yii::$app->shop->shopTypePrices) {
                 foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {

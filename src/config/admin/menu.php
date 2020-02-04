@@ -52,10 +52,37 @@ function shopProductsMenu()
 
                     return true;
                 },
-
             ];
 
             $result[] = $itemData;
+
+            if (\skeeks\cms\shop\models\ShopSupplier::find()->one()) {
+                $itemData = [
+                    'label'          => $content->name . " (поставщик)",
+                    "img"            => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+                    'url'            => ["shop/admin-cms-content-element-sub", "content_id" => $content->id],
+                    "activeCallback" => function ($adminMenuItem) use ($content) {
+                        return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element-sub');
+                    },
+
+                    "accessCallback" => function ($adminMenuItem) use ($content) {
+                        $controller = \Yii::$app->createController('shop/admin-cms-content-element-sub')[0];
+                        $controller->setContent($content);
+                        foreach ([$controller->permissionName] as $permissionName) {
+                            if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
+                                if (!\Yii::$app->user->can($permission->name)) {
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return true;
+                    },
+                ];
+
+                $result[] = $itemData;
+            }
+
         }
     }
 
