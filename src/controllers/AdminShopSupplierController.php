@@ -79,7 +79,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ]);
 
-                        $shopProductConnectedQuery = ShopProduct::find()->joinWith('shopSupplier')->select(['count(*) as inner_count'])->where([
+                        $shopProductConnectedQuery = ShopProduct::find()->select(['count(*) as inner_count1'])->where([
                             'shop_supplier_id' => new Expression(ShopSupplier::tableName().".id"),
                         ])->andWhere([
                             'is not',
@@ -154,10 +154,17 @@ class AdminShopSupplierController extends BackendModelStandartController
                                 if ($cmsSite->is_main) {
                                     return $cmsSite->raw_row['countShopProducts'];
                                 } else {
-                                    return $cmsSite->raw_row['countShopProducts']."/".Html::tag('span', $cmsSite->raw_row['countShopProductsConnected'], [
+                                    $result = $cmsSite->raw_row['countShopProducts'];
+
+                                    if ($cmsSite->raw_row['countShopProductsConnected']) {
+                                        $result .= " (".Html::tag('b', $cmsSite->raw_row['countShopProductsConnected'], [
                                             'title' => 'Количество привязанных/продаваемых товаров',
                                             'style' => 'color: green;',
-                                        ]);
+                                        ]) . ")";
+                                    }
+
+
+                                    return $result;
                                 }
 
                             },

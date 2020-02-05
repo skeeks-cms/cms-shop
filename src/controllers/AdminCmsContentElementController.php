@@ -846,6 +846,12 @@ HTML
         $productPrices = [];
         $shopStoreProducts = [];
 
+        //Если нужно создавать товар из поддтовара
+        $shopSubproductContentElement = null;
+        if ($shop_sub_product_id = \Yii::$app->request->get("shop_sub_product_id")) {
+            $shopSubproductContentElement = ShopCmsContentElement::find()->where(['id' => $shop_sub_product_id])->one();
+        }
+
 
         /**
          * @var ShopSupplier $shopSupplier ;
@@ -869,24 +875,12 @@ HTML
         $model = new $modelClassName();
 
         $model->loadDefaultValues();
-
-        if ($content_id = \Yii::$app->request->get("content_id")) {
-            $contentModel = \skeeks\cms\models\CmsContent::findOne($content_id);
-            $model->content_id = $content_id;
-        }
+        $model->content_id = $this->content->id;
 
         $relatedModel = $model->relatedPropertiesModel;
         $shopProduct = new ShopProduct();
 
         $shopProduct->loadDefaultValues();
-
-        /*$baseProductPrice = new ShopProductPrice([
-            'type_price_id' => \Yii::$app->shop->baseTypePrice->id,
-            'currency_code' => \Yii::$app->money->currencyCode,
-        ]);
-
-        $shopProduct->baseProductPriceCurrency = \Yii::$app->money->currencyCode;*/
-
         $rr = new RequestResponse();
 
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
@@ -961,6 +955,11 @@ HTML
                     /*$shopProduct->getBaseProductPriceValue();
                     $baseProductPrice = $shopProduct->baseProductPrice;*/
 
+                    if ($shopSubproductContentElement) {
+                        $shopSubproductContentElement->shopProduct->main_pid = $shopProduct->id;
+                        $shopSubproductContentElement->shopProduct->save();
+                    }
+
                     \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                     $is_saved = true;
@@ -988,6 +987,7 @@ HTML
             'is_saved'  => $is_saved,
             'submitBtn' => \Yii::$app->request->post('submit-btn'),
             'redirect'  => $redirect,
+            'shopSubproductContentElement'  => $shopSubproductContentElement,
         ]);
     }
 
