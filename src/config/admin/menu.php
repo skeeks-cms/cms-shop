@@ -58,7 +58,7 @@ function shopProductsMenu()
 
             if (\skeeks\cms\shop\models\ShopSupplier::find()->one()) {
                 $itemData = [
-                    'label'          => $content->name . " (поставщик)",
+                    'label'          => $content->name." (поставщик)",
                     "img"            => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
                     'url'            => ["shop/admin-cms-content-element-sub", "content_id" => $content->id],
                     "activeCallback" => function ($adminMenuItem) use ($content) {
@@ -66,6 +66,10 @@ function shopProductsMenu()
                     },
 
                     "accessCallback" => function ($adminMenuItem) use ($content) {
+
+                        if (!$content) {
+                            return false;
+                        }
                         $controller = \Yii::$app->createController('shop/admin-cms-content-element-sub')[0];
                         $controller->setContent($content);
                         foreach ([$controller->permissionName] as $permissionName) {
