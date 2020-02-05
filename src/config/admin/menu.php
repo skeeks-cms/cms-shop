@@ -67,9 +67,6 @@ function shopProductsMenu()
 
                     "accessCallback" => function ($adminMenuItem) use ($content) {
 
-                        if (!$content) {
-                            return false;
-                        }
                         $controller = \Yii::$app->createController('shop/admin-cms-content-element-sub')[0];
                         $controller->setContent($content);
                         foreach ([$controller->permissionName] as $permissionName) {
