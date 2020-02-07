@@ -17,11 +17,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 <?= $form->field($model, 'siteCodes')->checkboxList(
     \yii\helpers\ArrayHelper::map(\skeeks\cms\models\CmsSite::find()->all(), 'code', 'name')
 ); ?>
-<?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'priority'); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

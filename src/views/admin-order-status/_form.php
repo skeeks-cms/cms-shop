@@ -18,7 +18,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
-<?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'priority'); ?>
 <?= $form->field($model, 'color')->widget(\skeeks\cms\widgets\ColorInput::class); ?>
 
 <?= $form->fieldSetEnd(); ?>

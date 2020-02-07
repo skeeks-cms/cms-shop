@@ -54,10 +54,7 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 <div class="">
     <div class="sx-main-product-wrapper">
-        <?php $form = $action->beginDynamicActiveForm([
-            'enableAjaxValidation'   => false,
-            'enableClientValidation' => false,
-        ]); ?>
+        <?php $form = $action->beginActiveForm(); ?>
 
         <? if ($is_saved && @$is_create) : ?>
             <?php $this->registerJs(<<<JS
@@ -357,7 +354,10 @@ JS
                         )); ?>
                     </div>
                     <div class="col-md-3">
-                        <?= $form->fieldRadioListBoolean($shopProduct, 'vat_included'); ?>
+                        <?= $form->field($shopProduct, 'vat_included')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
                     </div>
                 </div>
             </div>

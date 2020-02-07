@@ -11,11 +11,14 @@
 $action = $this->context->action;
 ?>
 
-<?php $form = $action->beginDynamicActiveForm(); ?>
+<?php $form = $action->beginActiveForm(); ?>
 <?= $form->errorSummary($model); ?>
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
-<?= $form->fieldCheckboxBoolean($model, 'active'); ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 <?= $form->field($model, 'name')->textInput(); ?>
 
 <?= $form->field($model, 'site_id')->listBox(\yii\helpers\ArrayHelper::map(
@@ -32,8 +35,11 @@ $action = $this->context->action;
 
 <?= $form->field($model, 'max_discount')->textInput(); ?>
 
-<?= $form->fieldInputInt($model, 'priority'); ?>
-<?= $form->fieldCheckboxBoolean($model, 'last_discount'); ?>
+<?= $form->field($model, 'priority'); ?>
+<?= $form->field($model, 'last_discount')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 <?= $form->field($model, 'notes')->textarea(['rows' => 3]); ?>
 
 <?= $form->fieldSetEnd(); ?>
@@ -81,4 +87,4 @@ $action = $this->context->action;
 
 <?= $form->buttonsStandart($model); ?>
 <?= $form->errorSummary($model); ?>
-<?php $action->endActiveForm(); ?>
+<?php $form::end(); ?>

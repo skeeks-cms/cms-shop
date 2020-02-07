@@ -21,9 +21,12 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->field($model, 'name')->textInput(); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 <?= $form->field($model, 'base_rate')->textInput(); ?>
-<?= $form->fieldInputInt($model, 'min_plan_value'); ?>
+<?= $form->field($model, 'min_plan_value'); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

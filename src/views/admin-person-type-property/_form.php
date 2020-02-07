@@ -49,8 +49,14 @@ JS
 
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Main settings')) ?>
 
-<?= $form->fieldRadioListBoolean($model, 'active') ?>
-<?= $form->fieldRadioListBoolean($model, 'is_required') ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
+<?= $form->field($model, 'is_required')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]) ?>
 <?= $form->field($model, 'code')->textInput() ?>
@@ -77,13 +83,13 @@ JS
 
 <?= $form->fieldSet(\skeeks\cms\shop\Module::t('app', 'Additionally')) ?>
 <?= $form->field($model, 'hint')->textInput() ?>
-<?= $form->fieldInputInt($model, 'priority') ?>
+<?= $form->field($model, 'priority') ?>
 
 
-<? /*= $form->fieldRadioListBoolean($model, 'searchable') */ ?>
-<? /*= $form->fieldRadioListBoolean($model, 'filtrable') */ ?>
-<? /*= $form->fieldRadioListBoolean($model, 'smart_filtrable') */ ?>
-<? /*= $form->fieldRadioListBoolean($model, 'with_description') */ ?>
+<? /*= $form->field($model, 'searchable') */ ?>
+<? /*= $form->field($model, 'filtrable') */ ?>
+<? /*= $form->field($model, 'smart_filtrable') */ ?>
+<? /*= $form->field($model, 'with_description') */ ?>
 
 
 <? if ($content_id = \Yii::$app->request->get('shop_person_type_id')) : ?>
@@ -110,20 +116,44 @@ JS
 
 <?= $form->fieldSet('Связь с пользователем') ?>
 
-<?= $form->fieldRadioListBoolean($model, 'is_user_email') ?>
-<?= $form->fieldRadioListBoolean($model, 'is_user_phone') ?>
-<?= $form->fieldRadioListBoolean($model, 'is_user_username') ?>
-<?= $form->fieldRadioListBoolean($model, 'is_user_name') ?>
+<?= $form->field($model, 'is_user_email')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
+<?= $form->field($model, 'is_user_phone')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
+<?= $form->field($model, 'is_user_username')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
+<?= $form->field($model, 'is_user_name')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
 
-<?= $form->fieldRadioListBoolean($model, 'is_buyer_name') ?>
+<?= $form->field($model, 'is_buyer_name')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
 
 <?= $form->fieldSetEnd(); ?>
 
 <?= $form->fieldSet('Связь с заказом') ?>
 
-<?= $form->fieldRadioListBoolean($model, 'is_order_location_delivery') ?>
-<?= $form->fieldRadioListBoolean($model, 'is_order_location_tax') ?>
-<?= $form->fieldRadioListBoolean($model, 'is_order_postcode') ?>
+<?= $form->field($model, 'is_order_location_delivery')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
+<?= $form->field($model, 'is_order_location_tax')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
+<?= $form->field($model, 'is_order_postcode')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]) ?>
 
 <?= $form->fieldSetEnd(); ?>
 

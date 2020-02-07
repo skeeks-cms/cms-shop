@@ -540,7 +540,10 @@ JS
 
 ]); ?>
 
-<?= $form->fieldRadioListBoolean($model, 'canceled'); ?>
+<?= $form->field($model, 'canceled')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 <?= $form->field($model, 'reason_canceled')->textarea(['rows' => 5]) ?>
 
 <button class="btn btn-primary">Сохранить</button>

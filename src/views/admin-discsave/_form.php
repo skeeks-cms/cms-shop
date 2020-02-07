@@ -15,7 +15,10 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Cumulative program')); ?>
 
-<?= $form->fieldCheckboxBoolean($model, 'active'); ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 <?= $form->field($model, 'name')->textInput(); ?>
 
 <?= $form->fieldSelect($model, 'site_id', \yii\helpers\ArrayHelper::map(

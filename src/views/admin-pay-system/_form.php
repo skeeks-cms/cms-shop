@@ -56,11 +56,14 @@ JS
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 <?= $form->field($model, 'personTypeIds')->checkboxList(
     \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name')
 ); ?>
-<?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'priority'); ?>
 
 
 <?= $form->field($model, 'component')->listBox(array_merge(['' => ' — '],

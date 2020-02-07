@@ -27,8 +27,14 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
     \skeeks\cms\shop\models\ShopAffiliate::find()->all(), 'id', 'id'
 )); ?>
 
-<?= $form->fieldRadioListBoolean($model, 'fix_plan'); ?>
-<?= $form->fieldRadioListBoolean($model, 'active'); ?>
+<?= $form->field($model, 'fix_plan')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
+<?= $form->field($model, 'active')->checkbox([
+    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+]); ?>
 
 <?= $form->fieldSetEnd(); ?>
 

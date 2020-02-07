@@ -18,7 +18,7 @@ use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => 255]); ?>
 <?= $form->field($model, 'description')->textarea(); ?>
-<?= $form->fieldInputInt($model, 'priority'); ?>
+<?= $form->field($model, 'priority'); ?>
 
 <? if (!$model->isNewRecord) : ?>
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
