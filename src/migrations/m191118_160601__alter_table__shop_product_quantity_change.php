@@ -27,7 +27,7 @@ class m191118_160601__alter_table__shop_product_quantity_change extends Migratio
         $this->renameColumn($tableName, "measure_id", "measure_code");
         $this->alterColumn($tableName, "measure_code", $this->string(3));
 
-        $this->delete($tableName);
+        /*$this->delete($tableName);*/
 
     }
 
