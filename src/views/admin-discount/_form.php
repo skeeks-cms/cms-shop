@@ -50,7 +50,7 @@ $action = $this->context->action;
     \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class,
     [
         'options' => [
-            $action->reloadFieldParam => 'true',
+            \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
         ],
     ]
 ); ?>
