@@ -107,29 +107,7 @@ JS
         ]); ?>
 
 
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
 
-
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-seo', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
 
 
         <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Prices and availability')); ?>
@@ -185,19 +163,13 @@ JS
                     <? endif; ?>
                 </div>
 
-                <div class="row">
-                    <div class="col">
-                        <?= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
-                            'allowDeselect' => true,
-                            'options'       => [
-                                'data-form-reload' => "true",
-                            ],
-                        ]); ?>
-                    </div>
-                    <div class="col">
-                        <?= $form->field($shopProduct, "supplier_external_id"); ?>
-                    </div>
-                </div>
+                <?= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
+                    'allowDeselect' => true,
+                    'options'       => [
+                        'data-form-reload' => "true",
+                    ],
+                ]); ?>
+                <?= $form->field($shopProduct, "supplier_external_id"); ?>
 
                 <? if ($shopProduct->shop_supplier_id) : ?>
                     <?= $form->field($shopProduct, 'main_pid')->widget(
@@ -227,20 +199,17 @@ JS
 
                 <? if ($productPrices) : ?>
                     <? foreach ($productPrices as $productPrice) : ?>
-
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3 text-md-right  ">
                                     <label class="control-label"><?= $productPrice->typePrice->name; ?></label>
+                                </div>
+                                <div class="col-md-3">
                                     <?= Html::textInput("prices[".$productPrice->typePrice->id."][price]", $productPrice->price, [
                                         'class' => 'form-control',
                                     ]); ?>
                                 </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label class="control-label">Валюта</label>
-
+                                <div class="col-md-2">
                                     <?= \skeeks\widget\chosen\Chosen::widget([
                                         'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
                                         'value'         => $productPrice->currency_code,
@@ -250,15 +219,11 @@ JS
                                         ),
                                     ]) ?>
                                 </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <label>&nbsp;</label>
-                                <p>
+                                <div class="col-md-2">
                                     <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
                                         'productPrice' => $productPrice,
                                     ]); ?>
-                                </p>
+                                </div>
                             </div>
                         </div>
 
@@ -269,15 +234,9 @@ JS
                 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
                     'content' => \Yii::t('skeeks/shop/app', 'The number and account'),
                 ]); ?>
+                <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect()); ?>
+                <?= $form->field($shopProduct, 'measure_ratio'); ?>
 
-                <div class="row">
-                    <div class="col-md-3">
-                        <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect()); ?>
-                    </div>
-                    <div class="col-md-3">
-                        <?= $form->field($shopProduct, 'measure_ratio'); ?>
-                    </div>
-                </div>
 
                 <?= $form->field($shopProduct, "quantity"); ?>
 
@@ -500,6 +459,31 @@ JS
 
 
 
+
+
+        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
+            'form'         => $form,
+            'contentModel' => $contentModel,
+            'model'        => $model,
+        ]); ?>
+        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
+            'form'         => $form,
+            'contentModel' => $contentModel,
+            'model'        => $model,
+        ]); ?>
+
+
+        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
+            'form'         => $form,
+            'contentModel' => $contentModel,
+            'model'        => $model,
+        ]); ?>
+
+        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-seo', [
+            'form'         => $form,
+            'contentModel' => $contentModel,
+            'model'        => $model,
+        ]); ?>
 
 
         <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
