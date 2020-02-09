@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\components;
 
+use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
@@ -174,6 +175,14 @@ class ShopComponent extends Component
     }
 
 
+    /**
+     * @return ActiveForm
+     */
+    public function beginConfigForm()
+    {
+        return ActiveFormBackend::begin();
+    }
+    
     public function getConfigFormFields()
     {
         return [
