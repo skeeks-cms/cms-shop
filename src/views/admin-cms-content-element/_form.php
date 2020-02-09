@@ -1,7 +1,4 @@
 <?php
-
-
-use skeeks\cms\modules\admin\widgets\form\ActiveFormUseTab as ActiveForm;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -103,14 +100,23 @@ JS
             'model'        => $model,
         ]); ?>
 
+        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
+            'form'         => $form,
+            'contentModel' => $contentModel,
+            'model'        => $model,
+        ]); ?>
 
-        <? if ($contentModel->is_have_page) : ?>
-            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-description', [
-                'form'         => $form,
-                'contentModel' => $contentModel,
-                'model'        => $model,
-            ]); ?>
-        <? endif; ?>
+
+        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
+            'form'         => $form,
+            'contentModel' => $contentModel,
+            'model'        => $model,
+        ]); ?>
+        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
+            'form'         => $form,
+            'contentModel' => $contentModel,
+            'model'        => $model,
+        ]); ?>
 
 
         <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
@@ -126,7 +132,7 @@ JS
         ]); ?>
 
 
-        <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Prices and availability')); ?>
+        <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Prices and availability')); ?>
 
         <? if ($shopContent->childrenContent) : ?>
 
@@ -355,9 +361,9 @@ JS
                     </div>
                     <div class="col-md-3">
                         <?= $form->field($shopProduct, 'vat_included')->checkbox([
-    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
-]); ?>
+                            'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+                            'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+                        ]); ?>
                     </div>
                 </div>
             </div>
@@ -416,7 +422,7 @@ JS
         <? endif; ?>
 
 
-        <?= $form->fieldSetEnd() ?>
+        <? $fieldSet::end(); ?>
 
 
 
@@ -426,13 +432,13 @@ JS
     --><? /*= $form->fieldSetEnd() */ ?>
 
             <? if ($model->cmsContent->is_access_check_element) : ?>
-                <?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
+                <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
                 <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
                     'permissionName'        => $model->permissionName,
                     'permissionDescription' => \Yii::t('skeeks/shop/app', 'Access to this member').': '.$model->name,
                     'label'                 => \Yii::t('skeeks/shop/app', 'Access to this member'),
                 ]); ?>
-                <?= $form->fieldSetEnd() ?>
+                <? $fieldSet::end(); ?>
             <? endif; ?>
         <? endif; ?>
 
@@ -450,7 +456,7 @@ JS
             ])->all(); ?>
 
             <? foreach ($childContents as $childContent) : ?>
-                <?= $form->fieldSet($childContent->name); ?>
+                <? $fieldSet = $form->fieldSet($childContent->name); ?>
 
                 <? if ($model->isNewRecord) : ?>
 
@@ -488,8 +494,7 @@ JS
                 <? endif; ?>
 
 
-
-                <?= $form->fieldSetEnd() ?>
+                <? $fieldSet::end(); ?>
             <? endforeach; ?>
         <? endif; ?>
 
@@ -505,7 +510,7 @@ JS
 
         <?= $form->buttonsStandart($model); ?>
         <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
-        <?php ActiveForm::end(); ?>
+        <?php $form::end(); ?>
     </div>
 
     <? if ($shopSubproductContentElement) : ?>
@@ -565,7 +570,7 @@ CSS
                                     <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
                                         <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
                                     <? else : ?>
-                                    <b><?= $row; ?></b>
+                                        <b><?= $row; ?></b>
                                     <? endif; ?>
 
                                 <? else : ?>
