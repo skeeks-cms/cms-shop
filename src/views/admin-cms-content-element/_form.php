@@ -355,14 +355,7 @@ JS
         <? endif; ?>
 
 
-        <? if ($shopProduct->supplier_external_jsondata) : ?>
-            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                'content' => \Yii::t('skeeks/shop/app', 'Данные от поставщика'),
-            ]); ?>
-            <pre>
-    <?= print_r($shopProduct->supplier_external_jsondata, true); ?>
-</pre>
-        <? endif; ?>
+
 
 
         <? $fieldSet::end(); ?>
@@ -481,10 +474,11 @@ JS
         <?php $form::end(); ?>
     </div>
 
-    <? if ($shopSubproductContentElement) : ?>
-        <?
-        $this->registerCss(<<<CSS
-.sx-main-product-wrapper {
+
+    <? if ($shopSubproductContentElement || $shopProduct->supplier_external_jsondata) : ?>
+<?
+$this->registerCss(<<<CSS
+.sx-main-col {
     margin-right: 300px;
 }
 
@@ -513,9 +507,14 @@ overflow-y: auto;
     margin-bottom: 0px;
 }
 CSS
-        );
-        ?>
-        <div class="sx-subproduct-info g-bg-gray-light-v8">
+);
+?>
+    <div class="sx-subproduct-info g-bg-gray-light-v8">
+        <? endif; ?>
+
+
+        <? if ($shopSubproductContentElement) : ?>
+
             <div class="sx-info-block">
                 <h5><?= $shopSubproductContentElement->name; ?></h5>
             </div>
@@ -530,29 +529,28 @@ CSS
                 <? if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : ?>
                     <hr/>
                     <div class="sx-info-block">
-
-                        <? foreach ($data as $key => $row) : ?>
-                            <? if ($row) : ?>
-                                <p><span><?= $key; ?>:</span>
-                                <? if (is_string($row)) : ?>
-                                    <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
-                                        <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
-                                    <? else : ?>
-                                        <b><?= $row; ?></b>
-                                    <? endif; ?>
-
-                                <? else : ?>
-                                    <pre><?= print_r($row, true); ?></pre>
-                                <? endif; ?>
-                                </p>
-                            <? endif; ?>
-
-                        <? endforeach; ?>
+                        <?= $this->render("_external_data", [
+                            'data' => $data,
+                        ]); ?>
                     </div>
                 <? endif; ?>
-
             <? endif; ?>
+        <? endif; ?>
 
-        </div>
-    <? endif; ?>
+
+
+        <? if ($shopProduct->supplier_external_jsondata) : ?>
+            <div class="sx-info-block">
+                <?= $this->render("_external_data", [
+                    'data' => $shopProduct->supplier_external_jsondata,
+                ]); ?>
+            </div>
+        <? endif; ?>
+
+
+
+
+        <? if ($shopSubproductContentElement || $shopProduct->supplier_external_jsondata) : ?>
+    </div>
+<? endif; ?>
 </div>
