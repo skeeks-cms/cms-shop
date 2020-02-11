@@ -8,7 +8,10 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
+use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
+use skeeks\cms\backend\actions\BackendModelMultiAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
@@ -102,6 +105,18 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
             ],
             "update" => [
                 'fields' => [$this, 'updateFields'],
+            ],
+            "is-visible" => [
+                'class' => BackendModelMultiActivateAction::class,
+                'name' => 'Сделать видимыми',
+                'attribute' => 'is_visible',
+                'value' => 1,
+            ],
+            "is-un-visible" => [
+                'class' => BackendModelMultiDeactivateAction::class,
+                'attribute' => 'is_visible',
+                'name' => 'Скрыть',
+                'value' => 0,
             ],
         ]);
     }

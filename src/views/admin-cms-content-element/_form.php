@@ -283,48 +283,32 @@ JS
                     'content' => \Yii::t('skeeks/shop/app', 'Weight and size'),
                 ]); ?>
 
-                <div class="row">
-                    <div class="col-md-3">
-                        <?= $form->field($shopProduct, 'weight')->textInput([
-                            'type' => 'number',
-                        ]); ?>
-                    </div>
-                    <div class="col-md-3">
-                        <?= $form->field($shopProduct, 'length')->textInput([
-                            'type' => 'number',
-                        ]); ?>
+                <?= $form->field($shopProduct, 'weight')->textInput([
+                    'type' => 'number',
+                ]); ?>
+                <?= $form->field($shopProduct, 'length')->textInput([
+                    'type' => 'number',
+                ]); ?>
 
-                    </div>
-                    <div class="col-md-3">
-                        <?= $form->field($shopProduct, 'width')->textInput([
-                            'type' => 'number',
-                        ]); ?>
-                    </div>
-                    <div class="col-md-3">
-                        <?= $form->field($shopProduct, 'height')->textInput([
-                            'type' => 'number',
-                        ]); ?>
-                    </div>
-                </div>
+                <?= $form->field($shopProduct, 'width')->textInput([
+                    'type' => 'number',
+                ]); ?>
+                <?= $form->field($shopProduct, 'height')->textInput([
+                    'type' => 'number',
+                ]); ?>
 
 
                 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
                     'content' => \Yii::t('skeeks/shop/app', 'Setting prices'),
                 ]); ?>
 
-                <div class="row">
-                    <div class="col-md-3">
-                        <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
-                            \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
-                        )); ?>
-                    </div>
-                    <div class="col-md-3">
-                        <?= $form->field($shopProduct, 'vat_included')->checkbox([
-                            'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-                            'value'   => \skeeks\cms\components\Cms::BOOL_Y,
-                        ]); ?>
-                    </div>
-                </div>
+                <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
+                )); ?>
+                <?= $form->field($shopProduct, 'vat_included')->checkbox([
+                    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+                    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+                ]); ?>
             </div>
         <? endif; ?>
 
