@@ -144,6 +144,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                         ],
 
                         'name' => [
+                            'viewAttribute' => 'asText',
                             'class' => DefaultActionColumn::class,
                         ],
 
@@ -241,6 +242,8 @@ class AdminShopSupplierController extends BackendModelStandartController
                 },
             ],
 
+
+
             "products" => [
                 'class'           => BackendGridModelRelatedAction::class,
                 'accessCallback'  => true,
@@ -269,6 +272,34 @@ class AdminShopSupplierController extends BackendModelStandartController
 
                     ArrayHelper::removeValue($visibleColumns, 'shop_supplier_id');
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+            "properties" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Свойства",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-shop-supplier-property",
+                'relation'        => ['shop_supplier_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_supplier_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+
+                    $action->relatedIndexAction->on('afterRender', function (Event $event) {
+                        $event->content = '';
+                    });
+
 
                 },
             ],

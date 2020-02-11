@@ -82,6 +82,7 @@ class AdminShopStoreController extends BackendModelStandartController
                         
                         'name'           => [
                             'class' => DefaultActionColumn::class,
+                            'viewAttribute' => 'asText',
                         ],
                         
                     ],

@@ -69,6 +69,7 @@ class AdminTypePriceController extends BackendModelStandartController
                     'columns'        => [
                         'name' => [
                             'class' => DefaultActionColumn::class,
+                            'viewAttribute' => 'asText',
                         ],
                     ],
 

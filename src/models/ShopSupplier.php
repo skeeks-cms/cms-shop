@@ -33,6 +33,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopStore[]  $shopStores
  * @property ShopTypePrice[]  $shopTypePrices
  * @property ShopProduct[]  $shopProducts
+ * @property ShopSupplierProperty[] $shopSupplierProperties
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -141,5 +142,15 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
     public function getShopProducts()
     {
         return $this->hasMany(ShopProduct::class, ['shop_supplier_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopSupplierProperties]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplierProperties()
+    {
+        return $this->hasMany(ShopSupplierProperty::className(), ['shop_supplier_id' => 'id']);
     }
 }
