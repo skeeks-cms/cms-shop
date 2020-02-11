@@ -89,7 +89,7 @@ JS
             <? endif; ?>
 
             <? if ($contentModel && $contentModel->parentContent) : ?>
-                <?= Html::activeHiddenInput($contentModel, 'parent_content_is_required'); ?>
+                <?= Html::activeHiddenInput($contentModel, 'is_parent_content_required'); ?>
             <? endif; ?>
         </div>
 
