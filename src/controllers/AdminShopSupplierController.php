@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopSupplier;
+use skeeks\cms\shop\models\ShopSupplierProperty;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\yii2\ckeditor\CKEditorWidget;
@@ -289,6 +290,9 @@ class AdminShopSupplierController extends BackendModelStandartController
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+
+
+
                     $action->relatedIndexAction->backendShowings = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
@@ -300,6 +304,37 @@ class AdminShopSupplierController extends BackendModelStandartController
                         $event->content = '';
                     });
 
+
+                },
+            ],
+
+
+            "options" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Опции",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-shop-supplier-property-option",
+                //'relation'        => ['shop_supplier_property_id' => 'id'],
+                'priority'        => 700,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                        /**
+                         * @var $querAdminCmsContentElementControllery ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $query->joinWith("shopSupplierProperty as shopSupplierProperty");
+                        $query->andWhere(['in', 'shopSupplierProperty.id', ShopSupplierProperty::find()->andWhere(['shop_supplier_id' => $this->model->id])->select(['id'])]);
+                    };
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    //ArrayHelper::removeValue($visibleColumns, 'shop_supplier_property_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
                 },
             ],

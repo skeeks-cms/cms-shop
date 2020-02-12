@@ -44,6 +44,11 @@ class m200212_130601__create_table__shop_supplier_property_option extends Migrat
         $this->addCommentOnTable($tableName, 'Опции свойств поставщика');
 
         $this->addForeignKey(
+            "{$tableName}__shop_supplier_property_id", $tableName,
+            'shop_supplier_property_id', '{{%shop_supplier_property}}', 'id', 'CASCADE', 'CASCADE'
+        );
+
+        $this->addForeignKey(
             "{$tableName}__cms_content_property_enum_id", $tableName,
             'cms_content_property_enum_id', '{{%cms_content_property_enum}}', 'id', 'SET NULL', 'SET NULL'
         );

@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
@@ -66,7 +67,8 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                     },
 
                     'defaultOrder' => [
-                        'id' => SORT_DESC,
+                        'is_visible' => SORT_DESC,
+                        'priority' => SORT_ASC,
                     ],
 
                     'visibleColumns' => [
@@ -117,6 +119,29 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                 'name'      => 'Скрыть',
                 'value'     => 0,
             ],
+
+            "options" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Опции",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-shop-supplier-property-option",
+                'relation'        => ['shop_supplier_property_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_supplier_property_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
         ]);
     }
 

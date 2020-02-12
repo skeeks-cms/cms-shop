@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsContentProperty $cmsContentProperty
  * @property ShopSupplier $shopSupplier
+ * @property ShopSupplierPropertyOption[] $shopSupplierPropertyOptions
  * 
  * @property string $propertyTypeAsText
  *
@@ -120,5 +121,15 @@ class ShopSupplierProperty extends ActiveRecord
     public function getShopSupplier()
     {
         return $this->hasOne(ShopSupplier::className(), ['id' => 'shop_supplier_id']);
+    }
+
+    /**
+     * Gets query for [[ShopSupplierPropertyOptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplierPropertyOptions()
+    {
+        return $this->hasMany(ShopSupplierPropertyOption::className(), ['shop_supplier_property_id' => 'id']);
     }
 }

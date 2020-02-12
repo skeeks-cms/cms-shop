@@ -9,7 +9,9 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsContentPropertyEnum;
 use yii\helpers\ArrayHelper;
 /**
  *
@@ -23,6 +25,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsContentElement      $cmsContentElement
  * @property CmsContentPropertyEnum $cmsContentPropertyEnum
+ * @property ShopSupplierProperty $shopSupplierProperty
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -61,8 +64,8 @@ class ShopSupplierPropertyOption extends ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id' => 'ID',
-            'shop_supplier_property_id' => 'Shop Supplier Property ID',
-            'name' => 'Name',
+            'shop_supplier_property_id' => 'Свойство',
+            'name' => 'Название',
             'cms_content_property_enum_id' => 'Cms Content Property Enum ID',
             'cms_content_element_id' => 'Cms Content Element ID',
         ]);
@@ -86,5 +89,15 @@ class ShopSupplierPropertyOption extends ActiveRecord
     public function getCmsContentPropertyEnum()
     {
         return $this->hasOne(CmsContentPropertyEnum::className(), ['id' => 'cms_content_property_enum_id']);
+    }
+
+    /**
+     * Gets query for [[ShopSupplierProperty]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplierProperty()
+    {
+        return $this->hasOne(ShopSupplierProperty::className(), ['id' => 'shop_supplier_property_id']);
     }
 }
