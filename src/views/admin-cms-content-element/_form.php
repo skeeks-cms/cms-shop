@@ -479,7 +479,7 @@ JS
 <?
 $this->registerCss(<<<CSS
 .sx-main-col {
-    margin-right: 300px;
+    margin-right: 400px;
 }
 
 .sx-subproduct-info hr{
@@ -487,7 +487,7 @@ $this->registerCss(<<<CSS
     margin-bottom: 0px;
 }
 .sx-subproduct-info {
-width: 300px;
+width: 400px;
 position: fixed;
 top: 0px;
 right: 0px;
@@ -529,9 +529,7 @@ CSS
                 <? if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : ?>
                     <hr/>
                     <div class="sx-info-block">
-                        <?= $this->render("_external_data", [
-                            'shopProduct' => $shopSubproductContentElement->shopProduct,
-                        ]); ?>
+                        <?= \skeeks\cms\shop\widgets\admin\SupproductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); ?>
                     </div>
                 <? endif; ?>
             <? endif; ?>
@@ -541,9 +539,7 @@ CSS
 
         <? if ($shopProduct->supplier_external_jsondata) : ?>
             <div class="sx-info-block">
-                <?= $this->render("_external_data", [
-                    'shopProduct' => $shopProduct,
-                ]); ?>
+                <?= \skeeks\cms\shop\widgets\admin\SupproductExternalDataWidget::widget(['shopProduct' => $shopProduct]); ?>
             </div>
         <? endif; ?>
 

@@ -56,8 +56,6 @@ use yii\helpers\Url;
  */
 class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsContentElementController
 {
-    public $notSubmitParam = 'sx-reload-form';
-
     public $modelClassName = ShopCmsContentElement::class;
     public $modelShowAttribute = "asText";
 
@@ -921,7 +919,7 @@ HTML
 
 
         if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
+            if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
                 $shopProduct->load(\Yii::$app->request->post());
@@ -1102,7 +1100,7 @@ HTML
             }
 
             if ($rr->isRequestPjaxPost()) {
-                if (!\Yii::$app->request->post($this->notSubmitParam)) {
+                if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                     $model->load(\Yii::$app->request->post());
                     $relatedModel->load(\Yii::$app->request->post());
 
