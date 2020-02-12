@@ -1166,7 +1166,8 @@ HTML
             $model->addError('name', $e->getMessage());
         }
 
-        return $this->render('@skeeks/cms/shop/views/admin-cms-content-element/_form', [
+        //return $this->render('@skeeks/cms/shop/views/admin-cms-content-element/_form', [
+        return $this->render('_form', [
             'model'             => $model,
             'relatedModel'      => $relatedModel,
             'shopProduct'       => $shopProduct,

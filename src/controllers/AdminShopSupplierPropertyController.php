@@ -10,28 +10,19 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
-use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
-use skeeks\cms\backend\actions\BackendModelMultiAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\shop\models\ShopProduct;
-use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopSupplierProperty;
-use skeeks\cms\shop\models\ShopTypePrice;
-use skeeks\cms\widgets\AjaxFileUploadWidget;
-use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
-use yii\db\Expression;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -56,7 +47,7 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
-            'index'  => [
+            'index'         => [
                 "filters" => [
                     'visibleFilters' => [
                         'id',
@@ -87,60 +78,96 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                         'shop_supplier_id',
                         'name',
 
+                        'priority',
+                        'property_type',
                         'is_visible',
                     ],
                     'columns'        => [
                         'is_visible' => [
-                            'class'      => BooleanColumn::class,
+                            'class' => BooleanColumn::class,
                         ],
 
                         'external_code' => [
                             'class' => DefaultActionColumn::class,
                         ],
+                        'property_type' => [
+                            'value' => function (ShopSupplierProperty $property) {
+                                return $property->propertyTypeAsText;
+                            },
+                        ],
                     ],
                 ],
             ],
-            "create" => [
+            "create"        => [
                 'fields' => [$this, 'updateFields'],
             ],
-            "update" => [
+            "update"        => [
                 'fields' => [$this, 'updateFields'],
             ],
-            "is-visible" => [
-                'class' => BackendModelMultiActivateAction::class,
-                'name' => 'Сделать видимыми',
+            "is-visible"    => [
+                'class'     => BackendModelMultiActivateAction::class,
+                'name'      => 'Сделать видимыми',
                 'attribute' => 'is_visible',
-                'value' => 1,
+                'value'     => 1,
             ],
             "is-un-visible" => [
-                'class' => BackendModelMultiDeactivateAction::class,
+                'class'     => BackendModelMultiDeactivateAction::class,
                 'attribute' => 'is_visible',
-                'name' => 'Скрыть',
-                'value' => 0,
+                'name'      => 'Скрыть',
+                'value'     => 0,
             ],
         ]);
     }
 
     public function updateFields($action)
     {
+        /**
+         * @var $model ShopSupplierProperty
+         */
+        $model = $action->model;
+
         return [
 
-            'shop_supplier_id'         => [
-                'class'        => SelectField::class,
-                'items'  => ArrayHelper::map(
-                    ShopSupplier::find()->all(),
-                    'id',
-                    'asText'
-                )
+            'supplier' => [
+                'class'  => FieldSet::class,
+                'name'   => 'От поставщика',
+                'fields' => [
+                    'shop_supplier_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            ShopSupplier::find()->all(),
+                            'id',
+                            'asText'
+                        ),
+                    ],
+
+                    'external_code',
+                ],
+            ],
+            'main'     => [
+                'class'  => FieldSet::class,
+                'name'   => 'Настройки свойства',
+                'fields' => [
+
+                    'property_type' => [
+                        'class' => SelectField::class,
+                        'items' => ShopSupplierProperty::getPopertyTypeOptions(),
+                    ],
+
+                    'is_visible' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+
+
+                    'name',
+                    'priority',
+
+
+                ],
             ],
 
-            'is_visible' => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
-            ],
 
-            'external_code',
-            'name',
         ];
     }
 

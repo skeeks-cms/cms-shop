@@ -18,16 +18,25 @@ use yii\helpers\ArrayHelper;
  * @property int $shop_supplier_id
  * @property string $external_code
  * @property string|null $name
+ * @property string|null $property_type
  * @property int $is_visible
+ * @property int $priority
  * @property int|null $cms_content_property_id
  *
  * @property CmsContentProperty $cmsContentProperty
  * @property ShopSupplier $shopSupplier
+ * 
+ * @property string $propertyTypeAsText
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 class ShopSupplierProperty extends ActiveRecord
 {
+    const PROPERTY_TYPE_STRING = "string";
+    const PROPERTY_TYPE_LIST = "list";
+    const PROPERTY_TYPE_NUMBER = "number";
+    const PROPERTY_TYPE_ARRAY = "array";
+    
     /**
      * @inheritdoc
      */
@@ -37,13 +46,37 @@ class ShopSupplierProperty extends ActiveRecord
     }
 
     /**
+     * @return array
+     */
+    static public function getPopertyTypeOptions()
+    {
+        return [
+            self::PROPERTY_TYPE_LIST => 'Список',
+            self::PROPERTY_TYPE_STRING => 'Строка',
+            self::PROPERTY_TYPE_NUMBER => 'Число',
+            self::PROPERTY_TYPE_ARRAY => 'Массив',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPropertyTypeAsText()
+    {
+        return (string) ArrayHelper::getValue(self::getPopertyTypeOptions(), $this->property_type);
+    }
+    
+    /**
      * @inheritdoc
      */
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
              [['shop_supplier_id', 'external_code'], 'required'],
+             [['priority'], 'integer'],
              [['external_code'], 'trim'],
+             [['property_type'], 'string'],
+             [['property_type'], 'in', 'range' => array_keys(self::getPopertyTypeOptions())],
             [['shop_supplier_id', 'is_visible', 'cms_content_property_id'], 'integer'],
             [['external_code', 'name'], 'string', 'max' => 255],
             [['shop_supplier_id', 'external_code'], 'unique', 'targetAttribute' => ['shop_supplier_id', 'external_code']],
@@ -64,6 +97,8 @@ class ShopSupplierProperty extends ActiveRecord
             'name' => 'Название',
             'is_visible' => 'Видимость',
             'cms_content_property_id' => 'Свойство товара в cms',
+            'priority' => 'Сортировка',
+            'property_type' => 'Тип свойства',
         ]);
     }
 

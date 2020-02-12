@@ -530,7 +530,7 @@ CSS
                     <hr/>
                     <div class="sx-info-block">
                         <?= $this->render("_external_data", [
-                            'data' => $data,
+                            'shopProduct' => $shopSubproductContentElement->shopProduct,
                         ]); ?>
                     </div>
                 <? endif; ?>
@@ -542,7 +542,7 @@ CSS
         <? if ($shopProduct->supplier_external_jsondata) : ?>
             <div class="sx-info-block">
                 <?= $this->render("_external_data", [
-                    'data' => $shopProduct->supplier_external_jsondata,
+                    'shopProduct' => $shopProduct,
                 ]); ?>
             </div>
         <? endif; ?>

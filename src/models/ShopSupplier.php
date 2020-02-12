@@ -151,6 +151,6 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
      */
     public function getShopSupplierProperties()
     {
-        return $this->hasMany(ShopSupplierProperty::className(), ['shop_supplier_id' => 'id']);
+        return $this->hasMany(ShopSupplierProperty::className(), ['shop_supplier_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 }
