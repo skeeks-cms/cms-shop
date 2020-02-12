@@ -14,6 +14,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopSupplierProperty;
 use skeeks\yii2\form\fields\BoolField;
@@ -162,6 +163,15 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
 
                     'name',
                     'priority',
+
+                    'cms_content_property_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            CmsContentProperty::find()->all(),
+                            'id',
+                            'asText'
+                        )
+                    ],
 
 
                 ],

@@ -495,6 +495,7 @@ height: 100%;
 overflow-y: auto;
 }
 .sx-info-block {
+    font-size: 10px;
     padding: 10px 10px 0px 10px;
 }
 .sx-info-block span {
