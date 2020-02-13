@@ -50,7 +50,7 @@ JS
 
 
             <? if ($row) : ?>
-                <div>
+                <div class="sx-propery-row">
         <span>
             <? if ($supplierProperty->name) : ?>
                 <?= $supplierProperty->name; ?>
