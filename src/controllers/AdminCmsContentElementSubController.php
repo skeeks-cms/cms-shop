@@ -20,6 +20,8 @@ use yii\helpers\ArrayHelper;
 class AdminCmsContentElementSubController extends AdminCmsContentElementController
 {
 
+    public $editForm = '@skeeks/cms/shop/views/admin-cms-content-element/_form';
+
     public function initGridData($action, $content)
     {
         parent::initGridData($action, $content);

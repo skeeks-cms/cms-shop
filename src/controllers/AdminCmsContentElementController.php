@@ -974,7 +974,7 @@ HTML
 
         }
 
-        return $this->render('_form', [
+        return $this->render($this->editForm, [
             'model'             => $model,
             'relatedModel'      => $relatedModel,
             'shopProduct'       => $shopProduct,
@@ -1165,7 +1165,7 @@ HTML
         }
 
         //return $this->render('@skeeks/cms/shop/views/admin-cms-content-element/_form', [
-        return $this->render('_form', [
+        return $this->render($this->editForm, [
             'model'             => $model,
             'relatedModel'      => $relatedModel,
             'shopProduct'       => $shopProduct,
