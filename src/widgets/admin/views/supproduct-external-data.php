@@ -84,7 +84,7 @@ JS
     <div class="sx-supplier-properies-hidden">
         <? foreach ($data as $key => $row) : ?>
             <? if ($row) : ?>
-                <div><span><?= $key; ?>:</span>
+                <div  class="sx-propery-row"><span><?= $key; ?>:</span>
                     <? if (is_string($row)) : ?>
                         <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
                             <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
