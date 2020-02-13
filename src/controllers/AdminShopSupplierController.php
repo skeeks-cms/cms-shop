@@ -17,6 +17,7 @@ use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopSupplierProperty;
+use skeeks\cms\shop\models\ShopSupplierPropertyOption;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\yii2\ckeditor\CKEditorWidget;
@@ -146,11 +147,11 @@ class AdminShopSupplierController extends BackendModelStandartController
 
                         'name' => [
                             'viewAttribute' => 'asText',
-                            'class' => DefaultActionColumn::class,
+                            'class'         => DefaultActionColumn::class,
                         ],
 
                         'countShopProducts'   => [
-                            'format' => 'raw',
+                            'format'    => 'raw',
                             'value'     => function (ShopSupplier $cmsSite) {
 
                                 if ($cmsSite->is_main) {
@@ -160,9 +161,9 @@ class AdminShopSupplierController extends BackendModelStandartController
 
                                     if ($cmsSite->raw_row['countShopProductsConnected']) {
                                         $result .= " (".Html::tag('b', $cmsSite->raw_row['countShopProductsConnected'], [
-                                            'title' => 'Количество привязанных/продаваемых товаров',
-                                            'style' => 'color: green;',
-                                        ]) . ")";
+                                                'title' => 'Количество привязанных/продаваемых товаров',
+                                                'style' => 'color: green;',
+                                            ]).")";
                                     }
 
 
@@ -244,7 +245,6 @@ class AdminShopSupplierController extends BackendModelStandartController
             ],
 
 
-
             "products" => [
                 'class'           => BackendGridModelRelatedAction::class,
                 'accessCallback'  => true,
@@ -291,6 +291,41 @@ class AdminShopSupplierController extends BackendModelStandartController
                      */
                     $action = $e->sender;
 
+                    $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                        /**
+                         * @var $querAdminCmsContentElementControllery ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $optionsQuery = ShopSupplierPropertyOption::find()->select(['count(*) as inner_count'])->where([
+                            'shop_supplier_property_id' => new Expression(ShopSupplierProperty::tableName().".id"),
+                        ]);
+
+                        $optionsNotConnectQuery = ShopSupplierPropertyOption::find()->select(['count(*) as inner_count1'])->where([
+                            'shop_supplier_property_id' => new Expression(ShopSupplierProperty::tableName().".id"),
+                        ])->andWhere([
+                            'and',
+                            ['cms_content_property_enum_id' => null],
+                            ['cms_content_element_id' => null],
+                        ]);
+
+                        $optionsConnectQuery = ShopSupplierPropertyOption::find()->select(['count(*) as inner_count1'])->where([
+                            'shop_supplier_property_id' => new Expression(ShopSupplierProperty::tableName().".id"),
+                        ])->andWhere([
+                            'or',
+                            ['is not', 'cms_content_property_enum_id', null],
+                            ['is not', 'cms_content_element_id', null],
+                        ]);
+
+                        $query->groupBy(ShopSupplierProperty::tableName().".id");
+
+                        $query->select([
+                            ShopSupplierProperty::tableName().'.*',
+                            'countOptions'           => $optionsQuery,
+                            'countConnectOptions'    => $optionsConnectQuery,
+                            'countNotConnectOptions' => $optionsNotConnectQuery,
+                        ]);
+                    };
 
 
                     $action->relatedIndexAction->backendShowings = false;
@@ -327,6 +362,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                          * @var $querAdminCmsContentElementControllery ActiveQuery
                          */
                         $query = $e->sender->dataProvider->query;
+
                         $query->joinWith("shopSupplierProperty as shopSupplierProperty");
                         $query->andWhere(['in', 'shopSupplierProperty.id', ShopSupplierProperty::find()->andWhere(['shop_supplier_id' => $this->model->id])->select(['id'])]);
                     };

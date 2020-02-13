@@ -18,12 +18,15 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopSupplierProperty;
+use skeeks\cms\shop\models\ShopSupplierPropertyOption;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -64,11 +67,41 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                          */
                         $query = $e->sender->dataProvider->query;
                         $dataProvider = $e->sender->dataProvider;
+
+                        $optionsQuery = ShopSupplierPropertyOption::find()->select(['count(*) as inner_count'])->where([
+                            'shop_supplier_property_id' => new Expression(ShopSupplierProperty::tableName().".id"),
+                        ]);
+
+                        $optionsNotConnectQuery = ShopSupplierPropertyOption::find()->select(['count(*) as inner_count1'])->where([
+                            'shop_supplier_property_id' => new Expression(ShopSupplierProperty::tableName().".id"),
+                        ])->andWhere([
+                            'and',
+                            ['cms_content_property_enum_id' => null],
+                            ['cms_content_element_id' => null],
+                        ]);
+
+                        $optionsConnectQuery = ShopSupplierPropertyOption::find()->select(['count(*) as inner_count1'])->where([
+                            'shop_supplier_property_id' => new Expression(ShopSupplierProperty::tableName().".id"),
+                        ])->andWhere([
+                            'or',
+                            ['is not', 'cms_content_property_enum_id', null],
+                            ['is not', 'cms_content_element_id', null],
+                        ]);
+
+                        $query->groupBy(ShopSupplierProperty::tableName().".id");
+
+                        $query->select([
+                            ShopSupplierProperty::tableName().'.*',
+                            'countOptions'           => $optionsQuery,
+                            'countConnectOptions' => $optionsConnectQuery,
+                            'countNotConnectOptions' => $optionsNotConnectQuery,
+                        ]);
+
                     },
 
                     'defaultOrder' => [
                         'is_visible' => SORT_DESC,
-                        'priority' => SORT_ASC,
+                        'priority'   => SORT_ASC,
                     ],
 
                     'visibleColumns' => [
@@ -81,8 +114,10 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                         'shop_supplier_id',
                         'name',
 
-                        'priority',
                         'property_type',
+                        'cms_content_property_id',
+
+                        'priority',
                         'is_visible',
                     ],
                     'columns'        => [
@@ -95,7 +130,21 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                         ],
                         'property_type' => [
                             'value' => function (ShopSupplierProperty $property) {
-                                return $property->propertyTypeAsText;
+                                $result[] = $property->propertyTypeAsText;
+                                if ($property->property_type == ShopSupplierProperty::PROPERTY_TYPE_LIST) {
+                                    $countOptions = ArrayHelper::getValue($property->raw_row, 'countOptions');
+                                    $countConnectOptions = ArrayHelper::getValue($property->raw_row, 'countConnectOptions');
+                                    $countNotConnectOptions = ArrayHelper::getValue($property->raw_row, 'countNotConnectOptions');
+
+                                    if ($countNotConnectOptions == 0) {
+                                        $result[] = "<span title='Всего опций'> {$countOptions}</span> (<span style='color:green;' title='Все привязаны!'><span class='fa fa-check'></span></span>)";
+                                    } else {
+                                        $result[] = "<span title='Всего опций'> {$countOptions}</span> (<span style='color:red;' title='Не привязанных'>{$countNotConnectOptions}</span>)";
+                                    }
+
+                                }
+
+                                return implode(" ", $result);
                             },
                         ],
                     ],
@@ -195,10 +244,26 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                             CmsContentProperty::find()->all(),
                             'id',
                             'asText'
-                        )
+                        ),
                     ],
 
 
+                ],
+            ],
+
+            'import' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Настройки импорта/преобразования',
+                'fields' => [
+                    'import_delimetr' => [
+                        'class' => TextareaField::class,
+                    ],
+                    'import_replace'  => [
+                        'class' => TextareaField::class,
+                    ],
+                    'import_miltiple' => [
+                        'class' => TextareaField::class,
+                    ],
                 ],
             ],
 

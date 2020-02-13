@@ -22,6 +22,9 @@ use yii\helpers\ArrayHelper;
  * @property int $is_visible
  * @property int $priority
  * @property int|null $cms_content_property_id
+ * @property string|null $import_delimetr
+ * @property string|null $import_replace
+ * @property number|null $import_miltiple
  *
  * @property CmsContentProperty $cmsContentProperty
  * @property ShopSupplier $shopSupplier
@@ -77,6 +80,9 @@ class ShopSupplierProperty extends ActiveRecord
              [['priority'], 'integer'],
              [['external_code'], 'trim'],
              [['property_type'], 'string'],
+             [['import_delimetr'], 'string'],
+             [['import_replace'], 'string'],
+             [['import_miltiple'], 'integer'],
              [['property_type'], 'in', 'range' => array_keys(self::getPopertyTypeOptions())],
             [['shop_supplier_id', 'is_visible', 'cms_content_property_id'], 'integer'],
             [['external_code', 'name'], 'string', 'max' => 255],
@@ -100,6 +106,10 @@ class ShopSupplierProperty extends ActiveRecord
             'cms_content_property_id' => 'Свойство товара в cms',
             'priority' => 'Сортировка',
             'property_type' => 'Тип свойства',
+
+            'import_delimetr' => 'Разделители',
+            'import_replace' => 'Символы для замены',
+            'import_miltiple' => 'Умножить на',
         ]);
     }
 

@@ -66,8 +66,8 @@ class ShopSupplierPropertyOption extends ActiveRecord
             'id' => 'ID',
             'shop_supplier_property_id' => 'Свойство',
             'name' => 'Название',
-            'cms_content_property_enum_id' => 'Cms Content Property Enum ID',
-            'cms_content_element_id' => 'Cms Content Element ID',
+            'cms_content_property_enum_id' => 'Опция',
+            'cms_content_element_id' => 'Опция',
         ]);
     }
 
