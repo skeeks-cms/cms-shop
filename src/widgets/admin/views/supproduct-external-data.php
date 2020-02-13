@@ -47,7 +47,10 @@ JS
             $row = \yii\helpers\ArrayHelper::getValue($data, $supplierProperty->external_code);
             \yii\helpers\ArrayHelper::remove($data, $supplierProperty->external_code);
             ?>
-            <div>
+
+
+            <? if ($row) : ?>
+                <div>
         <span>
             <? if ($supplierProperty->name) : ?>
                 <?= $supplierProperty->name; ?>
@@ -57,17 +60,19 @@ JS
                 :
             </span>
 
-                <? if (is_string($row)) : ?>
-                    <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
-                        <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
-                    <? else : ?>
-                        <b><?= $row; ?></b>
-                    <? endif; ?>
+                    <? if (is_string($row)) : ?>
+                        <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
+                            <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
+                        <? else : ?>
+                            <b><?= $row; ?></b>
+                        <? endif; ?>
 
-                <? else : ?>
-                    <pre><?= print_r($row, true); ?></pre>
-                <? endif; ?>
-            </div>
+                    <? else : ?>
+                        <pre><?= print_r($row, true); ?></pre>
+                    <? endif; ?>
+                </div>
+
+            <? endif; ?>
         <? endforeach; ?>
     </div>
 <? endif; ?>
