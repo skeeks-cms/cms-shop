@@ -9,8 +9,11 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopProductPrice;
+use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
@@ -26,8 +29,39 @@ class AdminCmsContentElementSubController extends AdminCmsContentElementControll
     {
         parent::initGridData($action, $content);
 
+        $filterFields = [];
+        $filterFields['is_ready'] = [
+            'class'    => SelectField::class,
+            'items'    => [
+                'on' => 'Готов',
+                'off' => 'Не привязан',
+            ],
+            'label'    => 'Привязка',
+            'multiple' => false,
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                $query->joinWith('shopProduct as sp');
+
+                if ($e->field->value) {
+                    if ($e->field->value == 'on') {
+                        $query->andWhere(['is not', 'sp.main_pid', null]);
+                    } else {
+                        $query->andWhere(['sp.main_pid' => null]);
+                    }
+
+                }
+            },
+        ];
+        $filterFieldsRules[] = ['is_ready', 'safe'];
+
+        $action->filters['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'fields']), $filterFields);
+        $action->filters['filtersModel']['rules'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'rules']), $filterFieldsRules);
         $action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), [
-            'shop_supplier_id'
+            'shop_supplier_id',
+            'is_ready'
         ]);
 
         //Приджоивание магазинных данных

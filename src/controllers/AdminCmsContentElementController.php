@@ -517,6 +517,7 @@ HTML
             'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
                 if ($shopCmsContentElement->shopProduct) {
                     $result = $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
+
                     if ($shopCmsContentElement->shopProduct->shopStoreProducts) {
                         $storesQuantity = [];
                         foreach ($shopCmsContentElement->shopProduct->shopStoreProducts as $shopStoreProduct) {
@@ -525,6 +526,21 @@ HTML
                                     'title' => $shopStoreProduct->shopStore->shopSupplier->name." - ".$shopStoreProduct->shopStore->name,
                                 ]);
                             }
+
+                        }
+
+                        if ($storesQuantity) {
+                            $result .= "<hr>".implode("<br>", $storesQuantity);
+                        }
+                    }
+
+                    if ($shopSupplierProducts = $shopCmsContentElement->shopProduct->shopSupplierProducts) {
+
+                        $storesQuantity = [];
+                        foreach ($shopCmsContentElement->shopProduct->shopSupplierProducts as $shopStoreProduct) {
+                            $storesQuantity[] = Html::tag('span', $shopStoreProduct->quantity . " - " . $shopStoreProduct->shopSupplier->name, [
+                                'title' => $shopStoreProduct->shopSupplier->name,
+                            ]);
 
                         }
 

@@ -250,7 +250,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                 'accessCallback'  => true,
                 'name'            => "Товары",
                 'icon'            => 'fa fa-list',
-                'controllerRoute' => "/shop/admin-cms-content-element",
+                'controllerRoute' => "/shop/admin-cms-content-element-sub",
                 //'relation'        => ['shopProduct.shop_supplier_id' => 'id'],
                 'priority'        => 600,
                 'on gridInit'     => function ($e) {
@@ -258,6 +258,7 @@ class AdminShopSupplierController extends BackendModelStandartController
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
+                    $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction,$action->relatedIndexAction->controller->content);
 
                     $action->relatedIndexAction->grid['on init'] = function (Event $e) {
                         /**
@@ -318,6 +319,9 @@ class AdminShopSupplierController extends BackendModelStandartController
                         ]);
 
                         $query->groupBy(ShopSupplierProperty::tableName().".id");
+                        $query->andWhere([
+                            ShopSupplierProperty::tableName().'.shop_supplier_id' => $this->model->id,
+                        ]);
 
                         $query->select([
                             ShopSupplierProperty::tableName().'.*',
