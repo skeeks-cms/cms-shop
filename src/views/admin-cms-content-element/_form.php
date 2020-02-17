@@ -125,7 +125,7 @@ JS
 
             ?>
 
-            <? if ($parent_content_element_id || $shopProduct->shop_supplier_id) : ?>
+            <? if ($parent_content_element_id || $shopProduct->shop_supplier_id || $shopSubproductContentElement) : ?>
                 <div style="display: none;">
                     <?= $form->fieldSelect($shopProduct, 'product_type',
                         \skeeks\cms\shop\models\ShopProduct::possibleProductTypes()); ?>
@@ -163,35 +163,39 @@ JS
                     <? endif; ?>
                 </div>
 
-                <?= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
-                    'allowDeselect' => true,
-                    'options'       => [
-                        'data-form-reload' => "true",
-                    ],
-                ]); ?>
-                <?= $form->field($shopProduct, "supplier_external_id"); ?>
+                <? if (!$shopSubproductContentElement) : ?>
+                    <?= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
+                        'allowDeselect' => true,
+                        'options'       => [
+                            'data-form-reload' => "true",
+                        ],
+                    ]); ?>
+                    <?= $form->field($shopProduct, "supplier_external_id"); ?>
 
-                <? if ($shopProduct->shop_supplier_id) : ?>
-                    <?= $form->field($shopProduct, 'main_pid')->widget(
-                        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                        [
-                            'options'     => [
-                                'data-form-reload' => "true",
-                            ],
-                            'content_id'  => $contentModel->id,
-                            'dialogRoute' => [
-                                '/shop/admin-cms-content-element',
-                                'w3-submit-key' => "1",
-                                'findex'        => [
-                                    'shop_supplier_id' => [
-                                        'mode' => 'empty',
+                    <? if ($shopProduct->shop_supplier_id) : ?>
+                        <?= $form->field($shopProduct, 'main_pid')->widget(
+                            \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+                            [
+                                'options'     => [
+                                    'data-form-reload' => "true",
+                                ],
+                                'content_id'  => $contentModel->id,
+                                'dialogRoute' => [
+                                    '/shop/admin-cms-content-element',
+                                    'w3-submit-key' => "1",
+                                    'findex'        => [
+                                        'shop_supplier_id' => [
+                                            'mode' => 'empty',
+                                        ],
                                     ],
                                 ],
-                            ],
-                        ]
-                    );
-                    ?>
+                            ]
+                        );
+                        ?>
+                    <? endif; ?>
+
                 <? endif; ?>
+
 
                 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
                     'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
