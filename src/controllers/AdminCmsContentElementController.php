@@ -650,6 +650,16 @@ HTML
                             $data[] = '<span style="color: red;"><i class="fas fa-link" title="Привязан к главному товару"></i> Не привязан к главному товару!</span>';
                         }
                     }
+                    
+                    if ($model->shopProduct->tradeOffers) {
+                        $data[] = '<div class="row"></div>';
+                        foreach ($model->shopProduct->tradeOffers as $tradeOffer)
+                        {
+                            $data[] = '<span style="margin-left: 60px;">
+                                            <i class="fas fa-link" title="Привязан к главному товару"></i> '.$tradeOffer->asText."</span>";
+                        }
+                        
+                    }
 
 
                     $info = implode("<br />", $data);
@@ -812,6 +822,11 @@ HTML
             $query->joinWith('shopProduct as sp');
             $query->joinWith('shopProduct.shopSupplier as shopSupplier');
 
+            $query->andWhere(['in', 'sp.product_type', [
+                ShopProduct::TYPE_SIMPLE,
+                ShopProduct::TYPE_OFFERS
+            ]]);
+                        
             $query->andWhere([
                 'or',
                 ['shopSupplier.id' => null],

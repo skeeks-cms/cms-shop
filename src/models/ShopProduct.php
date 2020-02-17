@@ -206,9 +206,9 @@ class ShopProduct extends \skeeks\cms\models\Core
         if ($this->isAttributeChanged('product_type')) {
             //Выставили что у него есть предложения
             if ($this->product_type == self::TYPE_OFFERS) {
-                if (!$this->getTradeOffers()->all()) {
+                /*if (!$this->getTradeOffers()->all()) {
                     $this->product_type = self::TYPE_SIMPLE;
-                }
+                }*/
             } elseif ($this->product_type == self::TYPE_SIMPLE) //Если указали что товар простой, значит у него не должно быть предложений
             {
                 if ($this->getTradeOffers()->all()) {
