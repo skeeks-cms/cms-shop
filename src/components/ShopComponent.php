@@ -21,12 +21,10 @@ use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
-use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /**
@@ -154,6 +152,11 @@ class ShopComponent extends Component
      */
     public $type_price_mrc_id = null;
 
+    /**
+     * @var array
+     */
+    public $offers_properties = [];
+
 
     /**
      * Можно задать название и описание компонента
@@ -182,7 +185,7 @@ class ShopComponent extends Component
     {
         return ActiveFormBackend::begin();
     }
-    
+
     public function getConfigFormFields()
     {
         return [
@@ -193,91 +196,100 @@ class ShopComponent extends Component
                 'fields' => [
 
 
-                    'notify_emails' => [
+                    'notify_emails'         => [
                         'class' => TextareaField::class,
                     ],
                     'start_order_status_id' => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
                     ],
-                    'end_order_status_id' => [
+                    'end_order_status_id'   => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
                     ],
-                    'payAfterConfirmation' => [
-                        'class' => BoolField::class,
-                        'trueValue' => "Y",
+                    'payAfterConfirmation'  => [
+                        'class'      => BoolField::class,
+                        'trueValue'  => "Y",
                         'falseValue' => "N",
                     ],
 
 
-                    
                     'type_price_purchase_id' => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
-                    'type_price_retail_id' => [
+                    'type_price_retail_id'   => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
-                    'type_price_mrc_id' => [
+                    'type_price_mrc_id'      => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                    ],
+                    'offers_properties'      => [
+                        'class' => SelectField::class,
+                        'multiple' => true,
+                        'items' => ArrayHelper::map(
+                            CmsContentProperty::find()->all(), 'code', 'asText'
+                        ),
                     ],
 
                 ],
             ],
+
 
             'catalog' => [
                 'class' => FieldSet::class,
                 'name'  => \Yii::t('skeeks/shop/app', 'Каталог'),
 
                 'fields' => [
-                    [
-                        'class'   => HtmlBlock::class,
-                        'content' => Html::tag('h3', 'Каталог'),
-                    ],
 
-                    'is_show_product_no_price' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false,
+                    'is_show_product_no_price'      => [
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
                     'is_show_product_only_quantity' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false,
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
-                    'is_show_button_no_price' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false,
+                    'is_show_button_no_price'       => [
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
-                    'is_show_quantity_product' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false,
+                    'is_show_quantity_product'      => [
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
 
 
-                    [
-                        'class'   => HtmlBlock::class,
-                        'content' => Html::tag('h3', 'Фильтры'),
-                    ],
+                ],
+            ],
 
+
+            'filters' => [
+                'class' => FieldSet::class,
+                'name'  => \Yii::t('skeeks/shop/app', 'Фильтры'),
+
+                'fields' => [
                     'is_show_filters_has_subtree' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false,
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
 
                     'show_filter_property_ids' => [
-                        'class' => SelectField::class,
+                        'class'    => SelectField::class,
                         'multiple' => true,
-                        'items' => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                        'items'    => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
-                ]
-            ]
+                ],
+
+            ],
+
         ];
     }
 
@@ -285,6 +297,7 @@ class ShopComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            [['offers_properties'], 'safe'],
             [['show_filter_property_ids'], 'safe'],
             [['email'], 'string'],
             [['payAfterConfirmation'], 'string'],
@@ -294,7 +307,7 @@ class ShopComponent extends Component
             [['type_price_purchase_id'], 'integer'],
             [['type_price_retail_id'], 'integer'],
             [['type_price_mrc_id'], 'integer'],
-            
+
             ['notify_emails', 'string'],
             ['start_order_status_id', 'required'],
             ['end_order_status_id', 'required'],
@@ -304,7 +317,7 @@ class ShopComponent extends Component
                     'is_show_button_no_price',
                     'is_show_product_only_quantity',
                     'is_show_filters_has_subtree',
-                    'is_show_quantity_product'
+                    'is_show_quantity_product',
                 ],
                 'boolean',
             ],
@@ -313,36 +326,38 @@ class ShopComponent extends Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'start_order_status_id'    => 'Начальный статус заказа',
-            'end_order_status_id'      => 'Конечный статус заказа',
-            'email'                    => 'Email',
-            'payAfterConfirmation'     => \Yii::t('skeeks/shop/app',
+            'start_order_status_id'         => 'Начальный статус заказа',
+            'end_order_status_id'           => 'Конечный статус заказа',
+            'email'                         => 'Email',
+            'payAfterConfirmation'          => \Yii::t('skeeks/shop/app',
                 'Include payment orders only after the manager approval'),
-            'notify_emails'            => \Yii::t('skeeks/shop/app', 'Email notification address'),
-            'is_show_product_no_price' => "Показывать товары с нулевыми ценами?",
-            'is_show_button_no_price'  => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
-            'is_show_product_only_quantity'  => "Показывать товары только в наличии на сайте?",
-            'show_filter_property_ids'  => "Какие фильтры разрешено показывать на сайте?",
-            'is_show_filters_has_subtree'  => "Показывать фильтры если есть подкатегории?",
-            'is_show_quantity_product'  => "Показывать оставшееся количество товаров на складе?",
-            'type_price_purchase_id'  => "Закупочная цена",
-            'type_price_retail_id'  => "Розничная цена",
-            'type_price_mrc_id'  => "Минимальная розничная цена",
+            'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
+            'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
+            'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
+            'is_show_product_only_quantity' => "Показывать товары только в наличии на сайте?",
+            'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
+            'is_show_filters_has_subtree'   => "Показывать фильтры если есть подкатегории?",
+            'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
+            'type_price_purchase_id'        => "Закупочная цена",
+            'type_price_retail_id'          => "Розничная цена",
+            'type_price_mrc_id'             => "Минимальная розничная цена",
+            'offers_properties'             => "Свойства предложений",
         ]);
     }
+
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'start_order_status_id'   => "Статус, который присваивается заказу сразу после его оформления",
-            'end_order_status_id'     => "Статус, который присваивается заказу после завершения работы с ним",
-            'notify_emails'           => \Yii::t('skeeks/shop/app',
+            'start_order_status_id'         => "Статус, который присваивается заказу сразу после его оформления",
+            'end_order_status_id'           => "Статус, который присваивается заказу после завершения работы с ним",
+            'notify_emails'                 => \Yii::t('skeeks/shop/app',
                 'Enter email addresses, separated by commas, they will come on new orders information'),
-            'is_show_product_no_price' => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
-            'is_show_button_no_price' => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
-            'show_filter_property_ids' => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
-            'is_show_filters_has_subtree' => "Если каталог большой то лучше для производительности не показывать фильтры в категориях где есть подкатегории",
+            'is_show_product_no_price'      => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
+            'is_show_button_no_price'       => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
+            'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
+            'is_show_filters_has_subtree'   => "Если каталог большой то лучше для производительности не показывать фильтры в категориях где есть подкатегории",
             'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
-            'is_show_quantity_product' => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
+            'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
         ]);
     }
 
@@ -369,8 +384,8 @@ class ShopComponent extends Component
 
         return $this->_baseTypePrice;
     }
-    
-  
+
+
     /**
      * @return ShopPersonType[]
      */
@@ -535,8 +550,8 @@ class ShopComponent extends Component
     }
 
     /**
-     * TODO: is @deprecated remove it!
-     * @return array
+     * TODO: is @return array
+     * @deprecated remove it!
      */
     public function getArrayForSelectElement()
     {
@@ -565,9 +580,6 @@ class ShopComponent extends Component
 
         return $result;
     }
-
-
-
 
 
     /**
@@ -606,7 +618,7 @@ class ShopComponent extends Component
         ]);
 
         $activeQuery->andWhere([
-            'shopProduct.shop_supplier_id' => null
+            'shopProduct.shop_supplier_id' => null,
         ]);
 
         return $this;

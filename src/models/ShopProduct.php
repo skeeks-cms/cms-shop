@@ -66,7 +66,12 @@ use yii\helpers\ArrayHelper;
  * @property ShopTypePrice               $shopTypePrices
  * @property ShopProduct                 $shopMainProduct
  * @property ShopProduct[]               $shopSupplierProducts
+ *
  * @property boolean                     $isSubProduct
+ *
+ * @property boolean                     $isSimpleProduct
+ * @property boolean                     $isOfferProduct
+ * @property boolean                     $isOffersProduct
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -236,9 +241,6 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this
             ->hasMany(ShopCmsContentElement::class, ['parent_content_element_id' => 'id'])
             ->andWhere([ShopCmsContentElement::tableName().".content_id" => $childContentId])
-            //->joinWith('cmsContentElement')
-            //->joinWith('cmsContentElement.cmsContent')
-            //->andWhere(["content.id" => $this->cmsContentElement->cmsContent->parent_content_id])
             ->orderBy(['priority' => SORT_ASC]);
     }
     /**
@@ -773,4 +775,26 @@ class ShopProduct extends \skeeks\cms\models\Core
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public function getIsSimpleProduct()
+    {
+        return (bool) ($this->product_type === self::TYPE_SIMPLE);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsOfferProduct()
+    {
+        return (bool) ($this->product_type === self::TYPE_OFFER);
+    }
+    /**
+     * @return bool
+     */
+    public function getIsOffersProduct()
+    {
+        return (bool) ($this->product_type === self::TYPE_OFFERS);
+    }
 }

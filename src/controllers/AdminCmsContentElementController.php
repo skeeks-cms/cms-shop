@@ -13,6 +13,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\events\ViewRenderEvent;
+use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
@@ -114,6 +115,85 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     'class'          => BackendModelAction::class,
                     "name"           => "Посмотреть",
                 ],*/
+
+
+                "offers" => [
+                    'class'           => BackendGridModelRelatedAction::class,
+                    'accessCallback'  => true,
+                    'name'            => "Предложения",
+                    'icon'            => 'fa fa-list',
+                    'controllerRoute' => "/shop/admin-cms-content-element",
+                    //'relation'        => ['shopProduct.shop_supplier_id' => 'id'],
+                    'priority'        => 150,
+                    'on gridInit'     => function ($e) {
+                        /**
+                         * @var $action BackendGridModelRelatedAction
+                         */
+                        $action = $e->sender;
+                        $controller = $action->relatedIndexAction->controller;
+                        $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction, $action->relatedIndexAction->controller->content);
+
+                        $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                            /**
+                             * @var $querAdminCmsContentElementControllery ActiveQuery
+                             */
+                            $query = $e->sender->dataProvider->query;
+                            $query->andWhere(['parent_content_element_id' => $this->model->id]);
+                        };
+
+                        $action->relatedIndexAction->on('beforeRender', function (Event $event) use ($controller) {
+
+                            if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+
+                                /**
+                                 * @var $controller BackendModelController
+                                 * @var $createAction BackendModelCreateAction
+                                 */
+                                $r = new \ReflectionClass($controller->modelClassName);
+
+                                $createAction->url = ArrayHelper::merge($createAction->urlData, [
+                                    'parent_content_element_id' => $this->model->id,
+                                ]);
+
+                                //$createAction->name = "Добавить платеж";
+
+                                $event->content = ControllerActionsWidget::widget([
+                                        'actions'         => [$createAction],
+                                        'isOpenNewWindow' => true,
+                                        'minViewCount'    => 1,
+                                        'itemTag'         => 'button',
+                                        'itemOptions'     => ['class' => 'btn btn-primary'],
+                                    ])."<br>";
+                            }
+                        });
+
+                        //$action->relatedIndexAction->backendShowings = false;
+                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                        ArrayHelper::removeValue($visibleColumns, 'shop_supplier_id');
+                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                    },
+
+                    'accessCallback' => function (BackendModelAction $action) {
+
+                        $model = $action->model;
+
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        if ($model->shopProduct->product_type == ShopProduct::TYPE_OFFERS) {
+                            return true;
+                        }
+
+                    },
+                ],
+
 
                 "connect-to-main" => [
                     /*'on afterRender' => function(ViewRenderEvent $viewRenderEvent) {

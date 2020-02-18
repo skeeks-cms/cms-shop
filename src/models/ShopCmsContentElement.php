@@ -202,5 +202,33 @@ class ShopCmsContentElement extends CmsContentElement
 
     }
 
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        $text = parent::asText();
+
+        $result = [];
+        //Если это предложение, то надо в заголовок добавить ключевые свойства.
+        if ($this->shopProduct->isOfferProduct) {
+            if (\Yii::$app->shop->offers_properties) {
+                foreach (\Yii::$app->shop->offers_properties as $propertyCode)
+                {
+                    if ($value = $this->relatedPropertiesModel->getAttribute($propertyCode)) {
+                        $result[] = $this->relatedPropertiesModel->getAttributeAsText($propertyCode);
+                    }
+                }
+            }
+        }
+
+        if ($result) {
+            $text .= " [" . implode(", ", $result) . "]";
+        }
+
+        return $text;
+    }
+
+
 
 }

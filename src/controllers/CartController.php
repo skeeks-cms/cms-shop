@@ -103,6 +103,11 @@ class CartController extends Controller
                 return (array)$rr;
             }
 
+            if ($product->isOffersProduct) {
+                $rr->message = \Yii::t('skeeks/shop/app', 'Этот товар является общим, и не может быть добавлен в корзину.');
+                return (array)$rr;
+            }
+
             if ($product->measure_ratio > 1) {
                 if ($quantity % $product->measure_ratio != 0) {
                     $quantity = $product->measure_ratio;

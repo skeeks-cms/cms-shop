@@ -41,6 +41,7 @@ if ($model->isNewRecord) {
         $model->tree_id = $tree_id;
     }
 
+    //Если создаем вложенный товар
     if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
         $parent = \skeeks\cms\shop\models\ShopCmsContentElement::findOne($parent_content_element_id);
 
@@ -57,6 +58,13 @@ if ($model->isNewRecord) {
 
         $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER;
         $allowChangeProductType = false;
+        $this->registerCss(<<<CSS
+.field-shopcmscontentelement-tree_id,
+.field-shopcmscontentelement-parent_content_element_id {
+    display: none;
+}
+CSS
+        );
     }
 
     if ($contentModel->parent_content_id && $model->parentContentElement) {
@@ -68,6 +76,14 @@ if ($model->isNewRecord) {
     }
 }
 
+if ($model->parent_content_element_id) {
+    $this->registerCss(<<<CSS
+.field-shopcmscontentelement-tree_id {
+    display: none;
+}
+CSS
+        );
+}
 
 if ($shopProduct->tradeOffers) {
     $allowChangeProductType = false;
@@ -354,11 +370,19 @@ JS
                                 [
                                     'class' => 'alert-warning',
                                 ],
-                            'body'    => \Yii::t('skeeks/shop/app', 'Management will be available after saving'),
+                            'body'    => \Yii::t('skeeks/shop/app', 'Управлять предложениями можно после сохранения товара, в отдельной вкладке.'),
                         ]); ?>
                     <? else: ?>
 
-                        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                    <?= \yii\bootstrap\Alert::widget([
+                            'options' =>
+                                [
+                                    'class' => 'alert-warning',
+                                ],
+                            'body'    => \Yii::t('skeeks/shop/app', 'Управлять предложениями можно в отдельной вкладке.'),
+                        ]); ?>
+
+                        <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                             'label'       => false,
                             'parentModel' => $model,
                             'relation'    => [
@@ -377,7 +401,7 @@ JS
                             'gridViewOptions' => [
                                 'columns' => (array)\skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($shopContent->childrenContent),
                             ],
-                        ]); ?>
+                        ]); */?>
 
                     <? endif; ?>
 
