@@ -24,6 +24,10 @@ $this->registerCss(<<<CSS
     
 }
 
+.btn-select-option {
+    margin-bottom: 5px;
+}
+
 
 CSS
 );
@@ -55,17 +59,18 @@ JS
 ?>
 
 <? $form = \yii\bootstrap\ActiveForm::begin([
-    'id' => 'sx-select-offer',
+    'id'      => 'sx-select-offer',
     'options' => [
-        'data-pjax' => 1
-    ]
+        'data-pjax' => 1,
+    ],
 ]); ?>
 <div class="sx-properties-choose">
     <? if ($helper->chooseFields) : ?>
         <? foreach ($helper->chooseFields as $code => $data) : ?>
             <? $disabled = \yii\helpers\ArrayHelper::getValue($data, 'disabledOptions'); ?>
+            <? if ((array)\yii\helpers\ArrayHelper::getValue($data, 'options')) : ?>
 
-            <div class="sx-choose-property-group">
+                <div class="sx-choose-property-group">
                     <?= $form->field($helper->chooseModel, $code)->hiddenInput()
                         /*->listBox(
                         \yii\helpers\ArrayHelper::getValue($data, 'options'),
@@ -78,29 +83,31 @@ JS
                         );
                     ?>
 
-                <? foreach (\yii\helpers\ArrayHelper::getValue($data, 'options') as $key => $value): ?>
-                    <?
-                    $isChecked = false;
-                    $isDisabled = false;
-                    $cssClass = 'u-btn-outline-darkgray';
-                    if ($helper->chooseModel->{$code} == $key) {
-                        $isChecked = true;
-                        $cssClass = 'u-btn-primary';
-                    }
-                    if (in_array($key, $disabled)) {
-                        $isDisabled = true;
-                        $cssClass = "sx-disabled-btn-option";
-                    }
+                    <? foreach ((array)\yii\helpers\ArrayHelper::getValue($data, 'options') as $key => $value): ?>
+                        <?
+                        $isChecked = false;
+                        $isDisabled = false;
+                        $cssClass = 'u-btn-outline-darkgray';
+                        if ($helper->chooseModel->{$code} == $key) {
+                            $isChecked = true;
+                            $cssClass = 'u-btn-primary';
+                        }
+                        if (in_array($key, $disabled)) {
+                            $isDisabled = true;
+                            $cssClass = "sx-disabled-btn-option";
+                        }
 
-                    ?>
-                    <button class="btn btn-select-option <?= $cssClass; ?>" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
-                        <? if ($isChecked) : ?>
-                            <i class="fas fa-check"></i>
-                        <? endif; ?>
-                        <?= $value; ?>
-                    </button>
-                <? endforeach; ?>
-            </div>
+                        ?>
+                        <button class="btn btn-select-option <?= $cssClass; ?>" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
+                            <? if ($isChecked) : ?>
+                                <i class="fas fa-check"></i>
+                            <? endif; ?>
+                            <?= $value; ?>
+                        </button>
+                    <? endforeach; ?>
+                </div>
+            <? endif; ?>
+
 
         <? endforeach; ?>
     <? endif; ?>
