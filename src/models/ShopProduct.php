@@ -59,7 +59,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopQuantityNoticeEmail[]   $shopQuantityNoticeEmails
  * @property ShopStoreProduct[]          $shopStoreProducts
  *
- * @property ShopCmsContentElement       $tradeOffers
+ * @property ShopCmsContentElement[]       $tradeOffers
  * @property ShopOrderItem[]             $shopOrderItems
  * @property ShopOrder[]                 $shopOrders
  * @property ShopSupplier                $shopSupplier
@@ -715,15 +715,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         $this->_baseProductPriceCurrency = $value;
         return $this;
-    }
-
-    /**
-     * Товар с предложениями?
-     * @return bool
-     */
-    public function isTradeOffers()
-    {
-        return (bool)($this->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
     }
 
     /**
