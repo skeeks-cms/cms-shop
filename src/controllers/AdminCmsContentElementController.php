@@ -725,9 +725,9 @@ HTML
 
                     if ($model->shopProduct->isSubProduct) {
                         if ($model->shopProduct->main_pid) {
-                            $data[] = '<span style="color: green;"><i class="fas fa-link" title="Привязан к главному товару"></i> '.$model->shopProduct->shopMainProduct->cmsContentElement->asText."</span>";
+                            $data[] = '<span style="color: green; margin-left: 60px;"><i class="fas fa-link" title="Привязан к главному товару"></i> '.$model->shopProduct->shopMainProduct->cmsContentElement->asText."</span>";
                         } else {
-                            $data[] = '<span style="color: red;"><i class="fas fa-link" title="Привязан к главному товару"></i> Не привязан к главному товару!</span>';
+                            $data[] = '<span style="color: red;margin-left: 60px;" ><i class="fas fa-link" title="Привязан к главному товару"></i> Не привязан к главному товару!</span>';
                         }
                     }
                     
