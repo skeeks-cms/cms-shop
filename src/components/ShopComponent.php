@@ -119,6 +119,11 @@ class ShopComponent extends Component
     public $show_filter_property_ids = [];
 
     /**
+     * @var array Фильтры отрктые по умолчанию
+     */
+    public $open_filter_property_ids = [];
+
+    /**
      * Показывать фильтры если есть подкатегории?
      * @var bool
      */
@@ -286,6 +291,12 @@ class ShopComponent extends Component
                         'multiple' => true,
                         'items'    => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
+                    
+                    'open_filter_property_ids' => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                    ],
                 ],
 
             ],
@@ -299,6 +310,7 @@ class ShopComponent extends Component
         return ArrayHelper::merge(parent::rules(), [
             [['offers_properties'], 'safe'],
             [['show_filter_property_ids'], 'safe'],
+            [['open_filter_property_ids'], 'safe'],
             [['email'], 'string'],
             [['payAfterConfirmation'], 'string'],
             [['start_order_status_id'], 'integer'],
@@ -336,6 +348,7 @@ class ShopComponent extends Component
             'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
             'is_show_product_only_quantity' => "Показывать товары только в наличии на сайте?",
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
+            'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_filters_has_subtree'   => "Показывать фильтры если есть подкатегории?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
             'type_price_purchase_id'        => "Закупочная цена",
