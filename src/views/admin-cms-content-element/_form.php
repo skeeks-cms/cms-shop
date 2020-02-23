@@ -24,7 +24,8 @@ $isShowPrices = true;
 $isShowNdsSettings = true;
 $isShowMeasureRatio = true;
 $isShowQuantity = true;
-
+$isAllowChangeSupplier = true;
+$possibleProductTypes = \skeeks\cms\shop\models\ShopProduct::possibleProductTypes();
 /**
  * @var $shopContent \skeeks\cms\shop\models\ShopContent
  */
@@ -83,6 +84,18 @@ CSS
         $isShowMeasureRatio = false;
         $isShowQuantity = false;
     }
+} else {
+    //Товар не новый уже и у него заданы товары поставщика
+    if ($shopProduct->shopSupplierProducts) {
+        $allowChangeProductType = true;
+        $isAllowChangeSupplier = false;
+        $isShowPrices = false;
+        $isShowNdsSettings = false;
+        $isShowMeasureRatio = false;
+        $isShowQuantity = false;
+        
+        \yii\helpers\ArrayHelper::remove($possibleProductTypes, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
+    }
 }
 
 if ($model->parent_content_element_id) {
@@ -106,7 +119,6 @@ if ($shopContent->childrenContent) {
     }
 }
 
-$isAllowChangeSupplier = true;
 if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find()->exists()) {
     $isAllowChangeSupplier = false;
 }
@@ -184,7 +196,7 @@ JS
                     \skeeks\cms\shop\models\ShopProduct::possibleProductTypes()); ?>
             </div>
         <? else : ?>
-            <?= $form->fieldSelect($shopProduct, 'product_type', \skeeks\cms\shop\models\ShopProduct::possibleProductTypes(), [
+            <?= $form->fieldSelect($shopProduct, 'product_type', $possibleProductTypes, [
                 'options' => [
                     'data-form-reload' => "true",
                 ],
@@ -342,7 +354,7 @@ JS
             <? endif; ?>
 
             <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                'content' => \Yii::t('skeeks/shop/app', 'Weight and size'),
+                'content' => \Yii::t('skeeks/shop/app', 'Weight and dimensions of goods with packaging'),
             ]); ?>
 
             <?= $form->field($shopProduct, 'weight')->textInput([

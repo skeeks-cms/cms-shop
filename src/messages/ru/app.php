@@ -430,4 +430,5 @@ return
         "Coupon successfully installed"          => 'Купон успешно установлен',
         "Discounts"                              => 'Скидки',
         "Marketing"                              => 'Маркетинг',
+        "Weight and dimensions of goods with packaging"                              => 'Вес и размеры товара с упаковкой',
     ];
