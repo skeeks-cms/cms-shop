@@ -955,11 +955,7 @@ HTML
         $productPrices = [];
         $shopStoreProducts = [];
 
-        //Если нужно создавать товар из поддтовара
-        $shopSubproductContentElement = null;
-        if ($shop_sub_product_id = \Yii::$app->request->get("shop_sub_product_id")) {
-            $shopSubproductContentElement = ShopCmsContentElement::find()->where(['id' => $shop_sub_product_id])->one();
-        }
+
 
 
         /**
@@ -991,6 +987,24 @@ HTML
 
         $shopProduct->loadDefaultValues();
         $rr = new RequestResponse();
+
+
+        //Если нужно создавать товар из поддтовара
+        $shopSubproductContentElement = null;
+        if ($shop_sub_product_id = \Yii::$app->request->get("shop_sub_product_id")) {
+            /**
+             * @var $shopSubproductContentElement ShopCmsContentElement
+             */
+            $shopSubproductContentElement = ShopCmsContentElement::find()->where(['id' => $shop_sub_product_id])->one();
+
+            if ($shopSubproductContentElement) {
+                $subShopProduct = $shopSubproductContentElement->shopProduct;
+                $model->name = $shopSubproductContentElement->name;
+
+                $shopProduct->measure_code = $subShopProduct->measure_code;
+                $shopProduct->measure_ratio = $subShopProduct->measure_ratio;
+            }
+        }
 
         if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
             $model->load(\Yii::$app->request->post());

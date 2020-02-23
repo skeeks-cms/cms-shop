@@ -19,7 +19,11 @@ $parent_content_element_id = null;
 $shopSubproductContentElement = @$shopSubproductContentElement;
 //Разрешено ли менять тип товара?
 $allowChangeProductType = false;
-
+//Показывать управление ценами
+$isShowPrices = true;
+$isShowNdsSettings = true;
+$isShowMeasureRatio = true;
+$isShowQuantity = true;
 
 /**
  * @var $shopContent \skeeks\cms\shop\models\ShopContent
@@ -71,8 +75,13 @@ CSS
         $model->name = $model->parentContentElement->name;
     }
 
+    //Если создается новый товар и указан товар поставщика
     if ($shopSubproductContentElement) {
         $allowChangeProductType = false;
+        $isShowPrices = false;
+        $isShowNdsSettings = false;
+        $isShowMeasureRatio = false;
+        $isShowQuantity = false;
     }
 }
 
@@ -82,7 +91,7 @@ if ($model->parent_content_element_id) {
     display: none;
 }
 CSS
-        );
+    );
 }
 
 if ($shopProduct->tradeOffers) {
@@ -237,53 +246,61 @@ JS
                 <? endif; ?>
             <? endif; ?>
 
+            <? if ($isShowPrices) : ?>
 
-            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
-            ]) ?>
+                <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                    'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
+                ]) ?>
 
-            <? if ($productPrices) : ?>
-                <? foreach ($productPrices as $productPrice) : ?>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-3 text-md-right  ">
-                                <label class="control-label"><?= $productPrice->typePrice->name; ?></label>
-                            </div>
-                            <div class="col-md-3">
-                                <?= Html::textInput("prices[".$productPrice->typePrice->id."][price]", $productPrice->price, [
-                                    'class' => 'form-control',
-                                ]); ?>
-                            </div>
-                            <div class="col-md-2">
-                                <?= \skeeks\widget\chosen\Chosen::widget([
-                                    'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
-                                    'value'         => $productPrice->currency_code,
-                                    'allowDeselect' => false,
-                                    'items'         => \yii\helpers\ArrayHelper::map(
-                                        \Yii::$app->money->activeCurrencies, 'code', 'code'
-                                    ),
-                                ]) ?>
-                            </div>
-                            <div class="col-md-2">
-                                <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
-                                    'productPrice' => $productPrice,
-                                ]); ?>
+                <? if ($productPrices) : ?>
+                    <? foreach ($productPrices as $productPrice) : ?>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3 text-md-right  ">
+                                    <label class="control-label"><?= $productPrice->typePrice->name; ?></label>
+                                </div>
+                                <div class="col-md-3">
+                                    <?= Html::textInput("prices[".$productPrice->typePrice->id."][price]", $productPrice->price, [
+                                        'class' => 'form-control',
+                                    ]); ?>
+                                </div>
+                                <div class="col-md-2">
+                                    <?= \skeeks\widget\chosen\Chosen::widget([
+                                        'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
+                                        'value'         => $productPrice->currency_code,
+                                        'allowDeselect' => false,
+                                        'items'         => \yii\helpers\ArrayHelper::map(
+                                            \Yii::$app->money->activeCurrencies, 'code', 'code'
+                                        ),
+                                    ]) ?>
+                                </div>
+                                <div class="col-md-2">
+                                    <?= \skeeks\cms\shop\widgets\admin\PropductPriceChangeAdminWidget::widget([
+                                        'productPrice' => $productPrice,
+                                    ]); ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                <? endforeach; ?>
+                    <? endforeach; ?>
 
+                <? endif; ?>
             <? endif; ?>
 
-            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                'content' => \Yii::t('skeeks/shop/app', 'The number and account'),
-            ]); ?>
-            <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect()); ?>
-            <?= $form->field($shopProduct, 'measure_ratio'); ?>
+            <? if ($isShowMeasureRatio || $isShowQuantity) : ?>
+                <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                    'content' => \Yii::t('skeeks/shop/app', 'The number and account'),
+                ]); ?>
+            <? endif; ?>
+            <? if ($isShowMeasureRatio) : ?>
+                <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect()); ?>
+                <?= $form->field($shopProduct, 'measure_ratio'); ?>
+            <? endif; ?>
 
 
-            <?= $form->field($shopProduct, "quantity"); ?>
+            <? if ($isShowMeasureRatio) : ?>
+                <?= $form->field($shopProduct, "quantity"); ?>
+            <? endif; ?>
 
             <? if ($shopStoreProducts && $shopProduct->shop_supplier_id) : ?>
 
@@ -343,17 +360,20 @@ JS
             ]); ?>
 
 
-            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-                'content' => \Yii::t('skeeks/shop/app', 'Setting prices'),
-            ]); ?>
+            <? if ($isShowNdsSettings) : ?>
 
-            <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
-                \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
-            )); ?>
-            <?= $form->field($shopProduct, 'vat_included')->checkbox([
-                'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-                'value'   => \skeeks\cms\components\Cms::BOOL_Y,
-            ]); ?>
+                <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                    'content' => \Yii::t('skeeks/shop/app', 'Setting prices'),
+                ]); ?>
+
+                <?= $form->fieldSelect($shopProduct, 'vat_id', \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\shop\models\ShopVat::find()->all(), 'id', 'name'
+                )); ?>
+                <?= $form->field($shopProduct, 'vat_included')->checkbox([
+                    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
+                    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
+                ]); ?>
+            <? endif; ?>
         <? endif; ?>
 
 
@@ -374,7 +394,7 @@ JS
                         ]); ?>
                     <? else: ?>
 
-                    <?= \yii\bootstrap\Alert::widget([
+                        <?= \yii\bootstrap\Alert::widget([
                             'options' =>
                                 [
                                     'class' => 'alert-warning',
@@ -382,7 +402,7 @@ JS
                             'body'    => \Yii::t('skeeks/shop/app', 'Управлять предложениями можно в отдельной вкладке.'),
                         ]); ?>
 
-                        <?/*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                        <? /*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                             'label'       => false,
                             'parentModel' => $model,
                             'relation'    => [
@@ -401,7 +421,7 @@ JS
                             'gridViewOptions' => [
                                 'columns' => (array)\skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($shopContent->childrenContent),
                             ],
-                        ]); */?>
+                        ]); */ ?>
 
                     <? endif; ?>
 
