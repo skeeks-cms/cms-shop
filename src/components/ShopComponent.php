@@ -18,6 +18,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
+use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -162,6 +163,11 @@ class ShopComponent extends Component
      */
     public $offers_properties = [];
 
+    /**
+     * @var array
+     */
+    public $visible_shop_supplier_ids = [];
+
 
     /**
      * Можно задать название и описание компонента
@@ -238,6 +244,13 @@ class ShopComponent extends Component
                             CmsContentProperty::find()->all(), 'code', 'asText'
                         ),
                     ],
+                    'visible_shop_supplier_ids'      => [
+                        'class' => SelectField::class,
+                        'multiple' => true,
+                        'items' => ArrayHelper::map(
+                            ShopSupplier::find()->all(), 'id', 'asText'
+                        ),
+                    ],
 
                 ],
             ],
@@ -308,6 +321,7 @@ class ShopComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            [['visible_shop_supplier_ids'], 'safe'],
             [['offers_properties'], 'safe'],
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
@@ -355,6 +369,7 @@ class ShopComponent extends Component
             'type_price_retail_id'          => "Розничная цена",
             'type_price_mrc_id'             => "Минимальная розничная цена",
             'offers_properties'             => "Свойства предложений",
+            'visible_shop_supplier_ids'             => "Отображать товары поставщиков",
         ]);
     }
 
@@ -629,9 +644,18 @@ class ShopComponent extends Component
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
 
-        $activeQuery->andWhere([
-            'shopProduct.shop_supplier_id' => null,
-        ]);
+        if ($this->visible_shop_supplier_ids) {
+            $activeQuery->andWhere([
+                'or',
+                ['shopProduct.shop_supplier_id' => null],
+                ['in', 'shopProduct.shop_supplier_id', $this->visible_shop_supplier_ids],
+            ]);
+        } else {
+            $activeQuery->andWhere(
+                ['shopProduct.shop_supplier_id' => null]
+            );
+        }
+
 
         return $this;
     }
