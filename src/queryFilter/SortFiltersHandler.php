@@ -75,10 +75,10 @@ class SortFiltersHandler extends Model
     public function getSortOptions()
     {
         return [
-            '-popular' => 'Популярные',
-            'price'    => 'Сначала дешевые',
-            '-price'   => 'Сначала дорогие',
-            '-new'     => 'Сначала новые',
+            '-popular' => \Yii::t("skeeks/unify", "Popular"),
+            'price'   => \Yii::t("skeeks/unify-shop", "Cheap first"),
+            '-price'   => \Yii::t("skeeks/unify-shop", "Dear first"),
+            '-new'     => \Yii::t("skeeks/unify", "New"),
         ];
     }
     /**
