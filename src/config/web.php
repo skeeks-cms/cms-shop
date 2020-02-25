@@ -29,17 +29,25 @@ return [
             'menu' => [
                 'data' => [
                     'shop' => [
-                        'name' => ['skeeks/shop/app', 'Shop'],
-                        'icon' => 'fas fa-shopping-cart',
+                        'name'  => ['skeeks/shop/app', 'Shop'],
+                        'icon'  => 'fas fa-shopping-cart',
                         'items' => [
                             [
                                 'name' => ['skeeks/shop/app', 'Orders'],
-                                'url' => ['/shop/upa-order'],
+                                'url'  => ['/shop/upa-order'],
                                 'icon' => 'fas fa-cart-arrow-down',
-                            ]
+                            ],
                         ],
                     ],
                 ],
+            ],
+        ],
+    ],
+
+    'modules' => [
+        'cms' => [
+            'controllerMap' => [
+                'content-element' => \skeeks\cms\shop\controllers\ContentElementController::class,
             ],
         ],
     ],

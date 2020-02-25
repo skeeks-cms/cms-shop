@@ -554,8 +554,7 @@ class ShopComponent extends Component
     public function getShopContents()
     {
         $query = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
-            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id',
-                'content_id'),
+            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id'),
         ]);
 
         $query->multiple = true;
