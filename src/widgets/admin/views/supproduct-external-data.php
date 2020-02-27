@@ -60,17 +60,18 @@ JS
                 :
             </span>
 
-                    <? if (is_string($row)) : ?>
-                        <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
-                            <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
-                        <? else : ?>
-                            <b><?= $row; ?></b>
-                        <? endif; ?>
 
+                <? if (is_string($row)) : ?>
+                    <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
+                        <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
                     <? else : ?>
-                        <pre><?= print_r($row, true); ?></pre>
+                        <b><?= $row; ?></b>
                     <? endif; ?>
-                </div>
+
+                <? else : ?>
+                    <pre><?= print_r($row, true); ?></pre>
+                <? endif; ?>
+            </div>
 
             <? endif; ?>
         <? endforeach; ?>
