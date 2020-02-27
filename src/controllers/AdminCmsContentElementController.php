@@ -1025,13 +1025,8 @@ HTML
         }
 
         $productPrices = [];
-        $productPriceQuery = ShopTypePrice::find()->andWhere(['shop_supplier_id' => null])->orderBy(['priority' => SORT_ASC]);
-        if ($shopProduct->shop_supplier_id) {
-            $productPriceQuery->orWhere(['in', 'shop_supplier_id', $shopProduct->shop_supplier_id]);
-        }
-
-
-        if ($typePrices = $productPriceQuery->all()) {
+        $typePrices = $shopProduct->shopTypePrices;
+        if ($typePrices) {
             foreach ($typePrices as $typePrice) {
 
                 $productPrice = new ShopProductPrice([
@@ -1196,11 +1191,8 @@ HTML
 
 
             $productPrices = [];
-            $productPriceQuery = ShopTypePrice::find()->andWhere(['shop_supplier_id' => null])->orderBy(['priority' => SORT_ASC]);
-            if ($shopProduct->shop_supplier_id) {
-                $productPriceQuery->orWhere(['in', 'shop_supplier_id', $shopProduct->shop_supplier_id]);
-            }
-            if ($typePrices = $productPriceQuery->all()) {
+            $typePrices = $shopProduct->shopTypePrices;
+            if ($typePrices) {
                 foreach ($typePrices as $typePrice) {
 
                     $productPrice = ShopProductPrice::find()->where([

@@ -741,9 +741,17 @@ class ShopProduct extends \skeeks\cms\models\Core
         $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
 
         if ($this->shop_supplier_id) {
-            $query->orWhere(['shop_supplier_id' => $this->shop_supplier_id]);
+            if ($this->shopSupplier->is_main) {
+                $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
+                $query->orWhere(['shop_supplier_id' => $this->shop_supplier_id]);
+            } else {
+                $query = ShopTypePrice::find()->where(['shop_supplier_id' => $this->shop_supplier_id]);
+            }
+        } else {
+            $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
         }
 
+        $query->orderBy(['priority' => SORT_ASC]);
         $query->multiple = true;
         return $query;
     }

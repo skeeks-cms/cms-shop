@@ -12,6 +12,7 @@ use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\models\CmsTree;
 use yii\helpers\ArrayHelper;
 /**
  *
@@ -22,7 +23,9 @@ use yii\helpers\ArrayHelper;
  * @property string                 $name
  * @property int|null               $cms_content_property_enum_id
  * @property int|null               $cms_content_element_id
+ * @property int|null               $cms_tree_id
  *
+ * @property CmsTree      $cmsTree
  * @property CmsContentElement      $cmsContentElement
  * @property CmsContentPropertyEnum $cmsContentPropertyEnum
  * @property ShopSupplierProperty $shopSupplierProperty
@@ -48,7 +51,7 @@ class ShopSupplierPropertyOption extends ActiveRecord
         return ArrayHelper::merge(parent::rules(), [
 
             [['shop_supplier_property_id', 'name'], 'required'],
-            [['shop_supplier_property_id', 'cms_content_property_enum_id', 'cms_content_element_id'], 'integer'],
+            [['shop_supplier_property_id', 'cms_content_property_enum_id', 'cms_content_element_id', 'cms_tree_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['shop_supplier_property_id', 'name'], 'unique', 'targetAttribute' => ['shop_supplier_property_id', 'name']],
             [['cms_content_element_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentElement::className(), 'targetAttribute' => ['cms_content_element_id' => 'id']],
@@ -68,6 +71,7 @@ class ShopSupplierPropertyOption extends ActiveRecord
             'name' => 'Название',
             'cms_content_property_enum_id' => 'Опция',
             'cms_content_element_id' => 'Опция',
+            'cms_tree_id' => 'Раздел',
         ]);
     }
 
@@ -79,6 +83,15 @@ class ShopSupplierPropertyOption extends ActiveRecord
     public function getCmsContentElement()
     {
         return $this->hasOne(CmsContentElement::className(), ['id' => 'cms_content_element_id']);
+    }
+    /**
+     * Gets query for [[CmsContentElement]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsTree()
+    {
+        return $this->hasOne(CmsTree::className(), ['id' => 'cms_tree_id']);
     }
 
     /**

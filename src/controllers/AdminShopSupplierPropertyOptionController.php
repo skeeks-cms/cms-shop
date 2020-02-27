@@ -8,23 +8,19 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
-use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
-use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
-use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopSupplierProperty;
 use skeeks\cms\shop\models\ShopSupplierPropertyOption;
-use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -53,7 +49,7 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
-            'index'         => [
+            'index'  => [
                 "filters" => [
                     'visibleFilters' => [
                         'id',
@@ -84,13 +80,14 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
                         'shop_supplier_property_id',
                         'name',
                         'connect',
+                        'cms_tree_id',
                     ],
                     'columns'        => [
-                        
-                        'connect' => [
+
+                        'connect'       => [
                             'format' => 'raw',
-                            'label' => 'Связь',
-                            'value' => function (ShopSupplierPropertyOption $property) {
+                            'label'  => 'CMS опция',
+                            'value'  => function (ShopSupplierPropertyOption $property) {
                                 if ($property->cms_content_element_id) {
                                     return $property->cmsContentElement->asText;
                                 }
@@ -98,6 +95,16 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
                                     return $property->cmsContentPropertyEnum->asText;
                                 }
 
+                                return '';
+                            },
+                        ],
+                        'cms_tree_id'       => [
+                            'format' => 'raw',
+                            'label'  => 'CMS раздел',
+                            'value'  => function (ShopSupplierPropertyOption $property) {
+                                if ($property->cms_tree_id) {
+                                    return $property->cmsTree->asText;
+                                }
                                 return '';
                             },
                         ],
@@ -113,10 +120,10 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
                     ],
                 ],
             ],
-            "create"        => [
+            "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
-            "update"        => [
+            "update" => [
                 'fields' => [$this, 'updateFields'],
             ],
         ]);
@@ -131,6 +138,19 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
 
         $connect = [];
 
+        $connect = [
+            'connect' => [
+                'class' => FieldSet::class,
+                'name'  => 'Связь с опциями cms',
+            ],
+        ];
+
+        $connect['connect']['fields'] = [
+            'cms_tree_id' => [
+                'class'       => WidgetField::class,
+                'widgetClass' => SelectModelDialogTreeWidget::class,
+            ],
+        ];
         if ($model->shopSupplierProperty) {
 
             $property = $model->shopSupplierProperty;
@@ -139,49 +159,31 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
                 $contentProperty = $property->cmsContentProperty;
                 if ($contentProperty->handler instanceof PropertyTypeList) {
 
-                    $connect = [
-                        'conncet' => [
-                            'class'  => FieldSet::class,
-                            'name'   => 'Связь с опциями cms',
-                            'fields' => [
-                                'cms_content_property_enum_id' => [
-                                    'class' => SelectField::class,
-                                    'items' => ArrayHelper::map(
-                                        $contentProperty->getEnums()->all(),
-                                        'id',
-                                        'asText'
-                                    ),
-                                ],
-                            ],
-                        ],
+                    $connect['connect']['fields']['cms_content_property_enum_id'] = [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            $contentProperty->getEnums()->all(),
+                            'id',
+                            'asText'
+                        ),
                     ];
 
                 } elseif ($contentProperty->handler instanceof PropertyTypeElement) {
                     $content_id = $property->cmsContentProperty->handler->content_id;
 
-                    $connect = [
-                        'conncet' => [
-                            'class'  => FieldSet::class,
-                            'name'   => 'Связь с опциями cms',
-                            'fields' => [
-                                'cms_content_element_id' => [
-                                    'class' => SelectField::class,
-                                    'items' => ArrayHelper::map(
-                                        CmsContentElement::find()->andWhere(['content_id' => $content_id])->all(),
-                                        'id',
-                                        'asText'
-                                    ),
-                                ],
-                            ],
-                        ],
+                    $connect['connect']['fields']['cms_content_element_id'] = [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            CmsContentElement::find()->andWhere(['content_id' => $content_id])->all(),
+                            'id',
+                            'asText'
+                        ),
                     ];
                 }
-
-
             }
-
         }
 
+        
 
         $result = [
 
@@ -190,11 +192,11 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
                 'name'   => 'От поставщика',
                 'fields' => [
                     'shop_supplier_property_id' => [
-                        'class' => SelectField::class,
+                        'class'          => SelectField::class,
                         'elementOptions' => [
-                            RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true'
+                            RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
                         ],
-                        'items' => ArrayHelper::map(
+                        'items'          => ArrayHelper::map(
                             ShopSupplierProperty::find()->all(),
                             'id',
                             'asText'
