@@ -231,4 +231,46 @@ class ShopCmsContentElement extends CmsContentElement
 
 
 
+    public function loadDataToMainModel(ShopCmsContentElement $model)
+    {
+        $model->name = $this->name;
+
+        if ($this->shopProduct && $this->shopProduct->supplier_external_jsondata && $this->shopProduct->shopSupplier) {
+            foreach ($this->shopProduct->supplier_external_jsondata as $key => $value)
+            {
+                /**
+                 * @var $property ShopSupplierProperty
+                 * @var $option ShopSupplierPropertyOption
+                 */
+                if ($property = $this->shopProduct->shopSupplier->getShopSupplierProperties()->andWhere(['external_code' => $key])->one()) {
+                    if ($property->cmsContentProperty) {
+                        $code = $property->cmsContentProperty->code;
+                        if (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_LIST])) {
+                            if (is_array($value)) {
+                                $data = [];
+                                foreach ($value as $k => $v)
+                                {
+                                    if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $v])->one()) {
+                                        $data[] = $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id;
+                                    }
+                                }
+                                $model->relatedPropertiesModel->setAttribute($code, $data);
+                            } else {
+                                if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $value])->one()) {
+                                    $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
+                                }
+                            }
+                        } elseif (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_STRING, ShopSupplierProperty::PROPERTY_TYPE_NUMBER])) {
+                            if (is_array($value)) {
+
+                            } else {
+                                $model->relatedPropertiesModel->setAttribute($code, $value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

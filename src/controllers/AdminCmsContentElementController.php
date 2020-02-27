@@ -999,7 +999,7 @@ HTML
 
             if ($shopSubproductContentElement) {
                 $subShopProduct = $shopSubproductContentElement->shopProduct;
-                $model->name = $shopSubproductContentElement->name;
+                $shopSubproductContentElement->loadDataToMainModel($model);
 
                 $shopProduct->measure_code = $subShopProduct->measure_code;
                 $shopProduct->measure_ratio = $subShopProduct->measure_ratio;
