@@ -251,12 +251,18 @@ class ShopCmsContentElement extends CmsContentElement
                                 foreach ($value as $k => $v)
                                 {
                                     if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $v])->one()) {
+                                        if ($option->cms_tree_id) {
+                                            $model->tree_id = $option->cms_tree_id;
+                                        }
                                         $data[] = $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id;
                                     }
                                 }
                                 $model->relatedPropertiesModel->setAttribute($code, $data);
                             } else {
                                 if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $value])->one()) {
+                                    if ($option->cms_tree_id) {
+                                        $model->tree_id = $option->cms_tree_id;
+                                    }
                                     $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
                                 }
                             }
