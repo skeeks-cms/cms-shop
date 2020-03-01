@@ -604,11 +604,21 @@ CSS
         <? if ($shopSubproductContentElement) : ?>
 
             <div class="sx-info-block">
-                <h5><?= $shopSubproductContentElement->name; ?></h5>
+                <h5><?= $shopSubproductContentElement->name; ?>
+                    <a href="https://market.yandex.ru/search?cvredirect=2&text=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в yandex market" target="_blank" style="color: blue" class="btn btn-xs btn-secondary">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                    <a href="https://yandex.ru/search/?lr=213&text=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в yandex" target="_blank" style="color: red" class="btn btn-xs btn-secondary">
+                        <i class="fab fa-yandex"></i>
+                    </a>
+                    <a href="https://www.google.com/search?q=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в google" target="_blank" style="" class="btn btn-xs btn-secondary">
+                        <i class="fab fa-google"></i>
+                    </a>
+                </h5>
             </div>
             <? if ($shopSubproductContentElement->shopProduct->shopSupplier) : ?>
                 <div class="sx-info-block">
-                    <p><span>Производитель:</span> <b><?= $shopSubproductContentElement->shopProduct->shopSupplier->asText; ?></b></p>
+                    <p><span>Поставщик:</span> <b><?= $shopSubproductContentElement->shopProduct->shopSupplier->asText; ?></b></p>
                     <p><span>Артикул:</span> <b><?= $shopSubproductContentElement->shopProduct->supplier_external_id; ?></b></p>
                 </div>
                 <div class="sx-info-block">

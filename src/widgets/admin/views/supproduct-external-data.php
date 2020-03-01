@@ -39,6 +39,8 @@ JS
 ?>
 <?= \yii\helpers\Html::beginTag('div', $widget->options); ?>
 
+<div itemscope="" itemtype="http://schema.org/Product">
+    <meta itemprop="name" content="<?= $widget->shopProduct->cmsContentElement->name; ?>">
 
 <? if ($supplierProperties) : ?>
     <div class="sx-supplier-properies-visible">
@@ -102,4 +104,5 @@ JS
     </div>
 <? endif; ?>
 
+</div>
 <?= \yii\helpers\Html::endTag('div'); ?>

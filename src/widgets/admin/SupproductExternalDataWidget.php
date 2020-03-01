@@ -18,6 +18,9 @@ use yii\helpers\Html;
  */
 class SupproductExternalDataWidget extends Widget
 {
+    /**
+     * @var null|ShopProduct
+     */
     public $shopProduct = null;
     public $options = [];
 
