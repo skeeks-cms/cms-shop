@@ -91,7 +91,7 @@ CSS
         $isAllowChangeSupplier = false;
         $isShowPrices = false;
         $isShowNdsSettings = false;
-        $isShowMeasureRatio = false;
+        $isShowMeasureRatio = true;
         $isShowQuantity = false;
         
         \yii\helpers\ArrayHelper::remove($possibleProductTypes, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
@@ -305,10 +305,17 @@ JS
                 ]); ?>
             <? endif; ?>
             <? if ($isShowMeasureRatio) : ?>
-                <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect()); ?>
+                <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect(), [
+                    "options" => [
+                        \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true"
+                    ]
+                ]); ?>
                 <?= $form->field($shopProduct, 'measure_ratio'); ?>
             <? endif; ?>
 
+            <?= $form->field($shopProduct, 'measure_matches_jsondata')->widget(
+                    \skeeks\cms\shop\widgets\admin\ProductMeasureMatchesInputWidget::class
+            ); ?>
 
             <? if ($isShowMeasureRatio) : ?>
                 <?= $form->field($shopProduct, "quantity"); ?>

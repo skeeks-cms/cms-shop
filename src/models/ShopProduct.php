@@ -39,6 +39,7 @@ use yii\helpers\ArrayHelper;
  * @property integer|null                $shop_supplier_id
  * @property string|null                 $supplier_external_id
  * @property array|null                  $supplier_external_jsondata
+ * @property array|null                  $measure_matches_jsondata
  *
  * @property string                      $productTypeAsText
  * @property Measure                     $measure
@@ -96,6 +97,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                 'class'  => HasJsonFieldsBehavior::class,
                 'fields' => [
                     'supplier_external_jsondata',
+                    /*'measure_matches_jsondata',*/
                 ],
             ],
         ]);
@@ -434,6 +436,9 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['supplier_external_id'], 'string'],
             [['supplier_external_id'], 'default', 'value' => null],
 
+            [['measure_matches_jsondata'], 'string'],
+            [['measure_matches_jsondata'], 'default', 'value' => null],
+
             [['supplier_external_jsondata'], 'safe'],
             [['supplier_external_jsondata'], 'default', 'value' => null],
 
@@ -489,6 +494,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'shop_supplier_id'           => \Yii::t('skeeks/shop/app', 'Поставщик'),
             'supplier_external_id'       => \Yii::t('skeeks/shop/app', 'Идентификатор поставщика'),
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
+            'measure_matches_jsondata' => \Yii::t('skeeks/shop/app', 'Упаковка'),
         ];
     }
 
