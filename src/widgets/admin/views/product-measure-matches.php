@@ -58,10 +58,12 @@ CSS
                 =
             </div>
             <div class="my-auto sx-new-value">
+                <div class="input-group">
                 <input type="text" class="form-control" name="value">
-            </div>
-            <div class="my-auto sx-new-measure">
-                <?= $model->measure->symbol; ?>
+                <div class="input-group-append">
+                    <span class="input-group-text"><?= $model->measure->symbol; ?></span>
+                </div>
+                </div>
             </div>
             <div class="my-auto sx-new-measure">
                 <button class="btn btn-xs sx-remove-row-btn"><i class="fas fa-remove"></i></button>

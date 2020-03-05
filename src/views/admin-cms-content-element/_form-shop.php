@@ -363,9 +363,9 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
         'content' => \Yii::t('skeeks/shop/app', 'Вес и размеры товара за ' . $shopProduct->measure_ratio . " " . $shopProduct->measure->symbol),
     ]); ?>
 
-    <?= $form->field($shopProduct, 'weight')->textInput([
-        'type' => 'number',
-    ]); ?>
+    <?= $form->field($shopProduct, 'weight')->widget(
+        \skeeks\cms\shop\widgets\admin\SmartWeightInputWidget::class
+    ); ?>
     <?= $form->field($shopProduct, 'length')->textInput([
         'type' => 'number',
     ]); ?>
