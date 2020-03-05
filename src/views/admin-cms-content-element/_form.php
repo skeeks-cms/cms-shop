@@ -322,7 +322,7 @@ JS
             <? endif; ?>
 
             <? if ($shopStoreProducts && $shopProduct->shop_supplier_id) : ?>
-
+l
                 <?
                 /**
                  * @var $shopSuppliers \skeeks\cms\shop\models\ShopSupplier[]

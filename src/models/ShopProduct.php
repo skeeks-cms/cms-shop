@@ -484,7 +484,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'vat_included'      => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
             'quantity_reserved' => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
             'measure_code'      => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
-            'measure_ratio'     => \Yii::t('skeeks/shop/app', 'The coefficient unit'),
+            'measure_ratio'     => \Yii::t('skeeks/shop/app', 'Минимальное количество продажи'),
             'width'             => \Yii::t('skeeks/shop/app', 'Width (mm)'),
             'length'            => \Yii::t('skeeks/shop/app', 'Length (mm)'),
             'height'            => \Yii::t('skeeks/shop/app', 'Height (mm)'),
@@ -502,6 +502,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return [
             'supplier_external_id' => \Yii::t('skeeks/shop/app', 'Уникальный идентификатор в системе поставщика'),
+            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
         ];
     }
     /**

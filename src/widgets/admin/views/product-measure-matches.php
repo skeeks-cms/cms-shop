@@ -41,6 +41,9 @@ CSS
 
     <div style="display: none;">
         <div class="sx-template d-flex flex-row sx-measure-row">
+            <div class="my-auto" style="width: 15px;">
+                1
+            </div>
             <div class="my-auto sx-measure-base-value">
                 <?= \yii\helpers\Html::listBox("measure", [], \Yii::$app->measure->getDataForSelect(), [
                     'class' => 'form-control',
