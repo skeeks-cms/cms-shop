@@ -6,7 +6,7 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 /* @var $this yii\web\View */
-/* @var $widget \skeeks\cms\shop\widgets\admin\SupproductExternalDataWidget */
+/* @var $widget \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget */
 
 $data = $widget->shopProduct->supplier_external_jsondata;
 $shopSupplier = $widget->shopProduct->shopSupplier;

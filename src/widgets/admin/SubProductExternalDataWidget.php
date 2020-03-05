@@ -16,7 +16,7 @@ use yii\helpers\Html;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class SupproductExternalDataWidget extends Widget
+class SubProductExternalDataWidget extends Widget
 {
     /**
      * @var null|ShopProduct

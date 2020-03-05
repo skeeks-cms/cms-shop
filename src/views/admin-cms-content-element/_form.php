@@ -277,7 +277,7 @@ CSS
                 <? if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : ?>
                     <hr/>
                     <div class="sx-info-block">
-                        <?= \skeeks\cms\shop\widgets\admin\SupproductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); ?>
+                        <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); ?>
                     </div>
                 <? endif; ?>
             <? endif; ?>
@@ -287,7 +287,7 @@ CSS
 
         <? if ($shopProduct->supplier_external_jsondata) : ?>
             <div class="sx-info-block">
-                <?= \skeeks\cms\shop\widgets\admin\SupproductExternalDataWidget::widget(['shopProduct' => $shopProduct]); ?>
+                <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopProduct]); ?>
             </div>
         <? endif; ?>
 
