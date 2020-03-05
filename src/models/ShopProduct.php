@@ -15,6 +15,7 @@ use skeeks\modules\cms\money\models\Currency;
 use skeeks\yii2\measureClassifier\models\Measure;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "{{%shop_product}}".
@@ -410,6 +411,18 @@ class ShopProduct extends \skeeks\cms\models\Core
                     if (!\Yii::$app->measureClassifier->getMeasureByCode($this->measure_code)) {
                         $this->addError("measure_code", "Указан код валюты которой нет в базе.");
                     }
+
+                    //Если у товара есть товары поставщика
+                    if ($this->shopSupplierProducts) {
+                        foreach ($this->shopSupplierProducts as $shopSupplierProduct)
+                        {
+                            if ($shopSupplierProduct->measure_code != $this->measure_code) {
+                                $m = \Yii::$app->measureClassifier->getMeasureByCode($shopSupplierProduct->measure_code);
+
+                                $this->addError("measure_code", "У товара задан товар поставщика с единицей измерения: {$m->symbol}. Укажите у текущего товара такую же единицу измерения.");
+                            }
+                        }
+                    }
                 },
             ],
 
@@ -438,6 +451,32 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['measure_matches_jsondata'], 'string'],
             [['measure_matches_jsondata'], 'default', 'value' => null],
+            [['measure_matches_jsondata'], function() {
+                if ($this->measure_matches_jsondata) {
+                    try {
+                        $data = Json::decode($this->measure_matches_jsondata);
+                        foreach ($data as $measure_code => $value)
+                        {
+                            if ($measure_code == $this->measure_code) {
+                                $this->addError("measure_matches_jsondata", "Соответствие не должно повторятся с базовой единицей измерения");
+                                return false;
+                            }
+
+                            $value = (float) $value;
+                            $data[$measure_code] = $value;
+                            if (!$value) {
+                                $this->addError("measure_matches_jsondata", "Не заполнено значение для одного из соответствий");
+                                return false;
+                            }
+                        }
+
+                        $this->measure_matches_jsondata = Json::encode($data);
+
+                    } catch (\Exception $e) {
+                        $this->addError("measure_matches_jsondata", "Указано некорректное занчение");
+                    }
+                }
+            }],
 
             [['supplier_external_jsondata'], 'safe'],
             [['supplier_external_jsondata'], 'default', 'value' => null],
@@ -502,6 +541,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return [
             'supplier_external_id' => \Yii::t('skeeks/shop/app', 'Уникальный идентификатор в системе поставщика'),
+            'measure_code' => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
             'measure_ratio' => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
         ];
     }

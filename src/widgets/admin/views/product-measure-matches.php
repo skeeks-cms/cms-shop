@@ -14,7 +14,7 @@ $model = $widget->model;
 
 $this->registerCss(<<<CSS
 .sx-product-measure-matches-wrapper .sx-measure-base-value {
-    width: 200px;
+    width: 220px;
 }
 .sx-product-measure-matches-wrapper .sx-new-value {
     width: 140px;
@@ -41,14 +41,18 @@ CSS
 
     <div style="display: none;">
         <div class="sx-template d-flex flex-row sx-measure-row">
-            <div class="my-auto" style="width: 15px;">
-                1
-            </div>
+
             <div class="my-auto sx-measure-base-value">
-                <?= \yii\helpers\Html::listBox("measure", [], \Yii::$app->measure->getDataForSelect(), [
-                    'class' => 'form-control',
-                    'size' => '1'
-                ]); ?>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">1</div>
+                    </div>
+                    <?= \yii\helpers\Html::listBox("measure", [], \Yii::$app->measure->getDataForSelect(), [
+                        'class' => 'form-control',
+                        'size' => '1'
+                    ]); ?>
+                </div>
+
             </div>
             <div class="my-auto " style="width: 20px; text-align: center;">
                 =
