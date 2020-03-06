@@ -17,7 +17,7 @@ $this->registerCss(<<<CSS
     width: 220px;
 }
 .sx-product-measure-matches-wrapper .sx-new-value {
-    width: 140px;
+    width: 160px;
 }
 .sx-product-measure-matches-wrapper .sx-new-measure {
     width: 40px;
@@ -44,8 +44,8 @@ CSS
 
             <div class="my-auto sx-measure-base-value">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                      <div class="input-group-text">1</div>
+                    <div class="input-group-prepend" style="min-width: 20px;">
+                      <div class="input-group-text"  style="min-width: 20px;">1</div>
                     </div>
                     <?= \yii\helpers\Html::listBox("measure", [], \Yii::$app->measure->getDataForSelect(), [
                         'class' => 'form-control',
@@ -59,7 +59,7 @@ CSS
             </div>
             <div class="my-auto sx-new-value">
                 <div class="input-group">
-                <input type="text" class="form-control" name="value">
+                <input type="number" class="form-control" name="value" step="0.0000001">
                 <div class="input-group-append">
                     <span class="input-group-text"><?= $model->measure->symbol; ?></span>
                 </div>
