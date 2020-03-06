@@ -283,10 +283,10 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
 
     <? if ($isShowMeasureRatio) : ?>
         <?= $form->field($shopProduct, 'measure_ratio')
-            ->textInput([
-                \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
-            ])
-            ->label("Минимальное количество продажи " . $shopProduct->measure->symbol); ?>
+            ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                'dynamicReload' => true,
+                'append' => $shopProduct->measure->symbol
+            ]); ?>
     <? endif; ?>
 
     <?= $form->field($shopProduct, 'measure_matches_jsondata')->widget(
@@ -366,16 +366,9 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     <?= $form->field($shopProduct, 'weight')->widget(
         \skeeks\cms\shop\widgets\admin\SmartWeightInputWidget::class
     ); ?>
-    <?= $form->field($shopProduct, 'length')->textInput([
-        'type' => 'number',
-    ]); ?>
-
-    <?= $form->field($shopProduct, 'width')->textInput([
-        'type' => 'number',
-    ]); ?>
-    <?= $form->field($shopProduct, 'height')->textInput([
-        'type' => 'number',
-    ]); ?>
+    <?= $form->field($shopProduct, 'length')->widget(\skeeks\cms\shop\widgets\admin\SmartDimensionsInputWidget::class); ?>
+    <?= $form->field($shopProduct, 'width')->widget(\skeeks\cms\shop\widgets\admin\SmartDimensionsInputWidget::class); ?>
+    <?= $form->field($shopProduct, 'height')->widget(\skeeks\cms\shop\widgets\admin\SmartDimensionsInputWidget::class); ?>
 
 
     <? if ($isShowNdsSettings) : ?>
