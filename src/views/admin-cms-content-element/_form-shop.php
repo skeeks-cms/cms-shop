@@ -247,7 +247,7 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     <? elseif ($shopSubproductContentElement): ?>
         <? $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
-            'options' => [
+            'options'     => [
                 'class' => 'alert-default text-center',
             ],
         ]); ?>
@@ -256,15 +256,15 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     <? elseif ($shopProduct->shopSupplierProducts) : ?>
         <? $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
-            'options' => [
+            'options'     => [
                 'class' => 'alert-default text-center',
             ],
         ]); ?>
-            Цена по этому товару рассчитывается автоматически из данных поставщиков.
+        Цена по этому товару рассчитывается автоматически из данных поставщиков.
         <? $alert::end(); ?>
-        <?/* foreach ($shopProduct->shopSupplierProducts as $shopSupplierProduct) : */?><!--
-            <?/*= $shopSupplierProduct->shopSupplier */?>
-        --><?/* endforeach; */?>
+        <? /* foreach ($shopProduct->shopSupplierProducts as $shopSupplierProduct) : */ ?><!--
+            <? /*= $shopSupplierProduct->shopSupplier */ ?>
+        --><? /* endforeach; */ ?>
     <? endif; ?>
 
 
@@ -285,7 +285,7 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
         <?= $form->field($shopProduct, 'measure_ratio')
             ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
                 'dynamicReload' => true,
-                'append' => $shopProduct->measure->symbol
+                'append'        => $shopProduct->measure->symbol,
             ]); ?>
     <? endif; ?>
 
@@ -294,31 +294,39 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     ); ?>
 
 
-
-
     <? if ($isShowMeasureQuantity) : ?>
-        <?= $form->field($shopProduct, "quantity")->label("Доступное количество " . $shopProduct->measure->symbol); ?>
+
+        <?= $form->field($shopProduct, "quantity")
+            ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                'options' => [
+                    'step' => 0.0001,
+                ],
+                'append'  => $shopProduct->measure->symbol,
+            ]);
+        //->label("Доступное количество " . $shopProduct->measure->symbol);
+        ?>
+
     <? elseif ($shopSubproductContentElement): ?>
         <? $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
-            'options' => [
+            'options'     => [
                 'class' => 'alert-default text-center',
             ],
         ]); ?>
-            Количество по этому товару будет рассчитано автоматически.
+        Количество по этому товару будет рассчитано автоматически.
         <? $alert::end(); ?>
     <? elseif ($shopProduct->shopSupplierProducts) : ?>
         <? $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
-            'options' => [
+            'options'     => [
                 'class' => 'alert-default text-center',
             ],
         ]); ?>
-            Количество по этому товару будет рассчитано автоматически из данных поставщиков.
+        Количество по этому товару будет рассчитано автоматически из данных поставщиков.
         <? $alert::end(); ?>
-        <?/* foreach ($shopProduct->shopSupplierProducts as $shopSupplierProduct) : */?><!--
-            <?/*= $shopSupplierProduct->shopSupplier */?>
-        --><?/* endforeach; */?>
+        <? /* foreach ($shopProduct->shopSupplierProducts as $shopSupplierProduct) : */ ?><!--
+            <? /*= $shopSupplierProduct->shopSupplier */ ?>
+        --><? /* endforeach; */ ?>
     <? endif; ?>
 
     <? if ($shopStoreProducts && $shopProduct->shop_supplier_id) : ?>
@@ -333,26 +341,43 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
         $shopSuppliers = $querySuppliers->all(); ?>
         <? if ($shopSuppliers) : ?>
             <? foreach ($shopSuppliers as $shopSupplier) : ?>
-                <div class="col-md-12">
-                    <h4><?= $shopSupplier->name; ?></h4>
-                </div>
-                <? foreach ($shopSupplier->shopStores as $shopStore) : ?>
-
-                    <? foreach ($shopStoreProducts as $shopStoreProduct) : ?>
-                        <? if ($shopStoreProduct->shop_store_id == $shopStore->id) : ?>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label class="control-label"><?= $shopStore->name; ?> (количество)</label>
-                                        <?= \yii\helpers\Html::textInput("stores[".$shopStore->id."][quantity]", $shopStoreProduct->quantity, [
-                                            'class' => 'form-control',
-                                        ]); ?>
+                <div class="sx-supplier-quantity" style="background: #efefef;
+    padding: 10px;
+    margin: 10px;">
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-9">
+                            <h4><?= $shopSupplier->name; ?></h4>
+                        </div>
+                    </div>
+                    <? foreach ($shopSupplier->shopStores as $shopStore) : ?>
+                        <? foreach ($shopStoreProducts as $shopStoreProduct) : ?>
+                            <? if ($shopStoreProduct->shop_store_id == $shopStore->id) : ?>
+                                <div class="form-group">
+                                    <div class="row sx-inline-row">
+                                        <div class="col-md-3 text-md-right my-auto">
+                                            <label class="control-label">Склад: <?= $shopStore->name; ?></label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <?= \skeeks\cms\backend\widgets\forms\NumberInputWidget::widget([
+                                                'name' => "stores[".$shopStore->id."][quantity]",
+                                                'value' => $shopStoreProduct->quantity,
+                                                'options' => [
+                                                    'class' => 'form-control',
+                                                    'step' => 0.0001,
+                                                ],
+                                                'append' => $shopProduct->measure->symbol
+                                            ])?>
+                                            <?/*= \yii\helpers\Html::textInput("stores[".$shopStore->id."][quantity]", $shopStoreProduct->quantity, [
+                                                'class' => 'form-control',
+                                            ]); */?>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        <? endif; ?>
+                            <? endif; ?>
+                        <? endforeach; ?>
                     <? endforeach; ?>
-                <? endforeach; ?>
+                </div>
 
             <? endforeach; ?>
         <? endif; ?>
@@ -360,7 +385,7 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     <? endif; ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Вес и размеры товара за ' . $shopProduct->measure_ratio . " " . $shopProduct->measure->symbol),
+        'content' => \Yii::t('skeeks/shop/app', 'Вес и размеры товара за '.$shopProduct->measure_ratio." ".$shopProduct->measure->symbol),
     ]); ?>
 
     <?= $form->field($shopProduct, 'weight')->widget(
