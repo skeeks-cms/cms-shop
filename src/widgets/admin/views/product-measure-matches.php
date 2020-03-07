@@ -45,11 +45,18 @@ CSS
             <div class="my-auto sx-measure-base-value">
                 <div class="input-group">
                     <div class="input-group-prepend" style="min-width: 20px;">
-                      <div class="input-group-text"  style="min-width: 20px;">1</div>
+                        <div class="input-group-text" style="min-width: 20px;">1</div>
                     </div>
-                    <?= \yii\helpers\Html::listBox("measure", [], \Yii::$app->measure->getDataForSelect(), [
+                    <?= \yii\helpers\Html::listBox("measure", [], \yii\helpers\ArrayHelper::map(
+                        \skeeks\cms\measure\models\CmsMeasure::find()
+                            ->orderBy(['priority' => SORT_ASC])
+                            ->andWhere(['!=', 'code', $model->measure_code])
+                            ->all(),
+                        'code',
+                        'asShortText'
+                    ), [
                         'class' => 'form-control',
-                        'size' => '1'
+                        'size'  => '1',
                     ]); ?>
                 </div>
 
@@ -59,10 +66,10 @@ CSS
             </div>
             <div class="my-auto sx-new-value">
                 <div class="input-group">
-                <input type="number" class="form-control" name="value" step="0.0000001">
-                <div class="input-group-append">
-                    <span class="input-group-text"><?= $model->measure->symbol; ?></span>
-                </div>
+                    <input type="number" class="form-control" name="value" step="0.0000001">
+                    <div class="input-group-append">
+                        <span class="input-group-text"><?= $model->measure->symbol; ?></span>
+                    </div>
                 </div>
             </div>
             <div class="my-auto sx-new-measure">

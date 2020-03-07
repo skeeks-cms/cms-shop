@@ -274,7 +274,11 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     ]); ?>
 
     <? if ($isShowMeasureCode) : ?>
-        <?= $form->fieldSelect($shopProduct, 'measure_code', \Yii::$app->measure->getDataForSelect(), [
+        <?= $form->fieldSelect($shopProduct, 'measure_code', \yii\helpers\ArrayHelper::map(
+                \skeeks\cms\measure\models\CmsMeasure::find()->orderBy(['priority' => SORT_ASC])->all(),
+                'code',
+                'asShortText'
+        ), [
             "options" => [
                 \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
             ],

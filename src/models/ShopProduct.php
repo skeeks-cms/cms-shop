@@ -9,10 +9,10 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
-use skeeks\yii2\measureClassifier\models\Measure;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -43,7 +43,7 @@ use yii\helpers\Json;
  * @property array|null                  $measure_matches_jsondata
  *
  * @property string                      $productTypeAsText
- * @property Measure                     $measure
+ * @property CmsMeasure                  $measure
  * @property ShopCmsContentElement       $cmsContentElement
  * @property ShopTypePrice               $trialPrice
  * @property ShopVat                     $vat
@@ -61,7 +61,7 @@ use yii\helpers\Json;
  * @property ShopQuantityNoticeEmail[]   $shopQuantityNoticeEmails
  * @property ShopStoreProduct[]          $shopStoreProducts
  *
- * @property ShopCmsContentElement[]       $tradeOffers
+ * @property ShopCmsContentElement[]     $tradeOffers
  * @property ShopOrderItem[]             $shopOrderItems
  * @property ShopOrder[]                 $shopOrders
  * @property ShopSupplier                $shopSupplier
@@ -414,8 +414,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
                     //Если у товара есть товары поставщика
                     if ($this->shopSupplierProducts) {
-                        foreach ($this->shopSupplierProducts as $shopSupplierProduct)
-                        {
+                        foreach ($this->shopSupplierProducts as $shopSupplierProduct) {
                             if ($shopSupplierProduct->measure_code != $this->measure_code) {
                                 $m = \Yii::$app->measureClassifier->getMeasureByCode($shopSupplierProduct->measure_code);
 
@@ -451,32 +450,34 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['measure_matches_jsondata'], 'string'],
             [['measure_matches_jsondata'], 'default', 'value' => null],
-            [['measure_matches_jsondata'], function() {
-                if ($this->measure_matches_jsondata) {
-                    try {
-                        $data = Json::decode($this->measure_matches_jsondata);
-                        foreach ($data as $measure_code => $value)
-                        {
-                            if ($measure_code == $this->measure_code) {
-                                $this->addError("measure_matches_jsondata", "Соответствие не должно повторятся с базовой единицей измерения");
-                                return false;
+            [
+                ['measure_matches_jsondata'],
+                function () {
+                    if ($this->measure_matches_jsondata) {
+                        try {
+                            $data = Json::decode($this->measure_matches_jsondata);
+                            foreach ($data as $measure_code => $value) {
+                                if ($measure_code == $this->measure_code) {
+                                    $this->addError("measure_matches_jsondata", "Соответствие не должно повторятся с базовой единицей измерения");
+                                    return false;
+                                }
+
+                                $value = (float)$value;
+                                $data[$measure_code] = $value;
+                                if (!$value) {
+                                    $this->addError("measure_matches_jsondata", "Не заполнено значение для одного из соответствий");
+                                    return false;
+                                }
                             }
 
-                            $value = (float) $value;
-                            $data[$measure_code] = $value;
-                            if (!$value) {
-                                $this->addError("measure_matches_jsondata", "Не заполнено значение для одного из соответствий");
-                                return false;
-                            }
+                            $this->measure_matches_jsondata = Json::encode($data);
+
+                        } catch (\Exception $e) {
+                            $this->addError("measure_matches_jsondata", "Указано некорректное занчение");
                         }
-
-                        $this->measure_matches_jsondata = Json::encode($data);
-
-                    } catch (\Exception $e) {
-                        $this->addError("measure_matches_jsondata", "Указано некорректное занчение");
                     }
-                }
-            }],
+                },
+            ],
 
             [['supplier_external_jsondata'], 'safe'],
             [['supplier_external_jsondata'], 'default', 'value' => null],
@@ -533,7 +534,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'shop_supplier_id'           => \Yii::t('skeeks/shop/app', 'Поставщик'),
             'supplier_external_id'       => \Yii::t('skeeks/shop/app', 'Идентификатор поставщика'),
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
-            'measure_matches_jsondata' => \Yii::t('skeeks/shop/app', 'Упаковка'),
+            'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
         ];
     }
 
@@ -541,8 +542,8 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return [
             'supplier_external_id' => \Yii::t('skeeks/shop/app', 'Уникальный идентификатор в системе поставщика'),
-            'measure_code' => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
-            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
+            'measure_code'         => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
+            'measure_ratio'        => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
         ];
     }
     /**
@@ -571,12 +572,10 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getMeasure()
     {
-        if (!\Yii::$app->measureClassifier->getMeasureByCode($this->measure_code)) {
-            return \Yii::$app->measureClassifier->getMeasureByCode(\Yii::$app->measure->default_measure_code);
-        }
+        return $this->hasOne(CmsMeasure::class, ['code' => 'measure_code']);
 
-        return \Yii::$app->measureClassifier->getMeasureByCode($this->measure_code);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -826,7 +825,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getIsSimpleProduct()
     {
-        return (bool) ($this->product_type === self::TYPE_SIMPLE);
+        return (bool)($this->product_type === self::TYPE_SIMPLE);
     }
 
     /**
@@ -834,13 +833,13 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getIsOfferProduct()
     {
-        return (bool) ($this->product_type === self::TYPE_OFFER);
+        return (bool)($this->product_type === self::TYPE_OFFER);
     }
     /**
      * @return bool
      */
     public function getIsOffersProduct()
     {
-        return (bool) ($this->product_type === self::TYPE_OFFERS);
+        return (bool)($this->product_type === self::TYPE_OFFERS);
     }
 }
