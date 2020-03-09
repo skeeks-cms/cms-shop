@@ -26,8 +26,7 @@
     ],
     "require": {
         "skeeks/cms": "^5.0.4 || dev-master",
-        "skeeks/cms-money": "^0.1.0 || ^1.0.0 || dev-master",
-        "skeeks/cms-measure": "^2.0.0 || dev-master"
+        "skeeks/cms-money": "^0.1.0 || ^1.0.0 || dev-master"
     },
     "autoload": {
         "psr-4": {
