@@ -246,6 +246,14 @@ class ShopCmsContentElement extends CmsContentElement
                     if ($property->cmsContentProperty) {
                         $code = $property->cmsContentProperty->code;
                         if (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_LIST])) {
+                            if ($property->import_delimetr) {
+                                $value = explode($property->import_delimetr, $value);
+                                foreach ($value as $k => $v)
+                                {
+                                    $value[$k] = trim($v);
+                                }
+                            }
+
                             if (is_array($value)) {
                                 $data = [];
                                 foreach ($value as $k => $v)

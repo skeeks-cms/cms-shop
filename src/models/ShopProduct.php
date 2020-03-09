@@ -408,7 +408,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             [
                 ['measure_code'],
                 function ($model) {
-                    if (!\Yii::$app->measureClassifier->getMeasureByCode($this->measure_code)) {
+                    if (!$this->measure) {
                         $this->addError("measure_code", "Указан код валюты которой нет в базе.");
                     }
 
