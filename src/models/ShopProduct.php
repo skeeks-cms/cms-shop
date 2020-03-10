@@ -226,6 +226,13 @@ class ShopProduct extends \skeeks\cms\models\Core
             {
                 if (!$this->cmsContentElement->parent_content_element_id) {
                     $this->product_type = self::TYPE_SIMPLE;
+                } else {
+                    //Если товар к которому привязываем не с предложениями то нужно сделать его таким
+                    $parentShopProduct = $this->cmsContentElement->parentContentElement->shopProduct;
+                    if ($parentShopProduct->product_type != self::TYPE_OFFERS) {
+                        $parentShopProduct->product_type = self::TYPE_OFFERS;
+                        $parentShopProduct->update(false, ['product_type']);
+                    }
                 }
 
             }
@@ -427,15 +434,16 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['product_type'], 'string', 'max' => 10],
             [['product_type'], 'default', 'value' => static::TYPE_SIMPLE],
-            /*[
+            [
                 'product_type', function ($attribute) {
                     if ($this->{$attribute} == self::TYPE_OFFER) {
-                        return false;
+                        if (!$this->cmsContentElement->parent_content_element_id) {
+                            $this->addError($attribute, "Для того чтобы товар был предложением, нужно выбрать общий товар в который он будет вложен.");
+                        }
                     }
-
                 },
 
-            ],*/
+            ],
 
 
             [['quantity'], 'default', 'value' => 1],
