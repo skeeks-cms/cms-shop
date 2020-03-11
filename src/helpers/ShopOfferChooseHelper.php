@@ -172,7 +172,7 @@ class ShopOfferChooseHelper extends Component
                             }
                         } else {
                             //Нужно исключить опции которые недоступны
-                            $options = ArrayHelper::getValue($dataField, 'options');
+                            $options = ArrayHelper::getValue($dataField, 'options', []);
                             $disabledOptions = [];
                             foreach ($options as $optionKey => $optionValue)
                             {
