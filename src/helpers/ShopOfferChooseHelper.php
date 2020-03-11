@@ -130,7 +130,15 @@ class ShopOfferChooseHelper extends Component
                 foreach ($this->shopProduct->tradeOffers as $tradeOfferElement) {
                     
                     if ($value = $tradeOfferElement->relatedPropertiesModel->getAttribute($code)) {
-                        $this->_chooseFields[$code]['options'][$value] = $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
+                        if (is_array($value)) {
+                            foreach ($value as $v)
+                            {
+                                //$this->_chooseFields[$code]['options'][$v] = $v;
+                            }
+                        } else {
+                            $this->_chooseFields[$code]['options'][$value] = $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
+                        }
+                        
                     }
                 }
                 
