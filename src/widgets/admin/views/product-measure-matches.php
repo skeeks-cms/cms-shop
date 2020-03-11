@@ -68,7 +68,7 @@ CSS
                 <div class="input-group">
                     <input type="number" class="form-control" name="value" step="0.0000001">
                     <div class="input-group-append">
-                        <span class="input-group-text"><?= $model->measure->symbol; ?></span>
+                        <span class="input-group-text"><?= $model->measure ? $model->measure->symbol : ""; ?></span>
                     </div>
                 </div>
             </div>

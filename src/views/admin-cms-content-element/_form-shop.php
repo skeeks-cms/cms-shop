@@ -289,7 +289,7 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
         <?= $form->field($shopProduct, 'measure_ratio')
             ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
                 'dynamicReload' => true,
-                'append'        => $shopProduct->measure->symbol,
+                'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : ""
             ]); ?>
     <? endif; ?>
 
@@ -305,7 +305,7 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
                 'options' => [
                     'step' => 0.0001,
                 ],
-                'append'  => $shopProduct->measure->symbol,
+                'append'  => $shopProduct->measure ? $shopProduct->measure->symbol : "",
             ]);
         //->label("Доступное количество " . $shopProduct->measure->symbol);
         ?>
@@ -370,7 +370,7 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
                                                     'class' => 'form-control',
                                                     'step' => 0.0001,
                                                 ],
-                                                'append' => $shopProduct->measure->symbol
+                                                'append' => $shopProduct->measure ? $shopProduct->measure->symbol : ""
                                             ])?>
                                             <?/*= \yii\helpers\Html::textInput("stores[".$shopStore->id."][quantity]", $shopStoreProduct->quantity, [
                                                 'class' => 'form-control',
@@ -389,7 +389,7 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     <? endif; ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Вес и размеры товара за '.$shopProduct->measure_ratio." ".$shopProduct->measure->symbol),
+        'content' => \Yii::t('skeeks/shop/app', 'Вес и размеры товара за '.$shopProduct->measure_ratio." ". ($shopProduct->measure ? $shopProduct->measure->symbol : "") ),
     ]); ?>
 
     <?= $form->field($shopProduct, 'weight')->widget(
@@ -398,7 +398,6 @@ if ($shopSubproductContentElement || !\skeeks\cms\shop\models\ShopSupplier::find
     <?= $form->field($shopProduct, 'length')->widget(\skeeks\cms\shop\widgets\admin\SmartDimensionsInputWidget::class); ?>
     <?= $form->field($shopProduct, 'width')->widget(\skeeks\cms\shop\widgets\admin\SmartDimensionsInputWidget::class); ?>
     <?= $form->field($shopProduct, 'height')->widget(\skeeks\cms\shop\widgets\admin\SmartDimensionsInputWidget::class); ?>
-
 
     <? if ($isShowNdsSettings) : ?>
 
