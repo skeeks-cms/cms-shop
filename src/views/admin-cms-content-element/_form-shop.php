@@ -68,6 +68,8 @@ if ($model->isNewRecord) {
         $model->parent_content_element_id = $parent_content_element_id;
 
         $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER;
+        $model->tree_id = $parent->tree_id;
+        
         $allowChangeProductType = false;
         $this->registerCss(<<<CSS
 .field-shopcmscontentelement-tree_id,
