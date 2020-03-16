@@ -22,6 +22,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property CmsStorageFile $cmsImage
  * @property ShopSupplier   $shopSupplier
+ * @property ShopStoreProduct[] $shopStoreProducts
+ * @property ShopProduct[] $shopProducts
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -53,10 +55,11 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
             [['cms_image_id'], 'safe'],
             [['shop_supplier_id'], 'integer'],
-
-            [['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
-            [['external_id'], 'string'],
+            
             [['external_id'], 'default', 'value' => null],
+            //[['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
+            [['external_id'], 'string'],
+            
 
         ]);
     }
@@ -92,6 +95,27 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function getShopSupplier()
     {
         return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
+    }
+    
+    
+    /**
+     * Gets query for [[ShopStoreProducts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopStoreProducts()
+    {
+        return $this->hasMany(ShopStoreProduct::className(), ['shop_store_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopProducts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProducts()
+    {
+        return $this->hasMany(ShopProduct::className(), ['id' => 'shop_product_id'])->viaTable('shop_store_product', ['shop_store_id' => 'id']);
     }
 
 }

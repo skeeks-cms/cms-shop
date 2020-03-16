@@ -9,23 +9,68 @@
 namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\shop\models\ShopCart;
-use skeeks\cms\shop\models\ShopFuser;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\console\Controller;
-use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
- * Module shop agents
- *
- * Class AgentsController
- * @package skeeks\cms\shop\console\controllers
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AgentsController extends Controller
 {
 
+    public function actionUpdateQuantity()
+    {
+        //Обновление количества товаров у которых заданы склады
+        \Yii::$app->db->createCommand("
+            UPDATE 
+                `shop_product` as sp
+                LEFT JOIN shop_store_product ssp on ssp.shop_product_id = sp.id 
+            SET 
+                sp.`quantity` = (select sum(ssp_inner.quantity) from shop_store_product as ssp_inner WHERE ssp_inner.shop_product_id = sp.id )
+            WHERE 
+                ssp.id is not null
+        ")->execute();
+
+
+        //Обновление количества у главных товаров, к которым привязаны товары поставщиков
+        \Yii::$app->db->createCommand("
+            UPDATE 
+                `shop_product` as sp 
+                INNER JOIN
+                (
+                   SELECT main_pid, SUM(quantity) as sum_quantity
+                   FROM shop_product 
+                   GROUP BY main_pid
+                ) sp_has_main ON sp.id = sp_has_main.main_pid
+            SET 
+                sp.`quantity` = sp_has_main.sum_quantity
+            WHERE 
+                sp_has_main.main_pid is not null
+        ")->execute();
+
+
+
+        \Yii::$app->db->createCommand("
+            UPDATE 
+                `shop_product` as sp 
+                INNER JOIN
+                (
+                   SELECT main_pid, SUM(quantity) as sum_quantity
+                   FROM shop_product 
+                   GROUP BY main_pid
+                ) sp_has_main ON sp.id = sp_has_main.main_pid
+            SET 
+                sp.`quantity` = sp_has_main.sum_quantity
+            WHERE 
+                sp_has_main.main_pid is not null
+        ")->execute();
+        
+    }
+
     /**
-     * Просмотр созданных бекапов баз данных
+     * Удаление пустых корзин старше
+     * @param int $days количество дней
      */
     public function actionDeleteEmptyCarts($days = 1)
     {
@@ -77,7 +122,7 @@ SQL
                 Console::endProgress();*/
 
         if ($ids) {
-            $this->stdout("Empty orders for delete: " . count($ids) . "\n");
+            $this->stdout("Empty orders for delete: ".count($ids)."\n");
             $deleted = ShopOrder::deleteAll(['id' => $ids]);
             $this->stdout("Removed empty orders: ".$deleted."\n");
         } else {
