@@ -12,6 +12,7 @@ use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Console;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -19,10 +20,72 @@ use yii\helpers\ArrayHelper;
 class AgentsController extends Controller
 {
 
+    /**
+     * Проверка и исправление типа товара
+     * @throws \yii\db\Exception
+     */
+    public function actionUpdateProductType()
+    {
+        //Товары у которых не задан родительский элемент делаем простыми
+        $result = \Yii::$app->db->createCommand(<<<SQL
+            UPDATE 
+                `shop_product` as sp 
+                LEFT JOIN cms_content_element cce on cce.id = sp.id 
+            SET 
+                sp.`product_type` = "simple"
+            WHERE 
+                cce.parent_content_element_id is null
+SQL
+        )->execute();
+
+        //Товары у которых есть дочерние - товарами с предложенями
+        $result = \Yii::$app->db->createCommand(<<<SQL
+            UPDATE 
+                `shop_product` as sp 
+                INNER JOIN
+                (
+                    /*Товары которые являются общими*/
+                   SELECT cce.parent_content_element_id as inner_sp_id
+                   FROM shop_product inner_sp
+                       LEFT JOIN cms_content_element cce on cce.id = inner_sp.id 
+                   WHERE cce.parent_content_element_id is not null
+                   GROUP BY cce.parent_content_element_id
+                ) sp_has_parent ON sp.id = sp_has_parent.inner_sp_id
+            SET 
+                sp.`product_type` = "offers"
+SQL
+        )->execute();
+
+        //Товар-предложение
+        $result = \Yii::$app->db->createCommand(<<<SQL
+            UPDATE 
+                `shop_product` as sp 
+                INNER JOIN
+                (
+                    /*Товары которые являются предложениями */
+                   SELECT inner_sp.id as inner_sp_id
+                   FROM shop_product inner_sp
+                       LEFT JOIN cms_content_element cce on cce.id = inner_sp.id 
+                   WHERE cce.parent_content_element_id is not null
+                   GROUP BY inner_sp.id
+                ) sp_has_parent ON sp.id = sp_has_parent.inner_sp_id
+            SET 
+                sp.`product_type` = "offer"
+SQL
+        )->execute();
+
+
+    }
+
+    /**
+     * Обновление количества товаров
+     * 
+     * @throws \yii\db\Exception
+     */
     public function actionUpdateQuantity()
     {
         //Обновление количества товаров у которых заданы склады
-        \Yii::$app->db->createCommand("
+        /*\Yii::$app->db->createCommand("
             UPDATE 
                 `shop_product` as sp
                 LEFT JOIN shop_store_product ssp on ssp.shop_product_id = sp.id 
@@ -30,8 +93,27 @@ class AgentsController extends Controller
                 sp.`quantity` = (select sum(ssp_inner.quantity) from shop_store_product as ssp_inner WHERE ssp_inner.shop_product_id = sp.id )
             WHERE 
                 ssp.id is not null
-        ")->execute();
+        ")->execute();*/
 
+
+        //Обновление количества товаров у которых задан поставщик, информация берется со складов
+        $result = \Yii::$app->db->createCommand(<<<SQL
+            UPDATE 
+                `shop_product` as sp 
+                INNER JOIN
+                (
+                    /*Товары у которых задан поставщик и количество на их складах*/
+                   SELECT inner_sp.id as inner_sp_id, SUM(ssp.quantity) as sum_quantity
+                   FROM shop_product inner_sp
+                       LEFT JOIN shop_store_product ssp on ssp.shop_product_id = inner_sp.id 
+                       WHERE inner_sp.shop_supplier_id is not null
+                   GROUP BY inner_sp.id
+                ) sp_has_supplier ON sp.id = sp_has_supplier.inner_sp_id
+            SET 
+                sp.`quantity` = if(sp_has_supplier.sum_quantity is null, 0, sp_has_supplier.sum_quantity)
+SQL
+        )->execute();
+        
 
         //Обновление количества у главных товаров, к которым привязаны товары поставщиков
         \Yii::$app->db->createCommand("
@@ -50,21 +132,23 @@ class AgentsController extends Controller
         ")->execute();
 
 
-
+        //Обновления количества у общих товаров
         \Yii::$app->db->createCommand("
             UPDATE 
                 `shop_product` as sp 
                 INNER JOIN
                 (
-                   SELECT main_pid, SUM(quantity) as sum_quantity
-                   FROM shop_product 
-                   GROUP BY main_pid
-                ) sp_has_main ON sp.id = sp_has_main.main_pid
+                    /*Товары у которых задан общий товар*/
+                   SELECT cce.parent_content_element_id as inner_sp_id, SUM(inner_sp.quantity) as sum_quantity
+                   FROM shop_product inner_sp
+                       LEFT JOIN cms_content_element cce on cce.id = inner_sp.id 
+                   WHERE cce.parent_content_element_id is not null
+                   GROUP BY cce.parent_content_element_id
+                ) sp_has_parent ON sp.id = sp_has_parent.inner_sp_id
             SET 
-                sp.`quantity` = sp_has_main.sum_quantity
-            WHERE 
-                sp_has_main.main_pid is not null
+                sp.`quantity` = sp_has_parent.sum_quantity
         ")->execute();
+        
         
     }
 
