@@ -306,7 +306,7 @@ class ShopOrderItem extends ActiveRecord
         //Если это предложение, нужно добавить свойства
         if ($parentElement && !$this->isNewRecord) {
 
-            if ($product->cmsContentElement->name != $parentElement->name) {
+            /*if ($product->cmsContentElement->name != $parentElement->name) {
                 $basketProperty = new ShopOrderItemProperty();
                 $basketProperty->shop_order_item_id = $this->id;
                 $basketProperty->code = 'name';
@@ -314,21 +314,25 @@ class ShopOrderItem extends ActiveRecord
                 $basketProperty->name = \Yii::t('skeeks/cms', 'name');
 
                 $basketProperty->save();
-            }
+            }*/
 
             if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray()) {
                 foreach ($properties as $code => $value) {
-                    if (!$this->getShopOrderItemProperties()->andWhere(['code' => $code])->count() && $value) {
-                        $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
-
-                        $basketProperty = new ShopOrderItemProperty();
-                        $basketProperty->shop_order_item_id = $this->id;
-                        $basketProperty->code = $code;
-                        $basketProperty->value = $product->cmsContentElement->relatedPropertiesModel->getSmartAttribute($code);
-                        $basketProperty->name = $property->name;
-
-                        $basketProperty->save();
+                    
+                    if (in_array($code, (array) \Yii::$app->shop->offers_properties)) {
+                        if (!$this->getShopOrderItemProperties()->andWhere(['code' => $code])->count() && $value) {
+                            $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
+    
+                            $basketProperty = new ShopOrderItemProperty();
+                            $basketProperty->shop_order_item_id = $this->id;
+                            $basketProperty->code = $code;
+                            $basketProperty->value = $product->cmsContentElement->relatedPropertiesModel->getAttributeAsText($code);
+                            $basketProperty->name = $property->name;
+    
+                            $basketProperty->save();
+                        }
                     }
+                    
                 }
             }
 
@@ -404,7 +408,12 @@ class ShopOrderItem extends ActiveRecord
         if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
             if ($parent = $this->shopProduct->cmsContentElement->parentContentElement) {
-                return $parent->image;
+                if ($this->shopProduct->cmsContentElement->image) {
+                    return $this->shopProduct->cmsContentElement->image;
+                } else {
+                    return $parent->image;
+                }
+                
             } else {
                 return $this->shopProduct->cmsContentElement->image;
             }
