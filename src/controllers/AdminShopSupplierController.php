@@ -13,6 +13,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopSupplier;
@@ -258,7 +259,15 @@ class AdminShopSupplierController extends BackendModelStandartController
                      * @var $action BackendGridModelRelatedAction
                      */
                     $action = $e->sender;
-                    $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction,$action->relatedIndexAction->controller->content);
+                    /**
+                     * @var ShopContent $shopContent
+                     */
+                    $content = null;
+                    $shopContent = ShopContent::find()->one();
+                    if ($shopContent) {
+                        $content = $shopContent->content;
+                    }
+                    $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction, $content);
 
                     $action->relatedIndexAction->grid['on init'] = function (Event $e) {
                         /**
