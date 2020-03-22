@@ -67,7 +67,8 @@ JS
 <div class="sx-properties-choose">
     <? if ($helper->chooseFields) : ?>
         <? foreach ($helper->chooseFields as $code => $data) : ?>
-            <? $disabled = \yii\helpers\ArrayHelper::getValue($data, 'disabledOptions'); ?>
+            <?
+            $disabled = \yii\helpers\ArrayHelper::getValue($data, 'disabledOptions'); ?>
             <? if ((array)\yii\helpers\ArrayHelper::getValue($data, 'options')) : ?>
 
                 <div class="sx-choose-property-group">
@@ -113,13 +114,21 @@ JS
     <? endif; ?>
 </div>
 <div class="sx-offer-choose">
-    <? if (count($helper->availableOffers) > 1) : ?>
+
+    <? if (!$helper->is_offers_properties) : ?>
+        <?= $form->field($helper->chooseModel, 'offer_id')->listBox(\yii\helpers\ArrayHelper::map(
+            $helper->availableOffers,
+            'id',
+            'asText'
+        ), ['size' => 1])->label("Предложение"); ?>
+    <? elseif (count($helper->availableOffers) > 1 && \Yii::$app->request->post()) : ?>
         <?= $form->field($helper->chooseModel, 'offer_id')->listBox(\yii\helpers\ArrayHelper::map(
             $helper->availableOffers,
             'id',
             'asText'
         ), ['size' => 1])->label("Предложение"); ?>
     <? endif; ?>
+
 </div>
 
 <? $form::end(); ?>

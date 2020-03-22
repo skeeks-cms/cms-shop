@@ -86,6 +86,11 @@ class ShopOfferChooseHelper extends Component
     
     public $viewFile = '@skeeks/cms/shop/views/helpers/shop-offer-choose';
 
+    /**
+     * @var bool Есть ли выбираемые свойства?
+     */
+    public $is_offers_properties = false;
+
     public function init()
     {
         parent::init();
@@ -130,12 +135,15 @@ class ShopOfferChooseHelper extends Component
                 foreach ($this->shopProduct->tradeOffers as $tradeOfferElement) {
                     
                     if ($value = $tradeOfferElement->relatedPropertiesModel->getAttribute($code)) {
+                        $this->is_offers_properties = true;
+
                         if (is_array($value)) {
                             foreach ($value as $v)
                             {
                                 //$this->_chooseFields[$code]['options'][$v] = $v;
                             }
                         } else {
+
                             $this->_chooseFields[$code]['options'][$value] = $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
                         }
                         
@@ -144,7 +152,7 @@ class ShopOfferChooseHelper extends Component
                 
             }
         }
-        
+
         if (\Yii::$app->request->post()) {
             $this->_chooseModel->load(\Yii::$app->request->post());
             
