@@ -22,6 +22,46 @@ $contentModel = $controller->content;
 
 $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
 
+
+
+if ($model->isNewRecord) {
+
+    if ($tree_id = \Yii::$app->request->get("tree_id")) {
+        $model->tree_id = $tree_id;
+    }
+
+    //Если создаем вложенный товар
+    if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
+        $parent = \skeeks\cms\shop\models\ShopCmsContentElement::findOne($parent_content_element_id);
+
+        $data = $parent->toArray();
+        \yii\helpers\ArrayHelper::remove($data, 'image_id');
+        \yii\helpers\ArrayHelper::remove($data, 'image_full_id');
+        \yii\helpers\ArrayHelper::remove($data, 'imageIds');
+        \yii\helpers\ArrayHelper::remove($data, 'fileIds');
+        \yii\helpers\ArrayHelper::remove($data, 'code');
+        \yii\helpers\ArrayHelper::remove($data, 'id');
+        $model->setAttributes($data);
+        $model->relatedPropertiesModel->setAttributes($parent->relatedPropertiesModel->toArray());
+        $model->parent_content_element_id = $parent_content_element_id;
+
+        $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER;
+        $model->tree_id = $parent->tree_id;
+
+        $allowChangeProductType = false;
+        $this->registerCss(<<<CSS
+.field-shopcmscontentelement-tree_id,
+.field-shopcmscontentelement-parent_content_element_id {
+    display: none;
+}
+CSS
+        );
+    }
+
+    if ($contentModel->parent_content_id && $model->parentContentElement) {
+        $model->name = $model->parentContentElement->name;
+    }
+}
 ?>
 
 <div class="">
