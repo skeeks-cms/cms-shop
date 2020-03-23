@@ -12,7 +12,7 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\backend\events\ViewRenderEvent;
+use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\helpers\Image;
@@ -35,7 +35,6 @@ use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopSupplier;
-use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
@@ -227,13 +226,16 @@ HTML
                                 'widgetClass'  => SelectModelDialogContentElementWidget::class,
                                 'widgetConfig' => [
                                     'content_id'  => $model->content_id,
-                                    'options'       => [
+                                    'options'     => [
                                         'data-form-reload' => "true",
                                     ],
                                     'dialogRoute' => [
                                         '/shop/admin-cms-content-element',
-                                        'w3-submit-key' => "1",
-                                        'findex'        => [
+                                        BackendUrlHelper::BACKEND_PARAM_NAME => [
+                                            'sx-to-main' => "true",
+                                        ],
+                                        'w3-submit-key'                      => "1",
+                                        'findex'                             => [
                                             'shop_supplier_id' => [
                                                 'mode' => 'empty',
                                             ],
@@ -246,12 +248,13 @@ HTML
                         if (!$model->shopProduct->main_pid) {
                             $url = Url::to(['/shop/admin-cms-content-element/create', 'content_id' => $model->content_id, 'shop_sub_product_id' => $model->id]);
                             $result[] = [
-                                'class' => HtmlBlock::class,
+                                'class'   => HtmlBlock::class,
                                 'content' => <<<HTML
 <div class="text-center g-ma-20">
 <a href="{$url}" data-pjax='0' class="btn btn-xxl btn-primary">Создать главный товар</a>
 </div>
 HTML
+                                ,
 
                             ];
                         }
@@ -618,7 +621,7 @@ HTML
 
                         $storesQuantity = [];
                         foreach ($shopCmsContentElement->shopProduct->shopSupplierProducts as $shopStoreProduct) {
-                            $storesQuantity[] = Html::tag('span', $shopStoreProduct->quantity . " - " . $shopStoreProduct->shopSupplier->name, [
+                            $storesQuantity[] = Html::tag('span', $shopStoreProduct->quantity." - ".$shopStoreProduct->shopSupplier->name, [
                                 'title' => $shopStoreProduct->shopSupplier->name,
                             ]);
 
@@ -730,15 +733,14 @@ HTML
                             $data[] = '<span style="color: red;margin-left: 60px;" ><i class="fas fa-link" title="Привязан к главному товару"></i> Не привязан к главному товару!</span>';
                         }
                     }
-                    
+
                     if ($model->shopProduct->tradeOffers) {
                         $data[] = '<div class="row"></div>';
-                        foreach ($model->shopProduct->tradeOffers as $tradeOffer)
-                        {
+                        foreach ($model->shopProduct->tradeOffers as $tradeOffer) {
                             $data[] = '<span style="margin-left: 60px;">
                                             <i class="fas fa-link" title="Привязан к главному товару"></i> '.$tradeOffer->asText."</span>";
                         }
-                        
+
                     }
 
 
@@ -896,17 +898,35 @@ HTML
              */
             $query = $event->sender->dataProvider->query;
             if ($this->content) {
-                $query->andWhere(['content_id' => $this->content->id]);
+                $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
             }
 
             $query->joinWith('shopProduct as sp');
             $query->joinWith('shopProduct.shopSupplier as shopSupplier');
 
-            $query->andWhere(['in', 'sp.product_type', [
-                ShopProduct::TYPE_SIMPLE,
-                ShopProduct::TYPE_OFFERS
-            ]]);
-                        
+            $urlHelper = new BackendUrlHelper();
+            $urlHelper->setBackendParamsByCurrentRequest();
+            if ($urlHelper->getBackenParam("sx-to-main")) {
+                $query->andWhere([
+                    'in',
+                    'sp.product_type',
+                    [
+                        ShopProduct::TYPE_SIMPLE,
+                        ShopProduct::TYPE_OFFER,
+                    ],
+                ]);
+            } else {
+                $query->andWhere([
+                    'in',
+                    'sp.product_type',
+                    [
+                        ShopProduct::TYPE_SIMPLE,
+                        ShopProduct::TYPE_OFFERS,
+                    ],
+                ]);
+            }
+
+
             $query->andWhere([
                 'or',
                 ['shopSupplier.id' => null],
@@ -954,8 +974,6 @@ HTML
 
         $productPrices = [];
         $shopStoreProducts = [];
-
-
 
 
         /**
@@ -1102,10 +1120,10 @@ HTML
             'shopStoreProducts' => $shopStoreProducts,
             //'baseProductPrice' => $baseProductPrice,
 
-            'is_saved'  => $is_saved,
-            'submitBtn' => \Yii::$app->request->post('submit-btn'),
-            'redirect'  => $redirect,
-            'shopSubproductContentElement'  => $shopSubproductContentElement,
+            'is_saved'                     => $is_saved,
+            'submitBtn'                    => \Yii::$app->request->post('submit-btn'),
+            'redirect'                     => $redirect,
+            'shopSubproductContentElement' => $shopSubproductContentElement,
         ]);
     }
 
