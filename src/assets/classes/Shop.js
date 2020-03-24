@@ -41,6 +41,77 @@
             });
         },
 
+        _onDomReady: function () {
+            var self = this;
+
+            //Глобальное место со всем избранным
+            self.on("favoriteAddProduct favoriteRemoveProduct", function (e, data) {
+                var total = Number(data.result.total);
+                var jFavoriteProducts = $(".sx-favorite-products");
+                var jTotalWrapper = $(".sx-favorite-total-wrapper", jFavoriteProducts);
+                var jTotal = $(".sx-favorite-total", jFavoriteProducts);
+                jTotal.empty().append(total);
+                if (total > 0) {
+                    jTotalWrapper.show();
+                } else {
+                    jTotalWrapper.hide();
+                }
+
+                jFavoriteProducts.animate({
+                    transform: 'scale(1.3)'
+                }, 200, function () {
+                    $(this).animate({
+                        transform: 'scale(1)'
+                    }, 200, function () {
+                        $(this).removeAttr('style');
+                    });
+                });
+
+            });
+
+            //Клик по добавлению и удаления избранного
+            $("body").on("click", ".sx-favorite-product-trigger", function () {
+
+                var jTrigger = $(this);
+                var jWrapper = $(this).closest('.sx-favorite-product');
+                var isAdded = jWrapper.data("is-added");
+                var addedIcon = jWrapper.data("added-icon-class");
+                var notAddedIcon = jWrapper.data("not-added-icon-class");
+                var product_id = jWrapper.data("product_id");
+
+                if (isAdded) {
+                    //remove
+                    //add
+                    var ajax = self.createAjaxFavoriteRemoveProduct(product_id);
+                    ajax.on("success", function (e, data) {
+                        jWrapper.trigger("complite", data.response.data);
+                        jWrapper.trigger("removed", data.response.data);
+
+                        jWrapper.data("is-added", 0);
+                        jTrigger.empty().append(
+                            "<i class='" + notAddedIcon + "'></i>"
+                        );
+                    });
+                    ajax.execute();
+
+                } else {
+                    //add
+                    var ajax = self.createAjaxFavoriteAddProduct(product_id);
+                    ajax.on("success", function (e, data) {
+                        jWrapper.trigger("complite", data.response.data);
+                        jWrapper.trigger("added", data.response.data);
+
+                        jWrapper.data("is-added", 1);
+                        jTrigger.empty().append(
+                            "<i class='" + addedIcon + "'></i>"
+                        );
+                    });
+                    ajax.execute();
+                }
+                return false;
+            });
+        },
+
         /**
          * @returns {sx.classes.AjaxQuery}
          */
@@ -195,6 +266,84 @@
             });
 
             return ajax;
+        },
+
+
+        /**
+         *
+         * @param product_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxFavoriteAddProduct: function (product_id) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-favorite-add-product'));
+
+            product_id = Number(product_id);
+
+            ajax.setData({
+                'product_id': product_id,
+            });
+
+            ajax.onBeforeSend(function (e, data) {
+                self.trigger('beforeFavoriteAddProduct', {
+                    'product_id': product_id,
+                });
+            });
+
+            ajax.onSuccess(function (e, data) {
+                self.trigger('favoriteAddProduct', {
+                    'product_id': product_id,
+                    'result': data.response.data,
+                });
+            });
+
+            return ajax;
+        },
+
+        /**
+         *
+         * @param product_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxFavoriteRemoveProduct: function (product_id) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-favorite-remove-product'));
+
+            product_id = Number(product_id);
+
+            ajax.setData({
+                'product_id': product_id,
+            });
+
+            ajax.onBeforeSend(function (e, data) {
+                self.trigger('beforeFavoriteRemoveProduct', {
+                    'product_id': product_id,
+                });
+            });
+
+            ajax.onSuccess(function (e, data) {
+
+                self.trigger('favoriteRemoveProduct', {
+                    'product_id': product_id,
+                    'result': data.response.data,
+                });
+            });
+
+            return ajax;
+        },
+
+
+        /**
+         * Adding product to cart
+         *
+         * @param product_id
+         * @param quantity
+         * @param additional
+         * @returns {sx.classes.shop._App}
+         */
+        favoriteAddProduct: function (product_id) {
+            this.createAjaxFavoriteAddProduct(product_id).execute();
+            return this;
         },
 
         /**

@@ -16,8 +16,6 @@ use skeeks\cms\models\CmsSite;
  * @property integer           $shop_fuser_id
  * @property integer           $shop_product_id
  * @property integer           $site_id
- * @property string            $name
- * @property string            $url
  *
  * @property CmsSite           $site
  * @property ShopFuser         $shopFuser
@@ -45,7 +43,6 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
                 'integer',
             ],
             [['shop_fuser_id', 'shop_product_id', 'site_id'], 'required'],
-            [['name', 'url'], 'string', 'max' => 255],
         ];
     }
 
@@ -63,8 +60,6 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
             'shop_fuser_id'   => \Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
             'shop_product_id' => \Yii::t('skeeks/shop/app', 'Shop Product ID'),
             'site_id'         => \Yii::t('skeeks/shop/app', 'Site ID'),
-            'name'            => \Yii::t('skeeks/shop/app', 'Name'),
-            'url'             => \Yii::t('skeeks/shop/app', 'Url'),
         ];
     }
 

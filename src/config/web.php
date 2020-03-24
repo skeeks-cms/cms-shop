@@ -18,6 +18,7 @@ return [
 
         'urlManager' => [
             'rules' => [
+                '~shop-favorite'                => 'shop/favorite',
                 '~shop-cart'                    => 'shop/cart',
                 '~shop-<_a:(checkout|payment)>' => 'shop/cart/<_a>',
                 '~shop-<_a:(finish)>'           => 'shop/order/<_a>',

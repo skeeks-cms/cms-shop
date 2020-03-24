@@ -42,6 +42,10 @@ class ShopGlobalWidget extends Widget
             'backend-clear-cart'             => UrlHelper::construct('shop/cart/clear')->toString(),
             'backend-remove-discount-coupon' => UrlHelper::construct('shop/cart/remove-discount-coupon')->toString(),
             'backend-add-discount-coupon'    => UrlHelper::construct('shop/cart/add-discount-coupon')->toString(),
+
+            'backend-favorite-add-product'    => UrlHelper::construct('shop/favorite/add-product')->toString(),
+            'backend-favorite-remove-product' => UrlHelper::construct('shop/favorite/remove-product')->toString(),
+            'backend-favorite'                => UrlHelper::construct('shop/favorite')->toString(),
         ];
     }
 

@@ -74,6 +74,8 @@ use yii\helpers\Json;
  * @property boolean                     $isSimpleProduct
  * @property boolean                     $isOfferProduct
  * @property boolean                     $isOffersProduct
+ *
+ * @property ShopFavoriteProduct[] $shopFavoriteProducts
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -567,7 +569,6 @@ class ShopProduct extends \skeeks\cms\models\Core
         }
 
         $shopViewdProduct = new ShopViewedProduct();
-        $shopViewdProduct->name = $this->cmsContentElement->name;
         $shopViewdProduct->shop_product_id = $this->id;
         $shopViewdProduct->site_id = \Yii::$app->cms->site->id;
         $shopViewdProduct->shop_fuser_id = \Yii::$app->shop->cart->id;
@@ -849,5 +850,16 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getIsOffersProduct()
     {
         return (bool)($this->product_type === self::TYPE_OFFERS);
+    }
+
+
+    /**
+     * Gets query for [[ShopFavoriteProducts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopFavoriteProducts()
+    {
+        return $this->hasMany(ShopFavoriteProduct::className(), ['shop_product_id' => 'id']);
     }
 }

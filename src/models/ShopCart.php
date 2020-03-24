@@ -52,6 +52,7 @@ use yii\db\ActiveQuery;
  * @property ShopPaySystem[]   $paySystems
  *
  *
+ * @property ShopFavoriteProduct[] $shopFavoriteProducts
  *
  *
  * @property ShopOrder         $shopOrder
@@ -416,6 +417,17 @@ class ShopCart extends ActiveRecord
     public function getDiscountCoupons()
     {
         return ($this->shopOrder && $this->shopOrder->shopDiscountCoupons ? $this->shopOrder->shopDiscountCoupons : []);
+    }
+
+
+    /**
+     * Gets query for [[ShopFavoriteProducts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopFavoriteProducts()
+    {
+        return $this->hasMany(ShopFavoriteProduct::className(), ['shop_cart_id' => 'id']);
     }
 
 }
