@@ -10,6 +10,7 @@ use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
 use skeeks\cms\shop\Module;
+use yii\base\Event;
 use yii\base\ModelEvent;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
@@ -104,6 +105,8 @@ use yii\helpers\Url;
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
+    const EVENT_AFTER_RECALCULATE = 'afterRecalculate';
+
     protected $_email = null;
     /**
      * @inheritdoc
@@ -918,6 +921,8 @@ class ShopOrder extends \skeeks\cms\models\Core
         $this->amount = $this->calcMoney->amount;
         $this->discount_amount = $this->calcMoneyDiscount->amount;
         $this->delivery_amount = $this->calcMoneyDelivery->amount;
+
+        $this->trigger(self::EVENT_AFTER_RECALCULATE, new Event());
 
         return $this;
     }
