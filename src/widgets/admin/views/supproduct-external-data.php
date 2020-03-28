@@ -26,7 +26,7 @@ display: none;
 }
 .sx-propery-row {
     /*margin: 2px 0px;*/
-    height: 22px;
+    min-height: 22px;
     line-height: 21px;
 }
 CSS
