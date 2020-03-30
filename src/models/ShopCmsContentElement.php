@@ -211,7 +211,7 @@ class ShopCmsContentElement extends CmsContentElement
 
         $result = [];
         //Если это предложение, то надо в заголовок добавить ключевые свойства.
-        if ($this->shopProduct->isOfferProduct) {
+        if ($this->shopProduct && $this->shopProduct->isOfferProduct) {
             if (\Yii::$app->shop->offers_properties) {
                 foreach (\Yii::$app->shop->offers_properties as $propertyCode)
                 {

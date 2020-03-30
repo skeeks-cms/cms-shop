@@ -11,7 +11,6 @@ return [
         'shop' => [
             'class' => 'skeeks\cms\shop\components\ShopComponent',
         ],
-
         'i18n' => [
             'translations' =>
                 [
@@ -25,7 +24,6 @@ return [
                         ],
                 ],
         ],
-
         'cmsAgent' => [
             'commands' => [
 
@@ -60,7 +58,6 @@ return [
                 ],
             ],
         ],
-
         'authManager' => [
             'config' => [
                 'roles' => [
@@ -116,8 +113,6 @@ return [
                 ],
             ],
         ],
-
-        
     ],
 
     'modules' => [
