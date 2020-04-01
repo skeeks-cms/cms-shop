@@ -29,6 +29,7 @@ use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNe;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
+use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
@@ -868,13 +869,30 @@ HTML
             },*/
         ];
 
-        //$filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
-        //$filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
-        //$filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
+        $filterFields['supplier_external_jsondata'] = [
+            'class'           => StringFilterField::class,
+            'label'           => 'Данные поставщика [магазин]',
+            'filterAttribute' => 'sp.supplier_external_jsondata',
+            /*'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                $query = $e->dataProvider->query;
+
+                if ($e->field->value) {
+                    $query->andWhere(['sp.product_type' => $e->field->value]);
+                }
+            },*/
+        ];
+
+        $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
+        $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
+        $filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
+        $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика [магазин]';
 
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
         $filterFieldsRules[] = ['shop_supplier_id', 'safe'];
+        $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
 
         //Мерж колонок и сортировок
         if ($shopColumns) {
@@ -888,7 +906,7 @@ HTML
             $action->filters['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'attributeLabels']), $filterFieldsLabels);
             $action->filters['filtersModel']['rules'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'rules']), $filterFieldsRules);
 
-            $action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), array_keys($filterFieldsLabels));
+            //$action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), array_keys($filterFieldsLabels));
         }
 
         //Приджоивание магазинных данных
