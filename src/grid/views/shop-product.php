@@ -22,20 +22,55 @@
         </div>
     </div>
 
-    <div><i class="fas fa-truck" style="width: 20px;" title="Поставщик"></i> <?= $model->shopProduct->shopSupplier->asText; ?></div>
+    <div>
+
+        <?
+        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+            'controllerId' => "/shop/admin-shop-supplier",
+            'modelId'      => $model->shopProduct->shopSupplier->id,
+        ]);
+        ?>
+        <i class="fas fa-truck" style="width: 20px;" title="Поставщик"></i>
+        <?= $model->shopProduct->shopSupplier->asText; ?>
+        <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+    </div>
     <? if ($model->tree_id) : ?>
-        <div><i class="far fa-folder" style="width: 20px;"></i><a href="<?= $model->cmsTree->url; ?>" title="<?= $model->cmsTree->fullName; ?>"
-                                                                  data-pjax="0" target="_blank" style="color: #333; max-width: 200px; border-bottom: 0;"><?= $model->cmsTree->name; ?></a></div>
+        <div>
+            <?
+            \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                'controllerId' => "/cms/admin-tree",
+                'modelId'      => $model->cmsTree->id,
+                'options'      => [
+                    'title' => $model->cmsTree->fullName,
+                ],
+            ]);
+            ?>
+            <i class="far fa-folder" style="width: 20px;"></i>
+            <?= $model->cmsTree->name; ?>
+            <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+        </div>
     <? endif; ?>
 
     <? if ($model->shopProduct->main_pid) : ?>
         <div>
-            <span style="color: green;"><i class="fas fa-link" style="width: 20px;" title="Привязан к главному товару"></i>
+
+
+            <?
+            \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                'controllerId' => "/shop/admin-cms-content-element",
+                'modelId'      => $model->shopProduct->shopMainProduct->id,
+            ]);
+            ?>
+            <span style="color: green;">
+                <i class="fas fa-link" style="width: 20px;" title="Привязан к главному товару"></i>
                 <img src='<?= $model->shopProduct->shopMainProduct->cmsContentElement->image ? $model->shopProduct->shopMainProduct->cmsContentElement->image->src : \skeeks\cms\helpers\Image::getCapSrc(); ?>'
                      style='max-width: 20px; max-height: 20px; border-radius: 5px;'
                 />
                 <span><?= $model->shopProduct->shopMainProduct->cmsContentElement->asText; ?></span>
             </span>
+            <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+
+
         </div>
     <? else : ?>
         <div>
@@ -65,19 +100,43 @@
     <div style="margin-top: 5px;">
         <? foreach ($model->shopProduct->tradeOffers as $tradeOffer) : ?>
             <div style="margin-left: 20px;">
+
+                <?
+                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                    'controllerId' => "/shop/admin-cms-content-element",
+                    'modelId'      => $tradeOffer->id,
+                    'options'      => [
+                        'style' => 'color: #333;',
+                    ],
+                ]);
+                ?>
                 <i class="fas fa-link" title="Привязан к главному товару"></i> <?= $tradeOffer->asText; ?>
+                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                 
                 <? if ($tradeOffer->shopProduct->shopSupplierProducts) : ?>
+
+
                     <div style="margin-top: 5px; margin-bottom: 5px;">
                         <? foreach ($tradeOffer->shopProduct->shopSupplierProducts as $shopSupplierProduct) : ?>
-                            <div style="margin-left: 20px; color: gray;"><i class="fas fa-link" title="Привязан к главному товару"></i> 
+                            <div style="margin-left: 20px;">
+                                <?
+                                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => "/shop/admin-cms-content-element-sub",
+                                    'modelId'      => $shopSupplierProduct->id,
+                                    'options'      => [
+                                        'style' => 'color: gray;',
+                                    ],
+                                ]);
+                                ?>
+                                <i class="fas fa-link" title="Привязан к главному товару"></i>
                                 <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->shopSupplier->name; ?> -
                                 товар #<?= $shopSupplierProduct->id; ?>
+                                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                             </div>
                         <? endforeach; ?>
                     </div>
                 <? endif; ?>
-                            
+
             </div>
         <? endforeach; ?>
     </div>
@@ -96,19 +155,44 @@
     </div>
 
     <? if ($model->tree_id) : ?>
-        <div><i class="far fa-folder" style="width: 20px;"></i><a href="<?= $model->cmsTree->url; ?>" title="<?= $model->cmsTree->fullName; ?>"
-                                                                  data-pjax="0" target="_blank" style="color: #333; max-width: 200px; border-bottom: 0;"><?= $model->cmsTree->name; ?></a></div>
+
+        <div>
+            <?
+            \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                'controllerId' => "/cms/admin-tree",
+                'modelId'      => $model->cmsTree->id,
+                'options'      => [
+                    'title' => $model->cmsTree->fullName,
+                ],
+            ]);
+            ?>
+            <i class="far fa-folder" style="width: 20px;"></i>
+            <?= $model->cmsTree->name; ?>
+            <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+        </div>
     <? endif; ?>
 
     <? if ($model->shopProduct->shopSupplierProducts) : ?>
-        <div style="margin-top: 5px; color: gray;">
-            <? foreach ($model->shopProduct->shopSupplierProducts as $shopSupplierProduct) : ?>
-                <div style="margin-left: 0px;"><i class="fas fa-link" title="Привязан к главному товару"></i> 
-                    <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->shopSupplier->name; ?> -
-                    товар #<?= $shopSupplierProduct->id; ?>
-                </div>
-            <? endforeach; ?>
-        </div>
+
+        <? foreach ($model->shopProduct->shopSupplierProducts as $shopSupplierProduct) : ?>
+
+            <div style="margin-top: 5px; margin-left: 20px; color: gray;">
+                <?
+                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                    'controllerId' => "/shop/admin-cms-content-element-sub",
+                    'modelId'      => $shopSupplierProduct->id,
+                    'options'      => [
+                        'style' => 'color: gray;',
+                    ],
+                ]);
+                ?>
+                <i class="fas fa-link" title="Привязан к главному товару"></i>
+                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->shopSupplier->name; ?> -
+                товар #<?= $shopSupplierProduct->id; ?>
+                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+            </div>
+        <? endforeach; ?>
+
     <? endif; ?>
 
 
