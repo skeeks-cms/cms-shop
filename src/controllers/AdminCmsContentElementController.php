@@ -552,7 +552,6 @@ HTML
     {
         parent::initGridData($action, $content);
 
-
         $sortAttributes = [];
         $shopColumns = [];
         $visibleColumns = [];
