@@ -862,4 +862,10 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopFavoriteProduct::className(), ['shop_product_id' => 'id']);
     }
+    
+    
+    public function asText()
+    {
+        return $this->cmsContentElement->asText;
+    }
 }

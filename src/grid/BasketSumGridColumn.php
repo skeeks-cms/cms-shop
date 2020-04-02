@@ -24,7 +24,7 @@ class BasketSumGridColumn extends DataColumn
      * @param mixed $key
      * @param int   $index
      * @return string
-     */
+     */ShopProductColumn
     protected function renderDataCellContent($model, $key, $index)
     {
         if (!$this->label) {

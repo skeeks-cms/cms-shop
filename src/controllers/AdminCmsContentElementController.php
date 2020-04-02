@@ -31,6 +31,7 @@ use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
@@ -691,70 +692,7 @@ HTML
 
             $shopColumns["custom"] = [
                 'attribute' => 'id',
-                'format'    => 'raw',
-                'value'     => function (ShopCmsContentElement $model) {
-
-                    $data = [];
-
-                    $data[] = "<span style='max-width: 300px;'>".Html::a($model->asText, "#", [
-                            'class' => 'sx-trigger-action',
-                            'title' => $model->asText,
-                            //'style' => 'white-space: nowrap; '
-                        ])."</span>";
-
-                    if ($model->tree_id) {
-                        $data[] = '<i class="far fa-folder"></i> '.Html::a($model->cmsTree->name, $model->cmsTree->url, [
-                                'data-pjax' => '0',
-                                'target'    => '_blank',
-                                'title'     => $model->cmsTree->fullName,
-                                'style'     => 'color: #333; max-width: 200px;',
-                            ]);
-                    }
-
-                    if ($model->cmsTrees) {
-                        foreach ($model->cmsTrees as $cmsTree) {
-                            $data[] = Html::a($cmsTree->name, $cmsTree->url, [
-                                'data-pjax' => '0',
-                                'target'    => '_blank',
-                                'title'     => $cmsTree->fullName,
-                                'style'     => 'color: #333; max-width: 200px; ',
-                            ]);
-                        }
-                    }
-
-                    if ($model->shopProduct && $model->shopProduct->shop_supplier_id) {
-                        $data[] = '<i class="fas fa-truck" title="Поставщик"></i> '.$model->shopProduct->shopSupplier->asText;
-                    }
-
-
-                    if ($model->shopProduct->isSubProduct) {
-                        if ($model->shopProduct->main_pid) {
-                            $data[] = '<span style="color: green; margin-left: 60px;"><i class="fas fa-link" title="Привязан к главному товару"></i> '.$model->shopProduct->shopMainProduct->cmsContentElement->asText."</span>";
-                        } else {
-                            $data[] = '<span style="color: red;margin-left: 60px;" ><i class="fas fa-link" title="Привязан к главному товару"></i> Не привязан к главному товару!</span>';
-                        }
-                    }
-
-                    if ($model->shopProduct->tradeOffers) {
-                        $data[] = '<div class="row"></div>';
-                        foreach ($model->shopProduct->tradeOffers as $tradeOffer) {
-                            $data[] = '<span style="margin-left: 60px;">
-                                            <i class="fas fa-link" title="Привязан к главному товару"></i> '.$tradeOffer->asText."</span>";
-                        }
-
-                    }
-
-
-                    $info = implode("<br />", $data);
-
-                    return "<div class='row no-gutters'>
-                                                <div style='margin-left: 5px;'>
-                                                <div class='sx-trigger-action' style='width: 50px; margin-right: 10px; float: left;'>
-                                                    <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                        <img src='".($model->image ? $model->image->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                    </a>
-                                                </div>".$info."</div></div>";;
-                },
+                'class' => ShopProductColumn::class
             ];
 
             $shopColumns["shop.priceDefult"] = [
