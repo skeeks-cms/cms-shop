@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
  * Class ShopProductFiltersWidget
  * @package skeeks\cms\shop\cmsWidgets\filters
  */
-class ShopProductColumn extends WidgetRenderable
+class ShopProductFiltersWidget extends WidgetRenderable
 {
     //Навигация
     public $content_id;

@@ -93,8 +93,18 @@
     </div>
 
     <? if ($model->tree_id) : ?>
-        <div><i class="far fa-folder" style="width: 20px;"></i><a href="<?= $model->cmsTree->url; ?>" title="<?= $model->cmsTree->fullName; ?>"
-                                                                  data-pjax="0" target="_blank" style="color: #333; max-width: 200px; border-bottom: 0;"><?= $model->cmsTree->name; ?></a></div>
+        <?
+            \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                'controllerId' => "/cms/admin-tree",
+                'modelId'      => $model->cmsTree->id,
+                'options'      => [
+                    'title' => $model->cmsTree->fullName,
+                ],
+            ]);
+            ?>
+            <i class="far fa-folder" style="width: 20px;"></i>
+            <?= $model->cmsTree->name; ?>
+            <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
     <? endif; ?>
 
     <div style="margin-top: 5px;">
