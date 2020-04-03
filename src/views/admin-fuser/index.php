@@ -51,7 +51,8 @@ $query->orderBy(['shop_cart.updated_at' => SORT_DESC]);
     'columns'         =>
         [
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
+                'class' => \skeeks\cms\grid\DateTimeColumnData::class,
+                'attribute' => 'updated_at'
             ],
 
             [

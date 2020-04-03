@@ -606,8 +606,9 @@ HTML
                         $storesQuantity = [];
                         foreach ($shopCmsContentElement->shopProduct->shopStoreProducts as $shopStoreProduct) {
                             if ($shopStoreProduct->quantity > 0) {
-                                $storesQuantity[] = Html::tag('span', $shopStoreProduct->quantity, [
+                                $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity, [
                                     'title' => $shopStoreProduct->shopStore->shopSupplier->name." - ".$shopStoreProduct->shopStore->name,
+                                    'style' => 'white-space: nowrap; color: gray;'
                                 ]);
                             }
 
@@ -622,8 +623,9 @@ HTML
 
                         $storesQuantity = [];
                         foreach ($shopCmsContentElement->shopProduct->shopSupplierProducts as $shopStoreProduct) {
-                            $storesQuantity[] = Html::tag('span', $shopStoreProduct->quantity." - ".$shopStoreProduct->shopSupplier->name, [
+                            $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity." - ".$shopStoreProduct->shopSupplier->name, [
                                 'title' => $shopStoreProduct->shopSupplier->name,
+                                'style' => 'white-space: nowrap; color: gray;'
                             ]);
 
                         }

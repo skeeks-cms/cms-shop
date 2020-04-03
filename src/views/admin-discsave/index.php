@@ -48,7 +48,8 @@ $dataProvider->query->andWhere(['type' => \skeeks\cms\shop\models\ShopDiscount::
             ],
 
             [
-                'class' => \skeeks\cms\grid\UpdatedAtColumn::class,
+                'class' => \skeeks\cms\grid\DateTimeColumnData::class,
+                'attribute' => "created_at",
             ],
 
             'priority',
