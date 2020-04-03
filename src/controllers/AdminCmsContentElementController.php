@@ -311,7 +311,13 @@ HTML
                          * @var $newModel ShopCmsContentElement
                          * @var $model ShopCmsContentElement
                          */
-                        $newModel = $action->model->copy();
+                        try {
+                            $newModel = $action->model->copy();
+                        } catch (\Exception $e) {
+                            print_r($e->getMessage());
+                            die;
+                        }
+                        
 
                         if ($newModel) {
                             $action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
