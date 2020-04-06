@@ -48,7 +48,6 @@ use yii\helpers\Url;
  * @property string                     $paid_amount
  * @property integer                    $locked_by
  * @property integer                    $locked_at
- * @property integer                    $shop_affiliate_id
  * @property string                     $delivery_doc_num
  * @property integer                    $delivery_doc_at
  * @property string                     $tracking_number
@@ -383,7 +382,6 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'shop_pay_system_id',
                     'locked_by',
                     'locked_at',
-                    'shop_affiliate_id',
                     'delivery_doc_at',
                     'shop_order_status_id',
                 ],
@@ -554,7 +552,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             'paid_amount'         => \Yii::t('skeeks/shop/app', 'Sum Paid'),
             'locked_by'           => \Yii::t('skeeks/shop/app', 'Locked By'),
             'locked_at'           => \Yii::t('skeeks/shop/app', 'Locked At'),
-            'shop_affiliate_id'   => \Yii::t('skeeks/shop/app', 'Affiliate ID'),
             'delivery_doc_num'    => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
             'delivery_doc_at'     => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
             'tracking_number'     => \Yii::t('skeeks/shop/app', 'Tracking Number'),
@@ -598,14 +595,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         return $this;
     }
 
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopAffiliate()
-    {
-        return $this->hasOne(ShopAffiliate::class, ['id' => 'shop_affiliate_id']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery
