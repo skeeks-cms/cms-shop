@@ -15,7 +15,6 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
-use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\IHasUrl;
@@ -40,6 +39,7 @@ use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
@@ -317,7 +317,7 @@ HTML
                             print_r($e->getMessage());
                             die;
                         }
-                        
+
 
                         if ($newModel) {
                             $action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
@@ -614,7 +614,7 @@ HTML
                             if ($shopStoreProduct->quantity > 0) {
                                 $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity, [
                                     'title' => $shopStoreProduct->shopStore->shopSupplier->name." - ".$shopStoreProduct->shopStore->name,
-                                    'style' => 'white-space: nowrap; color: gray;'
+                                    'style' => 'white-space: nowrap; color: gray;',
                                 ]);
                             }
 
@@ -631,7 +631,7 @@ HTML
                         foreach ($shopCmsContentElement->shopProduct->shopSupplierProducts as $shopStoreProduct) {
                             $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity." - ".$shopStoreProduct->shopSupplier->name, [
                                 'title' => $shopStoreProduct->shopSupplier->name,
-                                'style' => 'white-space: nowrap; color: gray;'
+                                'style' => 'white-space: nowrap; color: gray;',
                             ]);
 
                         }
@@ -699,7 +699,7 @@ HTML
 
             $shopColumns["custom"] = [
                 'attribute' => 'id',
-                'class' => ShopProductColumn::class
+                'class'     => ShopProductColumn::class,
             ];
 
             $shopColumns["shop.priceDefult"] = [
@@ -765,16 +765,47 @@ HTML
             },
         ];
 
+        $filterFields['all_ids'] = [
+            'class'    => TextField::class,
+            'label'    => 'ID + вложенные',
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 **/
+                $query = $e->dataProvider->query;
+
+                if ($e->field->value) {
+
+                    $q = ShopProduct::find()
+                        ->select(['parent_id' => 'cmsContentElement.parent_content_element_id'])
+                        ->joinWith('cmsContentElement as cmsContentElement')
+                        ->where([ShopProduct::tableName().'.id' => $e->field->value])//->andWhere(['is not', 'cmsContentElement.parent_content_element_id', null])
+                    ;
+
+                    //print_R($q->createCommand()->rawSql);die;
+
+
+                    $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(ShopCmsContentElement::tableName().".id")]);
+
+                    $query->andWhere([
+                        'or',
+                        [ShopCmsContentElement::tableName().'.id' => $e->field->value],
+                        ['is not', 'p.parent_id', null],
+                    ]);
+                }
+            },
+        ];
+
         $filterFields['shop_supproducts'] = [
-            'class' => SelectField::class,
-            'items' => function () {
+            'class'    => SelectField::class,
+            'items'    => function () {
                 return ArrayHelper::map(
                     ShopSupplier::find()->all(),
                     'id',
                     'asText'
                 );
             },
-            'label'           => 'Привязанные поставщики',
+            'label'    => 'Привязанные поставщики',
             'multiple' => true,
             'on apply' => function (QueryFiltersEvent $e) {
                 /**
@@ -786,17 +817,16 @@ HTML
 
                     $q = ShopProduct::find()
                         ->select(['parent_id' => 'cmsContentElement.parent_content_element_id'])
-                        ->where([ShopProduct::tableName() . '.shop_supplier_id' => $e->field->value])
+                        ->where([ShopProduct::tableName().'.shop_supplier_id' => $e->field->value])
                         ->joinWith('shopMainProduct as shopMainProduct')
                         ->joinWith('shopMainProduct.cmsContentElement as cmsContentElement')
-                        ->andWhere(['is not', 'cmsContentElement.parent_content_element_id', null])
-                    ;
+                        ->andWhere(['is not', 'cmsContentElement.parent_content_element_id', null]);
 
                     //print_R($q->createCommand()->rawSql);die;
 
                     $query->joinWith('shopProduct.shopSupplierProducts as supProds');
 
-                    $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(ShopCmsContentElement::tableName() . ".id")]);
+                    $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(ShopCmsContentElement::tableName().".id")]);
 
                     $query->andWhere([
                         'or',
@@ -878,6 +908,7 @@ HTML
         $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
         $filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
         $filterFieldsLabels['shop_supproducts'] = 'Привязанные поставщики';
+        $filterFieldsLabels['all_ids'] = 'ID + вложенные';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика [магазин]';
 
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
@@ -885,6 +916,7 @@ HTML
         $filterFieldsRules[] = ['shop_supplier_id', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
         $filterFieldsRules[] = ['shop_supproducts', 'safe'];
+        $filterFieldsRules[] = ['all_ids', 'safe'];
 
         //Мерж колонок и сортировок
         if ($shopColumns) {
