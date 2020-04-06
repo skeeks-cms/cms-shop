@@ -765,6 +765,51 @@ HTML
             },
         ];
 
+        $filterFields['shop_supproducts'] = [
+            'class' => SelectField::class,
+            'items' => function () {
+                return ArrayHelper::map(
+                    ShopSupplier::find()->all(),
+                    'id',
+                    'asText'
+                );
+            },
+            'label'           => 'Привязанные поставщики',
+            'multiple' => true,
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 **/
+                $query = $e->dataProvider->query;
+
+                if ($e->field->value) {
+
+                    $q = ShopProduct::find()
+                        ->select(['parent_id' => 'cmsContentElement.parent_content_element_id'])
+                        ->where([ShopProduct::tableName() . '.shop_supplier_id' => $e->field->value])
+                        ->joinWith('shopMainProduct as shopMainProduct')
+                        ->joinWith('shopMainProduct.cmsContentElement as cmsContentElement')
+                        ->andWhere(['is not', 'cmsContentElement.parent_content_element_id', null])
+                    ;
+
+                    //print_R($q->createCommand()->rawSql);die;
+
+                    $query->joinWith('shopProduct.shopSupplierProducts as supProds');
+
+                    $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(ShopCmsContentElement::tableName() . ".id")]);
+
+                    $query->andWhere([
+                        'or',
+                        ['supProds.shop_supplier_id' => $e->field->value],
+                        ['is not', 'p.parent_id', null],
+                    ]);
+
+                    //print_R($query->createCommand()->rawSql);die;
+                    //$query->groupBy([ShopCmsContentElement::tableName() . ".id"]);
+                }
+            },
+        ];
+
         $filterFields['shop_supplier_id'] = [
             'class'           => FilterField::class,
             'field'           => [
@@ -832,12 +877,14 @@ HTML
         $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
         $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
         $filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
+        $filterFieldsLabels['shop_supproducts'] = 'Привязанные поставщики';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика [магазин]';
 
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
         $filterFieldsRules[] = ['shop_supplier_id', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
+        $filterFieldsRules[] = ['shop_supproducts', 'safe'];
 
         //Мерж колонок и сортировок
         if ($shopColumns) {

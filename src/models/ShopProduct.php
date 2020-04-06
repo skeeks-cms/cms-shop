@@ -605,7 +605,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getShopMainProduct()
     {
-        return $this->hasOne(ShopProduct::class, ['id' => 'main_pid']);
+        return $this->hasOne(ShopProduct::class, ['id' => 'main_pid'])->from(['shopMainProduct' => ShopProduct::tableName()]);
     }
 
     /**
