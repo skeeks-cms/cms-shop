@@ -12,7 +12,7 @@ class m200406_090601__drop_tables extends Migration
 {
     public function safeUp()
     {
-        //$this->dropTable('shop_affiliate_tier');
+        $this->dropTable('shop_affiliate_tier');
         $this->dropTable('shop_affiliate');
         $this->dropTable('shop_affiliate_plan');
     }
