@@ -154,6 +154,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function afterUpdateCallback()
     {
         if ($this->isAttributeChanged('price') || $this->isAttributeChanged('currency_code') || $this->isAttributeChanged('quantity_from') || $this->isAttributeChanged('quantity_to')) {
+            
             $shopProductPriceChange = new ShopProductPriceChange();
 
             $shopProductPriceChange->price = $this->price;
@@ -163,7 +164,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
             if ($shopProductPriceChange->save()) {
                 $shopProductPriceChange->link('shopProductPrice', $this);
-            }
+            } 
         }
 
     }
