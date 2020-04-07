@@ -26,7 +26,7 @@ SQL
         )->execute();
 
         $this->dropForeignKey("shop_person_type_site_site_code", $tableName);
-        $this->dropIndex("site_code__person_type_id", $tableName);
+        //$this->dropIndex("site_code__person_type_id", $tableName);
 
         $this->dropColumn($tableName, "site_code");
 
