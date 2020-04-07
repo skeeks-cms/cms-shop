@@ -91,12 +91,12 @@ class ShopPersonType extends \skeeks\cms\models\Core
 
             //добавляем новые
             foreach ($this->_siteCodes as $code) {
-                $shopTypeSite = $this->getShopPersonTypeSites()->andWhere(['site_code' => $code])->one();
+                $shopTypeSite = $this->getShopPersonTypeSites()->andWhere(['cms_site_id' => $code])->one();
                 //Такой связи еще нет
                 if (!$shopTypeSite) {
                     $shopTypeSite = new ShopPersonTypeSite();
 
-                    $shopTypeSite->site_code = $code;
+                    $shopTypeSite->cms_site_id = $code;
                     $shopTypeSite->person_type_id = $this->id;
 
                     $shopTypeSite->save();
@@ -197,7 +197,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function getSites()
     {
-        return $this->hasMany(CmsSite::class, ['code' => 'site_code'])->viaTable('{{%shop_person_type_site}}',
+        return $this->hasMany(CmsSite::class, ['id' => 'cms_site_id'])->viaTable('{{%shop_person_type_site}}',
             ['person_type_id' => 'id']);
     }
 

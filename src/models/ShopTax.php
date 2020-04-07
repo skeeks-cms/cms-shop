@@ -23,9 +23,6 @@ use yii\helpers\ArrayHelper;
  * @property string  $name
  * @property string  $description
  * @property string  $code
- * @property string  $site_code
- *
- * @property CmsSite $site
  */
 class ShopTax extends Core
 {
@@ -48,7 +45,6 @@ class ShopTax extends Core
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
             [['code'], 'string', 'max' => 50],
-            [['site_code'], 'string', 'max' => 15],
         ]);
     }
 
@@ -66,15 +62,6 @@ class ShopTax extends Core
             'name'        => \Yii::t('skeeks/shop/app', 'Name'),
             'description' => \Yii::t('skeeks/shop/app', 'Description'),
             'code'        => \Yii::t('skeeks/shop/app', 'Code'),
-            'site_code'   => \Yii::t('skeeks/shop/app', 'Site'),
         ]);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSite()
-    {
-        return $this->hasOne(CmsSite::class, ['code' => 'site_code']);
     }
 }

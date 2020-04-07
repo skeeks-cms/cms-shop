@@ -14,7 +14,7 @@ use skeeks\cms\models\CmsSite;
  * This is the model class for table "{{%shop_person_type_site}}".
  *
  * @property integer        $person_type_id
- * @property string         $site_code
+ * @property integer         $cms_site_id
  *
  * @property CmsSite        $site
  * @property ShopPersonType $personType
@@ -35,13 +35,13 @@ class ShopPersonTypeSite extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['person_type_id', 'site_code'], 'required'],
+            [['person_type_id', 'cms_site_id'], 'required'],
             [['person_type_id'], 'integer'],
-            [['site_code'], 'string', 'max' => 15],
+            [['cms_site_id'], 'integer'],
             [
-                ['person_type_id', 'site_code'],
+                ['person_type_id', 'cms_site_id'],
                 'unique',
-                'targetAttribute' => ['person_type_id', 'site_code'],
+                'targetAttribute' => ['person_type_id', 'cms_site_id'],
                 'message'         => \Yii::t('skeeks/shop/app', 'The combination of Person Type ID and Site Code
      has already been taken.'),
             ],
@@ -55,7 +55,7 @@ class ShopPersonTypeSite extends \yii\db\ActiveRecord
     {
         return [
             'person_type_id' => \Yii::t('skeeks/shop/app', 'Person type ID'),
-            'site_code'      => \Yii::t('skeeks/shop/app', 'Site code'),
+            'cms_site_id'      => \Yii::t('skeeks/shop/app', 'Site'),
         ];
     }
 
@@ -64,7 +64,7 @@ class ShopPersonTypeSite extends \yii\db\ActiveRecord
      */
     public function getSite()
     {
-        return $this->hasOne(CmsSite::class, ['code' => 'site_code']);
+        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
     }
 
     /**

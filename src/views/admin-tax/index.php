@@ -26,11 +26,6 @@
         [
             'name',
             'code',
-
-            [
-                'class'     => \skeeks\cms\grid\SiteColumn::class,
-                'attribute' => "site_code",
-            ],
         ],
 ]); ?>
 
