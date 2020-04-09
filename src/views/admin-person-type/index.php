@@ -43,7 +43,7 @@
                 $result = [];
                 if ($model->sites) {
                     foreach ($model->sites as $site) {
-                        $result[] = "$site->name [$site->code]";
+                        $result[] = "$site->name";
                     }
                 }
 
