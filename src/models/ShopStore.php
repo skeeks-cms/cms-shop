@@ -8,22 +8,25 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property string         $name
- * @property string         $description
- * @property int            $cms_image_id
- * @property bool           $is_active
- * @property bool           $shop_supplier_id
- * @property string|null    $external_id
+ * @property string             $name
+ * @property string             $description
+ * @property int                $cms_image_id
+ * @property bool               $is_active
+ * @property bool               $shop_supplier_id
+ * @property string|null        $external_id
+ * @property integer|null       $cms_site_id
  *
- * @property CmsStorageFile $cmsImage
- * @property ShopSupplier   $shopSupplier
+ * @property CmsStorageFile     $cmsImage
+ * @property ShopSupplier       $shopSupplier
+ * @property CmsSite            $cmsSite
  * @property ShopStoreProduct[] $shopStoreProducts
- * @property ShopProduct[] $shopProducts
+ * @property ShopProduct[]      $shopProducts
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -55,11 +58,32 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
             [['cms_image_id'], 'safe'],
             [['shop_supplier_id'], 'integer'],
-            
+
             [['external_id'], 'default', 'value' => null],
             //[['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
             [['external_id'], 'string'],
-            
+
+
+            [['cms_site_id'], 'integer'],
+
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->cms->site) {
+                        return \Yii::$app->cms->site->id;
+                    }
+                },
+            ],
+
+            [
+                ['cms_site_id', 'external_id'],
+                'unique',
+                'targetAttribute' => ['cms_site_id', 'external_id'],
+                'when'            => function (self $model) {
+                    return (bool)$model->external_id;
+                },
+            ],
 
         ]);
     }
@@ -96,8 +120,16 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     {
         return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
     }
-    
-    
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSite()
+    {
+        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
+    }
+
+
     /**
      * Gets query for [[ShopStoreProducts]].
      *

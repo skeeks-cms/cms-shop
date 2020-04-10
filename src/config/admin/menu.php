@@ -56,7 +56,7 @@ function shopProductsMenu()
 
             $result[] = $itemData;
 
-            if (\skeeks\cms\shop\models\ShopSupplier::find()->one()) {
+            /*if (\skeeks\cms\shop\models\ShopSupplier::find()->one()) {
                 $itemData = [
                     'label'          => $content->name." (поставщик)",
                     "img"            => ['skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
@@ -82,7 +82,7 @@ function shopProductsMenu()
                 ];
 
                 $result[] = $itemData;
-            }
+            }*/
 
         }
     }

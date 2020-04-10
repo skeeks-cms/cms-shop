@@ -16,6 +16,7 @@ use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -50,6 +51,16 @@ class AdminTypePriceController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $query->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
+                    },
+
                     'defaultOrder' => [
                         'priority' => SORT_ASC,
                     ],
@@ -61,14 +72,13 @@ class AdminTypePriceController extends BackendModelStandartController
                         ///'id',
 
                         'name',
-                        'shop_supplier_id',
 
                         'priority',
 
                     ],
                     'columns'        => [
                         'name' => [
-                            'class' => DefaultActionColumn::class,
+                            'class'         => DefaultActionColumn::class,
                             'viewAttribute' => 'asText',
                         ],
                     ],
@@ -79,7 +89,7 @@ class AdminTypePriceController extends BackendModelStandartController
             "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
-            
+
             "update" => [
                 'fields' => [$this, 'updateFields'],
             ],
@@ -93,7 +103,7 @@ class AdminTypePriceController extends BackendModelStandartController
          * @var $model ShopTypePrice
          */
         $model = $action->model;
-        
+
         $model->load(\Yii::$app->request->get());
 
         $result = [
@@ -103,10 +113,10 @@ class AdminTypePriceController extends BackendModelStandartController
                     ShopSupplier::find()->all(),
                     'id',
                     'asText'
-                )
+                ),
             ],
             'name',
-            'description' => [
+            'description'      => [
                 'class' => TextareaField::class,
             ],
             'priority',
@@ -150,7 +160,7 @@ class AdminTypePriceController extends BackendModelStandartController
                     ]),
             ];
         }
-        
+
         return $result;
     }
 

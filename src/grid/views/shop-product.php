@@ -22,18 +22,18 @@
         </div>
     </div>
 
-    <div>
+    <!--<div>
 
-        <?
+        <?/*
         \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
             'controllerId' => "/shop/admin-shop-supplier",
             'modelId'      => $model->shopProduct->shopSupplier->id,
         ]);
-        ?>
+        */?>
         <i class="fas fa-truck" style="width: 20px;" title="Поставщик"></i>
-        <?= $model->shopProduct->shopSupplier->asText; ?>
-        <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-    </div>
+        <?/*= $model->shopProduct->shopSupplier->asText; */?>
+        <?/* \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); */?>
+    </div>-->
     <? if ($model->tree_id) : ?>
         <div>
             <?

@@ -793,9 +793,11 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getShopTypePrices()
     {
-        $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
+        $query = ShopTypePrice::find()
+            ->andWhere(['cms_site_id' => $this->cmsContentElement->cms_site_id])
+        ;
 
-        if ($this->shop_supplier_id) {
+        /*if ($this->cmsContentElement->cms_site_id) {
             if ($this->shopSupplier->is_main) {
                 $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
                 $query->orWhere(['shop_supplier_id' => $this->shop_supplier_id]);
@@ -804,7 +806,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             }
         } else {
             $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
-        }
+        }*/
 
         $query->orderBy(['priority' => SORT_ASC]);
         $query->multiple = true;
@@ -820,8 +822,8 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getIsSubProduct()
     {
-        if ($this->shop_supplier_id) {
-            if (!$this->shopSupplier->is_main) {
+        if ($this->cmsContentElement && $this->cmsContentElement->cms_site_id) {
+            if (!$this->cmsContentElement->cmsSite->is_default) {
                 return true;
             }
         }

@@ -20,6 +20,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\IHasUrl;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\queryfilters\filters\FilterField;
@@ -34,8 +35,10 @@ use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
+use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopSupplier;
+use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
@@ -578,7 +581,7 @@ HTML
             },
         ];
 
-        $shopColumns["shop.shop_supplier_id"] = [
+        /*$shopColumns["shop.shop_supplier_id"] = [
             'attribute' => "shop.shop_supplier_id",
             'label'     => 'Поставщик [магазин]',
             'format'    => 'raw',
@@ -587,9 +590,9 @@ HTML
                     return $shopCmsContentElement->shopProduct->shopSupplier->asText;
                 }
             },
-        ];
+        ];*/
 
-        $shopColumns["shop.supplier_external_id"] = [
+        /*$shopColumns["shop.supplier_external_id"] = [
             'attribute' => "shop.supplier_external_id",
             'label'     => 'Идентификатор поставщика [магазин]',
             'format'    => 'raw',
@@ -598,7 +601,7 @@ HTML
                     return $shopCmsContentElement->shopProduct->supplier_external_id;
                 }
             },
-        ];
+        ];*/
 
         $shopColumns["shop.quantity"] = [
             'attribute' => "shop.quantity",
@@ -608,12 +611,12 @@ HTML
                 if ($shopCmsContentElement->shopProduct) {
                     $result = $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
 
-                    if ($shopCmsContentElement->shopProduct->shopStoreProducts) {
+                    if (count($shopCmsContentElement->shopProduct->shopStoreProducts) > 1) {
                         $storesQuantity = [];
                         foreach ($shopCmsContentElement->shopProduct->shopStoreProducts as $shopStoreProduct) {
                             if ($shopStoreProduct->quantity > 0) {
                                 $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity, [
-                                    'title' => $shopStoreProduct->shopStore->shopSupplier->name." - ".$shopStoreProduct->shopStore->name,
+                                    'title' => $shopStoreProduct->shopStore->name,
                                     'style' => 'white-space: nowrap; color: gray;',
                                 ]);
                             }
@@ -703,7 +706,7 @@ HTML
             ];
 
             $shopColumns["shop.priceDefult"] = [
-                'label'     => "Все цены [магазин]",
+                'label'     => "Доступные цены [магазин]",
                 'attribute' => 'shop.priceDefult',
                 'format'    => 'raw',
                 'value'     => function (ShopCmsContentElement $model) {
@@ -904,13 +907,42 @@ HTML
             },*/
         ];
 
+
+        $filterFields['is_ready'] = [
+            'class'    => SelectField::class,
+            'items'    => [
+                'on'  => 'Готов',
+                'off' => 'Не привязан',
+            ],
+            'label'    => 'Привязка',
+            'multiple' => false,
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                $query->joinWith('shopProduct as sp');
+
+                if ($e->field->value) {
+                    if ($e->field->value == 'on') {
+                        $query->andWhere(['is not', 'sp.main_pid', null]);
+                    } else {
+                        $query->andWhere(['sp.main_pid' => null]);
+                    }
+
+                }
+            },
+        ];
+
         $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
+        $filterFieldsLabels['is_ready'] = 'Связь с главным товаром [магазин]';
         $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
         $filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
         $filterFieldsLabels['shop_supproducts'] = 'Привязанные поставщики';
         $filterFieldsLabels['all_ids'] = 'ID + вложенные';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика [магазин]';
 
+        $filterFieldsRules[] = ['is_ready', 'safe'];
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
         $filterFieldsRules[] = ['shop_supplier_id', 'safe'];
@@ -948,7 +980,12 @@ HTML
 
             $urlHelper = new BackendUrlHelper();
             $urlHelper->setBackendParamsByCurrentRequest();
+            
+            $site_id = \Yii::$app->cms->site->id;
             if ($urlHelper->getBackenParam("sx-to-main")) {
+                
+                $site = CmsSite::find()->where(['is_default' => 1])->one();
+                $site_id = $site->id;
                 $query->andWhere([
                     'in',
                     'sp.product_type',
@@ -969,11 +1006,13 @@ HTML
             }
 
 
+            $query->andWhere(['cms_site_id' => $site_id]);
+            /*
             $query->andWhere([
                 'or',
                 ['shopSupplier.id' => null],
                 ['shopSupplier.is_main' => 1],
-            ]);
+            ]);*/
 
             if (\Yii::$app->shop->shopTypePrices) {
                 foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
@@ -1021,17 +1060,13 @@ HTML
         /**
          * @var ShopSupplier $shopSupplier ;
          */
-        if ($shopSuppliers = \skeeks\cms\shop\models\ShopSupplier::find()->all()) {
-            foreach ($shopSuppliers as $key => $shopSupplier) {
-                if ($shopSupplier->shopStores) {
-                    foreach ($shopSupplier->shopStores as $shopStore) {
-                        $shopStoreProduct = new ShopStoreProduct([
-                            'shop_store_id' => $shopStore->id,
-                        ]);
+        if ($shopStores = ShopStore::find()->where(['cms_site_id' => \Yii::$app->cms->site->id])->all()) {
+            foreach ($shopStores as $shopStore) {
+                $shopStoreProduct = new ShopStoreProduct([
+                    'shop_store_id' => $shopStore->id,
+                ]);
 
-                        $shopStoreProducts[] = $shopStoreProduct;
-                    }
-                }
+                $shopStoreProducts[] = $shopStoreProduct;
             }
         }
 
@@ -1085,7 +1120,8 @@ HTML
         }
 
         $productPrices = [];
-        $typePrices = $shopProduct->shopTypePrices;
+        /*$typePrices = $shopProduct->shopTypePrices;*/
+        $typePrices = ShopTypePrice::find()->where(['cms_site_id' => \Yii::$app->cms->site->id])->all();
         if ($typePrices) {
             foreach ($typePrices as $typePrice) {
 

@@ -25,6 +25,7 @@ use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -59,6 +60,15 @@ class AdminShopStoreController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $query->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
+                    },
                     'defaultOrder'   => [
                         'id' => SORT_DESC,
                     ],
@@ -69,7 +79,6 @@ class AdminShopStoreController extends BackendModelStandartController
 
                         //'id',
                         'name',
-                        'shop_supplier_id',
 
                         'is_active',
                     ],
