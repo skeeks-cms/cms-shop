@@ -123,7 +123,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                 "offers" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback'  => true,
                     'name'            => "Предложения",
                     'icon'            => 'fa fa-list',
                     'controllerRoute' => "/shop/admin-cms-content-element",
@@ -192,6 +191,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         }
 
                         if ($model->shopProduct->product_type == ShopProduct::TYPE_OFFERS) {
+                            return \Yii::$app->user->can($action->controller->uniqueId . "__" . $model->content_id . "/update", [
+                                'model' => $model
+                            ]);
                             return true;
                         }
 
