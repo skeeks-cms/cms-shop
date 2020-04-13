@@ -8,20 +8,29 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\shop\models\ShopTaxRate;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminTaxRateController extends AdminModelEditorController
+class AdminTaxRateController extends BackendModelStandartController
 {
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Tax rates');
         $this->modelShowAttribute = "id";
         $this->modelClassName = ShopTaxRate::class;
+
+        $this->generateAccessActions = false;
+
+        $this->accessCallback = function () {
+            if (!\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
 
         parent::init();
     }

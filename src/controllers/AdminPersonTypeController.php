@@ -8,14 +8,14 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\shop\models\ShopPersonType;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminPersonTypeController extends AdminModelEditorController
+class AdminPersonTypeController extends BackendModelStandartController
 {
     public function init()
     {
@@ -23,6 +23,15 @@ class AdminPersonTypeController extends AdminModelEditorController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopPersonType::class;
 
+        $this->generateAccessActions = false;
+
+        $this->accessCallback = function () {
+            if (!\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+            return \Yii::$app->user->can($this->uniqueId);
+        };
+        
         parent::init();
     }
 }
