@@ -243,7 +243,19 @@ class ProductPriceHelper extends Component
      */
     public function getHasDiscount()
     {
-        return (bool)($this->basePrice->money->amount != $this->minMoney->amount);
+        if (!$this->basePrice || !$this->minMoney) {
+            return false;
+        }
+        
+        if ((float) $this->basePrice->money->amount == 0) {
+            return false;
+        }
+        
+        if ((float) $this->minMoney->amount == 0) {
+            return false;
+        }
+        
+        return (bool) ((float) $this->basePrice->money->amount != (float) $this->minMoney->amount);
     }
 
     /**
