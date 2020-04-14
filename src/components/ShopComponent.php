@@ -644,7 +644,7 @@ class ShopComponent extends Component
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
 
-        if ($this->visible_shop_supplier_ids) {
+        /*if ($this->visible_shop_supplier_ids) {
             $activeQuery->andWhere([
                 'or',
                 ['shopProduct.shop_supplier_id' => null],
@@ -654,7 +654,7 @@ class ShopComponent extends Component
             $activeQuery->andWhere(
                 ['shopProduct.shop_supplier_id' => null]
             );
-        }
+        }*/
 
 
         return $this;
