@@ -368,6 +368,13 @@ HTML
                          */
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     },
+
+                    "eachAccessCallback" => function($model) {
+                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                    },
+                    "accessCallback" => function() {
+                        return \Yii::$app->user->can($this->permissionName . "/update");
+                    },
                 ],
 
                 "shop-properties" => [
@@ -384,12 +391,18 @@ HTML
                             $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                         }
                     },
+
+                    "eachAccessCallback" => function($model) {
+                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                    },
+                    "accessCallback" => function() {
+                        return \Yii::$app->user->can($this->permissionName . "/update");
+                    },
                 ],
 
 
                 "viewed-products" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback'  => true,
                     'name'            => ['skeeks/shop/app', 'Looked'],
                     'icon'            => 'far fa-eye',
                     'controllerRoute' => "/shop/admin-viewed-product",
@@ -411,7 +424,11 @@ HTML
 
                 "quantity-notice-emails" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback'  => true,
+                    'accessCallback' => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        return \Yii::$app->user->can($this->permissionName . "/viewed-products", ['model' => $model]);
+                    },
+
                     'name'            => ['skeeks/shop/app', 'Waiting for receipt'],
                     'icon'            => 'far fa-envelope',
                     'controllerRoute' => "/shop/admin-quantity-notice-email",
@@ -433,7 +450,10 @@ HTML
 
                 "carts" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback'  => true,
+                    'accessCallback' => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        return \Yii::$app->user->can($this->permissionName . "/viewed-products", ['model' => $model]);
+                    },
                     'name'            => ['skeeks/shop/app', 'In baskets'],
                     'icon'            => 'fas fa-cart-arrow-down',
                     'controllerRoute' => "/shop/admin-cart",
@@ -466,7 +486,10 @@ HTML
 
                 "orders" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback'  => true,
+                    'accessCallback' => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        return \Yii::$app->user->can($this->permissionName . "/viewed-products", ['model' => $model]);
+                    },
                     'name'            => ['skeeks/shop/app', 'In orders'],
                     'icon'            => 'fas fa-cart-arrow-down',
                     'controllerRoute' => "/shop/admin-order",
