@@ -139,8 +139,8 @@
                                 ]);
                                 ?>
                                 <i class="fas fa-link" title="Привязан к главному товару"></i>
-                                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->shopSupplier->name; ?> -
-                                товар #<?= $shopSupplierProduct->id; ?>
+                                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
+                                <?= $shopSupplierProduct->asText; ?>
                                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                             </div>
                         <? endforeach; ?>
@@ -197,8 +197,8 @@
                 ]);
                 ?>
                 <i class="fas fa-link" title="Привязан к главному товару"></i>
-                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->shopSupplier->name; ?> -
-                товар #<?= $shopSupplierProduct->id; ?>
+                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
+                <?= $shopSupplierProduct->asText; ?>
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
             </div>
         <? endforeach; ?>
