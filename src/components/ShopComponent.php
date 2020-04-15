@@ -166,7 +166,8 @@ class ShopComponent extends Component
     /**
      * @var array
      */
-    public $visible_shop_supplier_ids = [];
+    //public $visible_shop_supplier_ids = [];
+    public $is_show_products_has_main = false;
 
 
     /**
@@ -244,12 +245,9 @@ class ShopComponent extends Component
                             CmsContentProperty::find()->all(), 'code', 'asText'
                         ),
                     ],
-                    'visible_shop_supplier_ids' => [
-                        'class'    => SelectField::class,
-                        'multiple' => true,
-                        'items'    => ArrayHelper::map(
-                            ShopSupplier::find()->all(), 'id', 'asText'
-                        ),
+                    'is_show_products_has_main' => [
+                        'class'    => BoolField::class,
+                        'allowNull' => false,
                     ],
 
                 ],
@@ -321,7 +319,6 @@ class ShopComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['visible_shop_supplier_ids'], 'safe'],
             [['offers_properties'], 'safe'],
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
@@ -344,6 +341,7 @@ class ShopComponent extends Component
                     'is_show_product_only_quantity',
                     'is_show_filters_has_subtree',
                     'is_show_quantity_product',
+                    'is_show_products_has_main',
                 ],
                 'boolean',
             ],
@@ -369,13 +367,14 @@ class ShopComponent extends Component
             'type_price_retail_id'          => "Розничная цена",
             'type_price_mrc_id'             => "Минимальная розничная цена",
             'offers_properties'             => "Свойства предложений",
-            'visible_shop_supplier_ids'     => "Отображать товары поставщиков",
+            'is_show_products_has_main'     => "Отображать только товары которые привязаны к главным?",
         ]);
     }
 
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'is_show_products_has_main'         => "Если выбрано да, то будут показываться только оформленные товары",
             'start_order_status_id'         => "Статус, который присваивается заказу сразу после его оформления",
             'end_order_status_id'           => "Статус, который присваивается заказу после завершения работы с ним",
             'notify_emails'                 => \Yii::t('skeeks/shop/app',
@@ -644,6 +643,11 @@ class ShopComponent extends Component
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
 
+        if ($this->is_show_products_has_main) {
+            $activeQuery->andWhere(
+                ['is not', 'shopProduct.main_pid', null]
+            );
+        }
         /*if ($this->visible_shop_supplier_ids) {
             $activeQuery->andWhere([
                 'or',
@@ -778,6 +782,25 @@ SQL
     public function updateAllQuantities()
     {
         //Обновление количества товаров у которых задан поставщик, информация берется со складов
+        /*UPDATE
+            `shop_product` as sp
+            INNER JOIN (
+                SELECT
+                    inner_sp.id as inner_sp_id,
+                    SUM(ssp.quantity) as sum_quantity
+                FROM
+                    shop_product inner_sp
+                    LEFT JOIN shop_store_product ssp on ssp.shop_product_id = inner_sp.id
+                WHERE
+                    inner_sp.shop_supplier_id is not null
+                GROUP BY
+                    inner_sp.id
+            ) sp_has_supplier ON sp.id = sp_has_supplier.inner_sp_id
+        SET
+            sp.`quantity` = if(
+                sp_has_supplier.sum_quantity is null,
+                0, sp_has_supplier.sum_quantity
+            )*/
         $result = \Yii::$app->db->createCommand(<<<SQL
             UPDATE 
                 `shop_product` as sp 
@@ -787,7 +810,10 @@ SQL
                    SELECT inner_sp.id as inner_sp_id, SUM(ssp.quantity) as sum_quantity
                    FROM shop_product inner_sp
                        LEFT JOIN shop_store_product ssp on ssp.shop_product_id = inner_sp.id 
-                       WHERE inner_sp.shop_supplier_id is not null
+                       LEFT JOIN cms_content_element cce on ssp.id = cce.id 
+                       LEFT JOIN cms_site as site on site.id = cce.cms_site_id 
+                       LEFT JOIN shop_site as shopSite on site.id = shopSite.id 
+                       WHERE shopSite.is_supplier = 1
                    GROUP BY inner_sp.id
                 ) sp_has_supplier ON sp.id = sp_has_supplier.inner_sp_id
             SET 
