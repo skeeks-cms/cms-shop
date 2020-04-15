@@ -56,6 +56,11 @@ return [
                     'name'     => ['skeeks/shop/app', 'Обновление типа товаров'],
                     'interval' => 60 * 5,
                 ],
+                'shop/agents/update-subproducts' => [
+                    'class'    => \skeeks\cms\agent\CmsAgent::class,
+                    'name'     => ['skeeks/shop/app', 'Обновление данных по вложенным товарам'],
+                    'interval' => 60 * 5,
+                ],
             ],
         ],
         'authManager' => [

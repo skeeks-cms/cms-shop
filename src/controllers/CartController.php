@@ -133,6 +133,9 @@ class CartController extends Controller
             }
 
             $shopBasket->quantity = $shopBasket->quantity + $quantity;
+            
+            $int = round($shopBasket->quantity / $product->measure_ratio);
+            $shopBasket->quantity = $int * $product->measure_ratio;
 
 
             if (!$shopBasket->recalculate()->save()) {

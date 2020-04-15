@@ -74,8 +74,9 @@ use yii\helpers\Json;
  * @property boolean                     $isSimpleProduct
  * @property boolean                     $isOfferProduct
  * @property boolean                     $isOffersProduct
+ * @property array                       $measureMatches
  *
- * @property ShopFavoriteProduct[] $shopFavoriteProducts
+ * @property ShopFavoriteProduct[]       $shopFavoriteProducts
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -351,6 +352,19 @@ class ShopProduct extends \skeeks\cms\models\Core
             $parentProduct->save();
         }
     }
+
+    /**
+     * @return array
+     */
+    public function getMeasureMatches()
+    {
+        if ($this->measure_matches_jsondata) {
+            return (array)Json::decode($this->measure_matches_jsondata);
+        }
+
+        return [];
+    }
+
     /**
      * @inheritdoc
      */
@@ -437,7 +451,8 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['product_type'], 'string', 'max' => 10],
             [['product_type'], 'default', 'value' => static::TYPE_SIMPLE],
             [
-                'product_type', function ($attribute) {
+                'product_type',
+                function ($attribute) {
                     if ($this->{$attribute} == self::TYPE_OFFER) {
                         if (!$this->cmsContentElement->parent_content_element_id) {
                             $this->addError($attribute, "Для того чтобы товар был предложением, нужно выбрать общий товар в который он будет вложен.");
@@ -794,8 +809,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getShopTypePrices()
     {
         $query = ShopTypePrice::find()
-            ->andWhere(['cms_site_id' => $this->cmsContentElement->cms_site_id])
-        ;
+            ->andWhere(['cms_site_id' => $this->cmsContentElement->cms_site_id]);
 
         /*if ($this->cmsContentElement->cms_site_id) {
             if ($this->shopSupplier->is_main) {
@@ -864,8 +878,8 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopFavoriteProduct::className(), ['shop_product_id' => 'id']);
     }
-    
-    
+
+
     public function asText()
     {
         return $this->cmsContentElement->asText;

@@ -40,7 +40,7 @@ function shopProductsMenu()
                 },
 
                 "accessCallback" => function ($adminMenuItem) use ($content) {
-                    $permissionNames =  "shop/admin-cms-content-element__" . $content->id;
+                    $permissionNames = "shop/admin-cms-content-element__".$content->id;
                     foreach ([$permissionNames] as $permissionName) {
                         if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
                             if (!\Yii::$app->user->can($permission->name)) {
@@ -273,7 +273,7 @@ return [
                         ],
                     ],
 
-                    [
+                    /*[
                         'priority' => 0,
                         'label'    => \Yii::t('skeeks/shop/app', 'Поставщики/Склады'),
                         "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
@@ -286,15 +286,11 @@ return [
                                     "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                                 ],
 
-                                [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Склады'),
-                                    "url"   => ["shop/admin-shop-store"],
-                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-                                ],
+                                
 
                             ],
 
-                    ],
+                    ],*/
 
 
                     [
@@ -326,7 +322,13 @@ return [
                         'items' =>
                             [
                                 [
-                                    "label"          => \Yii::t('skeeks/shop/app', 'Main settings'),
+                                    "img"   => ['skeeks\cms\assets\CmsAsset', 'images/icons/settings.png'],
+                                    "label" => \Yii::t('skeeks/shop/app', 'Main'),
+                                    "url"   => ["shop/admin-shop-site"],
+                                ],
+
+                                [
+                                    "label"          => \Yii::t('skeeks/shop/app', 'Дополнительные'),
                                     "url"            => [
                                         "cms/admin-settings",
                                         "component" => 'skeeks\cms\shop\components\ShopComponent',
@@ -335,6 +337,12 @@ return [
                                     "activeCallback" => function ($adminMenuItem) {
                                         return (bool)(\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
                                     },
+                                ],
+
+                                [
+                                    "label" => \Yii::t('skeeks/shop/app', 'Склады'),
+                                    "url"   => ["shop/admin-shop-store"],
+                                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                                 ],
 
                                 [
@@ -350,21 +358,25 @@ return [
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Types of prices'),
                                     "url"   => ["shop/admin-type-price"],
+                                    'icon'  => "fas fa-dollar-sign",
                                 ],
 
                                 [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Types of profiles'),
+                                    "label" => \Yii::t('skeeks/shop/app', 'Типы покупателей'),
                                     "url"   => ["shop/admin-person-type"],
+                                    "icon"  => "fas fa-user-friends"
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Payment systems'),
                                     "url"   => ["shop/admin-pay-system"],
+                                    "icon"  => "fab fa-cc-visa",
                                 ],
 
                                 [
                                     "label" => \Yii::t('skeeks/shop/app', 'Delivery services'),
                                     "url"   => ["shop/admin-delivery"],
+                                    "icon" => "fas fa-truck"
                                 ],
 
 

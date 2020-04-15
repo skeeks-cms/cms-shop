@@ -225,29 +225,29 @@ class ShopComponent extends Component
                     ],
 
 
-                    'type_price_purchase_id' => [
+                    'type_price_purchase_id'    => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
-                    'type_price_retail_id'   => [
+                    'type_price_retail_id'      => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
-                    'type_price_mrc_id'      => [
+                    'type_price_mrc_id'         => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopTypePrice::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
-                    'offers_properties'      => [
-                        'class' => SelectField::class,
+                    'offers_properties'         => [
+                        'class'    => SelectField::class,
                         'multiple' => true,
-                        'items' => ArrayHelper::map(
+                        'items'    => ArrayHelper::map(
                             CmsContentProperty::find()->all(), 'code', 'asText'
                         ),
                     ],
-                    'visible_shop_supplier_ids'      => [
-                        'class' => SelectField::class,
+                    'visible_shop_supplier_ids' => [
+                        'class'    => SelectField::class,
                         'multiple' => true,
-                        'items' => ArrayHelper::map(
+                        'items'    => ArrayHelper::map(
                             ShopSupplier::find()->all(), 'id', 'asText'
                         ),
                     ],
@@ -304,7 +304,7 @@ class ShopComponent extends Component
                         'multiple' => true,
                         'items'    => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
-                    
+
                     'open_filter_property_ids' => [
                         'class'    => SelectField::class,
                         'multiple' => true,
@@ -369,7 +369,7 @@ class ShopComponent extends Component
             'type_price_retail_id'          => "Розничная цена",
             'type_price_mrc_id'             => "Минимальная розничная цена",
             'offers_properties'             => "Свойства предложений",
-            'visible_shop_supplier_ids'             => "Отображать товары поставщиков",
+            'visible_shop_supplier_ids'     => "Отображать товары поставщиков",
         ]);
     }
 
@@ -680,10 +680,46 @@ class ShopComponent extends Component
 
 
     /**
+     * Обновление данныех по товарам из главных товаров
+     * 
      * @return $this
      * @throws \yii\db\Exception
      */
-    public function updateAllTypes() {
+    public function updateAllSubproducts()
+    {
+        $result = \Yii::$app->db->createCommand(<<<SQL
+            UPDATE 
+                `shop_product` as sp 
+                INNER JOIN (
+                    /*Товары у которых задан главный товар*/
+                    SELECT 
+                        inner_sp.id as inner_sp_id 
+                    FROM 
+                        shop_product inner_sp 
+                    WHERE 
+                        inner_sp.main_pid is not null
+                ) sp_has_main_pid ON sp_has_main_pid.inner_sp_id = sp.id 
+                LEFT JOIN shop_product as sp_main on sp_main.id = sp.main_pid 
+            SET 
+                sp.`measure_ratio` = sp_main.measure_ratio, 
+                sp.`measure_matches_jsondata` = sp_main.measure_matches_jsondata, 
+                sp.`measure_code` = sp_main.measure_code, 
+                sp.`width` = sp_main.width, 
+                sp.`length` = sp_main.length, 
+                sp.`height` = sp_main.height, 
+                sp.`weight` = sp_main.weight
+SQL
+        )->execute();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws \yii\db\Exception
+     */
+    public function updateAllTypes()
+    {
         //Товары у которых не задан родительский элемент делаем простыми
         $result = \Yii::$app->db->createCommand(<<<SQL
             UPDATE 
@@ -731,7 +767,7 @@ SQL
                 sp.`product_type` = "offer"
 SQL
         )->execute();
-        
+
         return $this;
     }
 
@@ -758,7 +794,7 @@ SQL
                 sp.`quantity` = if(sp_has_supplier.sum_quantity is null, 0, sp_has_supplier.sum_quantity)
 SQL
         )->execute();
-        
+
 
         //Обновление количества у главных товаров, к которым привязаны товары поставщиков
         \Yii::$app->db->createCommand("
@@ -793,7 +829,7 @@ SQL
             SET 
                 sp.`quantity` = sp_has_parent.sum_quantity
         ")->execute();
-        
+
         return $this;
     }
 }
