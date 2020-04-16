@@ -781,26 +781,7 @@ SQL
      */
     public function updateAllQuantities()
     {
-        //Обновление количества товаров у которых задан поставщик, информация берется со складов
-        /*UPDATE
-            `shop_product` as sp
-            INNER JOIN (
-                SELECT
-                    inner_sp.id as inner_sp_id,
-                    SUM(ssp.quantity) as sum_quantity
-                FROM
-                    shop_product inner_sp
-                    LEFT JOIN shop_store_product ssp on ssp.shop_product_id = inner_sp.id
-                WHERE
-                    inner_sp.shop_supplier_id is not null
-                GROUP BY
-                    inner_sp.id
-            ) sp_has_supplier ON sp.id = sp_has_supplier.inner_sp_id
-        SET
-            sp.`quantity` = if(
-                sp_has_supplier.sum_quantity is null,
-                0, sp_has_supplier.sum_quantity
-            )*/
+
         $result = \Yii::$app->db->createCommand(<<<SQL
             UPDATE 
                 `shop_product` as sp 
@@ -828,9 +809,13 @@ SQL
                 `shop_product` as sp 
                 INNER JOIN
                 (
-                   SELECT main_pid, SUM(quantity) as sum_quantity
-                   FROM shop_product 
-                   GROUP BY main_pid
+                   SELECT inner_sp.main_pid, SUM(inner_sp.quantity) as sum_quantity
+                   FROM shop_product as inner_sp
+                   LEFT JOIN cms_content_element as inner_cce ON inner_cce.id = inner_sp.id
+                   LEFT JOIN cms_site as inner_cms_site_id ON inner_cms_site_id.id = inner_cce.cms_site_id
+                   LEFT JOIN shop_site as inner_shop_site ON inner_shop_site.id = inner_cms_site_id.id
+                   WHERE inner_shop_site.is_supplier = 1
+                   GROUP BY inner_sp.main_pid
                 ) sp_has_main ON sp.id = sp_has_main.main_pid
             SET 
                 sp.`quantity` = sp_has_main.sum_quantity
