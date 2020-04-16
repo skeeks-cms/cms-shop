@@ -657,8 +657,8 @@ HTML
 
                         $storesQuantity = [];
                         foreach ($shopCmsContentElement->shopProduct->shopSupplierProducts as $shopStoreProduct) {
-                            $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity." - ".$shopStoreProduct->shopSupplier->name, [
-                                'title' => $shopStoreProduct->shopSupplier->name,
+                            $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity." - ".$shopStoreProduct->cmsContentElement->cmsSite->name, [
+                                'title' => $shopStoreProduct->cmsContentElement->cmsSite->name,
                                 'style' => 'white-space: nowrap; color: gray;',
                             ]);
 
