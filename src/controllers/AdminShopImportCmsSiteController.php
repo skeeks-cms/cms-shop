@@ -43,7 +43,7 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
             /**
              * @var ShopSite $shopSite
              */
-            $shopSite = \Yii::$app->shop->shopSite;
+            $shopSite = \Yii::$app->skeeks->site->shopSite;
             if (!$shopSite) {
                 return false;
             }

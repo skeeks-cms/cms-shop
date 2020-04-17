@@ -41,7 +41,6 @@ use yii\widgets\ActiveForm;
  * @property CmsContent       $shopContents
  *
  * @property array            $notifyEmails
- * @property ShopSite         $shopSite
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -719,23 +718,6 @@ SQL
         return $this;
     }
 
-
-    /**
-     * @var null|ShopSite
-     */
-    protected $_shopSite = null;
-
-    /**
-     * @return array|\yii\db\ActiveRecord|null
-     */
-    public function getShopSite()
-    {
-        if ($this->_shopSite === null) {
-            $this->_shopSite = ShopSite::find()->where(['id' => \Yii::$app->skeeks->site->id])->one();
-        }
-
-        return $this->_shopSite;
-    }
 
     /**
      * @return $this
