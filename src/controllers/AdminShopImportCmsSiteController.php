@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopImportCmsSite;
 use skeeks\cms\shop\models\ShopSite;
@@ -168,11 +169,14 @@ HTML
                     'id',
                     'asText'
                 ),
+                'elementOptions' => [
+                    RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
+                ],
             ],
             'sender_shop_type_price_id' => [
                 'class' => SelectField::class,
                 'items' => ArrayHelper::map(
-                    ShopTypePrice::find()->where(['cms_site_id' => 1])->all(),
+                    ShopTypePrice::find()->where(['cms_site_id' => $model->sender_cms_site_id ? $model->sender_cms_site_id : null])->all(),
                     'id',
                     'asText'
                 ),

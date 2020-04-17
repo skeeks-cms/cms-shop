@@ -83,7 +83,7 @@ class ShopImportCmsSite extends ActiveRecord
             'receiver_shop_type_price_id' => 'Цена на сайте получателе',
             'receiver_cms_tree_id' => 'Раздел на сайте получателе',
             'sender_cms_site_id' => 'Поставщик',
-            'sender_shop_type_price_id' => 'Цена на сайте отправителе',
+            'sender_shop_type_price_id' => 'Цена поставщика',
             'extra_charge' => 'Наценка/Уценка',
         ]);
     }

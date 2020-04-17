@@ -125,16 +125,6 @@ HTML
         $action->model->load(\Yii::$app->request->get());
         
         return [
-            'shop_supplier_id' => [
-                'class'        => SelectField::class,
-                'items'  => function() {
-                    return ArrayHelper::map(
-                        ShopSupplier::find()->all(),
-                        'id',
-                        'asText'
-                    );
-                },
-            ],
             'cms_image_id' => [
                 'class'        => WidgetField::class,
                 'widgetClass'  => AjaxFileUploadWidget::class,
