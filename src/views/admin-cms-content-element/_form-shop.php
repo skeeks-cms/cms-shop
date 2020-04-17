@@ -347,7 +347,7 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
         if ($model->cms_site_id) {
             $site_id = $model->cms_site_id;
         } else {
-            $site_id = \Yii::$app->cms->site->id;
+            $site_id = \Yii::$app->skeeks->site->id;
         }
         
         

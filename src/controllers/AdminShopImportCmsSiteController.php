@@ -9,15 +9,13 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopImportCmsSite;
 use skeeks\cms\shop\models\ShopSite;
-use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
-use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
@@ -38,14 +36,14 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
 
         $this->accessCallback = function () {
             //Если это сайт по умолчанию, этот раздел не показываем
-            if (\Yii::$app->cms->site->is_default) {
+            if (\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
 
             /**
              * @var ShopSite $shopSite
              */
-            $shopSite = ShopSite::find()->where(['id' => \Yii::$app->cms->site->id])->one();
+            $shopSite = \Yii::$app->shop->shopSite;
             if (!$shopSite) {
                 return false;
             }
@@ -71,7 +69,27 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
 
             "index" => [
-                'on beforeRender' => function (Event $e) {
+                'on beforeRender' => function (ViewRenderEvent $e) {
+
+                    if (!\Yii::$app->skeeks->site->receiverShopImportCmsSites) {
+                        $e->isRenderContent = false;
+
+                        \Yii::$app->view->registerJs(<<<JS
+$(".sx-content-actions [data-id=create]").popover({
+'content': 'Добавьте первого поставщика!', 
+'trigger': 'focus', 
+'container': false
+});
+_.delay(function() {
+    $(".sx-content-actions [data-id=create]").popover("show");    
+}, 1000);
+JS
+
+                        );
+                    }
+
+
+                    //$e->isRenderContent = false;
                     $e->content = Alert::widget([
                         'closeButton' => false,
                         'options'     => [
@@ -79,7 +97,7 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
                         ],
 
                         'body' => <<<HTML
-В этом разделе вы можете настроить сбор товаров на сайт от других поставщиков.
+В этом разделе вы можете настроить автоматический сбор товаров на сайт от поставщиков.
 HTML
                         ,
                     ]);
@@ -93,7 +111,7 @@ HTML
                          */
                         $query = $e->sender->dataProvider->query;
 
-                        $query->andWhere(['receiver_cms_site_id' => \Yii::$app->cms->site->id]);
+                        $query->andWhere(['receiver_cms_site_id' => \Yii::$app->skeeks->site->id]);
                     },
 
                     'defaultOrder' => [
@@ -129,69 +147,37 @@ HTML
         ]);
     }
 
+    /**
+     * @param $action
+     * @return array
+     */
     public function updateFields($action)
     {
         /**
-         * @var $model ShopTypePrice
+         * @var $model ShopImportCmsSite
          */
         $model = $action->model;
 
         $model->load(\Yii::$app->request->get());
 
         $result = [
-            'shop_supplier_id' => [
+            'sender_cms_site_id'        => [
                 'class' => SelectField::class,
                 'items' => ArrayHelper::map(
-                    ShopSupplier::find()->all(),
+                    ShopSite::find()->where(['is_supplier' => 1])->all(),
                     'id',
                     'asText'
                 ),
             ],
-            'name',
-            'description'      => [
-                'class' => TextareaField::class,
+            'sender_shop_type_price_id' => [
+                'class' => SelectField::class,
+                'items' => ArrayHelper::map(
+                    ShopTypePrice::find()->where(['cms_site_id' => 1])->all(),
+                    'id',
+                    'asText'
+                ),
             ],
-            'priority',
-            'external_id',
         ];
-
-        if ($model->isNewRecord) {
-            $result[] = [
-                'class'   => HtmlBlock::class,
-                'content' => \yii\bootstrap\Alert::widget([
-                    'options' => [
-                        'class' => 'alert-info',
-                    ],
-                    'body'    => \skeeks\cms\shop\Module::t('app', 'After saving can be set up to whom this type available price'),
-                ]),
-            ];
-        } else {
-            $result[] = [
-                'class'   => HtmlBlock::class,
-                'content' => \yii\bootstrap\Alert::widget([
-                        'options' => [
-                            'class' => 'alert-warning',
-                        ],
-                        'body'    => \skeeks\cms\shop\Module::t('app',
-                            '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'),
-                    ]).
-                    \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                        'notClosedRoles'        => [],
-                        'permissionName'        => $model->viewPermissionName,
-                        'permissionDescription' => \skeeks\cms\shop\Module::t('app', 'Rights to see the prices')." '{$model->name}'",
-                        'label'                 => \skeeks\cms\shop\Module::t('app', 'User Groups that have permission to view this type of price'),
-                    ])
-                    .
-                    \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                        'permissionName'        => $model->buyPermissionName,
-                        'notClosedRoles'        => [],
-                        'permissionDescription' => \skeeks\cms\shop\Module::t('app',
-                                'The right to buy at a price').": '{$model->name}'",
-                        'label'                 => \skeeks\cms\shop\Module::t('app',
-                            'Group of users who have the right to purchase on this type of price'),
-                    ]),
-            ];
-        }
 
         return $result;
     }

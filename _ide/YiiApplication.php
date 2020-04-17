@@ -8,10 +8,14 @@
 
 namespace yii\web;
 
+use skeeks\cms\_ide\ShopSkeeks;
 use skeeks\cms\shop\components\ShopComponent;
+use skeeks\cms\Skeeks;
 
 /**
- * @property ShopComponent $shop
+ * @property ShopComponent     $shop
+ * @property Skeeks|ShopSkeeks $skeeks
+ *
  * Class Application
  * @package yii\web
  */

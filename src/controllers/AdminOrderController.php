@@ -491,7 +491,7 @@ HTML;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
-            $shopFuser->link('site', \Yii::$app->cms->site);
+            $shopFuser->link('site', \Yii::$app->skeeks->site);
             $rr->data = $shopFuser->toArray([], $shopFuser->extraFields());
             return (array)$rr;
         } else {

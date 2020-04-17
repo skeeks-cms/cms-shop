@@ -1006,7 +1006,7 @@ HTML
             $urlHelper = new BackendUrlHelper();
             $urlHelper->setBackendParamsByCurrentRequest();
             
-            $site_id = \Yii::$app->cms->site->id;
+            $site_id = \Yii::$app->skeeks->site->id;
             if ($urlHelper->getBackenParam("sx-to-main")) {
                 
                 $site = CmsSite::find()->where(['is_default' => 1])->one();
@@ -1085,7 +1085,7 @@ HTML
         /**
          * @var ShopSupplier $shopSupplier ;
          */
-        if ($shopStores = ShopStore::find()->where(['cms_site_id' => \Yii::$app->cms->site->id])->all()) {
+        if ($shopStores = ShopStore::find()->where(['cms_site_id' => \Yii::$app->skeeks->site->id])->all()) {
             foreach ($shopStores as $shopStore) {
                 $shopStoreProduct = new ShopStoreProduct([
                     'shop_store_id' => $shopStore->id,
@@ -1146,7 +1146,7 @@ HTML
 
         $productPrices = [];
         /*$typePrices = $shopProduct->shopTypePrices;*/
-        $typePrices = ShopTypePrice::find()->where(['cms_site_id' => \Yii::$app->cms->site->id])->all();
+        $typePrices = ShopTypePrice::find()->where(['cms_site_id' => \Yii::$app->skeeks->site->id])->all();
         if ($typePrices) {
             foreach ($typePrices as $typePrice) {
 

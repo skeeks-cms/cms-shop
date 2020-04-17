@@ -118,6 +118,10 @@ return [
                 ],
             ],
         ],
+        
+        'skeeks' => [
+            'siteClass' => \skeeks\cms\shop\models\CmsSite::class,
+        ],
     ],
 
     'modules' => [

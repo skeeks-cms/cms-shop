@@ -148,7 +148,7 @@ class CartController extends Controller
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
@@ -178,7 +178,7 @@ class CartController extends Controller
                 }
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
@@ -201,7 +201,7 @@ class CartController extends Controller
                 $basket->delete();
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             $rr->success = true;
             $rr->message = "";
@@ -255,7 +255,7 @@ class CartController extends Controller
 
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->cms->site);
+            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {

@@ -157,8 +157,8 @@ class ShopCart extends ActiveRecord
             if (!$this->_newShopOrder) {
                 $this->_newShopOrder = new ShopOrder();
 
-                if (\Yii::$app->cms->site) {
-                    $this->_newShopOrder->cms_site_id = \Yii::$app->cms->site->id;
+                if (\Yii::$app->skeeks->site) {
+                    $this->_newShopOrder->cms_site_id = \Yii::$app->skeeks->site->id;
                 }
 
                 //Для того чтобы применились default rules
@@ -170,8 +170,8 @@ class ShopCart extends ActiveRecord
             //todo: добавить транзакцию
             $order = new ShopOrder();
 
-            if (\Yii::$app->cms->site) {
-                $order->cms_site_id = \Yii::$app->cms->site->id;
+            if (\Yii::$app->skeeks->site) {
+                $order->cms_site_id = \Yii::$app->skeeks->site->id;
             }
 
                 //Для того чтобы применились default rules

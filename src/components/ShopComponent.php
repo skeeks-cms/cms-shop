@@ -18,7 +18,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
-use skeeks\cms\shop\models\ShopSupplier;
+use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -41,6 +41,7 @@ use yii\widgets\ActiveForm;
  * @property CmsContent       $shopContents
  *
  * @property array            $notifyEmails
+ * @property ShopSite         $shopSite
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -246,7 +247,7 @@ class ShopComponent extends Component
                         ),
                     ],
                     'is_show_products_has_main' => [
-                        'class'    => BoolField::class,
+                        'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
 
@@ -374,7 +375,7 @@ class ShopComponent extends Component
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_show_products_has_main'         => "Если выбрано да, то будут показываться только оформленные товары",
+            'is_show_products_has_main'     => "Если выбрано да, то будут показываться только оформленные товары",
             'start_order_status_id'         => "Статус, который присваивается заказу сразу после его оформления",
             'end_order_status_id'           => "Статус, который присваивается заказу после завершения работы с ним",
             'notify_emails'                 => \Yii::t('skeeks/shop/app',
@@ -541,7 +542,7 @@ class ShopComponent extends Component
          */
         /*if (!$this->_shopCart->shop_order_id) {
             $shopOrder = new ShopOrder();
-            $shopOrder->cms_site_id = \Yii::$app->cms->site->id;
+            $shopOrder->cms_site_id = \Yii::$app->skeeks->site->id;
             if (!$shopOrder->save()) {
                 throw new UserException("Заказ-черновик не создан: ".print_r($shopOrder->errors, true));
             }
@@ -685,7 +686,7 @@ class ShopComponent extends Component
 
     /**
      * Обновление данныех по товарам из главных товаров
-     * 
+     *
      * @return $this
      * @throws \yii\db\Exception
      */
@@ -716,6 +717,24 @@ SQL
         )->execute();
 
         return $this;
+    }
+
+
+    /**
+     * @var null|ShopSite
+     */
+    protected $_shopSite = null;
+
+    /**
+     * @return array|\yii\db\ActiveRecord|null
+     */
+    public function getShopSite()
+    {
+        if ($this->_shopSite === null) {
+            $this->_shopSite = ShopSite::find()->where(['id' => \Yii::$app->skeeks->site->id])->one();
+        }
+
+        return $this->_shopSite;
     }
 
     /**

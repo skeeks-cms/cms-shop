@@ -585,7 +585,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         $shopViewdProduct = new ShopViewedProduct();
         $shopViewdProduct->shop_product_id = $this->id;
-        $shopViewdProduct->site_id = \Yii::$app->cms->site->id;
+        $shopViewdProduct->site_id = \Yii::$app->skeeks->site->id;
         $shopViewdProduct->shop_fuser_id = \Yii::$app->shop->cart->id;
 
         return $shopViewdProduct->save();

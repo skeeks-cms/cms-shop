@@ -36,7 +36,7 @@ class AdminShopSiteController extends BackendModelController
         $this->generateAccessActions = false;
 
         /*$this->accessCallback = function () {
-            if (!\Yii::$app->cms->site->is_default) {
+            if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
             return \Yii::$app->user->can($this->uniqueId);
@@ -51,7 +51,7 @@ class AdminShopSiteController extends BackendModelController
     public function getModel()
     {
         if ($this->_model === null && \Yii::$app instanceof Application) {
-            $shopSite = ShopSite::find()->where(['id' => \Yii::$app->cms->site->id])->one();
+            $shopSite = ShopSite::find()->where(['id' => \Yii::$app->skeeks->site->id])->one();
             if (!$shopSite) {
                 $shopSite = new ShopSite();
                 if (!$shopSite->save(false)) {

@@ -46,8 +46,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                 'id',
                 'default',
                 'value' => function () {
-                    if (\Yii::$app->cms->site) {
-                        return \Yii::$app->cms->site->id;
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
                     }
                 },
             ],
@@ -93,5 +93,13 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     public function getShopSupplier()
     {
         return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        return $this->cmsSite->asText;
     }
 }

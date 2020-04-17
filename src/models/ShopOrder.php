@@ -428,7 +428,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
             [['status_at'], 'default', 'value' => \Yii::$app->formatter->asTimestamp(time())],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
-            [['cms_site_id'], 'default', 'value' => \Yii::$app->cms->site->id],
+            [['cms_site_id'], 'default', 'value' => \Yii::$app->skeeks->site->id],
 
             [['reason_canceled'], 'validateCanceled'],
 

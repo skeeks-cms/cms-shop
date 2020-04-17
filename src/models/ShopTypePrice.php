@@ -58,8 +58,8 @@ class ShopTypePrice extends \skeeks\cms\models\Core
                 'cms_site_id',
                 'default',
                 'value' => function () {
-                    if (\Yii::$app->cms->site) {
-                        return \Yii::$app->cms->site->id;
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
                     }
                 },
             ],

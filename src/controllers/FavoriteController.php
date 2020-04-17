@@ -81,7 +81,7 @@ class FavoriteController extends Controller
             $shopFavoriteProduct = new ShopFavoriteProduct();
             $shopFavoriteProduct->shop_cart_id = \Yii::$app->shop->cart->id;
             $shopFavoriteProduct->shop_product_id = $product->id;
-            $shopFavoriteProduct->cms_site_id = \Yii::$app->cms->site->id;
+            $shopFavoriteProduct->cms_site_id = \Yii::$app->skeeks->site->id;
 
             $shopFavoriteProduct->save();
 

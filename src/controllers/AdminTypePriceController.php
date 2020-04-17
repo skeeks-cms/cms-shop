@@ -73,7 +73,7 @@ HTML
                          */
                         $query = $e->sender->dataProvider->query;
 
-                        $query->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
+                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
                     },
 
                     'defaultOrder' => [
