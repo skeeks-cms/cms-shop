@@ -80,11 +80,17 @@ class ShopImportCmsSite extends ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'receiver_cms_site_id' => 'Сайт получатель',
-            'receiver_shop_type_price_id' => 'Цена на сайте получателе',
+            'receiver_shop_type_price_id' => 'Цена на вашем сайте',
             'receiver_cms_tree_id' => 'Раздел на сайте получателе',
             'sender_cms_site_id' => 'Поставщик',
             'sender_shop_type_price_id' => 'Цена поставщика',
             'extra_charge' => 'Наценка/Уценка',
+        ]);
+    }
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'extra_charge' => 'Если выбрано 100% то цена на вашем сайте будет такой же, как выбранная цена у поставщика',
         ]);
     }
 

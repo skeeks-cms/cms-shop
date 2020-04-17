@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopImportCmsSite;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
@@ -177,6 +178,18 @@ HTML
                 'class' => SelectField::class,
                 'items' => ArrayHelper::map(
                     ShopTypePrice::find()->where(['cms_site_id' => $model->sender_cms_site_id ? $model->sender_cms_site_id : null])->all(),
+                    'id',
+                    'asText'
+                ),
+            ],
+            "extra_charge" => [
+                'class' => NumberField::class,
+                'append' => "%",
+            ],
+            'receiver_shop_type_price_id' => [
+                'class' => SelectField::class,
+                'items' => ArrayHelper::map(
+                    \Yii::$app->skeeks->site->shopTypePrices,
                     'id',
                     'asText'
                 ),
