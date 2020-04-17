@@ -11,6 +11,8 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\shop\models\ShopImportCmsSite;
+use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -23,16 +25,40 @@ use yii\helpers\ArrayHelper;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminTypePriceController extends BackendModelStandartController
+class AdminShopImportCmsSiteController extends BackendModelStandartController
 {
 
     public function init()
     {
-        $this->name = \Yii::t('skeeks/shop/app', 'Types of prices');
+        $this->name = \Yii::t('skeeks/shop/app', 'Поставщики');
         $this->modelShowAttribute = "asText";
-        $this->modelClassName = ShopTypePrice::class;
+        $this->modelClassName = ShopImportCmsSite::class;
 
         $this->generateAccessActions = false;
+
+        $this->accessCallback = function () {
+            //Если это сайт по умолчанию, этот раздел не показываем
+            if (\Yii::$app->cms->site->is_default) {
+                return false;
+            }
+
+            /**
+             * @var ShopSite $shopSite
+             */
+            $shopSite = ShopSite::find()->where(['id' => \Yii::$app->cms->site->id])->one();
+            if (!$shopSite) {
+                return false;
+            }
+
+            /**
+             *
+             */
+            if ($shopSite->is_supplier) {
+                return false;
+            }
+
+            return \Yii::$app->user->can($this->uniqueId);
+        };
 
         parent::init();
     }
@@ -53,19 +79,13 @@ class AdminTypePriceController extends BackendModelStandartController
                         ],
 
                         'body' => <<<HTML
-Настройте какие цены будут доступны на сайте.
+В этом разделе вы можете настроить сбор товаров на сайт от других поставщиков.
 HTML
                         ,
                     ]);
                 },
-
-                "filters" => [
-                    "visibleFilters" => [
-                        'id',
-                        'name',
-                    ],
-                ],
-                'grid'    => [
+                "filters"         => false,
+                'grid'            => [
                     'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
@@ -73,7 +93,7 @@ HTML
                          */
                         $query = $e->sender->dataProvider->query;
 
-                        $query->andWhere(['cms_site_id' => \Yii::$app->cms->site->id]);
+                        $query->andWhere(['receiver_cms_site_id' => \Yii::$app->cms->site->id]);
                     },
 
                     'defaultOrder' => [
@@ -86,15 +106,12 @@ HTML
 
                         ///'id',
 
-                        'name',
-
-                        'priority',
-
+                        'sender_cms_site_id',
                     ],
                     'columns'        => [
-                        'name' => [
-                            'class'         => DefaultActionColumn::class,
-                            'viewAttribute' => 'asText',
+                        'sender_cms_site_id' => [
+                            'class' => DefaultActionColumn::class,
+                            //'viewAttribute' => 'asText',
                         ],
                     ],
 

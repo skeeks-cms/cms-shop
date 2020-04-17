@@ -26,6 +26,7 @@ use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
+use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -52,6 +53,19 @@ class AdminShopStoreController extends BackendModelStandartController
     {
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
+                'on beforeRender' => function (Event $e) {
+                    $e->content = Alert::widget([
+                        'closeButton' => false,
+                        'options'     => [
+                            'class' => 'alert-default',
+                        ],
+
+                        'body' => <<<HTML
+Добавьте склады для того чтобы указывать наличие по товарам на них.
+HTML
+                        ,
+                    ]);
+                },
                 "filters" => [
                     'visibleFilters' => [
                         'id',

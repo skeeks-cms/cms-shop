@@ -29,7 +29,7 @@ class AdminShopSiteController extends BackendModelController
     public function init()
     {
         $this->name = "Настройки магазина";
-        $this->modelShowAttribute = "id";
+        $this->modelShowAttribute = false;
         $this->modelClassName = ShopSite::class;
 
         $this->defaultAction = "update";
