@@ -54,6 +54,7 @@ class ShopImportCmsSite extends ActiveRecord
                 ['created_by', 'updated_by', 'created_at', 'updated_at', 'receiver_cms_site_id', 'receiver_shop_type_price_id', 'receiver_cms_tree_id', 'sender_cms_site_id', 'sender_shop_type_price_id', 'extra_charge'],
                 'integer',
             ],
+            [['receiver_cms_site_id', 'sender_cms_site_id'], 'unique', 'targetAttribute' => ['receiver_cms_site_id', 'sender_cms_site_id']],
             [['receiver_shop_type_price_id', 'sender_cms_site_id', 'sender_shop_type_price_id'], 'required'],
             [['sender_shop_type_price_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopTypePrice::className(), 'targetAttribute' => ['sender_shop_type_price_id' => 'id']],
             [['receiver_cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['receiver_cms_site_id' => 'id']],

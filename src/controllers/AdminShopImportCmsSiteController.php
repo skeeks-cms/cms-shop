@@ -16,8 +16,11 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopImportCmsSite;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
+use skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget;
+use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
@@ -130,8 +133,11 @@ HTML
                     ],
                     'columns'        => [
                         'sender_cms_site_id' => [
-                            'class' => DefaultActionColumn::class,
-                            //'viewAttribute' => 'asText',
+                            'value' => function(ShopImportCmsSite $model) {
+                                return \yii\helpers\Html::a($model->senderCmsSite->asText, "#", [
+                                    'class' => "sx-trigger-action",
+                                ]);
+                            }
                         ],
                     ],
 
@@ -139,7 +145,21 @@ HTML
             ],
 
             "create" => [
-                'fields' => [$this, 'updateFields'],
+                'on beforeRender' => function (ViewRenderEvent $e) {
+
+                    $e->content = Alert::widget([
+                        'closeButton' => false,
+                        'options'     => [
+                            'class' => 'alert-default',
+                        ],
+
+                        'body' => <<<HTML
+В этом разделе вы можете настроить автоматический сбор товаров на сайт от поставщиков.
+HTML
+                        ,
+                    ]);
+                },
+                'fields'          => [$this, 'updateFields'],
             ],
 
             "update" => [
@@ -163,37 +183,61 @@ HTML
         $model->load(\Yii::$app->request->get());
 
         $result = [
-            'sender_cms_site_id'        => [
-                'class' => SelectField::class,
-                'items' => ArrayHelper::map(
-                    ShopSite::find()->where(['is_supplier' => 1])->all(),
-                    'id',
-                    'asText'
-                ),
-                'elementOptions' => [
-                    RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
+            'supplier' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Поставщик',
+                'fields' => [
+                    'sender_cms_site_id'        => [
+                        'class'          => SelectField::class,
+                        'items'          => ArrayHelper::map(
+                            ShopSite::find()->where(['is_supplier' => 1])->all(),
+                            'id',
+                            'asText'
+                        ),
+                        'elementOptions' => [
+                            RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
+                        ],
+                    ],
+                    'sender_shop_type_price_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            ShopTypePrice::find()->where(['cms_site_id' => $model->sender_cms_site_id ? $model->sender_cms_site_id : null])->all(),
+                            'id',
+                            'asText'
+                        ),
+                    ],
                 ],
             ],
-            'sender_shop_type_price_id' => [
-                'class' => SelectField::class,
-                'items' => ArrayHelper::map(
-                    ShopTypePrice::find()->where(['cms_site_id' => $model->sender_cms_site_id ? $model->sender_cms_site_id : null])->all(),
-                    'id',
-                    'asText'
-                ),
+
+            'site' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Ваш сайт',
+                'fields' => [
+                    "extra_charge"                => [
+                        'class'  => NumberField::class,
+                        'append' => "%",
+                    ],
+                    'receiver_shop_type_price_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            \Yii::$app->skeeks->site->shopTypePrices,
+                            'id',
+                            'asText'
+                        ),
+                    ],
+                    'receiver_cms_tree_id' => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => SelectTreeInputWidget::class,
+                        'widgetConfig' => [
+                            'treeWidgetOptions' => [
+                                'models' => \skeeks\cms\models\CmsTree::findRootsForSite()->all(),
+                            ],
+                        ],
+                    ]
+                ],
             ],
-            "extra_charge" => [
-                'class' => NumberField::class,
-                'append' => "%",
-            ],
-            'receiver_shop_type_price_id' => [
-                'class' => SelectField::class,
-                'items' => ArrayHelper::map(
-                    \Yii::$app->skeeks->site->shopTypePrices,
-                    'id',
-                    'asText'
-                ),
-            ],
+
+
         ];
 
         return $result;

@@ -58,7 +58,7 @@ class m200417_110601__create_table__shop_import_cms_site extends Migration
         $this->createIndex($tableName.'__sender_shop_type_price_id', $tableName, 'sender_shop_type_price_id');
 
         //На один сайт одно задание на импорт с другого сайта
-        $this->createIndex($tableName.'__uniq', $tableName, ["receiver_cms_site_id", "sender_cms_site_id"]);
+        $this->createIndex($tableName.'__uniq', $tableName, ["receiver_cms_site_id", "sender_cms_site_id"], true);
 
         $this->createIndex($tableName.'__extra_charge', $tableName, 'extra_charge');
 
