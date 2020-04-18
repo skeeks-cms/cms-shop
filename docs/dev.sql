@@ -5,7 +5,7 @@ SET AUTOCOMMIT = 0;
 SET @site_id = 10;
 
 /* Вставка элементов контента */
-INSERT
+INSERT IGNORE
     INTO cms_content_element (`name`,`code`,`content_id`, `external_id`, `cms_site_id`, `published_at`)
 SELECT
 	ce_main.name,
@@ -23,16 +23,16 @@ WHERE
     /*Импорт только элементов заданных в настройках сайта*/
 	ce.cms_site_id in (
 		SELECT
-			shop_site_import.cms_site_supplier_id
+			shop_import_cms_site.sender_cms_site_id
 		FROM
-			shop_site_import
+			shop_import_cms_site
 		WHERE
-			shop_site_import.cms_site_id = @site_id
+			shop_import_cms_site.cms_site_id = @site_id
 	)
 	/*Только товары которые привязаны к моделям*/
 	AND sp.main_pid is not null
 	/*Только товары которые еще не добавлены на сайт*/
-	AND sp.main_pid not in (
+	/*AND sp.main_pid not in (
 	    SELECT
 	        added_sp.main_pid
         FROM
@@ -40,10 +40,10 @@ WHERE
             LEFT JOIN cms_content_element as ce_added ON ce_added.id = added_sp.id
         WHERE
             ce_added.cms_site_id = @site_id
-	)
+	)*/
 GROUP BY
 	sp_main.id
-LIMIT 10;
+LIMIT 20;
 
 
 /* Вставка товаров */
@@ -66,11 +66,11 @@ SELECT
            LEFT JOIN cms_content_element as cce_inner ON cce_inner.id = sp_inner.id
            WHERE cce_inner.cms_site_id in (
                 SELECT
-                    shop_site_import.cms_site_supplier_id
+                    shop_import_cms_site.sender_cms_site_id
                 FROM
-                    shop_site_import
+                    shop_import_cms_site
                 WHERE
-                    shop_site_import.cms_site_id = @site_id
+                    shop_import_cms_site.cms_site_id = @site_id
            ) AND sp_inner.main_pid = sp_model.id
         GROUP BY sp_inner.main_pid
     )

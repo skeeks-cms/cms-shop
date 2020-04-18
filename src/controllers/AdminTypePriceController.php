@@ -13,12 +13,14 @@ use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
+use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -86,16 +88,25 @@ HTML
 
                         ///'id',
 
-                        'name',
+                        'custom',
 
                         'priority',
 
                     ],
                     'columns'        => [
-                        'name' => [
-                            'class'         => DefaultActionColumn::class,
-                            'viewAttribute' => 'asText',
-                        ],
+                        'custom'       => [
+                            'attribute' => 'name',
+                            'format' => 'raw',
+                            'value' => function (ShopTypePrice $model) {
+
+                                $data = [];
+                                $data[] = ($model->is_default ? '<span class="fa fa-check text-success" title="Цена по умолчанию"></span> ' : '').Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = $model->description;
+
+                                return implode("<br />", $data);
+                            }
+                        ]
+
                     ],
 
                 ],
@@ -122,13 +133,11 @@ HTML
         $model->load(\Yii::$app->request->get());
 
         $result = [
-            'shop_supplier_id' => [
-                'class' => SelectField::class,
-                'items' => ArrayHelper::map(
-                    ShopSupplier::find()->all(),
-                    'id',
-                    'asText'
-                ),
+
+            'is_default' => [
+                'class' => BoolField::class,
+                'formElement' => BoolField::ELEMENT_CHECKBOX,
+                'allowNull' => false,
             ],
             'name',
             'description'      => [

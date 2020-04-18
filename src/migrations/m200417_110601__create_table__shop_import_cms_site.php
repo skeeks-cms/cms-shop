@@ -21,7 +21,7 @@ class m200417_110601__create_table__shop_import_cms_site extends Migration
 
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
-            $tableOptions = 'CHAShopImportCmsSiteRACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
         $this->createTable($tableName, [
@@ -34,14 +34,14 @@ class m200417_110601__create_table__shop_import_cms_site extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'receiver_cms_site_id'        => $this->integer()->notNull()->comment("Сайт получатель"),
-            'receiver_shop_type_price_id' => $this->integer()->notNull()->comment("Цена на сайте получателе"),
-            'receiver_cms_tree_id'        => $this->integer()->comment("Раздел на сайте получателе"),
+            'cms_site_id'        => $this->integer()->notNull()->comment("Сайт получатель"),
 
             'sender_cms_site_id'        => $this->integer()->notNull()->comment("Сайт отправитель"),
             'sender_shop_type_price_id' => $this->integer()->notNull()->comment("Цена на сайте отправителе"),
 
             'extra_charge' => $this->integer()->notNull()->defaultValue(100)->comment("Наценка/Уценка"),
+
+            'priority' => $this->integer()->notNull()->defaultValue(100)->comment("Приоритет"),
 
         ], $tableOptions);
 
@@ -50,15 +50,14 @@ class m200417_110601__create_table__shop_import_cms_site extends Migration
         $this->createIndex($tableName.'__created_at', $tableName, 'created_at');
         $this->createIndex($tableName.'__updated_at', $tableName, 'updated_at');
 
-        $this->createIndex($tableName.'__receiver_cms_site_id', $tableName, 'receiver_cms_site_id');
-        $this->createIndex($tableName.'__receiver_shop_type_price_id', $tableName, 'receiver_shop_type_price_id');
-        $this->createIndex($tableName.'__receiver_cms_tree_id', $tableName, 'receiver_cms_tree_id');
+        $this->createIndex($tableName.'__cms_site_id', $tableName, 'cms_site_id');
+        $this->createIndex($tableName.'__priority', $tableName, 'priority');
 
         $this->createIndex($tableName.'__sender_cms_site_id', $tableName, 'sender_cms_site_id');
         $this->createIndex($tableName.'__sender_shop_type_price_id', $tableName, 'sender_shop_type_price_id');
 
         //На один сайт одно задание на импорт с другого сайта
-        $this->createIndex($tableName.'__uniq', $tableName, ["receiver_cms_site_id", "sender_cms_site_id"], true);
+        $this->createIndex($tableName.'__uniq', $tableName, ["cms_site_id", "sender_cms_site_id"], true);
 
         $this->createIndex($tableName.'__extra_charge', $tableName, 'extra_charge');
 
@@ -75,20 +74,9 @@ class m200417_110601__create_table__shop_import_cms_site extends Migration
 
         //Удаляя сайт - удаляются и все его задания
         $this->addForeignKey(
-            "{$tableName}__receiver_cms_site_id", $tableName,
-            'receiver_cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
+            "{$tableName}__cms_site_id", $tableName,
+            'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
         );
-        //Нельзя удалить цену на сайте если с ней связаны задания импорта
-        $this->addForeignKey(
-            "{$tableName}__receiver_shop_type_price_id", $tableName,
-            'receiver_shop_type_price_id', '{{%shop_type_price}}', 'id', 'RESTRICT', 'RESTRICT'
-        );
-        //Удаляя раздел, в импорте сбрасывается таке
-        $this->addForeignKey(
-            "{$tableName}__receiver_cms_tree_id", $tableName,
-            'receiver_cms_tree_id', '{{%cms_tree}}', 'id', 'CASCADE', 'CASCADE'
-        );
-
 
         $this->addForeignKey(
             "{$tableName}__sender_cms_site_id", $tableName,

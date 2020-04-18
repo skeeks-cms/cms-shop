@@ -76,7 +76,7 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
             "index" => [
                 'on beforeRender' => function (ViewRenderEvent $e) {
 
-                    if (!\Yii::$app->skeeks->site->receiverShopImportCmsSites) {
+                    if (!\Yii::$app->skeeks->site->shopImportCmsSites) {
                         $e->isRenderContent = false;
 
                         \Yii::$app->view->registerJs(<<<JS
@@ -116,7 +116,7 @@ HTML
                          */
                         $query = $e->sender->dataProvider->query;
 
-                        $query->andWhere(['receiver_cms_site_id' => \Yii::$app->skeeks->site->id]);
+                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
                     },
 
                     'defaultOrder' => [
@@ -130,6 +130,7 @@ HTML
                         ///'id',
 
                         'sender_cms_site_id',
+                        'priority',
                     ],
                     'columns'        => [
                         'sender_cms_site_id' => [
@@ -217,7 +218,10 @@ HTML
                         'class'  => NumberField::class,
                         'append' => "%",
                     ],
-                    'receiver_shop_type_price_id' => [
+                    "priority"                => [
+                        'class'  => NumberField::class,
+                    ],
+                    /*'receiver_shop_type_price_id' => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(
                             \Yii::$app->skeeks->site->shopTypePrices,
@@ -233,7 +237,7 @@ HTML
                                 'models' => \skeeks\cms\models\CmsTree::findRootsForSite()->all(),
                             ],
                         ],
-                    ]
+                    ]*/
                 ],
             ],
 

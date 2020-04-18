@@ -11,7 +11,7 @@ namespace skeeks\cms\shop\models;
 /**
  * @property ShopDelivery[]        $shopDeliveries
  * @property ShopFavoriteProduct[] $shopFavoriteProducts
- * @property ShopImportCmsSite[]   $receiverShopImportCmsSites
+ * @property ShopImportCmsSite[]   $shopImportCmsSites
  * @property ShopImportCmsSite[]   $senderShopImportCmsSites
  * @property ShopOrder[]           $shopOrders
  * @property ShopPaySystem[]       $shopPaySystems
@@ -50,9 +50,9 @@ class CmsSite extends \skeeks\cms\models\CmsSite
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getReceiverShopImportCmsSites()
+    public function getShopImportCmsSites()
     {
-        return $this->hasMany(ShopImportCmsSite::className(), ['receiver_cms_site_id' => 'id']);
+        return $this->hasMany(ShopImportCmsSite::className(), ['cms_site_id' => 'id']);
     }
 
     /**
