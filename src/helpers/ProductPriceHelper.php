@@ -223,6 +223,11 @@ class ProductPriceHelper extends Component
     {
         if (!$this->_basePrice) {
             $this->_basePrice = $this->shopCmsContentElement->shopProduct->baseProductPrice;
+            if (!$this->_basePrice) {
+                $this->_basePrice = new ShopProductPrice();
+                $this->_basePrice->product_id = $this->shopCmsContentElement->id;
+                $this->_basePrice->currency_code = "RUB";
+            }
         }
 
         return $this->_basePrice;

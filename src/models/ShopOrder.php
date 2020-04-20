@@ -1014,14 +1014,14 @@ class ShopOrder extends \skeeks\cms\models\Core
         $ids = ArrayHelper::map($this->buyTypePrices, 'id', 'id');
         $minPh = null;
 
-        /*$ph = new ProductPriceHelper([
+        $minPh = new ProductPriceHelper([
             'shopCmsContentElement' => $shopCmsContentElement,
             'shopOrder'             => $this,
             'price'                 => new ShopProductPrice([
                 'currency_code' => \Yii::$app->money->currencyCode,
                 'price' => 0,
             ]),
-        ]);;*/
+        ]);;
 
         if ($shopCmsContentElement->shopProduct && $shopCmsContentElement->shopProduct->shopProductPrices) {
             foreach ($shopCmsContentElement->shopProduct->shopProductPrices as $price) {
