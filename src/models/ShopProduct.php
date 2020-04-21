@@ -335,9 +335,15 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getBaseProductPrice()
     {
-        return $this->hasOne(ShopProductPrice::class, [
+        $result = $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
-        ])->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id]);
+        ]);
+        
+        if (\Yii::$app->shop->baseTypePrice) {
+            $result->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id]);
+        };
+
+        return $result;
     }
     /**
      * Если втавленный элемент является дочерним для другого то родительскому нужно изменить тип
@@ -808,8 +814,7 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getShopTypePrices()
     {
-        $query = ShopTypePrice::find()
-            ->andWhere(['cms_site_id' => $this->cmsContentElement->cms_site_id]);
+        $query = \Yii::$app->skeeks->site->getShopTypePrices();
 
         /*if ($this->cmsContentElement->cms_site_id) {
             if ($this->shopSupplier->is_main) {

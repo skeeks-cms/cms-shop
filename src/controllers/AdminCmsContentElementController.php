@@ -1039,8 +1039,8 @@ HTML
                 ['shopSupplier.is_main' => 1],
             ]);*/
 
-            if (\Yii::$app->shop->shopTypePrices) {
-                foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+            if (\Yii::$app->skeeks->site->shopTypePrices) {
+                foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
                     $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
                         "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
                         "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
@@ -1146,7 +1146,7 @@ HTML
 
         $productPrices = [];
         /*$typePrices = $shopProduct->shopTypePrices;*/
-        $typePrices = ShopTypePrice::find()->where(['cms_site_id' => \Yii::$app->skeeks->site->id])->all();
+        $typePrices = \Yii::$app->skeeks->site->shopTypePrices;
         if ($typePrices) {
             foreach ($typePrices as $typePrice) {
 
