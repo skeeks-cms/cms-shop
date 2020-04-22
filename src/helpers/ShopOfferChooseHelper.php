@@ -126,9 +126,16 @@ class ShopOfferChooseHelper extends Component
                 
                 $this->_chooseModel->defineAttribute($code);
                 $this->_chooseModel->addRule($code, 'safe');
+                /**
+                 * @var $property CmsContentProperty
+                 */
                 if ($property = CmsContentProperty::find()->where(['code' => $code])->one()) {
+                    $name = $property->name;
+                    if ($property->cms_measure_code) {
+                        $name = $name . ", " . $property->cmsMeasure->symbol;
+                    }
                     $this->_chooseFields[$code]['property'] = $property;
-                    $this->_chooseFields[$code]['label'] = $property->name;
+                    $this->_chooseFields[$code]['label'] = $name;
                     $this->_chooseFields[$code]['disabledOptions'] = [];
                 }
                 
