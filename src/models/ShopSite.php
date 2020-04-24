@@ -9,15 +9,19 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property string  $description
- * @property string  $description_internal
- * @property int     $id
- * @property int     $is_supplier
+ * @property string   $description
+ * @property string   $description_internal
+ * @property int      $id
+ * @property int      $is_supplier
+ * @property int      $is_receiver
+ * @property int|null $catalog_cms_tree_id
  *
- * @property CmsSite $cmsSite
+ * @property CmsSite  $cmsSite
+ * @property CmsTree  $catalogCmsTree
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -38,6 +42,10 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::rules(), [
             [['is_supplier'], 'integer'],
+            [['is_receiver'], 'integer'],
+
+            [['catalog_cms_tree_id'], 'integer'],
+            [['catalog_cms_tree_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsTree::className(), 'targetAttribute' => ['catalog_cms_tree_id' => 'id']],
 
             [['description'], 'string'],
             [['description_internal'], 'string'],
@@ -49,6 +57,18 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     if (\Yii::$app->skeeks->site) {
                         return \Yii::$app->skeeks->site->id;
                     }
+                },
+            ],
+
+            [
+                'catalog_cms_tree_id',
+                function () {
+                    if ($this->catalog_cms_tree_id) {
+                        if ($this->cmsSite->id != $this->catalogCmsTree->cms_site_id) {
+                            $this->addError("catalog_cms_tree_id", "Раздел каталога должен лежать в этом же сайте");
+                        }
+                    }
+
                 },
             ],
         ]);
@@ -64,6 +84,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'description'          => "Описание",
             'description_internal' => "Скрытое описание",
             'is_supplier'          => "Поставщик товаров?",
+            'is_receiver'          => "Разрешено получать товары от постащиков",
+            'catalog_cms_tree_id'  => "Основной раздел для товаров",
         ]);
     }
 
@@ -73,8 +95,9 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-
-            'is_supplier'          => "Этот сайт является поставщиком товаров для других сайтов?",
+            'is_supplier' => "Этот сайт является поставщиком товаров для других сайтов. Значит товары на этом сайте необходимо привязывать к главным товарам портала.",
+            'is_receiver' => "Если эта опция включена то на сайте появляется раздел «Поставщики»",
+            'catalog_cms_tree_id' => "",
         ]);
     }
 
@@ -84,7 +107,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
      */
     public function getCmsSite()
     {
-        return $this->hasOne(CmsSite::class, ['id' => 'id']);
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'id']);
     }
 
     /**
@@ -101,5 +125,15 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     public function asText()
     {
         return $this->cmsSite->asText;
+    }
+
+    /**
+     * Gets query for [[CatalogCmsTree]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCatalogCmsTree()
+    {
+        return $this->hasOne(CmsTree::className(), ['id' => 'catalog_cms_tree_id']);
     }
 }

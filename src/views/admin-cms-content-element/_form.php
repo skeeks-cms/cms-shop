@@ -26,6 +26,11 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 if ($model->isNewRecord) {
 
+    if ($shopSubproductContentElement) {
+        $defaultSite = \skeeks\cms\models\CmsSite::find()->where(['is_default' => 1])->one();
+        $model->cms_site_id = $defaultSite->id;
+    }
+    
     if ($tree_id = \Yii::$app->request->get("tree_id")) {
         $model->tree_id = $tree_id;
     }

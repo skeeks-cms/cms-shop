@@ -270,6 +270,9 @@ HTML
                     },
                     'accessCallback' => function (BackendModelAction $action) {
 
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
                         $model = $action->model;
 
                         if (!$model) {
@@ -277,6 +280,15 @@ HTML
                         }
 
                         if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+                        //Показываем только для сайтов которые являются поставщиками
+                        if (!$site->shopSite->is_supplier) {
                             return false;
                         }
 

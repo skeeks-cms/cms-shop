@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\shop\models\ShopContent;
@@ -83,6 +84,14 @@ class AdminShopSiteController extends BackendModelController
             'is_supplier' => [
                 'class' => BoolField::class,
                 'allowNull' => false
+            ],
+            'is_receiver' => [
+                'class' => BoolField::class,
+                'allowNull' => false
+            ],
+            'catalog_cms_tree_id' => [
+                'class' => WidgetField::class,
+                'widgetClass' => SelectModelDialogTreeWidget::class,
             ],
             'description' => [
                 'class' => WidgetField::class,

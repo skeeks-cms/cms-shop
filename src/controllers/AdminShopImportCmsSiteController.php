@@ -60,6 +60,10 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
                 return false;
             }
 
+            if (!$shopSite->is_receiver) {
+                return false;
+            }
+
             return \Yii::$app->user->can($this->uniqueId);
         };
 

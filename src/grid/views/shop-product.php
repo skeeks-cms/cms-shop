@@ -21,19 +21,6 @@
             </div>
         </div>
     </div>
-
-    <!--<div>
-
-        <?/*
-        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-            'controllerId' => "/shop/admin-shop-supplier",
-            'modelId'      => $model->shopProduct->shopSupplier->id,
-        ]);
-        */?>
-        <i class="fas fa-truck" style="width: 20px;" title="Поставщик"></i>
-        <?/*= $model->shopProduct->shopSupplier->asText; */?>
-        <?/* \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); */?>
-    </div>-->
     <? if ($model->tree_id) : ?>
         <div>
             <?
@@ -53,12 +40,13 @@
 
     <? if ($model->shopProduct->main_pid) : ?>
         <div>
-
-
             <?
             \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                 'controllerId' => "/shop/admin-cms-content-element",
                 'modelId'      => $model->shopProduct->shopMainProduct->id,
+                'options' => [
+                        'style' => 'color: gray; text-align: left;',
+                ]
             ]);
             ?>
             <span style="color: green;">
@@ -69,13 +57,13 @@
                 <span><?= $model->shopProduct->shopMainProduct->cmsContentElement->asText; ?></span>
             </span>
             <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-
-
         </div>
     <? else : ?>
-        <div>
-            <span style="color: red;"><i class="fas fa-link" style="width: 20px;" title="Привязан к главному товару"></i><span>Не привязан к главному товару!</span></span>
-        </div>
+        <? if ($model->cmsSite->shopSite->is_supplier) : ?>
+            <div>
+                <span style="color: red;"><i class="fas fa-link" style="width: 20px;" title="Привязан к главному товару"></i><span>Не привязан к главному товару!</span></span>
+            </div>
+        <? endif; ?>
     <? endif; ?>
 
 <? elseif ($model->shopProduct->tradeOffers) : ?>
@@ -192,7 +180,7 @@
                     'controllerId' => "/shop/admin-cms-content-element-sub",
                     'modelId'      => $shopSupplierProduct->id,
                     'options'      => [
-                        'style' => 'color: gray;',
+                        'style' => 'color: gray; text-align: left;',
                     ],
                 ]);
                 ?>
