@@ -8,11 +8,13 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopImportCmsSite;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -24,6 +26,8 @@ use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -78,8 +82,10 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
 
             "index" => [
+                'backendShowings' => false,
                 'on beforeRender' => function (ViewRenderEvent $e) {
 
+                    $btn = "";
                     if (!\Yii::$app->skeeks->site->shopImportCmsSites) {
                         $e->isRenderContent = false;
 
@@ -95,6 +101,52 @@ _.delay(function() {
 JS
 
                         );
+                    } else {
+
+                        $backendUrl = Url::to(['import-data']);
+                        \Yii::$app->view->registerJs(<<<JS
+
+$(".sx-import").on("click", function() {
+    var jBtn = $(this);
+    if (jBtn.hasClass("disabled")) {
+        return false;
+    }
+    var Blocker = sx.block($(".sx-main-col"));
+    jBtn.addClass("disabled");
+    
+    var AjaxQuery = sx.ajax.preparePostQuery("{$backendUrl}");
+    var AjaxHandler = new sx.classes.AjaxHandlerStandartRespose(AjaxQuery);
+    
+    AjaxHandler.on("success", function () {
+        setTimeout(function() {
+            sx.notify.info("Страница сейчас будет перезагружена");
+        }, 1000)
+        
+        setTimeout(function() {
+            window.location.reload();
+        }, 3000)
+        
+        /*Blocker.unblock();
+        jBtn.removeClass("disabled");*/
+    });
+    AjaxHandler.on("error", function () {
+        Blocker.unblock();
+        jBtn.removeClass("disabled");
+    });
+    
+    AjaxQuery.execute();
+    
+    return false;
+});
+
+JS
+                        );
+
+                        $btn = Html::button("<i class='fas fa-cloud-download-alt'></i> Загрузить данные", [
+                            'class' => 'btn btn-primary sx-import',
+                            'title' => 'Эта кнопка запускает загрузку товаров от поставщиков на ваш сайт',
+                            'data-toggle' => 'tooltip'
+                        ]);
                     }
 
 
@@ -106,13 +158,14 @@ JS
                         ],
 
                         'body' => <<<HTML
-В этом разделе вы можете настроить автоматический сбор товаров на сайт от поставщиков.
+В этом разделе вы можете настроить автоматический сбор товаров на сайт от поставщиков. {$btn}
 HTML
                         ,
                     ]);
                 },
                 "filters"         => false,
                 'grid'            => [
+                    
                     'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
@@ -150,6 +203,7 @@ HTML
             ],
 
             "create" => [
+                'name' => 'Добавить поставщика',
                 'on beforeRender' => function (ViewRenderEvent $e) {
 
                     $e->content = Alert::widget([
@@ -167,6 +221,11 @@ HTML
                 'fields'          => [$this, 'updateFields'],
             ],
 
+            /*"import" => [
+                'class' => BackendAction::class,
+                'name' => 'Ипорт'
+            ],*/
+
             "update" => [
                 'fields' => [$this, 'updateFields'],
             ],
@@ -174,6 +233,27 @@ HTML
         ]);
     }
 
+    /**
+     * Загрузка данных поставщика на сайт
+     * 
+     * @return RequestResponse
+     */
+    public function actionImportData()
+    {
+        $rr = new RequestResponse();
+        $rr->success = true;
+        $rr->message = "Данные успешно загружены";
+
+        try {
+            ShopComponent::importNewProductsOnSite();
+        } catch (\Exception $e) {
+            $rr->success = false;
+            $rr->message = "Ошибка загрузки данных: " . $e->getMessage();
+        }
+
+        return $rr;
+    }
+    
     /**
      * @param $action
      * @return array

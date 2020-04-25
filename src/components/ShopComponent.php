@@ -14,7 +14,9 @@ use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
@@ -24,6 +26,7 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -801,5 +804,85 @@ SQL
         ")->execute();
 
         return $this;
+    }
+
+
+    /**
+     * @param CmsSite|null $cmsSite
+     */
+    static public function importNewProductsOnSite(CmsSite $cmsSite = null)
+    {
+        if ($cmsSite === null) {
+            $cmsSite = \Yii::$app->skeeks->site;
+        }
+
+        if (!$cmsSite->shopSite) {
+            throw new Exception("Сайт не настроен зайдите в основные настройким магазина и заполните недостающие настройки магазина");
+        }
+
+        if (!$cmsSite->shopSite->catalogCmsTree) {
+            throw new Exception("В основных настройках сайта укажите каталог для товаров");
+        }
+        
+        //1) Создаем необходимые категории на сайте
+        
+        $data = \Yii::$app->db->createCommand(<<<SQL
+        SELECT
+            tree.*
+        FROM
+            cms_content_element as ce
+            LEFT JOIN shop_product as sp ON sp.id = ce.id
+            LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
+            LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
+            LEFT JOIN cms_tree as tree ON tree.id = ce_main.tree_id
+        WHERE
+        
+            /*Импорт только элементов заданных в настройках сайта*/
+            ce.cms_site_id in (
+                SELECT
+                    shop_import_cms_site.sender_cms_site_id
+                FROM
+                    shop_import_cms_site
+                WHERE
+                    shop_import_cms_site.cms_site_id = {$cmsSite->id}
+            )
+            /*Только товары которые привязаны к моделям*/
+            AND sp.main_pid is not null
+        GROUP BY
+            tree.id
+SQL
+        )->queryAll();
+        
+        if ($data) {
+            foreach ($data as $row)
+            {
+                $source = CmsTree::find()->where(['id' => $row['id']])->one();
+                $parent = $cmsSite->shopSite->catalogCmsTree;
+
+                if (!$parent->getChildren()->andWhere(['external_id' => $source->id])->exists()) {
+                    $tree = new CmsTree();
+                    $tree->name = $source->name;
+                    $tree->external_id = (string) $source->id;
+                    
+                    if (!$tree->appendTo($parent)->save()) {
+                        throw new Exception("Раздел не создан: " . print_r($tree->errors, true));
+                    }
+                }
+
+            }
+        }
+
+        /**
+         * 2 вставка товаров
+         */
+        
+        $sqlFile = \Yii::getAlias('@skeeks/cms/shop/sql/insert-new-products.sql');
+        $sql = file_get_contents($sqlFile);
+        $sql = str_replace("{site_id}", $cmsSite->id, $sql);
+        $sql = str_replace("{limit}", 50, $sql);
+        
+        \Yii::$app->db->createCommand($sql)->execute();
+
+        
     }
 }

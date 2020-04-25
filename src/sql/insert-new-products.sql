@@ -2,44 +2,20 @@ START TRANSACTION;
 
 SET AUTOCOMMIT = 0;
 
-SET @site_id = 10;
-
-
-
-SELECT
-	tree.*
-FROM
-	cms_content_element as ce
-	LEFT JOIN shop_product as sp ON sp.id = ce.id
-	LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
-	LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
-	LEFT JOIN cms_tree as tree ON tree.id = ce_main.tree_id
-WHERE
-
-	/*Импорт только элементов заданных в настройках сайта*/
-	ce.cms_site_id in (
-		SELECT
-			shop_import_cms_site.sender_cms_site_id
-		FROM
-			shop_import_cms_site
-		WHERE
-			shop_import_cms_site.cms_site_id = 10
-	)
-	/*Только товары которые привязаны к моделям*/
-	AND sp.main_pid is not null
-GROUP BY
-	tree.id
-
+SET @site_id = {site_id};
 
 
 /* Вставка элементов контента */
 INSERT IGNORE
-    INTO cms_content_element (`name`,`code`,`content_id`, `external_id`, `cms_site_id`, `published_at`)
+    INTO cms_content_element (`name`,`code`,`content_id`, `external_id`, `tree_id`, `cms_site_id`, `published_at`)
 SELECT
 	ce_main.name,
 	ce_main.code,
 	ce_main.content_id,
 	ce_main.id,
+	/*source_tree.id as source_tree_id,
+	source_tree.name as source_tree_name,*/
+	new_tree.id as new_tree_id,
 	@site_id,
 	UNIX_TIMESTAMP()
 FROM
@@ -47,6 +23,10 @@ FROM
 	LEFT JOIN shop_product as sp ON sp.id = ce.id
 	LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
     LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
+    LEFT JOIN cms_tree as source_tree ON source_tree.id = ce_main.tree_id
+	LEFT JOIN (
+	    SELECT * FROM cms_tree as inner_new_tree WHERE inner_new_tree.cms_site_id = @site_id
+	) as new_tree ON new_tree.external_id = source_tree.id
 WHERE
     /*Импорт только элементов заданных в настройках сайта*/
 	ce.cms_site_id in (
@@ -71,7 +51,7 @@ WHERE
 	)*/
 GROUP BY
 	sp_main.id
-LIMIT 50;
+LIMIT {limit};
 
 
 /* Вставка товаров */
