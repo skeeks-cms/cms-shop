@@ -85,6 +85,8 @@ return [
 
                                 "shop/admin-viewed-product",
                                 "shop/admin-quantity-notice-email",
+
+                                "shop/admin-shop-import-cms-site",
                             ],
                         ],
                     ],

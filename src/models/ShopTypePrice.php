@@ -129,6 +129,9 @@ class ShopTypePrice extends \skeeks\cms\models\Core
      */
     public function getIsDefault()
     {
+        if (!\Yii::$app->shop->baseTypePrice) {
+            return false;
+        }
         return (bool)($this->id == \Yii::$app->shop->baseTypePrice->id);
     }
 
