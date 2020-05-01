@@ -22,7 +22,6 @@ use yii\helpers\ArrayHelper;
  *
  * ***
  *
- * @property ShopSupplier $shopSupplier
  * @property string       $buyPermissionName
  * @property string       $viewPermissionName
  */
@@ -133,14 +132,6 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             return false;
         }
         return (bool)($this->id == \Yii::$app->shop->baseTypePrice->id);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopSupplier()
-    {
-        return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
     }
 
 

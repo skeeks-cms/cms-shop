@@ -12,7 +12,10 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendAction;
+use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
+use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\helpers\RequestResponse;
@@ -23,11 +26,6 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
-use skeeks\cms\queryfilters\filters\FilterField;
-use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
-use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
-use skeeks\cms\queryfilters\filters\modes\FilterModeNe;
-use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -37,8 +35,6 @@ use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
-use skeeks\cms\shop\models\ShopSupplier;
-use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
@@ -46,6 +42,7 @@ use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
+use yii\bootstrap\Alert;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Expression;
@@ -64,41 +61,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public $modelClassName = ShopCmsContentElement::class;
     public $modelShowAttribute = "asText";
 
-    static public function getSorts(ActiveQuery $activeQuery)
-    {
-        $activeQuery->joinWith('shopProduct as sp');
-
-        $sorts = [
-            'quantity' => [
-                'asc'     => ['sp.quantity' => SORT_ASC],
-                'desc'    => ['sp.quantity' => SORT_DESC],
-                'label'   => \Yii::t('skeeks/shop/app', 'Available quantity'),
-                'default' => SORT_ASC,
-            ],
-        ];
-
-        if (\Yii::$app->shop->shopTypePrices) {
-            foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
-
-
-                /*$pricesQuery = (new \yii\db\Query())->from(ShopProductPrice::tableName())->andWhere(['type_price_id' => $shopTypePrice->id]);
-                $activeQuery->leftJoin(["p{$shopTypePrice->id}" => $pricesQuery], "p{$shopTypePrice->id}.product_id = sp.id");*/
-                $activeQuery->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
-                    "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
-                    "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
-                ]);
-
-                $sorts['price.'.$shopTypePrice->id] = [
-                    'asc'     => ["p{$shopTypePrice->id}.price" => SORT_ASC],
-                    'desc'    => ["p{$shopTypePrice->id}.price" => SORT_DESC],
-                    'label'   => $shopTypePrice->name,
-                    'default' => SORT_ASC,
-                ];
-            }
-        }
-
-        return $sorts;
-    }
 
     public function init()
     {
@@ -121,12 +83,12 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],*/
 
 
+
                 "offers" => [
                     'class'           => BackendGridModelRelatedAction::class,
                     'name'            => "Предложения",
                     'icon'            => 'fa fa-list',
                     'controllerRoute' => "/shop/admin-cms-content-element",
-                    //'relation'        => ['shopProduct.shop_supplier_id' => 'id'],
                     'priority'        => 150,
                     'on gridInit'     => function ($e) {
                         /**
@@ -141,7 +103,8 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                              * @var $querAdminCmsContentElementControllery ActiveQuery
                              */
                             $query = $e->sender->dataProvider->query;
-                            $query->andWhere(['parent_content_element_id' => $this->model->id]);
+                            $query->joinWith("shopProduct as sp");
+                            $query->andWhere(['sp.offers_pid' => $this->model->id]);
                         };
 
                         $action->relatedIndexAction->on('beforeRender', function (Event $event) use ($controller) {
@@ -173,13 +136,15 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         //$action->relatedIndexAction->backendShowings = false;
                         $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
-                        ArrayHelper::removeValue($visibleColumns, 'shop_supplier_id');
                         $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
                     },
 
                     'accessCallback' => function (BackendModelAction $action) {
 
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
                         $model = $action->model;
 
                         if (!$model) {
@@ -190,9 +155,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             return false;
                         }
 
-                        if ($model->shopProduct->product_type == ShopProduct::TYPE_OFFERS) {
-                            return \Yii::$app->user->can($action->controller->uniqueId . "__" . $model->content_id . "/update", [
-                                'model' => $model
+                        if ($model->shopProduct->isOffersProduct) {
+                            return \Yii::$app->user->can($action->controller->uniqueId."__".$model->content_id."/update", [
+                                'model' => $model,
                             ]);
                             return true;
                         }
@@ -381,11 +346,11 @@ HTML
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     },
 
-                    "eachAccessCallback" => function($model) {
-                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                    "eachAccessCallback" => function ($model) {
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                     },
-                    "accessCallback" => function() {
-                        return \Yii::$app->user->can($this->permissionName . "/update");
+                    "accessCallback"     => function () {
+                        return \Yii::$app->user->can($this->permissionName."/update");
                     },
                 ],
 
@@ -404,11 +369,11 @@ HTML
                         }
                     },
 
-                    "eachAccessCallback" => function($model) {
-                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $model]);
+                    "eachAccessCallback" => function ($model) {
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                     },
-                    "accessCallback" => function() {
-                        return \Yii::$app->user->can($this->permissionName . "/update");
+                    "accessCallback"     => function () {
+                        return \Yii::$app->user->can($this->permissionName."/update");
                     },
                 ],
 
@@ -435,10 +400,10 @@ HTML
                 ],
 
                 "quantity-notice-emails" => [
-                    'class'           => BackendGridModelRelatedAction::class,
+                    'class'          => BackendGridModelRelatedAction::class,
                     'accessCallback' => function (BackendModelAction $action) {
                         $model = $action->model;
-                        return \Yii::$app->user->can($this->permissionName . "/viewed-products", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/viewed-products", ['model' => $model]);
                     },
 
                     'name'            => ['skeeks/shop/app', 'Waiting for receipt'],
@@ -462,9 +427,9 @@ HTML
 
                 "carts" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback' => function (BackendModelAction $action) {
+                    'accessCallback'  => function (BackendModelAction $action) {
                         $model = $action->model;
-                        return \Yii::$app->user->can($this->permissionName . "/viewed-products", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/viewed-products", ['model' => $model]);
                     },
                     'name'            => ['skeeks/shop/app', 'In baskets'],
                     'icon'            => 'fas fa-cart-arrow-down',
@@ -498,9 +463,9 @@ HTML
 
                 "orders" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback' => function (BackendModelAction $action) {
+                    'accessCallback'  => function (BackendModelAction $action) {
                         $model = $action->model;
-                        return \Yii::$app->user->can($this->permissionName . "/viewed-products", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/viewed-products", ['model' => $model]);
                     },
                     'name'            => ['skeeks/shop/app', 'In orders'],
                     'icon'            => 'fas fa-cart-arrow-down',
@@ -531,6 +496,12 @@ HTML
 
                     },
                 ],
+
+                "update-data" => [
+                    'class' => ViewBackendAction::class,
+                    'icon' => 'fas fa-sync',
+                    'name' => 'Обновление данных',
+                ]
 
             ]
         );
@@ -608,7 +579,7 @@ HTML
 
         $shopColumns["shop.product_type"] = [
             'attribute' => "shop.product_type",
-            'label'     => 'Тип товара [магазин]',
+            'label'     => 'Тип товара',
             'format'    => 'raw',
             'value'     => function ($shopCmsContentElement) {
                 if ($shopCmsContentElement->shopProduct) {
@@ -618,31 +589,10 @@ HTML
             },
         ];
 
-        /*$shopColumns["shop.shop_supplier_id"] = [
-            'attribute' => "shop.shop_supplier_id",
-            'label'     => 'Поставщик [магазин]',
-            'format'    => 'raw',
-            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
-                if ($shopCmsContentElement->shopProduct && $shopCmsContentElement->shopProduct->shopSupplier) {
-                    return $shopCmsContentElement->shopProduct->shopSupplier->asText;
-                }
-            },
-        ];*/
-
-        /*$shopColumns["shop.supplier_external_id"] = [
-            'attribute' => "shop.supplier_external_id",
-            'label'     => 'Идентификатор поставщика [магазин]',
-            'format'    => 'raw',
-            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
-                if ($shopCmsContentElement->shopProduct) {
-                    return $shopCmsContentElement->shopProduct->supplier_external_id;
-                }
-            },
-        ];*/
 
         $shopColumns["shop.quantity"] = [
             'attribute' => "shop.quantity",
-            'label'     => 'Количество [магазин]',
+            'label'     => 'Количество',
             'format'    => 'raw',
             'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
                 if ($shopCmsContentElement->shopProduct) {
@@ -689,14 +639,14 @@ HTML
         $sortAttributes["shop.quantity"] = [
             'asc'  => ['sp.quantity' => SORT_ASC],
             'desc' => ['sp.quantity' => SORT_DESC],
-            'name' => 'Количество [магазин]',
+            'name' => 'Количество',
+        ];
+        $sortAttributes["shop.product_type"] = [
+            'asc'  => ['sp.product_type' => SORT_ASC],
+            'desc' => ['sp.product_type' => SORT_DESC],
+            'name' => 'Тип товара',
         ];
 
-        $sortAttributes["shop.supplier_external_id"] = [
-            'asc'  => ['sp.supplier_external_id' => SORT_ASC],
-            'desc' => ['sp.supplier_external_id' => SORT_DESC],
-            'name' => 'Идентификатор поставщика [магазин]',
-        ];
 
         $visibleColumns[] = "shop.product_type";
         $visibleColumns[] = "shop.quantity";
@@ -706,10 +656,10 @@ HTML
             foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
 
                 $shopColumns["shop.price{$shopTypePrice->id}"] = [
-                    'label'     => $shopTypePrice->name." [магазин]",
+                    'label'     => $shopTypePrice->name,
                     'attribute' => 'shop.price'.$shopTypePrice->id,
                     'format'    => 'raw',
-                    'value'     => function (\skeeks\cms\models\CmsContentElement $model) use ($shopTypePrice) {
+                    'value'     => function (ShopCmsContentElement $model) use ($shopTypePrice) {
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
                         if ($shopProduct) {
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
@@ -724,26 +674,26 @@ HTML
                 ];
 
 
-                /*$visibleColumns[] = 'shop.price'.$shopTypePrice->id;
+                $visibleColumns[] = 'shop.price'.$shopTypePrice->id;
 
                 $sortAttributes['shop.price'.$shopTypePrice->id] = [
                     'asc'     => ["p{$shopTypePrice->id}.price" => SORT_ASC],
                     'desc'    => ["p{$shopTypePrice->id}.price" => SORT_DESC],
                     'label'   => $shopTypePrice->name,
                     'default' => SORT_ASC,
-                ];*/
+                ];
             }
 
 
-            $defaultId = '';
+            $defaultId = \Yii::$app->shop->baseTypePrice ? \Yii::$app->shop->baseTypePrice->id : '';
 
             $shopColumns["custom"] = [
                 'attribute' => 'id',
                 'class'     => ShopProductColumn::class,
             ];
 
-            $shopColumns["shop.priceDefult"] = [
-                'label'     => "Доступные цены [магазин]",
+            /*$shopColumns["shop.priceDefult"] = [
+                'label'     => "Цена",
                 'attribute' => 'shop.priceDefult',
                 'format'    => 'raw',
                 'value'     => function (ShopCmsContentElement $model) {
@@ -752,9 +702,6 @@ HTML
                         return "";
                     }
                     foreach ($model->shopProduct->shopTypePrices as $shopTypePrice) {
-                        if ($shopTypePrice->isDefault) {
-                            $defaultId = $shopTypePrice->id;
-                        }
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
                         if ($shopProduct) {
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
@@ -782,7 +729,7 @@ HTML
                     'default' => SORT_ASC,
                 ];
 
-            }
+            }*/
 
 
         }
@@ -791,7 +738,7 @@ HTML
         $filterFields['shop_product_type'] = [
             'class'    => SelectField::class,
             'items'    => \skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
-            'label'    => 'Тип товара [магазин]',
+            'label'    => 'Тип товара',
             'multiple' => true,
             'on apply' => function (QueryFiltersEvent $e) {
                 /**
@@ -836,87 +783,10 @@ HTML
             },
         ];
 
-        $filterFields['shop_supproducts'] = [
-            'class'    => SelectField::class,
-            'items'    => function () {
-                return ArrayHelper::map(
-                    ShopSupplier::find()->all(),
-                    'id',
-                    'asText'
-                );
-            },
-            'label'    => 'Привязанные поставщики',
-            'multiple' => true,
-            'on apply' => function (QueryFiltersEvent $e) {
-                /**
-                 * @var $query ActiveQuery
-                 **/
-                $query = $e->dataProvider->query;
-
-                if ($e->field->value) {
-
-                    $q = ShopProduct::find()
-                        ->select(['parent_id' => 'cmsContentElement.parent_content_element_id'])
-                        ->where([ShopProduct::tableName().'.shop_supplier_id' => $e->field->value])
-                        ->joinWith('shopMainProduct as shopMainProduct')
-                        ->joinWith('shopMainProduct.cmsContentElement as cmsContentElement')
-                        ->andWhere(['is not', 'cmsContentElement.parent_content_element_id', null]);
-
-                    //print_R($q->createCommand()->rawSql);die;
-
-                    $query->joinWith('shopProduct.shopSupplierProducts as supProds');
-
-                    $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(ShopCmsContentElement::tableName().".id")]);
-
-                    $query->andWhere([
-                        'or',
-                        ['supProds.shop_supplier_id' => $e->field->value],
-                        ['is not', 'p.parent_id', null],
-                    ]);
-
-                    //print_R($query->createCommand()->rawSql);die;
-                    //$query->groupBy([ShopCmsContentElement::tableName() . ".id"]);
-                }
-            },
-        ];
-
-        $filterFields['shop_supplier_id'] = [
-            'class'           => FilterField::class,
-            'field'           => [
-                'class' => SelectField::class,
-                'items' => function () {
-                    return ArrayHelper::map(
-                        ShopSupplier::find()->all(),
-                        'id',
-                        'asText'
-                    );
-                },
-            ],
-            'label'           => 'Поставщик',
-            'filterAttribute' => 'sp.shop_supplier_id',
-            'modes'           => [
-                FilterModeEmpty::class,
-                FilterModeNotEmpty::class,
-
-                FilterModeEq::class,
-                FilterModeNe::class,
-            ],
-            //'multiple' => true,
-            /*'multiple' => true,
-            'on apply' => function (QueryFiltersEvent $e) {
-                /**
-                 * @var $query ActiveQuery
-                $query = $e->dataProvider->query;
-
-                if ($e->field->value) {
-                    $query->andWhere(['sp.shop_supplier_id' => $e->field->value]);
-                }
-            },*/
-        ];
 
         $filterFields['shop_quantity'] = [
             'class'           => NumberFilterField::class,
-            'label'           => 'Количество [магазин]',
+            'label'           => 'Количество',
             'filterAttribute' => 'sp.quantity',
             /*'on apply' => function (QueryFiltersEvent $e) {
                 /**
@@ -931,7 +801,7 @@ HTML
 
         $filterFields['supplier_external_jsondata'] = [
             'class'           => StringFilterField::class,
-            'label'           => 'Данные поставщика [магазин]',
+            'label'           => 'Данные поставщика',
             'filterAttribute' => 'sp.supplier_external_jsondata',
             /*'on apply' => function (QueryFiltersEvent $e) {
                 /**
@@ -971,20 +841,16 @@ HTML
             },
         ];
 
-        $filterFieldsLabels['shop_product_type'] = 'Тип товара [магазин]';
-        $filterFieldsLabels['is_ready'] = 'Связь с главным товаром [магазин]';
-        $filterFieldsLabels['shop_quantity'] = 'Количество [магазин]';
-        $filterFieldsLabels['shop_supplier_id'] = 'Поставщик [магазин]';
-        $filterFieldsLabels['shop_supproducts'] = 'Привязанные поставщики';
+        $filterFieldsLabels['shop_product_type'] = 'Тип товара';
+        $filterFieldsLabels['is_ready'] = 'Связь с главным товаром';
+        $filterFieldsLabels['shop_quantity'] = 'Количество';
         $filterFieldsLabels['all_ids'] = 'ID + вложенные';
-        $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика [магазин]';
+        $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика';
 
         $filterFieldsRules[] = ['is_ready', 'safe'];
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
-        $filterFieldsRules[] = ['shop_supplier_id', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
-        $filterFieldsRules[] = ['shop_supproducts', 'safe'];
         $filterFieldsRules[] = ['all_ids', 'safe'];
 
         //Мерж колонок и сортировок
@@ -1013,14 +879,13 @@ HTML
             }
 
             $query->joinWith('shopProduct as sp');
-            $query->joinWith('shopProduct.shopSupplier as shopSupplier');
 
             $urlHelper = new BackendUrlHelper();
             $urlHelper->setBackendParamsByCurrentRequest();
-            
+
             $site_id = \Yii::$app->skeeks->site->id;
             if ($urlHelper->getBackenParam("sx-to-main")) {
-                
+
                 $site = CmsSite::find()->where(['is_default' => 1])->one();
                 $site_id = $site->id;
                 $query->andWhere([
@@ -1044,12 +909,7 @@ HTML
 
 
             $query->andWhere(['cms_site_id' => $site_id]);
-            /*
-            $query->andWhere([
-                'or',
-                ['shopSupplier.id' => null],
-                ['shopSupplier.is_main' => 1],
-            ]);*/
+
 
             if (\Yii::$app->skeeks->site->shopTypePrices) {
                 foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
@@ -1071,9 +931,10 @@ HTML
         try {
             $formData = [];
             parse_str(\Yii::$app->request->post('formData'), $formData);
-            $model->load($formData);
+            //$model->load($formData);
 
             $sp = $model->shopProduct;
+            $sp->load($formData);
             $sp->product_type = ShopProduct::TYPE_OFFER;
 
             $model->save(false);
@@ -1094,9 +955,6 @@ HTML
         $shopStoreProducts = [];
 
 
-        /**
-         * @var ShopSupplier $shopSupplier ;
-         */
         if ($shopStores = ShopStore::find()->where(['cms_site_id' => \Yii::$app->skeeks->site->id])->all()) {
             foreach ($shopStores as $shopStore) {
                 $shopStoreProduct = new ShopStoreProduct([
@@ -1138,26 +996,34 @@ HTML
             }
         }
 
-        if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $shopProduct->load(\Yii::$app->request->post());
 
-            return \yii\widgets\ActiveForm::validateMultiple([
-                $model,
-                $relatedModel,
-                $shopProduct,
-            ]);
-        }
+        //Если создаем товар предложение
+        if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
+            $parent = \skeeks\cms\shop\models\ShopCmsContentElement::findOne($parent_content_element_id);
 
-        if ($post = \Yii::$app->request->post()) {
-            $model->load(\Yii::$app->request->post());
-            $relatedModel->load(\Yii::$app->request->post());
-            $shopProduct->load(\Yii::$app->request->post());
+            $data = $parent->toArray();
+            \yii\helpers\ArrayHelper::remove($data, 'image_id');
+            \yii\helpers\ArrayHelper::remove($data, 'image_full_id');
+            \yii\helpers\ArrayHelper::remove($data, 'imageIds');
+            \yii\helpers\ArrayHelper::remove($data, 'fileIds');
+            \yii\helpers\ArrayHelper::remove($data, 'code');
+            \yii\helpers\ArrayHelper::remove($data, 'id');
+            $model->setAttributes($data);
+            $model->relatedPropertiesModel->setAttributes($parent->relatedPropertiesModel->toArray());
+            $shopProduct->offers_pid = $parent_content_element_id;
+            $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER;
+            $model->tree_id = $parent->tree_id;
+
+            \Yii::$app->view->registerCss(<<<CSS
+    .field-shopcmscontentelement-tree_id,
+    .field-shopproduct-offers_pid {
+        display: none;
+    }
+CSS
+            );
         }
 
         $productPrices = [];
-        /*$typePrices = $shopProduct->shopTypePrices;*/
         $typePrices = \Yii::$app->skeeks->site->shopTypePrices;
         if ($typePrices) {
             foreach ($typePrices as $typePrice) {
@@ -1170,59 +1036,82 @@ HTML
             }
         }
 
+        if ($post = \Yii::$app->request->post()) {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel->load(\Yii::$app->request->post());
+            $shopProduct->load(\Yii::$app->request->post());
+
+            foreach ($productPrices as $productPrice) {
+                $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                $productPrice->load($data, "");
+            }
+
+        }
+
 
         if ($rr->isRequestPjaxPost()) {
             if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
-                $model->load(\Yii::$app->request->post());
-                $relatedModel->load(\Yii::$app->request->post());
-                $shopProduct->load(\Yii::$app->request->post());
 
-                if ($model->save() && $relatedModel->save()) {
-                    $shopProduct->id = $model->id;
-                    $shopProduct->save();
+                $t = \Yii::$app->db->beginTransaction();
 
+                try {
+                    if ($model->save() && $relatedModel->save()) {
+                        $shopProduct->id = $model->id;
+                        if (!$shopProduct->save()) {
+                            throw new \yii\base\Exception("Товар не сохранен: ".print_r($shopProduct->errors, true));
+                        }
 
-                    $savedPrice = $shopProduct->getBaseProductPrice()->one();
-                    foreach ($productPrices as $productPrice) {
-                        if ($savedPrice->type_price_id == $productPrice->type_price_id) {
-                            $productPrice = $savedPrice;
-                            $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
-                            $productPrice->load($data, "");
-                            $productPrice->save();
+                        $savedPrice = $shopProduct->getBaseProductPrice()->one();
+                        foreach ($productPrices as $productPrice) {
+                            if ($savedPrice->type_price_id == $productPrice->type_price_id) {
+                                $productPrice = $savedPrice;
+                                $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                                $productPrice->load($data, "");
+                                $productPrice->save();
+                            } else {
+                                $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                                $productPrice->load($data, "");
+                                $productPrice->product_id = $shopProduct->id;
+                                $productPrice->save();
+                            }
+
+                        }
+
+                        foreach ($shopStoreProducts as $shopStoreProduct) {
+                            $data = ArrayHelper::getValue($post, 'stores.'.$shopStoreProduct->shop_store_id);
+                            $shopStoreProduct->load($data, "");
+                            $shopStoreProduct->shop_product_id = $shopProduct->id;
+                            $shopStoreProduct->save();
+                        }
+                        /*$shopProduct->getBaseProductPriceValue();
+                        $baseProductPrice = $shopProduct->baseProductPrice;*/
+
+                        if ($shopSubproductContentElement) {
+                            $shopSubproductContentElement->shopProduct->main_pid = $shopProduct->id;
+                            $shopSubproductContentElement->shopProduct->save();
+                        }
+
+                        $t->commit();
+
+                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
+
+                        $is_saved = true;
+
+                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
+                            $redirect = UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
+                                ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
+                                ->toString();
                         } else {
-                            $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
-                            $productPrice->load($data, "");
-                            $productPrice->product_id = $shopProduct->id;
-                            $productPrice->save();
+                            $redirect = $this->url;
                         }
                     }
-
-                    foreach ($shopStoreProducts as $shopStoreProduct) {
-                        $data = ArrayHelper::getValue($post, 'stores.'.$shopStoreProduct->shop_store_id);
-                        $shopStoreProduct->load($data, "");
-                        $shopStoreProduct->shop_product_id = $shopProduct->id;
-                        $shopStoreProduct->save();
-                    }
-                    /*$shopProduct->getBaseProductPriceValue();
-                    $baseProductPrice = $shopProduct->baseProductPrice;*/
-
-                    if ($shopSubproductContentElement) {
-                        $shopSubproductContentElement->shopProduct->main_pid = $shopProduct->id;
-                        $shopSubproductContentElement->shopProduct->save();
-                    }
-
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
-
-                    $is_saved = true;
-
-                    if (\Yii::$app->request->post('submit-btn') == 'apply') {
-                        $redirect = UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                            ->toString();
-                    } else {
-                        $redirect = $this->url;
-                    }
+                } catch (\Exception $e) {
+                    $t->rollBack();
+                    throw $e;
+                    $is_saved = false;
+                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/shop/app', 'Данные не сохранены: '.$e->getMessage()));
                 }
+
             }
 
         }
@@ -1266,38 +1155,6 @@ HTML
 
 
             $shopStoreProducts = [];
-            /**
-             * @var ShopSupplier $shopSupplier ;
-             */
-            if ($shopSuppliers = \skeeks\cms\shop\models\ShopSupplier::find()->all()) {
-                foreach ($shopSuppliers as $key => $shopSupplier) {
-                    if ($shopSupplier->shopStores) {
-                        foreach ($shopSupplier->shopStores as $shopStore) {
-
-                            $shopStoreProduct = ShopStoreProduct::find()->where([
-                                'shop_product_id' => $shopProduct->id,
-                                'shop_store_id'   => $shopStore->id,
-                            ])->one();
-
-                            if (!$shopStoreProduct) {
-                                $shopStoreProduct = new ShopStoreProduct([
-                                    'shop_product_id' => $shopProduct->id,
-                                    'shop_store_id'   => $shopStore->id,
-                                ]);
-
-                            }
-
-                            if ($post = \Yii::$app->request->post()) {
-                                $data = ArrayHelper::getValue($post, 'stores.'.$shopStore->id);
-                                $shopStoreProduct->load($data, "");
-                            }
-
-
-                            $shopStoreProducts[] = $shopStoreProduct;
-                        }
-                    }
-                }
-            }
 
 
             $rr = new RequestResponse();
@@ -1412,6 +1269,7 @@ HTML
             }
         } catch (\Exception $e) {
             $model->addError('name', $e->getMessage());
+            throw $e;
         }
 
         //return $this->render('@skeeks/cms/shop/views/admin-cms-content-element/_form', [
@@ -1488,4 +1346,25 @@ HTML
         return $actions;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function actionUpdateAllData()
+    {
+        $rr = new RequestResponse();
+        $rr->success = true;
+        $rr->message = "Данные успешно загружены";
+
+        try {
+            \Yii::$app->shop->updateAllSubproducts();
+            \Yii::$app->shop->updateAllQuantities();
+            \Yii::$app->shop->updateAllTypes();
+        } catch (\Exception $e) {
+            $rr->success = false;
+            $rr->message = "Ошибка загрузки данных: " . $e->getMessage();
+        }
+
+        return $rr;
+
+    }
 }

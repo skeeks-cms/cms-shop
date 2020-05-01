@@ -23,7 +23,6 @@ use yii\helpers\ArrayHelper;
  * @property integer|null       $cms_site_id
  *
  * @property CmsStorageFile     $cmsImage
- * @property ShopSupplier       $shopSupplier
  * @property CmsSite            $cmsSite
  * @property ShopStoreProduct[] $shopStoreProducts
  * @property ShopProduct[]      $shopProducts
@@ -113,13 +112,6 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
         return $this->hasOne(StorageFile::class, ['id' => 'cms_image_id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopSupplier()
-    {
-        return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery

@@ -78,9 +78,8 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function afterSaveEvent()
     {
         //Обновление цены у родительского элемента если она есть
-        if ($this->product->cmsContentElement->parent_content_element_id) {
+        if ($parentProduct = $this->product->shopProductWhithOffers) {
 
-            $parentProduct = $this->product->cmsContentElement->parentContentElement->shopProduct;
             //Если родитель является офером
             $shopParentContent = ShopContent::find()->where(['content_id' => $parentProduct->cmsContentElement->content_id])->one();
 

@@ -8,6 +8,7 @@
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget */
 /* @var $supplierProperties \skeeks\cms\shop\models\ShopSupplierProperty[] */
+return false;
 
 $data = $widget->shopProduct->supplier_external_jsondata;
 $shopSupplier = $widget->shopProduct->shopSupplier;

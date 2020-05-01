@@ -8,88 +8,222 @@ SET @site_id = {site_id};
 /* Вставка элементов контента */
 INSERT IGNORE
     INTO cms_content_element (`name`,`code`,`content_id`, `external_id`, `tree_id`, `cms_site_id`, `published_at`)
-SELECT
-	ce_main.name,
-	ce_main.code,
-	ce_main.content_id,
-	ce_main.id,
-	/*source_tree.id as source_tree_id,
-	source_tree.name as source_tree_name,*/
-	new_tree.id as new_tree_id,
-	@site_id,
-	UNIX_TIMESTAMP()
-FROM
-	cms_content_element as ce
-	LEFT JOIN shop_product as sp ON sp.id = ce.id
-	LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
-    LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
-    LEFT JOIN cms_tree as source_tree ON source_tree.id = ce_main.tree_id
-	LEFT JOIN (
-	    SELECT * FROM cms_tree as inner_new_tree WHERE inner_new_tree.cms_site_id = @site_id
-	) as new_tree ON new_tree.external_id = source_tree.id
-WHERE
-    /*Импорт только элементов заданных в настройках сайта*/
-	ce.cms_site_id in (
-		SELECT
-			shop_import_cms_site.sender_cms_site_id
-		FROM
-			shop_import_cms_site
-		WHERE
-			shop_import_cms_site.cms_site_id = @site_id
-	)
-	/*Только товары которые привязаны к моделям*/
-	AND sp.main_pid is not null
-	/*Только товары которые еще не добавлены на сайт*/
-	/*AND sp.main_pid not in (
-	    SELECT
-	        added_sp.main_pid
-        FROM
-            shop_product as added_sp
-            LEFT JOIN cms_content_element as ce_added ON ce_added.id = added_sp.id
-        WHERE
-            ce_added.cms_site_id = @site_id
-	)*/
-GROUP BY
-	sp_main.id
-LIMIT {limit};
+    SELECT
+        *
+    FROM
+        (
+            (
+                /*Товары простые или предложения*/
+                SELECT
+                    ce_main.name,
+                    ce_main.code,
+                    ce_main.content_id,
+                    ce_main.id,
+
+                    /*source_tree.id as source_tree_id,
+                                        source_tree.name as source_tree_name,*/
+                    new_tree.id as new_tree_id,
+                    @site_id,
+                    UNIX_TIMESTAMP()
+                FROM
+
+                    /* Товары */
+                    cms_content_element as ce
+                    LEFT JOIN shop_product as sp ON sp.id = ce.id
+                    /* Модели */
+                    LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
+                    LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
+                    LEFT JOIN cms_tree as source_tree ON source_tree.id = ce_main.tree_id
+                    /* Разделы товаров на новом сайте */
+                    LEFT JOIN (
+                        SELECT
+                            *
+                        FROM
+                            cms_tree as inner_new_tree
+                        WHERE
+                            inner_new_tree.cms_site_id = @site_id
+                    ) as new_tree ON new_tree.external_id = source_tree.id
+                WHERE
+
+                    /*Импорт только элементов заданных в настройках сайта*/
+                    ce.cms_site_id in (
+                        SELECT
+                            shop_import_cms_site.sender_cms_site_id
+                        FROM
+                            shop_import_cms_site
+                        WHERE
+                            shop_import_cms_site.cms_site_id = @site_id
+                    )
+                    /*Только товары которые привязаны к моделям*/
+                    AND sp.main_pid is not null
+                GROUP BY
+                    sp_main.id
+            )
+            UNION ALL
+                (
+                    /*Товары с предложениями*/
+                    SELECT
+                        ce_main_with_offers.name,
+                        ce_main_with_offers.code,
+                        ce_main_with_offers.content_id,
+                        ce_main_with_offers.id,
+                        new_tree.id as new_tree_id,
+                        @site_id,
+                        UNIX_TIMESTAMP()
+                    FROM
+
+                        /* Товары */
+                        cms_content_element as ce
+                        LEFT JOIN shop_product as sp ON sp.id = ce.id
+                        /* Модели */
+                        LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
+                        LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
+                        /* Общие модели */
+                        LEFT JOIN shop_product as sp_main_with_offers ON sp_main_with_offers.id = sp_main.offers_pid
+                        LEFT JOIN cms_content_element as ce_main_with_offers ON ce_main_with_offers.id = sp_main_with_offers.id
+                        /* Разделы моделей */
+                        LEFT JOIN cms_tree as source_tree ON source_tree.id = ce_main_with_offers.tree_id
+                        /* Разделы товаров на новом сайте */
+                        LEFT JOIN (
+                            SELECT
+                                *
+                            FROM
+                                cms_tree as inner_new_tree
+                            WHERE
+                                inner_new_tree.cms_site_id = @site_id
+                        ) as new_tree ON new_tree.external_id = source_tree.id
+                    WHERE
+
+                        /*Импорт только элементов заданных в настройках сайта*/
+                        ce.cms_site_id in (
+                            SELECT
+                                shop_import_cms_site.sender_cms_site_id
+                            FROM
+                                shop_import_cms_site
+                            WHERE
+                                shop_import_cms_site.cms_site_id = @site_id
+                        )
+                        /*Только товары которые привязаны к моделям*/
+                        AND sp.main_pid is not null
+                        AND ce_main_with_offers.id is not null
+                        /*Только товары которые еще не добавлены на сайт*/
+                    GROUP BY
+                        ce_main_with_offers.id
+                )
+        ) as all_elements
+    GROUP BY
+        all_elements.id;
+
+
 
 
 /* Вставка товаров */
 INSERT
-    INTO shop_product (`id`,`main_pid`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`)
+    INTO shop_product (`id`,`main_pid`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
 SELECT
-    cce.id,
-    sp_model.id,
-    'simple',
-    sp_model.measure_matches_jsondata,
-    sp_model.measure_ratio,
-    sp_model.measure_code,
-    sp_model.width,
-    sp_model.length,
-    sp_model.height,
-    sp_model.weight,
-    (
-        SELECT SUM(sp_inner.quantity) as sum_quantity
-           FROM shop_product as sp_inner
-           LEFT JOIN cms_content_element as cce_inner ON cce_inner.id = sp_inner.id
-           WHERE cce_inner.cms_site_id in (
-                SELECT
-                    shop_import_cms_site.sender_cms_site_id
-                FROM
-                    shop_import_cms_site
-                WHERE
-                    shop_import_cms_site.cms_site_id = @site_id
-           ) AND sp_inner.main_pid = sp_model.id
-        GROUP BY sp_inner.main_pid
-    )
+	cce.id,
+	sp_model.id,
+	sp_model.product_type,
+	sp_model.measure_matches_jsondata,
+	sp_model.measure_ratio,
+	sp_model.measure_code,
+	sp_model.width,
+	sp_model.length,
+	sp_model.height,
+	sp_model.weight,
+	(
+		SELECT
+			SUM(sp_inner.quantity) as sum_quantity
+		FROM
+			shop_product as sp_inner
+			LEFT JOIN cms_content_element as cce_inner ON cce_inner.id = sp_inner.id
+		WHERE
+			cce_inner.cms_site_id in (
+				SELECT
+					shop_import_cms_site.sender_cms_site_id
+				FROM
+					shop_import_cms_site
+				WHERE
+					shop_import_cms_site.cms_site_id = @site_id
+			)
+			AND sp_inner.main_pid = sp_model.id
+		GROUP BY
+			sp_inner.main_pid
+	),
+    cce_2.id as offers_pid
+	/*sp_model_with_offers.id*/
 FROM
-    cms_content_element as cce
-    LEFT JOIN shop_product as sp ON sp.id = cce.id
-    LEFT JOIN shop_product as sp_model ON sp_model.id = cce.external_id
+	cms_content_element as cce
+	LEFT JOIN shop_product as sp ON sp.id = cce.id
+	LEFT JOIN shop_product as sp_model ON sp_model.id = cce.external_id
+	LEFT JOIN shop_product as sp_model_with_offers ON sp_model_with_offers.id = sp_model.offers_pid
+	LEFT JOIN (
+		SELECT
+			*
+		FROM
+			cms_content_element as ce_inner
+		WHERE
+			ce_inner.cms_site_id = @site_id
+	) as cce_2 ON cce_2.external_id = sp_model_with_offers.id
 WHERE
-    sp.id is null AND
-    cce.cms_site_id = @site_id;
+	sp.id is null
+	AND cce.cms_site_id = @site_id
+	AND sp_model_with_offers.id is null /*Сначала берем товары с предложениями и простые*/
+	;
 
+
+/* Вставка товаров */
+INSERT
+    INTO shop_product (`id`,`main_pid`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
+SELECT
+	cce.id,
+	sp_model.id,
+	sp_model.product_type,
+	sp_model.measure_matches_jsondata,
+	sp_model.measure_ratio,
+	sp_model.measure_code,
+	sp_model.width,
+	sp_model.length,
+	sp_model.height,
+	sp_model.weight,
+	(
+		SELECT
+			SUM(sp_inner.quantity) as sum_quantity
+		FROM
+			shop_product as sp_inner
+			LEFT JOIN cms_content_element as cce_inner ON cce_inner.id = sp_inner.id
+		WHERE
+			cce_inner.cms_site_id in (
+				SELECT
+					shop_import_cms_site.sender_cms_site_id
+				FROM
+					shop_import_cms_site
+				WHERE
+					shop_import_cms_site.cms_site_id = @site_id
+			)
+			AND sp_inner.main_pid = sp_model.id
+		GROUP BY
+			sp_inner.main_pid
+	),
+    cce_2.id as offers_pid
+	/*sp_model_with_offers.id*/
+FROM
+	cms_content_element as cce
+	LEFT JOIN shop_product as sp ON sp.id = cce.id
+	LEFT JOIN shop_product as sp_model ON sp_model.id = cce.external_id
+	LEFT JOIN shop_product as sp_model_with_offers ON sp_model_with_offers.id = sp_model.offers_pid
+	LEFT JOIN (
+		SELECT
+			*
+		FROM
+			cms_content_element as ce_inner
+		WHERE
+			ce_inner.cms_site_id = @site_id
+	) as cce_2 ON cce_2.external_id = sp_model_with_offers.id
+WHERE
+	sp.id is null
+	AND cce.cms_site_id = @site_id
+	;
 
 
 
@@ -183,6 +317,7 @@ FROM (
         siteimport.priority DESC
 
 ) as q;
+
 
 
 COMMIT;

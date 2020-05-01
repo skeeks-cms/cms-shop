@@ -13,6 +13,7 @@ use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
+use yii\base\Exception;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -35,10 +36,11 @@ use yii\helpers\Json;
  * @property double                      $width
  * @property double                      $length
  * @property double                      $height
+ *
  * @property integer|null                $main_pid
+ * @property integer|null                $offers_pid
+ *
  * @property string                      $product_type
- * @property integer|null                $shop_supplier_id
- * @property string|null                 $supplier_external_id
  * @property array|null                  $supplier_external_jsondata
  * @property array|null                  $measure_matches_jsondata
  *
@@ -66,8 +68,13 @@ use yii\helpers\Json;
  * @property ShopOrder[]                 $shopOrders
  * @property ShopSupplier                $shopSupplier
  * @property ShopTypePrice               $shopTypePrices
+ * 
+ * 
  * @property ShopProduct                 $shopMainProduct
- * @property ShopProduct[]               $shopSupplierProducts
+ * 
+ * @property ShopProduct                 $shopProductWhithOffers Товар с предложениями для текущего товара
+ * @property ShopProduct[]               $shopProductOffers Предложения для текущего товара
+ * 
  *
  * @property boolean                     $isSubProduct
  *
@@ -216,28 +223,17 @@ class ShopProduct extends \skeeks\cms\models\Core
         //Проверка измененного типа
         if ($this->isAttributeChanged('product_type')) {
             //Выставили что у него есть предложения
-            if ($this->product_type == self::TYPE_OFFERS) {
-                /*if (!$this->getTradeOffers()->all()) {
-                    $this->product_type = self::TYPE_SIMPLE;
-                }*/
-            } elseif ($this->product_type == self::TYPE_SIMPLE) //Если указали что товар простой, значит у него не должно быть предложений
-            {
-                if ($this->getTradeOffers()->all()) {
-                    $this->product_type = self::TYPE_OFFERS;
+            if ($this->product_type == self::TYPE_OFFER) {
+                $offersProduct = $this->shopProductWhithOffers;
+                //Если товар к которому привязываем текущия является предложением, то этого делать нельзя!
+                if ($offersProduct->isOfferProduct) {
+                    throw new Exception("К товару предложению, нельзя привязать другое предложение");
                 }
-            } elseif ($this->product_type == self::TYPE_OFFER) //Если указали что товар простой, значит у него не должно быть предложений
-            {
-                if (!$this->cmsContentElement->parent_content_element_id) {
-                    $this->product_type = self::TYPE_SIMPLE;
-                } else {
-                    //Если товар к которому привязываем не с предложениями то нужно сделать его таким
-                    $parentShopProduct = $this->cmsContentElement->parentContentElement->shopProduct;
-                    if ($parentShopProduct->product_type != self::TYPE_OFFERS) {
-                        $parentShopProduct->product_type = self::TYPE_OFFERS;
-                        $parentShopProduct->update(false, ['product_type']);
-                    }
+                //Если товар к которому привязываем, является простым, то ему можно изменить тип
+                if (!$offersProduct->isOffersProduct) {
+                    $offersProduct->product_type = self::TYPE_OFFERS;
+                    $offersProduct->update(false, ['product_type']);
                 }
-
             }
         }
     }
@@ -246,7 +242,19 @@ class ShopProduct extends \skeeks\cms\models\Core
      */
     public function getTradeOffers()
     {
-        $childContentId = null;
+        if ($this->isNewRecord) {
+            return [];
+        }
+        
+        $q = ShopCmsContentElement::find()
+            ->joinWith("shopProduct as shopProduct")
+            ->where(['shopProduct.offers_pid' => $this->id])
+        ;
+        $q->multiple = true;
+        
+        return $q;
+        
+        /*$childContentId = null;
         if ($this->cmsContentElement && $this->cmsContentElement->shopContent) {
             $childContentId = $this->cmsContentElement->shopContent->children_content_id;
         }
@@ -254,7 +262,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this
             ->hasMany(ShopCmsContentElement::class, ['parent_content_element_id' => 'id'])
             ->andWhere([ShopCmsContentElement::tableName().".content_id" => $childContentId])
-            ->orderBy(['priority' => SORT_ASC]);
+            ->orderBy(['priority' => SORT_ASC]);*/
     }
     /**
      * После сохранения следим за ценами создаем если нет
@@ -315,10 +323,10 @@ class ShopProduct extends \skeeks\cms\models\Core
             }
         }
 
-        if (in_array('product_type', (array)$event->changedAttributes)) {
+        if (in_array('product_type', array_keys((array) $event->changedAttributes))) {
             if ($this->product_type == self::TYPE_OFFER) {
-                if ($this->cmsContentElement->parentContentElement->shopProduct) {
-                    $sp = $this->cmsContentElement->parentContentElement->shopProduct;
+                if (!$this->shopProductWhithOffers->isOffersProduct) {
+                    $sp = $this->shopProductWhithOffers;
                     $sp->product_type = self::TYPE_OFFERS;
                     $sp->save();
                 }
@@ -338,7 +346,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         $result = $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
         ]);
-        
+
         if (\Yii::$app->shop->baseTypePrice) {
             $result->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id]);
         };
@@ -455,14 +463,26 @@ class ShopProduct extends \skeeks\cms\models\Core
             ],
 
             [['product_type'], 'string', 'max' => 10],
-            [['product_type'], 'default', 'value' => static::TYPE_SIMPLE],
+            [['product_type'], 'default', 'value' => function() {
+                //Если указан товар с предложениями, то текущий товар должен быть предложением
+                if ($this->offers_pid) {
+                    self::TYPE_OFFER;
+                }
+                
+                //По умолчанию товар простой
+                return self::TYPE_SIMPLE;
+            }],
+            
             [
                 'product_type',
                 function ($attribute) {
-                    if ($this->{$attribute} == self::TYPE_OFFER) {
-                        if (!$this->cmsContentElement->parent_content_element_id) {
+                    //Если выбран тип товар предлжение, то должен быть указан товар с предложением
+                    if ($this->{$attribute} == self::TYPE_OFFER && !$this->offers_pid) {
                             $this->addError($attribute, "Для того чтобы товар был предложением, нужно выбрать общий товар в который он будет вложен.");
-                        }
+                    }
+                    //Если указан товар с предложением, то тип должен быть оффер
+                    if ($this->offers_pid) {
+                        $this->{$attribute} = self::TYPE_OFFER;
                     }
                 },
 
@@ -471,13 +491,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['quantity'], 'default', 'value' => 1],
             [['quantity_reserved'], 'default', 'value' => 0],
-
-
-            [['shop_supplier_id'], 'integer'],
-            [['shop_supplier_id'], 'default', 'value' => null],
-
-            [['supplier_external_id'], 'string'],
-            [['supplier_external_id'], 'default', 'value' => null],
+            
 
             [['measure_matches_jsondata'], 'string'],
             [['measure_matches_jsondata'], 'default', 'value' => null],
@@ -513,8 +527,6 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['supplier_external_jsondata'], 'safe'],
             [['supplier_external_jsondata'], 'default', 'value' => null],
 
-            [['shop_supplier_id', 'supplier_external_id'], 'unique', 'targetAttribute' => ['shop_supplier_id', 'supplier_external_id']],
-
             [['main_pid'], 'integer'],
             [
                 ['main_pid'],
@@ -530,12 +542,10 @@ class ShopProduct extends \skeeks\cms\models\Core
                     ])) {
                         $this->addError("main_pid", "Родительский товар должен быть простым или предложением.");
                     }
-
-                    if (!$this->shop_supplier_id) {
-                        $this->addError("main_pid", "Для привязки необходимо задать поставщика для привязываемого товара.");
-                    }
                 },
             ],
+
+            [['offers_pid'], 'integer'],
         ];
     }
     /**
@@ -562,8 +572,6 @@ class ShopProduct extends \skeeks\cms\models\Core
             'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
             'main_pid'          => \Yii::t('skeeks/shop/app', 'Главный товар'),
 
-            'shop_supplier_id'           => \Yii::t('skeeks/shop/app', 'Поставщик'),
-            'supplier_external_id'       => \Yii::t('skeeks/shop/app', 'Идентификатор поставщика'),
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
             'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
         ];
@@ -572,7 +580,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function attributeHints()
     {
         return [
-            'supplier_external_id' => \Yii::t('skeeks/shop/app', 'Уникальный идентификатор в системе поставщика'),
             'measure_code'         => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
             'measure_ratio'        => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
         ];
@@ -613,13 +620,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopCmsContentElement::class, ['id' => 'id']);
     }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopSupplier()
-    {
-        return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
-    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -627,6 +627,23 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getShopMainProduct()
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'main_pid'])->from(['shopMainProduct' => ShopProduct::tableName()]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductWhithOffers()
+    {
+        return $this->hasOne(ShopProduct::class, ['id' => 'offers_pid'])->from(['shopProductWhithOffers' => ShopProduct::tableName()]);
+    }
+    
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductOffers()
+    {
+        return $this->hasOne(ShopProduct::class, ['offers_pid' => 'id'])->from(['shopProductOffers' => ShopProduct::tableName()]);
     }
 
     /**
@@ -815,17 +832,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getShopTypePrices()
     {
         $query = \Yii::$app->skeeks->site->getShopTypePrices();
-
-        /*if ($this->cmsContentElement->cms_site_id) {
-            if ($this->shopSupplier->is_main) {
-                $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
-                $query->orWhere(['shop_supplier_id' => $this->shop_supplier_id]);
-            } else {
-                $query = ShopTypePrice::find()->where(['shop_supplier_id' => $this->shop_supplier_id]);
-            }
-        } else {
-            $query = ShopTypePrice::find()->where(['shop_supplier_id' => null]);
-        }*/
 
         $query->orderBy(['priority' => SORT_ASC]);
         $query->multiple = true;

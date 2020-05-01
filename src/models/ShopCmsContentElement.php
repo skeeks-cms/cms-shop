@@ -81,20 +81,14 @@ class ShopCmsContentElement extends CmsContentElement
             $this->parentContentElement->shopProduct->save();
         }
     }
+    
     /**
+     * @deprecated 
      * @return \yii\db\ActiveQuery
      */
     public function getTradeOffers()
     {
-        $childContentId = null;
-        if ($this->shopContent) {
-            $childContentId = $this->shopContent->children_content_id;
-        }
-
-        return $this
-            ->hasMany(static::class, ['parent_content_element_id' => 'id'])
-            ->andWhere(["content_id" => $childContentId])
-            ->orderBy(['priority' => SORT_ASC]);
+        return $this->shopProduct->getTradeOffers();
     }
     /**
      * @return \yii\db\ActiveQuery

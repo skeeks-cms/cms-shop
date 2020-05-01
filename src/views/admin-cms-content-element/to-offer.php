@@ -11,12 +11,12 @@ $controller = $this->context;
 /* @var $controller \skeeks\cms\shop\controllers\AdminCmsContentElementController */
 $cmsContent = $controller->content;
 
-$model = new \skeeks\cms\shop\models\ShopCmsContentElement();
+$model = new \skeeks\cms\shop\models\ShopProduct();
 ?>
 <? $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin(); ?>
 
 <? if ($cmsContent) : ?>
-    <?= $form->field($model, 'parent_content_element_id')->widget(
+    <?= $form->field($model, 'offers_pid')->widget(
         \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
         [
             'content_id'  => $cmsContent->parent_content_id,

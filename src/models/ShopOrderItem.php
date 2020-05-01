@@ -254,7 +254,12 @@ class ShopOrderItem extends ActiveRecord
         ]);*/
 
         $product = $this->shopProduct;
-        $parentElement = $product->cmsContentElement->parentContentElement;
+        
+        $parentElement = null;
+        if ($product->shopProductWhithOffers) {
+            $parentElement = $product->shopProductWhithOffers->cmsContentElement;
+        }
+        
 
 
         $productPrice = $product->minProductPrice;
@@ -373,8 +378,8 @@ class ShopOrderItem extends ActiveRecord
     {
         if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->shopProduct->cmsContentElement->parentContentElement) {
-                return $parent->url;
+            if ($parent = $this->shopProduct->shopProductWhithOffers) {
+                return $parent->cmsContentElement->url;
             } else {
                 return $this->shopProduct->cmsContentElement->url;
             }
@@ -390,8 +395,8 @@ class ShopOrderItem extends ActiveRecord
     {
         if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->shopProduct->cmsContentElement->parentContentElement) {
-                return $parent->absoluteUrl;
+            if ($parent = $this->shopProduct->shopProductWhithOffers) {
+                return $parent->cmsContentElement->absoluteUrl;
             } else {
                 return $this->shopProduct->cmsContentElement->absoluteUrl;
             }
@@ -407,11 +412,11 @@ class ShopOrderItem extends ActiveRecord
     {
         if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->shopProduct->cmsContentElement->parentContentElement) {
+            if ($parent = $this->shopProduct->shopProductWhithOffers) {
                 if ($this->shopProduct->cmsContentElement->image) {
                     return $this->shopProduct->cmsContentElement->image;
                 } else {
-                    return $parent->image;
+                    return $parent->cmsContentElement->image;
                 }
                 
             } else {

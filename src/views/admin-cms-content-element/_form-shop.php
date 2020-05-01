@@ -39,10 +39,10 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 if ($shopContent->childrenContent) {
     $allowChangeProductType = true;
 
-    if ($shopProduct->shop_supplier_id) {
+    /*if ($shopProduct->shop_supplier_id) {
         $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE;
         $allowChangeProductType = false;
-    }
+    }*/
 }
 
 
@@ -54,34 +54,7 @@ if ($model->isNewRecord) {
 
     //Если создаем вложенный товар
     if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
-        $parent = \skeeks\cms\shop\models\ShopCmsContentElement::findOne($parent_content_element_id);
-
-        $data = $parent->toArray();
-        \yii\helpers\ArrayHelper::remove($data, 'image_id');
-        \yii\helpers\ArrayHelper::remove($data, 'image_full_id');
-        \yii\helpers\ArrayHelper::remove($data, 'imageIds');
-        \yii\helpers\ArrayHelper::remove($data, 'fileIds');
-        \yii\helpers\ArrayHelper::remove($data, 'code');
-        \yii\helpers\ArrayHelper::remove($data, 'id');
-        $model->setAttributes($data);
-        $model->relatedPropertiesModel->setAttributes($parent->relatedPropertiesModel->toArray());
-        $model->parent_content_element_id = $parent_content_element_id;
-
-        $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER;
-        $model->tree_id = $parent->tree_id;
-
         $allowChangeProductType = false;
-        $this->registerCss(<<<CSS
-.field-shopcmscontentelement-tree_id,
-.field-shopcmscontentelement-parent_content_element_id {
-    display: none;
-}
-CSS
-        );
-    }
-
-    if ($contentModel->parent_content_id && $model->parentContentElement) {
-        $model->name = $model->parentContentElement->name;
     }
 
     //Если создается новый товар и указан товар поставщика
@@ -108,15 +81,6 @@ CSS
 
         \yii\helpers\ArrayHelper::remove($possibleProductTypes, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
     }
-}
-
-if ($model->parent_content_element_id) {
-    $this->registerCss(<<<CSS
-.field-shopcmscontentelement-tree_id {
-    display: none;
-}
-CSS
-    );
 }
 
 if ($shopProduct->tradeOffers) {
@@ -163,7 +127,7 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
 ])) : ?>
 
     <? if ($isChangeParrentElement) : ?>
-        <?= $form->field($model, 'parent_content_element_id')->widget(
+        <?= $form->field($shopProduct, 'offers_pid')->widget(
             \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
                 'content_id'  => $shopContent->childrenContent->id,
@@ -435,27 +399,6 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
                         ],
                     'body'    => \Yii::t('skeeks/shop/app', 'Управлять предложениями можно в отдельной вкладке.'),
                 ]); ?>
-
-                <? /*= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                            'label'       => false,
-                            'parentModel' => $model,
-                            'relation'    => [
-                                'content_id'                => $shopContent->childrenContent->id,
-                                'parent_content_element_id' => $model->id,
-                            ],
-
-                            'sort' => [
-                                'defaultOrder' =>
-                                    [
-                                        'priority' => 'published_at',
-                                    ],
-                            ],
-
-                            'controllerRoute' => '/shop/admin-cms-content-element',
-                            'gridViewOptions' => [
-                                'columns' => (array)\skeeks\cms\shop\controllers\AdminCmsContentElementController::getColumns($shopContent->childrenContent),
-                            ],
-                        ]); */ ?>
 
             <? endif; ?>
 
