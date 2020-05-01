@@ -1,6 +1,8 @@
 .sx-hidden-wrapper {
     display: none;
-    padding-top: 10px;
+    background: white;
+    padding: 5px 0px;
+    border-radius: 5px;
 }
 
 .sx-product-controls a:first-child {
@@ -9,5 +11,5 @@
 
 .sx-product-controls a {
     margin-left: 15px;
-    color: black !important;
+    color: #333 !important;
 }

@@ -29,6 +29,41 @@
                 }
                 return false;
             });
+            
+            $("body").on("click", ".sx-supplier-trigger", function() {
+                var jTd = $(this).closest("td");
+                var jOffers = $(".sx-supplier-offers-wrapper", jTd);
+                var jAllWrappers = $(".sx-hidden-wrapper", jTd);
+
+                jAllWrappers.slideUp();
+                jAllWrappers.removeClass("sx-opened");
+
+                if (jOffers.hasClass("sx-opened")) {
+                    jOffers.slideUp();
+                    jOffers.removeClass("sx-opened");
+                } else {
+                    jOffers.slideDown();
+                    jOffers.addClass("sx-opened");
+                }
+                return false;
+            });
+            $("body").on("click", ".sx-seller-trigger", function() {
+                var jTd = $(this).closest("td");
+                var jOffers = $(".sx-seller-offers-wrapper", jTd);
+                var jAllWrappers = $(".sx-hidden-wrapper", jTd);
+
+                jAllWrappers.slideUp();
+                jAllWrappers.removeClass("sx-opened");
+
+                if (jOffers.hasClass("sx-opened")) {
+                    jOffers.slideUp();
+                    jOffers.removeClass("sx-opened");
+                } else {
+                    jOffers.slideDown();
+                    jOffers.addClass("sx-opened");
+                }
+                return false;
+            });
         },
 
         _onWindowReady: function () {

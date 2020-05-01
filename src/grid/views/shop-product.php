@@ -7,8 +7,9 @@
  */
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
+$shopSellerProducts = [];
 ?>
-    <!--Товар привязан к главному-->
+<!--Товар привязан к главному-->
 <? if ($model->shopProduct->isSubProduct) : ?>
     <div class="d-flex flex-row">
 
@@ -120,52 +121,96 @@
         </div>
     </div>
 
-    <? if ($model->shopProduct->shopSupplierProducts) : ?>
+<? endif; ?>
 
-        <? foreach ($model->shopProduct->shopSupplierProducts as $shopSupplierProduct) : ?>
+<!--Если сайт является приемщиком товаров-->
+<? if (\Yii::$app->skeeks->site->shopSite->is_receiver) : ?>
+    <div class="sx-product-controls">
+        <? if ($tradeOffers = $model->shopProduct->tradeOffers) : ?>
+            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Предложения (<?= count($model->shopProduct->tradeOffers); ?>)</a>
+        <? endif; ?>
 
-            <div style="margin-top: 5px; margin-left: 20px; color: gray;">
+        <?
+        $q = \skeeks\cms\shop\models\ShopImportCmsSite::find()->select([
+            'sender_cms_site_id',
+        ])->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+
+        $shopSupplierProducts = $model->shopProduct->shopMainProduct->getShopSupplierProducts()
+            ->andWhere(['cmsSite.id' => $q])
+            ->all();
+
+        if ($shopSupplierProducts) : ?>
+            <a href="#" class="sx-supplier-trigger" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= count($shopSupplierProducts); ?>)</a>
+        <? endif; ?>
+    </div>
+<? else : ?>
+
+    <div class="sx-product-controls">
+        <? if ($tradeOffers = $model->shopProduct->tradeOffers) : ?>
+            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Предложения (<?= count($model->shopProduct->tradeOffers); ?>)</a>
+        <? endif; ?>
+
+        <? if ($shopSupplierProducts = $model->shopProduct->shopSupplierProducts) : ?>
+            <a href="#" class="sx-supplier-trigger" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= count($model->shopProduct->shopSupplierProducts); ?>)</a>
+        <? endif; ?>
+
+        <? if ($shopSellerProducts = $model->shopProduct->shopSellerProducts) : ?>
+            <a href="#" class="sx-seller-trigger" style="border-bottom: 1px dashed;"><i class="fas fa-map-marker-alt"></i> Где продается (<?= count($model->shopProduct->shopSellerProducts); ?>)</a>
+        <? endif; ?>
+    </div>
+<? endif; ?>
+
+<? if ($shopSellerProducts) : ?>
+    <div class="sx-hidden-wrapper sx-seller-offers-wrapper">
+        <? foreach ($shopSellerProducts as $shopSupplierProduct) : ?>
+
+            <div style="margin-top: 5px; color: black;">
                 <?
                 \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                    'controllerId' => "/shop/admin-cms-content-element-sub",
+                    'controllerId' => "/shop/admin-cms-content-element",
                     'modelId'      => $shopSupplierProduct->id,
                     'options'      => [
-                        'style' => 'color: gray; text-align: left;',
+                        'style' => 'color: black; text-align: left;',
+                    ],
+                ]);
+                ?>
+                <i class="fas fa-map-marker-alt"></i>
+                <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
+                <?= $shopSupplierProduct->asText; ?>
+                 — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
+                
+                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+            </div>
+        <? endforeach; ?>
+    </div>
+<? endif; ?>
+
+<? if ($shopSupplierProducts) : ?>
+    <div class="sx-hidden-wrapper sx-supplier-offers-wrapper">
+        <? foreach ($shopSupplierProducts as $shopSupplierProduct) : ?>
+
+            <div style="margin-top: 5px; color: black;">
+                <?
+                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                    'controllerId' => "/shop/admin-cms-content-element",
+                    'modelId'      => $shopSupplierProduct->id,
+                    'options'      => [
+                        'style' => 'color: black; text-align: left;',
                     ],
                 ]);
                 ?>
                 <i class="fas fa-link" title="Привязан к главному товару"></i>
                 <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
-                <?= $shopSupplierProduct->asText; ?>
+                <?= $shopSupplierProduct->asText; ?> — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
             </div>
         <? endforeach; ?>
-
-    <? endif; ?>
-
-
+    </div>
 <? endif; ?>
 
-
-<div class="sx-product-controls">
-    <? if ($model->shopProduct->tradeOffers) : ?>
-        <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Предложения (<?= count($model->shopProduct->tradeOffers); ?>)</a>
-    <? endif; ?>
-    
-    <? if ($model->shopProduct->shopSupplierProducts) : ?>
-        <a href="#" class="sx-supplier-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Кто поставляет (<?= count($model->shopProduct->shopSupplierProducts); ?>)</a>
-    <? endif; ?>
-    
-    <? if ($model->shopProduct->shopSellerProducts) : ?>
-        <a href="#" class="sx-seller-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Где продается (<?= count($model->shopProduct->shopSellerProducts); ?>)</a>
-    <? endif; ?>
-    
-</div>
-
-
-<? if ($model->shopProduct->tradeOffers) : ?>
+<? if ($tradeOffers) : ?>
     <div class="sx-hidden-wrapper sx-offers-wrapper">
-        <? foreach ($model->shopProduct->tradeOffers as $tradeOffer) : ?>
+        <? foreach ($tradeOffers as $tradeOffer) : ?>
             <div>
 
                 <?
@@ -173,16 +218,14 @@
                     'controllerId' => "/shop/admin-cms-content-element",
                     'modelId'      => $tradeOffer->id,
                     'options'      => [
-                        'style' => 'color: #333;',
+                        'style' => 'color: black;',
                     ],
                 ]);
                 ?>
-                <i class="fas fa-link" title="Привязан к главному товару"></i> <?= $tradeOffer->asText; ?>
+                <i class="fab fa-product-hunt"></i> <?= $tradeOffer->asText; ?> — [<?= $tradeOffer->shopProduct->quantity; ?><?= $tradeOffer->shopProduct->measure->symbol; ?>]
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
 
                 <? if ($tradeOffer->shopProduct->shopSupplierProducts) : ?>
-
-
                     <div style="margin-top: 5px; margin-bottom: 5px;">
                         <? foreach ($tradeOffer->shopProduct->shopSupplierProducts as $shopSupplierProduct) : ?>
                             <div style="margin-left: 20px;">
@@ -195,9 +238,8 @@
                                     ],
                                 ]);
                                 ?>
-                                <i class="fas fa-link" title="Привязан к главному товару"></i>
                                 <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
-                                <?= $shopSupplierProduct->asText; ?>
+                                <?= $shopSupplierProduct->asText; ?> — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
                                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                             </div>
                         <? endforeach; ?>
@@ -208,3 +250,6 @@
         <? endforeach; ?>
     </div>
 <? endif; ?>
+
+
+

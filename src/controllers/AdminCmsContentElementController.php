@@ -87,7 +87,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                 "index" => [
                     'on beforeRender' => function(ViewRenderEvent $event) {
-                        $event->content = 'test';
+                        $event->content = '';
 
                         AdminShopProductAsset::register(\Yii::$app->view);
                         $data = [];
