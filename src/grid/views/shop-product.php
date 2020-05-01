@@ -225,9 +225,24 @@ $shopSellerProducts = [];
                 <i class="fab fa-product-hunt"></i> <?= $tradeOffer->asText; ?> — [<?= $tradeOffer->shopProduct->quantity; ?><?= $tradeOffer->shopProduct->measure->symbol; ?>]
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
 
-                <? if ($tradeOffer->shopProduct->shopSupplierProducts) : ?>
+                <? 
+                if (\Yii::$app->skeeks->site->shopSite->is_receiver)
+                {
+                    $q = \skeeks\cms\shop\models\ShopImportCmsSite::find()->select([
+                        'sender_cms_site_id',
+                    ])->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+            
+                    $shopSupplierProducts = $tradeOffer->shopProduct->shopMainProduct->getShopSupplierProducts()
+                        ->andWhere(['cmsSite.id' => $q])
+                        ->all();
+                } else {
+                    $shopSupplierProducts = $tradeOffer->shopProduct->shopSupplierProducts;
+                }
+                ?>
+                
+                <? if ($shopSupplierProducts) : ?>
                     <div style="margin-top: 5px; margin-bottom: 5px;">
-                        <? foreach ($tradeOffer->shopProduct->shopSupplierProducts as $shopSupplierProduct) : ?>
+                        <? foreach ($shopSupplierProducts as $shopSupplierProduct) : ?>
                             <div style="margin-left: 20px;">
                                 <?
                                 \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
