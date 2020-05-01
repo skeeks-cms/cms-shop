@@ -1,0 +1,13 @@
+.sx-hidden-wrapper {
+    display: none;
+    padding-top: 10px;
+}
+
+.sx-product-controls a:first-child {
+    margin-left: 0px;
+}
+
+.sx-product-controls a {
+    margin-left: 15px;
+    color: black !important;
+}

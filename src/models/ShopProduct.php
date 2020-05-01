@@ -68,13 +68,16 @@ use yii\helpers\Json;
  * @property ShopOrder[]                 $shopOrders
  * @property ShopSupplier                $shopSupplier
  * @property ShopTypePrice               $shopTypePrices
- * 
- * 
+ *
+ *
  * @property ShopProduct                 $shopMainProduct
- * 
+ * @property ShopProduct[]               $shopAttachedProducts
+ * @property ShopProduct[]               $shopSupplierProducts
+ * @property ShopProduct[]               $shopSellerProducts
+ *
  * @property ShopProduct                 $shopProductWhithOffers Товар с предложениями для текущего товара
  * @property ShopProduct[]               $shopProductOffers Предложения для текущего товара
- * 
+ *
  *
  * @property boolean                     $isSubProduct
  *
@@ -245,15 +248,14 @@ class ShopProduct extends \skeeks\cms\models\Core
         if ($this->isNewRecord) {
             return [];
         }
-        
+
         $q = ShopCmsContentElement::find()
             ->joinWith("shopProduct as shopProduct")
-            ->where(['shopProduct.offers_pid' => $this->id])
-        ;
+            ->where(['shopProduct.offers_pid' => $this->id]);
         $q->multiple = true;
-        
+
         return $q;
-        
+
         /*$childContentId = null;
         if ($this->cmsContentElement && $this->cmsContentElement->shopContent) {
             $childContentId = $this->cmsContentElement->shopContent->children_content_id;
@@ -323,7 +325,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             }
         }
 
-        if (in_array('product_type', array_keys((array) $event->changedAttributes))) {
+        if (in_array('product_type', array_keys((array)$event->changedAttributes))) {
             if ($this->product_type == self::TYPE_OFFER) {
                 if (!$this->shopProductWhithOffers->isOffersProduct) {
                     $sp = $this->shopProductWhithOffers;
@@ -450,8 +452,8 @@ class ShopProduct extends \skeeks\cms\models\Core
                     }
 
                     //Если у товара есть товары поставщика
-                    if ($this->shopSupplierProducts) {
-                        foreach ($this->shopSupplierProducts as $shopSupplierProduct) {
+                    if ($this->shopAttachedProducts) {
+                        foreach ($this->shopAttachedProducts as $shopSupplierProduct) {
                             if ($shopSupplierProduct->measure_code != $this->measure_code) {
                                 $m = \Yii::$app->measureClassifier->getMeasureByCode($shopSupplierProduct->measure_code);
 
@@ -463,22 +465,26 @@ class ShopProduct extends \skeeks\cms\models\Core
             ],
 
             [['product_type'], 'string', 'max' => 10],
-            [['product_type'], 'default', 'value' => function() {
-                //Если указан товар с предложениями, то текущий товар должен быть предложением
-                if ($this->offers_pid) {
-                    self::TYPE_OFFER;
-                }
-                
-                //По умолчанию товар простой
-                return self::TYPE_SIMPLE;
-            }],
-            
+            [
+                ['product_type'],
+                'default',
+                'value' => function () {
+                    //Если указан товар с предложениями, то текущий товар должен быть предложением
+                    if ($this->offers_pid) {
+                        self::TYPE_OFFER;
+                    }
+
+                    //По умолчанию товар простой
+                    return self::TYPE_SIMPLE;
+                },
+            ],
+
             [
                 'product_type',
                 function ($attribute) {
                     //Если выбран тип товар предлжение, то должен быть указан товар с предложением
                     if ($this->{$attribute} == self::TYPE_OFFER && !$this->offers_pid) {
-                            $this->addError($attribute, "Для того чтобы товар был предложением, нужно выбрать общий товар в который он будет вложен.");
+                        $this->addError($attribute, "Для того чтобы товар был предложением, нужно выбрать общий товар в который он будет вложен.");
                     }
                     //Если указан товар с предложением, то тип должен быть оффер
                     if ($this->offers_pid) {
@@ -491,7 +497,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['quantity'], 'default', 'value' => 1],
             [['quantity_reserved'], 'default', 'value' => 0],
-            
+
 
             [['measure_matches_jsondata'], 'string'],
             [['measure_matches_jsondata'], 'default', 'value' => null],
@@ -580,8 +586,8 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function attributeHints()
     {
         return [
-            'measure_code'         => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
-            'measure_ratio'        => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
+            'measure_code'  => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
+            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
         ];
     }
     /**
@@ -636,8 +642,8 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'offers_pid'])->from(['shopProductWhithOffers' => ShopProduct::tableName()]);
     }
-    
-    
+
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -649,9 +655,38 @@ class ShopProduct extends \skeeks\cms\models\Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopSupplierProducts()
+    public function getShopAttachedProducts()
     {
         return $this->hasMany(ShopProduct::class, ['main_pid' => 'id']);
+    }
+
+    /**
+     * Кто поставляет текущий товар
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplierProducts()
+    {
+        $q = $this->getShopAttachedProducts()
+            ->joinWith("cmsContentElement as cmsContentElement")
+            ->joinWith("cmsContentElement.cmsSite as cmsSite")
+            ->joinWith("cmsContentElement.cmsSite.shopSite as shopSite")
+            ->andWhere(['shopSite.is_supplier' => 1]);
+        return $q;
+    }
+    /**
+     * Кто получает и продает текущий товар на сайте
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSellerProducts()
+    {
+        $q = $this->getShopAttachedProducts()
+            ->joinWith("cmsContentElement as cmsContentElement")
+            ->joinWith("cmsContentElement.cmsSite as cmsSite")
+            ->joinWith("cmsContentElement.cmsSite.shopSite as shopSite")
+            ->andWhere(['shopSite.is_receiver' => 1]);
+        return $q;
     }
 
     /**

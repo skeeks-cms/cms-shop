@@ -29,6 +29,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\shop\assets\admin\AdminShopProductAsset;
 use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
@@ -48,6 +49,7 @@ use yii\db\Exception;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\helpers\Url;
 
 /**
@@ -83,6 +85,19 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],*/
 
 
+                "index" => [
+                    'on beforeRender' => function(ViewRenderEvent $event) {
+                        $event->content = 'test';
+
+                        AdminShopProductAsset::register(\Yii::$app->view);
+                        $data = [];
+                        $json = Json::encode($data);
+                    \Yii::$app->view->registerJs(<<<JS
+                sx.ProductList = new sx.classes.ProductList({$json});
+JS
+                    );
+                    }  
+                ],
 
                 "offers" => [
                     'class'           => BackendGridModelRelatedAction::class,
