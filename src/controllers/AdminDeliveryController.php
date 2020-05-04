@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\models\CmsAgent;
@@ -21,6 +22,7 @@ use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -48,28 +50,38 @@ class AdminDeliveryController extends BackendModelStandartController
             'index'  => [
                 "filters" => [
                     'visibleFilters' => [
-                        'id',
                         'name',
                     ],
                 ],
                 'grid'    => [
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                    },
                     'defaultOrder'   => [
-                        'active'   => SORT_DESC,
+                        'is_active'   => SORT_DESC,
                         'priority' => SORT_ASC,
                     ],
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
-                        'id',
-                        'logo_id',
                         'name',
                         'price',
-                        'active',
+                        'is_active',
                         'priority',
                         'shopPaySystems',
                     ],
                     'columns'        => [
-                        'active'         => [
+                        'name'         => [
+                            'class' => DefaultActionColumn::class,
+                            'viewAttribute' => 'asText',
+                        ],
+                        'is_active'         => [
                             'class' => BooleanColumn::class,
                         ],
                         'logo_id'        => [
@@ -121,20 +133,16 @@ class AdminDeliveryController extends BackendModelStandartController
                             'multiple' => false,
                         ],
                     ],
-                    'active'  => [
+                    'is_active'  => [
                         'class'      => BoolField::class,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
-                    ],
-
-                    'site_id' => [
-                        'class' => SelectField::class,
-                        'items' => \yii\helpers\ArrayHelper::map(
-                            \skeeks\cms\models\CmsSite::find()->all(), 'id', 'name'
-                        ),
+                        'allowNull'      => false,
                     ],
 
                     'name',
+                    'description' => [
+                        'class' => TextareaField::class,
+                    ],
+                    
                     'priority',
 
 
@@ -154,19 +162,6 @@ class AdminDeliveryController extends BackendModelStandartController
                 'fields' => [
 
 
-                    'period_from',
-                    'period_to',
-
-                    'period_type' => [
-                        'class' => SelectField::class,
-                        'items' => [
-                            'D' => 'день',
-                            'H' => 'час',
-                            'M' => 'месяц',
-                        ],
-                    ],
-
-
                     'weight_from',
                     'weight_to',
 
@@ -180,11 +175,8 @@ class AdminDeliveryController extends BackendModelStandartController
                     ],
 
 
-                    'description' => [
-                        'class' => TextareaField::class,
-                    ],
+                    
 
-                    'store',
 
                     'shopPaySystems' => [
                         'class'    => SelectField::class,
