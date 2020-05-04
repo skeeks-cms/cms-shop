@@ -23,7 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                   $updated_at
  * @property string                    $name
  * @property integer                   $priority
- * @property string                    $active
+ * @property boolean                    $is_active
  *
  * @property string[]                  $siteCodes
  *
@@ -68,7 +68,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
      */
     public function beforeSaveEvent($event)
     {
-        if ($this->isAttributeChanged('active') && $this->active == Cms::BOOL_N) {
+        if ($this->isAttributeChanged('is_active') && $this->is_active == 0) {
             if (!static::find()->active()->andWhere(['!=', 'id', $this->id])->count()) {
                 throw new Exception("Requires at least one active payer type");
             }
@@ -122,16 +122,16 @@ class ShopPersonType extends \skeeks\cms\models\Core
             [['priority'], 'default', 'value' => 100],
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
-            [['active'], 'string', 'max' => 1],
+            [['is_active'], 'integer'],
             [['name'], 'unique'],
             [['siteCodes'], 'safe'],
-            [['active'], 'default', 'value' => Cms::BOOL_Y],
+            [['is_active'], 'default', 'value' => 1],
             [['active'], 'validateActive'],
         ]);
     }
     public function validateActive($attribute)
     {
-        if ($this->$attribute == Cms::BOOL_N && !static::find()->active()->andWhere(['!=', 'id', $this->id])->count()) {
+        if ($this->$attribute == 0 && !static::find()->active()->andWhere(['!=', 'id', $this->id])->count()) {
             $this->addError($attribute,
                 \Yii::t('skeeks/shop/app', 'It is necessary at least to leave one active payer type in the site'));
         }
@@ -144,7 +144,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
         return array_merge(parent::attributeLabels(), [
             'name'      => \Yii::t('skeeks/shop/app', 'Name'),
             'priority'  => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active'    => \Yii::t('skeeks/shop/app', 'Active'),
+            'is_active'    => \Yii::t('skeeks/shop/app', 'Active'),
             'siteCodes' => \Yii::t('skeeks/shop/app', 'Sites'),
         ]);
     }

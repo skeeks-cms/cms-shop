@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                      $updated_at
  * @property string                       $name
  * @property string                       $code
- * @property string                       $active
+ * @property boolean                       $is_active
  * @property integer                      $priority
  * @property string                       $property_type
  * @property string                       $list_type
@@ -110,7 +110,10 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
                 'value' => Cms::BOOL_N,
             ],
             [['code'], 'string', 'max' => 64],
-            [['active', 'property_type', 'multiple', 'is_required'], 'string', 'max' => 1],
+            [['property_type'], 'string', 'max' => 1],
+            [['is_multiple'], 'integer'],
+            [['is_active'], 'integer'],
+            [['is_required'], 'integer'],
             [
                 ['code', 'shop_person_type_id'],
                 'unique',
@@ -125,7 +128,7 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
      */
     public function attributeLabels()
     {
-        return array_merge(parent::rules(), [
+        return ArrayHelper::merge(parent::attributeLabels(), [
             'id'                         => \Yii::t('skeeks/shop/app', 'ID'),
             'created_by'                 => \Yii::t('skeeks/shop/app', 'Created By'),
             'updated_by'                 => \Yii::t('skeeks/shop/app', 'Updated By'),
@@ -133,7 +136,7 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
             'updated_at'                 => \Yii::t('skeeks/shop/app', 'Updated At'),
             'name'                       => \Yii::t('skeeks/shop/app', 'Name'),
             'code'                       => \Yii::t('skeeks/shop/app', 'Code'),
-            'active'                     => \Yii::t('skeeks/shop/app', 'Active'),
+            'is_active'                     => \Yii::t('skeeks/shop/app', 'Active'),
             'priority'                   => \Yii::t('skeeks/shop/app', 'Priority'),
             'property_type'              => \Yii::t('skeeks/shop/app', 'Property Type'),
             'list_type'                  => \Yii::t('skeeks/shop/app', 'List Type'),
@@ -148,7 +151,7 @@ class ShopPersonTypeProperty extends RelatedPropertyModel
             'component_settings'         => \Yii::t('skeeks/shop/app', 'Component Settings'),
             'hint'                       => \Yii::t('skeeks/cms', 'Hint'),
             'smart_filtrable'            => \Yii::t('skeeks/cms', 'Smart Filtrable'),
-            'shop_person_type_id'        => \Yii::t('skeeks/shop/app', 'Shop Person Type ID'),
+            'shop_person_type_id'        => \Yii::t('skeeks/shop/app', 'Тип покупателя'),
             'is_order_location_delivery' => \Yii::t('skeeks/shop/app',
                 'The value of the properties will be used as the location of the buyer to calculate the cost of delivery (only for type LOCATION)'),
             'is_order_location_tax'      => \Yii::t('skeeks/shop/app',

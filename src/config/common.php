@@ -87,6 +87,10 @@ return [
                                 "shop/admin-quantity-notice-email",
 
                                 "shop/admin-shop-import-cms-site",
+                                
+                                "shop/admin-person-type",
+                                "shop/admin-person-type-property",
+                                "shop/admin-person-type-property-enum",
                             ],
                         ],
                     ],

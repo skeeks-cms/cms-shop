@@ -53,12 +53,7 @@ class ShopPersonTypePropertyEnum extends RelatedPropertyEnumModel
      */
     public function attributeLabels()
     {
-        return ArrayHelper::merge(parent::rules(), [
-            'id'          => \Yii::t('skeeks/shop/app', 'Person type ID'),
-            'created_by'  => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'  => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'  => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'  => \Yii::t('skeeks/shop/app', 'Updated At'),
+        return ArrayHelper::merge(parent::attributeLabels(), [
             'property_id' => \Yii::t('skeeks/shop/app', 'Property ID'),
             'value'       => \Yii::t('skeeks/shop/app', 'Value'),
             'def'         => \Yii::t('skeeks/shop/app', 'Def'),
