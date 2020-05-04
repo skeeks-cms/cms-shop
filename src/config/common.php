@@ -88,6 +88,8 @@ return [
 
                                 "shop/admin-shop-import-cms-site",
                                 
+                                "shop/admin-delivery",
+                                
                                 "shop/admin-person-type",
                                 "shop/admin-person-type-property",
                                 "shop/admin-person-type-property-enum",
