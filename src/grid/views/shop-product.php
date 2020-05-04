@@ -33,7 +33,7 @@ $shopSellerProducts = [];
         <? elseif ($model->cmsSite->shopSite->is_supplier) : ?>
             <div class="my-auto text-center" style="margin-right: 5px;">
                 <span style="color: red; font-size: 17px;">
-                    <i class="fas fa-link" style="width: 20px;" title="Привязан к главному товару"></i>
+                    <i class="fas fa-link" style="width: 20px;" title="Не привязан к главному товару"></i>
                 </span>
             </div>
         <? endif; ?>
