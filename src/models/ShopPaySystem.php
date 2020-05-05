@@ -20,7 +20,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property string                    $name
  * @property integer                   $priority
- * @property string                    $active
+ * @property integer                    $is_active
  * @property string                    $description
  * @property string                    $component
  * @property string                    $component_settings
@@ -113,10 +113,19 @@ class ShopPaySystem extends Core
             [['description'], 'string'],
             [['component_settings'], 'safe'],
             [['name', 'component'], 'string', 'max' => 255],
-            [['active'], 'string', 'max' => 1],
+            [['is_active'], 'integer'],
             [['personTypeIds'], 'safe'],
             [['priority'], 'default', 'value' => 100],
-            [['active'], 'default', 'value' => Cms::BOOL_Y],
+            
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                },
+            ],
         ]);
     }
     /**
@@ -127,7 +136,7 @@ class ShopPaySystem extends Core
         return array_merge(parent::attributeLabels(), [
             'name'          => \Yii::t('skeeks/shop/app', 'Name'),
             'priority'      => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active'        => \Yii::t('skeeks/shop/app', 'Active'),
+            'is_active'        => \Yii::t('skeeks/shop/app', 'Active'),
             'description'   => \Yii::t('skeeks/shop/app', 'Description'),
             'personTypeIds' => \Yii::t('skeeks/shop/app', 'Payers'),
             'component'     => \Yii::t('skeeks/shop/app', 'Handler'),

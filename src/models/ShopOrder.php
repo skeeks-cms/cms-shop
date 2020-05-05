@@ -899,7 +899,10 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getPaySystems()
     {
-        return $this->shopPersonType->getPaySystems()->andWhere([ShopPaySystem::tableName().".active" => Cms::BOOL_Y]);
+        return $this->shopPersonType->getPaySystems()
+            ->andWhere([ShopPaySystem::tableName().".is_active" => 1])
+            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id])
+        ;
     }
     /**
      * @return $this

@@ -9,11 +9,13 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopPaySystem;
+use yii\base\Event;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
@@ -44,12 +46,21 @@ class AdminPaySystemController extends BackendModelStandartController
                     [
                         "filters" => [
                             'visibleFilters' => [
-                                'id',
                                 'name',
                             ],
                         ],
 
                         'grid' => [
+                            'on init' => function (Event $e) {
+                                /**
+                                 * @var $dataProvider ActiveDataProvider
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $e->sender->dataProvider->query;
+        
+                                $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                            },
+                                    
                             'defaultOrder' => [
                                 'priority' => SORT_ASC,
                             ],
@@ -57,14 +68,16 @@ class AdminPaySystemController extends BackendModelStandartController
                             'visibleColumns' => [
                                 'checkbox',
                                 'actions',
-                                'id',
                                 'name',
-                                'active',
+                                'is_active',
                                 'priority',
                             ],
 
                             "columns" => [
-                                'name',
+                                'name'         => [
+                                    'class' => DefaultActionColumn::class,
+                                    'viewAttribute' => 'asText',
+                                ],
                                 'priority',
 
                                 [
@@ -76,9 +89,9 @@ class AdminPaySystemController extends BackendModelStandartController
                                     },
                                 ],
 
-                                [
+                                'is_active' => [
                                     'class'     => BooleanColumn::class,
-                                    'attribute' => "active",
+                                    'attribute' => "is_active",
                                 ],
                             ],
                         ],

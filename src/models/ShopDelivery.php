@@ -235,7 +235,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
         $shopOrder->moneyItems->amount;
 
         $q = static::find()
-            ->orderBy(['cms_site_id' => $shopOrder->cmsSite->id])
+            ->andWhere(['cms_site_id' => $shopOrder->cms_site_id])
             ->orderBy(['priority' => SORT_ASC])
             ->active()
         ;
