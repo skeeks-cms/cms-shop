@@ -19,7 +19,6 @@ namespace skeeks\cms\shop\models;
  * @property ShopSite              $shopSite
  * @property ShopStore[]           $shopStores
  * @property ShopTypePrice[]       $shopTypePrices
- * @property ShopViewedProduct[]   $shopViewedProducts
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -123,15 +122,5 @@ class CmsSite extends \skeeks\cms\models\CmsSite
     public function getShopTypePrices()
     {
         return $this->hasMany(ShopTypePrice::className(), ['cms_site_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[ShopViewedProducts]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopViewedProducts()
-    {
-        return $this->hasMany(ShopViewedProduct::className(), ['site_id' => 'id']);
     }
 }

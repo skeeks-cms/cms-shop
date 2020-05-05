@@ -207,7 +207,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
     static public function getAllowForOrder(ShopOrder $shopOrder = null)
     {
         if ($shopOrder === null) {
-            $shopOrder = \Yii::$app->shop->cart->shopOrder;
+            $shopOrder = \Yii::$app->shop->shopUser->shopOrder;
         }
         
         $q = static::findForOrder($shopOrder);
@@ -229,7 +229,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
     static public function findForOrder(ShopOrder $shopOrder = null)
     {
         if ($shopOrder === null) {
-            $shopOrder = \Yii::$app->shop->cart->shopOrder;
+            $shopOrder = \Yii::$app->shop->shopUser->shopOrder;
         }
 
         $shopOrder->moneyItems->amount;

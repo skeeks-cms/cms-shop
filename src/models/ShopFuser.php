@@ -9,10 +9,9 @@
 namespace skeeks\cms\shop\models;
 
 /**
- * @author Semenov Alexander <semenov@skeeks.com>
  * @deprecated
  */
-class ShopFuser extends ShopCart
+class ShopFuser extends ShopUser
 {
 
 }

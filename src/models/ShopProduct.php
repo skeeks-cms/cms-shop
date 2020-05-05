@@ -604,8 +604,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         $shopViewdProduct = new ShopViewedProduct();
         $shopViewdProduct->shop_product_id = $this->id;
-        $shopViewdProduct->site_id = \Yii::$app->skeeks->site->id;
-        $shopViewdProduct->shop_fuser_id = \Yii::$app->shop->cart->id;
+        $shopViewdProduct->shop_user_id = \Yii::$app->shop->shopUser->id;
 
         return $shopViewdProduct->save();
     }
@@ -739,19 +738,19 @@ class ShopProduct extends \skeeks\cms\models\Core
     /**
      * Цены доступные к просмотру
      *
-     * @param null $shopFuser
+     * @param null $shopUser
      * @return $this
      */
-    public function getViewProductPrices($shopFuser = null)
+    public function getViewProductPrices($shopUser = null)
     {
-        if ($shopFuser === null) {
-            $shopFuser = \Yii::$app->shop->cart;
+        if ($shopUser === null) {
+            $shopUser = \Yii::$app->shop->shopUser;
         }
 
         return $this->hasMany(ShopProductPrice::class, [
             'product_id' => 'id',
         ])->andWhere([
-            'type_price_id' => ArrayHelper::map($shopFuser->viewTypePrices, 'id', 'id'),
+            'type_price_id' => ArrayHelper::map($shopUser->viewTypePrices, 'id', 'id'),
         ])->orderBy(['price' => SORT_ASC]);
     }
 
@@ -759,20 +758,20 @@ class ShopProduct extends \skeeks\cms\models\Core
      *
      * Лучшая цена по которой может купить этот товар пользователь, среди всех доступных
      *
-     * @param null $shopFuser
+     * @param null $shopUser
      * @return $this
      */
-    public function getMinProductPrice($shopFuser = null)
+    public function getMinProductPrice($shopUser = null)
     {
-        if ($shopFuser === null) {
-            $shopFuser = \Yii::$app->shop->cart;
+        if ($shopUser === null) {
+            $shopUser = \Yii::$app->shop->shopUser;
         }
 
 
-        if (!$shopFuser) {
+        if (!$shopUser) {
             $basPriceTypes = [\Yii::$app->shop->baseTypePrice->id];
         } else {
-            $basPriceTypes = $shopFuser->buyTypePrices;
+            $basPriceTypes = $shopUser->buyTypePrices;
         }
 
         return $this->hasOne(ShopProductPrice::class, [

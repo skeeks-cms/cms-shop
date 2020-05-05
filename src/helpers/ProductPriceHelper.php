@@ -199,7 +199,7 @@ class ProductPriceHelper extends Component
     public function getshopOrder()
     {
         if (!$this->_shopOrder) {
-            $this->_shopOrder = \Yii::$app->shop->cart->shopOrder;
+            $this->_shopOrder = \Yii::$app->shop->shopUser->shopOrder;
         }
 
         return $this->_shopOrder;

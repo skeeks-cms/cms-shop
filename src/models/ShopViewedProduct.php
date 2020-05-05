@@ -2,27 +2,25 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\models\CmsSite;
+use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\query\CmsActiveQuery;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_viewed_product}}".
  *
- * @property integer           $id
- * @property integer           $created_by
- * @property integer           $updated_by
- * @property integer           $created_at
- * @property integer           $updated_at
- * @property integer           $shop_fuser_id
- * @property integer           $shop_product_id
- * @property integer           $site_id
+ * @property integer     $id
+ * @property integer     $created_by
+ * @property integer     $updated_by
+ * @property integer     $created_at
+ * @property integer     $updated_at
+ * @property integer     $shop_user_id
+ * @property integer     $shop_product_id
  *
- * @property CmsSite           $site
- * @property ShopFuser         $shopFuser
- * @property ShopProduct       $shopProduct
- * @property CmsContentElement $cmsContentElement
+ * @property ShopUser    $shopUser
+ * @property ShopProduct $shopProduct
  */
-class ShopViewedProduct extends \skeeks\cms\models\Core
+class ShopViewedProduct extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -37,13 +35,13 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
      */
     public function rules()
     {
-        return [
+        return ArrayHelper::merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_fuser_id', 'shop_product_id', 'site_id'],
+                ['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_user_id', 'shop_product_id'],
                 'integer',
             ],
-            [['shop_fuser_id', 'shop_product_id', 'site_id'], 'required'],
-        ];
+            [['shop_user_id', 'shop_product_id'], 'required'],
+        ]);
     }
 
     /**
@@ -51,33 +49,19 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
      */
     public function attributeLabels()
     {
-        return [
-            'id'              => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'      => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'      => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'      => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'      => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'shop_fuser_id'   => \Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'shop_user_id'    => \Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
             'shop_product_id' => \Yii::t('skeeks/shop/app', 'Shop Product ID'),
-            'site_id'         => \Yii::t('skeeks/shop/app', 'Site ID'),
-        ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSite()
-    {
-        return $this->hasOne(CmsSite::class, ['id' => 'site_id']);
+        ]);
     }
 
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopFuser()
+    public function getShopUser()
     {
-        return $this->hasOne(ShopFuser::class, ['id' => 'shop_fuser_id']);
+        return $this->hasOne(ShopUser::class, ['id' => 'shop_user_id']);
     }
 
     /**
@@ -87,13 +71,4 @@ class ShopViewedProduct extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCmsContentElement()
-    {
-        return $this->hasOne(CmsContentElement::class, ['id' => 'shop_product_id']);
-    }
-
 }

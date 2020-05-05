@@ -66,7 +66,7 @@ use yii\helpers\Url;
  * @property ShopOrderItem[]            $shopOrderItems
  * @property ShopOrderStatus            $shopOrderStatus
  *
- * @property ShopCart                   $shopCart
+ * @property ShopUser                   $shopCart
  * @property CmsUser|null               $cmsUser
  *
  * @property CmsContentElement          $store
@@ -1111,7 +1111,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getShopCart()
     {
-        return $this->hasOne(ShopCart::class, ['shop_order_id' => 'id']);
+        return $this->hasOne(ShopUser::class, ['shop_order_id' => 'id']);
     }
 
     /**

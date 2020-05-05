@@ -24,9 +24,9 @@ use yii\helpers\ArrayHelper;
  * @property string      $name
  * @property integer     $is_notified
  * @property integer     $notified_at
- * @property integer     $shop_fuser_id
+ * @property integer     $shop_user_id
  *
- * @property ShopFuser   $shopFuser
+ * @property ShopUser    $shopUser
  * @property ShopProduct $shopProduct
  */
 class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
@@ -54,18 +54,18 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
                     'shop_product_id',
                     'is_notified',
                     'notified_at',
-                    'shop_fuser_id',
+                    'shop_user_id',
                 ],
                 'integer',
             ],
             [['shop_product_id', 'email'], 'required'],
             [['email', 'name'], 'string', 'max' => 255],
             [
-                ['shop_fuser_id'],
+                ['shop_user_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => ShopFuser::class,
-                'targetAttribute' => ['shop_fuser_id' => 'id'],
+                'targetClass'     => ShopUser::class,
+                'targetAttribute' => ['shop_user_id' => 'id'],
             ],
             [
                 ['shop_product_id'],
@@ -77,10 +77,10 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
 
             [['email'], 'email'],
             [
-                ['shop_fuser_id'],
+                ['shop_user_id'],
                 'default',
                 'value' => function () {
-                    return \Yii::$app->shop->cart ? \Yii::$app->shop->cart->id : null;
+                    return \Yii::$app->shop->shopUser ? \Yii::$app->shop->shopUser->id : null;
                 },
             ],
         ]);
@@ -102,16 +102,16 @@ class ShopQuantityNoticeEmail extends \skeeks\cms\models\Core
             'name'            => Yii::t('skeeks/shop/app', 'Customer name'),
             'is_notified'     => Yii::t('skeeks/shop/app', 'Is notified'),
             'notified_at'     => Yii::t('skeeks/shop/app', 'Notified At'),
-            'shop_fuser_id'   => Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
+            'shop_user_id'    => Yii::t('skeeks/shop/app', 'Shop Fuser ID'),
         ]);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopFuser()
+    public function getShopUser()
     {
-        return $this->hasOne(ShopFuser::class, ['id' => 'shop_fuser_id']);
+        return $this->hasOne(ShopUser::class, ['id' => 'shop_user_id']);
     }
 
 

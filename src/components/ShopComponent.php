@@ -17,11 +17,10 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
-use skeeks\cms\shop\models\ShopCart;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
-use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
+use skeeks\cms\shop\models\ShopUser;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
@@ -39,7 +38,7 @@ use yii\widgets\ActiveForm;
  * @property ShopTypePrice[]  $shopTypePrices
  * @property ShopTypePrice[]  $canBuyTypePrices
  *
- * @property ShopCart         $cart
+ * @property ShopUser         $shopUser
  *
  * @property CmsContent       $shopContents
  *
@@ -50,6 +49,8 @@ use yii\widgets\ActiveForm;
  */
 class ShopComponent extends Component
 {
+    const SESSION_SHOP_USER_NAME = 'SKEEKS_CMS_SHOP_USER';
+
     /**
      * @var string Email отдела продаж
      */
@@ -86,10 +87,6 @@ class ShopComponent extends Component
      */
     public $notify_emails;
     /**
-     * @var string
-     */
-    public $sessionFuserName = 'SKEEKS_CMS_SHOP';
-    /**
      * @var ShopTypePrice
      */
     protected $_baseTypePrice;
@@ -98,13 +95,9 @@ class ShopComponent extends Component
      */
     protected $_shopTypePrices = [];
     /**
-     * @var CartComponent
+     * @var ShopUser
      */
-    private $_cart = null;
-    /**
-     * @var ShopCart
-     */
-    private $_shopCart = null;
+    private $_shopUser = null;
 
     /**
      * @var bool
@@ -146,8 +139,6 @@ class ShopComponent extends Component
     public $is_show_quantity_product = 1;
 
 
-   
-
     /**
      * @var array
      */
@@ -170,15 +161,12 @@ class ShopComponent extends Component
             'name' => \Yii::t('skeeks/shop/app', 'Shop'),
         ]);
     }
-    /**
-     * @return ShopCart
-     * @deprecated
-     */
-    public function getShopFuser()
-    {
-        return $this->cart;
-    }
 
+
+    public function getSessionFuserName()
+    {
+        return static::SESSION_SHOP_USER_NAME."_".\Yii::$app->skeeks->site->id;
+    }
 
     /**
      * @return ActiveForm
@@ -418,52 +406,60 @@ class ShopComponent extends Component
 
         return $result;
     }
+
+
     /**
-     * @return array|null|ShopCart
+     * @return array|ShopUser|\yii\db\ActiveRecord|null
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
-    public function getCart()
+    public function getShopUser()
     {
         if (\Yii::$app instanceof \yii\console\Application) {
             return null;
         }
 
-        if ($this->_shopCart instanceof ShopCart) {
-            return $this->_shopCart;
+        if ($this->_shopUser instanceof ShopUser) {
+            return $this->_shopUser;
         }
 
+        //Если пользователь гость
         if (isset(\Yii::$app->user) && \Yii::$app->user && \Yii::$app->user->isGuest) {
-            //Если пользователь гость
             //Проверка сессии
             if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
                 $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
-                $shopCart = ShopCart::find()->where(['id' => $fuserId])->one();
+                $shopCart = ShopUser::find()->where(['id' => $fuserId])->one();
                 //Поиск юзера
                 if ($shopCart) {
-                    $this->_shopCart = $shopCart;
+                    $this->_shopUser = $shopCart;
                 }
             }
 
-            if (!$this->_shopCart) {
-                $shopCart = new ShopCart();
+            if (!$this->_shopUser) {
+                $shopCart = new ShopUser();
                 //$shopCart->save();
                 //\Yii::$app->getSession()->set($this->sessionFuserName, $shopCart->id);
-                $this->_shopCart = $shopCart;
+                $this->_shopUser = $shopCart;
             }
         } else {
             //Если пользователь авторизован
-            $this->_shopCart = ShopCart::find()->where(['cms_user_id' => \Yii::$app->user->identity->id])->one();
+            $this->_shopUser = ShopUser::find()
+                ->where(['cms_user_id' => \Yii::$app->user->identity->id])
+                ->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id])
+                ->one();
+
             //Если у авторизовнного пользоывателя уже есть пользователь корзины
-            if ($this->_shopCart) {
+            if ($this->_shopUser) {
                 //Проверка сессии, а было ли чего то в корзине
                 if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
                     $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
-                    $shopCart = ShopCart::find()->where(['id' => $fuserId])->one();
+                    $shopCart = ShopUser::find()->where(['id' => $fuserId])->one();
 
                     /**
-                     * @var $shopCart ShopCart
+                     * @var $shopCart ShopUser
                      */
                     if ($shopCart) {
-                        $this->_shopCart->shopOrder->addShopOrderItems($shopCart->shopOrder->shopOrderItems);
+                        $this->_shopUser->shopOrder->addShopOrderItems($shopCart->shopOrder->shopOrderItems);
                         $shopCart->delete();
                     }
 
@@ -474,52 +470,42 @@ class ShopComponent extends Component
                 //Проверка сессии, а было ли чего то в корзине
                 if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
                     $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
-                    $shopCart = ShopCart::find()->where(['id' => $fuserId])->one();
+                    $shopCart = ShopUser::find()->where(['id' => $fuserId])->one();
                     //Поиск юзера
                     /**
-                     * @var $shopCart ShopCart
+                     * @var $shopCart ShopUser
                      */
                     if ($shopCart) {
                         $shopCart->cms_user_id = \Yii::$app->user->identity->id;
                         $shopCart->save();
                     }
 
-                    $this->_shopCart = $shopCart;
+                    $this->_shopUser = $shopCart;
                     \Yii::$app->getSession()->remove($this->sessionFuserName);
                 } else {
-                    $shopCart = new ShopCart([
+                    $shopCart = new ShopUser([
                         'cms_user_id' => \Yii::$app->user->identity->id,
                     ]);
 
-                    $shopCart->save();
-                    $this->_shopCart = $shopCart;
+                    if (!$shopCart->save()) {
+                        throw new Exception(print_r($shopCart->errors, true));
+                    }
+                    
+                    $this->_shopUser = $shopCart;
                 }
             }
         }
 
-        /**
-         * Если у корзины нет заказа, нужно его создать
-         */
-        /*if (!$this->_shopCart->shop_order_id) {
-            $shopOrder = new ShopOrder();
-            $shopOrder->cms_site_id = \Yii::$app->skeeks->site->id;
-            if (!$shopOrder->save()) {
-                throw new UserException("Заказ-черновик не создан: ".print_r($shopOrder->errors, true));
-            }
-            $this->_shopCart->shop_order_id = $shopOrder->id;
-            $this->_shopCart->save(false);
-        }*/
-
-        return $this->_shopCart;
+        return $this->_shopUser;
     }
 
     /**
-     * @param ShopCart $shopCart
+     * @param ShopUser $shopCart
      * @return $this
      */
-    public function setCart(ShopCart $shopCart)
+    public function setCart(ShopUser $shopCart)
     {
-        $this->_shopCart = $shopCart;
+        $this->_shopUser = $shopCart;
         return $this;
     }
 
@@ -820,7 +806,7 @@ SQL
         if (!$cmsSite->shopSite->catalogCmsTree) {
             throw new Exception("В основных настройках сайта укажите каталог для товаров");
         }
-        
+
         //1) Создаем необходимые категории на сайте
         $data = \Yii::$app->db->createCommand(<<<SQL
         SELECT 
@@ -887,20 +873,19 @@ SQL
             all_tree.id
 SQL
         )->queryAll();
-        
+
         if ($data) {
-            foreach ($data as $row)
-            {
+            foreach ($data as $row) {
                 $source = CmsTree::find()->where(['id' => $row['id']])->one();
                 $parent = $cmsSite->shopSite->catalogCmsTree;
 
                 if (!$parent->getChildren()->andWhere(['external_id' => $source->id])->exists()) {
                     $tree = new CmsTree();
                     $tree->name = $source->name;
-                    $tree->external_id = (string) $source->id;
-                    
+                    $tree->external_id = (string)$source->id;
+
                     if (!$tree->appendTo($parent)->save()) {
-                        throw new Exception("Раздел не создан: " . print_r($tree->errors, true));
+                        throw new Exception("Раздел не создан: ".print_r($tree->errors, true));
                     }
                 }
 
@@ -910,12 +895,12 @@ SQL
         /**
          * 2 вставка товаров
          */
-        
+
         $sqlFile = \Yii::getAlias('@skeeks/cms/shop/sql/insert-new-products.sql');
         $sql = file_get_contents($sqlFile);
         $sql = str_replace("{site_id}", $cmsSite->id, $sql);
         $sql = str_replace("{limit}", 5000, $sql);
-        
+
         \Yii::$app->db->createCommand($sql)->execute();
 
 
@@ -988,6 +973,25 @@ SET
 SQL
         )->execute();
 
-        
+
+    }
+
+
+    /**
+     * @return ShopUser
+     * @deprecated
+     */
+    public function getCart()
+    {
+        return $this->shopUser;
+    }
+
+    /**
+     * @return ShopUser
+     * @deprecated
+     */
+    public function getShopFuser()
+    {
+        return $this->shopUser;
     }
 }

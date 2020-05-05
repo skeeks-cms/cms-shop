@@ -384,13 +384,13 @@ if ($fuser) {
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app',
         'Viewed products')." (".\skeeks\cms\shop\models\ShopViewedProduct::find()->where([
-        'shop_fuser_id' => $fuser->id,
+        'shop_user_id' => $fuser->id,
     ])->count().")"); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ActiveDataProvider([
         'query' => \skeeks\cms\shop\models\ShopViewedProduct::find()->where([
-            'shop_fuser_id' => $fuser->id,
+            'shop_user_id' => $fuser->id,
         ])->orderBy(['created_at' => SORT_DESC]),
     ]),
     'columns'      =>
@@ -431,13 +431,13 @@ if ($fuser) {
 
 <?= $form->fieldSet(\Yii::t('skeeks/shop/app',
         'Notify admission')." (".\skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
-        'shop_fuser_id' => $fuser->id,
+        'shop_user_id' => $fuser->id,
     ])->count().")"); ?>
 
 <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
     'dataProvider' => new \yii\data\ActiveDataProvider([
         'query' => \skeeks\cms\shop\models\ShopQuantityNoticeEmail::find()->where([
-            'shop_fuser_id' => $fuser->id,
+            'shop_user_id' => $fuser->id,
         ])->orderBy(['created_at' => SORT_DESC]),
     ]),
     'columns'      =>

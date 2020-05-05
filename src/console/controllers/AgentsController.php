@@ -8,7 +8,7 @@
 
 namespace skeeks\cms\shop\console\controllers;
 
-use skeeks\cms\shop\models\ShopCart;
+use skeeks\cms\shop\models\ShopUser;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
@@ -122,7 +122,7 @@ SQL
             $this->stdout("Not found orders for delete\n");
         }
 
-        $deleted = ShopCart::deleteAll([
+        $deleted = ShopUser::deleteAll([
             'shop_order_id' => null,
         ]);
         $this->stdout("Removed empty carts: ".$deleted."\n");

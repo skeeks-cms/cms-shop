@@ -53,18 +53,18 @@ class AdminViewedProductController extends BackendModelStandartController
                         'checkbox',
                         'actions',
                         'created_at',
-                        'shop_fuser_id',
+                        'shop_user_id',
                         'shop_product_id',
                     ],
                     'columns'        => [
                         'created_at'      => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'shop_fuser_id'   => [
+                        'shop_user_id'   => [
                             'format' => 'raw',
                             'label'  => \Yii::t('skeeks/shop/app', 'User'),
                             'value'  => function (\skeeks\cms\shop\models\ShopViewedProduct $shopViewedProduct) {
-                                return $shopViewedProduct->shopFuser->cmsUser ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopViewedProduct->shopFuser->cmsUser]))->run() : \Yii::t('skeeks/shop/app',
+                                return $shopViewedProduct->shopUser->cmsUser ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopViewedProduct->shopUser->cmsUser]))->run() : \Yii::t('skeeks/shop/app',
                                     'Not authorized');
                             },
                         ],

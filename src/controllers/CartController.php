@@ -9,24 +9,15 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
-use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\models\CmsUser;
-use skeeks\cms\models\forms\SignupForm;
 use skeeks\cms\shop\models\ShopBasket;
-use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
-use skeeks\cms\shop\models\ShopFuser;
-use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrder2discountCoupon;
 use skeeks\cms\shop\models\ShopOrderItem;
-use skeeks\cms\shop\models\ShopPersonType;
-use skeeks\cms\shop\models\ShopPersonTypeProperty;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Exception;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
 
 /**
  * Class CartController
@@ -114,26 +105,26 @@ class CartController extends Controller
                 }
             }
 
-            if (\Yii::$app->shop->cart->isNewRecord) {
-                \Yii::$app->shop->cart->save();
-                \Yii::$app->getSession()->set(\Yii::$app->shop->sessionFuserName, \Yii::$app->shop->cart->id);
+            if (\Yii::$app->shop->shopUser->isNewRecord) {
+                \Yii::$app->shop->shopUser->save();
+                \Yii::$app->getSession()->set(\Yii::$app->shop->sessionFuserName, \Yii::$app->shop->shopUser->id);
             }
 
             $shopBasket = ShopOrderItem::find()->where([
-                'shop_order_id'   => \Yii::$app->shop->cart->shopOrder->id,
+                'shop_order_id'   => \Yii::$app->shop->shopUser->shopOrder->id,
                 'shop_product_id' => $product_id,
             ])->one();
 
             if (!$shopBasket) {
                 $shopBasket = new ShopOrderItem([
-                    'shop_order_id'   => \Yii::$app->shop->cart->shopOrder->id,
+                    'shop_order_id'   => \Yii::$app->shop->shopUser->shopOrder->id,
                     'shop_product_id' => $product->id,
                     'quantity'        => 0,
                 ]);
             }
 
             $shopBasket->quantity = $shopBasket->quantity + $quantity;
-            
+
             $int = round($shopBasket->quantity / $product->measure_ratio);
             $shopBasket->quantity = $int * $product->measure_ratio;
 
@@ -148,8 +139,8 @@ class CartController extends Controller
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
-            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
+            \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -178,8 +169,8 @@ class CartController extends Controller
                 }
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
-            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
+            \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -197,12 +188,12 @@ class CartController extends Controller
         $rr = new RequestResponse();
 
         if ($rr->isRequestAjaxPost()) {
-            foreach (\Yii::$app->shop->cart->shopOrder->shopOrderItems as $basket) {
+            foreach (\Yii::$app->shop->shopUser->shopOrder->shopOrderItems as $basket) {
                 $basket->delete();
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
-            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
+            \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
             $rr->success = true;
             $rr->message = "";
 
@@ -255,8 +246,8 @@ class CartController extends Controller
 
             }
 
-            \Yii::$app->shop->cart->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
-            $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
+            \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -279,14 +270,13 @@ class CartController extends Controller
                 }
 
 
-                ShopOrder2discountCoupon::deleteAll(['discount_coupon_id' => $couponId, 'order_id' => \Yii::$app->shop->cart->shopOrder->id]);
+                ShopOrder2discountCoupon::deleteAll(['discount_coupon_id' => $couponId, 'order_id' => \Yii::$app->shop->shopUser->shopOrder->id]);
 
-                foreach (\Yii::$app->shop->cart->shopOrder->shopOrderItems as $orderItem)
-                {
+                foreach (\Yii::$app->shop->shopUser->shopOrder->shopOrderItems as $orderItem) {
                     $orderItem->recalculate()->save();
                 };
 
-                $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
+                $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Your coupon was successfully deleted');
 
@@ -323,8 +313,8 @@ class CartController extends Controller
                     ->andWhere(['is_active' => 1])
                     ->andWhere([
                         'or',
-                        ['>','active_to', time()],
-                        ['active_to' => null]
+                        ['>', 'active_to', time()],
+                        ['active_to' => null],
                     ])
                     ->one();
 
@@ -334,28 +324,27 @@ class CartController extends Controller
                 }
 
                 /*$discount_coupons = [];
-                if (\Yii::$app->shop->cart->shopOrder->shopDiscountCoupons) {
-                    $discount_coupons = ArrayHelper::map(\Yii::$app->shop->cart->shopOrder->shopDiscountCoupons, 'id', 'id');
+                if (\Yii::$app->shop->shopUser->shopOrder->shopDiscountCoupons) {
+                    $discount_coupons = ArrayHelper::map(\Yii::$app->shop->shopUser->shopOrder->shopDiscountCoupons, 'id', 'id');
                 }
                 $discount_coupons[] = $applyShopDiscountCoupon->id;
                 array_unique($discount_coupons);*/
 
                 $map = new ShopOrder2discountCoupon();
-                $map->order_id = \Yii::$app->shop->cart->shopOrder->id;
+                $map->order_id = \Yii::$app->shop->shopUser->shopOrder->id;
                 $map->discount_coupon_id = $applyShopDiscountCoupon->id;
 
                 $map->save();
-                //\Yii::$app->shop->cart->shopOrder->shopDiscountCoupons = $discount_coupons;
-                //\Yii::$app->shop->cart->shopOrder->save();
-                /*$order = \Yii::$app->shop->cart->shopOrder;
+                //\Yii::$app->shop->shopUser->shopOrder->shopDiscountCoupons = $discount_coupons;
+                //\Yii::$app->shop->shopUser->shopOrder->save();
+                /*$order = \Yii::$app->shop->shopUser->shopOrder;
                 $order->refresh();*/
-                foreach (\Yii::$app->shop->cart->shopOrder->shopOrderItems as $orderItem)
-                {
+                foreach (\Yii::$app->shop->shopUser->shopOrder->shopOrderItems as $orderItem) {
                     $orderItem->recalculate()->save();
                 };
-                //\Yii::$app->shop->cart->shopOrder->recalculate()->save();
+                //\Yii::$app->shop->shopUser->shopOrder->recalculate()->save();
 
-                $rr->data = \Yii::$app->shop->cart->shopOrder->jsonSerialize();
+                $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Coupon successfully installed');
 

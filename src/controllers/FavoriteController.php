@@ -73,20 +73,19 @@ class FavoriteController extends Controller
                 return (array)$rr;
             }
 
-            if (\Yii::$app->shop->cart->isNewRecord) {
-                \Yii::$app->shop->cart->save();
-                \Yii::$app->getSession()->set(\Yii::$app->shop->sessionFuserName, \Yii::$app->shop->cart->id);
+            if (\Yii::$app->shop->shopUser->isNewRecord) {
+                \Yii::$app->shop->shopUser->save();
+                \Yii::$app->getSession()->set(\Yii::$app->shop->sessionFuserName, \Yii::$app->shop->shopUser->id);
             }
 
             $shopFavoriteProduct = new ShopFavoriteProduct();
-            $shopFavoriteProduct->shop_cart_id = \Yii::$app->shop->cart->id;
+            $shopFavoriteProduct->shop_user_id = \Yii::$app->shop->shopUser->id;
             $shopFavoriteProduct->shop_product_id = $product->id;
-            $shopFavoriteProduct->cms_site_id = \Yii::$app->skeeks->site->id;
 
             $shopFavoriteProduct->save();
 
             $rr->data = [
-                'total' => \Yii::$app->shop->cart->getShopFavoriteProducts()->count()
+                'total' => \Yii::$app->shop->shopUser->getShopFavoriteProducts()->count()
             ];
 
             return (array)$rr;
@@ -109,7 +108,7 @@ class FavoriteController extends Controller
         if ($rr->isRequestAjaxPost()) {
             $product_id = \Yii::$app->request->post('product_id');
 
-            $shopFavoriteProduct = \Yii::$app->shop->cart->getShopFavoriteProducts()->where(['shop_product_id' => $product_id])->one();
+            $shopFavoriteProduct = \Yii::$app->shop->shopUser->getShopFavoriteProducts()->where(['shop_product_id' => $product_id])->one();
             if ($shopFavoriteProduct) {
                 if ($shopFavoriteProduct->delete()) {
                     $rr->success = true;
@@ -118,7 +117,7 @@ class FavoriteController extends Controller
             }
 
             $rr->data = [
-                'total' => \Yii::$app->shop->cart->getShopFavoriteProducts()->count()
+                'total' => \Yii::$app->shop->shopUser->getShopFavoriteProducts()->count()
             ];
 
             return (array)$rr;
