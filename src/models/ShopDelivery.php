@@ -70,7 +70,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
                 ],
                 'integer',
             ],
-            [['name', 'cms_site_id'], 'required'],
+            [['name'], 'required'],
             [['order_price_from', 'order_price_to', 'price'], 'number'],
             [['description', 'name'], 'string'],
             [['priority'], 'default', 'value' => 1],
