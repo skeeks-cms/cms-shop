@@ -66,17 +66,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Elements');
-
-        AdminShopProductAsset::register(\Yii::$app->view);
-        $data = [];
-        $json = Json::encode($data);
-        \Yii::$app->view->registerJs(<<<JS
-                sx.ProductList = new sx.classes.ProductList({$json});
-JS
-        );
-
         parent::init();
     }
+    
     /**
      * @inheritdoc
      */
@@ -1418,6 +1410,14 @@ CSS
                 $this->name = $this->content->name_meny;
             }
         }
+        
+        AdminShopProductAsset::register(\Yii::$app->view);
+        $data = [];
+        $json = Json::encode($data);
+        \Yii::$app->view->registerJs(<<<JS
+                sx.ProductList = new sx.classes.ProductList({$json});
+JS
+        );
 
         return parent::beforeAction($action);
     }
