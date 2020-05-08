@@ -12,7 +12,6 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\ViewBackendAction;
@@ -34,6 +33,7 @@ use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
+use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\yii2\form\fields\BoolField;
@@ -43,7 +43,6 @@ use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
-use yii\bootstrap\Alert;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Expression;
@@ -67,6 +66,15 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Elements');
+
+        AdminShopProductAsset::register(\Yii::$app->view);
+        $data = [];
+        $json = Json::encode($data);
+        \Yii::$app->view->registerJs(<<<JS
+                sx.ProductList = new sx.classes.ProductList({$json});
+JS
+        );
+
         parent::init();
     }
     /**
@@ -85,27 +93,14 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],*/
 
 
-                "index" => [
-                    'on beforeRender' => function(ViewRenderEvent $event) {
-                        $event->content = '';
-
-                        AdminShopProductAsset::register(\Yii::$app->view);
-                        $data = [];
-                        $json = Json::encode($data);
-                    \Yii::$app->view->registerJs(<<<JS
-                sx.ProductList = new sx.classes.ProductList({$json});
-JS
-                    );
-                    }  
-                ],
-
                 "offers" => [
-                    'class'           => BackendGridModelRelatedAction::class,
-                    'name'            => "Предложения",
-                    'icon'            => 'fa fa-list',
-                    'controllerRoute' => "/shop/admin-cms-content-element",
-                    'priority'        => 150,
-                    'on gridInit'     => function ($e) {
+                    'class'                  => BackendGridModelRelatedAction::class,
+                    'name'                   => "Предложения",
+                    'icon'                   => 'fa fa-list',
+                    'controllerRoute'        => "/shop/admin-cms-content-element",
+                    'priority'               => 150,
+                    'isStandartBeforeRender' => false,
+                    'on gridInit'            => function ($e) {
                         /**
                          * @var $action BackendGridModelRelatedAction
                          */
@@ -122,6 +117,7 @@ JS
                             $query->andWhere(['sp.offers_pid' => $this->model->id]);
                         };
 
+
                         $action->relatedIndexAction->on('beforeRender', function (Event $event) use ($controller) {
 
                             if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
@@ -136,7 +132,7 @@ JS
                                     'parent_content_element_id' => $this->model->id,
                                 ]);
 
-                                //$createAction->name = "Добавить платеж";
+                                $createAction->name = "Добавить предложение";
 
                                 $event->content = ControllerActionsWidget::widget([
                                         'actions'         => [$createAction],
@@ -147,8 +143,12 @@ JS
                                     ])."<br>";
                             }
                         });
+                        $action->relatedIndexAction->on('afterRender', function (Event $event) {
+                            $event->content = '';
+                        });
 
-                        //$action->relatedIndexAction->backendShowings = false;
+                        $action->relatedIndexAction->backendShowings = false;
+                        $action->relatedIndexAction->filters = false;
                         $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
                         $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
@@ -180,6 +180,110 @@ JS
                     },
                 ],
 
+                "relations" => [
+                    'class'                  => BackendModelAction::class,
+                    'name'                   => "Связанные товары",
+                    'icon'                   => 'fa fa-list',
+                    'priority'               => 190,
+                ],
+                /*"relations" => [
+                    'class'                  => BackendGridModelRelatedAction::class,
+                    'name'                   => "Связанные товары",
+                    'icon'                   => 'fa fa-list',
+                    'controllerRoute'        => "/shop/admin-cms-content-element",
+                    'priority'               => 190,
+                    'isStandartBeforeRender' => false,
+                    'on gridInit'            => function ($e) {
+                        /**
+                         * @var $action BackendGridModelRelatedAction
+                        $action = $e->sender;
+                        $model = $action->model;
+                        $controller = $action->relatedIndexAction->controller;
+                        $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction, $action->relatedIndexAction->controller->content);
+
+                        if ($product_ids = \Yii::$app->request->post("product_ids")) {
+                            if ($product_ids) {
+                                foreach ($product_ids as $product_id) {
+                                    if ($product_id) {
+                                        $shopProductRelation = new ShopProductRelation();
+                                        $shopProductRelation->shop_product1_id = $model->id;
+                                        $shopProductRelation->shop_product2_id = $product_id;
+                                        if (!$shopProductRelation->save()) {
+                                            print_r($shopProductRelation->errors);
+                                            die;
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+
+                        $action->relatedIndexAction->grid['on init'] = function (Event $event) use ($model) {
+                            /**
+                             * @var $query ActiveQuery
+                            $query = $event->sender->dataProvider->query;
+                            if ($this->content) {
+                                $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
+                            }
+
+                            $query->joinWith('shopProduct as sp');
+
+                            $query->joinWith("shopProduct.shopProductRelations1 as shopProductRelations1")
+                                ->joinWith("shopProduct.shopProductRelations2 as shopProductRelations2")
+                                ->andWhere([
+                                    '!=', 'sp.id', $model->id
+                                ])
+                                ->andWhere([
+                                    'or',
+                                    ["shopProductRelations1.shop_product1_id" => $model->id],
+                                    ["shopProductRelations1.shop_product2_id" => $model->id],
+                                    ["shopProductRelations2.shop_product1_id" => $model->id],
+                                    ["shopProductRelations2.shop_product2_id" => $model->id],
+                                ]);
+
+                            $site_id = \Yii::$app->skeeks->site->id;
+                            $query->andWhere(['cms_site_id' => $site_id]);
+
+                            if (\Yii::$app->skeeks->site->shopTypePrices) {
+                                foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
+                                    $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
+                                        "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
+                                        "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
+                                    ]);
+                                }
+                            }
+
+                            $query->andWhere([
+                                'in',
+                                'sp.product_type',
+                                [
+                                    ShopProduct::TYPE_SIMPLE,
+                                    ShopProduct::TYPE_OFFERS,
+                                ],
+                            ]);
+                        };
+
+                        $action->relatedIndexAction->on('beforeRender', function (ViewRenderEvent $e) use ($controller, $model) {
+                            $e->content = \Yii::$app->view->render("@skeeks/cms/shop/views/admin-cms-content-element/relations", [
+                                'model' => $model,
+                            ]);
+                        });
+
+                        $action->relatedIndexAction->on('afterRender', function (Event $event) {
+                            $event->content = '';
+                        });
+
+                        $action->relatedIndexAction->backendShowings = false;
+                        $action->relatedIndexAction->filters = false;
+
+                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+                        ArrayHelper::removeValue($visibleColumns, 'checkbox');
+                        ArrayHelper::removeValue($visibleColumns, 'actions');
+                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                    },
+                ],*/
 
                 "connect-to-main" => [
                     /*'on afterRender' => function(ViewRenderEvent $viewRenderEvent) {
@@ -514,9 +618,9 @@ HTML
 
                 "update-data" => [
                     'class' => ViewBackendAction::class,
-                    'icon' => 'fas fa-sync',
-                    'name' => 'Обновление данных',
-                ]
+                    'icon'  => 'fas fa-sync',
+                    'name'  => 'Обновление данных',
+                ],
 
             ]
         );
@@ -895,10 +999,21 @@ HTML
 
             $query->joinWith('shopProduct as sp');
 
+            $site_id = \Yii::$app->skeeks->site->id;
+            $query->andWhere(['cms_site_id' => $site_id]);
+
+            if (\Yii::$app->skeeks->site->shopTypePrices) {
+                foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
+                    $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
+                        "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
+                        "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
+                    ]);
+                }
+            }
+
             $urlHelper = new BackendUrlHelper();
             $urlHelper->setBackendParamsByCurrentRequest();
 
-            $site_id = \Yii::$app->skeeks->site->id;
             if ($urlHelper->getBackenParam("sx-to-main")) {
 
                 $site = CmsSite::find()->where(['is_default' => 1])->one();
@@ -923,17 +1038,6 @@ HTML
             }
 
 
-            $query->andWhere(['cms_site_id' => $site_id]);
-
-
-            if (\Yii::$app->skeeks->site->shopTypePrices) {
-                foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
-                    $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
-                        "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
-                        "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
-                    ]);
-                }
-            }
         };
     }
     /**
@@ -1376,10 +1480,57 @@ CSS
             \Yii::$app->shop->updateAllTypes();
         } catch (\Exception $e) {
             $rr->success = false;
-            $rr->message = "Ошибка загрузки данных: " . $e->getMessage();
+            $rr->message = "Ошибка загрузки данных: ".$e->getMessage();
         }
 
         return $rr;
 
+    }
+
+    /**
+     * @return RequestResponse
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionRelationsDettach()
+    {
+        $rr = new RequestResponse();
+        if ($rr->isRequestAjaxPost()) {
+            $product1_id = \Yii::$app->request->post('product1_id');
+            $product2_id = \Yii::$app->request->post('product2_id');
+
+            if ($product1_id && $product2_id) {
+                $relation = ShopProductRelation::find()
+                    ->where([
+                        'shop_product1_id' => $product1_id
+                    ])
+                    ->andWhere([
+                        'shop_product2_id' => $product2_id
+                    ])
+                    ->one()
+                ;
+
+                if ($relation) {
+                    $relation->delete();
+                }
+
+                $relation = ShopProductRelation::find()
+                    ->where([
+                        'shop_product2_id' => $product1_id
+                    ])
+                    ->andWhere([
+                        'shop_product1_id' => $product2_id
+                    ])
+                    ->one()
+                ;
+
+                if ($relation) {
+                    $relation->delete();
+                }
+            }
+
+        }
+
+        return $rr;
     }
 }

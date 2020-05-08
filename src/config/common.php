@@ -93,6 +93,8 @@ return [
                                 "shop/admin-person-type",
                                 "shop/admin-person-type-property",
                                 "shop/admin-person-type-property-enum",
+                                
+                                "shop/admin-shop-product-relation",
                             ],
                         ],
                     ],

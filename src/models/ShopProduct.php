@@ -929,4 +929,49 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return $this->cmsContentElement->asText;
     }
+
+
+    /**
+     * Gets query for [[ShopProductRelations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductRelations1()
+    {
+        return $this->hasMany(ShopProductRelation::className(), ['shop_product1_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopProductRelations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductRelations2()
+    {
+        return $this->hasMany(ShopProductRelation::className(), ['shop_product2_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopProductRelations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductRelations()
+    {
+        $q = self::find()
+            ->joinWith("shopProductRelations1 as shopProductRelations1")
+            ->joinWith("shopProductRelations2 as shopProductRelations2")
+            ->andWhere([
+                'or',
+                ["shopProductRelations1.shop_product1_id" => $this->id],
+                ["shopProductRelations1.shop_product2_id" => $this->id],
+                ["shopProductRelations2.shop_product1_id" => $this->id],
+                ["shopProductRelations2.shop_product2_id" => $this->id],
+            ])
+        ;
+
+        $q->multiple = true;
+
+        return $q;
+    }
 }
