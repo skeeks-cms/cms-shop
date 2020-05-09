@@ -926,39 +926,106 @@ HTML
         ];
 
 
-        $filterFields['is_ready'] = [
-            'class'    => SelectField::class,
-            'items'    => [
-                'on'  => 'Готов',
-                'off' => 'Не привязан',
-            ],
-            'label'    => 'Привязка',
-            'multiple' => false,
-            'on apply' => function (QueryFiltersEvent $e) {
-                /**
-                 * @var $query ActiveQuery
-                 */
-                $query = $e->dataProvider->query;
-                $query->joinWith('shopProduct as sp');
+        //Только для сайта поставщика
+        if (\Yii::$app->skeeks->site->shopSite->is_supplier || \Yii::$app->skeeks->site->shopSite->is_receiver) {
+            $filterFields['is_ready'] = [
+                'class'    => SelectField::class,
+                'items'    => [
+                    'on'  => 'Готов',
+                    'off' => 'Не привязан',
+                ],
+                'label'    => 'Привязка',
+                'multiple' => false,
+                'on apply' => function (QueryFiltersEvent $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+                    $query->joinWith('shopProduct as sp');
 
-                if ($e->field->value) {
-                    if ($e->field->value == 'on') {
-                        $query->andWhere(['is not', 'sp.main_pid', null]);
-                    } else {
-                        $query->andWhere(['sp.main_pid' => null]);
+                    if ($e->field->value) {
+                        if ($e->field->value == 'on') {
+                            $query->andWhere(['is not', 'sp.main_pid', null]);
+                        } else {
+                            $query->andWhere(['sp.main_pid' => null]);
+                        }
+
                     }
+                },
+            ];
+            $filterFields['is_error'] = [
+                'class'    => SelectField::class,
+                'items'    => [
+                    'yes'  => 'Ошибочно привязан',
+                ],
+                'label'    => 'Ошибка привязки',
+                'multiple' => false,
+                'on apply' => function (QueryFiltersEvent $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
 
-                }
-            },
-        ];
+                    if ($e->field->value) {
+                        if ($e->field->value == 'yes') {
+                            $query->joinWith('shopProduct.shopMainProduct as shopMainProduct');
+                            $query->andWhere(['shopMainProduct.product_type' => ShopProduct::TYPE_OFFERS]);
+                            $query->groupBy(ShopCmsContentElement::tableName() . ".id");
+                        }
+
+                    }
+                },
+            ];
+
+            $filterFieldsLabels['is_ready'] = 'Привязка';
+            $filterFieldsRules[] = ['is_ready', 'safe'];
+
+            $filterFieldsLabels['is_error'] = 'Ошибочно привязан';
+            $filterFieldsRules[] = ['is_error', 'safe'];
+        }
+
+        if (\Yii::$app->skeeks->site->is_default) {
+            $filterFields['is_suppliers'] = [
+                'class'    => SelectField::class,
+                'items'    => [
+                    'yes'  => 'Да',
+                    'no'  => 'Нет'
+                ],
+                'label'    => 'Привязаны поставщики?',
+                'multiple' => false,
+                'on apply' => function (QueryFiltersEvent $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if ($e->field->value) {
+                        if ($e->field->value == 'no') {
+                            $query->joinWith('shopProduct.shopAttachedProducts as shopAttachedProducts');
+                            $query->andWhere(['shopAttachedProducts.id' => null]);
+                            $query->groupBy(ShopCmsContentElement::tableName() . ".id");
+                        } elseif ($e->field->value == 'yes') {
+                            $query->joinWith('shopProduct.shopAttachedProducts as shopAttachedProducts');
+                            $query->andWhere(['is not', 'shopAttachedProducts.id', null]);
+                            $query->groupBy(ShopCmsContentElement::tableName() . ".id");
+                        }
+
+                    }
+                },
+            ];
+
+            $filterFieldsLabels['is_suppliers'] = 'Привязаны поставщики?';
+            $filterFieldsRules[] = ['is_suppliers', 'safe'];
+        }
+
 
         $filterFieldsLabels['shop_product_type'] = 'Тип товара';
-        $filterFieldsLabels['is_ready'] = 'Связь с главным товаром';
+
         $filterFieldsLabels['shop_quantity'] = 'Количество';
         $filterFieldsLabels['all_ids'] = 'ID + вложенные';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика';
 
-        $filterFieldsRules[] = ['is_ready', 'safe'];
+
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
