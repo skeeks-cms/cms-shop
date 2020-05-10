@@ -177,6 +177,29 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     'name'                   => "Связанные товары",
                     'icon'                   => 'fa fa-list',
                     'priority'               => 190,
+                    
+                    'accessCallback' => function (BackendModelAction $action) {
+
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
+                        $model = $action->model;
+
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        if ($model->shopProduct->offers_pid) {
+                            return false;
+                        }
+                        
+                        return true;
+                        
+                    },
                 ],
                 /*"relations" => [
                     'class'                  => BackendGridModelRelatedAction::class,
@@ -613,6 +636,30 @@ HTML
                     'icon'  => 'fas fa-sync',
                     'name'  => 'Обновление данных',
                 ],
+
+                "update" => [
+                    'accessCallback' => function (BackendModelAction $action) {
+
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
+                        $model = $action->model;
+
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        if ($model->shopProduct->main_pid) {
+                            return false;
+                        }
+                        
+                        return true;
+                    },
+                ]
 
             ]
         );

@@ -18,7 +18,6 @@ use yii\helpers\ArrayHelper;
  * @property string             $description
  * @property int                $cms_image_id
  * @property bool               $is_active
- * @property bool               $shop_supplier_id
  * @property string|null        $external_id
  * @property integer|null       $cms_site_id
  *
@@ -49,17 +48,14 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
             [['name'], 'string', 'max' => 255],
             [['name'], 'required'],
-            [['name', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['name', 'shop_supplier_id']],
 
             [['description'], 'string'],
 
             [['is_active'], 'integer'],
 
             [['cms_image_id'], 'safe'],
-            [['shop_supplier_id'], 'integer'],
 
             [['external_id'], 'default', 'value' => null],
-            //[['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],
             [['external_id'], 'string'],
 
 
@@ -83,6 +79,8 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
                     return (bool)$model->external_id;
                 },
             ],
+            
+            [['name', 'cms_site_id'], 'unique', 'targetAttribute' => ['name', 'cms_site_id']],
 
         ]);
     }
@@ -97,7 +95,6 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'name'             => "Название",
             'description'      => "Описание",
             'cms_image_id'     => "Изображение",
-            'shop_supplier_id' => "Поставщик",
             'is_active'        => "Активность",
             'external_id'      => "ID из внешней системы",
         ]);
