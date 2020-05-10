@@ -9,16 +9,17 @@
 namespace skeeks\cms\shop\models;
 
 /**
- * @property ShopDelivery[]        $shopDeliveries
- * @property ShopFavoriteProduct[] $shopFavoriteProducts
- * @property ShopImportCmsSite[]   $shopImportCmsSites
- * @property ShopImportCmsSite[]   $senderShopImportCmsSites
- * @property ShopOrder[]           $shopOrders
- * @property ShopPaySystem[]       $shopPaySystems
- * @property ShopPersonTypeSite[]  $shopPersonTypeSites
- * @property ShopSite              $shopSite
- * @property ShopStore[]           $shopStores
- * @property ShopTypePrice[]       $shopTypePrices
+ * @property ShopDelivery[]         $shopDeliveries
+ * @property ShopFavoriteProduct[]  $shopFavoriteProducts
+ * @property ShopImportCmsSite[]    $shopImportCmsSites
+ * @property ShopImportCmsSite[]    $senderShopImportCmsSites
+ * @property ShopOrder[]            $shopOrders
+ * @property ShopPaySystem[]        $shopPaySystems
+ * @property ShopPersonTypeSite[]   $shopPersonTypeSites
+ * @property ShopSite               $shopSite
+ * @property ShopStore[]            $shopStores
+ * @property ShopTypePrice[]        $shopTypePrices
+ * @property ShopSupplierProperty[] $shopSupplierProperties
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -122,5 +123,15 @@ class CmsSite extends \skeeks\cms\models\CmsSite
     public function getShopTypePrices()
     {
         return $this->hasMany(ShopTypePrice::className(), ['cms_site_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopTypePrices]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplierProperties()
+    {
+        return $this->hasMany(ShopSupplierProperty::className(), ['cms_site_id' => 'id']);
     }
 }

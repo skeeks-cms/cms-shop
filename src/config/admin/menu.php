@@ -337,6 +337,12 @@ return [
                             "url"   => ["shop/admin-delivery"],
                             "icon"  => "fas fa-truck",
                         ],
+                        
+                        [
+                            "label" => \Yii::t('skeeks/shop/app', 'Свойства поставщика'),
+                            "url"   => ["shop/admin-shop-supplier-property"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
+                        ],
 
 
                         [

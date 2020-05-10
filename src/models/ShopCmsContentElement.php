@@ -81,10 +81,10 @@ class ShopCmsContentElement extends CmsContentElement
             $this->parentContentElement->shopProduct->save();
         }
     }
-    
+
     /**
-     * @deprecated 
      * @return \yii\db\ActiveQuery
+     * @deprecated
      */
     public function getTradeOffers()
     {
@@ -207,8 +207,7 @@ class ShopCmsContentElement extends CmsContentElement
         //Если это предложение, то надо в заголовок добавить ключевые свойства.
         if ($this->shopProduct && $this->shopProduct->isOfferProduct) {
             if (\Yii::$app->shop->offers_properties) {
-                foreach (\Yii::$app->shop->offers_properties as $propertyCode)
-                {
+                foreach (\Yii::$app->shop->offers_properties as $propertyCode) {
                     if ($value = $this->relatedPropertiesModel->getAttribute($propertyCode)) {
                         $result[] = $this->relatedPropertiesModel->getAttributeAsText($propertyCode);
                     }
@@ -217,42 +216,41 @@ class ShopCmsContentElement extends CmsContentElement
         }
 
         if ($result) {
-            $text .= " [" . implode(", ", $result) . "]";
+            $text .= " [".implode(", ", $result)."]";
         }
 
         return $text;
     }
 
 
-
     public function loadDataToMainModel(ShopCmsContentElement $model)
     {
         $model->name = $this->name;
 
-        return $this;
-        if ($this->shopProduct && $this->shopProduct->supplier_external_jsondata && $this->shopProduct->shopSupplier) {
-            foreach ($this->shopProduct->supplier_external_jsondata as $key => $value)
-            {
+        if ($this->shopProduct && $this->shopProduct->supplier_external_jsondata) {
+
+
+            foreach ($this->shopProduct->supplier_external_jsondata as $key => $value) {
                 /**
                  * @var $property ShopSupplierProperty
                  * @var $option ShopSupplierPropertyOption
                  */
-                if ($property = $this->shopProduct->shopSupplier->getShopSupplierProperties()->andWhere(['external_code' => $key])->one()) {
+                if ($property = $this->shopProduct->cmsContentElement->cmsSite
+                    ->getShopSupplierProperties()->andWhere(['external_code' => $key])
+                    ->one()) {
                     if ($property->cmsContentProperty) {
                         $code = $property->cmsContentProperty->code;
                         if (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_LIST])) {
                             if ($property->import_delimetr) {
                                 $value = explode($property->import_delimetr, $value);
-                                foreach ($value as $k => $v)
-                                {
+                                foreach ($value as $k => $v) {
                                     $value[$k] = trim($v);
                                 }
                             }
 
                             if (is_array($value)) {
                                 $data = [];
-                                foreach ($value as $k => $v)
-                                {
+                                foreach ($value as $k => $v) {
                                     if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $v])->one()) {
                                         if ($option->cms_tree_id) {
                                             $model->tree_id = $option->cms_tree_id;
@@ -260,20 +258,87 @@ class ShopCmsContentElement extends CmsContentElement
                                         $data[] = $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id;
                                     }
                                 }
-                                $model->relatedPropertiesModel->setAttribute($code, $data);
+                                //$model->relatedPropertiesModel->setAttribute($code, $data);
                             } else {
                                 if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $value])->one()) {
                                     if ($option->cms_tree_id) {
                                         $model->tree_id = $option->cms_tree_id;
                                     }
-                                    $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
+                                    //$model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
                                 }
                             }
                         } elseif (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_STRING, ShopSupplierProperty::PROPERTY_TYPE_NUMBER])) {
                             if (is_array($value)) {
 
                             } else {
-                                $model->relatedPropertiesModel->setAttribute($code, $value);
+                                //$model->relatedPropertiesModel->setAttribute($code, $value);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            //print_r($model->relatedPropertiesModel->toArray());
+            /*
+                        print_r(count($model->relatedProperties));
+                        print_r($model->relatedPropertiesModel->initAllProperties());
+                        print_r($model->relatedPropertiesModel->toArray());
+                        print_r($model->toArray());*/
+            ///die;
+
+            foreach ($this->shopProduct->supplier_external_jsondata as $key => $value) {
+                /**
+                 * @var $property ShopSupplierProperty
+                 * @var $option ShopSupplierPropertyOption
+                 */
+                if ($property = $this->shopProduct->cmsContentElement->cmsSite
+                    ->getShopSupplierProperties()->andWhere(['external_code' => $key])
+                    ->one()) {
+                    if ($property->cmsContentProperty) {
+                        $code = $property->cmsContentProperty->code;
+                        if (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_LIST])) {
+                            if ($property->import_delimetr) {
+                                $value = explode($property->import_delimetr, $value);
+                                foreach ($value as $k => $v) {
+                                    $value[$k] = trim($v);
+                                }
+                            }
+
+                            if (is_array($value)) {
+                                $data = [];
+                                foreach ($value as $k => $v) {
+                                    if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $v])->one()) {
+                                        if ($option->cms_tree_id) {
+                                            $model->tree_id = $option->cms_tree_id;
+                                        }
+                                        $data[] = $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id;
+                                    }
+                                }
+                                if ($model->relatedPropertiesModel->hasAttribute($code)) {
+                                    $model->relatedPropertiesModel->setAttribute($code, $data);
+                                }
+
+                            } else {
+                                if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $value])->one()) {
+                                    if ($option->cms_tree_id) {
+                                        $model->tree_id = $option->cms_tree_id;
+                                    }
+
+                                    if ($model->relatedPropertiesModel->hasAttribute($code)) {
+                                        $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
+                                    }
+
+
+                                }
+                            }
+                        } elseif (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_STRING, ShopSupplierProperty::PROPERTY_TYPE_NUMBER])) {
+                            if (is_array($value)) {
+
+                            } else {
+                                if ($model->relatedPropertiesModel->hasAttribute($code)) {
+                                    $model->relatedPropertiesModel->setAttribute($code, $value);
+                                }
                             }
                         }
                     }

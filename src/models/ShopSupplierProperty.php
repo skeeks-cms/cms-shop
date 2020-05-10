@@ -5,6 +5,7 @@
  * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
  */
+
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
@@ -14,23 +15,23 @@ use yii\helpers\ArrayHelper;
  *
  * This is the model class for table "shop_supplier_property".
  *
- * @property int $id
- * @property int $shop_supplier_id
- * @property string $external_code
- * @property string|null $name
- * @property string|null $property_type
- * @property int $is_visible
- * @property int $priority
- * @property int|null $cms_content_property_id
- * @property string|null $import_delimetr
- * @property string|null $import_replace
- * @property number|null $import_miltiple
+ * @property int                          $id
+ * @property int                          $cms_site_id
+ * @property string                       $external_code
+ * @property string|null                  $name
+ * @property string|null                  $property_type
+ * @property int                          $is_visible
+ * @property int                          $priority
+ * @property int|null                     $cms_content_property_id
+ * @property string|null                  $import_delimetr
+ * @property string|null                  $import_replace
+ * @property number|null                  $import_miltiple
  *
- * @property CmsContentProperty $cmsContentProperty
- * @property ShopSupplier $shopSupplier
+ * @property CmsContentProperty           $cmsContentProperty
+ * @property CmsSite                      $cmsSite
  * @property ShopSupplierPropertyOption[] $shopSupplierPropertyOptions
- * 
- * @property string $propertyTypeAsText
+ *
+ * @property string                       $propertyTypeAsText
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -40,7 +41,7 @@ class ShopSupplierProperty extends ActiveRecord
     const PROPERTY_TYPE_LIST = "list";
     const PROPERTY_TYPE_NUMBER = "number";
     const PROPERTY_TYPE_ARRAY = "array";
-    
+
     /**
      * @inheritdoc
      */
@@ -55,10 +56,10 @@ class ShopSupplierProperty extends ActiveRecord
     static public function getPopertyTypeOptions()
     {
         return [
-            self::PROPERTY_TYPE_LIST => 'Список',
+            self::PROPERTY_TYPE_LIST   => 'Список',
             self::PROPERTY_TYPE_STRING => 'Строка',
             self::PROPERTY_TYPE_NUMBER => 'Число',
-            self::PROPERTY_TYPE_ARRAY => 'Массив',
+            self::PROPERTY_TYPE_ARRAY  => 'Массив',
         ];
     }
 
@@ -67,28 +68,45 @@ class ShopSupplierProperty extends ActiveRecord
      */
     public function getPropertyTypeAsText()
     {
-        return (string) ArrayHelper::getValue(self::getPopertyTypeOptions(), $this->property_type);
+        return (string)ArrayHelper::getValue(self::getPopertyTypeOptions(), $this->property_type);
     }
-    
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-             [['shop_supplier_id', 'external_code'], 'required'],
-             [['priority'], 'integer'],
-             [['external_code'], 'trim'],
-             [['property_type'], 'string'],
-             [['import_delimetr'], 'string'],
-             [['import_replace'], 'string'],
-             [['import_miltiple'], 'integer'],
-             [['property_type'], 'in', 'range' => array_keys(self::getPopertyTypeOptions())],
-            [['shop_supplier_id', 'is_visible', 'cms_content_property_id'], 'integer'],
+            [['external_code'], 'required'],
+            [['priority'], 'integer'],
+            [['external_code'], 'trim'],
+            [['property_type'], 'string'],
+            [['import_delimetr'], 'string'],
+            [['import_replace'], 'string'],
+            [['import_miltiple'], 'integer'],
+            [['property_type'], 'in', 'range' => array_keys(self::getPopertyTypeOptions())],
+            [['cms_site_id', 'is_visible', 'cms_content_property_id'], 'integer'],
             [['external_code', 'name'], 'string', 'max' => 255],
-            [['shop_supplier_id', 'external_code'], 'unique', 'targetAttribute' => ['shop_supplier_id', 'external_code']],
             [['cms_content_property_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentProperty::className(), 'targetAttribute' => ['cms_content_property_id' => 'id']],
-            [['shop_supplier_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopSupplier::className(), 'targetAttribute' => ['shop_supplier_id' => 'id']],
+
+            [
+                ['cms_site_id', 'external_code'],
+                'unique',
+                'targetAttribute' => ['cms_site_id', 'external_code'],
+                'when'            => function (self $model) {
+                    return (bool)$model->external_code;
+                },
+            ],
+
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                },
+            ],
         ]);
     }
 
@@ -98,17 +116,16 @@ class ShopSupplierProperty extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id' => 'ID',
-            'shop_supplier_id' => 'Поставщик',
-            'external_code' => 'Код свойства',
-            'name' => 'Название',
-            'is_visible' => 'Видимость',
+            'id'                      => 'ID',
+            'external_code'           => 'Код свойства',
+            'name'                    => 'Название',
+            'is_visible'              => 'Видимость',
             'cms_content_property_id' => 'Свойство товара в cms',
-            'priority' => 'Сортировка',
-            'property_type' => 'Тип свойства',
+            'priority'                => 'Сортировка',
+            'property_type'           => 'Тип свойства',
 
             'import_delimetr' => 'Разделители',
-            'import_replace' => 'Символы для замены',
+            'import_replace'  => 'Символы для замены',
             'import_miltiple' => 'Умножить на',
         ]);
     }
@@ -128,9 +145,9 @@ class ShopSupplierProperty extends ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getShopSupplier()
+    public function getCmsSite()
     {
-        return $this->hasOne(ShopSupplier::className(), ['id' => 'shop_supplier_id']);
+        return $this->hasOne(CmsSite::className(), ['id' => 'cms_site_id']);
     }
 
     /**

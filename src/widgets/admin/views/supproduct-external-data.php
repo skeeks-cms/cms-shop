@@ -8,11 +8,9 @@
 /* @var $this yii\web\View */
 /* @var $widget \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget */
 /* @var $supplierProperties \skeeks\cms\shop\models\ShopSupplierProperty[] */
-return false;
 
 $data = $widget->shopProduct->supplier_external_jsondata;
-$shopSupplier = $widget->shopProduct->shopSupplier;
-$supplierProperties = $shopSupplier->getShopSupplierProperties()->andWhere(['is_visible' => 1])->andWhere(['in', 'external_code', array_keys($data)])->all();
+$supplierProperties = \Yii::$app->skeeks->site->getShopSupplierProperties()->andWhere(['is_visible' => 1])->andWhere(['in', 'external_code', array_keys($data)])->all();
 $this->registerCss(<<<CSS
 .sx-supplier-properies-hidden {
 display: none;

@@ -126,6 +126,16 @@ return [
                         ],
                     ]
                 ],
+                'permissions' => [
+                    [
+                        'name' => 'shop/admin-shop-import-cms-site',
+                        'description' => ['skeeks/cms', 'Поставщики'],
+                    ],
+                    [
+                        'name' => 'shop/admin-delivery',
+                        'description' => ['skeeks/cms', 'Поставщики'],
+                    ]
+                ]
             ],
         ],
         
