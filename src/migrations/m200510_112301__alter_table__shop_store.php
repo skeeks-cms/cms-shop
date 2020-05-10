@@ -15,9 +15,9 @@ class m200510_112301__alter_table__shop_store extends Migration
         $tableName = "shop_store";
 
         $this->dropForeignKey("shop_store__shop_supplier_id", $tableName);
-        $this->dropColumn($tableName, "shop_supplier_id");
         $this->dropIndex("shop_store__name_supplier", $tableName);
         $this->dropIndex("shop_store__external_id", $tableName);
+        $this->dropColumn($tableName, "shop_supplier_id");
         $this->createIndex("shop_store__name_supplier", $tableName, ['cms_site_id', 'name'], true);
     }
 
