@@ -42,7 +42,7 @@ INSERT IGNORE
                             cms_tree as inner_new_tree
                         WHERE
                             inner_new_tree.cms_site_id = @site_id
-                    ) as new_tree ON new_tree.external_id = source_tree.id
+                    ) as new_tree ON new_tree.main_cms_tree_id = source_tree.id
                 WHERE
 
                     /*Импорт только элементов заданных в настройках сайта*/
@@ -91,7 +91,7 @@ INSERT IGNORE
                                 cms_tree as inner_new_tree
                             WHERE
                                 inner_new_tree.cms_site_id = @site_id
-                        ) as new_tree ON new_tree.external_id = source_tree.id
+                        ) as new_tree ON new_tree.main_cms_tree_id = source_tree.id
                     WHERE
 
                         /*Импорт только элементов заданных в настройках сайта*/
@@ -231,7 +231,9 @@ WHERE
 
 
 
-
+/**
+ * Создание недостающих цен
+ */
 INSERT IGNORE
     INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
 SELECT

@@ -247,6 +247,7 @@ HTML
         try {
             ShopComponent::importNewProductsOnSite();
         } catch (\Exception $e) {
+            throw $e;
             $rr->success = false;
             $rr->message = "Ошибка загрузки данных: " . $e->getMessage();
         }

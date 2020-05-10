@@ -718,13 +718,137 @@ SQL
 SQL
         )->execute();
 
+
+
+        /*SELECT
+	offers_cce.tree_id,
+    cce.tree_id,
+    cce.*
+
+FROM
+	`cms_content_element` as cce
+	INNER JOIN (
+
+		SELECT
+			inner_sp.id as inner_sp_id,
+        inner_sp.offers_pid,
+        inner_sp.product_type
+		FROM
+			shop_product inner_sp
+		WHERE
+			inner_sp.offers_pid is not null
+		GROUP BY
+			inner_sp.id
+	) sp_has_parent ON cce.id = sp_has_parent.inner_sp_id
+	LEFT JOIN shop_product as offers_sp on offers_sp.id = sp_has_parent.offers_pid
+	LEFT JOIN cms_content_element as offers_cce on offers_cce.id = offers_sp.id
+
+    WHERE offers_cce.tree_id != cce.tree_id
+    */
+        //У товаров предложений раздел должнен совпадать с родительским
+        $result = \Yii::$app->db->createCommand(<<<SQL
+            UPDATE 
+                `cms_content_element` as cce 
+                INNER JOIN
+                (
+                    /*Товары которые являются предложениями */
+                   SELECT 
+                       inner_sp.id as inner_sp_id,
+                        inner_sp.offers_pid,
+                        inner_sp.product_type
+                   FROM shop_product inner_sp
+                   WHERE inner_sp.offers_pid is not null
+                   GROUP BY inner_sp.id
+                ) sp_has_parent ON cce.id = sp_has_parent.inner_sp_id
+                LEFT JOIN shop_product as offers_sp on offers_sp.id = sp_has_parent.offers_pid
+                LEFT JOIN cms_content_element as offers_cce on offers_cce.id = offers_sp.id
+            SET 
+                cce.`tree_id` = offers_cce.tree_id
+SQL
+        )->execute();
+
         return $this;
     }
 
     /**
+     * Обновление цен у товаров с пердложениями
      * @return $this
      * @throws \yii\db\Exception
      */
+    public function updateOffersPrice() {
+        /**
+         * Вставка недостающих цен для общих товаров и их обновление
+         */
+        \Yii::$app->db->createCommand(<<<SQL
+/*Создание недостающих цен у товаров с пердложениями*/
+INSERT IGNORE
+    INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
+select
+	/*sp.offers_pid,
+    sp_price.type_price_id,
+    min(sp_price.price) as min_price,
+    sp_price.**/
+
+    UNIX_TIMESTAMP(),
+    UNIX_TIMESTAMP(),
+    sp.offers_pid,
+    sp_price.type_price_id,
+    min(sp_price.price) as min_price,
+    sp_price.currency_code
+from
+	shop_product_price as sp_price
+	LEFT JOIN shop_product as sp on sp.id = sp_price.product_id
+	LEFT JOIN shop_product as sp_with_offers on sp_with_offers.id = sp.offers_pid
+WHERE
+	sp.offers_pid is not null
+GROUP BY
+	sp.offers_pid,
+	sp_price.type_price_id
+ORDER BY `sp`.`offers_pid`  DESC
+SQL
+        )->execute();
+
+        \Yii::$app->db->createCommand(<<<SQL
+/*Обновление цены от у товаров с предложениями*/
+UPDATE
+	`shop_product_price` as price
+	INNER JOIN (
+		select
+
+			/*sp.offers_pid,
+						    sp_price.type_price_id,
+						    min(sp_price.price) as min_price,
+						    sp_price.**/
+			sp_with_offers_price.id as price_id,
+			sp.offers_pid as offers_pid,
+			sp_price.type_price_id,
+			min(sp_price.price) as min_price,
+			sp_price.currency_code
+		from
+			shop_product_price as sp_price
+			LEFT JOIN shop_product as sp on sp.id = sp_price.product_id
+			LEFT JOIN shop_product as sp_with_offers on sp_with_offers.id = sp.offers_pid
+			LEFT JOIN shop_product_price as sp_with_offers_price on sp_with_offers_price.product_id = sp_with_offers.id
+		WHERE
+			sp.offers_pid is not null
+			AND sp_with_offers_price.id is not null
+		GROUP BY
+			sp.offers_pid,
+			sp_price.type_price_id
+		ORDER BY
+			`sp`.`offers_pid` DESC
+	) sp_with_offers_price ON sp_with_offers_price.price_id = price.id
+SET
+	price.`price` = sp_with_offers_price.min_price,
+	price.`currency_code` = sp_with_offers_price.currency_code
+
+SQL
+        )->execute();
+        
+        return $this;
+    }
+    
+    
     public function updateAllQuantities()
     {
 
@@ -795,6 +919,8 @@ SQL
      */
     static public function importNewProductsOnSite(CmsSite $cmsSite = null)
     {
+        ini_set("memory_limit", "1024M");
+        
         if ($cmsSite === null) {
             $cmsSite = \Yii::$app->skeeks->site;
         }
@@ -838,6 +964,7 @@ SQL
                     /*Только товары которые привязаны к моделям*/
                     AND sp.main_pid is not null 
                     AND offers_tree.id is not null 
+                    AND sp_main_with_offers.product_type = "offers"
                 GROUP BY 
                     offers_tree.id 
                 UNION ALL 
@@ -865,6 +992,7 @@ SQL
                     ) 
                     /*Только товары которые привязаны к моделям*/
                     AND sp.main_pid is not null 
+                    AND tree.id is not null 
                     AND sp_main.product_type = 'simple'
                 GROUP BY 
                     tree.id
@@ -879,10 +1007,13 @@ SQL
                 $source = CmsTree::find()->where(['id' => $row['id']])->one();
                 $parent = $cmsSite->shopSite->catalogCmsTree;
 
-                if (!$parent->getChildren()->andWhere(['external_id' => $source->id])->exists()) {
+                if (!CmsTree::find()
+                    ->andWhere(['cms_site_id' => $cmsSite->id])
+                    ->andWhere(['main_cms_tree_id' => $source->id])
+                    ->exists()) {
                     $tree = new CmsTree();
                     $tree->name = $source->name;
-                    $tree->external_id = (string)$source->id;
+                    $tree->main_cms_tree_id = $source->id;
 
                     if (!$tree->appendTo($parent)->save()) {
                         throw new Exception("Раздел не создан: ".print_r($tree->errors, true));
@@ -903,75 +1034,7 @@ SQL
 
         \Yii::$app->db->createCommand($sql)->execute();
 
-
-        /**
-         * Вставка недостающих цен для общих товаров и их обновление
-         */
-        \Yii::$app->db->createCommand(<<<SQL
-/*Создание недостающих цен у товаров с пердложениями*/
-INSERT IGNORE
-    INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
-select
-	/*sp.offers_pid,
-    sp_price.type_price_id,
-    min(sp_price.price) as min_price,
-    sp_price.**/
-
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
-    sp.offers_pid,
-    sp_price.type_price_id,
-    min(sp_price.price) as min_price,
-    sp_price.currency_code
-from
-	shop_product_price as sp_price
-	LEFT JOIN shop_product as sp on sp.id = sp_price.product_id
-	LEFT JOIN shop_product as sp_with_offers on sp_with_offers.id = sp.offers_pid
-WHERE
-	sp.offers_pid is not null
-GROUP BY
-	sp.offers_pid,
-	sp_price.type_price_id
-ORDER BY `sp`.`offers_pid`  DESC
-SQL
-        )->execute();
-
-        \Yii::$app->db->createCommand(<<<SQL
-/*Обновление цены от у товаров с предложениями*/
-UPDATE
-	`shop_product_price` as price
-	INNER JOIN (
-		select
-
-			/*sp.offers_pid,
-						    sp_price.type_price_id,
-						    min(sp_price.price) as min_price,
-						    sp_price.**/
-			sp_with_offers_price.id as price_id,
-			sp.offers_pid as offers_pid,
-			sp_price.type_price_id,
-			min(sp_price.price) as min_price,
-			sp_price.currency_code
-		from
-			shop_product_price as sp_price
-			LEFT JOIN shop_product as sp on sp.id = sp_price.product_id
-			LEFT JOIN shop_product as sp_with_offers on sp_with_offers.id = sp.offers_pid
-			LEFT JOIN shop_product_price as sp_with_offers_price on sp_with_offers_price.product_id = sp_with_offers.id
-		WHERE
-			sp.offers_pid is not null
-			AND sp_with_offers_price.id is not null
-		GROUP BY
-			sp.offers_pid,
-			sp_price.type_price_id
-		ORDER BY
-			`sp`.`offers_pid` DESC
-	) sp_with_offers_price ON sp_with_offers_price.price_id = price.id
-SET
-	price.`price` = sp_with_offers_price.min_price,
-	price.`currency_code` = sp_with_offers_price.currency_code
-
-SQL
-        )->execute();
+        \Yii::$app->shop->updateOffersPrice();
 
 
     }
