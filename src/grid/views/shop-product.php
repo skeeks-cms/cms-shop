@@ -135,9 +135,13 @@ $shopSellerProducts = [];
             'sender_cms_site_id',
         ])->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
 
-        $shopSupplierProducts = $model->shopProduct->shopMainProduct->getShopSupplierProducts()
-            ->andWhere(['cmsSite.id' => $q])
-            ->all();
+        $shopSupplierProducts = [];
+        if ($model->shopProduct->shopMainProduct) {
+            $shopSupplierProducts = $model->shopProduct->shopMainProduct->getShopSupplierProducts()
+                ->andWhere(['cmsSite.id' => $q])
+                ->all();
+        }
+        
 
         if ($shopSupplierProducts) : ?>
             <a href="#" class="sx-supplier-trigger" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= count($shopSupplierProducts); ?>)</a>

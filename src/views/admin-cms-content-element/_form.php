@@ -277,23 +277,30 @@ CSS
                     </a>
                 </h5>
             </div>
-            <? if ($shopSubproductContentElement->shopProduct->shopSupplier) : ?>
+        
+            <? if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : ?>
+                <hr/>
                 <div class="sx-info-block">
-                    <p><span>Поставщик:</span> <b><?= $shopSubproductContentElement->shopProduct->shopSupplier->asText; ?></b></p>
-                    <p><span>Артикул:</span> <b><?= $shopSubproductContentElement->shopProduct->supplier_external_id; ?></b></p>
+                    <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); ?>
+                </div>
+            <? endif; ?>
+        
+            <?/* if ($shopSubproductContentElement->shopProduct->shopSupplier) : */?><!--
+                <div class="sx-info-block">
+                    <p><span>Поставщик:</span> <b><?/*= $shopSubproductContentElement->shopProduct->shopSupplier->asText; */?></b></p>
+                    <p><span>Артикул:</span> <b><?/*= $shopSubproductContentElement->shopProduct->supplier_external_id; */?></b></p>
                 </div>
                 <div class="sx-info-block">
-                    <p><span>Количество:</span> <b><?= $shopSubproductContentElement->shopProduct->quantity; ?> <?= $shopSubproductContentElement->shopProduct->measure->symbol; ?></b></p>
+                    <p><span>Количество:</span> <b><?/*= $shopSubproductContentElement->shopProduct->quantity; */?> <?/*= $shopSubproductContentElement->shopProduct->measure->symbol; */?></b></p>
                 </div>
-                <? if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : ?>
+                <?/* if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : */?>
                     <hr/>
                     <div class="sx-info-block">
-                        <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); ?>
+                        <?/*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); */?>
                     </div>
-                <? endif; ?>
-            <? endif; ?>
+                <?/* endif; */?>
+            --><?/* endif; */?>
         <? endif; ?>
-
 
 
         <? if ($shopProduct->supplier_external_jsondata) : ?>
@@ -306,6 +313,6 @@ CSS
 
 
         <? if ($shopSubproductContentElement || $shopProduct->supplier_external_jsondata) : ?>
-    </div>
-<? endif; ?>
+            </div>
+        <? endif; ?>
 </div>

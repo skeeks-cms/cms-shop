@@ -229,6 +229,7 @@ class ShopCmsContentElement extends CmsContentElement
     {
         $model->name = $this->name;
 
+        return $this;
         if ($this->shopProduct && $this->shopProduct->supplier_external_jsondata && $this->shopProduct->shopSupplier) {
             foreach ($this->shopProduct->supplier_external_jsondata as $key => $value)
             {
