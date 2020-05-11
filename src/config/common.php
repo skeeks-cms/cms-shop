@@ -95,6 +95,8 @@ return [
                                 "shop/admin-person-type-property-enum",
                                 
                                 "shop/admin-shop-product-relation",
+                                
+                                "shop/admin-cms-site",
                             ],
                         ],
                     ],

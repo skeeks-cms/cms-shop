@@ -81,26 +81,26 @@ class AdminShopSiteController extends BackendModelController
     public function updateFields()
     {
         return [
-            'is_supplier' => [
+            /*'is_supplier' => [
                 'class' => BoolField::class,
                 'allowNull' => false
             ],
             'is_receiver' => [
                 'class' => BoolField::class,
                 'allowNull' => false
-            ],
+            ],*/
             'catalog_cms_tree_id' => [
                 'class' => WidgetField::class,
                 'widgetClass' => SelectModelDialogTreeWidget::class,
             ],
-            'description' => [
+            /*'description' => [
                 'class' => WidgetField::class,
                 'widgetClass' => Ckeditor::class
             ],
             'description_internal' => [
                 'class' => WidgetField::class,
                 'widgetClass' => Ckeditor::class
-            ],
+            ],*/
             
         ];
     }

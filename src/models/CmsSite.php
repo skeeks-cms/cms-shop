@@ -25,6 +25,22 @@ namespace skeeks\cms\shop\models;
  */
 class CmsSite extends \skeeks\cms\models\CmsSite
 {
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_INSERT, [$this, "_afterInsterEvent"]);
+        parent::init();
+    }
+
+    /**
+     * 
+     */
+    public function _afterInsterEvent()
+    {
+        $shopSite = new ShopSite();
+        $shopSite->id = $this->id;
+        $shopSite->save();
+    }
+    
     /**
      * Gets query for [[ShopDeliveries]].
      *
