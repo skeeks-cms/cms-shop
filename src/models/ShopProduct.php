@@ -877,12 +877,13 @@ class ShopProduct extends \skeeks\cms\models\Core
      * Является второстепенным товаром?
      * То есть не продается на главном сайте.
      *
+     * TODO: это не очень хорошая функция
      * @return bool
      */
     public function getIsSubProduct()
     {
         if ($this->cmsContentElement && $this->cmsContentElement->cms_site_id) {
-            if (!$this->cmsContentElement->cmsSite->is_default) {
+            if ($this->cmsContentElement->cmsSite->is_default) {
                 return true;
             }
         }

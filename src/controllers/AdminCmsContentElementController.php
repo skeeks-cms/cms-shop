@@ -105,6 +105,15 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                              * @var $querAdminCmsContentElementControllery ActiveQuery
                              */
                             $query = $e->sender->dataProvider->query;
+                            $query->with("image");
+                            $query->with("cmsContent");
+                            $query->with("cmsTree");
+                            $query->with("cmsSite");
+                            $query->with("shopProduct");
+                            $query->with("shopProduct.cmsContentElement.cmsContent");
+                            $query->with("shopProduct.cmsContentElement");
+                            $query->with("shopProduct.cmsContentElement.cmsSite");
+                            $query->with("shopProduct.measure");
                             $query->joinWith("shopProduct as sp");
                             $query->andWhere(['sp.offers_pid' => $this->model->id]);
                         };
@@ -1099,6 +1108,18 @@ HTML
              * @var $query ActiveQuery
              */
             $query = $event->sender->dataProvider->query;
+
+            $query->with("image");
+            $query->with("cmsContent");
+            $query->with("cmsTree");
+            $query->with("cmsSite");
+            $query->with("shopProduct");
+            $query->with("shopProduct.measure");
+            $query->with("shopProduct");
+            $query->with("shopProduct.cmsContentElement.cmsContent");
+            $query->with("shopProduct.cmsContentElement");
+            $query->with("shopProduct.cmsContentElement.cmsSite");
+
             if ($this->content) {
                 $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
             }

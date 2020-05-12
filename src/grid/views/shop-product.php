@@ -126,8 +126,8 @@ $shopSellerProducts = [];
 <!--Если сайт является приемщиком товаров-->
 <? if (\Yii::$app->skeeks->site->shopSite->is_receiver) : ?>
     <div class="sx-product-controls">
-        <? if ($tradeOffers = $model->shopProduct->tradeOffers) : ?>
-            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Предложения (<?= count($model->shopProduct->tradeOffers); ?>)</a>
+        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->with('shopProduct')->with('shopProduct.measure')->all()) : ?>
+            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Предложения (<?= count($tradeOffers); ?>)</a>
         <? endif; ?>
 
         <?
@@ -150,8 +150,8 @@ $shopSellerProducts = [];
 <? else : ?>
 
     <div class="sx-product-controls">
-        <? if ($tradeOffers = $model->shopProduct->tradeOffers) : ?>
-            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Предложения (<?= count($model->shopProduct->tradeOffers); ?>)</a>
+        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->with('cmsContent')->with('shopProduct')->with('shopProduct.measure')->all()) : ?>
+            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Предложения (<?= count($tradeOffers); ?>)</a>
         <? endif; ?>
 
         <? if ($shopSupplierProducts = $model->shopProduct->shopSupplierProducts) : ?>
