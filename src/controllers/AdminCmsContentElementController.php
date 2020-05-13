@@ -36,6 +36,7 @@ use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\SelectField;
@@ -744,6 +745,37 @@ HTML
         $filterFieldsRules = [];
 
 
+        $shopColumns["shop.relations_products"] = [
+            'attribute' => "shop.relations_products",
+            'label'     => 'Количество связанных товаров',
+            'format'    => 'raw',
+            'beforeCreateCallback'    => function(GridView $grid) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $grid->dataProvider->query;
+
+                $subQuery = ShopProductRelation::find()->select([new Expression("count(1)")])->where([
+                    'or',
+                    ['shop_product1_id' => new Expression("sp.id")],
+                    ['shop_product2_id' => new Expression("sp.id")],
+                ]);
+
+                $query->addSelect([
+                    'countRelations' => $subQuery,
+                ]);
+
+
+                $grid->sortAttributes["shop.relations_products"] = [
+                    'asc'  => ['countRelations' => SORT_ASC],
+                    'desc' => ['countRelations' => SORT_DESC],
+                ];
+            },
+            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
+                return $shopCmsContentElement->raw_row['countRelations'];
+            },
+        ];
+
         $shopColumns["shop.product_type"] = [
             'attribute' => "shop.product_type",
             'label'     => 'Тип товара',
@@ -806,12 +838,10 @@ HTML
         $sortAttributes["shop.quantity"] = [
             'asc'  => ['sp.quantity' => SORT_ASC],
             'desc' => ['sp.quantity' => SORT_DESC],
-            'name' => 'Количество',
         ];
         $sortAttributes["shop.product_type"] = [
             'asc'  => ['sp.product_type' => SORT_ASC],
             'desc' => ['sp.product_type' => SORT_DESC],
-            'name' => 'Тип товара',
         ];
 
 
@@ -858,47 +888,6 @@ HTML
                 'attribute' => 'id',
                 'class'     => ShopProductColumn::class,
             ];
-
-            /*$shopColumns["shop.priceDefult"] = [
-                'label'     => "Цена",
-                'attribute' => 'shop.priceDefult',
-                'format'    => 'raw',
-                'value'     => function (ShopCmsContentElement $model) {
-                    $result = [];
-                    if (!$model->shopProduct) {
-                        return "";
-                    }
-                    foreach ($model->shopProduct->shopTypePrices as $shopTypePrice) {
-                        $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
-                        if ($shopProduct) {
-                            if ($shopProductPrice = $shopProduct->getShopProductPrices()
-                                ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
-                            ) {
-                                $result[] = "<span title='{$shopTypePrice->name}'>".(string)$shopProductPrice->money."</span>";
-                            } else {
-                                $result[] = "<span title='{$shopTypePrice->name}'>"." — "."</span>";;
-                            }
-                        }
-                    }
-
-
-                    return implode("<br />", $result);
-                },
-            ];
-
-            $visibleColumns[] = 'shop.priceDefult';
-
-            if ($defaultId) {
-                $sortAttributes['shop.priceDefult'] = [
-                    'asc'     => ["p{$defaultId}.price" => SORT_ASC],
-                    'desc'    => ["p{$defaultId}.price" => SORT_DESC],
-                    //'label'   => $shopTypePrice->name,
-                    'default' => SORT_ASC,
-                ];
-
-            }*/
-
-
         }
 
 
@@ -1108,6 +1097,7 @@ HTML
              * @var $query ActiveQuery
              */
             $query = $event->sender->dataProvider->query;
+            $query->select([ShopCmsContentElement::tableName() . ".*"]);
 
             $query->with("image");
             $query->with("cmsContent");
