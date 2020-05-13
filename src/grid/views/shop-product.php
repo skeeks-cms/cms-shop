@@ -137,6 +137,8 @@ $shopSellerProducts = [];
 
         $shopSupplierProducts = [];
         if ($model->shopProduct->shopMainProduct) {
+            $shopSupplierProducts = [];
+
             $shopSupplierProducts = $model->shopProduct->shopMainProduct->getShopSupplierProducts()
                 ->andWhere(['cmsSite.id' => $q])
                 ->all();
