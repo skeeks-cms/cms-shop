@@ -883,7 +883,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getIsSubProduct()
     {
         if ($this->cmsContentElement && $this->cmsContentElement->cms_site_id) {
-            if ($this->cmsContentElement->cmsSite->is_default) {
+            if (!$this->cmsContentElement->cmsSite->is_default) {
                 return true;
             }
         }
