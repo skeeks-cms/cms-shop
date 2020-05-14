@@ -18,7 +18,7 @@ $this->registerCss(<<<CSS
 CSS
 );
 
-$ajaxBackendUrl = \yii\helpers\Url::to(['relations-dettach']);
+$ajaxBackendUrl = \yii\helpers\Url::to(['relations-dettach', 'content_id' => $model->content_id]);
 $modelId = $model->id;
 
 $this->registerJs(<<<JS

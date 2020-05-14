@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\ViewBackendAction;
@@ -86,6 +87,13 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],*/
 
 
+                /*"relations-dettach" => [
+                    'class' => BackendAction::class,
+                    'accessCallback' => true,
+                    'isVisible' => false,
+                    'callback' => [$this, "actionRelationsDettach"],
+                ],*/
+                
                 "offers" => [
                     'class'                  => BackendGridModelRelatedAction::class,
                     'name'                   => "Предложения",
