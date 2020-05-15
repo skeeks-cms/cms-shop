@@ -8,17 +8,27 @@
 
 namespace skeeks\cms\shop\widgets\cart;
 
-use skeeks\cms\base\WidgetRenderable;
 use skeeks\cms\shop\widgets\ShopGlobalWidget;
 use skeeks\cms\widgets\base\hasTemplate\WidgetHasTemplate;
+use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class ShopCartWidget
- * @package skeeks\cms\shop\widgets\cart
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
-class ShopCartWidget extends WidgetRenderable
+class ShopCartWidget extends Widget
 {
+    /**
+     * @var null Файл в котором будет реднериться виджет
+     */
+    public $viewFile = "default";
+
+    /**
+     * @deprecated 
+     * @var string 
+     */
+    public $namespace = "";
+
     /**
      * Подключить стандартные скрипты
      *
@@ -58,7 +68,13 @@ class ShopCartWidget extends WidgetRenderable
             ShopGlobalWidget::widget(['clientOptions' => $this->shopClientOptions]);
         }
 
-        return parent::run();
+        if ($this->viewFile) {
+            return $this->render($this->viewFile, [
+                'widget' => $this,
+            ]);
+        } else {
+            return \Yii::t('skeeks/cms', "Template not found");
+        }
     }
 
 
