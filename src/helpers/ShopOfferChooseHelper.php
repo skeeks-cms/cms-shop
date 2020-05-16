@@ -10,12 +10,15 @@ namespace skeeks\cms\shop\helpers;
 
 use skeeks\cms\base\DynamicModel;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\relatedProperties\models\RelatedPropertyModel;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
+use yii\debug\components\search\matchers\SameAs;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -124,25 +127,31 @@ class ShopOfferChooseHelper extends Component
             {
                 $counter ++;
                 
-                $this->_chooseModel->defineAttribute($code);
-                $this->_chooseModel->addRule($code, 'safe');
-                /**
-                 * @var $property CmsContentProperty
-                 */
-                if ($property = CmsContentProperty::find()->where(['code' => $code])->one()) {
-                    $name = $property->name;
-                    if ($property->cms_measure_code) {
-                        $name = $name . ", " . $property->cmsMeasure->symbol;
-                    }
-                    $this->_chooseFields[$code]['property'] = $property;
-                    $this->_chooseFields[$code]['label'] = $name;
-                    $this->_chooseFields[$code]['disabledOptions'] = [];
-                }
+
                 
                 foreach ($this->shopProduct->tradeOffers as $tradeOfferElement) {
                     
                     if ($value = $tradeOfferElement->relatedPropertiesModel->getAttribute($code)) {
+
                         $this->is_offers_properties = true;
+
+                        if (!isset($this->_chooseFields[$code])) {
+                            $this->_chooseModel->defineAttribute($code);
+                            $this->_chooseModel->addRule($code, 'safe');
+                            $this->_chooseModel->addRule($code, 'required');
+                            /**
+                             * @var $property CmsContentProperty
+                             */
+                            if ($property = CmsContentProperty::find()->where(['code' => $code])->one()) {
+                                $name = $property->name;
+                                if ($property->cms_measure_code) {
+                                    $name = $name . ", " . $property->cmsMeasure->symbol;
+                                }
+                                $this->_chooseFields[$code]['property'] = $property;
+                                $this->_chooseFields[$code]['label'] = $name;
+                                $this->_chooseFields[$code]['disabledOptions'] = [];
+                            }
+                        }
 
                         if (is_array($value)) {
                             foreach ($value as $v)
@@ -162,7 +171,9 @@ class ShopOfferChooseHelper extends Component
 
         if (\Yii::$app->request->post()) {
             $this->_chooseModel->load(\Yii::$app->request->post());
-            
+            $this->_chooseModel->validate();
+
+
             //Если мы выбрали конкретный оффер, то нужно просто его показать и загрузить его данные в опции
             if ($this->_chooseModel->offer_id) {
                 $this->_offerCmsContentElement = ShopCmsContentElement::findOne($this->_chooseModel->offer_id);
@@ -207,8 +218,12 @@ class ShopOfferChooseHelper extends Component
                                         $disabledOptions[$optionKey] = $optionKey;
                                     }*/
                                 }
+
                                 if (!in_array($optionKey, $availableOptions)) {
                                     $disabledOptions[$optionKey] = $optionKey;
+                                    if ($this->_chooseModel->{$code} == $optionKey) {
+                                        $this->_chooseModel->{$code} = '';
+                                    }
                                 }
                                 //print_r($availableOptions);
                             }
@@ -237,19 +252,32 @@ class ShopOfferChooseHelper extends Component
                     
                     $this->_availableOffers = $availableOffers;
                 }
+
+
+                $this->_chooseModel->validate();
+                if (!$this->_offerCmsContentElement && !$this->_chooseModel->errors) {
+                    $this->_offerCmsContentElement = array_values($this->_availableOffers)[0];
+                }
             }
         }
 
-        if (!$this->_offerCmsContentElement) {
-            $this->_offerCmsContentElement = array_values($this->_availableOffers)[0];
-        }
-        
-        if (\Yii::$app->shop->offers_properties) {
-            foreach (\Yii::$app->shop->offers_properties as $code)
+        //Сортировка значений
+        if ($this->_chooseFields) {
+            foreach ($this->_chooseFields as $code => $data)
             {
-                $this->_chooseModel->{$code} = $this->_offerCmsContentElement->relatedPropertiesModel->getAttribute($code);
+                /**
+                 * @var $property RelatedPropertyModel
+                 */
+                $property = $data['property'];
+                $options = $data['options'];
+
+                if ($property && $options && $property->property_type == PropertyType::CODE_LIST) {
+                    $options = $property->getEnums()->andWhere(['id' => array_keys($options)])->orderBy(['priority' => SORT_ASC])->all();
+                    $this->_chooseFields[$code]['options'] = ArrayHelper::map($options, 'id', 'value');
+                }
             }
         }
+
     }
 
     public function render()

@@ -100,7 +100,7 @@ class AdminQuantityNoticeEmailController extends BackendModelStandartController
                             'format' => 'raw',
                             'label'  => \Yii::t('skeeks/shop/app', 'User'),
                             'value'  => function (\skeeks\cms\shop\models\ShopQuantityNoticeEmail $shopQuantityNoticeEmail) {
-                                return ($shopQuantityNoticeEmail->shopFuser && $shopQuantityNoticeEmail->shopFuser->cmsUser ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopQuantityNoticeEmail->shopFuser->cmsUser]))->run() : \Yii::t('skeeks/shop/app',
+                                return ($shopQuantityNoticeEmail->shopUser && $shopQuantityNoticeEmail->shopUser->cmsUser ? (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $shopQuantityNoticeEmail->shopUser->cmsUser]))->run() : \Yii::t('skeeks/shop/app',
                                     'Not authorized'));
                             },
                         ],

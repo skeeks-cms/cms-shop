@@ -8,6 +8,7 @@
 /* @var $this yii\web\View */
 /* @var $helper \skeeks\cms\shop\helpers\ShopOfferChooseHelper */
 ?>
+
 <?
 $this->registerCss(<<<CSS
 .sx-choose-property-group .form-group {
@@ -27,9 +28,6 @@ $this->registerCss(<<<CSS
     margin-bottom: 5px;
 }
 
-.sx-need-select label {
-    color: red;
-}
 
 CSS
 );
