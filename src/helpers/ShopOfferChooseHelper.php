@@ -118,15 +118,17 @@ class ShopOfferChooseHelper extends Component
         ], ['formName' => 'offers']);
 
         $this->_chooseModel->addRule('offer_id', 'safe');
-        
+
         //Если указаны свойства
-        if (\Yii::$app->shop->offers_properties) {
+        if (\Yii::$app->shop->offerCmsContentProperties) {
 
             $counter = 0;
-            foreach (\Yii::$app->shop->offers_properties as $code)
+            foreach (\Yii::$app->shop->offerCmsContentProperties as $cmsContentProperty)
             {
                 $counter ++;
 
+                $code = $cmsContentProperty->code;
+                
                 foreach ($this->shopProduct->tradeOffers as $tradeOfferElement) {
                     
                     if ($value = $tradeOfferElement->relatedPropertiesModel->getAttribute($code)) {

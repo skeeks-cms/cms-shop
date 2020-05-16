@@ -310,6 +310,11 @@ return [
                         ],
 
                         [
+                            "label" => \Yii::t('skeeks/shop/app', 'Свойства предложений'),
+                            "url"   => ["shop/admin-shop-offer-property"],
+                        ],
+
+                        [
                             "label" => \Yii::t('skeeks/shop/app', 'Order statuses'),
                             "url"   => ["shop/admin-order-status"],
                         ],

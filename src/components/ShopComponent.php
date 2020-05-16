@@ -17,6 +17,7 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
+use skeeks\cms\shop\models\ShopOfferProperty;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -33,16 +34,17 @@ use yii\widgets\ActiveForm;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  *
- * @property ShopTypePrice    $baseTypePrice
- * @property ShopPersonType[] $shopPersonTypes
- * @property ShopTypePrice[]  $shopTypePrices
- * @property ShopTypePrice[]  $canBuyTypePrices
+ * @property ShopTypePrice        $baseTypePrice
+ * @property ShopPersonType[]     $shopPersonTypes
+ * @property ShopTypePrice[]      $shopTypePrices
+ * @property ShopTypePrice[]      $canBuyTypePrices
+ * @property CmsContentProperty[] $offerCmsContentProperties
  *
- * @property ShopUser         $shopUser
+ * @property ShopUser             $shopUser
  *
- * @property CmsContent       $shopContents
+ * @property CmsContent           $shopContents
  *
- * @property array            $notifyEmails
+ * @property array                $notifyEmails
  *
  * Class ShopComponent
  * @package skeeks\cms\shop\components
@@ -203,13 +205,7 @@ class ShopComponent extends Component
                         'falseValue' => "N",
                     ],
 
-                    'offers_properties'         => [
-                        'class'    => SelectField::class,
-                        'multiple' => true,
-                        'items'    => ArrayHelper::map(
-                            CmsContentProperty::find()->all(), 'code', 'asText'
-                        ),
-                    ],
+
                     'is_show_products_has_main' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
@@ -284,7 +280,6 @@ class ShopComponent extends Component
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['offers_properties'], 'safe'],
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
             [['email'], 'string'],
@@ -324,7 +319,6 @@ class ShopComponent extends Component
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_filters_has_subtree'   => "Показывать фильтры если есть подкатегории?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
-            'offers_properties'             => "Свойства предложений",
             'is_show_products_has_main'     => "Отображать только товары которые привязаны к главным?",
         ]);
     }
@@ -490,7 +484,7 @@ class ShopComponent extends Component
                     if (!$shopCart->save()) {
                         throw new Exception(print_r($shopCart->errors, true));
                     }
-                    
+
                     $this->_shopUser = $shopCart;
                 }
             }
@@ -719,7 +713,6 @@ SQL
         )->execute();
 
 
-
         /*SELECT
 	offers_cce.tree_id,
     cce.tree_id,
@@ -775,7 +768,8 @@ SQL
      * @return $this
      * @throws \yii\db\Exception
      */
-    public function updateOffersPrice() {
+    public function updateOffersPrice()
+    {
         /**
          * Вставка недостающих цен для общих товаров и их обновление
          */
@@ -844,11 +838,11 @@ SET
 
 SQL
         )->execute();
-        
+
         return $this;
     }
-    
-    
+
+
     public function updateAllQuantities()
     {
 
@@ -920,7 +914,7 @@ SQL
     static public function importNewProductsOnSite(CmsSite $cmsSite = null)
     {
         ini_set("memory_limit", "1024M");
-        
+
         if ($cmsSite === null) {
             $cmsSite = \Yii::$app->skeeks->site;
         }
@@ -1037,6 +1031,15 @@ SQL
         \Yii::$app->shop->updateOffersPrice();
 
 
+    }
+
+
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getOfferCmsContentProperties()
+    {
+        return ShopOfferProperty::findCmsContentProperties()->all();
     }
 
 

@@ -324,7 +324,7 @@ class ShopOrderItem extends ActiveRecord
             if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray()) {
                 foreach ($properties as $code => $value) {
                     
-                    if (in_array($code, (array) \Yii::$app->shop->offers_properties)) {
+                    if (in_array($code, (array) ArrayHelper::map(\Yii::$app->shop->offerCmsContentProperties, "code", 'code'))) {
                         if (!$this->getShopOrderItemProperties()->andWhere(['code' => $code])->count() && $value) {
                             $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
     
