@@ -61,6 +61,7 @@ JS
 ?>
 
 <? $form = \yii\bootstrap\ActiveForm::begin([
+    'enableClientValidation'      => false,
     'id'      => 'sx-select-offer',
     'options' => [
         'data-pjax' => 1,

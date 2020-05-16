@@ -126,9 +126,7 @@ class ShopOfferChooseHelper extends Component
             foreach (\Yii::$app->shop->offers_properties as $code)
             {
                 $counter ++;
-                
 
-                
                 foreach ($this->shopProduct->tradeOffers as $tradeOfferElement) {
                     
                     if ($value = $tradeOfferElement->relatedPropertiesModel->getAttribute($code)) {

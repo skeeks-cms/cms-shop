@@ -8,8 +8,9 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\components\Cms;
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\CmsContent;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_content}}".
@@ -20,17 +21,12 @@ use skeeks\cms\models\CmsContent;
  * @property integer    $created_at
  * @property integer    $updated_at
  * @property integer    $content_id
- * @property string     $yandex_export
- * @property string     $subscription
- * @property integer    $vat_id
  * @property integer    $children_content_id
  *
- * @property CmsContent $content
- * @property ShopVat    $vat
- * @property CmsContent $childrenContent
- * @property CmsContent $offerContent
+ * @property CmsContent $cmsContent
+ * @property CmsContent $cmsContentForOffers
  */
-class ShopContent extends \skeeks\cms\models\Core
+class ShopContent extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -39,6 +35,10 @@ class ShopContent extends \skeeks\cms\models\Core
     {
         return '{{%shop_content}}';
     }
+
+    /**
+     *
+     */
     public function init()
     {
         parent::init();
@@ -46,25 +46,27 @@ class ShopContent extends \skeeks\cms\models\Core
         $this->on(self::EVENT_AFTER_INSERT, [$this, '_updateCmsContent']);
         $this->on(self::EVENT_AFTER_UPDATE, [$this, '_updateCmsContent']);
     }
+
+
     public function _updateCmsContent($e)
     {
-        $this->content->visible = Cms::BOOL_N;
-        $this->content->save();
+        $this->content->is_visible = false;
+        $this->content->save(false);
     }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
-        return [
+        return ArrayHelper::merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'content_id', 'vat_id', 'children_content_id'],
+                ['content_id', 'children_content_id'],
                 'integer',
             ],
             [['content_id'], 'required'],
             [['content_id'], 'unique'],
-            [['yandex_export', 'subscription'], 'string', 'max' => 1],
-        ];
+        ]);
     }
 
     /**
@@ -72,24 +74,18 @@ class ShopContent extends \skeeks\cms\models\Core
      */
     public function attributeLabels()
     {
-        return [
-            'id'                  => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'          => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'          => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'          => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'          => \Yii::t('skeeks/shop/app', 'Updated At'),
+        return ArrayHelper::merge(parent::attributeLabels(), [
             'content_id'          => \Yii::t('skeeks/shop/app', 'Content'),
-            'yandex_export'       => \Yii::t('skeeks/shop/app', 'Export to Yandex.Products'),
-            'subscription'        => \Yii::t('skeeks/shop/app', 'Subscription'),
-            'vat_id'              => \Yii::t('skeeks/shop/app', 'Vat ID'),
             'children_content_id' => \Yii::t('skeeks/shop/app', 'Trade offers'),
-        ];
+        ]);
     }
+
+
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOfferContent()
+    public function getCmsContentForOffers()
     {
         return $this->hasOne(CmsContent::class, ['id' => 'children_content_id']);
     }
@@ -97,25 +93,43 @@ class ShopContent extends \skeeks\cms\models\Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getChildrenContent()
-    {
-        return $this->hasOne(CmsContent::class, ['id' => 'children_content_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getContent()
+    public function getCmsContent()
     {
         return $this->hasOne(CmsContent::class, ['id' => 'content_id']);
     }
 
     /**
+     * @deprecated
      * @return \yii\db\ActiveQuery
      */
-    public function getVat()
+    public function getOfferContent()
     {
-        return $this->hasOne(ShopVat::class, ['id' => 'vat_id']);
+        return $this->getCmsContentForOffers();
     }
 
+    /**
+     * @deprecated
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildrenContent()
+    {
+        return $this->getCmsContentForOffers();
+    }
+
+    /**
+     * @deprecated
+     * @return \yii\db\ActiveQuery
+     */
+    public function getContent()
+    {
+        return $this->getCmsContent();
+    }
+
+    /**
+     * @return string
+     */
+    public function asText()
+    {
+        return $this->cmsContent->asText;
+    }
 }
