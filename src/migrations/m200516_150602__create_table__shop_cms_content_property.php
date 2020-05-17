@@ -8,11 +8,11 @@
 
 use yii\db\Migration;
 
-class m200516_140602__create_table__shop_offer_property extends Migration
+class m200516_150602__create_table__shop_cms_content_property extends Migration
 {
     public function safeUp()
     {
-        $tableName = 'shop_offer_property';
+        $tableName = 'shop_cms_content_property';
         $tableExist = $this->db->getTableSchema($tableName, true);
 
         if ($tableExist) {
@@ -35,6 +35,7 @@ class m200516_140602__create_table__shop_offer_property extends Migration
             'updated_at' => $this->integer(),
 
             'cms_content_property_id'        => $this->integer()->notNull(),
+            'is_offer_property'        => $this->integer(1)->defaultValue(0)->notNull(),
 
         ], $tableOptions);
 
@@ -45,6 +46,7 @@ class m200516_140602__create_table__shop_offer_property extends Migration
 
         //На один сайт одно задание на импорт с другого сайта
         $this->createIndex($tableName.'__cms_content_property_id', $tableName, ["cms_content_property_id"], true);
+        $this->createIndex($tableName.'__is_offer_property', $tableName, ["is_offer_property"]);
 
 
         $this->addForeignKey(

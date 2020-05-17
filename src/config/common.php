@@ -82,7 +82,7 @@ return [
                                 "shop/admin-shop-store",
                                 
                                 "shop/admin-content",
-                                "shop/admin-shop-offer-property",
+                                "shop/admin-shop-cms-content-property",
 
                                 "shop/admin-viewed-product",
                                 "shop/admin-quantity-notice-email",
@@ -139,8 +139,8 @@ return [
                         'description' => ['skeeks/cms', 'Поставщики'],
                     ],
                     [
-                        'name' => 'shop/admin-shop-offer-property',
-                        'description' => ['skeeks/cms', 'Свойства предложений'],
+                        'name' => 'shop/admin-shop-cms-content-property',
+                        'description' => ['skeeks/cms', 'Свойства контента в магазине'],
                     ]
                 ]
             ],

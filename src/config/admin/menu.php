@@ -310,8 +310,8 @@ return [
                         ],
 
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Свойства предложений'),
-                            "url"   => ["shop/admin-shop-offer-property"],
+                            "label" => \Yii::t('skeeks/shop/app', 'Свойства контента'),
+                            "url"   => ["shop/admin-shop-cms-content-property"],
                         ],
 
                         [

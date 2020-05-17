@@ -17,7 +17,7 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
-use skeeks\cms\shop\models\ShopOfferProperty;
+use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -1039,7 +1039,7 @@ SQL
      */
     public function getOfferCmsContentProperties()
     {
-        return ShopOfferProperty::findCmsContentProperties()->all();
+        return ShopCmsContentProperty::findCmsContentProperties()->all();
     }
 
 

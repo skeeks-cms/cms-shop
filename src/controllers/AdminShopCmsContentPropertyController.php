@@ -10,10 +10,12 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\shop\models\ShopContent;
-use skeeks\cms\shop\models\ShopOfferProperty;
+use skeeks\cms\shop\models\ShopCmsContentProperty;
+use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
@@ -22,13 +24,13 @@ use yii\helpers\ArrayHelper;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminShopOfferPropertyController extends BackendModelStandartController
+class AdminShopCmsContentPropertyController extends BackendModelStandartController
 {
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Свойства предложений');
         $this->modelShowAttribute = "asText";
-        $this->modelClassName = ShopOfferProperty::class;
+        $this->modelClassName = ShopCmsContentProperty::class;
 
         $this->generateAccessActions = false;
 
@@ -55,7 +57,8 @@ class AdminShopOfferPropertyController extends BackendModelStandartController
                         ],
 
                         'body' => <<<HTML
-Свойства добавленные в эту таблицу будут являтся свойствами предложений и показываться в сложных товарах.
+<p>Дополнительные настройки контента, которые участвуют в работе магазина.</p>
+<p>Например, в этом разделе можно выделить свойства, которые являются свойствами предложений. И будут влиять на формирование сложной карточки товара.</p>
 HTML
                         ,
                     ]);
@@ -70,6 +73,7 @@ HTML
                         'actions',
 
                         'id',
+                        'is_offer_property',
                     ],
 
                     'columns' => [
@@ -77,6 +81,9 @@ HTML
                             'label'         => 'Свойство',
                             'viewAttribute' => 'asText',
                             'class'         => DefaultActionColumn::class,
+                        ],
+                        'is_offer_property' => [
+                            'class'         => BooleanColumn::class,
                         ],
 
                     ],
@@ -101,6 +108,10 @@ HTML
             'cms_content_property_id'          => [
                 'class' => SelectField::class,
                 'items' => ArrayHelper::map(CmsContentProperty::find()->all(), 'id', 'asText'),
+            ],
+            'is_offer_property'          => [
+                'class' => BoolField::class,
+                'allowNull' => false,
             ],
         ];
     }

@@ -22,18 +22,19 @@ use yii\helpers\ArrayHelper;
  * @property integer    $updated_by
  * @property integer    $created_at
  * @property integer    $updated_at
+ * @property integer    $is_offer_property
  * @property integer    $cms_content_property_id
  *
  * @property CmsContentProperty $cmsContentProperty
  */
-class ShopOfferProperty extends ActiveRecord
+class ShopCmsContentProperty extends ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%shop_offer_property}}';
+        return '{{%shop_cms_content_property}}';
     }
 
     /**
@@ -43,7 +44,7 @@ class ShopOfferProperty extends ActiveRecord
     {
         return ArrayHelper::merge(parent::rules(), [
             [
-                ['cms_content_property_id'],
+                ['cms_content_property_id', 'is_offer_property'],
                 'integer',
             ],
             [['cms_content_property_id'], 'required'],
@@ -58,6 +59,16 @@ class ShopOfferProperty extends ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_content_property_id'          => \Yii::t('skeeks/shop/app', 'Свойство'),
+            'is_offer_property'          => \Yii::t('skeeks/shop/app', 'Свойство предложения?'),
+        ]);
+    }
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'is_offer_property'          => \Yii::t('skeeks/shop/app', 'Если это свойство является свойством предложения, то оно будет показываться в сложных карточках.'),
         ]);
     }
 
@@ -85,7 +96,9 @@ class ShopOfferProperty extends ActiveRecord
     static public function findCmsContentProperties()
     {
         $q = CmsContentProperty::find()
-            ->join("INNER JOIN", ShopOfferProperty::tableName(), [ShopOfferProperty::tableName() . ".cms_content_property_id" => new Expression(CmsContentProperty::tableName() . ".id")]);
+            ->join("INNER JOIN", ShopCmsContentProperty::tableName(), [ShopCmsContentProperty::tableName() . ".cms_content_property_id" => new Expression(CmsContentProperty::tableName() . ".id")])
+            ->andWhere([ShopCmsContentProperty::tableName() . ".is_offer_property" => 1]);
+
         return $q;
     }
 }

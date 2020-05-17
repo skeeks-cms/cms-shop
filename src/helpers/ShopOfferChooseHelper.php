@@ -15,16 +15,13 @@ use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Component;
-use yii\base\Exception;
 use yii\base\InvalidConfigException;
-use yii\base\Widget;
-use yii\debug\components\search\matchers\SameAs;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property DynamicModel $chooseModel
- * @property ShopCmsContentElement $offerCmsContentElement
- * @property array $chooseFields
+ * @property DynamicModel            $chooseModel
+ * @property ShopCmsContentElement   $offerCmsContentElement
+ * @property array                   $chooseFields
  * @property ShopCmsContentElement[] $availableOffers
  *
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -41,12 +38,12 @@ class ShopOfferChooseHelper extends Component
      */
     protected $_chooseModel = null;
     /**
-     * @var ShopCmsContentElement 
+     * @var ShopCmsContentElement
      */
     protected $_offerCmsContentElement = null;
 
     /**
-     * @var array 
+     * @var array
      */
     protected $_chooseFields = [];
 
@@ -62,7 +59,7 @@ class ShopOfferChooseHelper extends Component
     {
         return $this->_availableOffers;
     }
-    
+
     /**
      * @return DynamicModel
      */
@@ -70,7 +67,7 @@ class ShopOfferChooseHelper extends Component
     {
         return $this->_chooseModel;
     }
-    
+
     /**
      * @return array
      */
@@ -78,7 +75,7 @@ class ShopOfferChooseHelper extends Component
     {
         return $this->_chooseFields;
     }
-    
+
     /**
      * @return ShopCmsContentElement
      */
@@ -86,7 +83,7 @@ class ShopOfferChooseHelper extends Component
     {
         return $this->_offerCmsContentElement;
     }
-    
+
     public $viewFile = '@skeeks/cms/shop/views/helpers/shop-offer-choose';
 
     /**
@@ -105,16 +102,30 @@ class ShopOfferChooseHelper extends Component
         if (!$this->shopProduct->isOffersProduct) {
             throw new InvalidConfigException("Товар должен быть с предложениями!");
         }
-        
-        if (!$this->shopProduct->tradeOffers) {
+
+        /**
+         * @var ShopCmsContentElement[] $offersCsmContentElement
+         */
+        $offersCsmContentElement = $this->shopProduct->getTradeOffers()
+            ->with("shopProduct")
+            ->all();
+
+        if (!$offersCsmContentElement) {
             return false;
         }
-        
-        $this->_availableOffers = $this->shopProduct->tradeOffers;
-        
+
+        /**
+         * Если есть главный товар
+         */
+        $hasMainProduct = false;
+        if ($this->shopProduct->main_pid) {
+            $hasMainProduct = true;
+        }
+
+        $this->_availableOffers = $offersCsmContentElement;
 
         $this->_chooseModel = new \skeeks\cms\base\DynamicModel([
-            'offer_id'
+            'offer_id',
         ], ['formName' => 'offers']);
 
         $this->_chooseModel->addRule('offer_id', 'safe');
@@ -123,14 +134,20 @@ class ShopOfferChooseHelper extends Component
         if (\Yii::$app->shop->offerCmsContentProperties) {
 
             $counter = 0;
-            foreach (\Yii::$app->shop->offerCmsContentProperties as $cmsContentProperty)
-            {
-                $counter ++;
+            foreach (\Yii::$app->shop->offerCmsContentProperties as $cmsContentProperty) {
+                $counter++;
 
                 $code = $cmsContentProperty->code;
-                
-                foreach ($this->shopProduct->tradeOffers as $tradeOfferElement) {
-                    
+
+                foreach ($offersCsmContentElement as $tradeOfferElement) {
+
+                    if ($hasMainProduct) {
+                        $mainCCE = $tradeOfferElement->shopProduct->shopMainProduct->cmsContentElement;
+                        if ($mainCCE) {
+                            $tradeOfferElement = $mainCCE;
+                        }
+                    }
+
                     if ($value = $tradeOfferElement->relatedPropertiesModel->getAttribute($code)) {
 
                         $this->is_offers_properties = true;
@@ -145,7 +162,7 @@ class ShopOfferChooseHelper extends Component
                             if ($property = CmsContentProperty::find()->where(['code' => $code])->one()) {
                                 $name = $property->name;
                                 if ($property->cms_measure_code) {
-                                    $name = $name . ", " . $property->cmsMeasure->symbol;
+                                    $name = $name.", ".$property->cmsMeasure->symbol;
                                 }
                                 $this->_chooseFields[$code]['property'] = $property;
                                 $this->_chooseFields[$code]['label'] = $name;
@@ -154,18 +171,18 @@ class ShopOfferChooseHelper extends Component
                         }
 
                         if (is_array($value)) {
-                            foreach ($value as $v)
-                            {
+                            foreach ($value as $v) {
                                 //$this->_chooseFields[$code]['options'][$v] = $v;
                             }
                         } else {
 
                             $this->_chooseFields[$code]['options'][$value] = $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
                         }
-                        
+
                     }
+
                 }
-                
+
             }
         }
 
@@ -182,19 +199,23 @@ class ShopOfferChooseHelper extends Component
                 if ($this->_chooseFields) {
                     $counter = 0;
                     $availableOffers = $this->_availableOffers;
-                    
-                    foreach ($this->_chooseFields as $code => $dataField)
-                    {
+
+                    foreach ($this->_chooseFields as $code => $dataField) {
                         $tmpAvailableOffers = $availableOffers;
-                        $counter ++;
-                        
+                        $counter++;
+
                         //Берем все опции
 
-                        
+
                         if ($counter == 1) {
                             $selectedValue = $this->chooseModel->{$code};
-                            foreach ($tmpAvailableOffers as $key => $availableOffer)
-                            {
+                            foreach ($tmpAvailableOffers as $key => $availableOffer) {
+                                if ($hasMainProduct) {
+                                    $mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
+                                    if ($mainCCE) {
+                                        $availableOffer = $mainCCE;
+                                    }
+                                }
                                 if ($availableOffer->relatedPropertiesModel->getAttribute($code) != $selectedValue) {
                                     unset($tmpAvailableOffers[$key]);
                                 }
@@ -208,11 +229,9 @@ class ShopOfferChooseHelper extends Component
                             //Нужно исключить опции которые недоступны
                             $options = ArrayHelper::getValue($dataField, 'options', []);
                             $disabledOptions = [];
-                            foreach ($options as $optionKey => $optionValue)
-                            {
+                            foreach ($options as $optionKey => $optionValue) {
                                 $availableOptions = [];
-                                foreach ($tmpAvailableOffers as $key => $availableOffer)
-                                {
+                                foreach ($tmpAvailableOffers as $key => $availableOffer) {
                                     $availableOptions[$availableOffer->relatedPropertiesModel->getAttribute($code)] = $availableOffer->relatedPropertiesModel->getAttribute($code);
                                     /*if ($availableOffer->relatedPropertiesModel->getAttribute($code) != $optionKey) {
                                         $disabledOptions[$optionKey] = $optionKey;
@@ -233,8 +252,13 @@ class ShopOfferChooseHelper extends Component
                             $this->_chooseFields[$code]['disabledOptions'] = $disabledOptions;
 
                             $selectedValue = $this->chooseModel->{$code};
-                            foreach ($tmpAvailableOffers as $key => $availableOffer)
-                            {
+                            foreach ($tmpAvailableOffers as $key => $availableOffer) {
+                                if ($hasMainProduct) {
+                                    $mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
+                                    if ($mainCCE) {
+                                        $availableOffer = $mainCCE;
+                                    }
+                                }
                                 if ($availableOffer->relatedPropertiesModel->getAttribute($code) != $selectedValue) {
                                     unset($tmpAvailableOffers[$key]);
                                 }
@@ -245,11 +269,11 @@ class ShopOfferChooseHelper extends Component
                                 $tmpAvailableOffers = $availableOffers;
                             }
                         }
-                        
+
                         $availableOffers = $tmpAvailableOffers;
 
                     }
-                    
+
                     $this->_availableOffers = $availableOffers;
                 }
 
@@ -263,8 +287,7 @@ class ShopOfferChooseHelper extends Component
 
         //Сортировка значений
         if ($this->_chooseFields) {
-            foreach ($this->_chooseFields as $code => $data)
-            {
+            foreach ($this->_chooseFields as $code => $data) {
                 /**
                  * @var $property RelatedPropertyModel
                  */
@@ -283,7 +306,7 @@ class ShopOfferChooseHelper extends Component
     public function render()
     {
         return \Yii::$app->view->render($this->viewFile, [
-            'helper' => $this
+            'helper' => $this,
         ]);
     }
 }
