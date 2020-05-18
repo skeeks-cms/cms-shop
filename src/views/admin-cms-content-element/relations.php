@@ -55,6 +55,7 @@ JS
                 echo \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
                     'name'        => 'product_ids',
                     'multiple'    => true,
+                    'closeDialogAfterSelect'    => false,
                     'selectBtn'   => [
                         'content' => '<i class="fa fa-list" aria-hidden="true"></i> Выбрать товары',
                     ],

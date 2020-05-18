@@ -214,7 +214,7 @@ $shopSellerProducts = [];
     </div>
 <? endif; ?>
 
-<? if ($tradeOffers) : ?>
+<? if ($tradeOffers && 1 == 2) : ?>
     <div class="sx-hidden-wrapper sx-offers-wrapper">
         <? foreach ($tradeOffers as $tradeOffer) : ?>
             <div>

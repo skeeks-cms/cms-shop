@@ -14,6 +14,10 @@
         _onDomReady: function () {
             $("body").on("click", ".sx-offers-trigger", function() {
                 var jTd = $(this).closest("td");
+                var jTr = $(this).closest("tr");
+                var jBtn = $(".sx-controller-actions-td .sx-btn-ajax-actions", jTr);
+                jBtn.trigger("goAction", {"action" : "offers"});
+
                 var jOffers = $(".sx-offers-wrapper", jTd);
                 var jAllWrappers = $(".sx-hidden-wrapper", jTd);
 

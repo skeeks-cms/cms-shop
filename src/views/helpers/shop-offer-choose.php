@@ -118,7 +118,7 @@ JS
 </div>
 <div class="sx-offer-choose">
 
-    <? if (!$helper->is_offers_properties) : ?>
+    <? if (!$helper->is_offers_properties && $helper->availableOffers) : ?>
         <?= $form->field($helper->chooseModel, 'offer_id')->listBox(\yii\helpers\ArrayHelper::map(
             $helper->availableOffers,
             'id',

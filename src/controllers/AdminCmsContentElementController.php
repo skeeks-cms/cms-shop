@@ -109,7 +109,12 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         $controller = $action->relatedIndexAction->controller;
                         $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction, $action->relatedIndexAction->controller->content);
 
-                        $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                        $helper = new \skeeks\cms\shop\helpers\ShopOfferChooseHelper([
+                            'shopProduct' => $controller->model->shopProduct
+                        ]);
+                    
+                        $action->relatedIndexAction->grid['on init'] = function (Event $e) use($helper) {
+                            
                             /**
                              * @var $querAdminCmsContentElementControllery ActiveQuery
                              */
@@ -125,17 +130,22 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             $query->with("shopProduct.measure");
                             $query->joinWith("shopProduct as sp");
                             $query->andWhere(['sp.offers_pid' => $this->model->id]);
+                            $query->andWhere(['in', 'sp.id', ArrayHelper::map($helper->availableOffers, 'id', 'id')]);
                         };
 
 
-                        $action->relatedIndexAction->on('beforeRender', function (Event $event) use ($controller) {
-
-                            if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
+                        $action->relatedIndexAction->on('beforeRender', function (Event $event) use ($controller, $helper) {
+                                                        
+                            $event->content = \Yii::$app->view->render("@skeeks/cms/shop/views/admin-cms-content-element/rp-header", [
+                                'controller' => $controller,
+                                'helper' => $helper,
+                            ]);
+                    
+                            /*if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
 
                                 /**
                                  * @var $controller BackendModelController
                                  * @var $createAction BackendModelCreateAction
-                                 */
                                 $r = new \ReflectionClass($controller->modelClassName);
 
                                 $createAction->url = ArrayHelper::merge($createAction->urlData, [
@@ -150,8 +160,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                                         'minViewCount'    => 1,
                                         'itemTag'         => 'button',
                                         'itemOptions'     => ['class' => 'btn btn-primary'],
-                                    ])."<br>";
-                            }
+                                    ])."<br>" . \Yii::$app->view->render("@skeeks/cms-shop/views/admin-cms-content-element/rp-header", [
+                                        ''
+                                    ]);
+                            }*/
                         });
                         $action->relatedIndexAction->on('afterRender', function (Event $event) {
                             $event->content = '';
