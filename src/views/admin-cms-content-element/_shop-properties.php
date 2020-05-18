@@ -13,7 +13,7 @@
 $model = new \skeeks\cms\models\CmsContentElement();
 
 $jsData = \yii\helpers\Json::encode([
-    'id' => $action->id
+    'id' => $action->id,
 ]);
 
 $this->registerJs(<<<JS
@@ -61,36 +61,72 @@ JS
         <?php $element = new \skeeks\cms\shop\models\ShopProduct(); ?>
         <?php $element->loadDefaultValues(); ?>
 
-   
+
         <?php if ($element) : ?>
 
             <?php $form = \skeeks\cms\modules\admin\widgets\ActiveForm::begin([
                 'options' => [
                     'class' => 'sx-form',
-                ]
-            ]); ?>
-            <?= \skeeks\widget\chosen\Chosen::widget([
-                'multiple' => true,
-                'name' => 'fields',
-                'options' => [
-                    'class' => 'sx-select'
                 ],
-                'items' => [
-                    'quantity' => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), 'quantity')
-                ]
+            ]); ?>
+
+            <?
+
+            $items = [
+                'quantity' => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), 'quantity'),
+            ];
+
+            if (\Yii::$app->skeeks->site->shopTypePrices) {
+                foreach (\Yii::$app->skeeks->site->shopTypePrices as $typePrice) {
+                    $items["price-".$typePrice->id] = $typePrice->name;
+                }
+            }
+
+            echo \skeeks\widget\chosen\Chosen::widget([
+                'multiple' => true,
+                'name'     => 'fields',
+                'options'  => [
+                    'class' => 'sx-select',
+                ],
+                'items'    => $items,
             ]); ?>
 
             <?= \yii\helpers\Html::hiddenInput('content_id', $content->id); ?>
 
-            <?php /*foreach ($element->toArray() as $key => $value) : */?>
-                <div class="sx-multi-shop sx-multi-shop-quantity" style="display: none;">
-                    <?
-                    echo $form->field($element, "quantity");
-                    ?>
-                </div>
-            <?php /*endforeach; */?>
+            <?php /*foreach ($element->toArray() as $key => $value) : */ ?>
+            <div class="sx-multi-shop sx-multi-shop-quantity" style="display: none;">
+                <?
+                echo $form->field($element, "quantity");
+                ?>
+            </div>
+            <?php /*endforeach; */ ?>
 
-            
+            <? if (\Yii::$app->skeeks->site->shopTypePrices) : ?>
+                <? foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) : ?>
+
+                    <div class="sx-multi-shop sx-multi-shop-price-<?= $shopTypePrice->id; ?>" style="display: none;">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-9">
+                                    <input name="price[<?= $shopTypePrice->id; ?>][value]" class="form-control" placeholder="<?= $shopTypePrice->name; ?> — значение" value=""/>
+                                </div>
+                                <div class="col-3">
+                                    <?= \yii\helpers\Html::listBox("price[{$shopTypePrice->id}][currency]", \Yii::$app->money->currencyCode,
+                                        \yii\helpers\ArrayHelper::map(
+                                            \Yii::$app->money->activeCurrencies, 'code', 'code'
+                                        ), [
+                                            'class' => 'form-control',
+                                            'size'  => 1,
+                                        ]
+                                    ); ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <? endforeach; ?>
+
+            <? endif; ?>
+
             <?= $form->buttonsStandart($model, ['apply']); ?>
             <?php $form::end(); ?>
         <?php else

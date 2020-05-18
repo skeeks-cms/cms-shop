@@ -14,6 +14,8 @@ use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
 use yii\base\Exception;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -974,5 +976,46 @@ class ShopProduct extends \skeeks\cms\models\Core
         $q->multiple = true;
 
         return $q;
+    }
+
+
+    /**
+     * @param      $shopTypePrice
+     * @param      $value
+     * @param null $curencyCode
+     * @return array|ShopProductPrice|\yii\db\ActiveRecord|null
+     */
+    public function savePrice($shopTypePrice, $value, $curencyCode = null)
+    {
+        $typePriceId = null;
+        if ($shopTypePrice instanceof ShopTypePrice) {
+            $typePriceId = $shopTypePrice->id;
+        } else {
+            $typePriceId = (int) $shopTypePrice;
+        }
+
+        if (!$typePriceId) {
+            throw new InvalidArgumentException("Need type price id");
+        }
+        
+        if (!$productPrice = $this->getShopProductPrices()->andWhere([
+            'type_price_id' => $typePriceId
+        ])->one()) {
+            $productPrice = new ShopProductPrice();
+            $productPrice->product_id = $this->id;
+            $productPrice->type_price_id = $typePrice->id;
+        }
+        
+        $productPrice->price = $value;
+        
+        if ($curencyCode) {
+            $productPrice->currency_code = $curencyCode;
+        }
+
+        if (!$productPrice->save()) {
+            throw new Exception(print_r($productPrice->errors, true));
+        }
+        
+        return $productPrice;
     }
 }

@@ -726,15 +726,38 @@ HTML
                 return false;
             }
 
+            $prices = [];
+            foreach ($fields as $fieldName)
+            {
+                if (strpos($fieldName, "price-") !== false) {
+                    $prices[] = (int) str_replace("price-", "", $fieldName);
+                }
+            }
+            
+
 
             /**
              * @var CmsContent $content
              */
-            $content = CmsContent::findOne($content_id);
+            $content = CmsContent::findOne((int) $content_id);
             if (!$content) {
                 return false;
             }
 
+            
+            if ($prices) {
+                foreach ($prices as $key => $typePriceId)
+                {                    
+                    $priceData = ArrayHelper::getValue($formData, 'price.' . $typePriceId);
+                    
+                    $model->shopProduct->savePrice(
+                        $typePriceId,
+                        (float) ArrayHelper::getValue($priceData, "value"),
+                        (string) ArrayHelper::getValue($priceData, "currency")
+                    );
+                }
+            }
+            
 
             $tmpProduct = new ShopProduct();
             $tmpProduct->load($formData);
