@@ -555,11 +555,9 @@ class ShopOrder extends \skeeks\cms\models\Core
             'delivery_doc_num'    => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
             'delivery_doc_at'     => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
             'tracking_number'     => \Yii::t('skeeks/shop/app', 'Tracking Number'),
-            'shop_buyer_id'       => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
+            'shop_buyer_id'       => \Yii::t('skeeks/shop/app', 'Buyer'),
             'is_allowed_payment'       => \Yii::t('skeeks/shop/app', 'Allow Payment'),
 
-            'shop_delivery_id'   => \Yii::t('skeeks/shop/app', 'Delivery service'),
-            'shop_buyer_id'      => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Payment system'),
 
             'is_created' => \Yii::t('skeeks/shop/app', 'Заказ создан?'),

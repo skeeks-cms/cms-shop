@@ -13,6 +13,6 @@
 <? if ($model->paid_at) : ?>
 <a href="#" data-toggle="modal" data-target="#sx-payment-container-close" class="btn btn-primary">Изменить<a>
 <? else : ?>
-<a href="#" data-toggle="modal" data-target="#sx-payment-container" class="btn btn-primary">Оплатить<a>
+<a href="#" data-toggle="modal" data-target="#sx-payment-container" class="btn btn-primary">Отметить оплату<a>
 <? endif; ?>
 

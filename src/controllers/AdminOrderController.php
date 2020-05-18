@@ -313,12 +313,13 @@ HTML;
                 'isVisible' => false,
             ],
 
-            'create-order' => [
+            /*'create-order' => [
+
                 'class'    => AdminAction::class,
                 'name'     => \Yii::t('skeeks/shop/app', 'Place your order'),
                 "icon"     => "fa fa-plus",
                 "callback" => [$this, 'createOrder'],
-            ],
+            ],*/
 
             'payments' => [
                 'class'    => BackendModelAction::class,

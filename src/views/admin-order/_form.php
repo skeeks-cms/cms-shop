@@ -154,11 +154,6 @@ HTML
                 'value'  => (new \skeeks\cms\shop\widgets\AdminBuyerUserWidget(['user' => $model->cmsUser]))->run(),
             ],
 
-            [                      // the owner name of the model
-                'label'  => \Yii::t('skeeks/shop/app', 'Type payer'),
-                'format' => 'raw',
-                'value'  => $model->shopPersonType->name,
-            ],
 
             [                      // the owner name of the model
                 'label'  => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
@@ -169,7 +164,7 @@ HTML
                         'pk' => $model->buyer->id,
                     ])->enableAdmin(), [
                         'data-pjax' => 0,
-                    ]) : '-',
+                    ]) . " ({$model->shopPersonType->name})" : '-',
             ],
 
 
@@ -242,7 +237,7 @@ HTML
     'attributes' =>
         [
             [                      // the owner name of the model
-                'label'  => \Yii::t('skeeks/shop/app', 'Delivery service'),
+                'label'  => \Yii::t('skeeks/shop/app', 'Delivery'),
                 'format' => 'raw',
                 'value'  => Html::a($model->shopDelivery ? $model->shopDelivery->name : "нет", "#", [
                     "data-toggle" => "modal",
