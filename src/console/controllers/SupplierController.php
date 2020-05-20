@@ -27,22 +27,127 @@ class SupplierController extends Controller
 {
 
 
-    public function actionConnectOptions($supplier_id)
+    public function actionInsertCmsProperty($external_property_code)
     {
         /**
          * @var $shopSupplier ShopSupplier
          */
-        $shopSupplier = ShopSupplier::find()->where(['id' => $supplier_id])->one();
-        if (!$shopSupplier) {
-            $this->stdout("Такого поставщика нет\n");
+        $siteName = \Yii::$app->skeeks->site->name;
+        $this->stdout("Поставщик: {$siteName}\n");
+
+        /**
+         * @var $shopSupplierProperty ShopSupplierProperty
+         */
+        if (!$shopSupplierProperty = ShopSupplierProperty::find()->cmsSite()->andWhere(['external_code' => $external_property_code])->one()) {
+            $this->stdout("Свойство не найдено\n", Console::FG_RED);
             return false;
         }
+        
+        if (!$shopSupplierProperty->cmsContentProperty) {
+            $this->stdout("Не настроено соответствие со свойством cms\n", Console::FG_RED);
+            return false;
+        }
+        
+      
+        
+        $shopProductsQuery = ShopProduct::find()->joinWith('cmsContentElement as cmsContentElement')
+            //->andWhere(['cmsContentElement.id' => 47432])
+            ->andWhere(['cmsContentElement.cms_site_id' => \Yii::$app->skeeks->site->id]);
+        $this->stdout("Products: ".$shopProductsQuery->count()."\n");
+
+        if (!$shopProductsQuery->count()) {
+            $this->stdout("Товаров нет\n");
+            return false;
+        }
+        
+        /**
+         * @var $shopProduct ShopProduct
+         */
+        foreach ($shopProductsQuery->each(10) as $shopProduct) {
+            $this->stdout("\tProduct: {$shopProduct->id}\n");
+            if ($shopProduct->supplier_external_jsondata) {
+                foreach ($shopProduct->supplier_external_jsondata as $key => $value) {
+                    $key = trim($key);
+                    if ($key == $shopSupplierProperty->external_code) {
+                        $this->stdout("\t\t$key: {$value}\n");
+                        if (!trim($value)) {
+                            $this->stdout("\t\tЗначение не заполнено\n", Console::FG_RED);
+                            //sleep(5);
+                            continue;
+                        }
+                        
+                        if ($shopSupplierProperty->property_type == ShopSupplierProperty::PROPERTY_TYPE_LIST) {
+                            
+                            
+                            /**
+                             * @var $supplierOption ShopSupplierPropertyOption
+                             */
+                            if ($supplierOption = $shopSupplierProperty->getShopSupplierPropertyOptions()->andWhere(['name' => trim($value)])->one()) {
+                                $this->stdout("\t\tОпция найдена в базе\n");
+                                /*if (!$supplierOption->cmsContentElement || !$supplierOption->cmsContentPropertyEnum) {
+                                    $this->stdout("\t\tДля опции не настроена связь с cms\n", Console::FG_RED);
+                                    continue;
+                                }*/
+                                
+                                if ($supplierOption->cmsContentElement) {
+                                    $cmsElement = $shopProduct->cmsContentElement;
+                                    $cmsElement->relatedPropertiesModel->setAttribute($shopSupplierProperty->cmsContentProperty->code, $supplierOption->cmsContentElement->id);
+                                    if ($cmsElement->relatedPropertiesModel->save(true, [$shopSupplierProperty->cmsContentProperty->code])) {
+                                                                        
+                                        $this->stdout("\t\tЗначение свойства обновлено\n", Console::FG_GREEN);
+                                        continue;
+                                    } else {
+                                        $this->stdout("\t\tЗначение свойства не сохранено!!!\n", Console::FG_RED);
+                                        die;
+                                        continue;
+                                    }
+                                }
+                                
+                                $this->stdout("\t\tНе проработанный вариант\n", Console::FG_RED);
+                                continue;
+                            } else {
+                                $this->stdout("\t\tОпция не найдена в базе\n", Console::FG_RED);
+                                sleep(5);
+                                continue;
+                            }
+                            
+                        } elseif ($shopSupplierProperty->property_type == ShopSupplierProperty::PROPERTY_TYPE_STRING) {
+                            
+                            $cmsElement = $shopProduct->cmsContentElement;
+                            $cmsElement->relatedPropertiesModel->setAttribute($shopSupplierProperty->cmsContentProperty->code, trim($value));
+                            if ($cmsElement->relatedPropertiesModel->save(true, [$shopSupplierProperty->cmsContentProperty->code])) {
+                                                                
+                                $this->stdout("\t\tЗначение свойства обновлено\n", Console::FG_GREEN);
+                                continue;
+                            } else {
+                                $this->stdout("\t\tЗначение свойства не сохранено!!!\n", Console::FG_RED);
+                                die;
+                                continue;
+                            }
+                        }
+
+
+                        
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    public function actionConnectOptions()
+    {
+        /**
+         * @var $shopSupplier ShopSupplier
+         */
+        $siteName = \Yii::$app->skeeks->site->name;
+        $this->stdout("Поставщик: {$siteName}\n");
 
         /**
          * @var $properties ShopSupplierProperty[]
          * @var $option ShopSupplierPropertyOption
          */
-        if (!$properties = $shopSupplier->getShopSupplierProperties()
+        if (!$properties = ShopSupplierProperty::find()->cmsSite()
             ->andWhere(['property_type' => ShopSupplierProperty::PROPERTY_TYPE_LIST])
             ->andWhere(['is not', 'cms_content_property_id', null])
             ->all()) {
@@ -105,31 +210,25 @@ class SupplierController extends Controller
     }
 
 
-    public function actionLoadOptions($supplier_id)
+    public function actionLoadOptions()
     {
-        /**
-         * @var $shopSupplier ShopSupplier
-         */
-        $shopSupplier = ShopSupplier::find()->where(['id' => $supplier_id])->one();
-        if (!$shopSupplier) {
-            $this->stdout("Такого поставщика нет\n");
-            return false;
-        }
+        $siteName = \Yii::$app->skeeks->site->name;
+        $this->stdout("Поставщик: {$siteName}\n");
 
-        $this->stdout("Поставщик: {$shopSupplier->asText}\n");
-
-        $shopProductsQuery = ShopProduct::find()->where(['shop_supplier_id' => $supplier_id]);
+        $shopProductsQuery = ShopProduct::find()->joinWith('cmsContentElement as cmsContentElement')->andWhere(['cmsContentElement.cms_site_id' => \Yii::$app->skeeks->site->id]);
         $this->stdout("Products: ".$shopProductsQuery->count()."\n");
 
         if (!$shopProductsQuery->count()) {
             $this->stdout("Товаров нет\n");
             return false;
         }
+        
 
+        
         /**
          * @var $properties ShopSupplierProperty[]
          */
-        if (!$properties = $shopSupplier->getShopSupplierProperties()->andWhere(['property_type' => ShopSupplierProperty::PROPERTY_TYPE_LIST])->all()) {
+        if (!$properties = ShopSupplierProperty::find()->cmsSite()->andWhere(['property_type' => ShopSupplierProperty::PROPERTY_TYPE_LIST])->all()) {
             $this->stdout("Нет свойств типа список\n");
             return false;
         }
@@ -183,20 +282,13 @@ class SupplierController extends Controller
 
     }
 
-    public function actionLoadProperties($supplier_id)
+    public function actionLoadProperties()
     {
-        /**
-         * @var $shopSupplier ShopSupplier
-         */
-        $shopSupplier = ShopSupplier::find()->where(['id' => $supplier_id])->one();
-        if (!$shopSupplier) {
-            $this->stdout("Такого поставщика нет\n");
-            return false;
-        }
+    
+        $siteName = \Yii::$app->skeeks->site->name;
+        $this->stdout("Поставщик: {$siteName}\n");
 
-        $this->stdout("Поставщик: {$shopSupplier->asText}\n");
-
-        $shopProductsQuery = ShopProduct::find()->where(['shop_supplier_id' => $supplier_id]);
+        $shopProductsQuery = ShopProduct::find()->joinWith('cmsContentElement as cmsContentElement')->andWhere(['cmsContentElement.cms_site_id' => \Yii::$app->skeeks->site->id]);
         $this->stdout("Products: ".$shopProductsQuery->count()."\n");
 
         if (!$shopProductsQuery->count()) {
@@ -211,10 +303,9 @@ class SupplierController extends Controller
             if ($shopProduct->supplier_external_jsondata) {
                 foreach ($shopProduct->supplier_external_jsondata as $key => $value) {
                     $key = trim($key);
-                    if (!$shopSupplier->getShopSupplierProperties()->andWhere(['external_code' => $key])->one()) {
+                    if (! ShopSupplierProperty::find()->cmsSite()->andWhere(['external_code' => $key])->one()) {
                         $shopSupplierProperty = new ShopSupplierProperty();
                         $shopSupplierProperty->external_code = $key;
-                        $shopSupplierProperty->shop_supplier_id = $shopSupplier->id;
 
                         if ($shopSupplierProperty->save()) {
                             $this->stdout("Создано: {$key}\n", Console::FG_GREEN);
