@@ -122,11 +122,6 @@ class ShopComponent extends Component
      */
     public $open_filter_property_ids = [];
 
-    /**
-     * Показывать фильтры если есть подкатегории?
-     * @var bool
-     */
-    public $is_show_filters_has_subtree = 1;
 
     /**
      * Показывать товары только в наличии?
@@ -252,12 +247,7 @@ class ShopComponent extends Component
                 'name'  => \Yii::t('skeeks/shop/app', 'Фильтры'),
 
                 'fields' => [
-                    'is_show_filters_has_subtree' => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],
-
+                 
                     'show_filter_property_ids' => [
                         'class'    => SelectField::class,
                         'multiple' => true,
@@ -295,7 +285,6 @@ class ShopComponent extends Component
                     'is_show_product_no_price',
                     'is_show_button_no_price',
                     'is_show_product_only_quantity',
-                    'is_show_filters_has_subtree',
                     'is_show_quantity_product',
                     'is_show_products_has_main',
                 ],
@@ -317,7 +306,6 @@ class ShopComponent extends Component
             'is_show_product_only_quantity' => "Показывать товары только в наличии на сайте?",
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
-            'is_show_filters_has_subtree'   => "Показывать фильтры если есть подкатегории?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
             'is_show_products_has_main'     => "Отображать только товары которые привязаны к главным?",
         ]);
@@ -334,7 +322,6 @@ class ShopComponent extends Component
             'is_show_product_no_price'      => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
             'is_show_button_no_price'       => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
             'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
-            'is_show_filters_has_subtree'   => "Если каталог большой то лучше для производительности не показывать фильтры в категориях где есть подкатегории",
             'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
             'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
         ]);

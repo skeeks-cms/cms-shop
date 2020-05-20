@@ -8,10 +8,10 @@
 return [
 
     'components' => [
-        'shop' => [
+        'shop'        => [
             'class' => 'skeeks\cms\shop\components\ShopComponent',
         ],
-        'i18n' => [
+        'i18n'        => [
             'translations' =>
                 [
                     'skeeks/shop/app' =>
@@ -24,7 +24,7 @@ return [
                         ],
                 ],
         ],
-        'cmsAgent' => [
+        'cmsAgent'    => [
             'commands' => [
 
                 'shop/agents/delete-empty-carts' => [
@@ -32,7 +32,7 @@ return [
                     'name'     => ['skeeks/shop/app', 'Remove empty baskets'],
                     'interval' => 3600 * 6,
                 ],
-                
+
                 'shop/agents/delete-empty-carts' => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Remove empty baskets'],
@@ -56,7 +56,7 @@ return [
                     'name'     => ['skeeks/shop/app', 'Обновление типа товаров'],
                     'interval' => 60 * 5,
                 ],
-                'shop/agents/update-subproducts' => [
+                'shop/agents/update-subproducts'  => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление данных по вложенным товарам'],
                     'interval' => 60 * 5,
@@ -65,7 +65,7 @@ return [
         ],
         'authManager' => [
             'config' => [
-                'roles' => [
+                'roles'       => [
                     [
                         'name'  => \skeeks\cms\rbac\CmsManager::ROLE_ADMIN,
                         'child' => [
@@ -73,14 +73,14 @@ return [
                             'permissions' => [
                                 "shop/admin-order",
                                 "shop/admin-cart",
-                                
+
                                 "shop/admin-order-status",
                                 "shop/admin-type-price",
 
                                 "shop/admin-shop-supplier-property",
                                 "shop/admin-shop-supplier",
                                 "shop/admin-shop-store",
-                                
+
                                 "shop/admin-content",
                                 "shop/admin-shop-cms-content-property",
 
@@ -88,15 +88,15 @@ return [
                                 "shop/admin-quantity-notice-email",
 
                                 "shop/admin-shop-import-cms-site",
-                                
+
                                 "shop/admin-delivery",
-                                
+
                                 "shop/admin-person-type",
                                 "shop/admin-person-type-property",
                                 "shop/admin-person-type-property-enum",
-                                
+
                                 "shop/admin-shop-product-relation",
-                                
+
                                 "shop/admin-cms-site",
                             ],
                         ],
@@ -115,37 +115,35 @@ return [
                         ],
                     ],
 
-                    'roles' => [
-                         [
-                            'name'        => \skeeks\cms\rbac\CmsManager::ROLE_USER,
+                    [
+                        'name'  => \skeeks\cms\rbac\CmsManager::ROLE_USER,
 
-                            //Есть доступ к системе администрирования
-                            'child'       => [
-                                'permissions' => [
-                                    'shop/upa-order'
-                                ],
+                        //Есть доступ к системе администрирования
+                        'child' => [
+                            'permissions' => [
+                                'shop/upa-order',
                             ],
-
                         ],
-                    ]
+
+                    ],
                 ],
                 'permissions' => [
                     [
-                        'name' => 'shop/admin-shop-import-cms-site',
+                        'name'        => 'shop/admin-shop-import-cms-site',
                         'description' => ['skeeks/cms', 'Поставщики'],
                     ],
                     [
-                        'name' => 'shop/admin-delivery',
+                        'name'        => 'shop/admin-delivery',
                         'description' => ['skeeks/cms', 'Поставщики'],
                     ],
                     [
-                        'name' => 'shop/admin-shop-cms-content-property',
+                        'name'        => 'shop/admin-shop-cms-content-property',
                         'description' => ['skeeks/cms', 'Свойства контента в магазине'],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ],
-        
+
         'skeeks' => [
             'siteClass' => \skeeks\cms\shop\models\CmsSite::class,
         ],

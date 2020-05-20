@@ -14,6 +14,7 @@ use common\models\V3pFeature;
 use common\models\V3pFeatureValue;
 use common\models\V3pFtSoption;
 use common\models\V3pProduct;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\yii2\queryfilter\IQueryFilterHandler;
 use v3project\yii2\productfilter\EavFiltersHandler;
 use v3project\yii2\productfilter\IFiltersHandler;
@@ -98,11 +99,11 @@ class SortFiltersHandler extends Model
         if ($this->value) {
             switch ($this->value) {
                 case ('-popular'):
-                    $query->orderBy(['show_counter' => SORT_DESC]);
+                    $query->orderBy([CmsContentElement::tableName() . '.show_counter' => SORT_DESC]);
                     break;
 
                 case ('-new'):
-                    $query->orderBy(['created_at' => SORT_DESC]);
+                    $query->orderBy([CmsContentElement::tableName() . '.created_at' => SORT_DESC]);
                     break;
 
                 case ('price'):

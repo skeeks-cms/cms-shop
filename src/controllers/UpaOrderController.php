@@ -30,6 +30,11 @@ class UpaOrderController extends BackendModelStandartController
 
         $this->generateAccessActions = false;
 
+        
+        /*$this->permissionNames = [
+            "shop/upa-order" => 'Доступ к персональной части',
+        ];*/
+        
         parent::init();
     }
 
