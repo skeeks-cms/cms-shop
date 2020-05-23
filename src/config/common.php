@@ -140,6 +140,10 @@ return [
                         'name'        => 'shop/admin-shop-cms-content-property',
                         'description' => ['skeeks/cms', 'Свойства контента в магазине'],
                     ],
+                    [
+                        'name'        => 'shop/admin-cms-site',
+                        'description' => 'shop/admin-cms-site',
+                    ],
                 ],
             ],
         ],

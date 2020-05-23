@@ -297,6 +297,10 @@ class ShopOfferChooseHelper extends Component
                 if ($property && $options && $property->property_type == PropertyType::CODE_LIST) {
                     $options = $property->getEnums()->andWhere(['id' => array_keys($options)])->orderBy(['priority' => SORT_ASC])->all();
                     $this->_chooseFields[$code]['options'] = ArrayHelper::map($options, 'id', 'value');
+                } elseif ($property && $property->property_type == PropertyType::CODE_NUMBER) {
+                    $options = $this->_chooseFields[$code]['options'];
+                    ksort($options);
+                    $this->_chooseFields[$code]['options'] = $options;
                 }
             }
         }
