@@ -11,6 +11,12 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopOrderStatus;
+use skeeks\cms\widgets\ColorInput;
+use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
@@ -76,7 +82,7 @@ HTML
 
                         'name',
 
-                        'description',
+                        //'description',
 
                         'priority',
 
@@ -84,10 +90,11 @@ HTML
                     'columns'        => [
                         'name' => [
                             'value' => function (ShopOrderStatus $shopOrderStatus) {
-                                return \yii\helpers\Html::label($shopOrderStatus->name, null, [
-                                    'style' => "background: {$shopOrderStatus->color}; color: white; border-radius: 3px;",
-                                    'class' => "label g-pl-5 g-pr-5",
-                                ]);
+                                return \yii\helpers\Html::a($shopOrderStatus->name, null, [
+                                    'style' => "background: {$shopOrderStatus->bg_color}; color: {$shopOrderStatus->color}; border-radius: 3px; padding-left: 5px; padding-right: 5px;",
+                                    'class' => "sx-trigger-action",
+                                    'href'  => "#",
+                                ]) . "<br /><span style='color: gray'>" . $shopOrderStatus->description . "</span>";
                             },
                         ],
                     ],
@@ -95,6 +102,66 @@ HTML
                 ],
             ],
 
+            "create" => [
+                'fields' => [$this, 'updateFields'],
+            ],
+
+            "update" => [
+                'fields' => [$this, 'updateFields'],
+            ],
         ]);
+    }
+
+    public function updateFields($action)
+    {
+        /**
+         * @var $model ShopTypePrice
+         */
+        $model = $action->model;
+
+        $model->load(\Yii::$app->request->get());
+        return [
+            'main' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Основное',
+                'fields' => [
+                    'name',
+                    'priority' => [
+                        'class' => NumberField::class,
+                    ],
+
+                    'description' => [
+                        'class' => TextareaField::class,
+                    ],
+
+                    'color' => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => ColorInput::class,
+                    ],
+                    'bg_color' => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => ColorInput::class,
+                    ],
+
+                ],
+            ],
+
+
+            'other' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Дополнительно',
+                'fields' => [
+                    'order_page_description' => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => ComboTextInputWidget::class,
+                    ],
+
+                    'email_notify_description' => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => ComboTextInputWidget::class,
+                    ],
+                ]
+            ]
+        ];
     }
 }

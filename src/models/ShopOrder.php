@@ -126,7 +126,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                 ->setTo($this->email)
                 ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
-                        'New order').' #'.$this->id)
+                        'New order').' №'.$this->id)
                 ->send();
         }
     }
@@ -168,7 +168,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                             ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                             ->setTo($email)
                             ->setSubject(\Yii::t('skeeks/shop/app',
-                                    'New order').' #'.$this->id)
+                                    'New order').' №'.$this->id)
                             ->send();
                     }
                 }

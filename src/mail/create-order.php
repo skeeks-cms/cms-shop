@@ -9,16 +9,23 @@ $order->refresh();
 ?>
 
 <?= Html::beginTag('h1'); ?>
-<?= \Yii::t('skeeks/shop/app', 'New order'); ?> #<?= $order->id; ?> «<?= \Yii::t('skeeks/shop/app',
-    'in site'); ?> <?= \Yii::$app->cms->appName ?>»
+<?= \Yii::t('skeeks/shop/app', 'New order'); ?> №<?= $order->id; ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::tag('hr'); ?>
 
+<?= Html::beginTag('p'); ?>
+Здравствуйте!
+<?= Html::endTag('p'); ?>
+
+<?= Html::beginTag('p'); ?>
+Благодарим вас за заказ на сайте <a href="<?php echo \yii\helpers\Url::home(true);?>"><?= \Yii::$app->cms->appName ?></a>
+<?= Html::endTag('p'); ?>
+
 <div style="text-align: left;">
-    <?= Html::beginTag('h3'); ?>
+    <?= Html::beginTag('h4'); ?>
     Заказ:
-    <?= Html::endTag('h3'); ?>
+    <?= Html::endTag('h4'); ?>
     <?= Html::beginTag('p'); ?>
 
     <?=
@@ -106,9 +113,9 @@ $order->refresh();
     <?= Html::endTag('p'); ?>
 
 
-    <?= Html::beginTag('h3'); ?>
+    <?= Html::beginTag('h4'); ?>
     Покупатель:
-    <?= Html::endTag('h3'); ?>
+    <?= Html::endTag('h4'); ?>
 
     <?
     $attributes = [];
@@ -129,9 +136,9 @@ $order->refresh();
     ?>
 
     <? if ($order->shop_pay_system_id) : ?>
-        <?= Html::beginTag('h3'); ?>
+        <?= Html::beginTag('h4'); ?>
         Оплата:
-        <?= Html::endTag('h3'); ?>
+        <?= Html::endTag('h4'); ?>
 
         <?=
         \yii\widgets\DetailView::widget([
@@ -153,9 +160,9 @@ $order->refresh();
     <? endif; ?>
 
     <? if ($order->shop_delivery_id) : ?>
-        <?= Html::beginTag('h3'); ?>
+        <?= Html::beginTag('h4'); ?>
         Доставка:
-        <?= Html::endTag('h3'); ?>
+        <?= Html::endTag('h4'); ?>
 
         <?=
         \yii\widgets\DetailView::widget([
@@ -172,9 +179,9 @@ $order->refresh();
     <? endif; ?>
 
     <? if ($order->shopDiscountCoupons) : ?>
-        <?= Html::beginTag('h3'); ?>
+        <?= Html::beginTag('h4'); ?>
         <?= count($order->shopDiscountCoupons) == 1 ? "Скидочный купон:" : "Скидочные купоны:" ;?>
-        <?= Html::endTag('h3'); ?>
+        <?= Html::endTag('h4'); ?>
 
 
         <? foreach ($order->shopDiscountCoupons as $shopDiscountCoupon) : ?>
@@ -187,9 +194,9 @@ $order->refresh();
     <? endif; ?>
 
 
-    <?= Html::beginTag('h3'); ?>
+    <?= Html::beginTag('h4'); ?>
     Итого:
-    <?= Html::endTag('h3'); ?>
+    <?= Html::endTag('h4'); ?>
 
     <?= Html::beginTag('p'); ?>
     Стоимость товаров: <?= Html::tag('b', (string)$order->calcMoneyItems); ?><br/>
@@ -197,6 +204,12 @@ $order->refresh();
     Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
     К оплате: <?= Html::tag('b', (string)$order->money); ?>
     <?= Html::endTag('p'); ?>
+
+    <?php if ($order->shopOrderStatus->email_notify_description) : ?>
+        <div>
+            <?php echo $order->shopOrderStatus->email_notify_description; ?>
+        </div>
+    <?php endif; ?>
 
     <?= Html::beginTag('p'); ?>
     <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>

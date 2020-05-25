@@ -61,12 +61,9 @@ HTML
                     ]);
                 },
 
-                "filters" => [
-                    "visibleFilters" => [
-                        'id',
-                        'name',
-                    ],
-                ],
+                "filters"         => false,
+                "backendShowings" => false,
+
                 'grid'    => [
                     'on init' => function (Event $e) {
                         /**
