@@ -196,6 +196,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         die;*/
         //После создания заказа делать его пересчет
         if ($this->isAttributeChanged('is_created') && $this->is_created) {
+            $this->created_at = time();
             $this->recalculate();
         }
         if ($this->isAttributeChanged('shop_delivery_id')) {

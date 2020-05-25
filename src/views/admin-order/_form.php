@@ -115,20 +115,21 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
                 'format' => 'raw',
                 'value'  => <<<HTML
 
-                    <a href="#" data-toggle="modal" data-target="#sx-status-change" class="sx-dashed" style="color: {$model->status->color}">{$model->status->name}</a>
-                    <small>({$statusDate})</small>
+                    <a href="#" data-toggle="modal" data-target="#sx-status-change" class="" style="color: {$model->status->color}; background: {$model->shopOrderStatus->bg_color}; padding: 5px 10px;">
+                    {$model->status->name}</a><br />
+                    <small>{$statusDate}</small>
 HTML
                 ,
 
             ],
 
-            [                      // the owner name of the model
+            /*[                      // the owner name of the model
                 'label'  => \Yii::t('skeeks/shop/app', 'Canceled'),
                 'format' => 'raw',
                 'value'  => $this->render('_close-order', [
                     'model' => $model,
                 ]),
-            ],
+            ],*/
 
             /*[                      // the owner name of the model
                 'label' => \Yii::t('skeeks/shop/app', 'Date of status change'),
@@ -159,21 +160,21 @@ HTML
                 'label'  => \Yii::t('skeeks/shop/app', 'Profile of buyer'),
                 'format' => 'raw',
                 'value'  => $model->buyer ? Html::a($model->buyer->name." [{$model->buyer->id}]",
-                    \skeeks\cms\helpers\UrlHelper::construct([
-                        '/shop/admin-buyer/update',
-                        'pk' => $model->buyer->id,
-                    ])->enableAdmin(), [
-                        'data-pjax' => 0,
-                    ]) . " ({$model->shopPersonType->name})" : '-',
+                        \skeeks\cms\helpers\UrlHelper::construct([
+                            '/shop/admin-buyer/update',
+                            'pk' => $model->buyer->id,
+                        ])->enableAdmin(), [
+                            'data-pjax' => 0,
+                        ])." ({$model->shopPersonType->name})" : '-',
             ],
 
 
         ],
 ]) ?>
 
-<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+<?/*= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/shop/app', 'Customer data'),
-]) ?>
+]) */?>
 <? if ($model->buyer) : ?>
     <?= \yii\widgets\DetailView::widget([
         'model'      => $model->buyer->relatedPropertiesModel,
@@ -187,7 +188,7 @@ HTML
 
 
 <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-    'content' => \Yii::t('skeeks/shop/app', 'Payment order'),
+    'content' => \Yii::t('skeeks/shop/app', 'Оплата'),
 ]) ?>
 <?= \yii\widgets\DetailView::widget([
     'model'      => $model,
@@ -216,14 +217,6 @@ HTML
                 ]),
             ],
 
-            [                      // the owner name of the model
-                'label'  => "",
-                'format' => 'raw',
-                'value'  => $this->render('_payment', [
-                    'model' => $model,
-                ]),
-
-            ],
         ],
 ]) ?>
 
@@ -368,7 +361,9 @@ HTML
             ],
         ],
     ],
-]); ?>
+]);
+
+?>
 
 
 <div class="row">
@@ -736,7 +731,7 @@ JS
 <?=
 $form->fieldSelect($model, 'shop_delivery_id', \yii\helpers\ArrayHelper::map(
     \skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'
-));
+))->label(false);
 ?>
 
 <? /*= $form->fieldRadioListBoolean($model, 'allow_delivery'); */ ?>

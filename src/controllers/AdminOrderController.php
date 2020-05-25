@@ -117,21 +117,21 @@ class AdminOrderController extends BackendModelStandartController
                     'visibleColumns' => [
                         'checkbox',
                         'actions',
-                        'id',
+                        //'id',
 
                         'updated_at',
 
-                        'shop_order_status_id',
+                        'custom',
 
                         'paid_at',
-                        'canceled_at',
+                        ///'canceled_at',
 
                         //'shop_buyer_id',
-                        'buyer',
+                        //'buyer',
                         'shop_pay_system_id',
                         'shop_delivery_id',
 
-                        'items',
+                        //'items',
 
                         'amount',
                         //'is_created',
@@ -249,7 +249,9 @@ CSS
                             },
                         ],
                         'updated_at'           => [
-                            'class' => DateTimeColumnData::class,
+                            'value' => function(ShopOrder $shopOrder) {
+                                return \Yii::$app->formatter->asRelativeTime($shopOrder->updated_at);
+                            }
                         ],
                         'items'                => [
                             'label'  => "Товары",
@@ -281,6 +283,28 @@ HTML;
                                 }
                             },
                         ],
+                        'custom' => [
+                            'attribute' => "id",
+                            'format' => "raw",
+                            'label' => "Номер заказа",
+                            'value' => function (ShopOrder $shopOrder) {
+                                $name = "Заказ №" . $shopOrder->id;
+                                if (!$shopOrder->shopOrderStatus) {
+                                    return $name;
+                                }
+                                return
+                                    Html::a($name, "#", [
+                                         'class' => "sx-trigger-action",
+                                        'style' => "font-size: 18px;",
+                                    ]) . " " . 
+                                    \yii\helpers\Html::label($shopOrder->shopOrderStatus->name, null, [
+                                        'style' => "background: {$shopOrder->shopOrderStatus->bg_color}; color: {$shopOrder->shopOrderStatus->color}; padding: 5px; 0px;",
+                                        //'class' => "label",
+                                    ])."<br />".
+                                    \yii\helpers\Html::tag("small",
+                                        \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
+                            },
+                        ],
                         'shop_order_status_id' => [
                             'value' => function (ShopOrder $shopOrder) {
                                 if (!$shopOrder->shopOrderStatus) {
@@ -296,6 +320,7 @@ HTML;
                         ],
                         'amount'               => [
                             'value' => function (ShopOrder $shopOrder) {
+                                return $shopOrder->money;
                                 $result = [];
                                 $result[] = "Товары:&nbsp;".$shopOrder->moneyItems;
                                 $result[] = "Доставка:&nbsp;".$shopOrder->moneyDelivery;
