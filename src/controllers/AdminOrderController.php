@@ -128,8 +128,8 @@ class AdminOrderController extends BackendModelStandartController
 
                         //'shop_buyer_id',
                         //'buyer',
-                        'shop_pay_system_id',
-                        'shop_delivery_id',
+                        //'shop_pay_system_id',
+                        //'shop_delivery_id',
 
                         //'items',
 
@@ -249,6 +249,12 @@ CSS
                             },
                         ],
                         'updated_at'           => [
+                            'headerOptions' => [
+                                'style' => 'max-width: 50px;'
+                            ],
+                            'contentOptions' => [
+                                'style' => 'max-width: 50px;'
+                            ],
                             'value' => function(ShopOrder $shopOrder) {
                                 return \Yii::$app->formatter->asRelativeTime($shopOrder->updated_at);
                             }
@@ -292,17 +298,28 @@ HTML;
                                 if (!$shopOrder->shopOrderStatus) {
                                     return $name;
                                 }
-                                return
-                                    Html::a($name, "#", [
+                                
+                                $data = [];
+                                
+                                $data[] = Html::a($name, "#", [
                                          'class' => "sx-trigger-action",
                                         'style' => "font-size: 18px;",
                                     ]) . " " . 
-                                    \yii\helpers\Html::label($shopOrder->shopOrderStatus->name, null, [
+                                    \yii\helpers\Html::tag("span", $shopOrder->shopOrderStatus->name, [
                                         'style' => "background: {$shopOrder->shopOrderStatus->bg_color}; color: {$shopOrder->shopOrderStatus->color}; padding: 5px; 0px;",
                                         //'class' => "label",
-                                    ])."<br />".
-                                    \yii\helpers\Html::tag("small",
-                                        \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
+                                    ]);
+                                
+                                $data[] = "от " . \yii\helpers\Html::tag("small", \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
+                                
+                                if ($shopOrder->shopPaySystem) {
+                                    $data[] = "" . $shopOrder->shopPaySystem->name;
+                                }
+                                
+                                if ($shopOrder->shopDelivery) {
+                                    $data[] = "" . $shopOrder->shopDelivery->name;
+                                }
+                                return implode("<br />", $data);
                             },
                         ],
                         'shop_order_status_id' => [
@@ -319,8 +336,15 @@ HTML;
                             },
                         ],
                         'amount'               => [
+                            'contentOptions' => [
+                                'style' => 'max-width: 50px;'
+                            ],
+                            
                             'value' => function (ShopOrder $shopOrder) {
-                                return $shopOrder->money;
+                                return Html::tag('span', $shopOrder->money, [
+                                    'class' => 'g-color-primary',
+                                    'style' => 'font-size: 18px;',
+                                ]);
                                 $result = [];
                                 $result[] = "Товары:&nbsp;".$shopOrder->moneyItems;
                                 $result[] = "Доставка:&nbsp;".$shopOrder->moneyDelivery;
