@@ -98,7 +98,12 @@ return [
 
         'items' => [
             [
-                'priority' => 10,
+                    'priority' => 10,
+                    "label" => \Yii::t('skeeks/shop/app', 'Orders'),
+                    "url"   => ["shop/admin-order"],
+                    "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
+        
+                /*'priority' => 10,
                 'label'    => \Yii::t('skeeks/shop/app', 'Orders'),
                 "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
 
@@ -126,7 +131,7 @@ return [
                             "url"   => ["shop/admin-payment"],
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
                         ],
-                    ],
+                    ],*/
 
             ],
 
