@@ -58,15 +58,25 @@ $order->refresh();
                     'attribute' => 'name',
                     'format'    => 'raw',
                     'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
+                        $result = [];
                         if ($shopBasket->url) {
-                            return Html::a($shopBasket->name, $shopBasket->absoluteUrl, [
+                            $result[] =  Html::a($shopBasket->name, $shopBasket->absoluteUrl, [
                                 'target'    => '_blank',
                                 'titla'     => "Смотреть на сайте",
                                 'data-pjax' => 0,
                             ]);
                         } else {
-                            return $shopBasket->name;
+                            $result[] =  $shopBasket->name;
                         }
+
+                        if ($shopBasket->shopOrderItemProperties) {
+                            foreach ($shopBasket->shopOrderItemProperties as $prop)
+                            {
+                                $result[] = "<small style='color: gray;'>{$prop->name}: {$prop->value}</small>";
+                            }
+                        }
+
+                        return implode("<br />", $result);
 
                     },
                 ],

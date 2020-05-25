@@ -280,20 +280,6 @@ class ShopOrderItem extends ActiveRecord
             'length' => $product->length,
         ]);
 
-        //Рассчет налогов TODO: переделать
-        /*if ($product->vat && (float)$product->vat->rate > 0) {
-            $this->vat_rate = $product->vat->rate;
-
-            if ($product->vat_included == Cms::BOOL_Y) {
-                $this->price = $productPriceMoney->getValue();
-            } else {
-                $this->price = $productPriceMoney->getValue() * $this->vat_rate;
-            }
-
-        } else {
-            $this->price = $productPriceMoney->getValue();
-        }*/
-
         $this->currency_code = $productPriceMoney->currency->code;
 
         //Проверка скидок

@@ -145,7 +145,7 @@ class ShopComponent extends Component
      * @var array
      */
     //public $visible_shop_supplier_ids = [];
-    public $is_show_products_has_main = false;
+    //public $is_show_products_has_main = false;
 
 
     /**
@@ -201,10 +201,6 @@ class ShopComponent extends Component
                     ],
 
 
-                    'is_show_products_has_main' => [
-                        'class'     => BoolField::class,
-                        'allowNull' => false,
-                    ],
 
                 ],
             ],
@@ -286,7 +282,7 @@ class ShopComponent extends Component
                     'is_show_button_no_price',
                     'is_show_product_only_quantity',
                     'is_show_quantity_product',
-                    'is_show_products_has_main',
+                    //'is_show_products_has_main',
                 ],
                 'boolean',
             ],
@@ -307,14 +303,14 @@ class ShopComponent extends Component
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
-            'is_show_products_has_main'     => "Отображать только товары которые привязаны к главным?",
+            //'is_show_products_has_main'     => "Отображать только товары которые привязаны к главным?",
         ]);
     }
 
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_show_products_has_main'     => "Если выбрано да, то будут показываться только оформленные товары",
+            //'is_show_products_has_main'     => "Если выбрано да, то будут показываться только оформленные товары",
             'start_order_status_id'         => "Статус, который присваивается заказу сразу после его оформления",
             'end_order_status_id'           => "Статус, который присваивается заказу после завершения работы с ним",
             'notify_emails'                 => \Yii::t('skeeks/shop/app',
@@ -571,23 +567,11 @@ class ShopComponent extends Component
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
 
-        if ($this->is_show_products_has_main) {
+        /*if ($this->is_show_products_has_main) {
             $activeQuery->andWhere(
                 ['is not', 'shopProduct.main_pid', null]
             );
-        }
-        /*if ($this->visible_shop_supplier_ids) {
-            $activeQuery->andWhere([
-                'or',
-                ['shopProduct.shop_supplier_id' => null],
-                ['in', 'shopProduct.shop_supplier_id', $this->visible_shop_supplier_ids],
-            ]);
-        } else {
-            $activeQuery->andWhere(
-                ['shopProduct.shop_supplier_id' => null]
-            );
         }*/
-
 
         return $this;
     }
