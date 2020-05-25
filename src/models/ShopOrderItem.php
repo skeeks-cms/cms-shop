@@ -413,14 +413,30 @@ class ShopOrderItem extends ActiveRecord
         if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
             if ($parent = $this->shopProduct->shopProductWhithOffers) {
+
+                
                 if ($this->shopProduct->cmsContentElement->image) {
                     return $this->shopProduct->cmsContentElement->image;
                 } else {
-                    return $parent->cmsContentElement->image;
+               
+                    if (!$parent->cmsContentElement->image) {
+                        if ($parent->main_pid) {
+                            return $parent->shopMainProduct->cmsContentElement->image;
+                        }
+                    } else {
+                        return $parent->cmsContentElement->image;
+                    }
                 }
-                
+
             } else {
-                return $this->shopProduct->cmsContentElement->image;
+
+                if (!$this->shopProduct->cmsContentElement->image) {
+                    if ($this->shopProduct->main_pid) {
+                        return $this->shopProduct->shopMainProduct->cmsContentElement->image;
+                    }
+                } else {
+                    return $this->shopProduct->cmsContentElement->image;
+                }
             }
         }
 
