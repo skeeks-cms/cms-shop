@@ -8,8 +8,7 @@ $url = $order->url;
 ?>
 
 <?= Html::beginTag('h1'); ?>
-<?= \Yii::t('skeeks/shop/app', 'Changing status'); ?> #<?= $order->id; ?> <?= \Yii::t('skeeks/shop/app',
-    'Online'); ?> <?= \Yii::$app->cms->appName ?>
+    Заказ №<?= $order->id; ?> — <?= $order->shopOrderStatus->name; ?>
 <?= Html::endTag('h1'); ?>
 
 <?= Html::beginTag('p'); ?>
@@ -17,6 +16,20 @@ $url = $order->url;
     \yii\helpers\Url::home(true)) ?> <?= \Yii::t('skeeks/shop/app', 'changed to'); ?>: "<?= $order->status->name; ?>" .
     <br>
 <?= Html::endTag('p'); ?>
+
+<?php if ($order->statusComment) : ?>
+    <div>
+        <?php echo $order->statusComment; ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($order->shopOrderStatus->email_notify_description) : ?>
+    <div>
+        <?php echo $order->shopOrderStatus->email_notify_description; ?>
+    </div>
+<?php endif; ?>
+
+
 
 <?= Html::beginTag('p'); ?>
 <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>

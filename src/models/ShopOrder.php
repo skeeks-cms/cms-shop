@@ -2,7 +2,6 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -28,8 +27,6 @@ use yii\helpers\Url;
  * @property integer                    $shop_person_type_id
  * @property integer                    $paid_at
  * @property integer                    $shop_buyer_id
- * @property integer                    $canceled_at
- * @property string                     $reason_canceled
  * @property string                     $status_code
  * @property integer                    $status_at
  * @property string                     $delivery_amount
@@ -41,16 +38,8 @@ use yii\helpers\Url;
  * @property string                     $discount_amount
  * @property integer                    $shop_pay_system_id
  * @property integer                    $shop_delivery_id
- * @property string                     $user_description
- * @property string                     $additional_info
- * @property string                     $comments
  * @property string                     $tax_amount
  * @property string                     $paid_amount
- * @property integer                    $locked_by
- * @property integer                    $locked_at
- * @property string                     $delivery_doc_num
- * @property integer                    $delivery_doc_at
- * @property string                     $tracking_number
  * @property integer                    $shop_order_status_id
  * @property string                     $code
  * @property boolean                    $is_created Заказ создан? Если заказ не создан он связан с корзиной пользователя.
@@ -71,9 +60,12 @@ use yii\helpers\Url;
  *
  * @property CmsContentElement          $store
  * @property Currency                   $currency
- * @property CmsUser                    $lockedBy
  *
- * @property ShopOrderChange[]          $shopOrderChanges
+ * @property ShopOrderLog[]             $shopOrderLogs
+ * @property ShopOrderLog[]             $shopOrderStatusLogs
+ * @property ShopOrderLog               $lastStatusLog
+ *
+ *
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
  * @property ShopDiscountCoupon[]       $shopDiscountCoupons
  *
@@ -107,6 +99,21 @@ class ShopOrder extends \skeeks\cms\models\Core
     const EVENT_AFTER_RECALCULATE = 'afterRecalculate';
 
     protected $_email = null;
+
+
+    /**
+     * Уведомить по email о смене статуса?
+     * @var bool
+     */
+    public $isNotifyChangeStatus = true;
+
+    /**
+     * Сообщение привязанное к смене статуса
+     * @var string
+     */
+    public $statusComment = "";
+
+
     /**
      * @inheritdoc
      */
@@ -114,6 +121,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return '{{%shop_order}}';
     }
+
 
     public function notifyNew()
     {
@@ -138,7 +146,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         parent::init();
 
         //$this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterUpdateCallback"]);
-        $this->on(self::EVENT_AFTER_UPDATE,    [$this, "_afterUpdateCallback"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "_afterUpdateCallback"]);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeUpdateCallback"]);
 
 
@@ -148,10 +156,10 @@ class ShopOrder extends \skeeks\cms\models\Core
         //Заказ создан
         if (in_array("is_created", array_keys($event->changedAttributes)) && $this->is_created) {
 
-            \Yii::info($this->id . " is_created!", self::class);
-            
-            (new ShopOrderChange([
-                'type'          => ShopOrderChange::ORDER_ADDED,
+            \Yii::info($this->id." is_created!", self::class);
+
+            (new ShopOrderLog([
+                'action_type'   => ShopOrderLog::TYPE_ORDER_ADDED,
                 'shop_order_id' => $this->id,
             ]))->save();
 
@@ -173,9 +181,9 @@ class ShopOrder extends \skeeks\cms\models\Core
                     }
                 }
             } catch (\Exception $e) {
-                \Yii::error("Email seinding error: " . $e->getMessage(), self::class);
+                \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
             }
-            
+
             try {
                 //Письмо тому кто заказывает
                 if ($this->email) {
@@ -183,7 +191,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                     $this->notifyNew();
                 }
             } catch (\Exception $e) {
-                \Yii::error("Email client seinding error '{$this->email}': " . $e->getMessage(), self::class);
+                \Yii::error("Email client seinding error '{$this->email}': ".$e->getMessage(), self::class);
             }
 
         }
@@ -191,12 +199,10 @@ class ShopOrder extends \skeeks\cms\models\Core
 
     public function _beforeUpdateCallback(ModelEvent $e)
     {
-        /*var_dump($this->is_created);
-        var_dump($this->isAttributeChanged('is_created'));
-        die;*/
         //После создания заказа делать его пересчет
         if ($this->isAttributeChanged('is_created') && $this->is_created) {
             $this->created_at = time();
+            $this->is_allowed_payment = (bool)!\Yii::$app->shop->is_pay_after_confirmation;
             $this->recalculate();
         }
         if ($this->isAttributeChanged('shop_delivery_id')) {
@@ -207,20 +213,21 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         if ($this->isAttributeChanged('shop_order_status_id')) {
-            $this->status_at = \Yii::$app->formatter->asTimestamp(time());
+            $this->status_at = time();
 
-            (new ShopOrderChange([
-                'type'          => ShopOrderChange::ORDER_STATUS_CHANGED,
+            (new ShopOrderLog([
+                'action_type'   => ShopOrderLog::TYPE_ORDER_STATUS_CHANGED,
                 'shop_order_id' => $this->id,
-                'data'          =>
-                [
-                    'status' => $this->shopOrderStatus->name,
+                'action_data'   => [
+                    'status'    => $this->shopOrderStatus->name,
+                    'status_id' => $this->shopOrderStatus->id,
+                    'comment'   => $this->statusComment,
                 ],
             ]))->save();
 
 
             //Письмо тому кто заказывает
-            if ($this->email) {
+            if ($this->email && $this->isNotifyChangeStatus) {
                 try {
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
@@ -229,23 +236,22 @@ class ShopOrder extends \skeeks\cms\models\Core
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::t('skeeks/shop/app',
-                                'Change order status').' #'.$this->id)
+                        ->setSubject("Заказ №".$this->id." — ".$this->shopOrderStatus->name)
                         ->send();
 
                 } catch (\Exception $e) {
                     \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::class);
                 }
-
             }
         }
+
 
         if ($this->isAttributeChanged('paid_at') && $this->paid_at) {
 
             \Yii::info(print_r($this->toArray(), true), self::class);
 
-            (new ShopOrderChange([
-                'type'          => ShopOrderChange::ORDER_PAYED,
+            (new ShopOrderLog([
+                'action_type'   => ShopOrderLog::TYPE_ORDER_PAYED,
                 'shop_order_id' => $this->id,
             ]))->save();
 
@@ -278,8 +284,8 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         if ($this->isAttributeChanged('is_allowed_payment') && $this->is_allowed_payment) {
-            (new ShopOrderChange([
-                'type'          => ShopOrderChange::ORDER_ALLOW_PAYMENT,
+            (new ShopOrderLog([
+                'action_type'   => ShopOrderLog::TYPE_ORDER_ALLOW_PAYMENT,
                 'shop_order_id' => $this->id,
             ]))->save();
 
@@ -304,64 +310,6 @@ class ShopOrder extends \skeeks\cms\models\Core
                 }
             }
         }
-
-        if ($this->isAttributeChanged('allow_delivery') && $this->allow_delivery == Cms::BOOL_Y) {
-            (new ShopOrderChange([
-                'type'          => ShopOrderChange::ORDER_ALLOW_DELIVERY,
-                'shop_order_id' => $this->id,
-            ]))->save();
-
-
-            //Письмо тому кто заказывает
-            if ($this->email) {
-                try {
-
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
-
-                    \Yii::$app->mailer->compose('order-allow-delivery', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo($this->email)
-                        ->setSubject(\Yii::t('skeeks/shop/app',
-                                'Resolution of payment on request').' №'.$this->id)
-                        ->send();
-
-                } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::class);
-                }
-            }
-        }
-
-        if ($this->isAttributeChanged('canceled_at') && $this->canceled_at) {
-            (new ShopOrderChange([
-                'type'          => ShopOrderChange::ORDER_CANCELED,
-                'shop_order_id' => $this->id,
-                'data'          => [
-                    'reason_canceled' => $this->reason_canceled,
-                ],
-            ]))->save();
-
-
-            //Письмо тому кто заказывает
-            if ($this->email) {
-                try {
-
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
-
-                    \Yii::$app->mailer->compose('canceled', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo($this->email)
-                        ->setSubject(\Yii::t('skeeks/shop/app',
-                                'Cancellations').' №'.$this->id)
-                        ->send();
-                } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::class);
-                }
-            }
-        }
     }
     /**
      * @inheritdoc
@@ -377,13 +325,8 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'updated_at',
                     'shop_person_type_id',
                     'paid_at',
-                    'canceled_at',
                     'status_at',
-                    'allow_delivery_at',
                     'shop_pay_system_id',
-                    'locked_by',
-                    'locked_at',
-                    'delivery_doc_at',
                     'shop_order_status_id',
                 ],
                 'integer',
@@ -395,49 +338,22 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'boolean',
             ],
             [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
-            [['comments'], 'string'],
             [['shop_buyer_id'], 'integer'],
             [['is_allowed_payment'], 'integer'],
             [['cms_site_id'], 'integer'],
-            [
-                [
-                    'allow_delivery',
-                ],
-                'string',
-                'max' => 1,
-            ],
-            [
-                [
-                    'reason_canceled',
-                    'user_description',
-                    'additional_info',
-                ],
-                'string',
-                'max' => 255,
-            ],
+
             [['currency_code'], 'string', 'max' => 3],
             [['shop_delivery_id'], 'integer'],
-            [['delivery_doc_num'], 'string', 'max' => 20],
-            [['tracking_number'], 'string', 'max' => 100],
 
-            [
-                [
-                    'allow_delivery',
-                ],
-                'default',
-                'value' => Cms::BOOL_N,
-            ],
             [['status_at'], 'default', 'value' => \Yii::$app->formatter->asTimestamp(time())],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
             [['cms_site_id'], 'default', 'value' => \Yii::$app->skeeks->site->id],
-
-            [['reason_canceled'], 'validateCanceled'],
 
             [
                 ['is_allowed_payment'],
                 'default',
                 'value' => function () {
-                    return (\Yii::$app->shop->payAfterConfirmation == Cms::BOOL_Y) ? 0 : 1;
+                    return (bool)\Yii::$app->shop->is_pay_after_confirmation;
                 },
             ],
 
@@ -457,107 +373,45 @@ class ShopOrder extends \skeeks\cms\models\Core
                 },
             ],
 
-            /*['reason_canceled', 'required', 'when' => function($model) {
-                return $model->canceled == Cms::BOOL_Y;
-            }, 'whenClient' => "function (attribute, value) {
-                return $('#country').val() == 'Y';
-            }"],*/
+            [
+                'isNotifyChangeStatus',
+                'boolean',
+            ],
+
+            ['statusComment', 'string'],
+
 
         ];
     }
-    /**
-     * Процесс оплаты заказа
-     *
-     * @return $this
-     */
-    public function processNotePayment()
-    {
-        /*$transaction = new ShopUserTransact();
-        $transaction->cms_user_id = $this->user_id;
-        $transaction->shop_order_id = $this->id;
-        $transaction->amount = $this->money->amount;
-        $transaction->currency_code = $this->money->currency->code;
-        $transaction->debit = "Y";
-        $transaction->description = ShopUserTransact::OUT_CHARGE_OFF;
-        $transaction->save();
 
-
-        $transaction = new ShopUserTransact();
-        $transaction->cms_user_id = $this->user_id;
-        $transaction->shop_order_id = $this->id;
-        $transaction->amount = $this->money->amount;
-        $transaction->currency_code = $this->money->currency->code;
-        $transaction->debit = "N";
-        $transaction->description = ShopUserTransact::ORDER_PAY;
-        $transaction->save();*/
-
-        /*$this->payed = "Y";
-        $this->save();*/
-
-        return $this;
-    }
-    /**
-     * Отмена оплаты заказа
-     * @return $this
-     */
-    public function processCloseNotePayment()
-    {
-        $this->payed = "N";
-        $this->save();
-
-        return $this;
-    }
-    /**
-     * Валидация причины отмены
-     *
-     * @param $attribute
-     */
-    public function validateCanceled($attribute)
-    {
-        if ($this->canceled_at && !$this->reason_canceled) {
-            $this->addError($attribute, \Yii::t('skeeks/shop/app', 'Enter the reason for cancellation'));
-        }
-    }
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return [
-            'id'                  => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'          => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'          => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'          => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'          => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'cms_site_id'         => \Yii::t('skeeks/shop/app', 'Site'),
-            'shop_person_type_id' => \Yii::t('skeeks/shop/app', 'Person Type ID'),
-            'payed'               => \Yii::t('skeeks/shop/app', 'Оплачен'),
-            'paid_at'            => \Yii::t('skeeks/shop/app', 'Оплачен'),
-            'canceled'            => \Yii::t('skeeks/shop/app', 'Canceled'),
-            'canceled_at'         => \Yii::t('skeeks/shop/app', 'Canceled'),
-            'reason_canceled'     => \Yii::t('skeeks/shop/app', 'Reason of cancellation'),
-            'shop_order_status_id'         => \Yii::t('skeeks/shop/app', 'Status'),
-            'status_at'           => \Yii::t('skeeks/shop/app', 'Status At'),
-            'delivery_amount'     => \Yii::t('skeeks/shop/app', 'Price Delivery'),
-            'allow_delivery'      => \Yii::t('skeeks/shop/app', 'Allow Delivery'),
-            'allow_delivery_at'   => \Yii::t('skeeks/shop/app', 'Allow Delivery At'),
-            'amount'              => \Yii::t('skeeks/shop/app', 'Price'),
-            'currency_code'       => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'discount_amount'     => \Yii::t('skeeks/shop/app', 'Discount Value'),
-            'shop_pay_system_id'  => \Yii::t('skeeks/shop/app', 'Pay System ID'),
-            'shop_delivery_id'    => \Yii::t('skeeks/shop/app', 'Delivery'),
-            'user_description'    => \Yii::t('skeeks/shop/app', 'User Description'),
-            'additional_info'     => \Yii::t('skeeks/shop/app', 'Additional Info'),
-            'comments'            => \Yii::t('skeeks/shop/app', 'Comments'),
-            'tax_amount'          => \Yii::t('skeeks/shop/app', 'Tax Value'),
-            'paid_amount'         => \Yii::t('skeeks/shop/app', 'Sum Paid'),
-            'locked_by'           => \Yii::t('skeeks/shop/app', 'Locked By'),
-            'locked_at'           => \Yii::t('skeeks/shop/app', 'Locked At'),
-            'delivery_doc_num'    => \Yii::t('skeeks/shop/app', 'Delivery Doc Num'),
-            'delivery_doc_at'     => \Yii::t('skeeks/shop/app', 'Delivery Doc At'),
-            'tracking_number'     => \Yii::t('skeeks/shop/app', 'Tracking Number'),
-            'shop_buyer_id'       => \Yii::t('skeeks/shop/app', 'Buyer'),
-            'is_allowed_payment'       => \Yii::t('skeeks/shop/app', 'Allow Payment'),
+            'id'                   => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'           => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'           => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'           => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'           => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'cms_site_id'          => \Yii::t('skeeks/shop/app', 'Site'),
+            'shop_person_type_id'  => \Yii::t('skeeks/shop/app', 'Person Type ID'),
+            'paid_at'              => \Yii::t('skeeks/shop/app', 'Оплачен'),
+            'shop_order_status_id' => \Yii::t('skeeks/shop/app', 'Status'),
+            'status_at'            => \Yii::t('skeeks/shop/app', 'Status At'),
+            'delivery_amount'      => \Yii::t('skeeks/shop/app', 'Price Delivery'),
+            'amount'               => \Yii::t('skeeks/shop/app', 'Price'),
+            'currency_code'        => \Yii::t('skeeks/shop/app', 'Currency Code'),
+            'discount_amount'      => \Yii::t('skeeks/shop/app', 'Discount Value'),
+            'shop_pay_system_id'   => \Yii::t('skeeks/shop/app', 'Pay System ID'),
+            'shop_delivery_id'     => \Yii::t('skeeks/shop/app', 'Delivery'),
+            'tax_amount'           => \Yii::t('skeeks/shop/app', 'Tax Value'),
+            'paid_amount'          => \Yii::t('skeeks/shop/app', 'Sum Paid'),
+            'shop_buyer_id'        => \Yii::t('skeeks/shop/app', 'Buyer'),
+            'is_allowed_payment'   => \Yii::t('skeeks/shop/app', 'Allow Payment'),
+            'isNotifyChangeStatus' => \Yii::t('skeeks/shop/app', 'Отправить email уведомление клиенту?'),
+            'statusComment'        => \Yii::t('skeeks/shop/app', 'Комментарий к смене статуса'),
 
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Payment system'),
 
@@ -601,14 +455,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getCurrency()
     {
         return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getLockedBy()
-    {
-        return $this->hasOne(CmsUser::class, ['id' => 'locked_by']);
     }
 
     /**
@@ -669,10 +515,37 @@ class ShopOrder extends \skeeks\cms\models\Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopOrderChanges()
+    public function getShopOrderLogs()
     {
-        return $this->hasMany(ShopOrderChange::class,
+        return $this->hasMany(ShopOrderLog::class,
             ['shop_order_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrderStatusLogs()
+    {
+        return $this->getShopOrderLogs()->andWhere([
+            'in',
+            'action_type',
+            [
+                ShopOrderLog::TYPE_ORDER_STATUS_CHANGED,
+                ShopOrderLog::TYPE_ORDER_ADDED,
+            ],
+        ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLastStatusLog()
+    {
+        $q = $this->getShopOrderStatus()->limit(1);
+        $q->multiple = false;
+
+        return $q;
     }
     /**
      * @return \yii\db\ActiveQuery
@@ -795,8 +668,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         //Скидка на корзину
         if ($this->shopDiscountCoupons) {
-            foreach ($this->shopDiscountCoupons as $shopDiscountCoupon)
-            {
+            foreach ($this->shopDiscountCoupons as $shopDiscountCoupon) {
                 $shopDiscount = $shopDiscountCoupon->shopDiscount;
                 if ($shopDiscountCoupon->shopDiscount->assignment_type == ShopDiscount::ASSIGNMENT_TYPE_CART) {
 
@@ -804,7 +676,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                         $discountMoney = new Money($shopDiscount->value, $shopDiscount->currency_code);
                         $money->add($discountMoney);
                     }
-                    
+
                     if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_P) {
                         $moneyOrderItems = $this->calcMoneyItems;
                         $moneyValue = $moneyOrderItems->amount * $shopDiscount->value / 100;
@@ -900,8 +772,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->shopPersonType->getPaySystems()
             ->andWhere([ShopPaySystem::tableName().".is_active" => 1])
-            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id])
-        ;
+            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id]);
     }
     /**
      * @return $this
@@ -930,8 +801,8 @@ class ShopOrder extends \skeeks\cms\models\Core
         ), $scheme);
     }
     /**
-     * @deprecated
      * @return string
+     * @deprecated
      */
     public function getPublicUrl($options = [], $scheme = true)
     {
@@ -1021,7 +892,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'shopOrder'             => $this,
             'price'                 => new ShopProductPrice([
                 'currency_code' => \Yii::$app->money->currencyCode,
-                'price' => 0,
+                'price'         => 0,
             ]),
         ]);;
 
@@ -1169,16 +1040,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->paid_at ? "Y" : "N";
     }
-
-    /**
-     * @return string
-     * @deprecated
-     */
-    public function getCanceled()
-    {
-        return $this->canceled_at ? "Y" : "N";
-    }
-
     /**
      * @return \yii\db\ActiveQuery
      * @deprecated

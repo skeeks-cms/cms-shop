@@ -78,7 +78,6 @@ class UpaOrderController extends BackendModelStandartController
                         'shop_order_status_id',
 
                         'paid_at',
-                        'canceled_at',
 
                         //'shop_buyer_id',
                         //'shop_pay_system_id',
@@ -118,30 +117,7 @@ class UpaOrderController extends BackendModelStandartController
                                 ]);
                             },
                         ],
-                        'canceled_at'          => [
-                            'value' => function (ShopOrder $shopOrder, $key) {
-                                $reuslt = "<div>";
-                                if ($shopOrder->canceled_at) {
-                                    $this->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-red');
-JS
-                                    );
-
-                                    $this->view->registerCss(<<<CSS
-tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
-{
-background: #FFECEC !important;
-}
-CSS
-                                    );
-                                    $reuslt = "<div style='color: red;'>";
-                                }
-
-                                $reuslt .= $shopOrder->canceled_at ? \Yii::$app->formatter->asDatetime($shopOrder->canceled_at) : "-";
-                                $reuslt .= "</div>";
-                                return $reuslt;
-                            },
-                        ],
+                        
                         'paid_at'              => [
                             'value' => function (ShopOrder $shopOrder, $key) {
                                 $reuslt = "<div>";

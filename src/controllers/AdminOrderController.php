@@ -49,11 +49,16 @@ class AdminOrderController extends BackendModelStandartController
              */
             $model = $this->model;
             $date = \Yii::$app->formatter->asDatetime($model->created_at);
-            return Html::tag('h1', "Заказ №{$model->id} от {$date}".Html::a('<i class="fas fa-external-link-alt"></i>', $model->getPublicUrl(), [
+            return Html::tag('h1', "Заказ <span class='g-color-primary'>№{$model->id}</span> на сумму<span class='g-color-primary'> " . $model->money . "</span>" .  Html::a('<i class="fas fa-external-link-alt"></i>', $model->getPublicUrl(), [
                     'target' => "_blank",
                     'class'  => "g-ml-20",
                     'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                ]));
+                ]), [
+                    'style'  => "margin-bottom: 0px;",
+                ])
+                .
+                "<h4 style='color: gray;'>от " . Html::tag("span", \Yii::$app->formatter->asDatetime($model->created_at)) . "</h4>";
+                ;
         };
 
         parent::init();
@@ -124,7 +129,6 @@ class AdminOrderController extends BackendModelStandartController
                         'custom',
 
                         'paid_at',
-                        ///'canceled_at',
 
                         //'shop_buyer_id',
                         //'buyer',
@@ -200,31 +204,15 @@ class AdminOrderController extends BackendModelStandartController
                             },
 
                         ],
-                        'canceled_at'          => [
-                            'value' => function (ShopOrder $shopOrder, $key) {
-                                $reuslt = "<div>";
-                                if ($shopOrder->canceled_at) {
-                                    $this->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-red');
-JS
-                                    );
-
-                                    $this->view->registerCss(<<<CSS
-tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
-{
-background: #FFECEC !important;
-}
-CSS
-                                    );
-                                    $reuslt = "<div style='color: red;'>";
-                                }
-
-                                $reuslt .= $shopOrder->canceled_at ? \Yii::$app->formatter->asDatetime($shopOrder->canceled_at) : "-";
-                                $reuslt .= "</div>";
-                                return $reuslt;
-                            },
-                        ],
+                        
                         'paid_at'              => [
+                            'headerOptions' => [
+                                'style' => 'width: 80px;'
+                            ],
+                            'contentOptions' => [
+                                'style' => 'width: 80px;'
+                            ],
+
                             'value' => function (ShopOrder $shopOrder, $key) {
                                 $reuslt = "<div>";
                                 if ($shopOrder->paid_at) {
@@ -250,10 +238,10 @@ CSS
                         ],
                         'updated_at'           => [
                             'headerOptions' => [
-                                'style' => 'max-width: 50px;'
+                                'style' => 'width: 120px;'
                             ],
                             'contentOptions' => [
-                                'style' => 'max-width: 50px;'
+                                'style' => 'width: 120px;'
                             ],
                             'value' => function(ShopOrder $shopOrder) {
                                 return \Yii::$app->formatter->asRelativeTime($shopOrder->updated_at);
@@ -337,7 +325,7 @@ HTML;
                         ],
                         'amount'               => [
                             'contentOptions' => [
-                                'style' => 'max-width: 50px;'
+                                'style' => 'width: 120px;'
                             ],
                             
                             'value' => function (ShopOrder $shopOrder) {
@@ -701,6 +689,7 @@ HTML;
             if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
                 $indexAction->url = $this->action->urlData;
                 $indexAction->filters = false;
+                $indexAction->backendShowings = false;
                 $visibleColumns = $indexAction->grid['visibleColumns'];
                 ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
                 $indexAction->grid['visibleColumns'] = $visibleColumns;
@@ -763,6 +752,7 @@ HTML;
             if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
                 $indexAction->url = $this->action->urlData;
                 $indexAction->filters = false;
+                $indexAction->backendShowings = false;
                 $visibleColumns = $indexAction->grid['visibleColumns'];
                 ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
                 $indexAction->grid['visibleColumns'] = $visibleColumns;
@@ -824,6 +814,7 @@ HTML;
             if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
                 $indexAction->url = $this->action->urlData;
                 $indexAction->filters = false;
+                $indexAction->backendShowings = false;
                 $visibleColumns = $indexAction->grid['visibleColumns'];
                 ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
                 $indexAction->grid['visibleColumns'] = $visibleColumns;

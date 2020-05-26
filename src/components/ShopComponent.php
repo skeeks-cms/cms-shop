@@ -83,7 +83,7 @@ class ShopComponent extends Component
      * Оплата заказов онлайн системами, только после проверки менеджером
      * @var string
      */
-    public $payAfterConfirmation = Cms::BOOL_N;
+    public $is_pay_after_confirmation = 0;
     /**
      * @var Кого уведомить о новых товарах
      */
@@ -194,10 +194,9 @@ class ShopComponent extends Component
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
                     ],
-                    'payAfterConfirmation'  => [
+                    'is_pay_after_confirmation'  => [
                         'class'      => BoolField::class,
-                        'trueValue'  => "Y",
-                        'falseValue' => "N",
+                        'allowNull' => false
                     ],
 
 
@@ -269,7 +268,7 @@ class ShopComponent extends Component
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
             [['email'], 'string'],
-            [['payAfterConfirmation'], 'string'],
+            [['is_pay_after_confirmation'], 'integer'],
             [['start_order_status_id'], 'integer'],
             [['end_order_status_id'], 'integer'],
 
@@ -294,7 +293,7 @@ class ShopComponent extends Component
             'start_order_status_id'         => 'Начальный статус заказа',
             'end_order_status_id'           => 'Конечный статус заказа',
             'email'                         => 'Email',
-            'payAfterConfirmation'          => \Yii::t('skeeks/shop/app',
+            'is_pay_after_confirmation'          => \Yii::t('skeeks/shop/app',
                 'Include payment orders only after the manager approval'),
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",

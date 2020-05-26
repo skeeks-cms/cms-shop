@@ -12,6 +12,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopOrderChange;
+use skeeks\cms\shop\models\ShopOrderLog;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use yii\helpers\ArrayHelper;
 
@@ -24,7 +25,7 @@ class AdminOrderChangeController extends BackendModelStandartController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'История изменения заказов');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopOrderChange::class;
+        $this->modelClassName = ShopOrderLog::class;
 
         parent::init();
     }
@@ -58,7 +59,7 @@ class AdminOrderChangeController extends BackendModelStandartController
 
                         'shop_order_id',
 
-                        'type',
+                        'action_type',
 
                     ],
 
@@ -66,8 +67,8 @@ class AdminOrderChangeController extends BackendModelStandartController
                         'created_at'           => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'type'           => [
-                            'value' => function(ShopOrderChange $shopOrderChange) {
+                        'action_type'           => [
+                            'value' => function(ShopOrderLog $shopOrderChange) {
                                 return $shopOrderChange->typeAsText;
                             },
                         ],
