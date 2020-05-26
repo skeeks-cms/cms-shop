@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\Core;
 use yii\helpers\ArrayHelper;
 
@@ -21,6 +22,8 @@ use yii\helpers\ArrayHelper;
  * @property string|null $bg_color
  * @property string|null $email_notify_description
  * @property string|null $order_page_description
+ * @property integer     $is_comment_required
+ * @property array|null  $client_available_statuses
  *
  * @property ShopOrder[] $shopOrders
  */
@@ -39,7 +42,14 @@ class ShopOrderStatus extends Core
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), []);
+        return ArrayHelper::merge(parent::behaviors(), [
+            Implode::class => [
+                'class' => Implode::class,
+                'fields' => [
+                    'client_available_statuses'
+                ]
+            ]
+        ]);
     }
     /**
      * @inheritdoc
@@ -47,16 +57,19 @@ class ShopOrderStatus extends Core
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'name'        => \Yii::t('skeeks/shop/app', 'Name'),
+            'name' => \Yii::t('skeeks/shop/app', 'Name'),
 
             'description' => \Yii::t('skeeks/shop/app', 'Описание'),
             'priority'    => \Yii::t('skeeks/shop/app', 'Priority'),
 
-            'color'       => \Yii::t('skeeks/shop/app', 'Цвет названия статуса'),
-            'bg_color'       => \Yii::t('skeeks/shop/app', 'Цвет фона статуса'),
+            'color'    => \Yii::t('skeeks/shop/app', 'Цвет названия статуса'),
+            'bg_color' => \Yii::t('skeeks/shop/app', 'Цвет фона статуса'),
 
-            'email_notify_description'       => \Yii::t('skeeks/shop/app', 'Дополнительный текст email уведомления'),
-            'order_page_description'       => \Yii::t('skeeks/shop/app', 'Дополнительный текст на странице заказа'),
+            'email_notify_description' => \Yii::t('skeeks/shop/app', 'Дополнительный текст email уведомления'),
+            'order_page_description'   => \Yii::t('skeeks/shop/app', 'Дополнительный текст на странице заказа'),
+
+            'is_comment_required'   => \Yii::t('skeeks/shop/app', 'Комментарий к статусу обязателен?'),
+            'client_available_statuses'   => \Yii::t('skeeks/shop/app', 'Доступные статусы для клиента'),
         ]);
     }
     /**
@@ -67,8 +80,11 @@ class ShopOrderStatus extends Core
         return array_merge(parent::attributeLabels(), [
             'description' => \Yii::t('skeeks/shop/app', 'Короткая расшфировка статуса заказа'),
 
-            'email_notify_description'       => \Yii::t('skeeks/shop/app', 'Этот текст получают клиенты в email уведомлении.'),
-            'order_page_description'       => \Yii::t('skeeks/shop/app', 'Этот текст отображается клиенту на странице с заказом, в случае этого статуса'),
+            'email_notify_description' => \Yii::t('skeeks/shop/app', 'Этот текст получают клиенты в email уведомлении.'),
+            'order_page_description'   => \Yii::t('skeeks/shop/app', 'Этот текст отображается клиенту на странице с заказом, в случае этого статуса'),
+
+            'is_comment_required'   => \Yii::t('skeeks/shop/app', 'Если эта опция выбрана, то при установке этого статуса у заказа, потребуется ОБЯЗАТЕЛЬНО написать комментарий!'),
+            'client_available_statuses'   => \Yii::t('skeeks/shop/app', 'Когда заказ находится в этом статусе, то клиенту доступны кнопки для смены статуса выбранные в этом поле.'),
         ]);
     }
 
@@ -79,6 +95,8 @@ class ShopOrderStatus extends Core
     {
         return array_merge(parent::rules(), [
             [['priority'], 'integer'],
+            [['is_comment_required'], 'integer'],
+            [['client_available_statuses'], 'safe'],
             [['name'], 'required'],
             [['description'], 'string', 'max' => 255],
             [['order_page_description'], 'string'],

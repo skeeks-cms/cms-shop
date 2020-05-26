@@ -164,6 +164,19 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
             </div>
         </div>
 
+        <?php if ($model->lastStatusLog && $model->lastStatusLog->comment) : ?>
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-12">
+                    <div style="margin-bottom: 0; color: gray;"><small><b>Комментарий к статусу:</b></small></div>
+                </div>
+                <div class="col-12">
+                    <div class="g-brd-primary" style="background: #fafafa; border-left: 5px solid; padding: 20px; 10px;">
+                        <?php echo nl2br($model->lastStatusLog->comment); ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <?php if ($model->shopOrderStatus->order_page_description) : ?>
             <div class="row" style="margin-top: 20px;">
                 <div class="col-12">
@@ -448,9 +461,10 @@ JS
 <? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-status-change',
     'header' => 'Изменение статуса',
-    'size' => \yii\bootstrap\Modal::SIZE_LARGE,
+    'size'   => \yii\bootstrap\Modal::SIZE_LARGE,
 ]); ?>
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+    'enableClientValidation' => false,
     'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
         'shop/admin-order/validate',
         'pk' => $model->id,
@@ -474,7 +488,7 @@ JS
 )); ?>
 
 <?php echo $form->field($model, 'statusComment')->textarea([
-    'rows' => 10
+    'rows' => 10,
 ]); ?>
 <?php echo $form->field($model, 'isNotifyChangeStatus')->checkbox(); ?>
 
@@ -562,8 +576,6 @@ $form->fieldSelect($model, 'shop_delivery_id', \yii\helpers\ArrayHelper::map(
 <?php \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::end(); ?>
 
 <? $modal::end(); ?>
-
-
 
 
 <div style="display: none;">

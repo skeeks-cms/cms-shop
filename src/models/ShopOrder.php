@@ -221,8 +221,8 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'action_data'   => [
                     'status'    => $this->shopOrderStatus->name,
                     'status_id' => $this->shopOrderStatus->id,
-                    'comment'   => $this->statusComment,
                 ],
+                'comment'   => $this->statusComment,
             ]))->save();
 
 
@@ -379,6 +379,15 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
 
             ['statusComment', 'string'],
+            ['statusComment', 'required', 'when' => function() {
+                if ($this->shopOrderStatus) {
+                    if ($this->shopOrderStatus->is_comment_required) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }],
 
 
         ];
@@ -542,7 +551,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getLastStatusLog()
     {
-        $q = $this->getShopOrderStatus()->limit(1);
+        $q = $this->getShopOrderStatusLogs()->limit(1);
         $q->multiple = false;
 
         return $q;

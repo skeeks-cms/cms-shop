@@ -8,7 +8,7 @@
 
 use yii\db\Migration;
 
-class m260526_140601__create_table__shop_order_log extends Migration
+class m200526_140601__create_table__shop_order_log extends Migration
 {
     public function safeUp()
     {
@@ -34,10 +34,12 @@ class m260526_140601__create_table__shop_order_log extends Migration
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
 
-            'shop_order_id'        => $this->integer()->notNull(),
+            'shop_order_id' => $this->integer()->notNull(),
 
-            'action_type'        => $this->string(255)->notNull(),
-            'action_data'        => $this->text(),
+            'action_type' => $this->string(255)->notNull(),
+            'action_data' => $this->text(),
+
+            'comment' => $this->text(),
 
         ], $tableOptions);
 

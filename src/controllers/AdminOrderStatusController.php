@@ -13,8 +13,10 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\widgets\ColorInput;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
+use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
@@ -150,6 +152,22 @@ HTML
             'other' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Дополнительно',
+                'fields' => [
+                    'is_comment_required' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'client_available_statuses' => [
+                        'class' => SelectField::class,
+                        'multiple' => true,
+                        'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'name'),
+                    ],
+                ]
+            ],
+
+            'additional' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Дополнительные подписи',
                 'fields' => [
                     'order_page_description' => [
                         'class' => WidgetField::class,

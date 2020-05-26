@@ -4,26 +4,26 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
-use skeeks\cms\query\CmsActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_order_change}}".
  *
- * @property integer    $id
- * @property integer    $created_by
- * @property integer    $updated_by
- * @property integer    $created_at
- * @property integer    $updated_at
+ * @property integer     $id
+ * @property integer     $created_by
+ * @property integer     $updated_by
+ * @property integer     $created_at
+ * @property integer     $updated_at
  *
- * @property integer    $shop_order_id
- * @property string     $action_type
- * @property array|null $action_data
+ * @property integer     $shop_order_id
+ * @property string      $action_type
+ * @property array|null  $action_data
+ * @property string|null $comment
  *
  * ***
  *
- * @property string     $typeAsText
- * @property ShopOrder  $shopOrder
+ * @property string      $typeAsText
+ * @property ShopOrder   $shopOrder
  */
 class ShopOrderLog extends ActiveRecord
 {
@@ -78,6 +78,10 @@ class ShopOrderLog extends ActiveRecord
             [['shop_order_id', 'action_type'], 'required'],
             [['action_data'], 'safe'],
             [['action_type'], 'string', 'max' => 255],
+            [['comment'], 'string'],
+
+            [['comment'], 'default', 'value' => null],
+            [['action_data'], 'default', 'value' => null],
         ];
     }
     /**
@@ -94,6 +98,7 @@ class ShopOrderLog extends ActiveRecord
             'shop_order_id' => \Yii::t('skeeks/shop/app', 'Заказ'),
             'action_type'   => \Yii::t('skeeks/shop/app', 'Тип действия'),
             'action_data'   => \Yii::t('skeeks/shop/app', 'Данные'),
+            'comment'       => \Yii::t('skeeks/shop/app', 'Комментарий'),
         ];
     }
     /**
@@ -117,10 +122,10 @@ class ShopOrderLog extends ActiveRecord
     static public function types()
     {
         return [
-            self::TYPE_ORDER_ADDED          => \Yii::t('skeeks/shop/app', 'Create Order'),
-            self::TYPE_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Changing status'),
-            self::TYPE_ALLOW_PAYMENT  => \Yii::t('skeeks/shop/app', 'Payment agreement'),
-            self::TYPE_PAYED          => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
+            self::TYPE_ORDER_ADDED    => \Yii::t('skeeks/shop/app', 'Create Order'),
+            self::TYPE_ORDER_STATUS_CHANGED => \Yii::t('skeeks/shop/app', 'Changing status'),
+            self::TYPE_ORDER_ALLOW_PAYMENT  => \Yii::t('skeeks/shop/app', 'Payment agreement'),
+            self::TYPE_ORDER_PAYED          => \Yii::t('skeeks/shop/app', 'Order successfully paid'),
         ];
     }
 
