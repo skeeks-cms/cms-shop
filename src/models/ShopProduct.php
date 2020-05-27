@@ -550,6 +550,14 @@ class ShopProduct extends \skeeks\cms\models\Core
                     ])) {
                         $this->addError("main_pid", "Родительский товар должен быть простым или предложением.");
                     }
+
+                    if (!$shopProduct->cmsContentElement) {
+                        $this->addError("main_pid", "С родительским товаром проблемы");
+                    }
+
+                    if (!$shopProduct->cmsContentElement->cmsSite->is_default) {
+                        $this->addError("main_pid", "Родительский товар, должен относится к главному порталу!!!");
+                    }
                 },
             ],
 

@@ -353,7 +353,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['is_allowed_payment'],
                 'default',
                 'value' => function () {
-                    return (bool)\Yii::$app->shop->is_pay_after_confirmation;
+                    return (int)\Yii::$app->shop->is_pay_after_confirmation;
                 },
             ],
 

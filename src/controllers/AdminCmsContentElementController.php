@@ -1159,9 +1159,6 @@ HTML
 
             $query->joinWith('shopProduct as sp');
 
-            $site_id = \Yii::$app->skeeks->site->id;
-            $query->andWhere(['cms_site_id' => $site_id]);
-
             if (\Yii::$app->skeeks->site->shopTypePrices) {
                 foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
                     $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
@@ -1186,7 +1183,11 @@ HTML
                         ShopProduct::TYPE_OFFER,
                     ],
                 ]);
+
+                $query->andWhere([CmsContentElement::tableName() . ".cms_site_id" => $site_id]);
             } else {
+                $site_id = \Yii::$app->skeeks->site->id;
+                $query->andWhere(['cms_site_id' => $site_id]);
                 $query->andWhere([
                     'in',
                     'sp.product_type',

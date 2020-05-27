@@ -57,7 +57,22 @@ function shopProductsMenu()
         }
     }
 
-    return $result;
+    if (count($result) > 1) {
+        return [
+            'priority' => 20,
+            'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
+            "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+
+            'items' => $result,
+        ];
+    } else {
+        if (isset($result[0])) {
+            $result[0]['priority'] = 20;
+            return $result[0];
+        }
+
+        return [];
+    }
 }
 
 ;
@@ -135,13 +150,8 @@ return [
 
             ],
 
-            [
-                'priority' => 20,
-                'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
-                "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+            shopProductsMenu(),
 
-                'items' => shopProductsMenu(),
-            ],
 
             [
                 'priority' => 30,
