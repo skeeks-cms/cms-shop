@@ -37,6 +37,8 @@ class AdminDeliveryController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopDelivery::class;
 
+        $this->generateAccessActions = false;
+
         parent::init();
     }
 
@@ -48,11 +50,9 @@ class AdminDeliveryController extends BackendModelStandartController
     {
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
-                "filters" => [
-                    'visibleFilters' => [
-                        'name',
-                    ],
-                ],
+                "backendShowings" => false,
+                "filters" => false,
+
                 'grid'    => [
                     'on init' => function (Event $e) {
                         /**

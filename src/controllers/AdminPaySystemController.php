@@ -32,6 +32,8 @@ class AdminPaySystemController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopPaySystem::class;
 
+        $this->generateAccessActions = false;
+
         parent::init();
     }
 
@@ -44,11 +46,8 @@ class AdminPaySystemController extends BackendModelStandartController
             [
                 'index' =>
                     [
-                        "filters" => [
-                            'visibleFilters' => [
-                                'name',
-                            ],
-                        ],
+                        "backendShowings" => false,
+                        "filters" => false,
 
                         'grid' => [
                             'on init' => function (Event $e) {

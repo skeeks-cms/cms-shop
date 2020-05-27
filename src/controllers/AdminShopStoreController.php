@@ -66,13 +66,8 @@ HTML
                         ,
                     ]);
                 },
-                "filters" => [
-                    'visibleFilters' => [
-                        'id',
-                        'name',
-                        'shop_supplier_id',
-                    ],
-                ],
+                "filters" => false,
+                "backendShowings" => false,
                 'grid'    => [
                     'on init' => function (Event $e) {
                         /**
