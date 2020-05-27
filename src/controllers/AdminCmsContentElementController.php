@@ -1248,7 +1248,9 @@ HTML
 
         $modelClassName = $this->modelClassName;
         $model = new $modelClassName();
+        $model->cms_site_id = \Yii::$app->skeeks->site->id;
 
+                
         $model->loadDefaultValues();
         $model->content_id = $this->content->id;
 
@@ -1270,6 +1272,10 @@ HTML
             if ($shopSubproductContentElement) {
                 $subShopProduct = $shopSubproductContentElement->shopProduct;
                 $shopSubproductContentElement->loadDataToMainModel($model);
+                if (!$defaultSite = CmsSite::find()->andWhere(['is_default' => 1])->one()) {
+                    throw new Exception("Нет сайта по умолчанию");
+                }
+                $model->cms_site_id = $defaultSite->id;
 
                 $shopProduct->measure_code = $subShopProduct->measure_code;
                 $shopProduct->measure_ratio = $subShopProduct->measure_ratio;
@@ -1396,6 +1402,7 @@ CSS
 
         }
 
+        
         return $this->render($this->editForm, [
             'model'             => $model,
             'relatedModel'      => $relatedModel,
