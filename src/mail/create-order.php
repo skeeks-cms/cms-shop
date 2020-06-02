@@ -33,8 +33,8 @@ $order->refresh();
         'dataProvider' => new \yii\data\ArrayDataProvider([
             'allModels'  => $order->shopOrderItems,
             'pagination' => [
-                'pageSize'      => 200,
-                'pageSizeLimit' => [1, 200],
+                'pageSize'      => 2000,
+                'pageSizeLimit' => [1, 2000],
             ],
         ]),
         'layout'       => "{items}",
@@ -45,6 +45,13 @@ $order->refresh();
                 ],*/
 
                 [
+                    'headerOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
+
+                    'contentOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
                     'class'  => \yii\grid\DataColumn::class,
                     'format' => 'raw',
                     'value'  => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
@@ -54,6 +61,13 @@ $order->refresh();
                     },
                 ],
                 [
+                    'headerOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
+
+                    'contentOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
                     'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'name',
                     'format'    => 'raw',
@@ -82,6 +96,13 @@ $order->refresh();
                 ],
 
                 [
+                    'headerOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
+
+                    'contentOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
                     'class'     => \yii\grid\DataColumn::class,
                     'attribute' => 'quantity',
                     'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
@@ -90,6 +111,13 @@ $order->refresh();
                 ],
 
                 [
+                    'headerOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
+
+                    'contentOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
                     'class'     => \yii\grid\DataColumn::class,
                     'label'     => \Yii::t('skeeks/shop/app', 'Price'),
                     'attribute' => 'price',
@@ -100,13 +128,18 @@ $order->refresh();
                                     $shopBasket->notes)."<br />".(string)$shopBasket->money."<br />".Html::tag('small',
                                     \Yii::t('skeeks/shop/app', 'Discount').": ".$shopBasket->discount_value);
                         } else {
-                            return (string)$shopBasket->money."<br />".Html::tag('small',
-                                    $shopBasket->notes);
+                            return (string)$shopBasket->money;
                         }
 
                     },
                 ],
                 [
+                    'headerOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
+                    'contentOptions'  => [
+                        'style' => 'padding: 15px;'
+                    ],
                     'class'     => \yii\grid\DataColumn::class,
                     'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
                     'attribute' => 'price',
@@ -210,8 +243,12 @@ $order->refresh();
 
     <?= Html::beginTag('p'); ?>
     Стоимость товаров: <?= Html::tag('b', (string)$order->calcMoneyItems); ?><br/>
-    Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
-    Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
+    <?php if ((float)$order->moneyDelivery->amount > 0) : ?>
+        Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
+    <?php endif; ?>
+    <?php if ((float)$order->moneyDiscount->amount > 0) : ?>
+        Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
+    <?php endif; ?>
     К оплате: <?= Html::tag('b', (string)$order->money); ?>
     <?= Html::endTag('p'); ?>
 

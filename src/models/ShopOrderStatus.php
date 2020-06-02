@@ -15,17 +15,23 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%shop_order_status}}".
  *
- * @property string      $name
- * @property string|null $description
- * @property integer     $priority
- * @property string|null $color
- * @property string|null $bg_color
- * @property string|null $email_notify_description
- * @property string|null $order_page_description
- * @property integer     $is_comment_required
- * @property array|null  $client_available_statuses
+ * @property string            $name
+ * @property string|null       $description
+ * @property integer           $priority
+ * @property string|null       $color
+ * @property string|null       $bg_color
+ * @property string|null       $btn_name
+ * @property string|null       $email_notify_description
+ * @property string|null       $order_page_description
+ * @property integer           $is_comment_required
+ * @property array|null        $client_available_statuses
+ * @property integer|null      $auto_next_shop_order_status_id
+ * @property integer|null      $auto_next_status_time
  *
- * @property ShopOrder[] $shopOrders
+ * @property string            $btnName
+ * @property ShopOrder[]       $shopOrders
+ * @property ShopOrder         $autoNextShopOrderStatus
+ * @property ShopOrderStatus[] $clientAvailbaleStatuses
  */
 class ShopOrderStatus extends Core
 {
@@ -44,11 +50,11 @@ class ShopOrderStatus extends Core
     {
         return ArrayHelper::merge(parent::behaviors(), [
             Implode::class => [
-                'class' => Implode::class,
+                'class'  => Implode::class,
                 'fields' => [
-                    'client_available_statuses'
-                ]
-            ]
+                    'client_available_statuses',
+                ],
+            ],
         ]);
     }
     /**
@@ -68,8 +74,13 @@ class ShopOrderStatus extends Core
             'email_notify_description' => \Yii::t('skeeks/shop/app', 'Дополнительный текст email уведомления'),
             'order_page_description'   => \Yii::t('skeeks/shop/app', 'Дополнительный текст на странице заказа'),
 
-            'is_comment_required'   => \Yii::t('skeeks/shop/app', 'Комментарий к статусу обязателен?'),
-            'client_available_statuses'   => \Yii::t('skeeks/shop/app', 'Доступные статусы для клиента'),
+            'is_comment_required'       => \Yii::t('skeeks/shop/app', 'Комментарий к статусу обязателен?'),
+            'client_available_statuses' => \Yii::t('skeeks/shop/app', 'Доступные статусы для клиента'),
+
+            'btn_name' => \Yii::t('skeeks/shop/app', 'Название на кнопке смены статуса'),
+
+            'auto_next_shop_order_status_id' => \Yii::t('skeeks/shop/app', 'Автоматически изменить этот статус на'),
+            'auto_next_status_time'          => \Yii::t('skeeks/shop/app', 'Статус будет изменен автоматически через'),
         ]);
     }
     /**
@@ -83,8 +94,13 @@ class ShopOrderStatus extends Core
             'email_notify_description' => \Yii::t('skeeks/shop/app', 'Этот текст получают клиенты в email уведомлении.'),
             'order_page_description'   => \Yii::t('skeeks/shop/app', 'Этот текст отображается клиенту на странице с заказом, в случае этого статуса'),
 
-            'is_comment_required'   => \Yii::t('skeeks/shop/app', 'Если эта опция выбрана, то при установке этого статуса у заказа, потребуется ОБЯЗАТЕЛЬНО написать комментарий!'),
-            'client_available_statuses'   => \Yii::t('skeeks/shop/app', 'Когда заказ находится в этом статусе, то клиенту доступны кнопки для смены статуса выбранные в этом поле.'),
+            'is_comment_required'       => \Yii::t('skeeks/shop/app', 'Если эта опция выбрана, то при установке этого статуса у заказа, потребуется ОБЯЗАТЕЛЬНО написать комментарий!'),
+            'client_available_statuses' => \Yii::t('skeeks/shop/app', 'Когда заказ находится в этом статусе, то клиенту доступны кнопки для смены статуса выбранные в этом поле.'),
+
+            'btn_name' => \Yii::t('skeeks/shop/app', 'Клиент увидит название на кнопке при смене сатуса на этот. Например для смены статуса "отменен" название на кнопке должно быть "отменить"'),
+
+            'auto_next_shop_order_status_id' => \Yii::t('skeeks/shop/app', 'Текущий статус будет изменен автоматически на новый, который выбран в этом поле.'),
+            'auto_next_status_time'          => \Yii::t('skeeks/shop/app', 'Статус будет изменен через указанное количество сек.'),
         ]);
     }
 
@@ -96,11 +112,14 @@ class ShopOrderStatus extends Core
         return array_merge(parent::rules(), [
             [['priority'], 'integer'],
             [['is_comment_required'], 'integer'],
+            [['auto_next_shop_order_status_id'], 'integer'],
+            [['auto_next_status_time'], 'integer'],
             [['client_available_statuses'], 'safe'],
             [['name'], 'required'],
             [['description'], 'string', 'max' => 255],
             [['order_page_description'], 'string'],
             [['email_notify_description'], 'string'],
+            [['btn_name'], 'string'],
 
             [['name'], 'string', 'max' => 255],
 
@@ -118,5 +137,41 @@ class ShopOrderStatus extends Core
     public function getShopOrders()
     {
         return $this->hasMany(ShopOrder::class, ['shop_order_status_id' => 'id']);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAutoNextShopOrderStatus()
+    {
+        return $this->hasOne(ShopOrderStatus::class, ['id' => 'auto_next_shop_order_status_id']);
+    }
+
+    /**
+     * @return array|\skeeks\cms\query\CmsActiveQuery
+     */
+    public function getClientAvailbaleStatuses()
+    {
+        if (!$this->client_available_statuses) {
+            return [];
+        }
+
+        $q = self::find()->andWhere(['id' => $this->client_available_statuses]);
+        $q->multiple = true;
+
+        return $q;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBtnName()
+    {
+        if ($this->btn_name) {
+            return $this->btn_name;
+        }
+
+        return $this->name;
     }
 }

@@ -165,10 +165,32 @@ HTML
                 ]
             ],
 
+            'auto' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Автосмена',
+                'fields' => [
+                    
+                    'auto_next_shop_order_status_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            ShopOrderStatus::find()->all(),
+                            'id', 
+                            'name'
+                        )
+                    ],
+                    
+                    'auto_next_status_time' => [
+                        'class' => NumberField::class
+                    ]
+                    
+                ]
+            ],
+            
             'additional' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Дополнительные подписи',
                 'fields' => [
+                    'btn_name',
                     'order_page_description' => [
                         'class' => WidgetField::class,
                         'widgetClass' => ComboTextInputWidget::class,

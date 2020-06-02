@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\filters\CmsAccessControl;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\UserException;
@@ -108,8 +109,29 @@ class OrderController extends Controller
     {
         $this->view->title = \Yii::t('skeeks/shop/app', 'Order').' | '.\Yii::t('skeeks/shop/app', 'Shop');
 
+        /**
+         * @var $model ShopOrder
+         */
+        $model = ShopOrder::find()->andWhere(['code' => \Yii::$app->request->get('code')])->one();
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->post()) {
+            $rr = new RequestResponse();
+
+            if (\Yii::$app->request->post('act') == 'change') {
+                $model->shop_order_status_id = (int) \Yii::$app->request->post('status_id');
+                if (!$model->save()) {
+                    $rr->message = "Ошибка: " . print_r($model->errors, true);
+                    $rr->success = false;
+                } else {
+                    $rr->success = true;
+                    $rr->message = "Статус заказа обновлен";
+                }
+            }
+
+            return $rr;
+        }
+
         return $this->render($this->action->id, [
-            'model' => ShopOrder::find()->andWhere(['code' => \Yii::$app->request->get('code')])->one(),
+            'model' => $model
         ]);
     }
 

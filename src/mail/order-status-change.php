@@ -18,7 +18,7 @@ $url = $order->url;
 <?= Html::endTag('p'); ?>
 
 <?php if ($order->statusComment) : ?>
-    <div>
+    <div style="font-weight: bold;">
         <?php echo $order->statusComment; ?>
     </div>
 <?php endif; ?>
