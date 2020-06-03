@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\shop\models\ShopProduct;
@@ -101,6 +102,20 @@ class SupplierController extends Controller
                                         die;
                                         continue;
                                     }
+                                } elseif ($supplierOption->cmsContentPropertyEnum) {
+
+                                    $cmsElement = $shopProduct->cmsContentElement;
+                                    $cmsElement->relatedPropertiesModel->setAttribute($shopSupplierProperty->cmsContentProperty->code, $supplierOption->cmsContentPropertyEnum->id);
+
+                                    if ($cmsElement->relatedPropertiesModel->save(true, [$shopSupplierProperty->cmsContentProperty->code])) {
+
+                                        $this->stdout("\t\tЗначение свойства обновлено\n", Console::FG_GREEN);
+                                        continue;
+                                    } else {
+                                        $this->stdout("\t\tЗначение свойства не сохранено!!!\n", Console::FG_RED);
+                                        die;
+                                        continue;
+                                    }
                                 }
                                 
                                 $this->stdout("\t\tНе проработанный вариант\n", Console::FG_RED);
@@ -134,8 +149,16 @@ class SupplierController extends Controller
             
         }
     }
-    
-    public function actionConnectOptions()
+
+
+    /**
+     * Связывает опции поставщика и опции cms
+     *
+     * @param int $is_auto_create будет создавать опции в cms или нет?
+     * @return bool
+     * @throws Exception
+     */
+    public function actionConnectOptions($is_auto_create = 0)
     {
         /**
          * @var $shopSupplier ShopSupplier
@@ -200,6 +223,25 @@ class SupplierController extends Controller
                             $this->stdout("\t\tСвязана\n", Console::FG_GREEN);
                         } else {
                             $this->stdout("\t\tНе связана " . print_r($option->errors, true) . "\n", Console::FG_RED);
+                        }
+                    } else {
+                        if ($is_auto_create) {
+                            $enum = new CmsContentPropertyEnum();
+                            $enum->value = $option->name;
+                            $enum->property_id = $contentProperty->id;
+
+                            if (!$enum->save()) {
+                                throw new Exception("Не создалась опция: " . print_r($enum->errors, true));
+                            }
+
+                            $this->stdout("\t\tСоздана характеристика\n", Console::FG_GREEN);
+
+                            $option->cms_content_property_enum_id = $enum->id;
+                            if ($option->save()) {
+                                $this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                            } else {
+                                $this->stdout("\t\tНе связана " . print_r($option->errors, true) . "\n", Console::FG_RED);
+                            }
                         }
                     }
                 }
