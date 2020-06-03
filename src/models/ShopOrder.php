@@ -30,9 +30,7 @@ use yii\helpers\Url;
  * @property string                     $status_code
  * @property integer                    $status_at
  * @property string                     $delivery_amount
- * @property string                     $allow_delivery
  * @property string                     $is_allowed_payment
- * @property integer                    $allow_delivery_at
  * @property string                     $amount
  * @property string                     $currency_code
  * @property string                     $discount_amount
@@ -202,7 +200,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         //После создания заказа делать его пересчет
         if ($this->isAttributeChanged('is_created') && $this->is_created) {
             $this->created_at = time();
-            $this->is_allowed_payment = (bool)!\Yii::$app->shop->is_pay_after_confirmation;
             $this->recalculate();
         }
         if ($this->isAttributeChanged('shop_delivery_id')) {
@@ -283,33 +280,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             }
         }
 
-        if ($this->isAttributeChanged('is_allowed_payment') && $this->is_allowed_payment) {
-            (new ShopOrderLog([
-                'action_type'   => ShopOrderLog::TYPE_ORDER_ALLOW_PAYMENT,
-                'shop_order_id' => $this->id,
-            ]))->save();
-
-
-            //Письмо тому кто заказывает
-            if ($this->email) {
-                try {
-
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
-
-                    \Yii::$app->mailer->compose('allow-payment', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo($this->email)
-                        ->setSubject(\Yii::t('skeeks/shop/app',
-                                'Resolution of payment on request').' №'.$this->id)
-                        ->send();
-
-                } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::class);
-                }
-            }
-        }
     }
     /**
      * @inheritdoc
@@ -339,7 +309,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
             [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
             [['shop_buyer_id'], 'integer'],
-            [['is_allowed_payment'], 'integer'],
             [['cms_site_id'], 'integer'],
 
             [['currency_code'], 'string', 'max' => 3],
@@ -349,13 +318,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
             [['cms_site_id'], 'default', 'value' => \Yii::$app->skeeks->site->id],
 
-            [
-                ['is_allowed_payment'],
-                'default',
-                'value' => function () {
-                    return (int)\Yii::$app->shop->is_pay_after_confirmation;
-                },
-            ],
 
             [['code'], 'string'],
             [['code'], 'default', 'value' => \Yii::$app->security->generateRandomString()],
@@ -418,7 +380,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             'tax_amount'           => \Yii::t('skeeks/shop/app', 'Tax Value'),
             'paid_amount'          => \Yii::t('skeeks/shop/app', 'Sum Paid'),
             'shop_buyer_id'        => \Yii::t('skeeks/shop/app', 'Buyer'),
-            'is_allowed_payment'   => \Yii::t('skeeks/shop/app', 'Allow Payment'),
             'isNotifyChangeStatus' => \Yii::t('skeeks/shop/app', 'Отправить email уведомление клиенту?'),
             'statusComment'        => \Yii::t('skeeks/shop/app', 'Комментарий к смене статуса'),
 
@@ -988,6 +949,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopOrderItem::class, ['shop_order_id' => 'id']);
     }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -1042,14 +1004,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
     /**
-     * @return string
-     * @deprecated
-     */
-    public function getPayed()
-    {
-        return $this->paid_at ? "Y" : "N";
-    }
-    /**
      * @return \yii\db\ActiveQuery
      * @deprecated
      */
@@ -1064,10 +1018,5 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getShopBaskets()
     {
         return $this->getShopOrderItems();
-    }
-
-    public function getAllow_payment()
-    {
-        return $this->is_allowed_payment ? "Y" : "N";
     }
 }

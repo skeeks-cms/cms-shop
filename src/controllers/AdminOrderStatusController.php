@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\widgets\ColorInput;
@@ -165,6 +166,18 @@ HTML
                 ]
             ],
 
+            'pay' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Оплата',
+                'fields' => [
+                    'is_payment_allowed' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false
+                    ],
+
+                ]
+            ],
+            
             'auto' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Автосмена',
@@ -201,7 +214,8 @@ HTML
                         'widgetClass' => ComboTextInputWidget::class,
                     ],
                 ]
-            ]
+            ],
+            
         ];
     }
 }

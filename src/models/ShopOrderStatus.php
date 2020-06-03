@@ -27,6 +27,7 @@ use yii\helpers\ArrayHelper;
  * @property array|null        $client_available_statuses
  * @property integer|null      $auto_next_shop_order_status_id
  * @property integer|null      $auto_next_status_time
+ * @property integer|null      $is_payment_allowed
  *
  * @property string            $btnName
  * @property ShopOrder[]       $shopOrders
@@ -81,6 +82,8 @@ class ShopOrderStatus extends Core
 
             'auto_next_shop_order_status_id' => \Yii::t('skeeks/shop/app', 'Автоматически изменить этот статус на'),
             'auto_next_status_time'          => \Yii::t('skeeks/shop/app', 'Статус будет изменен автоматически через'),
+
+            'is_payment_allowed'          => \Yii::t('skeeks/shop/app', 'Разрешить онлайн оплату?'),
         ]);
     }
     /**
@@ -101,6 +104,8 @@ class ShopOrderStatus extends Core
 
             'auto_next_shop_order_status_id' => \Yii::t('skeeks/shop/app', 'Текущий статус будет изменен автоматически на новый, который выбран в этом поле.'),
             'auto_next_status_time'          => \Yii::t('skeeks/shop/app', 'Статус будет изменен через указанное количество сек.'),
+
+            'is_payment_allowed'          => \Yii::t('skeeks/shop/app', 'Разрешить онлайн оплату заказа если заказ находится в этом статусе?'),
         ]);
     }
 
@@ -125,6 +130,7 @@ class ShopOrderStatus extends Core
 
             [['color'], 'string', 'max' => 32],
             [['bg_color'], 'string', 'max' => 32],
+            [['is_payment_allowed'], 'integer'],
 
             [['description', 'color', 'bg_color', 'order_page_description', 'email_notify_description'], 'default', 'value' => null],
         ]);

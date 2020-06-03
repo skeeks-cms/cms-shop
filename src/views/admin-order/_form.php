@@ -116,7 +116,7 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
             </div>
         </div>
         <div class="row sx-data-row">
-            <div class="col-3">Способ оплаты</div>
+            <div class="col-3">Оплата</div>
             <div class="col-9">
                 <a href="#" data-toggle="modal" data-target="#sx-allow-payment" class="sx-dashed">
                     <?php if ($model->paySystem) : ?>
@@ -126,27 +126,23 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
                     <?php endif; ?>
                 </a>
 
-            </div>
-        </div>
-        <div class="row sx-data-row">
-            <div class="col-3">Оплата</div>
-            <div class="col-9">
-
-
-                <? if ($model->is_allowed_payment) : ?>
-                    <a href="#" data-toggle="modal" data-target="#sx-allow-payment" class="sx-dashed">Оплата разрешена</a>
-                <? else : ?>
-                    <a href="#" data-toggle="modal" data-target="#sx-allow-payment" class="sx-dashed">Оплата не разрешена</a>
-                <? endif; ?>
 
                 <span style="margin-left: 20px;">
-                <?php if ($model->paid_at) : ?>
-                    <span style='color: green;'>Оплачен</span>
-                <?php else: ?>
-                    <span style='color: gray;'>Не оплачен</span>
-                <?php endif; ?>
-                    
-                    </span>
+                    <?php if ($model->paid_at) : ?>
+                        <span style='color: green;'>Оплачен</span>
+                    <?php else: ?>
+                        <span style='color: gray;'>Не оплачен</span>
+                    <?php endif; ?>
+                </span>
+
+                <span style="margin-left: 20px;">
+                    <? if ($model->shopOrderStatus->is_payment_allowed) : ?>
+                        <span style='color: gray;'>Оплата разрешена</span>
+                    <? else : ?>
+                        <span style='color: gray;'>Оплата не разрешена</span>
+                    <? endif; ?>
+                </span>
+
 
             </div>
         </div>
@@ -465,11 +461,11 @@ JS
 ]); ?>
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'enableClientValidation' => false,
-    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
+    'validationUrl'          => \skeeks\cms\helpers\UrlHelper::construct([
         'shop/admin-order/validate',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
-    'action'        => \skeeks\cms\helpers\UrlHelper::construct([
+    'action'                 => \skeeks\cms\helpers\UrlHelper::construct([
         'shop/admin-order/save',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
@@ -529,8 +525,6 @@ $form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
     $model->paySystems, 'id', 'name'
 ));
 ?>
-
-<?= $form->field($model, 'is_allowed_payment')->checkbox(); ?>
 
 <button class="btn btn-primary">Сохранить</button>
 
