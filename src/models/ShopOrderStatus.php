@@ -94,7 +94,7 @@ class ShopOrderStatus extends Core
         return array_merge(parent::attributeLabels(), [
             'description' => \Yii::t('skeeks/shop/app', 'Короткая расшфировка статуса заказа'),
 
-            'email_notify_description' => \Yii::t('skeeks/shop/app', 'Этот текст получают клиенты в email уведомлении.'),
+            'email_notify_description' => \Yii::t('skeeks/shop/app', 'Этот текст получают клиенты в email уведомлении. Допустимо использование {order_url} {order_id}'),
             'order_page_description'   => \Yii::t('skeeks/shop/app', 'Этот текст отображается клиенту на странице с заказом, в случае этого статуса'),
 
             'is_comment_required'       => \Yii::t('skeeks/shop/app', 'Если эта опция выбрана, то при установке этого статуса у заказа, потребуется ОБЯЗАТЕЛЬНО написать комментарий!'),
@@ -179,5 +179,19 @@ class ShopOrderStatus extends Core
         }
 
         return $this->name;
+    }
+
+    /**
+     * @param ShopOrder $order
+     * @return mixed|string|null
+     */
+    public function getEmailNotifyDescriptionFormated(ShopOrder $order)
+    {
+        $result = $this->email_notify_description;
+
+        $result = str_replace("{order_url}", $order->url, $result);
+        $result = str_replace("{order_id}", $order->url, $result);
+
+        return $result;
     }
 }

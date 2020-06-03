@@ -240,6 +240,26 @@ class ShopOrder extends \skeeks\cms\models\Core
                     \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::class);
                 }
             }
+
+            try {
+                //Notify admins
+                if (\Yii::$app->shop->notifyEmails) {
+                    foreach (\Yii::$app->shop->notifyEmails as $email) {
+
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+
+                        \Yii::$app->mailer->compose('order-status-change', [
+                        'order' => $this,
+                    ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                            ->setTo($email)
+                            ->setSubject("Заказ №".$this->id." — ".$this->shopOrderStatus->name)
+                            ->send();
+                    }
+                }
+            } catch (\Exception $e) {
+                \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
+            }
         }
 
 

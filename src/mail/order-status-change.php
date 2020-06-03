@@ -25,7 +25,7 @@ $url = $order->url;
 
 <?php if ($order->shopOrderStatus->email_notify_description) : ?>
     <div>
-        <?php echo $order->shopOrderStatus->email_notify_description; ?>
+        <?php echo $order->shopOrderStatus->getEmailNotifyDescriptionFormated($order); ?>
     </div>
 <?php endif; ?>
 

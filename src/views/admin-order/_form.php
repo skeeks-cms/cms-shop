@@ -480,7 +480,7 @@ JS
 ]); ?>
 
 <?= $form->fieldSelect($model, 'shop_order_status_id', \yii\helpers\ArrayHelper::map(
-    \skeeks\cms\shop\models\ShopOrderStatus::find()->all(), 'id', 'name'
+    \skeeks\cms\shop\models\ShopOrderStatus::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'name'
 )); ?>
 
 <?php echo $form->field($model, 'statusComment')->textarea([
