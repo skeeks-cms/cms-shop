@@ -683,9 +683,12 @@ HTML
                             return false;
                         }
 
-                        if ($model->shopProduct->main_pid) {
+                        if ($model->cmsSite->shopSite->is_supplier) {
                             return false;
                         }
+                        /*if ($model->shopProduct->main_pid) {
+                            return false;
+                        }*/
                         
                         return true;
                     },
