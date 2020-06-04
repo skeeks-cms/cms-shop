@@ -689,8 +689,9 @@ HTML
                         /*if ($model->shopProduct->main_pid) {
                             return false;
                         }*/
-                        
+
                         return true;
+                        //return \Yii::$app->user->can($this->permissionName . "/" . $this->action->id, ['model' => $action->model]);
                     },
                 ]
 
