@@ -802,6 +802,7 @@ SQL
     public function updateAllQuantities()
     {
 
+        //Обновляет количество у товаров у которых есть склады, и они являются поставщиками
         $result = \Yii::$app->db->createCommand(<<<SQL
             UPDATE 
                 `shop_product` as sp 
@@ -811,7 +812,7 @@ SQL
                    SELECT inner_sp.id as inner_sp_id, SUM(ssp.quantity) as sum_quantity
                    FROM shop_product inner_sp
                        LEFT JOIN shop_store_product ssp on ssp.shop_product_id = inner_sp.id 
-                       LEFT JOIN cms_content_element cce on ssp.id = cce.id 
+                       LEFT JOIN cms_content_element cce on inner_sp.id = cce.id 
                        LEFT JOIN cms_site as site on site.id = cce.cms_site_id 
                        LEFT JOIN shop_site as shopSite on site.id = shopSite.id 
                        WHERE shopSite.is_supplier = 1
