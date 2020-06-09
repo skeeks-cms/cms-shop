@@ -313,12 +313,12 @@ FROM (
                 shop_import_cms_site.cms_site_id = @site_id
         )
         and sp_for_import.id is not null
-    GROUP BY
-        main_sp.id
     ORDER BY
-        siteimport.priority DESC
+        siteimport.priority ASC
 
-) as q;
+) as q
+GROUP BY receiver_product_id
+;
 
 /*Обновление цен по товарам*/
 UPDATE
@@ -407,12 +407,14 @@ UPDATE
                         shop_import_cms_site.cms_site_id = @site_id
                 )
                 and sp_for_import.id is not null
-            GROUP BY
-                main_sp.id
+            /*GROUP BY
+                main_sp.id*/
             ORDER BY
-                siteimport.priority DESC
+                siteimport.priority ASC
 
         ) as q
+        GROUP BY receiver_product_id
+
 	) calc_price ON calc_price.receiver_price_id = price.id
 SET
 	price.`price` = calc_price.calc_price,
