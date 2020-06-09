@@ -24,7 +24,7 @@ class AgentsController extends Controller
      * Проверка и исправление типа товара
      * @throws \yii\db\Exception
      */
-    public function actionUpdateSubproduct()
+    public function actionUpdateSubproducts()
     {
         \Yii::$app->shop->updateAllSubproducts();
     }
