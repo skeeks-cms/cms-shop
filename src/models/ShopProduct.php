@@ -1011,7 +1011,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         ])->one()) {
             $productPrice = new ShopProductPrice();
             $productPrice->product_id = $this->id;
-            $productPrice->type_price_id = $typePrice->id;
+            $productPrice->type_price_id = $typePriceId;
         }
         
         $productPrice->price = $value;
