@@ -131,7 +131,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             ])
                 ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                 ->setTo($this->email)
-                ->setSubject(\Yii::$app->cms->appName.': '.\Yii::t('skeeks/shop/app',
+                ->setSubject(\Yii::t('skeeks/shop/app',
                         'New order').' №'.$this->id)
                 ->send();
         }
@@ -164,19 +164,16 @@ class ShopOrder extends \skeeks\cms\models\Core
             try {
                 //Notify admins
                 if (\Yii::$app->shop->notifyEmails) {
-                    foreach (\Yii::$app->shop->notifyEmails as $email) {
 
-                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-                        \Yii::$app->mailer->compose('create-order', [
-                            'order' => $this,
-                        ])
-                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                            ->setTo($email)
-                            ->setSubject(\Yii::t('skeeks/shop/app',
-                                    'New order').' №'.$this->id)
-                            ->send();
-                    }
+                    \Yii::$app->mailer->compose('create-order', [
+                        'order' => $this,
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                        ->setTo(\Yii::$app->shop->notifyEmails)
+                        ->setSubject(\Yii::t('skeeks/shop/app',  'New order').' №'.$this->id)
+                        ->send();
                 }
             } catch (\Exception $e) {
                 \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
@@ -192,6 +189,67 @@ class ShopOrder extends \skeeks\cms\models\Core
                 \Yii::error("Email client seinding error '{$this->email}': ".$e->getMessage(), self::class);
             }
 
+        }
+
+
+
+        if (in_array("paid_at", array_keys($event->changedAttributes)) && $this->paid_at) {
+
+
+            \Yii::info(print_r($this->toArray(), true), self::class);
+
+
+
+            (new ShopOrderLog([
+                'action_type'   => ShopOrderLog::TYPE_ORDER_PAYED,
+                'shop_order_id' => $this->id,
+            ]))->save();
+
+
+            //Уведомить клиента об оплате
+            if ($this->email) {
+                try {
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
+
+                    \Yii::$app->mailer->compose('payed', [
+                        'order' => $this,
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                        ->setTo($this->email)
+                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id . " — Оплачен")
+                        ->send();
+
+                } catch (\Exception $e) {
+                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), self::class);
+                }
+            }
+
+            //Уведомить администраторов об оплате
+            if (\Yii::$app->shop->notifyEmails) {
+                try {
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
+
+                    \Yii::$app->mailer->compose('payed', [
+                        'order' => $this,
+                    ])
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                        ->setTo(\Yii::$app->shop->notifyEmails)
+                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id . " — Оплачен")
+                        ->send();
+
+                } catch (\Exception $e) {
+                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), self::class);
+                }
+            }
+
+
+            //Если в базе есть статус, который должен быть установлен после оплаты заказа, то нужно его установить.
+            if ($shopOrderStatus = ShopOrderStatus::find()->where(['is_install_after_pay' => 1])->one()) {
+                $this->shop_order_status_id = $shopOrderStatus->id;
+                if (!$this->save()) {
+                    \Yii::error('Статус заказа после оплаты не обновлен: ' . $e->getMessage(), self::class);
+                }
+            }
         }
     }
 
@@ -219,7 +277,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'status'    => $this->shopOrderStatus->name,
                     'status_id' => $this->shopOrderStatus->id,
                 ],
-                'comment'   => $this->statusComment,
+                'comment'       => $this->statusComment,
             ]))->save();
 
 
@@ -244,18 +302,16 @@ class ShopOrder extends \skeeks\cms\models\Core
             try {
                 //Notify admins
                 if (\Yii::$app->shop->notifyEmails) {
-                    foreach (\Yii::$app->shop->notifyEmails as $email) {
 
-                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-                        \Yii::$app->mailer->compose('order-status-change', [
+                    \Yii::$app->mailer->compose('order-status-change', [
                         'order' => $this,
                     ])
-                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                            ->setTo($email)
-                            ->setSubject("Заказ №".$this->id." — ".$this->shopOrderStatus->name)
-                            ->send();
-                    }
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                        ->setTo(\Yii::$app->shop->notifyEmails)
+                        ->setSubject("Заказ №".$this->id." — ".$this->shopOrderStatus->name)
+                        ->send();
                 }
             } catch (\Exception $e) {
                 \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
@@ -263,42 +319,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
 
-        if ($this->isAttributeChanged('paid_at') && $this->paid_at) {
 
-            \Yii::info(print_r($this->toArray(), true), self::class);
-
-            (new ShopOrderLog([
-                'action_type'   => ShopOrderLog::TYPE_ORDER_PAYED,
-                'shop_order_id' => $this->id,
-            ]))->save();
-
-
-            $emails = \Yii::$app->shop->notifyEmails;
-            if ($this->email) {
-                $emails[] = $this->email;
-            }
-
-            if ($emails) {
-                foreach ($emails as $email) {
-                    try {
-                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
-
-                        \Yii::$app->mailer->compose('payed', [
-                            'order' => $this,
-                        ])
-                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                            ->setTo($email)
-                            ->setSubject(\Yii::t('skeeks/shop/app',
-                                    'Order successfully paid').' №'.$this->id)
-                            ->send();
-
-                    } catch (\Exception $e) {
-                        \Yii::error('Ошибка отправки email: '.$e->getMessage(), Module::class);
-                    }
-                }
-
-            }
-        }
 
     }
     /**
@@ -343,7 +364,12 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['code'], 'default', 'value' => \Yii::$app->security->generateRandomString()],
 
             [['is_created'], 'default', 'value' => 0],
-            [['shop_order_status_id'], 'default', 'value' => \Yii::$app->shop->start_order_status_id],
+            [['shop_order_status_id'], 'default', 'value' => function() {
+                $shopOrder = ShopOrderStatus::find()->orderBy(['priority' => SORT_ASC])->one();
+                if ($shopOrder) {
+                    return $shopOrder->id;
+                }
+            }],
 
 
             [
@@ -361,15 +387,19 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
 
             ['statusComment', 'string'],
-            ['statusComment', 'required', 'when' => function() {
-                if ($this->shopOrderStatus) {
-                    if ($this->shopOrderStatus->is_comment_required) {
-                        return true;
+            [
+                'statusComment',
+                'required',
+                'when' => function () {
+                    if ($this->shopOrderStatus) {
+                        if ($this->shopOrderStatus->is_comment_required) {
+                            return true;
+                        }
                     }
-                }
 
-                return false;
-            }],
+                    return false;
+                },
+            ],
 
 
         ];

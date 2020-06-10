@@ -59,17 +59,6 @@ class ShopComponent extends Component
     public $email = "";
 
     /**
-     * Начальный статус после создания заказа
-     * @var string
-     */
-    public $start_order_status_id = "";
-    /**
-     * Конечный статус заказа
-     * @var string
-     */
-    public $end_order_status_id = "";
-
-    /**
      * Максимальное допустимое количество товаров
      * @var float
      */
@@ -181,14 +170,6 @@ class ShopComponent extends Component
                     'notify_emails'         => [
                         'class' => TextareaField::class,
                     ],
-                    'start_order_status_id' => [
-                        'class' => SelectField::class,
-                        'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
-                    ],
-                    'end_order_status_id'   => [
-                        'class' => SelectField::class,
-                        'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'asText'),
-                    ],
 
                 ],
             ],
@@ -257,12 +238,8 @@ class ShopComponent extends Component
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
             [['email'], 'string'],
-            [['start_order_status_id'], 'integer'],
-            [['end_order_status_id'], 'integer'],
 
             ['notify_emails', 'string'],
-            ['start_order_status_id', 'required'],
-            ['end_order_status_id', 'required'],
             [
                 [
                     'is_show_product_no_price',
@@ -278,8 +255,6 @@ class ShopComponent extends Component
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'start_order_status_id'         => 'Начальный статус заказа',
-            'end_order_status_id'           => 'Конечный статус заказа',
             'email'                         => 'Email',
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
@@ -296,8 +271,6 @@ class ShopComponent extends Component
     {
         return ArrayHelper::merge(parent::attributeHints(), [
             //'is_show_products_has_main'     => "Если выбрано да, то будут показываться только оформленные товары",
-            'start_order_status_id'         => "Статус, который присваивается заказу сразу после его оформления",
-            'end_order_status_id'           => "Статус, который присваивается заказу после завершения работы с ним",
             'notify_emails'                 => \Yii::t('skeeks/shop/app',
                 'Enter email addresses, separated by commas, they will come on new orders information'),
             'is_show_product_no_price'      => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",

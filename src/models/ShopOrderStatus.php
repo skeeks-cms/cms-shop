@@ -84,6 +84,7 @@ class ShopOrderStatus extends Core
             'auto_next_status_time'          => \Yii::t('skeeks/shop/app', 'Статус будет изменен автоматически через'),
 
             'is_payment_allowed'          => \Yii::t('skeeks/shop/app', 'Разрешить онлайн оплату?'),
+            'is_install_after_pay'          => \Yii::t('skeeks/shop/app', 'Установить этот статус после оплаты?'),
         ]);
     }
     /**
@@ -106,6 +107,7 @@ class ShopOrderStatus extends Core
             'auto_next_status_time'          => \Yii::t('skeeks/shop/app', 'Статус будет изменен через указанное количество сек.'),
 
             'is_payment_allowed'          => \Yii::t('skeeks/shop/app', 'Разрешить онлайн оплату заказа если заказ находится в этом статусе?'),
+            'is_install_after_pay'          => \Yii::t('skeeks/shop/app', 'После онлайн оплаты, статус заказа клиента станет этим.'),
         ]);
     }
 
@@ -131,8 +133,12 @@ class ShopOrderStatus extends Core
             [['color'], 'string', 'max' => 32],
             [['bg_color'], 'string', 'max' => 32],
             [['is_payment_allowed'], 'integer'],
+            [['is_install_after_pay'], 'integer'],
+            [['is_install_after_pay'], 'unique'],
 
             [['description', 'color', 'bg_color', 'order_page_description', 'email_notify_description'], 'default', 'value' => null],
+
+            [['is_install_after_pay'], 'default', 'value' => null],
         ]);
     }
 

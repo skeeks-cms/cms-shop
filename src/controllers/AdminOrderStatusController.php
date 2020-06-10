@@ -174,7 +174,10 @@ HTML
                         'class' => BoolField::class,
                         'allowNull' => false
                     ],
-
+                    'is_install_after_pay' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false
+                    ],
                 ]
             ],
             
