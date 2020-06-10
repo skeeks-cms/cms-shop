@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\shop\console\controllers;
 
+use skeeks\cms\shop\components\ShopComponent;
+use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopUser;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\console\Controller;
@@ -19,6 +21,24 @@ use yii\helpers\Console;
  */
 class AgentsController extends Controller
 {
+
+    /**
+     * Добавляет новые товары на сайты получатели
+     * 
+     * @throws \yii\base\Exception
+     */
+    public function actionUpdateReceiverSites()
+    {
+        /**
+         * @var $shopSite ShopSite
+         */
+        if ($shopSites = ShopSite::find()->where(['is_receiver' => 1])->all()) {
+            $this->stdout("Найдено сайтов получателей: " . count($shopSites) . "\n");
+            foreach ($shopSites as $shopSite) {
+                ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
+            }
+        }
+    }
 
     /**
      * Товарные данные обновляются из главных товаров
