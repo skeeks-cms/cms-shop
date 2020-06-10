@@ -581,7 +581,8 @@ class ShopComponent extends Component
 
 
     /**
-     * Обновление данныех по товарам из главных товаров
+     * Товарные данные обновляются из главных товаров
+     * Габариты, вес, соответствие величин
      *
      * @return $this
      * @throws \yii\db\Exception
@@ -617,6 +618,12 @@ SQL
 
 
     /**
+     *
+     * Товары у которых не задан родительский элемент делает простыми
+     * Товары у которых есть дочерние делает товарами с предложенями
+     * Обновляет раздел для товаров предложений. Раздел должнен совпадать с родительским, общим товаром
+     * Товары у которых задан общий делает товарами-предложениями
+     *
      * @return $this
      * @throws \yii\db\Exception
      */
@@ -669,31 +676,7 @@ SQL
         )->execute();
 
 
-        /*SELECT
-	offers_cce.tree_id,
-    cce.tree_id,
-    cce.*
 
-FROM
-	`cms_content_element` as cce
-	INNER JOIN (
-
-		SELECT
-			inner_sp.id as inner_sp_id,
-        inner_sp.offers_pid,
-        inner_sp.product_type
-		FROM
-			shop_product inner_sp
-		WHERE
-			inner_sp.offers_pid is not null
-		GROUP BY
-			inner_sp.id
-	) sp_has_parent ON cce.id = sp_has_parent.inner_sp_id
-	LEFT JOIN shop_product as offers_sp on offers_sp.id = sp_has_parent.offers_pid
-	LEFT JOIN cms_content_element as offers_cce on offers_cce.id = offers_sp.id
-
-    WHERE offers_cce.tree_id != cce.tree_id
-    */
         //У товаров предложений раздел должнен совпадать с родительским
         $result = \Yii::$app->db->createCommand(<<<SQL
             UPDATE 
@@ -720,7 +703,8 @@ SQL
     }
 
     /**
-     * Обновление цен у товаров с пердложениями
+     * Обновление цен у общих товаров с пердложениями
+     *
      * @return $this
      * @throws \yii\db\Exception
      */
@@ -799,6 +783,14 @@ SQL
     }
 
 
+    /**
+     * Обновляет наличие у товаров поставщиков у которых есть склады.
+     * Обновляет количество у главных товаров, к которым привязаны товары поставщиков.
+     * Обновляет количество у общих товаров (складывает предложения)
+     *
+     * @return $this
+     * @throws \yii\db\Exception
+     */
     public function updateAllQuantities()
     {
 

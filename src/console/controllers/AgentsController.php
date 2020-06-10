@@ -21,7 +21,9 @@ class AgentsController extends Controller
 {
 
     /**
-     * Проверка и исправление типа товара
+     * Товарные данные обновляются из главных товаров
+     * Габариты, вес, соответствие величин
+     *
      * @throws \yii\db\Exception
      */
     public function actionUpdateSubproducts()
@@ -31,6 +33,7 @@ class AgentsController extends Controller
     
     /**
      * Проверка и исправление типа товара
+     * Если у
      * @throws \yii\db\Exception
      */
     public function actionUpdateProductType()

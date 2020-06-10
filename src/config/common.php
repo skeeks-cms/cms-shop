@@ -54,7 +54,7 @@ return [
                 'shop/agents/update-product-type' => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление типа товаров'],
-                    'interval' => 60 * 5,
+                    'interval' => 60 * 60,
                 ],
                 'shop/agents/update-subproducts'  => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
