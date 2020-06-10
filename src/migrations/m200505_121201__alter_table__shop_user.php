@@ -24,8 +24,16 @@ class m200505_121201__alter_table__shop_user extends Migration
         $this->createIndex("{$tableName}__shop_order_id", $tableName, "shop_order_id", true);
         $this->dropIndex("shop_cart__shop_order_id", $tableName);
 
+        $this->dropForeignKey(
+            "{$tableName}__cms_site_id", $tableName
+        );
+
         $this->alterColumn($tableName, "cms_site_id", $this->integer()->notNull());
 
+        $this->addForeignKey(
+            "{$tableName}__cms_site_id", $tableName,
+            'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
+        );
     }
 
     public function safeDown()

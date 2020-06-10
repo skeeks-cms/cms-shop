@@ -25,7 +25,16 @@ class m200505_152301__alter_table__shop_pay_system extends Migration
         $this->update($tableName, ['is_active' => 0], ['active' => 'N']);
         $this->dropColumn($tableName, "active");
 
+        $this->dropForeignKey(
+            "{$tableName}__cms_site_id", $tableName
+        );
+        
         $this->alterColumn($tableName, "cms_site_id", $this->integer()->notNull());
+        
+        $this->addForeignKey(
+            "{$tableName}__cms_site_id", $tableName,
+            'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
+        );
     }
 
     public function safeDown()
