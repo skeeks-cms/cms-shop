@@ -27,15 +27,17 @@ use yii\web\NotFoundHttpException;
  */
 class ContentElementController extends \skeeks\cms\controllers\ContentElementController
 {
+    public $modelClassName = ShopCmsContentElement::class;
+
     public function beforeAction($action)
     {
-        if ($this->model) {
-            if (ShopContent::find()->where(["content_id" => $this->model->content_id])->exists()) {
+        if ($this->model && $this->model->shopProduct) {
+            //if (ShopContent::find()->where(["content_id" => $this->model->content_id])->exists()) {
                 //Это магазин
-                $this->model = ShopCmsContentElement::findOne($this->model->id);
+                //$this->model = ShopCmsContentElement::findOne($this->model->id);
                 $this->model->shopProduct->createNewView();
                 $this->editControllerRoute = "shop/admin-cms-content-element";
-            }
+            //}
         }
         return parent::beforeAction($action);
     }
