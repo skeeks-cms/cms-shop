@@ -62,7 +62,10 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
                 $ids = implode(",", $ids);
                 $this->elementIds = CmsContentElement::find()
                     ->andWhere(new Expression("id in ({$ids})"))
-                    ->select(['id']);
+                    ->select(['id'])
+                    
+                    ->column()
+                ;
                 
 
             } else {
