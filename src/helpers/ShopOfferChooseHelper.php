@@ -205,8 +205,6 @@ class ShopOfferChooseHelper extends Component
                         $counter++;
 
                         //Берем все опции
-
-
                         if ($counter == 1) {
                             $selectedValue = $this->chooseModel->{$code};
                             foreach ($tmpAvailableOffers as $key => $availableOffer) {
@@ -232,7 +230,16 @@ class ShopOfferChooseHelper extends Component
                             foreach ($options as $optionKey => $optionValue) {
                                 $availableOptions = [];
                                 foreach ($tmpAvailableOffers as $key => $availableOffer) {
-                                    $availableOptions[$availableOffer->relatedPropertiesModel->getAttribute($code)] = $availableOffer->relatedPropertiesModel->getAttribute($code);
+                                    
+                                    if ($hasMainProduct) {
+                                        $mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
+                                        if ($mainCCE) {
+                                            $availableOffer = $mainCCE;
+                                        }
+                                    } 
+                                         
+                                    $availableOptions[$availableOffer->relatedPropertiesModel->getAttribute($code)] = $availableOffer->relatedPropertiesModel->getAttribute($code);    
+                                    
                                     /*if ($availableOffer->relatedPropertiesModel->getAttribute($code) != $optionKey) {
                                         $disabledOptions[$optionKey] = $optionKey;
                                     }*/

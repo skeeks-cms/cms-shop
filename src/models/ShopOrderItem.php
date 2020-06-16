@@ -297,16 +297,6 @@ class ShopOrderItem extends ActiveRecord
         //Если это предложение, нужно добавить свойства
         if ($parentElement && !$this->isNewRecord) {
 
-            /*if ($product->cmsContentElement->name != $parentElement->name) {
-                $basketProperty = new ShopOrderItemProperty();
-                $basketProperty->shop_order_item_id = $this->id;
-                $basketProperty->code = 'name';
-                $basketProperty->value = $product->cmsContentElement->name;
-                $basketProperty->name = \Yii::t('skeeks/cms', 'name');
-
-                $basketProperty->save();
-            }*/
-
             if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray()) {
                 foreach ($properties as $code => $value) {
                     
@@ -323,10 +313,8 @@ class ShopOrderItem extends ActiveRecord
                             $basketProperty->save();
                         }
                     }
-                    
                 }
             }
-
         }
 
 
@@ -398,32 +386,7 @@ class ShopOrderItem extends ActiveRecord
     {
         if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
-            if ($parent = $this->shopProduct->shopProductWhithOffers) {
-
-                
-                if ($this->shopProduct->cmsContentElement->image) {
-                    return $this->shopProduct->cmsContentElement->image;
-                } else {
-               
-                    if (!$parent->cmsContentElement->image) {
-                        if ($parent->main_pid) {
-                            return $parent->shopMainProduct->cmsContentElement->image;
-                        }
-                    } else {
-                        return $parent->cmsContentElement->image;
-                    }
-                }
-
-            } else {
-
-                if (!$this->shopProduct->cmsContentElement->image) {
-                    if ($this->shopProduct->main_pid) {
-                        return $this->shopProduct->shopMainProduct->cmsContentElement->image;
-                    }
-                } else {
-                    return $this->shopProduct->cmsContentElement->image;
-                }
-            }
+            return $this->shopProduct->cmsContentElement->mainProductImage;
         }
 
         return null;

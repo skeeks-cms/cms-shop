@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsStorageFile;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -20,6 +21,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property ShopCmsContentElement[] $tradeOffers
  * @property ShopContent             $shopContent
+ *
+ * @property CmsStorageFile          $mainProductImage
  *
  * Class ShopCmsContentElement
  * @package skeeks\cms\shop\models
@@ -346,5 +349,50 @@ class ShopCmsContentElement extends CmsContentElement
             }
         }
     }
+
+
+    /**
+     * @return \skeeks\cms\models\CmsStorageFile|null
+     */
+    public function getMainProductImage()
+    {
+        //Главная картинка есть, больше ничего проверять не нужно
+        if ($this->image) {
+            return $this->image;
+        }
+
+        //У элемента нет товара, так же ничего проверять не нужно
+        if (!$shopProduct = $this->shopProduct) {
+            return null;
+        }
+
+        //Если у товара задан главный товар и у него есть картинка, берем ее
+        if ($shopProduct->main_pid && $shopProduct->shopMainProduct) {
+            if ($image = $shopProduct->shopMainProduct->cmsContentElement->image) {
+                return $image;
+            }
+        }
+        
+        //Если это товар предложение и у общего товара задана картинка то покажем ее
+        if ($shopProduct->isOfferProduct) {
+            if ($parent = $this->shopProduct->shopProductWhithOffers) {
+                if ($image = $parent->cmsContentElement->image) {
+                    return $image;
+                }
+
+                //Если общий товар связан с главным и у него есть картинка берем ее
+                if ($parent->main_pid && $parent->shopMainProduct) {
+                    if ($image = $parent->shopMainProduct->cmsContentElement->image) {
+                        return $image;
+                    }
+                }
+
+            }
+        }
+        
+
+        return null;
+    }
+
 
 }
