@@ -555,7 +555,7 @@ class ShopCmsContentElement extends CmsContentElement
             }
 
             if ($result) {
-                $name = $name . ", " . implode(", ", $result);
+                $name = trim($name) . ", " . implode(", ", $result);
             }
         }
 
@@ -592,7 +592,7 @@ class ShopCmsContentElement extends CmsContentElement
             }
 
             if ($result) {
-                $name = $name . ", " . implode(", ", $result);
+                $name = trim($name) . ", " . implode(", ", $result);
             }
         }
 
