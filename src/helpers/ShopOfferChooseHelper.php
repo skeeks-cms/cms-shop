@@ -83,6 +83,14 @@ class ShopOfferChooseHelper extends Component
     {
         return $this->_offerCmsContentElement;
     }
+    /**
+     * @return ShopCmsContentElement
+     */
+    public function setOfferCmsContentElement(ShopCmsContentElement $shopCmsContentElement)
+    {
+        $this->_offerCmsContentElement = $shopCmsContentElement;
+        return $this;
+    }
 
     public $viewFile = '@skeeks/cms/shop/views/helpers/shop-offer-choose';
 
@@ -190,11 +198,12 @@ class ShopOfferChooseHelper extends Component
             $this->_chooseModel->load(\Yii::$app->request->post());
             $this->_chooseModel->validate();
 
+            //$this->_chooseModel->offer_id = $this->shopProductOffer->id;
 
             //Если мы выбрали конкретный оффер, то нужно просто его показать и загрузить его данные в опции
             if ($this->_chooseModel->offer_id) {
                 $this->_offerCmsContentElement = ShopCmsContentElement::findOne($this->_chooseModel->offer_id);
-            } else {
+            }else {
                 //Если конкретный офер не указан, нужно его вычислить загрузив опции
                 if ($this->_chooseFields) {
                     $counter = 0;
@@ -286,10 +295,20 @@ class ShopOfferChooseHelper extends Component
 
 
                 $this->_chooseModel->validate();
-                if (!$this->_offerCmsContentElement && !$this->_chooseModel->errors) {
+                //if (!$this->_offerCmsContentElement && !$this->_chooseModel->errors) {
+                if (!$this->_chooseModel->errors) {
+
                     $this->_offerCmsContentElement = array_values($this->_availableOffers)[0];
                 }
             }
+
+            if ($this->_offerCmsContentElement) {
+                //Нужно для смены url в браузере
+                \Yii::$app->response->redirect($this->_offerCmsContentElement->url, 200);
+            }
+
+        } elseif ($this->offerCmsContentElement) {
+            $this->_chooseModel->offer_id = $this->offerCmsContentElement->id;
         }
 
         //Сортировка значений

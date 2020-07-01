@@ -270,7 +270,8 @@ class ShopOrderItem extends ActiveRecord
         $this->shop_product_price_id = $productPrice->id;
         $this->notes = $productPrice->typePrice->name;
 
-        $this->name = $parentElement ? $parentElement->name : $product->cmsContentElement->name;
+        $this->name = $product->cmsContentElement->productName;
+        //$this->name = $parentElement ? $parentElement->name : $product->cmsContentElement->name;
         $this->weight = $product->weight;
 
 
@@ -297,17 +298,29 @@ class ShopOrderItem extends ActiveRecord
         //Если это предложение, нужно добавить свойства
         if ($parentElement && !$this->isNewRecord) {
 
-            if ($properties = $product->cmsContentElement->relatedPropertiesModel->toArray()) {
+            $element = $product->cmsContentElement;
+            $properties = $product->cmsContentElement->relatedPropertiesModel->toArray();
+            if ($product->main_pid) {
+                $element = $product->shopMainProduct->cmsContentElement;
+                $properties = $product->shopMainProduct->cmsContentElement->relatedPropertiesModel->toArray();
+            }
+
+            if ($properties) {
                 foreach ($properties as $code => $value) {
                     
                     if (in_array($code, (array) ArrayHelper::map(\Yii::$app->shop->offerCmsContentProperties, "code", 'code'))) {
                         if (!$this->getShopOrderItemProperties()->andWhere(['code' => $code])->count() && $value) {
-                            $property = $product->cmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
-    
+                            $property = $element->relatedPropertiesModel->getRelatedProperty($code);
+
+                            $val = $element->relatedPropertiesModel->getAttributeAsText($code);
+                            if ($property->cmsMeasure) {
+                                $val = $val . $property->cmsMeasure->symbol;
+                            }
+
                             $basketProperty = new ShopOrderItemProperty();
                             $basketProperty->shop_order_item_id = $this->id;
                             $basketProperty->code = $code;
-                            $basketProperty->value = $product->cmsContentElement->relatedPropertiesModel->getAttributeAsText($code);
+                            $basketProperty->value = $val;
                             $basketProperty->name = $property->name;
     
                             $basketProperty->save();
@@ -353,7 +366,8 @@ class ShopOrderItem extends ActiveRecord
         if ($this->shopProduct) {
             //Это предложение у него есть родительский элемент
             if ($parent = $this->shopProduct->shopProductWhithOffers) {
-                return $parent->cmsContentElement->url;
+                return $this->shopProduct->cmsContentElement->url;
+                //return $parent->cmsContentElement->url;
             } else {
                 return $this->shopProduct->cmsContentElement->url;
             }
