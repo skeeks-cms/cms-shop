@@ -35,10 +35,10 @@ class Merchant extends Object
         $sSignatureValue = md5($signature);
 
         $data = [
-            'MrchLogin'      => $this->sMerchantLogin,
+            'MerchantLogin'      => $this->sMerchantLogin,
             'OutSum'         => $nOutSum,
             'InvId'          => $nInvId,
-            'Desc'           => $sInvDesc,
+            'Description'           => $sInvDesc,
             'SignatureValue' => $sSignatureValue,
             'IncCurrLabel'   => $sIncCurrLabel,
             'Email'          => $sEmail,

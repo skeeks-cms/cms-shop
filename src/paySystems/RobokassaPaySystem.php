@@ -9,8 +9,11 @@
 namespace skeeks\cms\shop\paySystems;
 
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
+use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
@@ -54,7 +57,7 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'isLive'         => 'Is live',
+            'isLive'         => 'Боевой режим?',
             'sMerchantLogin' => 'sMerchantLogin',
             'sMerchantPass1' => 'sMerchantPass1',
             'sMerchantPass2' => 'sMerchantPass2',
@@ -64,18 +67,27 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'isLive' => 'If is live used: https://auth.robokassa.ru/Merchant/Index.aspx else http://test.robokassa.ru/Index.aspx',
+            'isLive' => 'Боевой режим использует адрес: https://auth.robokassa.ru/Merchant/Index.aspx, не боевой — http://test.robokassa.ru/Index.aspx',
         ]);
     }
     /**
      * @param ShopOrder $shopOrder
      * @return $this
      */
-    public function paymentResponse(ShopOrder $shopOrder)
+    /*public function paymentResponse(ShopOrder $shopOrder)
     {
-        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id,
-            \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopOrder->user->email);
+        return $this->getMerchant()->payment($shopOrder->price, $shopOrder->id, \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopOrder->user->email);
+    }*/
+    
+    /**
+     * @param ShopOrder $shopOrder
+     * @return $this
+     */
+    public function actionPaymentResponse(ShopBill $shopBill)
+    {
+        return $this->getMerchant()->payment($shopBill->money->amount, $shopBill->id, \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopBill->shopOrder->email);
     }
+    
     /**
      * @return \skeeks\cms\shop\paySystems\robokassa\Merchant
      * @throws \yii\base\InvalidConfigException
@@ -97,8 +109,27 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
 
         return $merchant;
     }
+
+
     public function renderConfigForm(ActiveForm $activeForm)
     {
+        $successUrl = Url::to(['/shop/robokassa/success'], true);
+        $resultUrl = Url::to(['/shop/robokassa/result'], true);
+        $failUrl = Url::to(['/shop/robokassa/fail'], true);
+        echo Alert::widget([
+            'closeButton' => false,
+            'options'     => [
+                'class' => 'alert-info',
+            ],
+
+            'body' => <<<HTML
+<p>В личном кабинете <a href="https://partner.robokassa.ru/" target="_blank">https://partner.robokassa.ru/</a>, выбирите нужный магазин и пропишите настройки:</p> 
+<p>Result Url: <b>{$resultUrl}</b></p> 
+<p>Success Url: <b>{$successUrl}</b></p> 
+<p>Fail Url: <b>{$failUrl}</b></p> 
+HTML
+            ,
+        ]);
         echo $activeForm->field($this, 'isLive')->checkbox();
         echo $activeForm->field($this, 'sMerchantLogin')->textInput();
         echo $activeForm->field($this, 'sMerchantPass1')->textInput();

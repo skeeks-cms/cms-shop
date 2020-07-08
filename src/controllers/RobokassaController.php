@@ -9,7 +9,9 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\shop\paySystems\robokassa\Merchant;
 use skeeks\cms\shop\paySystems\RobokassaPaySystem;
 use yii\helpers\Url;
@@ -40,6 +42,12 @@ class RobokassaController extends Controller
         }
     }*/
 
+    /**
+     * Используется в случае успешного проведения платежа.
+     *
+     * @return \yii\web\Response
+     * @throws BadRequestHttpException
+     */
     public function actionSuccess()
     {
         RobokassaPaySystem::logInfo('success request');
@@ -49,17 +57,18 @@ class RobokassaController extends Controller
             throw new BadRequestHttpException('Not found params');
         }
 
-        $order = $this->loadModel($_REQUEST['InvId']);
-        $merchant = $this->getMerchant($order);
+        $bill = $this->loadModel($_REQUEST['InvId']);
+        $merchant = $this->getMerchant($bill->shopOrder);
         $shp = $this->getShp();
 
         if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'],
             $merchant->sMerchantPass1, $shp)
         ) {
 
-            $order->ps_status = "STATUS_ACCEPTED";
-            $order->save();
-            return $this->redirect(Url::to(['/shop/order/view', 'id' => $order->id]));
+            /*$order->ps_status = "STATUS_ACCEPTED";
+            $order->save();*/
+            return $this->redirect($bill->shopOrder->url);
+            //return $this->redirect(Url::to(['/shop/order/view', 'id' => $order->id]));
         }
 
         RobokassaPaySystem::logError('bad signature');
@@ -69,17 +78,19 @@ class RobokassaController extends Controller
      * Загрузка заказа
      *
      * @param integer $id
-     * @return ShopOrder
+     * @return ShopBill
      * @throws \yii\web\BadRequestHttpException
      */
     protected function loadModel($id)
     {
-        $model = ShopOrder::findOne($id);
+        $model = ShopBill::findOne($id);
         if ($model === null) {
             throw new BadRequestHttpException("Order: {$id} not found");
         }
         return $model;
     }
+
+
     /**
      * @param ShopOrder $order
      * @return \skeeks\cms\shop\paySystems\robokassa\Merchant
@@ -154,6 +165,13 @@ class RobokassaController extends Controller
 
         return $shp;
     }
+
+    /**
+     * Используется для оповещения о платеже
+     *
+     * @return string
+     * @throws BadRequestHttpException
+     */
     public function actionResult()
     {
         RobokassaPaySystem::logInfo('result request');
@@ -163,8 +181,8 @@ class RobokassaController extends Controller
             throw new BadRequestHttpException('Not found params');
         }
 
-        $order = $this->loadModel($_REQUEST['InvId']);
-        $merchant = $this->getMerchant($order);
+        $bill = $this->loadModel($_REQUEST['InvId']);
+        $merchant = $this->getMerchant($bill->shopOrder);
         $shp = $this->getShp();
 
         if ($merchant->checkSignature($_REQUEST['SignatureValue'], $_REQUEST['OutSum'], $_REQUEST['InvId'],
@@ -172,21 +190,59 @@ class RobokassaController extends Controller
         ) {
 
             RobokassaPaySystem::logInfo('result signature OK');
-            if ($order->payed != "Y") {
-                $order->processNotePayment();
+
+
+            $transaction = \Yii::$app->db->beginTransaction();
+
+            try {
+
+                $payment = new ShopPayment();
+                $payment->shop_buyer_id = $bill->shop_buyer_id;
+                $payment->shop_pay_system_id = $bill->shop_pay_system_id;
+                $payment->shop_order_id = $bill->shop_order_id;
+                $payment->amount = $bill->amount;
+                $payment->currency_code = $bill->currency_code;
+                $payment->comment = "Оплата по счету №{$bill->id} от ".\Yii::$app->formatter->asDate($bill->created_at);
+                $payment->external_data = $response;
+
+                if (!$payment->save()) {
+                    throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
+                }
+
+                $bill->isNotifyUpdate = false;
+                $bill->paid_at = time();
+                $bill->shop_payment_id = $payment->id;
+
+                if (!$bill->save()) {
+                    throw new Exception("Не обновился счет: ".print_r($payment->errors, true));
+                }
+
+                $bill->shopOrder->paid_at = time();
+                $bill->shopOrder->save();
+
+                $transaction->commit();
+
+                //return $this->redirect($bill->shopOrder->url);
+
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                \Yii::error($e->getMessage(), self::class);
+                throw $e;
             }
 
-            $order->ps_status = "STATUS_SUCCESS";
-            $order->payed = "Y";
-            $order->save();
-
-            return 'Ok';
+            return "OK{$bill->id}\n";
         }
 
         RobokassaPaySystem::logError('bad signature');
 
         throw new BadRequestHttpException;
     }
+
+
+    /**
+     * @return string|\yii\web\Response
+     * @throws BadRequestHttpException
+     */
     public function actionFail()
     {
         RobokassaPaySystem::logInfo('fail request');
@@ -196,13 +252,13 @@ class RobokassaController extends Controller
             throw new BadRequestHttpException;
         }
 
-        $order = $this->loadModel($_REQUEST['InvId']);
-        $merchant = $this->getMerchant($order);
+        $bill = $this->loadModel($_REQUEST['InvId']);
+        $merchant = $this->getMerchant($bill->shopOrder);
         $shp = $this->getShp();
 
-        $order->ps_status = "STATUS_FAIL";
-        $order->save();
-        return $this->redirect(Url::to(['/shop/order/view', 'id' => $order->id]));
+        /*$order->ps_status = "STATUS_FAIL";
+        $order->save();*/
+        return $this->redirect($bill->shopOrder->url);
         //$this->loadModel($nInvId)->updateAttributes(['status' => Invoice::STATUS_SUCCESS]);
         return 'Ok';
     }
