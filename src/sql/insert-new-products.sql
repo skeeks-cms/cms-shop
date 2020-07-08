@@ -241,7 +241,7 @@ SELECT
     UNIX_TIMESTAMP(),
     receiver_product_id,
     receiver_type_price_id,
-    calc_price,
+    ROUND(calc_price),
     sender_currency_code
 FROM (
     SELECT
@@ -327,7 +327,7 @@ UPDATE
         SELECT
             receiver_product_id,
             receiver_price_id,
-            calc_price,
+            ROUND(calc_price) as calc_price_round,
             sender_currency_code
         FROM (
             SELECT
@@ -417,7 +417,7 @@ UPDATE
 
 	) calc_price ON calc_price.receiver_price_id = price.id
 SET
-	price.`price` = calc_price.calc_price,
+	price.`price` = calc_price.calc_price_round,
 	price.`currency_code` = calc_price.sender_currency_code;
 
 COMMIT;
