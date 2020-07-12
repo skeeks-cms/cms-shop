@@ -28,6 +28,7 @@ use yii\helpers\ArrayHelper;
  * @property integer|null      $auto_next_shop_order_status_id
  * @property integer|null      $auto_next_status_time
  * @property integer|null      $is_payment_allowed
+ * @property integer|null      $is_install_after_pay
  *
  * @property string            $btnName
  * @property ShopOrder[]       $shopOrders
@@ -139,6 +140,11 @@ class ShopOrderStatus extends Core
             [['description', 'color', 'bg_color', 'order_page_description', 'email_notify_description'], 'default', 'value' => null],
 
             [['is_install_after_pay'], 'default', 'value' => null],
+            [['is_install_after_pay'], function() {
+                if ($this->is_install_after_pay == 0) {
+                    $this->is_install_after_pay = null;
+                }
+            }],
         ]);
     }
 
