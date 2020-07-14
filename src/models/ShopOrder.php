@@ -348,6 +348,16 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ],
                 'boolean',
             ],
+            [
+                [
+                    'shop_pay_system_id',
+                    'shop_delivery_id',
+                ],
+                'required',
+                'when' => function() {
+                    return $this->is_created;
+                }
+            ],
             [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
             [['shop_buyer_id'], 'integer'],
             [['cms_site_id'], 'integer'],
@@ -425,7 +435,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             'amount'               => \Yii::t('skeeks/shop/app', 'Price'),
             'currency_code'        => \Yii::t('skeeks/shop/app', 'Currency Code'),
             'discount_amount'      => \Yii::t('skeeks/shop/app', 'Discount Value'),
-            'shop_pay_system_id'   => \Yii::t('skeeks/shop/app', 'Pay System ID'),
             'shop_delivery_id'     => \Yii::t('skeeks/shop/app', 'Delivery'),
             'tax_amount'           => \Yii::t('skeeks/shop/app', 'Tax Value'),
             'paid_amount'          => \Yii::t('skeeks/shop/app', 'Sum Paid'),
@@ -433,7 +442,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'isNotifyChangeStatus' => \Yii::t('skeeks/shop/app', 'Отправить email уведомление клиенту?'),
             'statusComment'        => \Yii::t('skeeks/shop/app', 'Комментарий к смене статуса'),
 
-            'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Payment system'),
+            'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Оплата'),
 
             'is_created' => \Yii::t('skeeks/shop/app', 'Заказ создан?'),
         ];
@@ -790,9 +799,20 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getPaySystems()
     {
-        return $this->shopPersonType->getPaySystems()
+        $q = $this->shopPersonType->getPaySystems()
             ->andWhere([ShopPaySystem::tableName().".is_active" => 1])
-            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id]);
+            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id])
+        ;
+
+        //Если в заказе выбран способ доставки, и у способа доставки заданы способы оплаты, то накладываем доп фильтрацию
+        if ($this->shopDelivery) {
+            if ($shopDelivery2paySystems = $this->shopDelivery->shopDelivery2paySystems) {
+                $ids = ArrayHelper::map($shopDelivery2paySystems, "pay_system_id", "pay_system_id");;
+                $q->andWhere([ShopPaySystem::tableName().".id" => $ids]);
+
+            }
+        }
+        return $q;
     }
     /**
      * @return $this
