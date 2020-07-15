@@ -13,7 +13,7 @@ $action = $this->context->action;
 
 <?php $form = $action->beginActiveForm(); ?>
 <?= $form->errorSummary($model); ?>
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
+<? $fieldset = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
 <?= $form->field($model, 'active')->checkbox([
     'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
@@ -42,9 +42,9 @@ $action = $this->context->action;
 ]); ?>
 <?= $form->field($model, 'notes')->textarea(['rows' => 3]); ?>
 
-<?= $form->fieldSetEnd(); ?>
+<? $fieldset::end(); ?>
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Conditions')); ?>
+<? $fieldset = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Conditions')); ?>
 
 <?= $form->field($model, 'conditions')->widget(
     \skeeks\cms\shop\widgets\discount\DiscountConditionsWidget::class,
@@ -55,10 +55,10 @@ $action = $this->context->action;
     ]
 ); ?>
 
-<?= $form->fieldSetEnd(); ?>
+<? $fieldset::end(); ?>
 
 
-<?= $form->fieldSet(\Yii::t('skeeks/shop/app', 'Limitations')); ?>
+<? $fieldset = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Limitations')); ?>
 
 <?= $form->field($model, 'typePrices')->checkboxList(\yii\helpers\ArrayHelper::map(
     \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
@@ -82,7 +82,7 @@ $action = $this->context->action;
     'label'                 => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
 ]); ?>
 
-<?= $form->fieldSetEnd(); ?>
+<? $fieldset::end(); ?>
 
 
 <?= $form->buttonsStandart($model); ?>
