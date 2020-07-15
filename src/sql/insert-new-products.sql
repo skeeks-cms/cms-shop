@@ -229,6 +229,50 @@ WHERE
 
 
 
+/*Обновление количества по товарам */
+UPDATE
+	`shop_product` as product
+	INNER JOIN (
+
+        SELECT
+            sp.id,
+            /*sp.quantity,*/
+            (
+                SELECT
+                    SUM(sp_inner.quantity) as sum_quantity
+                FROM
+                    shop_product as sp_inner
+                    LEFT JOIN cms_content_element as cce_inner ON cce_inner.id = sp_inner.id
+                WHERE
+                    cce_inner.cms_site_id in (
+                        SELECT
+                            shop_import_cms_site.sender_cms_site_id
+                        FROM
+                            shop_import_cms_site
+                        WHERE
+                            shop_import_cms_site.cms_site_id = @site_id
+                    )
+                    AND sp_inner.main_pid = sp_model.id
+                GROUP BY
+                    sp_inner.main_pid
+            ) as calc_quantity
+        FROM
+            shop_product as sp
+            LEFT JOIN cms_content_element as cce ON sp.id = cce.id
+            LEFT JOIN shop_product as sp_model ON sp.main_pid = sp_model.id
+        WHERE
+            cce.cms_site_id = @site_id
+            AND sp.main_pid IS NOT NULL
+            AND sp.product_type != 'offers'
+
+
+	) site_product ON site_product.id = product.id
+SET
+	product.`quantity` = site_product.calc_quantity
+	;
+
+
+
 
 
 /**
