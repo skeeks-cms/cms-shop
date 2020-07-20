@@ -9,7 +9,6 @@
 namespace skeeks\cms\shop\components;
 
 use skeeks\cms\backend\widgets\ActiveFormBackend;
-use skeeks\cms\base\Component;
 use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
@@ -26,6 +25,7 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use yii\base\Component;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
@@ -43,20 +43,10 @@ use yii\widgets\ActiveForm;
  * @property ShopUser             $shopUser
  *
  * @property CmsContent           $shopContents
- *
- * @property array                $notifyEmails
- *
- * Class ShopComponent
- * @package skeeks\cms\shop\components
  */
 class ShopComponent extends Component
 {
     const SESSION_SHOP_USER_NAME = 'SKEEKS_CMS_SHOP_USER';
-
-    /**
-     * @var string Email отдела продаж
-     */
-    public $email = "";
 
     /**
      * Максимальное допустимое количество товаров
@@ -69,10 +59,6 @@ class ShopComponent extends Component
      */
     public $minQuantity = 0.01;
     /**
-     * @var Кого уведомить о новых товарах
-     */
-    public $notify_emails;
-    /**
      * @var ShopTypePrice
      */
     protected $_baseTypePrice;
@@ -84,52 +70,6 @@ class ShopComponent extends Component
      * @var ShopUser
      */
     private $_shopUser = null;
-
-    /**
-     * @var bool
-     */
-    public $is_show_product_no_price = 1;
-
-    /**
-     * @var bool
-     */
-    public $is_show_button_no_price = 1;
-
-    /**
-     * Какие фильтры показывать на сайте?
-     * @var array
-     */
-    public $show_filter_property_ids = [];
-
-    /**
-     * @var array Фильтры отрктые по умолчанию
-     */
-    public $open_filter_property_ids = [];
-
-
-    /**
-     * Показывать товары только в наличии?
-     * @var int
-     */
-    public $is_show_product_only_quantity = 1;
-
-    /**
-     * Показывать у товаров оставшееся количество на складе? Актуально для агрегаторов
-     * @var int
-     */
-    public $is_show_quantity_product = 1;
-
-
-    /**
-     * @var array
-     */
-    public $offers_properties = [];
-
-    /**
-     * @var array
-     */
-    //public $visible_shop_supplier_ids = [];
-    //public $is_show_products_has_main = false;
 
 
     /**
@@ -155,130 +95,6 @@ class ShopComponent extends Component
     public function beginConfigForm()
     {
         return ActiveFormBackend::begin();
-    }
-
-    public function getConfigFormFields()
-    {
-        return [
-            'main' => [
-                'class' => FieldSet::class,
-                'name'  => \Yii::t('skeeks/shop/app', 'Main'),
-
-                'fields' => [
-
-
-                    'notify_emails'         => [
-                        'class' => TextareaField::class,
-                    ],
-
-                ],
-            ],
-
-
-            'catalog' => [
-                'class' => FieldSet::class,
-                'name'  => \Yii::t('skeeks/shop/app', 'Каталог'),
-
-                'fields' => [
-
-                    'is_show_product_no_price'      => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],
-                    'is_show_product_only_quantity' => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],
-                    'is_show_button_no_price'       => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],
-                    'is_show_quantity_product'      => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],
-
-
-                ],
-            ],
-
-
-            'filters' => [
-                'class' => FieldSet::class,
-                'name'  => \Yii::t('skeeks/shop/app', 'Фильтры'),
-
-                'fields' => [
-                 
-                    'show_filter_property_ids' => [
-                        'class'    => SelectField::class,
-                        'multiple' => true,
-                        'items'    => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
-                    ],
-
-                    'open_filter_property_ids' => [
-                        'class'    => SelectField::class,
-                        'multiple' => true,
-                        'items'    => ArrayHelper::map(CmsContentProperty::find()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
-                    ],
-                ],
-
-            ],
-
-        ];
-    }
-
-
-    public function rules()
-    {
-        return ArrayHelper::merge(parent::rules(), [
-            [['show_filter_property_ids'], 'safe'],
-            [['open_filter_property_ids'], 'safe'],
-            [['email'], 'string'],
-
-            ['notify_emails', 'string'],
-            [
-                [
-                    'is_show_product_no_price',
-                    'is_show_button_no_price',
-                    'is_show_product_only_quantity',
-                    'is_show_quantity_product',
-                    //'is_show_products_has_main',
-                ],
-                'boolean',
-            ],
-        ]);
-    }
-    public function attributeLabels()
-    {
-        return ArrayHelper::merge(parent::attributeLabels(), [
-            'email'                         => 'Email',
-            'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
-            'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
-            'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
-            'is_show_product_only_quantity' => "Показывать товары только в наличии на сайте?",
-            'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
-            'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
-            'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
-            //'is_show_products_has_main'     => "Отображать только товары которые привязаны к главным?",
-        ]);
-    }
-
-    public function attributeHints()
-    {
-        return ArrayHelper::merge(parent::attributeHints(), [
-            //'is_show_products_has_main'     => "Если выбрано да, то будут показываться только оформленные товары",
-            'notify_emails'                 => \Yii::t('skeeks/shop/app',
-                'Enter email addresses, separated by commas, they will come on new orders information'),
-            'is_show_product_no_price'      => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
-            'is_show_button_no_price'       => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
-            'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
-            'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
-            'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
-        ]);
     }
 
     /**
@@ -489,25 +305,6 @@ class ShopComponent extends Component
         return $result;
     }
 
-
-    /**
-     * @return array
-     */
-    public function getNotifyEmails()
-    {
-        $emailsAll = [];
-        if ($this->notify_emails) {
-            $emails = explode(",", $this->notify_emails);
-
-            foreach ($emails as $email) {
-                $emailsAll[] = trim($email);
-            }
-        }
-
-        return $emailsAll;
-    }
-
-
     /**
      *
      * Фильтрация базового запроса на выборку товаров с учетом настроек магазина.
@@ -544,7 +341,7 @@ class ShopComponent extends Component
      */
     public function filterByPriceContentElementQuery(ActiveQuery $activeQuery)
     {
-        if (!$this->is_show_product_no_price) {
+        if (!\Yii::$app->skeeks->site->shopSite->is_show_product_no_price) {
             $activeQuery->joinWith('shopProduct.shopProductPrices as pricesFilter');
             $activeQuery->andWhere(['>', '`pricesFilter`.price', 0]);
         }

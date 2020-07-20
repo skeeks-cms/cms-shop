@@ -49,6 +49,7 @@ return [
         'cms' => [
             'controllerMap' => [
                 'content-element' => \skeeks\cms\shop\controllers\ContentElementController::class,
+                'admin-cms-site' => \skeeks\cms\shop\controllers\AdminCmsSiteController::class,
             ],
         ],
     ],

@@ -300,7 +300,7 @@ return [
                             "url"   => ["shop/admin-shop-site"],
                         ],
 
-                        [
+                        /*[
                             "label"          => \Yii::t('skeeks/shop/app', 'Дополнительные'),
                             "url"            => [
                                 "cms/admin-settings",
@@ -310,7 +310,7 @@ return [
                             "activeCallback" => function ($adminMenuItem) {
                                 return (bool)(\Yii::$app->request->getUrl() == $adminMenuItem->getUrl());
                             },
-                        ],
+                        ],*/
 
 
                         [

@@ -13,15 +13,24 @@ use skeeks\cms\models\CmsTree;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property string   $description
- * @property string   $description_internal
- * @property int      $id
- * @property int      $is_supplier
- * @property int      $is_receiver
- * @property int|null $catalog_cms_tree_id
+ * @property int         $id
+ * @property string|null $description
+ * @property string|null $description_internal
+ * @property int         $is_supplier
+ * @property int         $is_receiver Сайт получает товары от поставщиков?
+ * @property int|null    $catalog_cms_tree_id Главный раздел для товаров
+ * @property string|null $notify_emails Email адреса для уведомлений о заказах
+ * @property int         $is_show_product_no_price Показывать товары с нулевыми ценами?
+ * @property int         $is_show_button_no_price Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?
+ * @property int         $is_show_product_only_quantity Показывать товары только в наличии на сайте?
+ * @property int         $is_show_quantity_product Показывать оставшееся количество товаров на складе?
+ * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
+ * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
  *
- * @property CmsSite  $cmsSite
- * @property CmsTree  $catalogCmsTree
+ * @property CmsSite     $cmsSite
+ * @property CmsTree     $catalogCmsTree
+ *
+ * @property string[]    $notifyEmails
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -71,6 +80,20 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 
                 },
             ],
+
+            [['show_filter_property_ids'], 'safe'],
+            [['open_filter_property_ids'], 'safe'],
+
+            ['notify_emails', 'string'],
+            [
+                [
+                    'is_show_product_no_price',
+                    'is_show_button_no_price',
+                    'is_show_product_only_quantity',
+                    'is_show_quantity_product',
+                ],
+                'boolean',
+            ],
         ]);
     }
 
@@ -86,6 +109,14 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_supplier'          => "Поставщик товаров?",
             'is_receiver'          => "Разрешено получать товары от постащиков",
             'catalog_cms_tree_id'  => "Основной раздел для товаров",
+
+            'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
+            'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
+            'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
+            'is_show_product_only_quantity' => "Показывать товары только в наличии на сайте?",
+            'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
+            'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
+            'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
         ]);
     }
 
@@ -95,9 +126,18 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_supplier' => "Этот сайт является поставщиком товаров для других сайтов. Значит товары на этом сайте необходимо привязывать к главным товарам портала.",
-            'is_receiver' => "Если эта опция включена то на сайте появляется раздел «Поставщики»",
+            'is_supplier'         => "Этот сайт является поставщиком товаров для других сайтов. Значит товары на этом сайте необходимо привязывать к главным товарам портала.",
+            'is_receiver'         => "Если эта опция включена то на сайте появляется раздел «Поставщики»",
             'catalog_cms_tree_id' => "Основной раздел сайта, в который будут попадать товары по умолчанию, если раздел для них не задан.",
+
+            'notify_emails'                 => \Yii::t('skeeks/shop/app',
+                'Enter email addresses, separated by commas, they will come on new orders information'),
+            'is_show_product_no_price'      => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
+            'is_show_button_no_price'       => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
+            'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
+            'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
+            'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
+
         ]);
     }
 
@@ -136,4 +176,23 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     {
         return $this->hasOne(CmsTree::className(), ['id' => 'catalog_cms_tree_id']);
     }
+
+
+    /**
+     * @return array
+     */
+    public function getNotifyEmails()
+    {
+        $emailsAll = [];
+        if ($this->notify_emails) {
+            $emails = explode(",", $this->notify_emails);
+
+            foreach ($emails as $email) {
+                $emailsAll[] = trim($email);
+            }
+        }
+
+        return $emailsAll;
+    }
+
 }

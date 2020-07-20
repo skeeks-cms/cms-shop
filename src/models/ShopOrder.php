@@ -3,7 +3,6 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsContentElement;
-use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
@@ -163,16 +162,16 @@ class ShopOrder extends \skeeks\cms\models\Core
 
             try {
                 //Notify admins
-                if (\Yii::$app->shop->notifyEmails) {
+                if ($emails = $this->cmsSite->shopSite->notifyEmails) {
 
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                     \Yii::$app->mailer->compose('create-order', [
                         'order' => $this,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo(\Yii::$app->shop->notifyEmails)
-                        ->setSubject(\Yii::t('skeeks/shop/app',  'New order').' №'.$this->id)
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
+                        ->setTo($emails)
+                        ->setSubject(\Yii::t('skeeks/shop/app', 'New order').' №'.$this->id)
                         ->send();
                 }
             } catch (\Exception $e) {
@@ -192,12 +191,10 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
 
-
         if (in_array("paid_at", array_keys($event->changedAttributes)) && $this->paid_at) {
 
 
             \Yii::info(print_r($this->toArray(), true), self::class);
-
 
 
             (new ShopOrderLog([
@@ -216,7 +213,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
-                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id . " — Оплачен")
+                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id." — Оплачен")
                         ->send();
 
                 } catch (\Exception $e) {
@@ -225,16 +222,16 @@ class ShopOrder extends \skeeks\cms\models\Core
             }
 
             //Уведомить администраторов об оплате
-            if (\Yii::$app->shop->notifyEmails) {
+            if ($emails = $this->cmsSite->shopSite->notifyEmails) {
                 try {
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
 
                     \Yii::$app->mailer->compose('payed', [
                         'order' => $this,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo(\Yii::$app->shop->notifyEmails)
-                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id . " — Оплачен")
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
+                        ->setTo($emails)
+                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id." — Оплачен")
                         ->send();
 
                 } catch (\Exception $e) {
@@ -247,7 +244,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             if ($shopOrderStatus = ShopOrderStatus::find()->where(['is_install_after_pay' => 1])->one()) {
                 $this->shop_order_status_id = $shopOrderStatus->id;
                 if (!$this->save()) {
-                    \Yii::error('Статус заказа после оплаты не обновлен: ' . $e->getMessage(), self::class);
+                    \Yii::error('Статус заказа после оплаты не обновлен: '.$e->getMessage(), self::class);
                 }
             }
         }
@@ -301,15 +298,15 @@ class ShopOrder extends \skeeks\cms\models\Core
 
             try {
                 //Notify admins
-                if (\Yii::$app->shop->notifyEmails) {
+                if ($emails = $this->cmsSite->shopSite->notifyEmails) {
 
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                     \Yii::$app->mailer->compose('order-status-change', [
                         'order' => $this,
                     ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo(\Yii::$app->shop->notifyEmails)
+                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
+                        ->setTo($emails)
                         ->setSubject("Заказ №".$this->id." — ".$this->shopOrderStatus->name)
                         ->send();
                 }
@@ -317,8 +314,6 @@ class ShopOrder extends \skeeks\cms\models\Core
                 \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
             }
         }
-
-
 
 
     }
@@ -354,9 +349,9 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'shop_delivery_id',
                 ],
                 'required',
-                'when' => function() {
+                'when' => function () {
                     return $this->is_created;
-                }
+                },
             ],
             [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
             [['shop_buyer_id'], 'integer'],
@@ -374,12 +369,16 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['code'], 'default', 'value' => \Yii::$app->security->generateRandomString()],
 
             [['is_created'], 'default', 'value' => 0],
-            [['shop_order_status_id'], 'default', 'value' => function() {
-                $shopOrder = ShopOrderStatus::find()->orderBy(['priority' => SORT_ASC])->one();
-                if ($shopOrder) {
-                    return $shopOrder->id;
-                }
-            }],
+            [
+                ['shop_order_status_id'],
+                'default',
+                'value' => function () {
+                    $shopOrder = ShopOrderStatus::find()->orderBy(['priority' => SORT_ASC])->one();
+                    if ($shopOrder) {
+                        return $shopOrder->id;
+                    }
+                },
+            ],
 
 
             [
@@ -515,7 +514,8 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getCmsSite()
     {
-        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'cms_site_id']);
     }
 
     /**
@@ -801,8 +801,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $q = $this->shopPersonType->getPaySystems()
             ->andWhere([ShopPaySystem::tableName().".is_active" => 1])
-            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id])
-        ;
+            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id]);
 
         //Если в заказе выбран способ доставки, и у способа доставки заданы способы оплаты, то накладываем доп фильтрацию
         if ($this->shopDelivery) {

@@ -130,7 +130,7 @@ class PriceFiltersHandler extends Model
         $query->joinWith('shopProduct as shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
-        if (!\Yii::$app->shop->is_show_product_no_price) {
+        if (!\Yii::$app->skeeks->site->shopSite->is_show_product_no_price) {
             $query->andWhere(['>', 'prices.price',  0]);
         }
         $query->orderBy = [];

@@ -48,8 +48,8 @@ class NotifyController extends Controller
             if ($model->load(\Yii::$app->request->post()) && $model->save()) {
                 //Notify admins
                 try {
-                    if (\Yii::$app->shop->notifyEmails) {
-                        foreach (\Yii::$app->shop->notifyEmails as $email) {
+                    if ($emails = \Yii::$app->skeeks->site->shopSite->notifyEmails) {
+                        foreach ($emails as $email) {
                             \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
                             \Yii::$app->mailer->compose('notice-added', [
