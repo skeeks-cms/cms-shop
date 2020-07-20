@@ -450,7 +450,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                 ['measure_code'],
                 function ($model) {
                     if (!$this->measure) {
-                        $this->addError("measure_code", "Указан код валюты которой нет в базе.");
+                        $this->addError("measure_code", "Указан код валюты '{$this->measure_code}', которой нет в базе.");
                     }
 
                     //Если у товара есть товары поставщика
