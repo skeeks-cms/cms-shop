@@ -314,11 +314,12 @@ class ShopComponent extends Component
      */
     public function filterBaseContentElementQuery(ActiveQuery $activeQuery)
     {
-        $activeQuery->joinWith("shopProduct");
+        $activeQuery->joinWith("shopProduct as sp");
+        //$activeQuery->leftJoin('shop_product', '`shop_product`.`id` = `cms_content_element`.`id`');
 
         $activeQuery->andWhere([
             '!=',
-            'shopProduct.product_type',
+            'sp.product_type',
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
 
