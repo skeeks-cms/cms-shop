@@ -323,6 +323,7 @@ class ShopComponent extends Component
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
 
+
         /*if ($this->is_show_products_has_main) {
             $activeQuery->andWhere(
                 ['is not', 'shopProduct.main_pid', null]
