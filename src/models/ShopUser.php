@@ -409,7 +409,7 @@ class ShopUser extends ActiveRecord
      */
     public function getProductPriceHelper(ShopCmsContentElement $shopCmsContentElement)
     {
-        return $this->shopOrder->getProductPriceHelper($shopCmsContentElement);
+        return $this->shopOrder ? $this->shopOrder->getProductPriceHelper($shopCmsContentElement) : null;
     }
 
     /**

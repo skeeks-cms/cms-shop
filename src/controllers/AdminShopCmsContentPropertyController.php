@@ -74,6 +74,9 @@ HTML
 
                         'id',
                         'is_offer_property',
+                        
+                        'is_vendor',
+                        'is_vendor_code',
                     ],
 
                     'columns' => [
@@ -83,6 +86,12 @@ HTML
                             'class'         => DefaultActionColumn::class,
                         ],
                         'is_offer_property' => [
+                            'class'         => BooleanColumn::class,
+                        ],
+                        'is_vendor' => [
+                            'class'         => BooleanColumn::class,
+                        ],
+                        'is_vendor_code' => [
                             'class'         => BooleanColumn::class,
                         ],
 
@@ -110,6 +119,14 @@ HTML
                 'items' => ArrayHelper::map(CmsContentProperty::find()->all(), 'id', 'asText'),
             ],
             'is_offer_property'          => [
+                'class' => BoolField::class,
+                'allowNull' => false,
+            ],
+            'is_vendor'          => [
+                'class' => BoolField::class,
+                'allowNull' => false,
+            ],
+            'is_vendor_code'          => [
                 'class' => BoolField::class,
                 'allowNull' => false,
             ],

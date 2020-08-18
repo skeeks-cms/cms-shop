@@ -23,6 +23,8 @@ use yii\helpers\ArrayHelper;
  * @property integer    $created_at
  * @property integer    $updated_at
  * @property integer    $is_offer_property
+ * @property integer    $is_vendor
+ * @property integer    $is_vendor_code
  * @property integer    $cms_content_property_id
  *
  * @property CmsContentProperty $cmsContentProperty
@@ -49,6 +51,12 @@ class ShopCmsContentProperty extends ActiveRecord
             ],
             [['cms_content_property_id'], 'required'],
             [['cms_content_property_id'], 'unique'],
+            
+            [['is_vendor'], 'default', 'value' => null],
+            [['is_vendor_code'], 'default', 'value' => null],
+            
+            [['is_vendor_code'], 'unique'],
+            [['is_vendor'], 'unique'],
         ]);
     }
 
@@ -60,6 +68,8 @@ class ShopCmsContentProperty extends ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'cms_content_property_id'          => \Yii::t('skeeks/shop/app', 'Свойство'),
             'is_offer_property'          => \Yii::t('skeeks/shop/app', 'Свойство предложения?'),
+            'is_vendor'          => \Yii::t('skeeks/shop/app', 'Производитель?'),
+            'is_vendor_code'          => \Yii::t('skeeks/shop/app', 'Код производителя?'),
         ]);
     }
     /**

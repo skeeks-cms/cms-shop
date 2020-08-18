@@ -39,6 +39,8 @@ use yii\helpers\Json;
  * @property double                      $length
  * @property double                      $height
  *
+ * @property integer|null                $main_pid_at
+ * @property integer|null                $main_pid_by
  * @property integer|null                $main_pid
  * @property integer|null                $offers_pid
  *
@@ -239,6 +241,22 @@ class ShopProduct extends \skeeks\cms\models\Core
                     $offersProduct->product_type = self::TYPE_OFFERS;
                     $offersProduct->update(false, ['product_type']);
                 }
+            }
+        }
+
+        if ($this->isAttributeChanged('main_pid')) {
+            if ($this->main_pid) {
+                $this->main_pid_at = time();
+
+                if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
+                    $this->main_pid_by = \Yii::$app->user->id;
+                } else {
+                    $this->main_pid_by = null;
+                }
+
+            } else {
+                $this->main_pid_at = null;
+                $this->main_pid_by = null;
             }
         }
     }
@@ -536,6 +554,8 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['supplier_external_jsondata'], 'default', 'value' => null],
 
             [['main_pid'], 'integer'],
+            [['main_pid_at'], 'integer'],
+            [['main_pid_by'], 'integer'],
             [
                 ['main_pid'],
                 function ($attribute) {
@@ -560,6 +580,24 @@ class ShopProduct extends \skeeks\cms\models\Core
                     }
                 },
             ],
+
+            [['main_pid_at'], 'default', 'value' => function() {
+                if ($this->main_pid) {
+                    return time();
+                }
+
+                return null;
+            }],
+
+            [['main_pid_by'], 'default', 'value' => function() {
+                if ($this->main_pid) {
+                    if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
+                        return \Yii::$app->user->id;
+                    }
+                }
+
+                return null;
+            }],
 
             [['offers_pid'], 'integer'],
         ];
