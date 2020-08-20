@@ -61,7 +61,7 @@ $action = $this->context->action;
 <? $fieldset = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Limitations')); ?>
 
 <?= $form->field($model, 'typePrices')->checkboxList(\yii\helpers\ArrayHelper::map(
-    \skeeks\cms\shop\models\ShopTypePrice::find()->all(), 'id', 'name'
+    \skeeks\cms\shop\models\ShopTypePrice::find()->cmsSite()->all(), 'id', 'name'
 ))->hint(\Yii::t('skeeks/shop/app', 'if nothing is selected, it means all')); ?>
 
 

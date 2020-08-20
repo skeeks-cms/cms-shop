@@ -157,6 +157,7 @@ class ProductPriceHelper extends Component
             }
         }
 
+        $money->amount = round((float) $money->amount);
         $this->_minMoney = $money;
         $this->_minPrice = $price;
         $this->_applyedDiscounts = $applyedShopDiscounts;
