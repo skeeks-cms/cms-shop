@@ -25,10 +25,54 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 /**
+ * Работа с товарами поставщика
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 class SupplierController extends Controller
 {
+
+    public function actionCheckModels()
+    {
+
+        /*SELECT
+        count(1) as c,
+          properties1.value,
+          properties2.value,
+          cms_content_element.*
+        FROM
+          cms_content_element
+          LEFT JOIN shop_product sp ON cms_content_element.id = sp.id
+          LEFT JOIN cms_site cmsSite ON cms_content_element.cms_site_id = cmsSite.id
+          LEFT JOIN cms_content_element_property properties1 ON cms_content_element.id = properties1.element_id
+          LEFT JOIN cms_content_element_property properties2 ON cms_content_element.id = properties2.element_id
+        WHERE
+          (cmsSite.is_default = 1)
+          AND (properties1.property_id = 28)
+          AND (properties2.property_id = 60)
+
+        GROUP BY
+            properties1.value,
+            properties2.value
+            HAVING
+            c>1
+            ORDER BY c DESC*/
+
+        $q = ShopCmsContentElement::find()
+            ->joinWith("shopProduct as sp")
+            ->joinWith("cmsSite as cmsSite")
+            //->joinWith("cmsContentElementProperties as properties1")
+            //->joinWith("cmsContentElementProperties as properties2")
+            ->leftJoin(
+                ['p1' => CmsContentElementProperty::find()->where(['property_id' => 28])], ['p1.element_id' => new \yii\db\Expression(ShopCmsContentElement::tableName() . '.id')]
+            )
+
+            ->andWhere(['cmsSite.is_default' => 1])
+            //->andWhere(['properties1.property_id' => 28])
+            //->andWhere(['properties2.property_id' => 60])
+        ;
+
+        echo $q->createCommand()->rawSql . PHP_EOL;
+    }
 
     /**
      *
@@ -161,9 +205,9 @@ class SupplierController extends Controller
      */
     public function actionInsertCmsProperty($external_property_code)
     {
-        /*if ($external_property_code == "brand") {
+        if ($external_property_code == "brand") {
             $external_property_code = "Фабрика4";
-        }*/
+        }
         /**
          * @var $shopSupplier ShopSupplier
          */
