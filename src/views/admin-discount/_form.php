@@ -21,9 +21,9 @@ $action = $this->context->action;
 ]); ?>
 <?= $form->field($model, 'name')->textInput(); ?>
 
-<?= $form->field($model, 'site_id')->listBox(\yii\helpers\ArrayHelper::map(
+<?/*= $form->field($model, 'cms_site_id')->listBox(\yii\helpers\ArrayHelper::map(
     \skeeks\cms\models\CmsSite::find()->all(), 'id', 'name'
-), ['size' => 1]); ?>
+), ['size' => 1]); */?>
 
 <?= $form->field($model, 'assignment_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(), ['size' => 1]); ?>
 <?= $form->field($model, 'value_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getValueTypes(), ['size' => 1]); ?>

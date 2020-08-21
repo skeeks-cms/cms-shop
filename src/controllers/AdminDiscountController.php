@@ -11,9 +11,11 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDiscount;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -38,24 +40,16 @@ class AdminDiscountController extends BackendModelStandartController
      */
     public function actions()
     {
-        $bool = [
-            'isAllowChangeMode' => false,
-            'field'             => [
-                'class' => SelectField::class,
-                'items' => [
-                    'Y' => \Yii::t('yii', 'Yes'),
-                    'N' => \Yii::t('yii', 'No'),
-                ],
-            ],
-        ];
 
 
         return ArrayHelper::merge(parent::actions(), [
 
             'index' => [
+                'backendShowings' => false,
+
                 "filters" => [
                     'visibleFilters' => [
-                        'id',
+                        //'id',
                         'name',
                     ],
 
@@ -69,6 +63,15 @@ class AdminDiscountController extends BackendModelStandartController
                 ],
 
                 "grid" => [
+                     'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                    },
                     //'on init'       => function (Event $e) {
                     /**
                      * @var $dataProvider ActiveDataProvider
@@ -100,7 +103,6 @@ class AdminDiscountController extends BackendModelStandartController
                         'checkbox',
                         'actions',
 
-                        'id',
                         'name',
 
                         'value',
@@ -111,6 +113,9 @@ class AdminDiscountController extends BackendModelStandartController
                         'priority',
                     ],
                     'columns'        => [
+                        'name'        => [
+                            'class' => DefaultActionColumn::class,
+                        ],
                         'active'        => [
                             'class' => BooleanColumn::class,
                         ],

@@ -202,6 +202,9 @@ class ShopUser extends ActiveRecord
             return $order;
         }
 
+        /*print_r($this->shop_order_id);
+        die();*/
+
 
         return $this->hasOne(ShopOrder::class, ['id' => 'shop_order_id']);
     }
