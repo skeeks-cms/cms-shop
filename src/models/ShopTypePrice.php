@@ -119,8 +119,8 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     {
         return array_merge(parent::attributeHints(), [
             'is_default'      => "Обычно это розничная цена доступная всем покупателям",
-            'cmsUserRoles'      => "Если ничего не выбрано, то могут все.",
-            'viewCmsUserRoles'      => "Если ничего не выбрано, то видят все клиенты.",
+            //'cmsUserRoles'      => "Если ничего не выбрано, то могут все.",
+            //'viewCmsUserRoles'      => "Если ничего не выбрано, то видят все клиенты.",
         ]);
     }
 

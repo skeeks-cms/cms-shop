@@ -32,6 +32,7 @@ use yii\widgets\ActiveForm;
  * @property ShopPersonType[]     $shopPersonTypes
  * @property ShopTypePrice[]      $shopTypePrices
  * @property ShopTypePrice[]      $canBuyTypePrices
+ * @property ShopTypePrice[]      $canViewTypePrices
  * @property CmsContentProperty[] $offerCmsContentProperties
  *
  * @property ShopUser             $shopUser
@@ -149,11 +150,48 @@ class ShopComponent extends Component
             }
 
             if (!$typePrice->cmsUserRoles) {
-                $result[$typePrice->id] = $typePrice;
+                //$result[$typePrice->id] = $typePrice;
                 continue;
             }
 
             foreach ($typePrice->cmsUserRoles as $role) {
+                if (\Yii::$app->authManager->checkAccess($user ? $user->id : null, $role->name)) {
+                    $result[$typePrice->id] = $typePrice;
+                    continue;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Типы цен которые видит клиент
+     *
+     * @param null|CmsUser $user
+     * @return array
+     */
+    public function getCanViewTypePrices($user = null)
+    {
+        $result = [];
+
+        if (!$user) {
+            $user = \Yii::$app->user->identity;
+        }
+
+        foreach ($this->shopTypePrices as $typePrice) {
+
+            if ($typePrice->isDefault) {
+                $result[$typePrice->id] = $typePrice;
+                continue;
+            }
+
+            if (!$typePrice->viewCmsUserRoles) {
+                //$result[$typePrice->id] = $typePrice;
+                continue;
+            }
+
+            foreach ($typePrice->viewCmsUserRoles as $role) {
                 if (\Yii::$app->authManager->checkAccess($user ? $user->id : null, $role->name)) {
                     $result[$typePrice->id] = $typePrice;
                     continue;

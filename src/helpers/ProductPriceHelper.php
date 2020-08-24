@@ -96,9 +96,9 @@ class ProductPriceHelper extends Component
         if ($shopDiscountsTmp) {
             foreach ($shopDiscountsTmp as $shopDiscount) {
                 
-                //Если роли не выбраны в скидке тогда ее просто применяем
+                //Если роли не выбраны то скидка недоступна
                 if (!$shopDiscount->cmsUserRoles) {
-                    $shopDiscounts[$shopDiscount->id] = $shopDiscount;
+                    //$shopDiscounts[$shopDiscount->id] = $shopDiscount;
                     continue;
                 }
                 
