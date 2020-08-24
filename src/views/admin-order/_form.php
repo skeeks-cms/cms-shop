@@ -370,8 +370,8 @@ CSS
                     ],
 
                     [
-                        'label' => \Yii::t('skeeks/shop/app', 'Weight (gramm)'),
-                        'value' => $model->weight." ".\Yii::t('skeeks/shop/app', 'g.'),
+                        'label' => \Yii::t('skeeks/shop/app', 'Weight'),
+                        'value' => $model->weightFormatted,
                     ],
 
                     [
