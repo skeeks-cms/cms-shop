@@ -28,7 +28,7 @@ class AdminDiscountController extends BackendModelStandartController
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Discount goods');
-        $this->modelShowAttribute = "id";
+        $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopDiscount::class;
 
         parent::init();
@@ -107,8 +107,8 @@ class AdminDiscountController extends BackendModelStandartController
 
                         'value',
 
-                        'active',
-                        'last_discount',
+                        'is_active',
+                        'is_last',
 
                         'priority',
                     ],
@@ -116,10 +116,10 @@ class AdminDiscountController extends BackendModelStandartController
                         'name'        => [
                             'class' => DefaultActionColumn::class,
                         ],
-                        'active'        => [
+                        'is_active'        => [
                             'class' => BooleanColumn::class,
                         ],
-                        'last_discount' => [
+                        'is_last' => [
                             'class' => BooleanColumn::class,
                         ],
 

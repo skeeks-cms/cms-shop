@@ -2,6 +2,8 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\behaviors\RelationalBehavior;
+use skeeks\cms\rbac\models\CmsAuthItem;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
@@ -20,6 +22,9 @@ use yii\helpers\ArrayHelper;
  * @property integer|null $cms_site_id
  * @property integer|null $is_default
  *
+ * @property CmsAuthItem[]            $cmsUserRoles
+ * @property CmsAuthItem[]            $viewCmsUserRoles
+ *
  * ***
  *
  * @property string       $buyPermissionName
@@ -33,6 +38,13 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public static function tableName()
     {
         return '{{%shop_type_price}}';
+    }
+
+    public function behaviors()
+    {
+        return [
+            RelationalBehavior::class,
+        ];
     }
 
     public function init()
@@ -70,6 +82,9 @@ class ShopTypePrice extends \skeeks\cms\models\Core
                 },
             ],
 
+            ['cmsUserRoles', 'safe'], // allow set permissions with setAttributes()
+            ['viewCmsUserRoles', 'safe'], // allow set permissions with setAttributes()
+
             [
                 ['cms_site_id', 'external_id'],
                 'unique',
@@ -93,6 +108,8 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             'external_id'      => "ID из внешней системы",
             'cms_site_id'      => "Сайт",
             'is_default'      => "Главная цена",
+            'cmsUserRoles'    => \Yii::t('skeeks/shop/app', 'Кто может покупать по этой цене?'),
+            'viewCmsUserRoles'    => \Yii::t('skeeks/shop/app', 'Кто может видеть эту цену?'),
         ]);
     }
     /**
@@ -102,7 +119,22 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     {
         return array_merge(parent::attributeHints(), [
             'is_default'      => "Обычно это розничная цена доступная всем покупателям",
+            'cmsUserRoles'      => "Если ничего не выбрано, то могут все.",
+            'viewCmsUserRoles'      => "Если ничего не выбрано, то видят все клиенты.",
         ]);
+    }
+
+
+    public function getCmsUserRoles()
+    {
+        return $this->hasMany(CmsAuthItem::class, ['name' => 'auth_item_name'])
+            ->viaTable('{{%shop_type_price2auth_item}}', ['shop_type_price_id' => 'id']);
+    }
+
+    public function getViewCmsUserRoles()
+    {
+        return $this->hasMany(CmsAuthItem::class, ['name' => 'auth_item_name'])
+            ->viaTable('{{%shop_type_price2view_auth_item}}', ['shop_type_price_id' => 'id']);
     }
 
 
@@ -114,13 +146,6 @@ class ShopTypePrice extends \skeeks\cms\models\Core
         return "view-shop-type-price-".$this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getBuyPermissionName()
-    {
-        return "view-shop-type-price-".$this->id;
-    }
 
     /**
      * @return bool

@@ -9,7 +9,6 @@
 namespace skeeks\cms\shop\components;
 
 use skeeks\cms\backend\widgets\ActiveFormBackend;
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentProperty;
@@ -17,14 +16,9 @@ use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCmsContentProperty;
-use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\shop\models\ShopUser;
-use skeeks\yii2\form\fields\BoolField;
-use skeeks\yii2\form\fields\FieldSet;
-use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
@@ -148,10 +142,22 @@ class ShopComponent extends Component
         }
 
         foreach ($this->shopTypePrices as $typePrice) {
-            if (\Yii::$app->authManager->checkAccess($user ? $user->id : null, $typePrice->buyPermissionName)
-                || $typePrice->isDefault
-            ) {
+
+            if ($typePrice->isDefault) {
                 $result[$typePrice->id] = $typePrice;
+                continue;
+            }
+
+            if (!$typePrice->cmsUserRoles) {
+                $result[$typePrice->id] = $typePrice;
+                continue;
+            }
+
+            foreach ($typePrice->cmsUserRoles as $role) {
+                if (\Yii::$app->authManager->checkAccess($user ? $user->id : null, $role->name)) {
+                    $result[$typePrice->id] = $typePrice;
+                    continue;
+                }
             }
         }
 
@@ -478,7 +484,6 @@ SQL
                 sp.`product_type` = "offer"
 SQL
         )->execute();
-
 
 
         //У товаров предложений раздел должнен совпадать с родительским

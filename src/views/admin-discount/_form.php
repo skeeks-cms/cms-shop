@@ -15,15 +15,12 @@ $action = $this->context->action;
 <?= $form->errorSummary($model); ?>
 <? $fieldset = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Main')); ?>
 
-<?= $form->field($model, 'active')->checkbox([
-    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
-]); ?>
+<?= $form->field($model, 'is_active')->checkbox(); ?>
 <?= $form->field($model, 'name')->textInput(); ?>
 
-<?/*= $form->field($model, 'cms_site_id')->listBox(\yii\helpers\ArrayHelper::map(
+<? /*= $form->field($model, 'cms_site_id')->listBox(\yii\helpers\ArrayHelper::map(
     \skeeks\cms\models\CmsSite::find()->all(), 'id', 'name'
-), ['size' => 1]); */?>
+), ['size' => 1]); */ ?>
 
 <?= $form->field($model, 'assignment_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(), ['size' => 1]); ?>
 <?= $form->field($model, 'value_type')->listBox(\skeeks\cms\shop\models\ShopDiscount::getValueTypes(), ['size' => 1]); ?>
@@ -36,10 +33,7 @@ $action = $this->context->action;
 <?= $form->field($model, 'max_discount')->textInput(); ?>
 
 <?= $form->field($model, 'priority'); ?>
-<?= $form->field($model, 'last_discount')->checkbox([
-    'uncheck' => \skeeks\cms\components\Cms::BOOL_N,
-    'value'   => \skeeks\cms\components\Cms::BOOL_Y,
-]); ?>
+<?= $form->field($model, 'is_last')->checkbox(); ?>
 <?= $form->field($model, 'notes')->textarea(['rows' => 3]); ?>
 
 <? $fieldset::end(); ?>
@@ -64,23 +58,20 @@ $action = $this->context->action;
     \skeeks\cms\shop\models\ShopTypePrice::find()->cmsSite()->all(), 'id', 'name'
 ))->hint(\Yii::t('skeeks/shop/app', 'if nothing is selected, it means all')); ?>
 
+<?php $this->registerCss(<<<CSS
+    .sx-checkbox label
+    {
+        width: 100%;
+    }
+CSS
+    ) ?>
+<?=
+$form->field($model, 'cmsAuthItems')->checkboxList(\yii\helpers\ArrayHelper::map(
+    \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
+    ),[
+    'class' => 'sx-checkbox',
+])->hint(\Yii::t('skeeks/shop/app', 'if nothing is selected, it means all')); ?>
 
-<? $alert = \yii\bootstrap\Alert::begin([
-    'options' => [
-        'class' => 'alert-warning',
-    ],
-]); ?>
-<?= \Yii::t('skeeks/shop/app',
-    '<b> Warning! </b> Permissions are stored in real time. Thus, these settings are independent of site or user.'); ?>
-<? $alert::end() ?>
-
-<?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-    'permissionName'        => $model->permissionName,
-    'notClosedRoles'        => [],
-    'permissionDescription' => \Yii::t('skeeks/shop/app',
-            'Groups of users who can benefit from discounted rates').": '{$model->name}'",
-    'label'                 => \Yii::t('skeeks/shop/app', 'Groups of users who can benefit from discounted rates'),
-]); ?>
 
 <? $fieldset::end(); ?>
 

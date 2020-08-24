@@ -15,6 +15,7 @@ use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Event;
@@ -140,11 +141,31 @@ HTML
             'description'      => [
                 'class' => TextareaField::class,
             ],
-            'priority',
+            'priority' => [
+                'class' => NumberField::class
+            ],
             'external_id',
         ];
 
-        if ($model->isNewRecord) {
+
+
+        $result["cmsUserRoles"] = [
+            'class'   => SelectField::class,
+            'multiple' => true,
+            'items' => \yii\helpers\ArrayHelper::map(
+                \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
+            ),
+        ];
+
+        $result["viewCmsUserRoles"] = [
+            'class'   => SelectField::class,
+            'multiple' => true,
+            'items' => \yii\helpers\ArrayHelper::map(
+                \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
+            ),
+        ];
+
+        /*if ($model->isNewRecord) {
             $result[] = [
                 'class'   => HtmlBlock::class,
                 'content' => \yii\bootstrap\Alert::widget([
@@ -180,7 +201,7 @@ HTML
                             'Group of users who have the right to purchase on this type of price'),
                     ]),
             ];
-        }
+        }*/
 
         return $result;
     }

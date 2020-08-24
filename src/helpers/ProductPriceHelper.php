@@ -95,9 +95,22 @@ class ProductPriceHelper extends Component
 
         if ($shopDiscountsTmp) {
             foreach ($shopDiscountsTmp as $shopDiscount) {
-                if (\Yii::$app->authManager->checkAccess($this->shopOrder->cmsUser ? $this->shopOrder->cmsUser->id : null, $shopDiscount->permissionName)) {
+                
+                //Если роли не выбраны в скидке тогда ее просто применяем
+                if (!$shopDiscount->cmsUserRoles) {
                     $shopDiscounts[$shopDiscount->id] = $shopDiscount;
+                    continue;
                 }
+                
+                foreach ($shopDiscount->cmsUserRoles as $role)
+                {
+                    if (\Yii::$app->authManager->checkAccess($this->shopOrder->cmsUser ? $this->shopOrder->cmsUser->id : null, $role->name)) {
+                        $shopDiscounts[$shopDiscount->id] = $shopDiscount;
+                        continue;
+                    }
+                }
+                
+                
             }
         }
 
@@ -138,7 +151,7 @@ class ProductPriceHelper extends Component
                         $applyedShopDiscounts[] = $shopDiscount;
 
                         //Нужно остановится и не применять другие скидки
-                        if ($shopDiscount->last_discount === Cms::BOOL_Y) {
+                        if ($shopDiscount->is_last) {
                             break;
                         }
 
@@ -149,7 +162,7 @@ class ProductPriceHelper extends Component
                         $applyedShopDiscounts[] = $shopDiscount;
 
                         //Нужно остановится и не применять другие скидки
-                        if ($shopDiscount->last_discount === Cms::BOOL_Y) {
+                        if ($shopDiscount->is_last) {
                             break;
                         }
                     }
@@ -165,7 +178,7 @@ class ProductPriceHelper extends Component
     static public function getShopDiscounts()
     {
         if (self::$_shopDiscounts === false) {
-            self::$_shopDiscounts = ShopDiscount::find()->active()->andWhere(['assignment_type' => ShopDiscount::ASSIGNMENT_TYPE_PRODUCT])->all();
+            self::$_shopDiscounts = ShopDiscount::find()->cmsSite()->active()->andWhere(['assignment_type' => ShopDiscount::ASSIGNMENT_TYPE_PRODUCT])->all();
         }
 
         return self::$_shopDiscounts;
