@@ -274,13 +274,15 @@ class ShopUser extends ActiveRecord
      */
     public function getWeight()
     {
+        return $this->shopOrder->weight;
+        /*
         $result = 0;
 
         foreach ($this->shopBaskets as $shopBasket) {
             $result = $result + ($shopBasket->weight * $shopBasket->quantity);
         }
 
-        return $result;
+        return $result;*/
     }
     /**
      *

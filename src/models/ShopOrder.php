@@ -83,6 +83,7 @@ use yii\helpers\Url;
  * @property Money                      $calcMoneyItems     Сумма всех позиций корзины
  *
  * @property int                        $weight
+ * @property string                     $weightFormatted
  *
  *
  * @property string                     $email read-only
@@ -777,6 +778,20 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         return new Money("", $this->currency_code);
+    }
+
+    /**
+     * @return string
+     */
+    public function getWeightFormatted()
+    {
+        if ($this->weight >= 1000 && $this->weight <= 1000000) {
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000))." кг.";
+        } elseif ($this->weight >= 1000000) {
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000000))." т.";
+        } else {
+            return \Yii::$app->formatter->asDecimal(($this->weight))." г.";
+        }
     }
 
     /**
