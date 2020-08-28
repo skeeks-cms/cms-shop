@@ -258,9 +258,10 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->created_at = time();
             $this->recalculate();
         }
-        if ($this->isAttributeChanged('shop_delivery_id')) {
+        if ($this->isAttributeChanged('shop_delivery_id') && !$this->isAttributeChanged('delivery_amount')) {
             $this->recalculate();
         }
+
         if ($this->isAttributeChanged('shop_pay_system_id')) {
             $this->recalculate();
         }

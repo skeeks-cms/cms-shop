@@ -156,13 +156,27 @@ class AdminShopSiteController extends BackendModelController
                     'show_filter_property_ids' => [
                         'class'    => SelectField::class,
                         'multiple' => true,
-                        'items'    => ArrayHelper::map(CmsContentProperty::find()->cmsSite()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                        'items'    => ArrayHelper::map(CmsContentProperty::find()
+                            //->cmsSite()
+                            ->andWhere([
+                                'or',
+                                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                                [CmsContentProperty::tableName().'.cms_site_id' => null],
+                            ])
+                            ->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
 
                     'open_filter_property_ids' => [
                         'class'    => SelectField::class,
                         'multiple' => true,
-                        'items'    => ArrayHelper::map(CmsContentProperty::find()->cmsSite()->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                        'items'    => ArrayHelper::map(CmsContentProperty::find()
+                            //->cmsSite()
+                            ->andWhere([
+                                'or',
+                                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                                [CmsContentProperty::tableName().'.cms_site_id' => null],
+                            ])
+                            ->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
                     ],
                 ],
 

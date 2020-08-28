@@ -564,6 +564,9 @@ $form->fieldSelect($model, 'shop_delivery_id', \yii\helpers\ArrayHelper::map(
     \skeeks\cms\shop\models\ShopDelivery::find()->active()->all(), 'id', 'name'
 ))->label(false);
 ?>
+<?=
+$form->field($model, 'delivery_amount')->label("Стоимость доставки");
+?>
 
 <button class="btn btn-primary">Сохранить</button>
 
