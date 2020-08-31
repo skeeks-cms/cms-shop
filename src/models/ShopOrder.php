@@ -348,11 +348,19 @@ class ShopOrder extends \skeeks\cms\models\Core
             [
                 [
                     'shop_pay_system_id',
+                ],
+                'required',
+                'when' => function () {
+                    return $this->is_created && ShopPaySystem::find()->active()->cmsSite()->exists();
+                },
+            ],
+            [
+                [
                     'shop_delivery_id',
                 ],
                 'required',
                 'when' => function () {
-                    return $this->is_created;
+                    return $this->is_created && ShopDelivery::find()->active()->cmsSite()->exists();
                 },
             ],
             [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
