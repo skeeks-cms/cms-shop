@@ -36,7 +36,7 @@
 
             this.bind('removeBasket addProduct updateBasket clearCart addDiscountCoupon removeDiscountCoupon', function (e, data) {
                 self.trigger('change', {
-                    'Shop': this
+                    'Shop': self
                 });
             });
         },
