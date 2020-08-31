@@ -52,6 +52,8 @@ CSS
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
+    
+    
     sx.classes.OrderCallback = sx.classes.Component.extend({
 
         construct: function (jForm, ajaxQuery, opts)
@@ -156,7 +158,16 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
                     <?php else: ?>
                         Не выбрана
                     <?php endif; ?>
+
+
                 </a>
+
+                <?php if ((float) $model->moneyDelivery->amount > 0) : ?>
+                <span style="margin-left: 10px;">
+                        <?php echo $model->moneyDelivery; ?>
+                </span>
+                    <? endif; ?>
+
             </div>
         </div>
 
@@ -550,12 +561,18 @@ $form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
 
-    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
+    'clientCallback' => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+    
+        ActiveFormAjaxSubmit.on('success', function(e, response) {
+            ActiveFormAjaxSubmit.jForm.closest(".modal").find(".close").click();
+            _.delay(function() {
+                $.pjax.reload('#sx-pjax-order-wrapper', {});
+            }, 200);
+        });
+    }
 JS
-    ),
+)
 
 ]); ?>
 

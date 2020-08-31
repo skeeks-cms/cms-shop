@@ -135,16 +135,18 @@ class ShopOrderStatus extends Core
             [['bg_color'], 'string', 'max' => 32],
             [['is_payment_allowed'], 'integer'],
             [['is_install_after_pay'], 'integer'],
-            [['is_install_after_pay'], 'unique'],
+
 
             [['description', 'color', 'bg_color', 'order_page_description', 'email_notify_description'], 'default', 'value' => null],
 
             [['is_install_after_pay'], 'default', 'value' => null],
             [['is_install_after_pay'], function() {
-                if ($this->is_install_after_pay == 0) {
+                if ($this->is_install_after_pay == 0 || $this->is_install_after_pay == "0") {
                     $this->is_install_after_pay = null;
                 }
             }],
+
+            [['is_install_after_pay'], 'unique'],
         ]);
     }
 

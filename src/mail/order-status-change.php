@@ -17,6 +17,22 @@ $url = $order->url;
     <br>
 <?= Html::endTag('p'); ?>
 
+<?= Html::beginTag('h4'); ?>
+Детали заказа
+<?= Html::endTag('h4'); ?>
+
+<?= Html::beginTag('p'); ?>
+Стоимость товаров: <?= Html::tag('b', (string)$order->calcMoneyItems); ?><br/>
+<?php if ((float)$order->moneyDelivery->amount > 0) : ?>
+    Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
+<?php endif; ?>
+<?php if ((float)$order->moneyDiscount->amount > 0) : ?>
+    Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
+<?php endif; ?>
+К оплате: <?= Html::tag('b', (string)$order->money); ?>
+<?= Html::endTag('p'); ?>
+
+
 <?php if ($order->statusComment) : ?>
     <div style="font-weight: bold;">
         <?php echo $order->statusComment; ?>
