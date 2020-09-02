@@ -206,7 +206,7 @@ class SupplierController extends Controller
     public function actionInsertCmsProperty($external_property_code)
     {
         if ($external_property_code == "brand") {
-            $external_property_code = "Фабрика4";
+            $external_property_code = "Производитель ";
         }
         /**
          * @var $shopSupplier ShopSupplier

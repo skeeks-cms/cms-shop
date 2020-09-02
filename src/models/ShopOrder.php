@@ -259,6 +259,11 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->recalculate();
         }
         if ($this->isAttributeChanged('shop_delivery_id') && !$this->isAttributeChanged('delivery_amount')) {
+            $this->delivery_amount = $this->calcMoneyDelivery->amount;
+            $this->recalculate();
+        }
+
+        if ($this->isAttributeChanged('delivery_amount')) {
             $this->recalculate();
         }
 
@@ -354,7 +359,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                     return $this->is_created && ShopPaySystem::find()->active()->cmsSite()->exists();
                 },
             ],
-            [
+            /*[
                 [
                     'shop_delivery_id',
                 ],
@@ -362,7 +367,31 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'when' => function () {
                     return $this->is_created && ShopDelivery::find()->active()->cmsSite()->exists();
                 },
+            ],*/
+
+            [
+                ['shop_delivery_id'],
+                'default',
+                'value' => function () {
+                    $shopDelivery = ShopDelivery::find()->orderBy(['priority' => SORT_ASC])->active()->cmsSite()->one();
+                    if ($shopDelivery) {
+                        return $shopDelivery->id;
+                    }
+                },
             ],
+
+            [
+                ['shop_pay_system_id',],
+                'default',
+                'value' => function () {
+                    $shopPaySystem = ShopPaySystem::find()->orderBy(['priority' => SORT_ASC])->active()->cmsSite()->one();
+                    if ($shopPaySystem) {
+                        return $shopPaySystem->id;
+                    }
+                },
+            ],
+
+
             [['delivery_amount', 'amount', 'discount_amount', 'tax_amount', 'paid_amount'], 'number'],
             [['shop_buyer_id'], 'integer'],
             [['cms_site_id'], 'integer'],
@@ -618,7 +647,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getCalcMoney()
     {
         $money = $this->calcMoneyItems;
-        $money->add($this->calcMoneyDelivery);
+        $money->add($this->moneyDelivery);
         $money->sub($this->calcMoneyDiscount);
         return $money;
     }
@@ -845,7 +874,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         $this->tax_amount = $this->calcMoneyVat->amount;
         $this->amount = $this->calcMoney->amount;
         $this->discount_amount = $this->calcMoneyDiscount->amount;
-        $this->delivery_amount = $this->calcMoneyDelivery->amount;
 
         $this->trigger(self::EVENT_AFTER_RECALCULATE, new Event());
 

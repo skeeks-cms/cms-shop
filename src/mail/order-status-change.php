@@ -29,7 +29,7 @@ $url = $order->url;
 <?php if ((float)$order->moneyDiscount->amount > 0) : ?>
     Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
 <?php endif; ?>
-К оплате: <?= Html::tag('b', (string)$order->money); ?>
+Общая стоимость заказа: <?= Html::tag('b', (string)$order->money); ?>
 <?= Html::endTag('p'); ?>
 
 

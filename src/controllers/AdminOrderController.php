@@ -447,8 +447,12 @@ HTML;
         $model = $this->model;
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
             $rr->success = true;
-            return $rr;
+        } else {
+            $rr->success = false;
+            $rr->message = "Ошибка сохранения: " . print_r($model->errors, true);
         }
+
+        return $rr;
     }
 
 

@@ -15,7 +15,6 @@ use yii\helpers\Html;
 <?
 \skeeks\cms\widgets\Pjax::begin(['id' => "sx-pjax-order-wrapper"]);
 ?>
-
 <?
 $this->registerCss(<<<CSS
 
@@ -481,11 +480,23 @@ JS
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
 
-    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
+    'clientCallback' => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+    
+        ActiveFormAjaxSubmit.on('success', function(e, response) {
+            ActiveFormAjaxSubmit.jForm.closest(".modal").find(".close").click();
+            _.delay(function() {
+                $.pjax.reload('#sx-pjax-order-wrapper', {});
+            }, 200);
+        });
+    }
+JS
+
+    /*'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
             function(jForm, ajax){
                 new sx.classes.OrderCallback(jForm, ajax);
             };
-JS
+JS*/
     ),
 
 ]); ?>
@@ -522,10 +533,16 @@ JS
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
 
-    'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
-                function(jForm, ajax){
-                    new sx.classes.OrderCallback(jForm, ajax);
-                };
+    'clientCallback' => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+    
+        ActiveFormAjaxSubmit.on('success', function(e, response) {
+            ActiveFormAjaxSubmit.jForm.closest(".modal").find(".close").click();
+            _.delay(function() {
+                $.pjax.reload('#sx-pjax-order-wrapper', {});
+            }, 200);
+        });
+    }
 JS
     ),
 
@@ -564,6 +581,7 @@ $form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
     'clientCallback' => new \yii\web\JsExpression(<<<JS
     function (ActiveFormAjaxSubmit) {
     
+    console.log('111');
         ActiveFormAjaxSubmit.on('success', function(e, response) {
             ActiveFormAjaxSubmit.jForm.closest(".modal").find(".close").click();
             _.delay(function() {
