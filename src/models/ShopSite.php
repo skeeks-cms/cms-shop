@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use yii\helpers\ArrayHelper;
@@ -44,6 +45,18 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
         return '{{%shop_site}}';
     }
 
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            Implode::class => [
+                'class' => Implode::class,
+                'fields' => [
+                    'show_filter_property_ids',
+                    'open_filter_property_ids',
+                ]
+            ]
+        ]);
+    }
     /**
      * {@inheritdoc}
      */
