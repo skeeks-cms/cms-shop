@@ -102,6 +102,7 @@ class SupplierController extends Controller
             ->andWhere(['shopSite.is_supplier' => 1]) //только товары поставщиков
             //->andWhere(['content_id' => 2])
             ->andWhere(['sp.main_pid' => null]) //которые не привязаны к моделям
+            ->orderBy([ShopCmsContentElement::tableName() . '.id' => SORT_DESC])
         ;
         
         if ($cms_site_id) {
@@ -148,50 +149,55 @@ class SupplierController extends Controller
             //Ищем среди моделей, товар с таким же производителем и артикулом.
 
 
-            $find = ShopCmsContentElement::find()
-                ->joinWith("shopProduct as sp")
-                ->joinWith("cmsSite as cmsSite")
-                ->andWhere(['cmsSite.is_default' => 1]) //только товары поставщиков
-            ;
+            try {
+                $find = ShopCmsContentElement::find()
+                    ->joinWith("shopProduct as sp")
+                    ->joinWith("cmsSite as cmsSite")
+                    ->andWhere(['cmsSite.is_default' => 1]) //только товары поставщиков
+                ;
 
 
-            $find1 = CmsContentElementProperty::find()->select(['element_id as id'])
-                        ->where([
-                            "value_element_id"  => $modelVendorId,
-                            "property_id" => $vendor->cmsContentProperty->id,
-                        ]);
-            $find2 = CmsContentElementProperty::find()->select(['element_id as id'])
-                        ->where([
-                            "value"  => $modelVendorCode,
-                            "property_id" => $vendorCode->cmsContentProperty->id,
-                        ]);
+                $find1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                            ->where([
+                                "value_element_id"  => $modelVendorId,
+                                "property_id" => $vendor->cmsContentProperty->id,
+                            ]);
+                $find2 = CmsContentElementProperty::find()->select(['element_id as id'])
+                            ->where([
+                                "value"  => $modelVendorCode,
+                                "property_id" => $vendorCode->cmsContentProperty->id,
+                            ]);
 
-            $find->andWhere([
-                CmsContentElement::tableName().".id" => $find1,
-            ]);
+                $find->andWhere([
+                    CmsContentElement::tableName().".id" => $find1,
+                ]);
 
-            $find->andWhere([
-                CmsContentElement::tableName().".id" => $find2,
-            ]);
+                $find->andWhere([
+                    CmsContentElement::tableName().".id" => $find2,
+                ]);
 
-            /**
-             * @var $globalModel ShopCmsContentElement
-             */
-            if ($globalModel = $find->one()) {
-                $this->stdout("Найдена модель: {$globalModel->id}\n", Console::FG_GREEN);
-                $sp = $model->shopProduct;
-                $sp->main_pid = $globalModel->id;
-                if ($sp->save()) {
-                    $this->stdout("\t\t Связана\n", Console::FG_GREEN);
+                /**
+                 * @var $globalModel ShopCmsContentElement
+                 */
+                if ($globalModel = $find->one()) {
+                    $this->stdout("Найдена модель: {$globalModel->id}\n", Console::FG_GREEN);
+                    $sp = $model->shopProduct;
+                    $sp->main_pid = $globalModel->id;
+                    if ($sp->save()) {
+                        $this->stdout("\t\t Связана\n", Console::FG_GREEN);
+                    } else {
+                        $this->stdout("\t\t Не связана!" . print_r($sp->errors, true) . "\n", Console::FG_RED);
+                        $this->stdout("\t\t Ожидание 5 сек..." . "\n", Console::FG_RED);
+                        sleep(5);
+                    }
+                    /*die;*/
                 } else {
-                    $this->stdout("\t\t Не связана!" . print_r($sp->errors, true) . "\n", Console::FG_RED);
-                    $this->stdout("\t\t Ожидание 5 сек..." . "\n", Console::FG_RED);
-                    sleep(5);
+                    $this->stdout("Не найдена модель\n", Console::FG_RED);
                 }
-                /*die;*/
-            } else {
-                $this->stdout("Не найдена модель\n", Console::FG_RED);
+            } catch (\Exception $exception) {
+                $this->stdout($exception->getMessage() . "\n", Console::FG_RED);
             }
+
         }
     }
 
