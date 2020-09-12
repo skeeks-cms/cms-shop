@@ -546,6 +546,56 @@ SQL
 SQL
         )->execute();
 
+        //У товаров на сайта приемщиках должны быть заданы правильно разделы и названия
+        $result = \Yii::$app->db->createCommand(<<<SQL
+UPDATE 
+	`cms_content_element` as update_cce 
+	INNER JOIN (
+		SELECT 
+			ce.id, 
+			ce.cms_site_id, 
+			ce_main.name as model_name, 
+			
+			/*ce_main.code as model_code, 
+								ce_main.content_id as model_content_id, 
+								ce_main.id as model_id, */
+			ce.name, 
+			
+			/*source_tree.id as source_tree_id, 
+							source_tree.name as source_tree_name,*/
+			ce.tree_id, 
+			new_cms_tree.id as new_tree_id 
+		FROM 
+			
+			/* Товары */
+			cms_content_element as ce 
+			LEFT JOIN shop_product as sp ON sp.id = ce.id 
+			/* Сайты */
+			LEFT JOIN shop_site as shopSite ON shopSite.id = ce.cms_site_id 
+			/* Модели */
+			LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid 
+			LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id 
+			LEFT JOIN cms_tree as source_tree ON source_tree.id = ce_main.tree_id 
+			/* Разделы товаров на новом сайте */
+			LEFT JOIN cms_tree as new_cms_tree ON new_cms_tree.main_cms_tree_id = ce_main.tree_id 
+		WHERE 
+			shopSite.is_receiver = 1 
+			AND sp.main_pid is not NULL 
+			AND new_cms_tree.cms_site_id = ce.cms_site_id 
+			/*AND ce_main.name != ce.name */
+			AND (
+				ce.tree_id is NULL 
+				OR ce.tree_id != new_cms_tree.id 
+				OR ce_main.name != ce.name
+			)
+	) as ready_cce ON update_cce.id = ready_cce.id 
+SET 
+	update_cce.`name` = ready_cce.model_name, 
+	update_cce.tree_id = ready_cce.new_tree_id
+
+SQL
+        )->execute();
+
         return $this;
     }
 
