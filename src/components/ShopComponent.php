@@ -165,6 +165,7 @@ class ShopComponent extends Component
         return $result;
     }
 
+    protected $_canViewTypePrice = [];
     /**
      * Типы цен которые видит клиент
      *
@@ -177,6 +178,10 @@ class ShopComponent extends Component
 
         if (!$user) {
             $user = \Yii::$app->user->identity;
+        }
+
+        if (isset($this->_canViewTypePrice[$user ? $user->id : "no"])) {
+            return $this->_canViewTypePrice[$user ? $user->id : "no"];
         }
 
         foreach ($this->shopTypePrices as $typePrice) {
@@ -198,6 +203,8 @@ class ShopComponent extends Component
                 }
             }
         }
+
+        $this->_canViewTypePrice[$user ? $user->id : "no"] = $result;
 
         return $result;
     }

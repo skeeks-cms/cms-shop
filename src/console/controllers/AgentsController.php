@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopSite;
+use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\shop\models\ShopUser;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\console\Controller;
@@ -37,6 +38,83 @@ class AgentsController extends Controller
             foreach ($shopSites as $shopSite) {
                 ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
             }
+        }
+    }
+
+    /**
+     * Обновление цен которые рассчитываются автоматически
+     */
+    public function actionUpdateAutoPrices()
+    {
+        $q = ShopTypePrice::find()->where(['is_auto' => 1]);
+
+        $this->stdout("Найдено автообновляемых цен: " . $q->count() . "\n");
+
+        /**
+         * @var $shopTypePrice ShopTypePrice
+         */
+        foreach ($q->each(10) as $shopTypePrice) {
+            $type_price_id = $shopTypePrice->id;
+            $cms_site_id = $shopTypePrice->cms_site_id;
+            $base_auto_shop_type_price_id = $shopTypePrice->base_auto_shop_type_price_id;
+            $auto_extra_charge = $shopTypePrice->auto_extra_charge;
+
+            $result = \Yii::$app->db->createCommand(<<<SQL
+INSERT IGNORE
+    INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
+    SELECT 
+        UNIX_TIMESTAMP(),
+        UNIX_TIMESTAMP(),
+        spp.product_id,
+        {$type_price_id},
+        ROUND(spp.price * {$auto_extra_charge} / 100),
+        spp.currency_code
+    FROM 
+        shop_product_price as spp
+    WHERE
+        spp.type_price_id = {$base_auto_shop_type_price_id}
+SQL
+        )->execute();
+
+
+
+        $result = \Yii::$app->db->createCommand(<<<SQL
+UPDATE 
+	`shop_product_price` as update_price 
+	INNER JOIN (
+		SELECT 
+			spp.id, 
+			spp.currency_code, 
+			UNIX_TIMESTAMP() as updated_at_now, 
+			(
+				SELECT 
+					ROUND(
+						calc_price.price * stp.auto_extra_charge / 100
+					) 
+				FROM 
+					shop_product_price as calc_price 
+				WHERE 
+					calc_price.product_id = spp.product_id 
+					AND calc_price.type_price_id = stp.base_auto_shop_type_price_id
+			) as new_price, 
+			spp.price as old_price 
+		FROM 
+			`shop_product_price` as spp 
+			INNER JOIN (
+				SELECT 
+					* 
+				FROM 
+					shop_type_price as inner_stp 
+				WHERE 
+					inner_stp.is_auto = 1
+			) as stp ON stp.id = spp.type_price_id 
+			LEFT JOIN shop_type_price as baseTypePrice on baseTypePrice.id = stp.base_auto_shop_type_price_id
+	) as calced_price ON calced_price.id = update_price.id 
+SET 
+	update_price.price = calced_price.new_price
+SQL
+        )->execute();
+
         }
     }
 

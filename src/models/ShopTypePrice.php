@@ -21,11 +21,17 @@ use yii\helpers\ArrayHelper;
  * @property integer      $priority
  * @property integer|null $cms_site_id
  * @property integer|null $is_default
+ * 
+ * @property integer $is_auto
+ * @property integer $base_auto_shop_type_price_id
+ * @property integer $auto_extra_charge
+ * 
+ * ***
+ * 
+ * @property ShopTypePrice $baseAutoShopTypePrice
  *
  * @property CmsAuthItem[]            $cmsUserRoles
  * @property CmsAuthItem[]            $viewCmsUserRoles
- *
- * ***
  *
  * @property string       $buyPermissionName
  * @property string       $viewPermissionName
@@ -93,6 +99,16 @@ class ShopTypePrice extends \skeeks\cms\models\Core
                     return (bool)$model->external_id;
                 },
             ],
+            
+            [['is_auto'], 'integer'],
+            [['base_auto_shop_type_price_id'], 'integer'],
+            [['auto_extra_charge'], 'integer'],
+            
+            [['base_auto_shop_type_price_id'], 'default', 'value' => null],
+            
+            [['auto_extra_charge', 'base_auto_shop_type_price_id'], 'required', 'when' => function() {
+                return $this->is_auto;
+            }],
         ]);
     }
 
@@ -108,6 +124,9 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             'external_id'      => "ID из внешней системы",
             'cms_site_id'      => "Сайт",
             'is_default'      => "Главная цена",
+            'is_auto'    => \Yii::t('skeeks/shop/app', 'Цена обновляется автоматически?'),
+            'base_auto_shop_type_price_id'    => \Yii::t('skeeks/shop/app', 'Базовая цена от которой идет рассчет'),
+            'auto_extra_charge'    => \Yii::t('skeeks/shop/app', 'Наценка/Уценка'),
             'cmsUserRoles'    => \Yii::t('skeeks/shop/app', 'Кто может покупать по этой цене?'),
             'viewCmsUserRoles'    => \Yii::t('skeeks/shop/app', 'Кто может видеть эту цену?'),
         ]);
@@ -125,6 +144,11 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     }
 
 
+    public function getBaseAutoShopTypePrice()
+    {
+        return $this->hasOne(self::class, ['id' => 'base_auto_shop_type_price_id']);
+    }
+    
     public function getCmsUserRoles()
     {
         return $this->hasMany(CmsAuthItem::class, ['name' => 'auth_item_name'])

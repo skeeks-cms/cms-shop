@@ -9,12 +9,10 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
-use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
@@ -65,7 +63,7 @@ HTML
                 "filters"         => false,
                 "backendShowings" => false,
 
-                'grid'    => [
+                'grid' => [
                     'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
@@ -92,18 +90,23 @@ HTML
 
                     ],
                     'columns'        => [
-                        'custom'       => [
+                        'custom' => [
                             'attribute' => 'name',
-                            'format' => 'raw',
-                            'value' => function (ShopTypePrice $model) {
+                            'format'    => 'raw',
+                            'value'     => function (ShopTypePrice $model) {
 
                                 $data = [];
                                 $data[] = ($model->is_default ? '<span class="fa fa-check text-success" title="Цена по умолчанию"></span> ' : '').Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
-                                $data[] = $model->description;
+                                if ($model->description) {
+                                    $data[] = $model->description;
+                                }
+                                if ($model->is_auto) {
+                                    $data[] = "<small style='color: gray;'>Цена рассчитывается автоматически от цены: " . $model->baseAutoShopTypePrice->asText . "</small>";
+                                }
 
                                 return implode("<br />", $data);
-                            }
-                        ]
+                            },
+                        ],
 
                     ],
 
@@ -130,40 +133,89 @@ HTML
 
         $model->load(\Yii::$app->request->get());
 
+
         $result = [
+            'main' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Основное',
+                'fields' => [
+                    'is_default'  => [
+                        'class'       => BoolField::class,
+                        'formElement' => BoolField::ELEMENT_CHECKBOX,
+                        'allowNull'   => false,
+                    ],
+                    'name',
+                    'description' => [
+                        'class' => TextareaField::class,
+                    ],
+                    
+                ],
+            ],
 
-            'is_default' => [
-                'class' => BoolField::class,
-                'formElement' => BoolField::ELEMENT_CHECKBOX,
-                'allowNull' => false,
+            'permissions' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Права доступа',
+                'fields' => [
+                    'cmsUserRoles'     => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => \yii\helpers\ArrayHelper::map(
+                            \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
+                        ),
+                    ],
+                    'viewCmsUserRoles' => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => \yii\helpers\ArrayHelper::map(
+                            \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
+                        ),
+                    ],
+                ],
             ],
-            'name',
-            'description'      => [
-                'class' => TextareaField::class,
-            ],
-            'priority' => [
-                'class' => NumberField::class
-            ],
-            'external_id',
+            
+            'other' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Прочее',
+                'fields' => [
+                    'priority'    => [
+                        'class' => NumberField::class,
+                    ],
+                    'external_id',
+                    'is_auto' => [
+                        'class'       => BoolField::class,
+                        'formElement' => BoolField::ELEMENT_CHECKBOX,
+                        'allowNull'   => false,
+                        'elementOptions' => [
+                            'data-form-reload' => 'true'
+                        ]
+                    ],
+                ]
+            ]
         ];
 
+        if ($model->is_auto) {
+            $q = ShopTypePrice::find()->cmsSite();
+            if (!$model->isNewRecord) {
+                $q->andWhere(['!=', 'id', $model->id]);
+            }
+            $result['other']['fields'] = ArrayHelper::merge($result['other']['fields'], [
+                'base_auto_shop_type_price_id' => [
+                    'class' => SelectField::class,
+                    'items' => ArrayHelper::map(
+                        $q->all(),
+                        'id',
+                        'asText'
+                    ),
+                ],
+                "auto_extra_charge"                => [
+                    'class'  => NumberField::class,
+                    'append' => "%",
+                ],
+            ]);
+        }
 
+        
 
-        $result["cmsUserRoles"] = [
-            'class'   => SelectField::class,
-            'multiple' => true,
-            'items' => \yii\helpers\ArrayHelper::map(
-                \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
-            ),
-        ];
-
-        $result["viewCmsUserRoles"] = [
-            'class'   => SelectField::class,
-            'multiple' => true,
-            'items' => \yii\helpers\ArrayHelper::map(
-                \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
-            ),
-        ];
 
         /*if ($model->isNewRecord) {
             $result[] = [
