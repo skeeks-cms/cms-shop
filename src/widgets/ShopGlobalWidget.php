@@ -13,6 +13,7 @@ use skeeks\cms\shop\assets\ShopAsset;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\web\View;
 
 /**
  * Class ShopGlobalWidget
@@ -68,6 +69,7 @@ class ShopGlobalWidget extends Widget
         sx.Shop = new sx.classes.shop.App($options);
     })(sx, sx.$, sx._);
 JS
+            , View::POS_END
             );
             static::$isRegisteredAssets = true;
         }

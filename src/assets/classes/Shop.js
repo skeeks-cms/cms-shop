@@ -10,6 +10,8 @@
     /**
      * @events:
      *
+     * viewProduct
+     * 
      * beforeAddProduct
      * addProduct
      *
