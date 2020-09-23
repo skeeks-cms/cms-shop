@@ -102,9 +102,12 @@ JS
                         }
 
                         ?>
-                        <button class="btn btn-select-option <?= $cssClass; ?>" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
+                        <button class="btn <?= $cssClass; ?> btn-select-option" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
                             <? if ($isChecked) : ?>
-                                <i class="fas fa-check"></i>
+                                <!--<i class="fas fa-check"></i>-->
+                                &#10003;
+                            <? else: ?>
+                                <span class="sx-no-check">&#10003;</span>
                             <? endif; ?>
                             <?= $value; ?>
                         </button>
