@@ -86,6 +86,7 @@ class AdminOrderController extends BackendModelStandartController
                         $query = $e->sender->dataProvider->query;
 
                         $query->andWhere(['is_created' => 1]);
+                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
                         /*$paymentsQuery = CrmPayment::find()->select(['count(*)'])->where([
                             'or',
                             ['sender_crm_contractor_id' => new Expression(CrmContractor::tableName().".id")],
