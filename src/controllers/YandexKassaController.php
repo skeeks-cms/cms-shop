@@ -239,7 +239,7 @@ class YandexKassaController extends Controller
         $model = $bill;
         $yandexKassa = $model->shopPaySystem->paySystemHandler;
         $money = $model->money->convertToCurrency("RUB");
-        $returnUrl = $model->getUrl(true);
+        $returnUrl = $model->shopOrder->getUrl([], true);
 
         $client = new Client();
         $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);

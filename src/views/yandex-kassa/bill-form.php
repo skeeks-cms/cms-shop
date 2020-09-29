@@ -10,9 +10,9 @@
 /* @var $model \skeeks\cms\shop\models\ShopBill */
 
 $yandexKassa = $model->shopPaySystem->paySystemHandler;
-$returnUrl = $model->getUrl(true);
+$returnUrl = $model->shopOrder->getUrl(true);
 $money = $model->money->convertToCurrency("RUB");
-
+print_r($returnUrl);die;
 \yii\web\JqueryAsset::register($this);
 $this->registerJs(<<<JS
     $('#yandexKassa').submit();

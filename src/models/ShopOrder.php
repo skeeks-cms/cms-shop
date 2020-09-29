@@ -204,48 +204,47 @@ class ShopOrder extends \skeeks\cms\models\Core
             ]))->save();
 
 
-            //Уведомить клиента об оплате
-            if ($this->email) {
-                try {
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
-
-                    \Yii::$app->mailer->compose('payed', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
-                        ->setTo($this->email)
-                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id." — Оплачен")
-                        ->send();
-
-                } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), self::class);
-                }
-            }
-
-            //Уведомить администраторов об оплате
-            if ($emails = $this->cmsSite->shopSite->notifyEmails) {
-                try {
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
-
-                    \Yii::$app->mailer->compose('payed', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
-                        ->setTo($emails)
-                        ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id." — Оплачен")
-                        ->send();
-
-                } catch (\Exception $e) {
-                    \Yii::error('Ошибка отправки email: '.$e->getMessage(), self::class);
-                }
-            }
-
-
             //Если в базе есть статус, который должен быть установлен после оплаты заказа, то нужно его установить.
             if ($shopOrderStatus = ShopOrderStatus::find()->where(['is_install_after_pay' => 1])->one()) {
                 $this->shop_order_status_id = $shopOrderStatus->id;
                 if (!$this->save()) {
                     \Yii::error('Статус заказа после оплаты не обновлен: '.$e->getMessage(), self::class);
+                }
+            } else {
+                //Уведомить клиента об оплате
+                if ($this->email) {
+                    try {
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
+
+                        \Yii::$app->mailer->compose('payed', [
+                            'order' => $this,
+                        ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
+                            ->setTo($this->email)
+                            ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id." — Оплачен")
+                            ->send();
+
+                    } catch (\Exception $e) {
+                        \Yii::error('Ошибка отправки email: '.$e->getMessage(), self::class);
+                    }
+                }
+
+                //Уведомить администраторов об оплате
+                if ($emails = $this->cmsSite->shopSite->notifyEmails) {
+                    try {
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail/order';
+
+                        \Yii::$app->mailer->compose('payed', [
+                            'order' => $this,
+                        ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
+                            ->setTo($emails)
+                            ->setSubject(\Yii::t('skeeks/shop/app', 'Заказ').' №'.$this->id." — Оплачен")
+                            ->send();
+
+                    } catch (\Exception $e) {
+                        \Yii::error('Ошибка отправки email: '.$e->getMessage(), self::class);
+                    }
                 }
             }
         }

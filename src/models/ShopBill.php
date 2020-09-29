@@ -53,8 +53,8 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
     /**
      * @var bool
      */
-    public $isNotifyCreate = true;
-    public $isNotifyUpdate = true;
+    public $isNotifyCreate = false;
+    public $isNotifyUpdate = false;
 
     /**
      * {@inheritdoc}
