@@ -365,24 +365,11 @@ return [
                         ],
 
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/cms', 'Поставщики/Сайты'),
                             "url"   => ["/shop/admin-cms-site"],
                             "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
-    
-                            /*'items' => [
-                                [
-                                    "label" => \Yii::t('skeeks/cms', 'Sites'),
-                                    "url"   => ["/cms/admin-cms-site"],
-                                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
-                                ],
-                                [
-                                    "label" => \Yii::t('skeeks/cms', 'Domains'),
-                                    "url"   => ["/cms/admin-cms-site-domain"],
-                                    "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/www.png'],
-                                ],
-                            ],*/
-                        ],
+                        ],*/
                             
                         [
                             "label" => \Yii::t('skeeks/shop/app', 'Taxes'),
