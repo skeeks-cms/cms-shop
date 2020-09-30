@@ -73,7 +73,8 @@ $allProducts = $qProducts
 <?php $form = \yii\widgets\ActiveForm::begin([
     'method' => 'get',
 ]); ?>
-<div class="row sx-bg-secondary" style="padding: 5px;">
+<div class="sx-bg-secondary">
+<div class="row" style="padding: 15px; padding-bottom: 0px;">
     <div class="col">
         <?php echo $form->field($dm, 'from')->textInput(['type' => 'date'])->label("Начало периода"); ?>
     </div>
@@ -83,6 +84,7 @@ $allProducts = $qProducts
     <div class="col my-auto">
         <button type="submit" class="btn btn-primary">Отправить</button>
     </div>
+</div>
 </div>
 <?php $form::end(); ?>
 <div class="row" style="margin-top: 20px;">
