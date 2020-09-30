@@ -12,11 +12,8 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
-use skeeks\cms\backend\BackendAction;
-use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\ViewBackendAction;
-use skeeks\cms\backend\widgets\ControllerActionsWidget;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\UrlHelper;
@@ -70,7 +67,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         $this->name = \Yii::t('skeeks/shop/app', 'Elements');
         parent::init();
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -93,7 +90,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     'isVisible' => false,
                     'callback' => [$this, "actionRelationsDettach"],
                 ],*/
-                
+
                 "offers" => [
                     'class'                  => BackendGridModelRelatedAction::class,
                     'name'                   => "Предложения",
@@ -110,11 +107,11 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction, $action->relatedIndexAction->controller->content);
 
                         $helper = new \skeeks\cms\shop\helpers\ShopOfferChooseHelper([
-                            'shopProduct' => $controller->model->shopProduct
+                            'shopProduct' => $controller->model->shopProduct,
                         ]);
-                    
-                        $action->relatedIndexAction->grid['on init'] = function (Event $e) use($helper) {
-                            
+
+                        $action->relatedIndexAction->grid['on init'] = function (Event $e) use ($helper) {
+
                             /**
                              * @var $querAdminCmsContentElementControllery ActiveQuery
                              */
@@ -135,12 +132,12 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
 
                         $action->relatedIndexAction->on('beforeRender', function (Event $event) use ($controller, $helper) {
-                                                        
+
                             $event->content = \Yii::$app->view->render("@skeeks/cms/shop/views/admin-cms-content-element/rp-header", [
                                 'controller' => $controller,
-                                'helper' => $helper,
+                                'helper'     => $helper,
                             ]);
-                    
+
                             /*if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
 
                                 /**
@@ -203,11 +200,11 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 ],
 
                 "relations" => [
-                    'class'                  => BackendModelAction::class,
-                    'name'                   => "Связанные товары",
-                    'icon'                   => 'fa fa-list',
-                    'priority'               => 190,
-                    
+                    'class'    => BackendModelAction::class,
+                    'name'     => "Связанные товары",
+                    'icon'     => 'fa fa-list',
+                    'priority' => 190,
+
                     'accessCallback' => function (BackendModelAction $action) {
 
                         /**
@@ -226,9 +223,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         if ($model->shopProduct->offers_pid) {
                             return false;
                         }
-                        
+
                         return true;
-                        
+
                     },
                 ],
                 /*"relations" => [
@@ -382,17 +379,29 @@ HTML
                         ];
 
                         if (!$model->shopProduct->main_pid) {
-                            $url = Url::to(['/shop/admin-cms-content-element/create', 'content_id' => $model->content_id, 'shop_sub_product_id' => $model->id]);
-                            $result[] = [
-                                'class'   => HtmlBlock::class,
-                                'content' => <<<HTML
+                            /**
+                             * @var $defaultSite CmsSite
+                             */
+                            $defaultSite = CmsSite::find()->where(['is_default' => 1])->one();
+                            if ($defaultSite) {
+
+                                //$hostInfo = \Yii::$app->urlManager->hostInfo;
+                                //\Yii::$app->urlManager->hostInfo = $defaultSite->url;
+                                $url = Url::to(['/shop/admin-cms-content-element/create', 'content_id' => $model->content_id, 'shop_sub_product_id' => $model->id], true);
+                                //\Yii::$app->urlManager->hostInfo = $hostInfo;
+                                
+                                $result[] = [
+                                    'class'   => HtmlBlock::class,
+                                    'content' => <<<HTML
 <div class="text-center g-ma-20">
 <a href="{$url}" data-pjax='0' class="btn btn-xxl btn-primary">Создать главный товар</a>
 </div>
 HTML
-                                ,
+                                    ,
 
-                            ];
+                                ];
+                            }
+
                         }
 
                         return $result;
@@ -693,7 +702,7 @@ HTML
                         return true;
                         //return \Yii::$app->user->can($this->permissionName . "/" . $this->action->id, ['model' => $action->model]);
                     },
-                ]
+                ],
 
             ]
         );
@@ -731,37 +740,34 @@ HTML
             }
 
             $prices = [];
-            foreach ($fields as $fieldName)
-            {
+            foreach ($fields as $fieldName) {
                 if (strpos($fieldName, "price-") !== false) {
-                    $prices[] = (int) str_replace("price-", "", $fieldName);
+                    $prices[] = (int)str_replace("price-", "", $fieldName);
                 }
             }
-            
 
 
             /**
              * @var CmsContent $content
              */
-            $content = CmsContent::findOne((int) $content_id);
+            $content = CmsContent::findOne((int)$content_id);
             if (!$content) {
                 return false;
             }
 
-            
+
             if ($prices) {
-                foreach ($prices as $key => $typePriceId)
-                {                    
-                    $priceData = ArrayHelper::getValue($formData, 'price.' . $typePriceId);
-                    
+                foreach ($prices as $key => $typePriceId) {
+                    $priceData = ArrayHelper::getValue($formData, 'price.'.$typePriceId);
+
                     $model->shopProduct->savePrice(
                         $typePriceId,
-                        (float) ArrayHelper::getValue($priceData, "value"),
-                        (string) ArrayHelper::getValue($priceData, "currency")
+                        (float)ArrayHelper::getValue($priceData, "value"),
+                        (string)ArrayHelper::getValue($priceData, "currency")
                     );
                 }
             }
-            
+
 
             $tmpProduct = new ShopProduct();
             $tmpProduct->load($formData);
@@ -793,10 +799,10 @@ HTML
 
 
         $shopColumns["shop.relations_products"] = [
-            'attribute' => "shop.relations_products",
-            'label'     => 'Количество связанных товаров',
-            'format'    => 'raw',
-            'beforeCreateCallback'    => function(GridView $grid) {
+            'attribute'            => "shop.relations_products",
+            'label'                => 'Количество связанных товаров',
+            'format'               => 'raw',
+            'beforeCreateCallback' => function (GridView $grid) {
                 /**
                  * @var $query ActiveQuery
                  */
@@ -818,7 +824,7 @@ HTML
                     'desc' => ['countRelations' => SORT_DESC],
                 ];
             },
-            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
+            'value'                => function (ShopCmsContentElement $shopCmsContentElement) {
                 return $shopCmsContentElement->raw_row['countRelations'];
             },
         ];
@@ -1048,7 +1054,7 @@ HTML
             $filterFields['is_error'] = [
                 'class'    => SelectField::class,
                 'items'    => [
-                    'yes'  => 'Ошибочно привязан',
+                    'yes' => 'Ошибочно привязан',
                 ],
                 'label'    => 'Ошибка привязки',
                 'multiple' => false,
@@ -1062,7 +1068,7 @@ HTML
                         if ($e->field->value == 'yes') {
                             $query->joinWith('shopProduct.shopMainProduct as shopMainProduct');
                             $query->andWhere(['shopMainProduct.product_type' => ShopProduct::TYPE_OFFERS]);
-                            $query->groupBy(ShopCmsContentElement::tableName() . ".id");
+                            $query->groupBy(ShopCmsContentElement::tableName().".id");
                         }
 
                     }
@@ -1080,8 +1086,8 @@ HTML
             $filterFields['is_suppliers'] = [
                 'class'    => SelectField::class,
                 'items'    => [
-                    'yes'  => 'Да',
-                    'no'  => 'Нет'
+                    'yes' => 'Да',
+                    'no'  => 'Нет',
                 ],
                 'label'    => 'Привязаны поставщики?',
                 'multiple' => false,
@@ -1095,11 +1101,11 @@ HTML
                         if ($e->field->value == 'no') {
                             $query->joinWith('shopProduct.shopAttachedProducts as shopAttachedProducts');
                             $query->andWhere(['shopAttachedProducts.id' => null]);
-                            $query->groupBy(ShopCmsContentElement::tableName() . ".id");
+                            $query->groupBy(ShopCmsContentElement::tableName().".id");
                         } elseif ($e->field->value == 'yes') {
                             $query->joinWith('shopProduct.shopAttachedProducts as shopAttachedProducts');
                             $query->andWhere(['is not', 'shopAttachedProducts.id', null]);
-                            $query->groupBy(ShopCmsContentElement::tableName() . ".id");
+                            $query->groupBy(ShopCmsContentElement::tableName().".id");
                         }
 
                     }
@@ -1144,7 +1150,7 @@ HTML
              * @var $query ActiveQuery
              */
             $query = $event->sender->dataProvider->query;
-            $query->select([ShopCmsContentElement::tableName() . ".*"]);
+            $query->select([ShopCmsContentElement::tableName().".*"]);
 
             $query->with("image");
             $query->with("cmsContent");
@@ -1188,7 +1194,7 @@ HTML
                     ],
                 ]);
 
-                $query->andWhere([CmsContentElement::tableName() . ".cms_site_id" => $site_id]);
+                $query->andWhere([CmsContentElement::tableName().".cms_site_id" => $site_id]);
             } else {
                 $site_id = \Yii::$app->skeeks->site->id;
                 $query->andWhere(['cms_site_id' => $site_id]);
@@ -1254,7 +1260,7 @@ HTML
         $model = new $modelClassName();
         $model->cms_site_id = \Yii::$app->skeeks->site->id;
 
-                
+
         $model->loadDefaultValues();
         $model->content_id = $this->content->id;
 
@@ -1349,7 +1355,12 @@ CSS
                 $t = \Yii::$app->db->beginTransaction();
 
                 try {
+                    $site = \Yii::$app->skeeks->site;
+                    \Yii::$app->skeeks->site = CmsSite::find()->where(['is_default' => 1])->one();
                     if ($model->save() && $relatedModel->save()) {
+                        
+                        \Yii::$app->skeeks->site = $site;
+                            
                         $shopProduct->id = $model->id;
                         if (!$shopProduct->save()) {
                             throw new \yii\base\Exception("Товар не сохранен: ".print_r($shopProduct->errors, true));
@@ -1410,7 +1421,7 @@ CSS
 
         }
 
-        
+
         return $this->render($this->editForm, [
             'model'             => $model,
             'relatedModel'      => $relatedModel,
@@ -1594,7 +1605,7 @@ CSS
                 $this->name = $this->content->name_meny;
             }
         }
-        
+
         AdminShopProductAsset::register(\Yii::$app->view);
         $data = [];
         $json = Json::encode($data);
@@ -1687,13 +1698,12 @@ JS
             if ($product1_id && $product2_id) {
                 $relation = ShopProductRelation::find()
                     ->where([
-                        'shop_product1_id' => $product1_id
+                        'shop_product1_id' => $product1_id,
                     ])
                     ->andWhere([
-                        'shop_product2_id' => $product2_id
+                        'shop_product2_id' => $product2_id,
                     ])
-                    ->one()
-                ;
+                    ->one();
 
                 if ($relation) {
                     $relation->delete();
@@ -1701,13 +1711,12 @@ JS
 
                 $relation = ShopProductRelation::find()
                     ->where([
-                        'shop_product2_id' => $product1_id
+                        'shop_product2_id' => $product1_id,
                     ])
                     ->andWhere([
-                        'shop_product1_id' => $product2_id
+                        'shop_product1_id' => $product2_id,
                     ])
-                    ->one()
-                ;
+                    ->one();
 
                 if ($relation) {
                     $relation->delete();
