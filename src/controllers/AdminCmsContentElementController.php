@@ -228,104 +228,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                     },
                 ],
-                /*"relations" => [
-                    'class'                  => BackendGridModelRelatedAction::class,
-                    'name'                   => "Связанные товары",
-                    'icon'                   => 'fa fa-list',
-                    'controllerRoute'        => "/shop/admin-cms-content-element",
-                    'priority'               => 190,
-                    'isStandartBeforeRender' => false,
-                    'on gridInit'            => function ($e) {
-                        /**
-                         * @var $action BackendGridModelRelatedAction
-                        $action = $e->sender;
-                        $model = $action->model;
-                        $controller = $action->relatedIndexAction->controller;
-                        $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction, $action->relatedIndexAction->controller->content);
-
-                        if ($product_ids = \Yii::$app->request->post("product_ids")) {
-                            if ($product_ids) {
-                                foreach ($product_ids as $product_id) {
-                                    if ($product_id) {
-                                        $shopProductRelation = new ShopProductRelation();
-                                        $shopProductRelation->shop_product1_id = $model->id;
-                                        $shopProductRelation->shop_product2_id = $product_id;
-                                        if (!$shopProductRelation->save()) {
-                                            print_r($shopProductRelation->errors);
-                                            die;
-                                        }
-                                    }
-
-                                }
-                            }
-                        }
-
-
-                        $action->relatedIndexAction->grid['on init'] = function (Event $event) use ($model) {
-                            /**
-                             * @var $query ActiveQuery
-                            $query = $event->sender->dataProvider->query;
-                            if ($this->content) {
-                                $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
-                            }
-
-                            $query->joinWith('shopProduct as sp');
-
-                            $query->joinWith("shopProduct.shopProductRelations1 as shopProductRelations1")
-                                ->joinWith("shopProduct.shopProductRelations2 as shopProductRelations2")
-                                ->andWhere([
-                                    '!=', 'sp.id', $model->id
-                                ])
-                                ->andWhere([
-                                    'or',
-                                    ["shopProductRelations1.shop_product1_id" => $model->id],
-                                    ["shopProductRelations1.shop_product2_id" => $model->id],
-                                    ["shopProductRelations2.shop_product1_id" => $model->id],
-                                    ["shopProductRelations2.shop_product2_id" => $model->id],
-                                ]);
-
-                            $site_id = \Yii::$app->skeeks->site->id;
-                            $query->andWhere(['cms_site_id' => $site_id]);
-
-                            if (\Yii::$app->skeeks->site->shopTypePrices) {
-                                foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
-                                    $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
-                                        "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
-                                        "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
-                                    ]);
-                                }
-                            }
-
-                            $query->andWhere([
-                                'in',
-                                'sp.product_type',
-                                [
-                                    ShopProduct::TYPE_SIMPLE,
-                                    ShopProduct::TYPE_OFFERS,
-                                ],
-                            ]);
-                        };
-
-                        $action->relatedIndexAction->on('beforeRender', function (ViewRenderEvent $e) use ($controller, $model) {
-                            $e->content = \Yii::$app->view->render("@skeeks/cms/shop/views/admin-cms-content-element/relations", [
-                                'model' => $model,
-                            ]);
-                        });
-
-                        $action->relatedIndexAction->on('afterRender', function (Event $event) {
-                            $event->content = '';
-                        });
-
-                        $action->relatedIndexAction->backendShowings = false;
-                        $action->relatedIndexAction->filters = false;
-
-                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
-                        ArrayHelper::removeValue($visibleColumns, 'checkbox');
-                        ArrayHelper::removeValue($visibleColumns, 'actions');
-                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
-
-                    },
-                ],*/
 
                 "connect-to-main" => [
                     /*'on afterRender' => function(ViewRenderEvent $viewRenderEvent) {
@@ -693,6 +595,10 @@ HTML
                         }
 
                         if ($model->cmsSite->shopSite->is_supplier) {
+                            return false;
+                        }
+                        
+                        if ($model->cmsSite->shopSite->is_receiver) {
                             return false;
                         }
                         /*if ($model->shopProduct->main_pid) {
