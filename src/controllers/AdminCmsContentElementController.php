@@ -1422,8 +1422,7 @@ CSS
                 if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                     $model->load(\Yii::$app->request->post());
                     $relatedModel->load(\Yii::$app->request->post());
-
-
+                    
                     if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
 
                         /**
@@ -1484,6 +1483,8 @@ CSS
             throw $e;
         }
 
+                        //die('111');
+                        
         //return $this->render('@skeeks/cms/shop/views/admin-cms-content-element/_form', [
         return $this->render($this->editForm, [
             'model'             => $model,
