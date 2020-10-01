@@ -129,7 +129,6 @@ return [
                                 'shop/upa-order',
                             ],
                         ],
-
                     ],
                 ],
                 'permissions' => [

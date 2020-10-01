@@ -281,10 +281,11 @@ HTML
                         ];
 
                         if (!$model->shopProduct->main_pid) {
+                            $siteClass = \Yii::$app->skeeks->siteClass;
                             /**
                              * @var $defaultSite CmsSite
                              */
-                            $defaultSite = CmsSite::find()->where(['is_default' => 1])->one();
+                            $defaultSite = $siteClass::find()->where(['is_default' => 1])->one();
                             if ($defaultSite) {
 
                                 //$hostInfo = \Yii::$app->urlManager->hostInfo;
@@ -1089,7 +1090,8 @@ HTML
 
             if ($urlHelper->getBackenParam("sx-to-main")) {
 
-                $site = CmsSite::find()->where(['is_default' => 1])->one();
+                $siteClass = \Yii::$app->skeeks->siteClass;
+                $site = $siteClass::find()->where(['is_default' => 1])->one();
                 $site_id = $site->id;
                 $query->andWhere([
                     'in',
@@ -1188,7 +1190,8 @@ HTML
             if ($shopSubproductContentElement) {
                 $subShopProduct = $shopSubproductContentElement->shopProduct;
                 $shopSubproductContentElement->loadDataToMainModel($model);
-                if (!$defaultSite = CmsSite::find()->andWhere(['is_default' => 1])->one()) {
+                $siteClass = \Yii::$app->skeeks->siteClass;
+                if (!$defaultSite = $siteClass::find()->andWhere(['is_default' => 1])->one()) {
                     throw new Exception("Нет сайта по умолчанию");
                 }
                 $model->cms_site_id = $defaultSite->id;
@@ -1262,7 +1265,8 @@ CSS
 
                 try {
                     $site = \Yii::$app->skeeks->site;
-                    \Yii::$app->skeeks->site = CmsSite::find()->where(['is_default' => 1])->one();
+                    $siteClass = \Yii::$app->skeeks->siteClass;
+                    \Yii::$app->skeeks->site = $siteClass::find()->where(['is_default' => 1])->one();
                     if ($model->save() && $relatedModel->save()) {
                         
                         \Yii::$app->skeeks->site = $site;

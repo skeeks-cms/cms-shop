@@ -25,7 +25,8 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 if ($model->isNewRecord) {
 
     if ($shopSubproductContentElement) {
-        $defaultSite = \skeeks\cms\models\CmsSite::find()->where(['is_default' => 1])->one();
+        $siteClass = \Yii::$app->skeeks->siteClass;
+        $defaultSite = $siteClass::find()->where(['is_default' => 1])->one();
         $model->cms_site_id = $defaultSite->id;
     }
     
