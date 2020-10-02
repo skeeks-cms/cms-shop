@@ -1375,7 +1375,7 @@ CSS
 
             $rr = new RequestResponse();
 
-            if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
+            /*if (\Yii::$app->request->isAjax && !\Yii::$app->request->isPjax) {
                 $model->load(\Yii::$app->request->post());
                 $relatedModel->load(\Yii::$app->request->post());
                 $shopProduct->load(\Yii::$app->request->post());
@@ -1386,7 +1386,7 @@ CSS
                     $relatedModel,
                     $shopProduct,
                 ]);
-            }
+            }*/
 
             if ($post = \Yii::$app->request->post()) {
 
