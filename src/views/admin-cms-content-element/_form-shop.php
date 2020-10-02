@@ -197,7 +197,7 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
                                     ]); ?>
                                 </div>
                                 <div class="my-auto">
-                                    <?= \skeeks\widget\chosen\Chosen::widget([
+                                    <?= \skeeks\cms\widgets\Select::widget([
                                         'name'          => "prices[".$productPrice->typePrice->id."][currency_code]",
                                         'value'         => $productPrice->currency_code,
                                         'allowDeselect' => false,

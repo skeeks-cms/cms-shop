@@ -82,7 +82,7 @@ JS
                 }
             }
 
-            echo \skeeks\widget\chosen\Chosen::widget([
+            echo \skeeks\cms\widgets\Select::widget([
                 'multiple' => true,
                 'name'     => 'fields',
                 'options'  => [

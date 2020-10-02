@@ -117,7 +117,7 @@ JS
                 </div>
                 <? foreach ($dm->availableProperties as $property) : ?>
                     <? if ($property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) : ?>
-                        <?= $form->field($dm, $property->code)->label($property->name)->widget(\skeeks\widget\chosen\Chosen::class, [
+                        <?= $form->field($dm, $property->code)->label($property->name)->widget(\skeeks\cms\widgets\Select::class, [
                             'items'    => \yii\helpers\ArrayHelper::map($property->enums, 'id', 'value'),
                             'multiple' => true,
                         ]) ?>
@@ -125,7 +125,7 @@ JS
                         <?
                         $items = \skeeks\cms\models\CmsContentElement::find()->where(['content_id' => $property->handler->content_id])->all()
                         ?>
-                        <?= $form->field($dm, $property->code)->label($property->name)->widget(\skeeks\widget\chosen\Chosen::class, [
+                        <?= $form->field($dm, $property->code)->label($property->name)->widget(\skeeks\cms\widgets\Select::class, [
                             'items'    => \yii\helpers\ArrayHelper::map($items, 'id', 'name'),
                             'multiple' => true,
                         ]) ?>
