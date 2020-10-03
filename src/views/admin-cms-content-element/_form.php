@@ -40,7 +40,7 @@ if ($model->isNewRecord) {
     <div class="sx-main-product-wrapper">
         <?php $form = $action->beginActiveForm(); ?>
 
-        <? if ($is_saved && @$is_create) : ?>
+        <? if (@$is_saved && @$is_create) : ?>
             <?php $this->registerJs(<<<JS
     sx.Window.openerWidgetTriggerEvent('model-create', {
         'submitBtn' : '{$submitBtn}'
@@ -48,7 +48,7 @@ if ($model->isNewRecord) {
 JS
             ); ?>
 
-        <? elseif ($is_saved) : ?>
+        <? elseif (@$is_saved) : ?>
             <?php $this->registerJs(<<<JS
 sx.Window.openerWidgetTriggerEvent('model-update', {
         'submitBtn' : '{$submitBtn}'

@@ -26,6 +26,7 @@ use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\assets\admin\AdminShopProductAsset;
 use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopCmsContentElement;
@@ -74,22 +75,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
-                /*"create" => ["callback" => [$this, 'create']],
-                "update" => ["callback" => [$this, 'update']],*/
-
-
-                /*"view" => [
-                    'class'          => BackendModelAction::class,
-                    "name"           => "Посмотреть",
-                ],*/
-
-
-                /*"relations-dettach" => [
-                    'class' => BackendAction::class,
-                    'accessCallback' => true,
-                    'isVisible' => false,
-                    'callback' => [$this, "actionRelationsDettach"],
-                ],*/
 
                 "offers" => [
                     'class'                  => BackendGridModelRelatedAction::class,
@@ -190,11 +175,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         }
 
                         if ($model->shopProduct->isOffersProduct) {
-                            return \Yii::$app->user->can($action->controller->uniqueId."__".$model->content_id."/update", [
-                                'model' => $model,
-                            ]);
-                            return true;
+                            return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                         }
+
+                        return false;
 
                     },
                 ],
@@ -224,23 +208,13 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             return false;
                         }
 
-                        return true;
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
 
                     },
                 ],
 
                 "connect-to-main" => [
-                    /*'on afterRender' => function(ViewRenderEvent $viewRenderEvent) {
-                    if (!$this->action->model->shopProduct->main_pid) {
-                        $viewRenderEvent->content = <<<HTML
-<div class="text-center g-ma-20">
-<a href="#" class="btn btn-xxl btn-primary">Создать главный товар</a>
-</div>
-HTML
-                            ;
-                    }
 
-                    },*/
                     'class'    => BackendModelUpdateAction::class,
                     "name"     => "Привязать к главному",
                     "icon"     => "fas fa-link",
@@ -333,9 +307,11 @@ HTML
                             return false;
                         }
 
-                        if ($model->shopProduct->isSubProduct) {
-                            return true;
+                        if (!$model->shopProduct->isSubProduct) {
+                            return false;
                         }
+
+                        return \Yii::$app->user->can($this->permissionName."/create");
                     },
                 ],
 
@@ -399,11 +375,11 @@ HTML
                     },
                 ],
 
-
                 "to-offer" => [
                     'class'        => BackendModelMultiDialogEditAction::class,
                     "name"         => "Привязать к общему",
                     "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/to-offer",
+
                     "eachCallback" => [
                         $this,
                         'eachToOffer',
@@ -449,7 +425,7 @@ HTML
                         return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                     },
                     "accessCallback"     => function () {
-                        return \Yii::$app->user->can($this->permissionName."/update");
+                        return (\Yii::$app->user->can($this->permissionName."/update"));
                     },
                 ],
 
@@ -473,13 +449,17 @@ HTML
                         $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
                     },
+                    'accessCallback' => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
+                    },
                 ],
 
                 "quantity-notice-emails" => [
                     'class'          => BackendGridModelRelatedAction::class,
                     'accessCallback' => function (BackendModelAction $action) {
                         $model = $action->model;
-                        return \Yii::$app->user->can($this->permissionName."/viewed-products", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
 
                     'name'            => ['skeeks/shop/app', 'Waiting for receipt'],
@@ -505,7 +485,7 @@ HTML
                     'class'           => BackendGridModelRelatedAction::class,
                     'accessCallback'  => function (BackendModelAction $action) {
                         $model = $action->model;
-                        return \Yii::$app->user->can($this->permissionName."/viewed-products", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                     'name'            => ['skeeks/shop/app', 'In baskets'],
                     'icon'            => 'fas fa-cart-arrow-down',
@@ -538,11 +518,8 @@ HTML
                 ],
 
                 "orders" => [
+                    'generateAccess' => true,
                     'class'           => BackendGridModelRelatedAction::class,
-                    'accessCallback'  => function (BackendModelAction $action) {
-                        $model = $action->model;
-                        return \Yii::$app->user->can($this->permissionName."/viewed-products", ['model' => $model]);
-                    },
                     'name'            => ['skeeks/shop/app', 'In orders'],
                     'icon'            => 'fas fa-cart-arrow-down',
                     'controllerRoute' => "/shop/admin-order",
@@ -577,9 +554,17 @@ HTML
                     'class' => ViewBackendAction::class,
                     'icon'  => 'fas fa-sync',
                     'name'  => 'Обновление данных',
+                    "accessCallback"     => function () {
+                        if (!\Yii::$app->skeeks->site->is_default) {
+                            return false;
+                        }
+
+                        return \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+                    },
                 ],
 
                 "update" => [
+
                     'accessCallback' => function (BackendModelAction $action) {
 
                         /**
@@ -806,7 +791,7 @@ HTML
         ];
 
 
-        $visibleColumns[] = "shop.product_type";
+        //  $visibleColumns[] = "shop.product_type";
         $visibleColumns[] = "shop.quantity";
 
         if (\Yii::$app->shop->shopTypePrices) {
