@@ -620,6 +620,7 @@ HTML
 
         if (isset($actions['shop'])) {
             unset($actions['shop']);
+
         }
 
         return $actions;
