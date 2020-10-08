@@ -40,8 +40,6 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopSupplierProperty::class;
 
-        $this->generateAccessActions = false;
-
         $this->accessCallback = function () {
             //Если это сайт по умолчанию, этот раздел не показываем
             if (\Yii::$app->skeeks->site->is_default) {
@@ -67,7 +65,7 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                 return false;
             }*/
 
-            return \Yii::$app->user->can($this->uniqueId);
+            return true;
         };
 
         parent::init();

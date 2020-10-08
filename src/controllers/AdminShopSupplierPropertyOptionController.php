@@ -37,7 +37,7 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopSupplierPropertyOption::class;
 
-        $this->generateAccessActions = false;
+        $this->permissionName = 'shop/admin-shop-supplier-property';
 
         parent::init();
     }
