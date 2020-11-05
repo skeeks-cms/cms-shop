@@ -45,15 +45,27 @@ class ShopCmsContentProperty extends ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+
+            [
+                ['is_vendor', 'is_vendor_code'],
+                'integer',
+            ],
+
+            [['is_vendor'], 'default', 'value' => null],
+            [['is_vendor_code'], 'default', 'value' => null],
+
+            [['is_vendor_code', 'is_vendor'], function($attribute) {
+                if ($this->{$attribute} != 1) {
+                    $this->{$attribute} = null;
+                }
+            }],
+
             [
                 ['cms_content_property_id', 'is_offer_property'],
                 'integer',
             ],
             [['cms_content_property_id'], 'required'],
             [['cms_content_property_id'], 'unique'],
-            
-            [['is_vendor'], 'default', 'value' => null],
-            [['is_vendor_code'], 'default', 'value' => null],
             
             [['is_vendor_code'], 'unique'],
             [['is_vendor'], 'unique'],
