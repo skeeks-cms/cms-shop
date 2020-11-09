@@ -8,22 +8,26 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\modules\admin\controllers\AdminModelEditorController;
 use skeeks\cms\shop\models\ShopBasket;
+use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminBasketController extends AdminModelEditorController
+class AdminBasketController extends BackendModelStandartController
 {
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Cart items');
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopBasket::class;
+
+        $this->permissionName = 'shop/admin-order';
 
         parent::init();
     }
@@ -35,17 +39,8 @@ class AdminBasketController extends AdminModelEditorController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
-                    [
-                        "gridConfig" =>
-                            [
-                                /*'settingsData' =>
-                                [
-                                    'order' => SORT_ASC,
-                                    'orderBy' => "priority",
-                                ]*/
-                            ],
-
+                'index' => [
+                    'grid' => [
                         "columns" => [
                             [
                                 'class' => \yii\grid\SerialColumn::class,
@@ -119,8 +114,52 @@ class AdminBasketController extends AdminModelEditorController
                             ],
                         ],
                     ],
+                ],
+
+                "create" => [
+                    'fields' => [$this, 'updateFields'],
+                ],
+                "update" => [
+                    'fields' => [$this, 'updateFields'],
+                ],
             ]
         );
+    }
+
+    public function updateFields($action)
+    {
+        /**
+         * @var $model ShopBasket
+         */
+        $model = $action->model;
+        if (\Yii::$app->request->get('shop_order_id') && $model->isNewRecord) {
+            $model->shop_order_id = \Yii::$app->request->get('shop_order_id');
+        }
+
+        \Yii::$app->view->registerCss(<<<CSS
+.field-shopbasket-shop_order_id {
+    display: none;
+}
+CSS
+        );
+        
+        return [
+            'shop_order_id',
+            'name',
+            'quantity'      => [
+                'class' => NumberField::class,
+            ],
+            'measure_name',
+            'amount'        => [
+                'class' => NumberField::class,
+            ],
+            'currency_code' => [
+                'class' => SelectField::class,
+                'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(),
+                    'code', 'code'),
+            ],
+            'notes',
+        ];
     }
 
 }

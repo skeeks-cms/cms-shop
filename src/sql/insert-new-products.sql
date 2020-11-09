@@ -117,7 +117,7 @@ INSERT IGNORE
 
 
 
-/* Вставка товаров */
+/* Вставка товаров с предложениями и простые*/
 INSERT
     INTO shop_product (`id`,`main_pid`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
 SELECT
@@ -172,7 +172,7 @@ WHERE
 	;
 
 
-/* Вставка товаров */
+/* Вставка товаров предложений */
 INSERT
     INTO shop_product (`id`,`main_pid`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
 SELECT
@@ -223,6 +223,7 @@ FROM
 WHERE
 	sp.id is null
 	AND cce.cms_site_id = @site_id
+	AND sp_model_with_offers.id is not null
 	;
 
 

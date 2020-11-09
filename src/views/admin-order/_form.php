@@ -520,7 +520,7 @@ JS*/
 
 <? $modal = \yii\bootstrap\Modal::begin([
     'id'     => 'sx-allow-payment',
-    'header' => 'Разрешение оплаты',
+    'header' => 'Способ оплаты',
 ]); ?>
 
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
@@ -537,6 +537,7 @@ JS*/
     function (ActiveFormAjaxSubmit) {
     
         ActiveFormAjaxSubmit.on('success', function(e, response) {
+            console.log("111");
             ActiveFormAjaxSubmit.jForm.closest(".modal").find(".close").click();
             _.delay(function() {
                 $.pjax.reload('#sx-pjax-order-wrapper', {});
@@ -613,7 +614,7 @@ $form->field($model, 'delivery_amount')->label("Стоимость достав�
 <div style="display: none;">
     <?=
     \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
-        'dialogRoute'            => ['/shop/admin-cms-content-element'],
+        'dialogRoute'            => ['/shop/admin-cms-content-element/index'],
         'name'                   => 'sx-add-product',
         'id'                     => 'sx-add-product',
         'closeDialogAfterSelect' => false,
