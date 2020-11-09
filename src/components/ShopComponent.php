@@ -484,15 +484,23 @@ SQL
                 update_sp.`offers_pid` = inner_sp.secondary_product_pid
 SQL
         )->execute();
-        //Товары у которых не задан родительский элемент делаем простыми
+        //Товары у которых не задан родительский элемент и нет вложенных делаем простыми
         $result = \Yii::$app->db->createCommand(<<<SQL
             UPDATE 
                 `shop_product` as sp 
-                LEFT JOIN cms_content_element cce on cce.id = sp.id 
+                INNER JOIN (
+                    SELECT 
+                        inner_sp.id 
+                    FROM 
+                        `shop_product` as inner_sp 
+                        LEFT JOIN `shop_product` as sp_offers ON sp_offers.offers_pid = inner_sp.id 
+                    WHERE 
+                        inner_sp.offers_pid is null /*не задан общий товар*/
+                        and sp_offers.id is null /*к товару никто не привязан*/
+                        GROUP BY inner_sp.id
+                ) as join_sp on join_sp.id = sp.id
             SET 
                 sp.`product_type` = "simple"
-            WHERE 
-                sp.offers_pid is null
 SQL
         )->execute();
 
@@ -502,12 +510,16 @@ SQL
                 `shop_product` as sp 
                 INNER JOIN
                 (
-                    /*Товары которые являются общими*/
-                   SELECT inner_sp.offers_pid as inner_sp_id
-                   FROM shop_product inner_sp
-                   WHERE inner_sp.offers_pid is not null
-                   GROUP BY inner_sp.offers_pid
-                ) sp_has_parent ON sp.id = sp_has_parent.inner_sp_id
+                    SELECT 
+                        inner_sp.* 
+                    FROM 
+                        `shop_product` as inner_sp 
+                        LEFT JOIN `shop_product` as sp_offers ON sp_offers.offers_pid = inner_sp.id 
+                    WHERE 
+                        sp_offers.id is not null /*к товару кто то привязан*/
+                    GROUP BY 
+                        inner_sp.id 
+                ) sp_has_parent ON sp.id = sp_has_parent.id
             SET 
                 sp.`product_type` = "offers"
 SQL
