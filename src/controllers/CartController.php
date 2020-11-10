@@ -140,6 +140,7 @@ class CartController extends Controller
             }
 
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            \Yii::$app->shop->shopUser->shopOrder->refresh();
             $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
@@ -247,6 +248,7 @@ class CartController extends Controller
             }
 
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            \Yii::$app->shop->shopUser->shopOrder->refresh();
             $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
             return (array)$rr;
         } else {
