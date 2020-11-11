@@ -103,6 +103,8 @@ return [
                                 "shop/admin-shop-product-relation",
 
                                 "shop/admin-cms-site",
+                                "shop/admin-discount",
+
                             ],
                         ],
                     ],
@@ -147,6 +149,14 @@ return [
                     [
                         'name'        => 'shop/admin-cms-site',
                         'description' => 'shop/admin-cms-site',
+                    ],
+                    [
+                        'name'        => 'shop/admin-discount',
+                        'description' => 'Управление скидками',
+                    ],
+                    [
+                        'name'        => 'shop/admin-cart',
+                        'description' => 'Корзины пользователей',
                     ],
                 ],
             ],

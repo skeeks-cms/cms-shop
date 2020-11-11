@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\money\models\MoneyCurrency;
@@ -50,7 +51,7 @@ use yii\helpers\Json;
  *
  * @property bool                     $isLast
  */
-class ShopDiscount extends \skeeks\cms\models\Core
+class ShopDiscount extends ActiveRecord
 {
     CONST VALUE_TYPE_P = "P";
     CONST VALUE_TYPE_F = "F";
@@ -145,6 +146,16 @@ class ShopDiscount extends \skeeks\cms\models\Core
                     }
                 },
             ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return [
+            'cmsAuthItems'    => \Yii::t('skeeks/shop/app', 'Скидка будет доступна пользователям выбранных групп, а так же будет доступна пользователям, которые не входят в выбранные группы но у них есть активный купон этой скидки'),
         ];
     }
 

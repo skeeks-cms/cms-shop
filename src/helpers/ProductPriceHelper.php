@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\helpers;
 
 use skeeks\cms\components\Cms;
 use skeeks\cms\money\Money;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopDiscount;
 use skeeks\cms\shop\models\shopOrder;
@@ -178,7 +179,21 @@ class ProductPriceHelper extends Component
     static public function getShopDiscounts()
     {
         if (self::$_shopDiscounts === false) {
-            self::$_shopDiscounts = ShopDiscount::find()->cmsSite()->active()->andWhere(['assignment_type' => ShopDiscount::ASSIGNMENT_TYPE_PRODUCT])->all();
+
+            if (\Yii::$app->user->isGuest) {
+                $roleNames = [CmsManager::ROLE_GUEST];
+            } else {
+
+                $roleNames = array_keys((array) \Yii::$app->user->identity->getRoleNames());
+            }
+
+            self::$_shopDiscounts = ShopDiscount::find()
+                ->joinWith('cmsAuthItems as cmsAuthItems')
+                ->andWhere(['cmsAuthItems.name' => $roleNames])
+                ->cmsSite()
+                ->active()
+                ->andWhere(['assignment_type' => ShopDiscount::ASSIGNMENT_TYPE_PRODUCT])
+                ->all();
         }
 
         return self::$_shopDiscounts;

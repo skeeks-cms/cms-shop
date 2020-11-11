@@ -232,25 +232,18 @@ return [
 
                     [
                         "label" => \Yii::t('skeeks/shop/app', 'Discounts'),
-                        'items' =>
-                            [
-                                [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Discounts'),
-                                    "url"   => ["shop/admin-discount"],
-                                ],
-
-                                [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Discount coupons'),
-                                    "url"   => ["shop/admin-discount-coupon"],
-                                ],
-
-                            ],
+                        "url"   => ["shop/admin-discount"],
                     ],
 
                     [
+                        "label" => \Yii::t('skeeks/shop/app', 'Купоны'),
+                        "url"   => ["shop/admin-discount-coupon"],
+                    ],
+
+                    /*[
                         "label" => \Yii::t('skeeks/shop/app', 'Cumulative discounts'),
                         "url"   => ["shop/admin-discsave"],
-                    ],
+                    ],*/
 
                 ],
             ],

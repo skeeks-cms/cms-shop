@@ -131,6 +131,20 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
         ];
     }
 
+
+    /**
+     * @return array
+     */
+    public function attributeHints()
+    {
+        return [
+            'shop_discount_id' => Yii::t('skeeks/shop/app', 'Скидочный план, из него будут взяты все параметры скидки.'),
+            'coupon'           => Yii::t('skeeks/shop/app', 'Код купона, если не будет указан, но будет сгенерирован автоматически.'),
+            'max_use'          => Yii::t('skeeks/shop/app', 'Сколько раз может быть использован этот купон?'),
+            'description'      => Yii::t('skeeks/shop/app', 'Короткое описание'),
+        ];
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -157,4 +171,8 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
         return $this->hasMany(ShopOrder2discountCoupon::class, ['discount_coupon_id' => 'id']);
     }
 
+    public function asText()
+    {
+        return $this->coupon;
+    }
 }

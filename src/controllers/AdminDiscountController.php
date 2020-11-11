@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
@@ -63,7 +64,7 @@ class AdminDiscountController extends BackendModelStandartController
                 ],
 
                 "grid" => [
-                     'on init' => function (Event $e) {
+                    'on init'        => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
                          * @var $query ActiveQuery
@@ -72,21 +73,6 @@ class AdminDiscountController extends BackendModelStandartController
 
                         $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
                     },
-                    //'on init'       => function (Event $e) {
-                    /**
-                     * @var $dataProvider ActiveDataProvider
-                     * @var $query ActiveQuery
-                     */
-                    /*    $query = $e->sender->dataProvider->query;
-                        $dataProvider = $e->sender->dataProvider;
-
-                        $query->joinWith('cmsSiteDomains');
-                        $query->groupBy(CmsSite::tableName() . ".id");
-                        $query->select([
-                            CmsSite::tableName() . '.*',
-                            'countDomains' => new Expression("count(*)")
-                        ]);
-                    },*/
 
                     /*'sortAttributes' => [
                         'countDomains' => [
@@ -108,18 +94,17 @@ class AdminDiscountController extends BackendModelStandartController
                         'value',
 
                         'is_active',
-                        'is_last',
 
                         'priority',
                     ],
                     'columns'        => [
-                        'name'        => [
+                        'name'      => [
                             'class' => DefaultActionColumn::class,
                         ],
-                        'is_active'        => [
+                        'is_active' => [
                             'class' => BooleanColumn::class,
                         ],
-                        'is_last' => [
+                        'is_last'   => [
                             'class' => BooleanColumn::class,
                         ],
 
@@ -135,6 +120,28 @@ class AdminDiscountController extends BackendModelStandartController
                         ],
                     ],
                 ],
+            ],
+
+            "coupons" => [
+                'class' => BackendGridModelRelatedAction::class,
+                'accessCallback' => true,
+                'name'            => "Купоны",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-discount-coupon",
+                'relation'        => ['shop_discount_id' => 'id'],
+                'priority'        => 600,
+                'on gridInit'        => function($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_discount_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
             ],
 
             /*"create" => [

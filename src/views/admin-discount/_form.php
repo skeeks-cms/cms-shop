@@ -70,7 +70,7 @@ $form->field($model, 'cmsAuthItems')->checkboxList(\yii\helpers\ArrayHelper::map
     \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
     ),[
     'class' => 'sx-checkbox',
-])->hint(\Yii::t('skeeks/shop/app', 'if nothing is selected, it means all')); ?>
+]); ?>
 
 
 <? $fieldset::end(); ?>
