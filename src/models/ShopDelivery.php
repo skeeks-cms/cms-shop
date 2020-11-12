@@ -2,7 +2,6 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
@@ -21,10 +20,11 @@ use Yii;
  * @property integer                  $cms_site_id
  * @property integer                  $weight_from
  * @property integer                  $weight_to
+ * @property string                   $name
  * @property string                   $order_price_from
  * @property string                   $order_price_to
  * @property string                   $order_currency_code
- * @property boolean                   $is_active
+ * @property boolean                  $is_active
  * @property string                   $price
  * @property string                   $currency_code
  * @property integer                  $priority
@@ -105,7 +105,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
             'updated_by'          => \Yii::t('skeeks/shop/app', 'Updated By'),
             'created_at'          => \Yii::t('skeeks/shop/app', 'Created At'),
             'updated_at'          => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'cms_site_id'             => \Yii::t('skeeks/shop/app', 'Site'),
+            'cms_site_id'         => \Yii::t('skeeks/shop/app', 'Site'),
             'name'                => \Yii::t('skeeks/shop/app', 'Name'),
             'period_from'         => \Yii::t('skeeks/shop/app', 'Period From'),
             'period_to'           => \Yii::t('skeeks/shop/app', 'Period To'),
@@ -115,7 +115,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
             'order_price_from'    => \Yii::t('skeeks/shop/app', 'Order price from'),
             'order_price_to'      => \Yii::t('skeeks/shop/app', 'Order price to'),
             'order_currency_code' => \Yii::t('skeeks/shop/app', 'Order currency code'),
-            'is_active'              => \Yii::t('skeeks/shop/app', 'Active'),
+            'is_active'           => \Yii::t('skeeks/shop/app', 'Active'),
             'price'               => \Yii::t('skeeks/shop/app', 'Price'),
             'currency_code'       => \Yii::t('skeeks/shop/app', 'Currency Code'),
             'priority'            => \Yii::t('skeeks/shop/app', 'Priority'),
@@ -209,17 +209,16 @@ class ShopDelivery extends \skeeks\cms\models\Core
         if ($shopOrder === null) {
             $shopOrder = \Yii::$app->shop->shopUser->shopOrder;
         }
-        
+
         $q = static::findForOrder($shopOrder);
         if ($shopDeliveries = $q->all()) {
-            foreach ($shopDeliveries as $key => $shopDelivery)
-            {
+            foreach ($shopDeliveries as $key => $shopDelivery) {
                 if (!$shopDelivery->isAllowForOrder($shopOrder)) {
                     unset($shopDeliveries[$key]);
                 }
             }
         }
-        
+
         return $shopDeliveries;
     }
 
@@ -237,8 +236,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
         $q = static::find()
             ->andWhere(['cms_site_id' => $shopOrder->cms_site_id])
             ->orderBy(['priority' => SORT_ASC])
-            ->active()
-        ;
+            ->active();
 
         /*$q->andWhere([
             'or',
@@ -254,7 +252,7 @@ class ShopDelivery extends \skeeks\cms\models\Core
                 ['order_price_to' => null],
             ],
         ]);*/
-        
+
         return $q;
     }
 
@@ -265,12 +263,12 @@ class ShopDelivery extends \skeeks\cms\models\Core
     public function isAllowForOrder(ShopOrder $shopOrder)
     {
         if ($this->order_price_from) {
-            if ($this->order_price_from >= (float) $shopOrder->moneyItems->amount) {
+            if ($this->order_price_from >= (float)$shopOrder->moneyItems->amount) {
                 return false;
             }
         }
         if ($this->order_price_to) {
-            if ($this->order_price_to <= (float) $shopOrder->moneyItems->amount) {
+            if ($this->order_price_to <= (float)$shopOrder->moneyItems->amount) {
                 return false;
             }
         }

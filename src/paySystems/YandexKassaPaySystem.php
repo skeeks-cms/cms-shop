@@ -32,6 +32,11 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
     public $shop_id;
     public $scid;
     public $payment_type = "";
+
+    /**
+     * @var bool Отправлять данные по чекам?
+     */
+    public $is_receipt = false;
     /**
      * Можно задать название и описание компонента
      * @return array
@@ -106,6 +111,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
             [['shop_id'], 'string'],
             [['scid'], 'string'],
             [['isLive'], 'boolean'],
+            [['is_receipt'], 'boolean'],
             [['payment_type'], 'string'],
         ]);
     }
@@ -114,12 +120,14 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
         return ArrayHelper::merge(parent::attributeLabels(), [
             'isLive'         => 'Рабочий режим',
             'sMerchantPass2' => 'sMerchantPass2',
-            'shop_password' => 'Секретный ключ',
+            'shop_password'  => 'Секретный ключ',
+            'is_receipt'  => 'Отправлять данные для формирования чеков?',
         ]);
     }
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'is_receipt'       => 'Необходимо передавать, если вы отправляете данные для формирования чеков по одному из сценариев: Платеж и чек одновременно или Сначала чек, потом платеж.',
             'isLive'       => '',
             'payment_type' => 'Смотреть https://tech.yandex.ru/money/doc/payment-solution/reference/payment-type-codes-docpage/',
         ]);
@@ -149,6 +157,7 @@ class YandexKassaPaySystem extends PaySystemHandlerComponent
         echo $activeForm->field($this, 'shop_password');
         //echo $activeForm->field($this, 'security_type');
         echo $activeForm->field($this, 'shop_id');
+        echo $activeForm->field($this, 'is_receipt')->checkbox();
         //echo $activeForm->field($this, 'scid');
         //echo $activeForm->field($this, 'payment_type');
 
@@ -196,7 +205,7 @@ HTML
     }
     /**
      * Checking the MD5 sign.
-     * @param  array $request payment parameters
+     * @param array $request payment parameters
      * @return bool true if MD5 hash is correct
      */
     public function checkRequestMD5($request)
@@ -249,10 +258,10 @@ HTML
     }
     /**
      * Building XML response.
-     * @param  string $functionName "checkOrder" or "paymentAviso" string
-     * @param  string $invoiceId transaction number
-     * @param  string $result_code result code
-     * @param  string $message error message. May be null.
+     * @param string $functionName "checkOrder" or "paymentAviso" string
+     * @param string $invoiceId transaction number
+     * @param string $result_code result code
+     * @param string $message error message. May be null.
      * @return string                prepared XML response
      */
     public function buildResponse($functionName, $invoiceId, $result_code, $message = null)

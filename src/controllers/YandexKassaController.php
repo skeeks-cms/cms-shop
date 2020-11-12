@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopPayment;
@@ -241,10 +242,57 @@ class YandexKassaController extends Controller
         $money = $model->money->convertToCurrency("RUB");
         $returnUrl = $model->shopOrder->getUrl([], true);
 
+        /**
+         * Для чеков нужно указывать информацию о товарах
+         * https://kassa.yandex.ru/developers/api?lang=php#create_payment
+         */
+        $shopBuyer = $model->shopOrder->shopBuyer;
+        $receipt = [];
+        if ($yandexKassa->is_receipt) {
+            if ($shopBuyer->email) {
+                $receipt['customer'] = [
+                    'email'     => $shopBuyer->email,
+                    'full_name' => $shopBuyer->name,
+                ];
+            }
+
+            foreach ($model->shopOrder->shopOrderItems as $shopOrderItem)
+            {
+                $itemData = [];
+
+                $itemData['description'] = StringHelper::substr($shopOrderItem->name, 0, 128);
+                $itemData['quantity'] = $shopOrderItem->quantity;
+                $itemData['vat_code'] = 1; //todo: доработать этот момент
+                $itemData['amount'] = [
+                    'value' => $shopOrderItem->money->amount,
+                    'currency' => 'RUB',
+                ];
+
+                $receipt['items'][] = $itemData;
+            }
+
+            /**
+             * Стоимость доставки так же нужно добавить
+             */
+            if ((float) $model->shopOrder->moneyDelivery->amount > 0) {
+                $itemData = [];
+                $itemData['description'] = StringHelper::substr($model->shopOrder->shopDelivery->name, 0, 128);
+                $itemData['quantity'] = 1;
+                $itemData['vat_code'] = 1; //todo: доработать этот момент
+                $itemData['amount'] = [
+                    'value' => $model->shopOrder->moneyDelivery->amount,
+                    'currency' => 'RUB',
+                ];
+
+                $receipt['items'][] = $itemData;
+            }
+        }
+            
         $client = new Client();
         $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);
         $payment = $client->createPayment(
             array(
+                'receipt' => $receipt,
                 'amount' => array(
                     'value' => $money->amount,
                     'currency' => 'RUB',
@@ -254,10 +302,12 @@ class YandexKassaController extends Controller
                     'return_url' => $returnUrl,
                 ),
                 'description' => 'Заказ №' . $model->shop_order_id,
+                
             ),
             uniqid('', true)
         );
 
+        
         \Yii::info(print_r($payment, true), self::class);
 
         if (!$payment->id) {
