@@ -81,7 +81,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
         if ($parentProduct = $this->product->shopProductWhithOffers) {
 
             //Если родитель является офером
-            $shopParentContent = ShopContent::find()->where(['content_id' => $parentProduct->cmsContentElement->content_id])->one();
+            /*$shopParentContent = ShopContent::find()->where(['content_id' => $parentProduct->cmsContentElement->content_id])->one();
 
             if (!$shopParentContent) {
                 return;
@@ -89,9 +89,10 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
             if (!$shopParentContent->children_content_id) {
                 return;
-            }
+            }*/
 
-            if ($parentProduct && $shopParentContent->children_content_id && $shopParentContent->children_content_id == $this->product->cmsContentElement->content_id) {
+            /*if ($parentProduct && $shopParentContent->children_content_id && $shopParentContent->children_content_id == $this->product->cmsContentElement->content_id) {*/
+            //if ($parentProduct) {
                 $minPriceValue = $this->price;
                 $minPriceCurrency = $this->currency_code;
 
@@ -131,7 +132,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
                     }
                 }
 
-            }
+            //}
 
         }
     }

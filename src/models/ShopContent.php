@@ -24,7 +24,6 @@ use yii\helpers\ArrayHelper;
  * @property integer    $children_content_id
  *
  * @property CmsContent $cmsContent
- * @property CmsContent $cmsContentForOffers
  */
 class ShopContent extends ActiveRecord
 {
@@ -83,6 +82,7 @@ class ShopContent extends ActiveRecord
 
 
     /**
+     * @deprecated
      * @return \yii\db\ActiveQuery
      */
     public function getCmsContentForOffers()

@@ -25,55 +25,55 @@ CSS
 )
 
 ?>
-<? \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
+<? $widget = \skeeks\cms\modules\admin\widgets\Pjax::begin(); ?>
 
 
     <div class="sx-report-order">
 
-        <? $form = \yii\bootstrap\ActiveForm::begin([
+        <?/* $form = \yii\bootstrap\ActiveForm::begin([
             'method'               => 'get',
             'options'              =>
                 [
                     'data-pjax' => '1',
                 ],
             'enableAjaxValidation' => false,
-        ]); ?>
+        ]); */?><!--
         <div class="row sx-form-filters">
             <div class="col-md-3">
-                <?= $form->field($search,
+                <?/*= $form->field($search,
                     'groupType')->listBox(\skeeks\cms\shop\models\search\AdminReportOrderSearch::getGroupTypes(), [
                     'size' => 1,
-                ]); ?>
+                ]); */?>
             </div>
             <div class="col-md-3">
-                <?= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::class, [
+                <?/*= $form->field($search, 'from')->widget(\kartik\datecontrol\DateControl::class, [
                     //'displayFormat' => 'php:d-M-Y H:i:s',
                     'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-                ]); ?>
+                ]); */?>
             </div>
             <div class="col-md-3">
-                <?= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::class, [
+                <?/*= $form->field($search, 'to')->widget(\kartik\datecontrol\DateControl::class, [
                     //'displayFormat' => 'php:d-M-Y H:i:s',
                     'type' => \kartik\datecontrol\DateControl::FORMAT_DATETIME,
-                ]); ?>
+                ]); */?>
             </div>
 
             <div class="col-md-3">
                 <div class="form-group field-adminreportproductsearch-to">
                     <label class="control-label" for="adminreportproductsearch-to" style="width: 100%;">&nbsp;</label>
-                    <button class="btn btn-default" type="submit"><?= \Yii::t('skeeks/shop/app', 'Apply'); ?></button>
+                    <button class="btn btn-default" type="submit"><?/*= \Yii::t('skeeks/shop/app', 'Apply'); */?></button>
                 </div>
             </div>
         </div>
 
 
-        <? $form::end(); ?>
+        --><?/* $form::end(); */?>
 
-        <?= \skeeks\cms\modules\admin\widgets\GridView::widget([
+        <?/*= \skeeks\cms\modules\admin\widgets\GridView::widget([
             'dataProvider' => $dataProvider,
             'filterModel'  => $search,
             'columns'      => $search->getColumns(),
-        ]); ?>
+        ]); */?>
 
     </div>
-<? \skeeks\cms\modules\admin\widgets\Pjax::end(); ?>
+<? $widget::end(); ?>

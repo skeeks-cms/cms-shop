@@ -22,7 +22,7 @@ $parent_content_element_id = null;
 $shopSubproductContentElement = @$shopSubproductContentElement;
 
 //Разрешено ли менять тип товара?
-$allowChangeProductType = false;
+$allowChangeProductType = true;
 //Показывать управление ценами
 $isShowPrices = true;
 $isShowNdsSettings = true;
@@ -36,14 +36,14 @@ $possibleProductTypes = \skeeks\cms\shop\models\ShopProduct::possibleProductType
  * @var $shopContent \skeeks\cms\shop\models\ShopContent
  */
 $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
-if ($shopContent->childrenContent) {
-    $allowChangeProductType = true;
+/*if ($shopContent->childrenContent) {
+    $allowChangeProductType = true;*/
 
     /*if ($shopProduct->shop_supplier_id) {
         $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE;
         $allowChangeProductType = false;
     }*/
-}
+/*}*/
 
 
 if ($model->isNewRecord) {
