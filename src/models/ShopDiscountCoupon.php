@@ -2,6 +2,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsUser;
 use Yii;
@@ -28,7 +29,7 @@ use Yii;
  * @property ShopDiscount               $shopDiscount
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
  */
-class ShopDiscountCoupon extends \skeeks\cms\models\Core
+class ShopDiscountCoupon extends ActiveRecord
 {
     /**
      * @inheritdoc
