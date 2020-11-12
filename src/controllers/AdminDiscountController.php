@@ -16,7 +16,10 @@ use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDiscount;
+use skeeks\cms\shop\models\ShopDiscountCoupon;
+use skeeks\cms\widgets\GridView;
 use yii\base\Event;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -70,20 +73,12 @@ class AdminDiscountController extends BackendModelStandartController
                          * @var $query ActiveQuery
                          */
                         $query = $e->sender->dataProvider->query;
-
-                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                        $query->cmsSite();
                     },
 
-                    /*'sortAttributes' => [
-                        'countDomains' => [
-                            'asc' => ['countDomains' => SORT_ASC],
-                            'desc' => ['countDomains' => SORT_DESC],
-                            'label' => 'Количество доменов',
-                            'default' => SORT_ASC
-                        ]
-                    ],*/
                     'defaultOrder'   => [
-                        'priority' => SORT_ASC,
+                        'is_active' => SORT_DESC,
+                        'priority'  => SORT_ASC,
                     ],
                     'visibleColumns' => [
                         'checkbox',
@@ -96,6 +91,7 @@ class AdminDiscountController extends BackendModelStandartController
                         'is_active',
 
                         'priority',
+                        'countCoupons',
                     ],
                     'columns'        => [
                         'name'      => [
@@ -107,9 +103,49 @@ class AdminDiscountController extends BackendModelStandartController
                         'is_last'   => [
                             'class' => BooleanColumn::class,
                         ],
+                        'priority'  => [
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                        ],
+
+                        'countCoupons' => [
+                            'value'                => function (ShopDiscount $cmsSite) {
+                                return $cmsSite->raw_row['countCoupons'];
+                            },
+                            'attribute'            => 'countCoupons',
+                            'label'                => 'Количество купонов',
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'beforeCreateCallback' => function (GridView $gridView) {
+                                $query = $gridView->dataProvider->query;
+
+                                $qCount = ShopDiscountCoupon::find()->from([
+                                        'sdc' => ShopDiscountCoupon::tableName(),
+                                    ])
+                                    ->select(["total" => "count(*)"])
+                                    ->where(['sdc.shop_discount_id' => new Expression(ShopDiscount::tableName().".id")]);
+
+                                $query->groupBy(ShopDiscount::tableName().".id");
+                                $query->addSelect([
+                                    'countCoupons' => $qCount,
+                                ]);
+
+                                $gridView->sortAttributes['countCoupons'] = [
+                                    'asc'     => ['countCoupons' => SORT_ASC],
+                                    'desc'    => ['countCoupons' => SORT_DESC],
+                                    'label'   => 'Количество купонов',
+                                    'default' => SORT_ASC,
+                                ];
+                            },
+                        ],
 
                         'value' => [
-                            'value' => function (\skeeks\cms\shop\models\ShopDiscount $shopDiscount) {
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'value'         => function (\skeeks\cms\shop\models\ShopDiscount $shopDiscount) {
                                 if ($shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_P) {
                                     return \Yii::$app->formatter->asPercent($shopDiscount->value / 100);
                                 } else {
@@ -123,14 +159,14 @@ class AdminDiscountController extends BackendModelStandartController
             ],
 
             "coupons" => [
-                'class' => BackendGridModelRelatedAction::class,
-                'accessCallback' => true,
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
                 'name'            => "Купоны",
                 'icon'            => 'fa fa-list',
                 'controllerRoute' => "/shop/admin-discount-coupon",
                 'relation'        => ['shop_discount_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'        => function($e) {
+                'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */

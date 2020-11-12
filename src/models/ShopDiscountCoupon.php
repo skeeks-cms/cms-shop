@@ -171,6 +171,19 @@ class ShopDiscountCoupon extends \skeeks\cms\models\Core
         return $this->hasMany(ShopOrder2discountCoupon::class, ['discount_coupon_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrders()
+    {
+        $query = ShopOrder::find()->isCreated();
+        $query->joinWith('shopOrder2discountCoupons as shopOrder2discountCoupons');
+        $query->andWhere(['shopOrder2discountCoupons.discount_coupon_id' => $this->id]);
+
+        $query->multiple = true;
+        return $query;
+    }
+
     public function asText()
     {
         return $this->coupon;

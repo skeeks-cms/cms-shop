@@ -48,6 +48,7 @@ use yii\helpers\Json;
  * @property ShopTypePrice[]          $typePrices
  * @property CmsAuthItem[]            $cmsAuthItems
  * @property CmsAuthItem[]            $cmsUserRoles
+ * @property ShopDiscountCoupon[]     $shopDiscountCoupons
  *
  * @property bool                     $isLast
  */
@@ -155,7 +156,8 @@ class ShopDiscount extends ActiveRecord
     public function attributeHints()
     {
         return [
-            'cmsAuthItems'    => \Yii::t('skeeks/shop/app', 'Скидка будет доступна пользователям выбранных групп, а так же будет доступна пользователям, которые не входят в выбранные группы но у них есть активный купон этой скидки'),
+            'cmsAuthItems' => \Yii::t('skeeks/shop/app',
+                'Скидка будет доступна пользователям выбранных групп, а так же будет доступна пользователям, которые не входят в выбранные группы но у них есть активный купон этой скидки'),
         ];
     }
 
@@ -244,6 +246,15 @@ class ShopDiscount extends ActiveRecord
     public function getCmsUserRoles()
     {
         return $this->cmsAuthItems;
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopDiscountCoupons()
+    {
+        return $this->hasMany(ShopDiscountCoupon::class, ['shop_discount_id' => 'id']);
     }
 
     /**

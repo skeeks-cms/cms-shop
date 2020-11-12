@@ -7,6 +7,7 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
+use skeeks\cms\shop\models\queries\ShopOrderQuery;
 use skeeks\cms\shop\Module;
 use yii\base\Event;
 use yii\base\ModelEvent;
@@ -853,7 +854,8 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $q = $this->shopPersonType->getPaySystems()
             ->andWhere([ShopPaySystem::tableName().".is_active" => 1])
-            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id]);
+            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id])
+            ->orderBy([ShopPaySystem::tableName().".priority" => SORT_ASC]);
 
         //Если в заказе выбран способ доставки, и у способа доставки заданы способы оплаты, то накладываем доп фильтрацию
         if ($this->shopDelivery) {
@@ -1128,5 +1130,13 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getShopBaskets()
     {
         return $this->getShopOrderItems();
+    }
+
+    /**
+     * @return \skeeks\cms\query\CmsActiveQuery|ShopOrderQuery
+     */
+    public static function find()
+    {
+        return new ShopOrderQuery(get_called_class());
     }
 }

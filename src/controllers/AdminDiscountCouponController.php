@@ -10,18 +10,22 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDiscount;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
+use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\widgets\AjaxSelectModel;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -76,7 +80,7 @@ class AdminDiscountCouponController extends BackendModelStandartController
                          */
                         $query = $e->sender->dataProvider->query;
 
-                        $query->andWhere(['shop_discount_id' => ShopDiscount::find()->cmsSite()->select(['id'])]);
+                        $query->andWhere([ShopDiscountCoupon::tableName() . '.shop_discount_id' => ShopDiscount::find()->from(['d' => ShopDiscount::tableName()])->cmsSite()->select(['d.id'])]);
                     },
 
                     /*'sortAttributes' => [
@@ -97,6 +101,7 @@ class AdminDiscountCouponController extends BackendModelStandartController
                         'coupon',
                         'shop_discount_id',
                         'is_active',
+                        'countOrders',
                     ],
                     'columns'        => [
                         'coupon'    => [
@@ -106,20 +111,80 @@ class AdminDiscountCouponController extends BackendModelStandartController
                             'class' => BooleanColumn::class,
                         ],
 
+                        'countOrders' => [
+                            'value'                => function (ShopDiscountCoupon $cmsSite) {
+                                return $cmsSite->raw_row['countOrders'];
+                            },
+                            'attribute'            => 'countOrders',
+                            'label'                => 'Использован, раз',
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'beforeCreateCallback' => function (GridView $gridView) {
+                                $query = $gridView->dataProvider->query;
 
-                        'value' => [
-                            'value' => function (\skeeks\cms\shop\models\ShopDiscount $shopDiscount) {
-                                if ($shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_P) {
-                                    return \Yii::$app->formatter->asPercent($shopDiscount->value / 100);
-                                } else {
-                                    $money = new \skeeks\cms\money\Money((string)$shopDiscount->value, $shopDiscount->currency_code);
-                                    return (string)$money;
-                                }
+                                $qCount = ShopOrder::find()->from([
+                                        'order' => ShopOrder::tableName(),
+                                    ])
+                                    ->isCreated()
+                                    ->joinWith("shopOrder2discountCoupons as shopOrder2discountCoupons")
+                                    ->joinWith("shopOrder2discountCoupons.discountCoupon as shopDiscountCoupons")
+                                    ->select(["total" => "count(*)"])
+                                    ->andWhere(['shopDiscountCoupons.id' => new Expression(ShopDiscountCoupon::tableName().".id")]);
+
+                                $query->groupBy(ShopDiscountCoupon::tableName().".id");
+                                $query->addSelect([
+                                    'countOrders' => $qCount,
+                                ]);
+
+                                $gridView->sortAttributes['countOrders'] = [
+                                    'asc'     => ['countOrders' => SORT_ASC],
+                                    'desc'    => ['countOrders' => SORT_DESC],
+                                    'label'   => 'Использован, раз',
+                                    'default' => SORT_ASC,
+                                ];
                             },
                         ],
                     ],
                 ],
             ],
+
+            "orders" => [
+                'class'           => BackendGridModelRelatedAction::class,
+                'accessCallback'  => true,
+                'name'            => "Заказы",
+                'icon'            => 'fa fa-list',
+                'controllerRoute' => "/shop/admin-order",
+                'priority'        => 600,
+
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+
+                    $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                        /**
+                         * @var $query ActiveQuery
+                         *
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $query->cmsSite()->isCreated()
+                             ->joinWith("shopOrder2discountCoupons as shopOrder2discountCoupons")
+                            ->andWhere(['shopOrder2discountCoupons.discount_coupon_id' => $this->model->id]);
+                        ;
+
+                    };
+
+
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
 
             "create" => [
                 'fields' => [$this, 'updateFields'],
@@ -149,6 +214,17 @@ class AdminDiscountCouponController extends BackendModelStandartController
             $options = [
                 'disabled' => 'disabled'
             ];
+        }
+
+        $model->load(\Yii::$app->request->get());
+
+        if ($model->isNewRecord && $model->shop_discount_id) {
+            \Yii::$app->view->registerCss(<<<CSS
+.field-shopdiscountcoupon-shop_discount_id {
+    display: none;
+}
+CSS
+            );
         }
 
         return [
