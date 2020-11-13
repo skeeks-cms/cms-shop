@@ -182,10 +182,12 @@ $shopSellerProducts = [];
                 ?>
                 <i class="fas fa-map-marker-alt"></i>
                 <?= $shopSupplierProduct->cmsContentElement->cmsSite->internalName; ?> -
-                <?= $shopSupplierProduct->asText; ?>
+                #<?= $shopSupplierProduct->id; ?>
                  — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
                 
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                <a href="<?php echo $shopSupplierProduct->cmsContentElement->url; ?>" class="my-auto" data-pjax="0" target="_blank" style="text-decoration: none; color: black; border-bottom: 0;"><i class="fas fa-external-link-alt"></i></a>
+
             </div>
         <? endforeach; ?>
     </div>
