@@ -181,7 +181,7 @@ $shopSellerProducts = [];
                 ]);
                 ?>
                 <i class="fas fa-map-marker-alt"></i>
-                <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
+                <?= $shopSupplierProduct->cmsContentElement->cmsSite->internalName; ?> -
                 <?= $shopSupplierProduct->asText; ?>
                  — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
                 
@@ -206,7 +206,7 @@ $shopSellerProducts = [];
                 ]);
                 ?>
                 <i class="fas fa-link" title="Привязан к главному товару"></i>
-                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
+                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->internalName; ?> -
                 <?= $shopSupplierProduct->asText; ?> — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
             </div>
@@ -259,7 +259,7 @@ $shopSellerProducts = [];
                                     ],
                                 ]);
                                 ?>
-                                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->name; ?> -
+                                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->internalName; ?> -
                                 <?= $shopSupplierProduct->asText; ?> — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
                                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                             </div>
