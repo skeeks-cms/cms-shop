@@ -176,6 +176,8 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         parent::init();
 
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeUpdateEvent"]);
+
         $this->on(self::EVENT_BEFORE_INSERT, [$this, "_beforeSaveEvent"]);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeSaveEvent"]);
 
@@ -221,6 +223,19 @@ class ShopProduct extends \skeeks\cms\models\Core
             $log->save();
         }
     }
+
+    public function _beforeUpdateEvent($event)
+    {
+        if ($this->isAttributeChanged('offers_pid')) {
+
+            $element = $this->cmsContentElement;
+            $offersElement = $this->shopProductWhithOffers->cmsContentElement;
+
+            if ($element->tree_id != $offersElement->tree_id) {
+                throw new Exception("Товар с модификацией должен иметь такой же раздел. {$offersElement->tree_id} != {$element->tree_id}");
+            }
+        }
+    }
     /**
      * Перед сохранением модели, всегда следим за типом товара
      * @param $event
@@ -259,6 +274,9 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $this->main_pid_by = null;
             }
         }
+
+
+
     }
     /**
      * @return \yii\db\ActiveQuery
