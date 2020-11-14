@@ -209,6 +209,8 @@ class ShopCmsContentElement extends CmsContentElement
      */
     public function asText()
     {
+        return "#" .$this->id . "#" . $this->productName;
+        
         $text = parent::asText();
 
         $result = [];

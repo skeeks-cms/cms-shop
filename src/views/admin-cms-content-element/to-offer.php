@@ -17,18 +17,22 @@ $model = new \skeeks\cms\shop\models\ShopProduct();
 
 <? if ($cmsContent) : ?>
     <?= $form->field($model, 'offers_pid')->widget(
-        \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
+        \skeeks\cms\widgets\AjaxSelectModel::class,
         [
-            'content_id'  => $cmsContent->parent_content_id,
-            'dialogRoute' => [
-                '/shop/admin-cms-content-element',
-                'DynamicModel' => [
-                    'product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS],
-                ],
-            ],
+            'modelClass'  => \skeeks\cms\shop\models\ShopCmsContentElement::class,
+            'searchQuery' => function ($word = '') {
+                $query = \skeeks\cms\shop\models\ShopCmsContentElement::find()->cmsSite()->joinWith("shopProduct as sp");
+                $query->andWhere(['sp.product_type' => \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS]);
+
+                if ($word) {
+                    $query->search($word);
+                }
+
+                return $query;
+            },
         ]
     )
-        ->label('Общий товар с предложениями');
+        ->label('Товар содержащий модификации');
     ?>
 <? endif; ?>
 

@@ -60,7 +60,7 @@ CSS
                     'parent_content_element_id' => $controller->model->id,
                 ]);
 
-                $createAction->name = "Добавить предложение";
+                $createAction->name = "Добавить модификацию";
 
                 echo \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
                     'actions'         => [$createAction],

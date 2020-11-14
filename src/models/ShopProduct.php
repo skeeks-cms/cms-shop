@@ -134,8 +134,8 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         return [
             static::TYPE_SIMPLE => \Yii::t('skeeks/shop/app', 'Plain'),
-            static::TYPE_OFFERS => \Yii::t('skeeks/shop/app', 'With quotations'),
-            static::TYPE_OFFER  => \Yii::t('skeeks/shop/app', 'Товар-предложение'),
+            static::TYPE_OFFERS => \Yii::t('skeeks/shop/app', 'С модификациями'),
+            static::TYPE_OFFER  => \Yii::t('skeeks/shop/app', 'Это модификация другого товара'),
         ];
     }
     /**
@@ -600,6 +600,9 @@ class ShopProduct extends \skeeks\cms\models\Core
             }],
 
             [['offers_pid'], 'integer'],
+            [['offers_pid'], function($attribute) {
+
+            }],
         ];
     }
     /**

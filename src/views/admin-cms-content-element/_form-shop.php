@@ -52,7 +52,7 @@ if ($model->isNewRecord) {
         $model->tree_id = $tree_id;
     }
 
-    //Если создаем вложенный товар
+    //Если создаем товар модификацию
     if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
         $allowChangeProductType = false;
     }
@@ -67,6 +67,9 @@ if ($model->isNewRecord) {
         $isShowMeasureCode = false;
         $isShowQuantity = false;
     }
+
+    \yii\helpers\ArrayHelper::remove($possibleProductTypes, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER);
+
 } else {
     //Товар не новый уже и у него заданы товары поставщика
     if ($shopProduct->shopSupplierProducts) {
@@ -89,11 +92,10 @@ if ($shopProduct->tradeOffers) {
 }
 
 $isChangeParrentElement = false;
-if ($shopContent->childrenContent) {
-    if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER) {
-        $isChangeParrentElement = true;
-    }
+if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER) {
+    $isChangeParrentElement = true;
 }
+
 
 ?>
 
@@ -129,17 +131,32 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
 
     <? if ($isChangeParrentElement) : ?>
         <?= $form->field($shopProduct, 'offers_pid')->widget(
+            /*\skeeks\cms\widgets\AjaxSelectModel::class,
+            [
+                'modelClass' => \skeeks\cms\shop\models\ShopCmsContentElement::class,
+                'searchQuery' => function($word = '') {
+                    $query = \skeeks\cms\shop\models\ShopCmsContentElement::find()->cmsSite()->joinWith("shopProduct as sp");
+                    $query->andWhere(['sp.product_type' => \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS]);
+                    
+                    if ($word) {
+                        $query->search($word);
+                    }
+                    
+                    return $query;
+                },
+            ]*/
+                
             \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
-                'content_id'  => $shopContent->childrenContent->id,
+                'content_id'  => $model->content_id,
                 'dialogRoute' => [
                     '/shop/admin-cms-content-element',
                     'findex' => [
-                        'shop_product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS],
+                        'shop_product_type' => [\skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS],
                     ],
                 ],
             ]
-        )->label('Общий товар с предложениями');
+        )->label('Товар содержащий модификации');
         ?>
     <? endif; ?>
 

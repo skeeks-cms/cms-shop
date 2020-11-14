@@ -78,7 +78,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                 "offers" => [
                     'class'                  => BackendGridModelRelatedAction::class,
-                    'name'                   => "Предложения",
+                    'name'                   => "Модификации",
                     'icon'                   => 'fa fa-list',
                     'controllerRoute'        => "/shop/admin-cms-content-element",
                     'priority'               => 150,
@@ -355,7 +355,7 @@ HTML
                     },
                 ],
 
-                "to-offer" => [
+                /*"to-offer" => [
                     'class'        => BackendModelMultiDialogEditAction::class,
                     "name"         => "Привязать к общему",
                     "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/to-offer",
@@ -374,7 +374,6 @@ HTML
                         }
                         /**
                          * @var BackendGridModelAction $action
-                         */
                         $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
                     },
 
@@ -384,7 +383,7 @@ HTML
                     "accessCallback"     => function () {
                         return \Yii::$app->user->can($this->permissionName."/update");
                     },
-                ],
+                ],*/
 
                 "shop-properties" => [
                     'class'        => BackendModelMultiDialogEditAction::class,
