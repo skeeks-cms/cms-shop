@@ -452,38 +452,36 @@ SQL
      */
     public function updateAllTypes()
     {
-        //Запрос обновляет тип товаров на сайтах получателей. Делает тип товаров как на портале
+
+        //Удаляет товары с сайтов получателей, которые не связаны с главным
+        if (!\Yii::$app->shop->shopContents) {
+            return false;
+        }
+
+        $content_ids = ArrayHelper::map($this->shopContents, 'id', 'id');
+        $content_ids_row = implode(",", $content_ids);
+
         $result = \Yii::$app->db->createCommand(<<<SQL
-            UPDATE 
-                `shop_product` as update_sp 
-                INNER JOIN (
-                    SELECT 
-                        cce.cms_site_id, 
-                        
-                        sp.id as secondary_product_id, 
-                        sp_parent.id as secondary_product_pid, /*Такой общий товар долженыть быть*/
-                        sp.product_type as secondary_product_type, /*У текущих товаров такой тип*/
-                        
-                        main_sp.product_type as main_product_type, /*А должен быть как на портале такой*/
-                        main_sp.offers_pid as main_product_pid /*На портале такой общий товар*/
-                    FROM 
-                        shop_product sp 
-                        LEFT JOIN cms_content_element cce on cce.id = sp.id 
-                        LEFT JOIN shop_site shop_site on shop_site.id = cce.cms_site_id 
-                        
-                        INNER JOIN shop_product main_sp on main_sp.id = sp.main_pid /*Подтягиваем главные товары портала*/
-                        
-                        LEFT JOIN shop_product main_sp_parent on main_sp_parent.id = main_sp.offers_pid /*Общие товары портала*/
-                        LEFT JOIN shop_product sp_parent on sp_parent.main_pid = main_sp_parent.id 
-                    WHERE 
-                        sp.product_type != main_sp.product_type /*Только товары у которых не совпадает тип с порталом*/
-                        AND shop_site.is_receiver = 1 /*Касается только сайтов получаетелей*/
-                ) as inner_sp on inner_sp.secondary_product_id = update_sp.id
-            SET 
-                update_sp.`product_type` = inner_sp.main_product_type,
-                update_sp.`offers_pid` = inner_sp.secondary_product_pid
+    DELETE cce_for_delete 
+    FROM 
+        cms_content_element as cce_for_delete 
+        INNER JOIN (
+            SELECT 
+                sp.id 
+            FROM 
+                `shop_product` as sp 
+                LEFT JOIN cms_content_element as cce on sp.id = cce.id 
+                LEFT JOIN shop_site shop_site on shop_site.id = cce.cms_site_id 
+            WHERE 
+                shop_site.is_receiver = 1 
+                /*Касается только сайтов получаетелей*/
+                AND sp.`main_pid` is null
+                AND cce.`content_id` in ({$content_ids_row})
+            /*LIMIT 1*/
+        ) as not_hav_main_pid ON not_hav_main_pid.id = cce_for_delete.id
 SQL
-        )->execute();
+        );
+
         //Товары у которых не задан родительский элемент и нет вложенных делаем простыми
         $result = \Yii::$app->db->createCommand(<<<SQL
             UPDATE 
@@ -497,6 +495,7 @@ SQL
                     WHERE 
                         inner_sp.offers_pid is null /*не задан общий товар*/
                         and sp_offers.id is null /*к товару никто не привязан*/
+                        and inner_sp.product_type != 'simple' /*Не простой товар*/
                         GROUP BY inner_sp.id
                 ) as join_sp on join_sp.id = sp.id
             SET 
@@ -517,6 +516,7 @@ SQL
                         LEFT JOIN `shop_product` as sp_offers ON sp_offers.offers_pid = inner_sp.id 
                     WHERE 
                         sp_offers.id is not null /*к товару кто то привязан*/
+                        AND inner_sp.product_type != 'offers' /*И у которого неправильный тип*/
                     GROUP BY 
                         inner_sp.id 
                 ) sp_has_parent ON sp.id = sp_has_parent.id
@@ -535,6 +535,7 @@ SQL
                    SELECT inner_sp.id as inner_sp_id
                    FROM shop_product inner_sp
                    WHERE inner_sp.offers_pid is not null
+                   AND inner_sp.product_type != 'offer'
                    GROUP BY inner_sp.id
                 ) sp_has_parent ON sp.id = sp_has_parent.inner_sp_id
             SET 
