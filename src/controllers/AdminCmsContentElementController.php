@@ -113,6 +113,8 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             $query->joinWith("shopProduct as sp");
                             $query->andWhere(['sp.offers_pid' => $this->model->id]);
                             $query->andWhere(['in', 'sp.id', ArrayHelper::map($helper->availableOffers, 'id', 'id')]);
+
+                            $this->initGridColumns($e->sender, $this->content);
                         };
 
 
@@ -123,29 +125,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                                 'helper'     => $helper,
                             ]);
 
-                            /*if ($createAction = ArrayHelper::getValue($controller->actions, 'create')) {
 
-                                /**
-                                 * @var $controller BackendModelController
-                                 * @var $createAction BackendModelCreateAction
-                                $r = new \ReflectionClass($controller->modelClassName);
-
-                                $createAction->url = ArrayHelper::merge($createAction->urlData, [
-                                    'parent_content_element_id' => $this->model->id,
-                                ]);
-
-                                $createAction->name = "Добавить предложение";
-
-                                $event->content = ControllerActionsWidget::widget([
-                                        'actions'         => [$createAction],
-                                        'isOpenNewWindow' => true,
-                                        'minViewCount'    => 1,
-                                        'itemTag'         => 'button',
-                                        'itemOptions'     => ['class' => 'btn btn-primary'],
-                                    ])."<br>" . \Yii::$app->view->render("@skeeks/cms-shop/views/admin-cms-content-element/rp-header", [
-                                        ''
-                                    ]);
-                            }*/
                         });
                         $action->relatedIndexAction->on('afterRender', function (Event $event) {
                             $event->content = '';
@@ -679,17 +659,11 @@ HTML
         }
     }
 
-    public function initGridData($action, $content)
+    public function initGridColumns($grid, $content)
     {
-        parent::initGridData($action, $content);
+        parent::initGridColumns($grid, $content);
 
-        $sortAttributes = [];
         $shopColumns = [];
-        $visibleColumns = [];
-        $filterFields = [];
-        $filterFieldsLabels = [];
-        $filterFieldsRules = [];
-
 
         $shopColumns["shop.relations_products"] = [
             'attribute'            => "shop.relations_products",
@@ -733,7 +707,6 @@ HTML
                 }
             },
         ];
-
 
         $shopColumns["shop.quantity"] = [
             'attribute' => "shop.quantity",
@@ -781,18 +754,13 @@ HTML
                 return "—";
             },
         ];
-        $sortAttributes["shop.quantity"] = [
-            'asc'  => ['sp.quantity' => SORT_ASC],
-            'desc' => ['sp.quantity' => SORT_DESC],
-        ];
-        $sortAttributes["shop.product_type"] = [
-            'asc'  => ['sp.product_type' => SORT_ASC],
-            'desc' => ['sp.product_type' => SORT_DESC],
+
+        $shopColumns["custom"] = [
+            'attribute' => 'id',
+            'class'     => ShopProductColumn::class,
         ];
 
 
-        //  $visibleColumns[] = "shop.product_type";
-        $visibleColumns[] = "shop.quantity";
 
         if (\Yii::$app->shop->shopTypePrices) {
 
@@ -826,14 +794,51 @@ HTML
                     'default' => SORT_ASC,
                 ];
             }
+        }
+
+        if ($shopColumns) {
+            ArrayHelper::remove($grid->columns, 'custom');
+            $grid->columns = ArrayHelper::merge($grid->columns, $shopColumns);
+        }
+    }
 
 
-            $defaultId = \Yii::$app->shop->baseTypePrice ? \Yii::$app->shop->baseTypePrice->id : '';
+    public function initGridData($action, $content)
+    {
+        parent::initGridData($action, $content);
 
-            $shopColumns["custom"] = [
-                'attribute' => 'id',
-                'class'     => ShopProductColumn::class,
-            ];
+        $sortAttributes = [];
+        $visibleColumns = [];
+        $filterFields = [];
+        $filterFieldsLabels = [];
+        $filterFieldsRules = [];
+
+
+        $sortAttributes["shop.quantity"] = [
+            'asc'  => ['sp.quantity' => SORT_ASC],
+            'desc' => ['sp.quantity' => SORT_DESC],
+        ];
+        $sortAttributes["shop.product_type"] = [
+            'asc'  => ['sp.product_type' => SORT_ASC],
+            'desc' => ['sp.product_type' => SORT_DESC],
+        ];
+
+
+        //  $visibleColumns[] = "shop.product_type";
+        $visibleColumns[] = "shop.quantity";
+
+        if (\Yii::$app->shop->shopTypePrices) {
+
+            foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
+                $visibleColumns[] = 'shop.price'.$shopTypePrice->id;
+
+                $sortAttributes['shop.price'.$shopTypePrice->id] = [
+                    'asc'     => ["p{$shopTypePrice->id}.price" => SORT_ASC],
+                    'desc'    => ["p{$shopTypePrice->id}.price" => SORT_DESC],
+                    'label'   => $shopTypePrice->name,
+                    'default' => SORT_ASC,
+                ];
+            }
         }
 
 
@@ -1023,10 +1028,7 @@ HTML
         $filterFieldsRules[] = ['all_ids', 'safe'];
 
         //Мерж колонок и сортировок
-        if ($shopColumns) {
-            $action->grid['columns'] = ArrayHelper::merge($action->grid['columns'], $shopColumns);
-            $action->grid['sortAttributes'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->grid, ['sortAttributes']), $sortAttributes);
-            $action->grid['visibleColumns'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->grid, ['visibleColumns']), $visibleColumns);
+        if ($filterFields) {
 
             $action->filters['filtersModel']['fields'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'fields']), $filterFields);
             $action->filters['filtersModel']['attributeDefines'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'attributeDefines']),
@@ -1059,6 +1061,7 @@ HTML
             if ($this->content) {
                 $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
             }
+            $this->initGridColumns($event->sender, $this->content);
 
             $query->joinWith('shopProduct as sp');
 
