@@ -1,9 +1,9 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link https://skeeks.com/
- * @copyright (c) 2010 SkeekS
- * @date 13.11.2017
  */
 
 namespace skeeks\cms\shop\queryFilter;
@@ -21,11 +21,13 @@ use v3project\yii2\productfilter\IFiltersHandler;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
 use yii\db\QueryInterface;
+use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * Class AvailabilityFiltersHandler
- * @package skeeks\cms\shop\queryFilter
+ * @property string $valueAsText
+ * 
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class SortFiltersHandler extends Model
     implements IQueryFilterHandler
@@ -77,7 +79,7 @@ class SortFiltersHandler extends Model
     {
         return [
             '-popular' => \Yii::t("skeeks/unify", "Popular"),
-            'price'   => \Yii::t("skeeks/unify-shop", "Cheap first"),
+            'price'    => \Yii::t("skeeks/unify-shop", "Cheap first"),
             '-price'   => \Yii::t("skeeks/unify-shop", "Dear first"),
             '-new'     => \Yii::t("skeeks/unify", "New"),
         ];
@@ -99,11 +101,11 @@ class SortFiltersHandler extends Model
         if ($this->value) {
             switch ($this->value) {
                 case ('-popular'):
-                    $query->orderBy([CmsContentElement::tableName() . '.show_counter' => SORT_DESC]);
+                    $query->orderBy([CmsContentElement::tableName().'.show_counter' => SORT_DESC]);
                     break;
 
                 case ('-new'):
-                    $query->orderBy([CmsContentElement::tableName() . '.created_at' => SORT_DESC]);
+                    $query->orderBy([CmsContentElement::tableName().'.created_at' => SORT_DESC]);
                     break;
 
                 case ('price'):
@@ -125,31 +127,10 @@ class SortFiltersHandler extends Model
 
                     }
 
-                    /*$joined = [];
-                    if ($query->join)
-                    {
-                        $joined = (array) ArrayHelper::map($query->join, 1, 1);
-                    }
-
-                    if (ArrayHelper::getValue($joined, 'shop_product_price'))
-                    {
-                        $query->orderBy(['shop_product_price.price' => SORT_ASC]);
-                    } else if (ArrayHelper::getValue($joined, 'shop_product'))
-                    {
-                        $query->leftJoin('shop_product_price', '`shop_product_price`.`product_id` = `shop_product`.`id`');
-                        $query->orderBy(['shop_product_price.price' => SORT_ASC]);
-                    } else
-                    {
-                        $query->joinWith('shopProduct.baseProductPrice as basePrice');
-                        $query->orderBy(['basePrice.price' => SORT_ASC]);
-                    }*/
-
-
                     break;
 
                 case ('-price'):
-                    /*$query->joinWith('shopProduct.baseProductPrice as basePrice');
-                    $query->orderBy(['baseProductPrice.price' => SORT_DESC]);*/
+
                     if ($this->type_price_id) {
                         $query->joinWith('shopProduct as p');
                         $query->joinWith('shopProduct.shopProductPrices as prices');
@@ -162,7 +143,6 @@ class SortFiltersHandler extends Model
                         ]);
 
                         $query->orderBy(['realPrice' => SORT_DESC]);
-
                     }
 
                     break;
@@ -171,10 +151,12 @@ class SortFiltersHandler extends Model
 
         return $this;
     }
-    public function getSelected()
+
+    public function getValueAsText()
     {
-        return [];
+        return (string)ArrayHelper::getValue($this->getSortOptions(), $this->value);
     }
+
 
     public function render(ActiveForm $form)
     {

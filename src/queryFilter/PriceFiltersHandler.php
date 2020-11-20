@@ -14,7 +14,6 @@ use common\models\V3pFeature;
 use common\models\V3pFeatureValue;
 use common\models\V3pFtSoption;
 use common\models\V3pProduct;
-use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\yii2\queryfilter\IQueryFilterHandler;
 use v3p\aff\models\V3pShopCmsContentElement;
 use v3project\yii2\productfilter\EavFiltersHandler;
@@ -131,7 +130,7 @@ class PriceFiltersHandler extends Model
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
         if (!\Yii::$app->skeeks->site->shopSite->is_show_product_no_price) {
-            $query->andWhere(['>', 'prices.price',  0]);
+            $query->andWhere(['>', 'prices.price', 0]);
         }
         $query->orderBy = [];
         $query->groupBy = [];
@@ -146,15 +145,15 @@ class PriceFiltersHandler extends Model
         $query->joinWith('shopProduct.shopProductPrices.currency as currency');
         $query->select([
             //'min(price) as min', 'max(price) as max',
-            'min(currency.course * prices.price) as min', 'max(currency.course * prices.price) as max',
+            'min(currency.course * prices.price) as min',
+            'max(currency.course * prices.price) as max',
             //'realPrice' => '( currency.course * prices.price )',
             //'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = prices.currency_code) * prices.price )',
-        ])
-            ;
-        
+        ]);
+
         //echo $query->createCommand()->rawSql;die;
         $data = $query->createCommand()->queryOne();
-        
+
         $this->_min_max_data = [
             round(ArrayHelper::getValue($data, 'min'), 2),
             round(ArrayHelper::getValue($data, 'max'), 2),
@@ -199,20 +198,6 @@ class PriceFiltersHandler extends Model
                 'realPrice' => '( currency.course * prices.price )',
             ]);
 
-            /*$query->leftJoin('shop_product', 'shop_product.id = cms_content_element.id');
-
-            $query->leftJoin('shop_product_price', 'shop_product_price.product_id = shop_product.id');
-            $query->leftJoin('money_currency', 'money_currency.code = shop_product_price.currency_code');*/
-
-            //$query->andWhere(['shop_product_price.type_price_id' => $this->type_price_id]);
-
-
-            /*$query->select([
-                'cms_content_element.*',
-                'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = shop_product_price.currency_code) * shop_product_price.price )'
-            ]);*/
-
-
             if ($this->to) {
                 $query->andHaving(['<=', 'realPrice', $this->to]);
             }
@@ -223,6 +208,7 @@ class PriceFiltersHandler extends Model
 
         return $this;
     }
+
     public function render(ActiveForm $form)
     {
         return \Yii::$app->view->render($this->viewFile, [
