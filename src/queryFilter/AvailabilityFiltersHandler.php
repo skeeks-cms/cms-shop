@@ -1,9 +1,9 @@
 <?php
 /**
+ * @link https://cms.skeeks.com/
+ * @copyright Copyright (c) 2010 SkeekS
+ * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
- * @link https://skeeks.com/
- * @copyright (c) 2010 SkeekS
- * @date 13.11.2017
  */
 
 namespace skeeks\cms\shop\queryFilter;
@@ -20,11 +20,13 @@ use v3project\yii2\productfilter\IFiltersHandler;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
 use yii\db\QueryInterface;
+use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
- * Class AvailabilityFiltersHandler
- * @package skeeks\cms\shop\queryFilter
+ * @property string $valueAsText
+ *
+ * @author Semenov Alexander <semenov@skeeks.com>
  */
 class AvailabilityFiltersHandler extends Model
     implements IQueryFilterHandler
@@ -88,6 +90,19 @@ class AvailabilityFiltersHandler extends Model
         }
 
         return [];
+    }
+
+    public function getValueAsText()
+    {
+        return (string) ArrayHelper::getValue($this->getOptions(), $this->value);
+    }
+
+    public function getOptions()
+    {
+        return [
+            0 => 'Все',
+            1 => 'В наличии'
+        ];
     }
 
     public function render(ActiveForm $form)
