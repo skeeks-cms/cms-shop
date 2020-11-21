@@ -11,7 +11,9 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\shop\models\ShopUser;
 use skeeks\cms\shop\models\ShopViewedProduct;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
 
@@ -45,6 +47,15 @@ class AdminViewedProductController extends BackendModelStandartController
                     ],
                 ],
                 'grid'    => [
+                    'on init' => function (Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+                        $query->andWhere(['shop_user_id' => ShopUser::find()->select(['id'])->cmsSite()]);
+                    },
+                    
                     'defaultOrder'   => [
                         //'is_created' => SORT_DESC,
                         'created_at' => SORT_DESC,
