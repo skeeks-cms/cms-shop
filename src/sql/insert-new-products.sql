@@ -463,7 +463,8 @@ UPDATE
 	) calc_price ON calc_price.receiver_price_id = price.id
 SET
 	price.`price` = calc_price.calc_price_round,
-	price.`currency_code` = calc_price.sender_currency_code;
+	price.`currency_code` = calc_price.sender_currency_code
+;
 
 
 
@@ -504,7 +505,8 @@ UPDATE
     ) as inner_sp on inner_sp.secondary_product_id = update_sp.id
 SET
     update_sp.`product_type` = inner_sp.main_product_type,
-    update_sp.`offers_pid` = inner_sp.secondary_product_pid;
+    update_sp.`offers_pid` = inner_sp.secondary_product_pid
+;
 
 
 COMMIT;
