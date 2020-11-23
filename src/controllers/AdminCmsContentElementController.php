@@ -1037,6 +1037,14 @@ HTML
 
             //$action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), array_keys($filterFieldsLabels));
         }
+        
+        $visibleColumns = ArrayHelper::merge([
+            'checkbox',
+            'actions',
+            'custom',
+        ], $visibleColumns);
+        $visibleColumns = ArrayHelper::merge($visibleColumns, ['active', 'view']);
+        $action->grid['visibleColumns'] = $visibleColumns;
 
         //Приджоивание магазинных данных
         $action->grid['on init'] = function (Event $event) {
