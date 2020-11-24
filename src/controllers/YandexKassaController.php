@@ -282,8 +282,9 @@ class YandexKassaController extends Controller
                 $receipt['items'][] = $itemData;
             }
             /**
-             * Стоимость доставки так же нужно добавить
+             * Стоимость скидки
              */
+            //todo: тут можно еще подумать, это временное решение
             if ((float)$model->shopOrder->moneyDiscount->amount > 0) {
                 $discountValue = $model->shopOrder->moneyDiscount->amount;
                 foreach ($receipt['items'] as $key => $item)
