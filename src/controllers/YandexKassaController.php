@@ -166,8 +166,6 @@ class YandexKassaController extends Controller
         //$shopOrder->processNotePayment();
 
 
-
-
         $transaction = \Yii::$app->db->beginTransaction();
 
         try {
@@ -204,8 +202,6 @@ class YandexKassaController extends Controller
             \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
             throw $e;
         }
-
-
 
 
         $response = $yandexKassa->buildResponse("paymentAviso", $request['invoiceId'], 0);
@@ -256,15 +252,14 @@ class YandexKassaController extends Controller
                 ];
             }
 
-            foreach ($model->shopOrder->shopOrderItems as $shopOrderItem)
-            {
+            foreach ($model->shopOrder->shopOrderItems as $shopOrderItem) {
                 $itemData = [];
 
                 $itemData['description'] = StringHelper::substr($shopOrderItem->name, 0, 128);
                 $itemData['quantity'] = $shopOrderItem->quantity;
                 $itemData['vat_code'] = 1; //todo: доработать этот момент
                 $itemData['amount'] = [
-                    'value' => $shopOrderItem->money->amount,
+                    'value'    => $shopOrderItem->money->amount,
                     'currency' => 'RUB',
                 ];
 
@@ -274,40 +269,63 @@ class YandexKassaController extends Controller
             /**
              * Стоимость доставки так же нужно добавить
              */
-            if ((float) $model->shopOrder->moneyDelivery->amount > 0) {
+            if ((float)$model->shopOrder->moneyDelivery->amount > 0) {
                 $itemData = [];
                 $itemData['description'] = StringHelper::substr($model->shopOrder->shopDelivery->name, 0, 128);
                 $itemData['quantity'] = 1;
                 $itemData['vat_code'] = 1; //todo: доработать этот момент
                 $itemData['amount'] = [
-                    'value' => $model->shopOrder->moneyDelivery->amount,
+                    'value'    => $model->shopOrder->moneyDelivery->amount,
                     'currency' => 'RUB',
                 ];
 
                 $receipt['items'][] = $itemData;
             }
+            /**
+             * Стоимость доставки так же нужно добавить
+             */
+            if ((float)$model->shopOrder->moneyDiscount->amount > 0) {
+                $discountValue = $model->shopOrder->moneyDiscount->amount;
+                foreach ($receipt['items'] as $key => $item)
+                {
+                    if ($discountValue == 0) {
+                        break;
+                    }
+                    if ($item['amount']['value']) {
+                        if ($item['amount']['value'] >= $discountValue) {
+                            $item['amount']['value'] = $item['amount']['value'] - $discountValue;
+                            $discountValue = 0;
+                        } else {
+                            $item['amount']['value'] = 0;
+                            $discountValue = $discountValue - $item['amount']['value'];
+                        }
+                    }
+                    
+                    $receipt['items'][$key] = $item;
+                }
+
+                //$receipt['items'][] = $itemData;
+            }
         }
-            
+
         $client = new Client();
         $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);
-        $payment = $client->createPayment(
-            array(
-                'receipt' => $receipt,
-                'amount' => array(
-                    'value' => $money->amount,
+        $payment = $client->createPayment([
+                'receipt'      => $receipt,
+                'amount'       => [
+                    'value'    => $money->amount,
                     'currency' => 'RUB',
-                ),
-                'confirmation' => array(
-                    'type' => 'redirect',
+                ],
+                'confirmation' => [
+                    'type'       => 'redirect',
                     'return_url' => $returnUrl,
-                ),
-                'description' => 'Заказ №' . $model->shop_order_id,
-                
-            ),
+                ],
+                'description'  => 'Заказ №'.$model->shop_order_id,
+            ],
             uniqid('', true)
         );
 
-        
+
         \Yii::info(print_r($payment, true), self::class);
 
         if (!$payment->id) {
@@ -315,10 +333,9 @@ class YandexKassaController extends Controller
         }
 
         $model->external_data = [
-            'id' => $payment->id
+            'id' => $payment->id,
         ];
         $model->save();
-
 
 
         /*$paymentId = $payment->id;
@@ -354,7 +371,7 @@ class YandexKassaController extends Controller
          */
         $shopBill = ShopBill::find()->orderBy(['id' => SORT_DESC])->limit(1)->one();
 
-        \Yii::info("Счет: " . print_r($shopBill->toArray(), true), self::class);
+        \Yii::info("Счет: ".print_r($shopBill->toArray(), true), self::class);
 
         /* @var $yandexKassa \skeeks\cms\shop\paySystems\YandexKassaPaySystem */
         /* @var $model \skeeks\cms\shop\models\ShopBill */
@@ -363,7 +380,7 @@ class YandexKassaController extends Controller
         $yandexKassa = $model->shopPaySystem->paySystemHandler;
 
         if ($shopBill->paid_at) {
-            \Yii::info("Счет: " . $shopBill->id . " уже оплаечен", self::class);
+            \Yii::info("Счет: ".$shopBill->id." уже оплаечен", self::class);
             return "Ok";
         }
 
@@ -372,9 +389,9 @@ class YandexKassaController extends Controller
 
         if ($paymentId = ArrayHelper::getValue($shopBill->external_data, 'id')) {
 
-            \Yii::info("Запрос информации о платеже: " . print_r([
-                'shop_id' => $yandexKassa->shop_id,
-                'shop_password' => $yandexKassa->shop_password,
+            \Yii::info("Запрос информации о платеже: ".print_r([
+                    'shop_id'       => $yandexKassa->shop_id,
+                    'shop_password' => $yandexKassa->shop_password,
                 ], true), self::class);
 
 
@@ -382,7 +399,7 @@ class YandexKassaController extends Controller
             $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);
             $payment = $client->getPaymentInfo($paymentId);
 
-            \Yii::info("Информация о платеже в yandex kassa: " . print_r($payment, true), self::class);
+            \Yii::info("Информация о платеже в yandex kassa: ".print_r($payment, true), self::class);
 
             if ($payment->status == "waiting_for_capture") {
 
@@ -390,23 +407,22 @@ class YandexKassaController extends Controller
 
                 $idempotenceKey = uniqid('', true);
                 $response = $client->capturePayment(
-                    array(
-                        'amount' => array(
-                          'value' => $money->amount,
-                          'currency' => 'RUB',
-                        ),
-                    ),
+                    [
+                        'amount' => [
+                            'value'    => $money->amount,
+                            'currency' => 'RUB',
+                        ],
+                    ],
                     $paymentId,
                     $idempotenceKey
                 );
 
-                \Yii::info("Подтверждение оплаты: " . print_r($response, true), self::class);
+                \Yii::info("Подтверждение оплаты: ".print_r($response, true), self::class);
             }
 
             $payment = $client->getPaymentInfo($paymentId);
 
             if ($payment->status == "succeeded") {
-
 
 
                 $transaction = \Yii::$app->db->beginTransaction();
@@ -445,9 +461,6 @@ class YandexKassaController extends Controller
                     \Yii::error($e->getMessage(), YandexKassaPaySystem::class);
                     throw $e;
                 }
-
-
-
 
 
             }
