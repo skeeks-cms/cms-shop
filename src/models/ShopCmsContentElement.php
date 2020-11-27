@@ -28,6 +28,7 @@ use yii\helpers\ArrayHelper;
  * @property string                  $productDescriptionShort
  * @property string                  $productDescriptionFull
  * @property string                  $productName
+ * @property CmsSite                 $cmsSite
  *
  * Class ShopCmsContentElement
  * @package skeeks\cms\shop\models
@@ -209,8 +210,8 @@ class ShopCmsContentElement extends CmsContentElement
      */
     public function asText()
     {
-        return "#" .$this->id . "#" . $this->productName;
-        
+        return "#".$this->id."#".$this->productName;
+
         $text = parent::asText();
 
         $result = [];
@@ -546,7 +547,7 @@ class ShopCmsContentElement extends CmsContentElement
                 foreach (\Yii::$app->shop->offerCmsContentProperties as $cmsContentProperty) {
                     if ($value = $this->relatedPropertiesModel->getAttribute($cmsContentProperty->code)) {
                         if ($measure = $cmsContentProperty->cmsMeasure) {
-                            $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code) . $measure->symbol);
+                            $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code).$measure->symbol);
                         } else {
 
                             $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code));
@@ -557,7 +558,7 @@ class ShopCmsContentElement extends CmsContentElement
             }
 
             if ($result) {
-                $name = trim($name) . ", " . implode(", ", $result);
+                $name = trim($name).", ".implode(", ", $result);
             }
         }
 
@@ -583,7 +584,7 @@ class ShopCmsContentElement extends CmsContentElement
                 foreach (\Yii::$app->shop->offerCmsContentProperties as $cmsContentProperty) {
                     if ($value = $this->relatedPropertiesModel->getAttribute($cmsContentProperty->code)) {
                         if ($measure = $cmsContentProperty->cmsMeasure) {
-                            $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code) . $measure->symbol);
+                            $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code).$measure->symbol);
                         } else {
 
                             $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code));
@@ -594,7 +595,7 @@ class ShopCmsContentElement extends CmsContentElement
             }
 
             if ($result) {
-                $name = trim($name) . ", " . implode(", ", $result);
+                $name = trim($name).", ".implode(", ", $result);
             }
         }
 

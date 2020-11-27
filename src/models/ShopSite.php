@@ -27,6 +27,8 @@ use yii\helpers\ArrayHelper;
  * @property int         $is_show_quantity_product Показывать оставшееся количество товаров на складе?
  * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
  * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
+ * @property int         $is_allow_edit_products Разрешено редактировать и добавлять товары?
+ * @property int         $is_show_product_no_main
  *
  * @property CmsSite     $cmsSite
  * @property CmsTree     $catalogCmsTree
@@ -49,12 +51,12 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::behaviors(), [
             Implode::class => [
-                'class' => Implode::class,
+                'class'  => Implode::class,
                 'fields' => [
                     'show_filter_property_ids',
                     'open_filter_property_ids',
-                ]
-            ]
+                ],
+            ],
         ]);
     }
     /**
@@ -104,6 +106,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     'is_show_button_no_price',
                     'is_show_product_only_quantity',
                     'is_show_quantity_product',
+                    'is_allow_edit_products',
+                    'is_show_product_no_main',
                 ],
                 'boolean',
             ],
@@ -130,6 +134,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
+            'is_allow_edit_products'        => "Разрешено редактировать и добавлять товары?",
+            'is_show_product_no_main'       => "Показывать товары на сайте без информационной карточки?",
         ]);
     }
 
@@ -150,6 +156,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
             'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
             'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
+            'is_show_product_no_main'       => "Если выбрано «да», то на сайте будут показываться все созданные товары, в том числе и которые не пирвязаны к информационной карточке.",
 
         ]);
     }

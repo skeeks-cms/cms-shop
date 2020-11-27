@@ -7,6 +7,7 @@
  */
 return [
 
+    'bootstrap' => ['shop'],
     'components' => [
         'shop'        => [
             'class' => 'skeeks\cms\shop\components\ShopComponent',

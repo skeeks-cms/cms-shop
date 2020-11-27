@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
+use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
@@ -75,6 +76,13 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
+
+                "view" => [
+                    'class'    => BackendModelAction::class,
+                    'priority' => 80,
+                    'name' => 'Карточка',
+                    'icon' => 'fas fa-info-circle'
+                ],
 
                 "offers" => [
                     'class'                  => BackendGridModelRelatedAction::class,
@@ -187,6 +195,16 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         if ($model->shopProduct->offers_pid) {
                             return false;
                         }
+                        
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+                        //Если сайт поставщик убираем эту кнопку
+                        if ($site->shopSite->is_supplier) {
+                            return false;
+                        }
 
                         return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
 
@@ -196,9 +214,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 "connect-to-main" => [
 
                     'class'    => BackendModelUpdateAction::class,
-                    "name"     => "Привязать к главному",
+                    "name"     => "Инфо карточка",
                     "icon"     => "fas fa-link",
                     'priority' => 90,
+
 
                     'on initFormModels' => function (Event $e) {
                         $model = $e->sender->model;
@@ -251,7 +270,8 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                                     'class'   => HtmlBlock::class,
                                     'content' => <<<HTML
 <div class="text-center g-ma-20">
-<a href="{$url}" data-pjax='0' class="btn btn-xxl btn-primary">Создать главный товар</a>
+    <a href="{$url}" data-pjax='0' class="btn btn-xxl btn-primary">Создать информационную карточку</a>
+    
 </div>
 HTML
                                     ,
@@ -283,7 +303,7 @@ HTML
                          */
                         $site = $model->cmsSite;
                         //Показываем только для сайтов которые являются поставщиками
-                        if (!$site->shopSite->is_supplier) {
+                        if (!$site->shopSite->is_supplier && !$site->shopSite->is_receiver) {
                             return false;
                         }
 
@@ -352,6 +372,28 @@ HTML
                                 'label' => ['skeeks/cms', 'Copy files?'],
                             ],
                         ];
+                    },
+                    
+                    
+                    'accessCallback'  => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+                        //Если сайт поставщик убираем эту кнопку
+                        if ($site->shopSite->is_supplier) {
+                            return false;
+                        }
+                        return \Yii::$app->user->can($this->permissionName."/copy", ['model' => $model]);
                     },
                 ],
 
@@ -430,6 +472,24 @@ HTML
                     },
                     'accessCallback' => function (BackendModelAction $action) {
                         $model = $action->model;
+                        
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+                        //Если сайт поставщик убираем эту кнопку
+                        if ($site->shopSite->is_supplier) {
+                            return false;
+                        }
+                        
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                 ],
@@ -438,6 +498,22 @@ HTML
                     'class'          => BackendGridModelRelatedAction::class,
                     'accessCallback' => function (BackendModelAction $action) {
                         $model = $action->model;
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+                        //Если сайт поставщик убираем эту кнопку
+                        if ($site->shopSite->is_supplier) {
+                            return false;
+                        }
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
 
@@ -464,6 +540,22 @@ HTML
                     'class'           => BackendGridModelRelatedAction::class,
                     'accessCallback'  => function (BackendModelAction $action) {
                         $model = $action->model;
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+                        //Если сайт поставщик убираем эту кнопку
+                        if ($site->shopSite->is_supplier) {
+                            return false;
+                        }
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                     'name'            => ['skeeks/shop/app', 'In baskets'],
@@ -527,6 +619,26 @@ HTML
                         $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
                     },
+                    'accessCallback'  => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+                        //Если сайт поставщик убираем эту кнопку
+                        if ($site->shopSite->is_supplier) {
+                            return false;
+                        }
+                        return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
+                    },
                 ],
 
                 "update-data" => [
@@ -540,6 +652,18 @@ HTML
 
                         return \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
                     },
+                ],
+
+                "create" => [
+
+                    'accessCallback' => function (BackendAction $action) {
+                    
+                        if (!\Yii::$app->skeeks->site->shopSite->is_allow_edit_products) {
+                            return false;
+                        }
+                        
+                        return \Yii::$app->user->can($this->permissionName . "/create");
+                    }
                 ],
 
                 "update" => [
@@ -559,19 +683,19 @@ HTML
                             return false;
                         }
 
-                        if ($model->cmsSite->shopSite->is_supplier) {
+                        if (!$model->cmsSite->shopSite->is_allow_edit_products) {
                             return false;
                         }
                         
-                        if ($model->cmsSite->shopSite->is_receiver) {
+                        /*if ($model->cmsSite->shopSite->is_receiver) {
                             return false;
-                        }
+                        }*/
                         /*if ($model->shopProduct->main_pid) {
                             return false;
                         }*/
 
-                        return true;
-                        //return \Yii::$app->user->can($this->permissionName . "/" . $this->action->id, ['model' => $action->model]);
+                        //return true;
+                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $action->model]);
                     },
                 ],
 

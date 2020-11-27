@@ -26,14 +26,14 @@ $shopSellerProducts = [];
                 ]);
                 ?>
                 <span style="color: green; font-size: 17px;">
-                        <i class="fas fa-link" style="width: 20px;" title="Привязан к главному товару! <?= $model->shopProduct->shopMainProduct->asText; ?>"></i>
+                        <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Привязан к информационной карточке! <?= $model->shopProduct->shopMainProduct->asText; ?>"></i>
                     </span>
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
             </div>
-        <? elseif ($model->cmsSite->shopSite->is_supplier) : ?>
+        <? elseif ($model->cmsSite->shopSite->is_supplier || $model->cmsSite->shopSite->is_receiver) : ?>
             <div class="my-auto text-center" style="margin-right: 5px;">
                 <span style="color: red; font-size: 17px;">
-                    <i class="fas fa-link" style="width: 20px;" title="Не привязан к главному товару"></i>
+                    <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Не привязан к информационной карточке"></i>
                 </span>
             </div>
         <? endif; ?>

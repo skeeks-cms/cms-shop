@@ -96,21 +96,25 @@ $allProducts = $qProducts
                     <tr>
                         <td style="width: 400px;">
                             <?php $user = \skeeks\cms\models\CmsUser::findOne($data['created_by']); ?>
-                            <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                'controllerId' => 'cms/admin-user',
-                                'modelId' => $user->id
-                            ]); ?>
-                            <div class="d-flex flex-row">
-                                <div class="my-auto" style="margin-right: 5px;">
-                                    <img src='<?= $user->avatarSrc ? $user->avatarSrc : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 25px; max-height: 25px; border-radius: 50%;'/>
-                                </div>
-                                <div class="my-auto">
-                                    <div style="overflow: hidden; max-height: 40px; text-align: left;">
-                                        <?= $user->shortDisplayName; ?>
+                            <?php if($user) : ?>
+                                <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => 'cms/admin-user',
+                                    'modelId' => $user->id
+                                ]); ?>
+                                <div class="d-flex flex-row">
+                                    <div class="my-auto" style="margin-right: 5px;">
+                                        <img src='<?= $user->avatarSrc ? $user->avatarSrc : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 25px; max-height: 25px; border-radius: 50%;'/>
+                                    </div>
+                                    <div class="my-auto">
+                                        <div style="overflow: hidden; max-height: 40px; text-align: left;">
+                                            <?= $user->shortDisplayName; ?>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <? $widget::end(); ?>
+                                <? $widget::end(); ?>
+                            <?php else: ?>
+                                не пользователь
+                            <?php endif; ?>
                         </td>
                         <td>
                             <b><?php echo $data['count']; ?></b>

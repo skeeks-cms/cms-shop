@@ -15,7 +15,6 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\modules\cms\money\models\Currency;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
-use yii\base\InvalidConfigException;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -274,7 +273,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $this->main_pid_by = null;
             }
         }
-
 
 
     }
@@ -587,40 +585,62 @@ class ShopProduct extends \skeeks\cms\models\Core
                         self::TYPE_OFFER,
                     ])) {
                         $this->addError("main_pid", "Родительский товар должен быть простым или предложением.");
+                        return false;
                     }
 
                     if (!$shopProduct->cmsContentElement) {
                         $this->addError("main_pid", "С родительским товаром проблемы");
+                        return false;
                     }
 
                     if (!$shopProduct->cmsContentElement->cmsSite->is_default) {
                         $this->addError("main_pid", "Родительский товар, должен относится к главному порталу!!!");
+                        return false;
+                    }
+
+                    //Это товар принадлежит сайту получателю
+                    if ($this->cmsContentElement->cmsSite->shopSite->is_receiver) {
+                        if ($exist = ShopCmsContentElement::find()->cmsSite()->joinWith('shopProduct as sp')->andWhere(['sp.main_pid' => $this->main_pid])->one()) {
+                            $this->addError("main_pid", "Вы пытаетесь привязать товар к инфо карточке, которая уже есть на вашем сайте. id=".$exist->id);
+                            return false;
+                        }
                     }
                 },
             ],
 
-            [['main_pid_at'], 'default', 'value' => function() {
-                if ($this->main_pid) {
-                    return time();
-                }
-
-                return null;
-            }],
-
-            [['main_pid_by'], 'default', 'value' => function() {
-                if ($this->main_pid) {
-                    if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
-                        return \Yii::$app->user->id;
+            [
+                ['main_pid_at'],
+                'default',
+                'value' => function () {
+                    if ($this->main_pid) {
+                        return time();
                     }
-                }
 
-                return null;
-            }],
+                    return null;
+                },
+            ],
+
+            [
+                ['main_pid_by'],
+                'default',
+                'value' => function () {
+                    if ($this->main_pid) {
+                        if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
+                            return \Yii::$app->user->id;
+                        }
+                    }
+
+                    return null;
+                },
+            ],
 
             [['offers_pid'], 'integer'],
-            [['offers_pid'], function($attribute) {
+            [
+                ['offers_pid'],
+                function ($attribute) {
 
-            }],
+                },
+            ],
         ];
     }
     /**
@@ -645,12 +665,13 @@ class ShopProduct extends \skeeks\cms\models\Core
             'length'            => \Yii::t('skeeks/shop/app', 'Length'),
             'height'            => \Yii::t('skeeks/shop/app', 'Height'),
             'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
-            'main_pid'          => \Yii::t('skeeks/shop/app', 'Главный товар'),
+            'main_pid'          => \Yii::t('skeeks/shop/app', 'Инфо карточка'),
 
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
             'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
         ];
     }
+
 
     public function attributeHints()
     {
@@ -1037,14 +1058,59 @@ class ShopProduct extends \skeeks\cms\models\Core
                 ["shopProductRelations1.shop_product2_id" => $this->id],
                 ["shopProductRelations2.shop_product1_id" => $this->id],
                 ["shopProductRelations2.shop_product2_id" => $this->id],
-            ])
-        ;
+            ]);
 
         $q->multiple = true;
 
         return $q;
     }
 
+
+    /**
+     * Получить цену по товару
+     *
+     * @param ShopTypePrice|int $shopTypePrice
+     * @return ShopProductPrice|null
+     */
+    public function getPrice($shopTypePrice)
+    {
+        $typePriceId = null;
+        if ($shopTypePrice instanceof ShopTypePrice) {
+            $typePriceId = $shopTypePrice->id;
+        } else {
+            $typePriceId = (int)$shopTypePrice;
+        }
+
+        if (!$productPrice = $this->getShopProductPrices()->andWhere([
+            'type_price_id' => $typePriceId,
+        ])->one()) {
+            return null;
+        }
+
+        return $productPrice;
+    }
+
+    /**
+     * @param $shopStore
+     * @return ShopStoreProduct|null
+     */
+    public function getStoreProduct($shopStore)
+    {
+        $typePriceId = null;
+        if ($shopStore instanceof ShopStore) {
+            $typePriceId = $shopStore->id;
+        } else {
+            $typePriceId = (int)$shopStore;
+        }
+
+        if (!$productPrice = $this->getShopStoreProducts()->andWhere([
+            'shop_store_id' => $typePriceId,
+        ])->one()) {
+            return null;
+        }
+
+        return $productPrice;
+    }
 
     /**
      * @param      $shopTypePrice
@@ -1058,23 +1124,23 @@ class ShopProduct extends \skeeks\cms\models\Core
         if ($shopTypePrice instanceof ShopTypePrice) {
             $typePriceId = $shopTypePrice->id;
         } else {
-            $typePriceId = (int) $shopTypePrice;
+            $typePriceId = (int)$shopTypePrice;
         }
 
         if (!$typePriceId) {
             throw new InvalidArgumentException("Need type price id");
         }
-        
+
         if (!$productPrice = $this->getShopProductPrices()->andWhere([
-            'type_price_id' => $typePriceId
+            'type_price_id' => $typePriceId,
         ])->one()) {
             $productPrice = new ShopProductPrice();
             $productPrice->product_id = $this->id;
             $productPrice->type_price_id = $typePriceId;
         }
-        
+
         $productPrice->price = $value;
-        
+
         if ($curencyCode) {
             $productPrice->currency_code = $curencyCode;
         }
@@ -1082,7 +1148,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         if (!$productPrice->save()) {
             throw new Exception(print_r($productPrice->errors, true));
         }
-        
+
         return $productPrice;
     }
 }

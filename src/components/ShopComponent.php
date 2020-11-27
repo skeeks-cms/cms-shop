@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\shop\components;
 
+use skeeks\cms\admin\AdminComponent;
+use skeeks\cms\backend\BackendComponent;
 use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
@@ -19,10 +21,13 @@ use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\shop\models\ShopUser;
+use yii\base\BootstrapInterface;
 use yii\base\Component;
+use yii\base\Event;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
+use yii\web\Application;
 use yii\widgets\ActiveForm;
 
 /**
@@ -39,7 +44,7 @@ use yii\widgets\ActiveForm;
  *
  * @property CmsContent           $shopContents
  */
-class ShopComponent extends Component
+class ShopComponent extends Component implements BootstrapInterface
 {
     const SESSION_SHOP_USER_NAME = 'SKEEKS_CMS_SHOP_USER';
 
@@ -66,6 +71,60 @@ class ShopComponent extends Component
      */
     private $_shopUser = null;
 
+
+    public function bootstrap($application)
+    {
+        if ($application instanceof Application) {
+            Event::on(BackendComponent::class, "beforeRun", function (Event $e) {
+                $backendComponent = $e->sender;
+                //Если это сайт поставщика, у него будет свое меню
+                if ($backendComponent instanceof AdminComponent && \Yii::$app->skeeks->site->shopSite->is_supplier) {
+                    ArrayHelper::remove($backendComponent->menu->data, 'dashboard');
+                    ArrayHelper::remove($backendComponent->menu->data, 'content');
+                    ArrayHelper::remove($backendComponent->menu->data, 'site-users');
+
+                    $exportImport = ArrayHelper::getValue($backendComponent->menu->data, 'exportImport');
+
+                    $backendComponent->menu->data = [
+                        'tree'   => [
+                            'priority' => 100,
+                            "label"    => \Yii::t('skeeks/cms', "Sections"),
+                            "url"      => ["cms/admin-tree"],
+                            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
+                        ],
+                        'shop'   => self::getAdminShopProductsMenu(),
+                        'import' => [
+                            "label" => \Yii::t('skeeks/import', "Import"),
+                            "img"   => ['\skeeks\cms\import\assets\ImportAsset', 'icons/import.png'],
+                            "url"   => ["cmsImport/admin-import-task"],
+                        ],
+                        'agents' => [
+                            "name"  => ['skeeks/agent', "Agents"],
+                            "url"   => ["cmsAgent/admin-cms-agent"],
+                            "image" => ['skeeks\cms\agent\assets\CmsAgentAsset', 'icons/clock.png'],
+                        ],
+                        'stores' => [
+                            "label" => \Yii::t('skeeks/shop/app', 'Склады'),
+                            "url"   => ["shop/admin-shop-store"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+                        ],
+                        'prices' => [
+                            "label" => \Yii::t('skeeks/shop/app', 'Цены'),
+                            "url"   => ["shop/admin-type-price"],
+                            'icon'  => "fas fa-dollar-sign",
+                        ],
+                        'supplier' => [
+                            "label" => \Yii::t('skeeks/shop/app', 'Свойства поставщика'),
+                            "url"   => ["shop/admin-shop-supplier-property"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
+                        ],
+                    ];
+
+
+                }
+            });
+        }
+    }
 
     /**
      * Можно задать название и описание компонента
@@ -365,22 +424,28 @@ class ShopComponent extends Component
      */
     public function filterBaseContentElementQuery(ActiveQuery $activeQuery)
     {
-        $activeQuery->joinWith("shopProduct as sp");
-        //$activeQuery->leftJoin('shop_product', '`shop_product`.`id` = `cms_content_element`.`id`');
+        $this
+            ->filterByTypeContentElementQuery($activeQuery)
+            ->filterByPriceContentElementQuery($activeQuery)
+            ->filterByMainPidContentElementQuery($activeQuery)
+        ;
 
+        return $this;
+    }
+
+
+    /**
+     * @param ActiveQuery $activeQuery
+     * @return $this
+     */
+    public function filterByTypeContentElementQuery(ActiveQuery $activeQuery)
+    {
+        $activeQuery->joinWith("shopProduct as sp");
         $activeQuery->andWhere([
             '!=',
             'sp.product_type',
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
-
-
-        /*if ($this->is_show_products_has_main) {
-            $activeQuery->andWhere(
-                ['is not', 'shopProduct.main_pid', null]
-            );
-        }*/
-
         return $this;
     }
 
@@ -397,6 +462,22 @@ class ShopComponent extends Component
         if (!\Yii::$app->skeeks->site->shopSite->is_show_product_no_price) {
             $activeQuery->joinWith('shopProduct.shopProductPrices as pricesFilter');
             $activeQuery->andWhere(['>', '`pricesFilter`.price', 0]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ActiveQuery $activeQuery
+     * @return $this
+     */
+    public function filterByMainPidContentElementQuery(ActiveQuery $activeQuery)
+    {
+        if (\Yii::$app->skeeks->site->shopSite->is_receiver && !\Yii::$app->skeeks->site->shopSite->is_show_product_no_main) {
+            $activeQuery->joinWith("shopProduct as sp");
+            $activeQuery->andWhere(
+                ['is not', 'sp.main_pid', null]
+            );
         }
 
         return $this;
@@ -926,4 +1007,74 @@ SQL
     {
         return $this->shopUser;
     }
+
+
+    /**
+     * Возвращает данные для меню товаров в админке
+     * @return array|mixed
+     */
+    static public function getAdminShopProductsMenu()
+    {
+        $result = [];
+
+        try {
+            $table = \skeeks\cms\models\CmsContent::getTableSchema();
+            $table = \skeeks\cms\shop\models\ShopContent::getTableSchema();
+        } catch (\Exception $e) {
+            return $result;
+        }
+
+        if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
+            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id',
+                'content_id'),
+        ])->all()
+        ) {
+            /**
+             * @var $content \skeeks\cms\models\CmsContent
+             */
+            foreach ($contents as $content) {
+                $itemData = [
+                    'label'          => $content->name,
+                    "img"            => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+                    'url'            => ["shop/admin-cms-content-element", "content_id" => $content->id],
+                    "activeCallback" => function ($adminMenuItem) use ($content) {
+                        return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element');
+                    },
+
+                    "accessCallback" => function ($adminMenuItem) use ($content) {
+                        $permissionNames = "shop/admin-cms-content-element__".$content->id;
+                        foreach ([$permissionNames] as $permissionName) {
+                            if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
+                                if (!\Yii::$app->user->can($permission->name)) {
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return true;
+                    },
+                ];
+
+                $result[] = $itemData;
+            }
+        }
+
+        if (count($result) > 1) {
+            return [
+                'priority' => 20,
+                'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
+                "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+
+                'items' => $result,
+            ];
+        } else {
+            if (isset($result[0])) {
+                $result[0]['priority'] = 20;
+                return $result[0];
+            }
+
+            return [];
+        }
+    }
+
 }

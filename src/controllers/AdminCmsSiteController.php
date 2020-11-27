@@ -52,7 +52,6 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                         $query->groupBy(CmsSite::tableName().".id");
 
 
-
                         $shopTypePricesQuery = ShopTypePrice::find()->select(['count(*) as inner_count'])->where([
                             'cms_site_id' => new Expression(CmsSite::tableName().".id"),
                         ]);
@@ -126,13 +125,13 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
 
                     'columns' => [
                         'is_supplier' => [
-                            'label'  => 'Поставщик?',
+                            'label' => 'Поставщик?',
                             'value' => function (CmsSite $model) {
                                 return $model->shopSite->is_supplier ? "Да" : "";
                             },
                         ],
                         'is_receiver' => [
-                            'label'  => 'Получает товары?',
+                            'label' => 'Получает товары?',
                             'value' => function (CmsSite $model) {
                                 return $model->shopSite->is_receiver ? "Да" : "";
                             },
@@ -207,15 +206,23 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                 'class'  => FieldSet::class,
                 'name'   => 'Эти поля не могут редатировать владельцы сайтов',
                 'fields' => [
-                    'shopSite.is_supplier'          => [
+                    'shopSite.is_supplier'             => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'shopSite.is_receiver'          => [
+                    'shopSite.is_allow_edit_products'  => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'shopSite.description_internal' => [
+                    'shopSite.is_receiver'             => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'shopSite.is_show_product_no_main' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'shopSite.description_internal'    => [
                         'class'       => WidgetField::class,
                         'widgetClass' => Ckeditor::class,
                     ],

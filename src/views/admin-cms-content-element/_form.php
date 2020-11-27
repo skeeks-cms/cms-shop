@@ -81,143 +81,150 @@ JS
         </div>
 
 
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-main', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-
-
-        <?= $this->render('_form-shop', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-            'shopProduct'        => $shopProduct,
-            'productPrices'        => $productPrices,
-            'shopStoreProducts'        => $shopStoreProducts,
-            'shopContent'        => $shopContent,
-            'shopSubproductContentElement'        => $shopSubproductContentElement,
-        ]); ?>
-
-
-
-
-
-
-
-        <? if (!$model->isNewRecord) : ?>
-            <? /*= $form->fieldSet(\Yii::t('skeeks/shop/app','Additionally')); */ ?><!--
-        <? /*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */ ?>
-    --><? /*= $form->fieldSetEnd() */ ?>
-
-            <? if ($model->cmsContent->is_access_check_element) : ?>
-                <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
-                <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
-                    'permissionName'        => $model->permissionName,
-                    'permissionDescription' => \Yii::t('skeeks/shop/app', 'Access to this member').': '.$model->name,
-                    'label'                 => \Yii::t('skeeks/shop/app', 'Access to this member'),
-                ]); ?>
-                <? $fieldSet::end(); ?>
-            <? endif; ?>
-        <? endif; ?>
-
-        <? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
-                '!=',
-                'id',
-                $shopContent->childrenContent->id,
-            ])->all()
-        ) : ?>
-
-            <? $childContents = $model->cmsContent->getChildrenContents()->andWhere([
-                '!=',
-                'id',
-                $shopContent->childrenContent->id,
-            ])->all(); ?>
-
-            <? foreach ($childContents as $childContent) : ?>
-                <? $fieldSet = $form->fieldSet($childContent->name); ?>
-
-                <? if ($model->isNewRecord) : ?>
-
-                    <?= \yii\bootstrap\Alert::widget([
-                        'options' =>
-                            [
-                                'class' => 'alert-warning',
-                            ],
-                        'body'    => \Yii::t('skeeks/shop/app', 'Management will be available after saving'),
+        <?php if($shopProduct->main_pid) : ?>
+            
+        <?php else : ?>
+        
+            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-main', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+            ]); ?>
+    
+            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+            ]); ?>
+    
+    
+            <?= $this->render('_form-shop', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+                'shopProduct'        => $shopProduct,
+                'productPrices'        => $productPrices,
+                'shopStoreProducts'        => $shopStoreProducts,
+                'shopContent'        => $shopContent,
+                'shopSubproductContentElement'        => $shopSubproductContentElement,
+            ]); ?>
+    
+    
+    
+    
+    
+    
+    
+            <? if (!$model->isNewRecord) : ?>
+                <? /*= $form->fieldSet(\Yii::t('skeeks/shop/app','Additionally')); */ ?><!--
+            <? /*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */ ?>
+        --><? /*= $form->fieldSetEnd() */ ?>
+    
+                <? if ($model->cmsContent->is_access_check_element) : ?>
+                    <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
+                    <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
+                        'permissionName'        => $model->permissionName,
+                        'permissionDescription' => \Yii::t('skeeks/shop/app', 'Access to this member').': '.$model->name,
+                        'label'                 => \Yii::t('skeeks/shop/app', 'Access to this member'),
                     ]); ?>
-                <? else: ?>
-
-                    <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                        'label'       => $childContent->name,
-                        'namespace'   => md5($model->className().$childContent->id),
-                        'parentModel' => $model,
-                        'relation'    => [
-                            'content_id'                => $childContent->id,
-                            'parent_content_element_id' => $model->id,
-                        ],
-
-                        'sort' => [
-                            'defaultOrder' =>
-                                [
-                                    'priority' => 'published_at',
-                                ],
-                        ],
-
-                        'controllerRoute' => '/shop/admin-cms-content-element',
-                        'gridViewOptions' => [
-                            'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
-                        ],
-                    ]); ?>
-
+                    <? $fieldSet::end(); ?>
                 <? endif; ?>
+            <? endif; ?>
+    
+            <? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
+                    '!=',
+                    'id',
+                    $shopContent->childrenContent->id,
+                ])->all()
+            ) : ?>
+    
+                <? $childContents = $model->cmsContent->getChildrenContents()->andWhere([
+                    '!=',
+                    'id',
+                    $shopContent->childrenContent->id,
+                ])->all(); ?>
+    
+                <? foreach ($childContents as $childContent) : ?>
+                    <? $fieldSet = $form->fieldSet($childContent->name); ?>
+    
+                    <? if ($model->isNewRecord) : ?>
+    
+                        <?= \yii\bootstrap\Alert::widget([
+                            'options' =>
+                                [
+                                    'class' => 'alert-warning',
+                                ],
+                            'body'    => \Yii::t('skeeks/shop/app', 'Management will be available after saving'),
+                        ]); ?>
+                    <? else: ?>
+    
+                        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                            'label'       => $childContent->name,
+                            'namespace'   => md5($model->className().$childContent->id),
+                            'parentModel' => $model,
+                            'relation'    => [
+                                'content_id'                => $childContent->id,
+                                'parent_content_element_id' => $model->id,
+                            ],
+    
+                            'sort' => [
+                                'defaultOrder' =>
+                                    [
+                                        'priority' => 'published_at',
+                                    ],
+                            ],
+    
+                            'controllerRoute' => '/shop/admin-cms-content-element',
+                            'gridViewOptions' => [
+                                'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
+                            ],
+                        ]); ?>
+    
+                    <? endif; ?>
+    
+    
+                    <? $fieldSet::end(); ?>
+                <? endforeach; ?>
+            <? endif; ?>
+    
+    
+    
+    
+    
+            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+            ]); ?>
+            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+            ]); ?>
+    
+    
+            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+            ]); ?>
+    
+            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-seo', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+            ]); ?>
+    
+    
+            <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
+                'form'         => $form,
+                'contentModel' => $contentModel,
+                'model'        => $model,
+            ]); ?>
 
+        <?php endif; ?>
 
-                <? $fieldSet::end(); ?>
-            <? endforeach; ?>
-        <? endif; ?>
-
-
-
-
-
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-detail', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-
-
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-seo', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-
-
-        <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
-            'form'         => $form,
-            'contentModel' => $contentModel,
-            'model'        => $model,
-        ]); ?>
-
+        
         <?= $form->buttonsStandart($model); ?>
         <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
         <?php $form::end(); ?>

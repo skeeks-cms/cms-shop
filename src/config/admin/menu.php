@@ -11,71 +11,6 @@
  * Меню контента
  * @return array
  */
-function shopProductsMenu()
-{
-    $result = [];
-
-    try {
-        $table = \skeeks\cms\models\CmsContent::getTableSchema();
-        $table = \skeeks\cms\shop\models\ShopContent::getTableSchema();
-    } catch (\Exception $e) {
-        return $result;
-    }
-
-    if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
-        'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id',
-            'content_id'),
-    ])->all()
-    ) {
-        /**
-         * @var $content \skeeks\cms\models\CmsContent
-         */
-        foreach ($contents as $content) {
-            $itemData = [
-                'label'          => $content->name,
-                "img"            => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
-                'url'            => ["shop/admin-cms-content-element", "content_id" => $content->id],
-                "activeCallback" => function ($adminMenuItem) use ($content) {
-                    return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element');
-                },
-
-                "accessCallback" => function ($adminMenuItem) use ($content) {
-                    $permissionNames = "shop/admin-cms-content-element__".$content->id;
-                    foreach ([$permissionNames] as $permissionName) {
-                        if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
-                            if (!\Yii::$app->user->can($permission->name)) {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
-                },
-            ];
-
-            $result[] = $itemData;
-        }
-    }
-
-    if (count($result) > 1) {
-        return [
-            'priority' => 20,
-            'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
-            "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
-
-            'items' => $result,
-        ];
-    } else {
-        if (isset($result[0])) {
-            $result[0]['priority'] = 20;
-            return $result[0];
-        }
-
-        return [];
-    }
-}
-
-;
 
 function shopPersonTypes()
 {
@@ -150,7 +85,7 @@ return [
 
             ],
 
-            shopProductsMenu(),
+            \skeeks\cms\shop\components\ShopComponent::getAdminShopProductsMenu(),
 
 
             [
