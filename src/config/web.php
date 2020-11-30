@@ -30,15 +30,16 @@ return [
             'menu' => [
                 'data' => [
                     'shop' => [
-                        'name'  => ['skeeks/shop/app', 'Shop'],
+                        'name'  => ['skeeks/shop/app', 'Orders'],
+                        'url'  => ['/shop/upa-order'],
                         'icon'  => 'fas fa-shopping-cart',
-                        'items' => [
+                        /*'items' => [
                             [
                                 'name' => ['skeeks/shop/app', 'Orders'],
                                 'url'  => ['/shop/upa-order'],
                                 'icon' => 'fas fa-cart-arrow-down',
                             ],
-                        ],
+                        ],*/
                     ],
                 ],
             ],

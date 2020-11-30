@@ -9,12 +9,12 @@ $model = $action->model;
 \skeeks\cms\themes\unify\assets\components\UnifyThemeStickAsset::register($this);
 $this->registerJs(<<<JS
 
-_.delay(function() {
+/*_.delay(function() {
     $(".slick-slide").on("click", function() {
     var jElement = $(this).find(".sx-fancybox-gallary");
     jElement.trigger("click");
 });
-}, 500);
+}, 500);*/
 
 $('[data-fancybox="images"]').fancybox({
     
@@ -22,7 +22,7 @@ $('[data-fancybox="images"]').fancybox({
     autoStart: true, // Display thumbnails on opening
     hideOnClose: true, // Hide thumbnail grid when closing animation starts
     parentEl: ".fancybox-container", // Container is injected into this element
-    axis: "x", // Vertical (y) or horizontal (x) scrolling
+    axis: "y", // Vertical (y) or horizontal (x) scrolling
     
       clickContent: function(current, event) {
         return current.type === "image" ? "zoom" : false;
