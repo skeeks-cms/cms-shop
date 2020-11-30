@@ -32,22 +32,23 @@ $qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
                 'c' => \skeeks\cms\models\CmsContentElement::tableName(),
             ])
             //->cmsSite()
-            ->joinWith('shopProduct as shopProduct')
-            ->joinWith('shopProduct.shopMainProduct as shopMainProduct')
+            ->joinWith('mainCmsContentElement as mainCmsContentElement')
+            //->joinWith('shopProduct.shopMainProduct as shopMainProduct')
     
             ->andWhere(['c.content_id' => $content->id])
             ->andWhere(['is not', 'c.main_cce_by', null])
-            ->andWhere(['!=', 'shopMainProduct.created_at', new \yii\db\Expression("c.main_cce_at")])
+            ->andWhere(['!=', 'mainCmsContentElement.created_at', new \yii\db\Expression("c.main_cce_at")])
     
             ->groupBy(['c.main_cce_by'])
             ->select([
                 'count'      => new \yii\db\Expression("count(1)"),
                 "main_cce_by" => 'c.main_cce_by',
+                "main_cce_id" => 'c.main_cce_id',
                 "id" => 'c.id',
-                //"delta" => new \yii\db\Expression("abs(c.created_at - c.main_cce_at)"),
+                //"delta" => new \yii\db\Expression("abs(mainCmsContentElement.created_at - c.main_cce_at)"),
             ])
             /*->andHaving([
-                '>=', 'delta', 10
+                '>=', 'delta', 1
             ])*/
 ;
 

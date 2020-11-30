@@ -5,8 +5,13 @@
  * @license https://cms.skeeks.com/license/
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-/* @var $this yii\web\View */
-$backendUrl = \yii\helpers\Url::to(['update-all-data']);
+/** 
+* @var $this yii\web\View
+ * @var $context \skeeks\cms\backend\BackendAction
+*/
+$context = $this->context;
+
+$backendUrl = \yii\helpers\Url::to(['update-all-data', 'content_id' => $context->content->id]);
 $this->registerJs(<<<JS
 
 $(".sx-update").on("click", function() {

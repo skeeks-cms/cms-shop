@@ -715,18 +715,18 @@ class ShopProduct extends \skeeks\cms\models\Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopMainProduct()
+    /*public function getShopMainProduct()
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'main_pid'])->from(['shopMainProduct' => ShopProduct::tableName()]);
-    }
+    }*/
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopProductWhithOffers()
+    /*public function getShopProductWhithOffers()
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'offers_pid'])->from(['shopProductWhithOffers' => ShopProduct::tableName()]);
-    }
+    }*/
 
 
     /**

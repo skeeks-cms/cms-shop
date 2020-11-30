@@ -1072,7 +1072,7 @@ HTML
                     }
                 },
             ];
-            $filterFields['is_error'] = [
+            /*$filterFields['is_error'] = [
                 'class'    => SelectField::class,
                 'items'    => [
                     'yes' => 'Ошибочно привязан',
@@ -1082,7 +1082,6 @@ HTML
                 'on apply' => function (QueryFiltersEvent $e) {
                     /**
                      * @var $query ActiveQuery
-                     */
                     $query = $e->dataProvider->query;
 
                     if ($e->field->value) {
@@ -1094,13 +1093,13 @@ HTML
 
                     }
                 },
-            ];
+            ];*/
 
             $filterFieldsLabels['is_ready'] = 'Привязка';
             $filterFieldsRules[] = ['is_ready', 'safe'];
 
-            $filterFieldsLabels['is_error'] = 'Ошибочно привязан';
-            $filterFieldsRules[] = ['is_error', 'safe'];
+            /*$filterFieldsLabels['is_error'] = 'Ошибочно привязан';
+            $filterFieldsRules[] = ['is_error', 'safe'];*/
         }
 
         if (\Yii::$app->skeeks->site->is_default) {
