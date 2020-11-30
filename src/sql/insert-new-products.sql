@@ -96,7 +96,7 @@ INSERT
                                     inner_new_tree.cms_site_id = @site_id
                             ) as new_tree ON new_tree.main_cms_tree_id = source_tree.id
 
-                            LEFT JOIN cms_content_element as ce_current ON ce_current.main_cce_id = ce_main.id AND ce_current.cms_site_id = @site_id
+                            LEFT JOIN cms_content_element as ce_current ON ce_current.main_cce_id = ce_main_with_offers.id AND ce_current.cms_site_id = @site_id
                         WHERE
 
                             /*Импорт только элементов заданных в настройках сайта*/
@@ -502,12 +502,13 @@ UPDATE
             LEFT JOIN shop_product main_sp_parent on main_sp_parent.id = main_sp.offers_pid /*Общие товары портала*/
 
             /*LEFT JOIN shop_product sp_parent on sp_parent.main_pid = main_sp_parent.id*/
-            LEFT JOIN cms_content_element cce_parent on cce_parent.id = main_sp.offers_pid
+            /*LEFT JOIN cms_content_element cce_parent on cce_parent.id = main_sp.offers_pid*/
+            LEFT JOIN cms_content_element cce_parent on cce_parent.main_cce_id = main_sp.offers_pid AND cce_parent.cms_site_id = @site_id
         WHERE
             /*sp.product_type != main_sp.product_type*/ /*Только товары у которых не совпадает тип с порталом*/
             shop_site.is_receiver = 1 /*Касается только сайтов получаетелей*/
             AND cce.cms_site_id = @site_id
-            AND (cce_parent.cms_site_id is null OR cce_parent.cms_site_id = @site_id)
+            /*AND (cce_parent.cms_site_id is null OR cce_parent.cms_site_id = @site_id)*/
     ) as inner_sp on inner_sp.secondary_product_id = update_sp.id
 SET
     update_sp.`product_type` = inner_sp.main_product_type,
