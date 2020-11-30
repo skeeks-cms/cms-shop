@@ -658,6 +658,10 @@ HTML
 
                     'accessCallback' => function (BackendAction $action) {
                     
+                        if (\Yii::$app->request->get("shop_sub_product_id")) {
+                            return \Yii::$app->user->can($this->permissionName . "/create");
+                        }
+                        
                         if (!\Yii::$app->skeeks->site->shopSite->is_allow_edit_products) {
                             return false;
                         }
