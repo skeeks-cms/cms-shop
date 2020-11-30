@@ -245,10 +245,10 @@ class YandexKassaController extends Controller
         $shopBuyer = $model->shopOrder->shopBuyer;
         $receipt = [];
         if ($yandexKassa->is_receipt) {
-            if ($shopBuyer->email) {
+            if (trim($shopBuyer->email)) {
                 $receipt['customer'] = [
-                    'email'     => $shopBuyer->email,
-                    'full_name' => $shopBuyer->name,
+                    'email'     => trim($shopBuyer->email),
+                    'full_name' => trim($shopBuyer->name),
                 ];
             }
 
@@ -256,7 +256,7 @@ class YandexKassaController extends Controller
                 $itemData = [];
 
                 $itemData['description'] = StringHelper::substr($shopOrderItem->name, 0, 128);
-                $itemData['quantity'] = $shopOrderItem->quantity;
+                $itemData['quantity'] = (float) $shopOrderItem->quantity;
                 $itemData['vat_code'] = 1; //todo: доработать этот момент
                 $itemData['amount'] = [
                     'value'    => $shopOrderItem->money->amount,
@@ -281,12 +281,23 @@ class YandexKassaController extends Controller
 
                 $receipt['items'][] = $itemData;
             }
+
+            $totalCalcAmount = 0;
+            foreach ($receipt['items'] as $itemData) {
+                $totalCalcAmount = $totalCalcAmount + $itemData['amount']['value'];
+            }
+
+            $discount = 0;
+            if ($totalCalcAmount > (float) $money->amount) {
+                $discount = (float) $money->amount - $totalCalcAmount;
+            }
+
             /**
              * Стоимость скидки
              */
             //todo: тут можно еще подумать, это временное решение
-            if ((float)$model->shopOrder->moneyDiscount->amount > 0) {
-                $discountValue = $model->shopOrder->moneyDiscount->amount;
+            if ($discount > 0) {
+                $discountValue = $discount;
                 foreach ($receipt['items'] as $key => $item)
                 {
                     if ($discountValue == 0) {
@@ -308,6 +319,19 @@ class YandexKassaController extends Controller
                 //$receipt['items'][] = $itemData;
             }
         }
+
+        /*print_r([
+                'receipt'      => $receipt,
+                'amount'       => [
+                    'value'    => $money->amount,
+                    'currency' => 'RUB',
+                ],
+                'confirmation' => [
+                    'type'       => 'redirect',
+                    'return_url' => $returnUrl,
+                ],
+                'description'  => 'Заказ №'.$model->shop_order_id,
+            ]);die;*/
 
         $client = new Client();
         $client->setAuth($yandexKassa->shop_id, $yandexKassa->shop_password);

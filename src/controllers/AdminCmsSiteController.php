@@ -67,7 +67,7 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                             'cmsContentElement.cms_site_id' => new Expression(CmsSite::tableName().".id"),
                         ])->andWhere([
                             'is not',
-                            'main_pid',
+                            'cmsContentElement.main_cce_id',
                             null,
                         ]);
 

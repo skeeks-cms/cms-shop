@@ -421,10 +421,11 @@ $noValue = "<span style='color: silver;'>—</span>";
     ])->andWhere(['cms_site_id' => $model->cmsSite->id]);
 
     $shopSupplierProducts = [];
-    if ($model->shopProduct->shopMainProduct) {
+    if ($model->mainCmsContentElement) {
         $shopSupplierProducts = [];
 
-        $shopSupplierProducts = $model->shopProduct->shopMainProduct->getShopSupplierProducts()
+        $shopSupplierProducts = $model->mainCmsContentElement->shopProduct->getShopSupplierProducts()
+        //$shopSupplierProducts = $model->shopProduct->shopMainProduct->getShopSupplierProducts()
             ->andWhere(['cmsSite.id' => $q])
             ->all();
     };
@@ -466,8 +467,8 @@ $noValue = "<span style='color: silver;'>—</span>";
 
 <?php
 $infoModel = $model;
-if ($model->shopProduct->main_pid) {
-    $infoModel = $model->shopProduct->shopMainProduct->cmsContentElement;
+if ($model->main_cce_id) {
+    $infoModel = $model->mainCmsContentElement;
 }
 ?>
 

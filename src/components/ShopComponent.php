@@ -17,6 +17,7 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -474,9 +475,12 @@ class ShopComponent extends Component implements BootstrapInterface
     public function filterByMainPidContentElementQuery(ActiveQuery $activeQuery)
     {
         if (\Yii::$app->skeeks->site->shopSite->is_receiver && !\Yii::$app->skeeks->site->shopSite->is_show_product_no_main) {
-            $activeQuery->joinWith("shopProduct as sp");
+            /*$activeQuery->joinWith("shopProduct as sp");
             $activeQuery->andWhere(
                 ['is not', 'sp.main_pid', null]
+            );*/
+            $activeQuery->andWhere(
+                ['is not', ShopCmsContentElement::tableName() . '.main_cce_id', null]
             );
         }
 
@@ -499,13 +503,21 @@ class ShopComponent extends Component implements BootstrapInterface
                 INNER JOIN (
                     /*Товары у которых задан главный товар*/
                     SELECT 
+                        inner_cce.id as inner_sp_id,
+                        inner_cce.main_cce_id as main_cce_id
+                    FROM 
+                        cms_content_element inner_cce 
+                    WHERE 
+                        inner_cce.main_cce_id is not null
+                    /*SELECT 
                         inner_sp.id as inner_sp_id 
                     FROM 
                         shop_product inner_sp 
                     WHERE 
-                        inner_sp.main_pid is not null
+                        inner_sp.main_pid is not null*/
                 ) sp_has_main_pid ON sp_has_main_pid.inner_sp_id = sp.id 
-                LEFT JOIN shop_product as sp_main on sp_main.id = sp.main_pid 
+                /*LEFT JOIN cms_content_element as cce_main on cce_main.id = sp.main_pid*/ 
+                LEFT JOIN shop_product as sp_main on sp_main.id = sp_has_main_pid.main_cce_id 
             SET 
                 sp.`measure_ratio` = sp_main.measure_ratio, 
                 sp.`measure_matches_jsondata` = sp_main.measure_matches_jsondata, 
@@ -542,7 +554,7 @@ SQL
         $content_ids = ArrayHelper::map($this->shopContents, 'id', 'id');
         $content_ids_row = implode(",", $content_ids);
 
-        $result = \Yii::$app->db->createCommand(<<<SQL
+        /*$result = \Yii::$app->db->createCommand(<<<SQL
     DELETE cce_for_delete 
     FROM 
         cms_content_element as cce_for_delete 
@@ -554,14 +566,13 @@ SQL
                 LEFT JOIN cms_content_element as cce on sp.id = cce.id 
                 LEFT JOIN shop_site shop_site on shop_site.id = cce.cms_site_id 
             WHERE 
-                shop_site.is_receiver = 1 
-                /*Касается только сайтов получаетелей*/
-                AND sp.`main_pid` is null
+                shop_site.is_receiver = 1 /*Касается только сайтов получаетелей
+                AND cce.`main_cce_id` is null
                 AND cce.`content_id` in ({$content_ids_row})
-            /*LIMIT 1*/
+            /*LIMIT 1
         ) as not_hav_main_pid ON not_hav_main_pid.id = cce_for_delete.id
 SQL
-        );
+        );*/
 
         //Товары у которых не задан родительский элемент и нет вложенных делаем простыми
         $result = \Yii::$app->db->createCommand(<<<SQL
@@ -674,14 +685,14 @@ UPDATE
 			/* Сайты */
 			LEFT JOIN shop_site as shopSite ON shopSite.id = ce.cms_site_id 
 			/* Модели */
-			LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid 
+			LEFT JOIN shop_product as sp_main ON sp_main.id = ce.main_cce_id 
 			LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id 
 			LEFT JOIN cms_tree as source_tree ON source_tree.id = ce_main.tree_id 
 			/* Разделы товаров на новом сайте */
 			LEFT JOIN cms_tree as new_cms_tree ON new_cms_tree.main_cms_tree_id = ce_main.tree_id 
 		WHERE 
 			shopSite.is_receiver = 1 
-			AND sp.main_pid is not NULL 
+			AND ce.main_cce_id is not NULL 
 			AND new_cms_tree.cms_site_id = ce.cms_site_id 
 			/*AND ce_main.name != ce.name */
 			AND (
@@ -820,18 +831,18 @@ SQL
                 `shop_product` as sp 
                 INNER JOIN
                 (
-                   SELECT inner_sp.main_pid, SUM(inner_sp.quantity) as sum_quantity
+                   SELECT inner_cce.main_cce_id, SUM(inner_sp.quantity) as sum_quantity
                    FROM shop_product as inner_sp
                    LEFT JOIN cms_content_element as inner_cce ON inner_cce.id = inner_sp.id
                    LEFT JOIN cms_site as inner_cms_site_id ON inner_cms_site_id.id = inner_cce.cms_site_id
                    LEFT JOIN shop_site as inner_shop_site ON inner_shop_site.id = inner_cms_site_id.id
-                   WHERE inner_shop_site.is_supplier = 1
-                   GROUP BY inner_sp.main_pid
-                ) sp_has_main ON sp.id = sp_has_main.main_pid
+                   WHERE inner_shop_site.is_supplier = 1 AND inner_cce.main_cce_id is not null
+                   GROUP BY inner_cce.main_cce_id
+                ) sp_has_main ON sp.id = sp_has_main.main_cce_id
             SET 
                 sp.`quantity` = sp_has_main.sum_quantity
             WHERE 
-                sp_has_main.main_pid is not null
+                sp_has_main.main_cce_id is not null
         ")->execute();
 
 
@@ -887,9 +898,12 @@ SQL
                 FROM 
                     cms_content_element as ce 
                     LEFT JOIN shop_product as sp ON sp.id = ce.id 
-                    LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid 
+                    
+                    LEFT JOIN shop_product as sp_main ON sp_main.id = ce.main_cce_id 
+                    
                     LEFT JOIN shop_product as sp_main_with_offers ON sp_main_with_offers.id = sp_main.offers_pid 
                     LEFT JOIN cms_content_element as ce_main_with_offers ON ce_main_with_offers.id = sp_main_with_offers.id 
+                    
                     LEFT JOIN cms_tree as offers_tree ON offers_tree.id = ce_main_with_offers.tree_id 
                 WHERE 
                     
@@ -903,7 +917,7 @@ SQL
                             shop_import_cms_site.cms_site_id = {$cmsSite->id}
                     ) 
                     /*Только товары которые привязаны к моделям*/
-                    AND sp.main_pid is not null 
+                    AND ce.main_cce_id is not null 
                     AND offers_tree.id is not null 
                     AND sp_main_with_offers.product_type = "offers"
                 GROUP BY 
@@ -917,8 +931,10 @@ SQL
                 FROM 
                     cms_content_element as ce 
                     LEFT JOIN shop_product as sp ON sp.id = ce.id 
-                    LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid 
-                    LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id 
+                    
+                    LEFT JOIN cms_content_element as ce_main ON ce_main.id = ce.main_cce_id
+                    LEFT JOIN shop_product as sp_main ON sp_main.id = ce_main.id 
+                    
                     LEFT JOIN cms_tree as tree ON tree.id = ce_main.tree_id 
                 WHERE 
                     
@@ -932,7 +948,7 @@ SQL
                             shop_import_cms_site.cms_site_id = {$cmsSite->id}
                     ) 
                     /*Только товары которые привязаны к моделям*/
-                    AND sp.main_pid is not null 
+                    AND ce.main_cce_id is not null 
                     AND tree.id is not null 
                     AND sp_main.product_type = 'simple'
                 GROUP BY 

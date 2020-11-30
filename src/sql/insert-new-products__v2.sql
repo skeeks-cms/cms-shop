@@ -6,8 +6,8 @@ SET @site_id = {site_id};
 
 
 /* Вставка элементов контента */
-INSERT
-    INTO cms_content_element (`name`,`code`,`content_id`, `main_cce_id`, `tree_id`, `cms_site_id`, `published_at`, `created_at`)
+INSERT IGNORE
+    INTO cms_content_element (`name`,`code`,`content_id`, `external_id`, `tree_id`, `cms_site_id`, `published_at`, `created_at`)
         SELECT
             *
         FROM
@@ -19,6 +19,7 @@ INSERT
                         ce_main.code,
                         ce_main.content_id,
                         ce_main.id,
+
                         /*source_tree.id as source_tree_id,
                                             source_tree.name as source_tree_name,*/
                         new_tree.id as new_tree_id,
@@ -31,8 +32,8 @@ INSERT
                         cms_content_element as ce
                         LEFT JOIN shop_product as sp ON sp.id = ce.id
                         /* Модели */
-                        LEFT JOIN cms_content_element as ce_main ON ce_main.id = ce.main_cce_id
-                        LEFT JOIN shop_product as sp_main ON sp_main.id = ce.main_cce_id
+                        LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
+                        LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
                         LEFT JOIN cms_tree as source_tree ON source_tree.id = ce_main.tree_id
                         /* Разделы товаров на новом сайте */
                         LEFT JOIN (
@@ -44,8 +45,9 @@ INSERT
                                 inner_new_tree.cms_site_id = @site_id
                         ) as new_tree ON new_tree.main_cms_tree_id = source_tree.id
 
-                        LEFT JOIN cms_content_element as ce_current ON ce_current.main_cce_id = ce_main.id AND ce_current.cms_site_id = @site_id
+                        LEFT JOIN shop_product as sp_current ON sp_current.main_pid = ce_main.id
                     WHERE
+
                         /*Импорт только элементов заданных в настройках сайта*/
                         ce.cms_site_id in (
                             SELECT
@@ -56,10 +58,11 @@ INSERT
                                 shop_import_cms_site.cms_site_id = @site_id
                         )
                         /*Только товары которые привязаны к моделям*/
-                        AND ce.main_cce_id is not null
-                        AND ce_current.id is null
+                        AND sp.main_pid is not null
+
+                        AND sp_current.id is null
                     GROUP BY
-                        ce_main.id
+                        sp_main.id
                 )
                 UNION ALL
                     (
@@ -79,8 +82,8 @@ INSERT
                             cms_content_element as ce
                             LEFT JOIN shop_product as sp ON sp.id = ce.id
                             /* Модели */
-                            LEFT JOIN cms_content_element as ce_main ON ce_main.id = ce.main_cce_id
-                            LEFT JOIN shop_product as sp_main ON sp_main.id = ce.main_cce_id
+                            LEFT JOIN shop_product as sp_main ON sp_main.id = sp.main_pid
+                            LEFT JOIN cms_content_element as ce_main ON sp_main.id = ce_main.id
                             /* Общие модели */
                             LEFT JOIN shop_product as sp_main_with_offers ON sp_main_with_offers.id = sp_main.offers_pid
                             LEFT JOIN cms_content_element as ce_main_with_offers ON ce_main_with_offers.id = sp_main_with_offers.id
@@ -95,8 +98,6 @@ INSERT
                                 WHERE
                                     inner_new_tree.cms_site_id = @site_id
                             ) as new_tree ON new_tree.main_cms_tree_id = source_tree.id
-
-                            LEFT JOIN cms_content_element as ce_current ON ce_current.main_cce_id = ce_main.id AND ce_current.cms_site_id = @site_id
                         WHERE
 
                             /*Импорт только элементов заданных в настройках сайта*/
@@ -109,9 +110,8 @@ INSERT
                                     shop_import_cms_site.cms_site_id = @site_id
                             )
                             /*Только товары которые привязаны к моделям*/
-                            AND ce.main_cce_id is not null
+                            AND sp.main_pid is not null
                             AND ce_main_with_offers.id is not null
-                            AND ce_current.id is null
                             /*Только товары которые еще не добавлены на сайт*/
                         GROUP BY
                             ce_main_with_offers.id
@@ -125,9 +125,10 @@ INSERT
 
 /* Вставка товаров с предложениями и простые*/
 INSERT
-    INTO shop_product (`id`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
+    INTO shop_product (`id`,`main_pid`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
 SELECT
 	cce.id,
+	sp_model.id,
 	sp_model.product_type,
 	sp_model.measure_matches_jsondata,
 	sp_model.measure_ratio,
@@ -151,16 +152,16 @@ SELECT
 				WHERE
 					shop_import_cms_site.cms_site_id = @site_id
 			)
-			AND cce_inner.main_cce_id = sp_model.id
+			AND sp_inner.main_pid = sp_model.id
 		GROUP BY
-			cce_inner.main_cce_id
+			sp_inner.main_pid
 	),
     cce_2.id as offers_pid
 	/*sp_model_with_offers.id*/
 FROM
 	cms_content_element as cce
 	LEFT JOIN shop_product as sp ON sp.id = cce.id
-	LEFT JOIN shop_product as sp_model ON sp_model.id = cce.main_cce_id
+	LEFT JOIN shop_product as sp_model ON sp_model.id = cce.external_id
 	LEFT JOIN shop_product as sp_model_with_offers ON sp_model_with_offers.id = sp_model.offers_pid
 	LEFT JOIN (
 		SELECT
@@ -169,7 +170,7 @@ FROM
 			cms_content_element as ce_inner
 		WHERE
 			ce_inner.cms_site_id = @site_id
-	) as cce_2 ON cce_2.main_cce_id = sp_model_with_offers.id
+	) as cce_2 ON cce_2.external_id = sp_model_with_offers.id
 WHERE
 	sp.id is null
 	AND cce.cms_site_id = @site_id
@@ -179,9 +180,10 @@ WHERE
 
 /* Вставка товаров предложений */
 INSERT
-    INTO shop_product (`id`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
+    INTO shop_product (`id`,`main_pid`,`product_type`, `measure_matches_jsondata`, `measure_ratio`, `measure_code`, `width`, `length`, `height`, `weight`, `quantity`, `offers_pid`)
 SELECT
 	cce.id,
+	sp_model.id,
 	sp_model.product_type,
 	sp_model.measure_matches_jsondata,
 	sp_model.measure_ratio,
@@ -205,16 +207,16 @@ SELECT
 				WHERE
 					shop_import_cms_site.cms_site_id = @site_id
 			)
-			AND cce_inner.main_cce_id = sp_model.id
+			AND sp_inner.main_pid = sp_model.id
 		GROUP BY
-			cce_inner.main_cce_id
+			sp_inner.main_pid
 	),
     cce_2.id as offers_pid
 	/*sp_model_with_offers.id*/
 FROM
 	cms_content_element as cce
 	LEFT JOIN shop_product as sp ON sp.id = cce.id
-	LEFT JOIN shop_product as sp_model ON sp_model.id = cce.main_cce_id
+	LEFT JOIN shop_product as sp_model ON sp_model.id = cce.external_id
 	LEFT JOIN shop_product as sp_model_with_offers ON sp_model_with_offers.id = sp_model.offers_pid
 	LEFT JOIN (
 		SELECT
@@ -223,7 +225,7 @@ FROM
 			cms_content_element as ce_inner
 		WHERE
 			ce_inner.cms_site_id = @site_id
-	) as cce_2 ON cce_2.main_cce_id = sp_model_with_offers.id
+	) as cce_2 ON cce_2.external_id = sp_model_with_offers.id
 WHERE
 	sp.id is null
 	AND cce.cms_site_id = @site_id
@@ -257,17 +259,17 @@ UPDATE
                         WHERE
                             shop_import_cms_site.cms_site_id = @site_id
                     )
-                    AND cce_inner.main_cce_id = sp_model.id
+                    AND sp_inner.main_pid = sp_model.id
                 GROUP BY
-                    cce_inner.main_cce_id
+                    sp_inner.main_pid
             ) as calc_quantity
         FROM
             shop_product as sp
             LEFT JOIN cms_content_element as cce ON sp.id = cce.id
-            LEFT JOIN shop_product as sp_model ON sp_model.id = cce.main_cce_id
+            LEFT JOIN shop_product as sp_model ON sp.main_pid = sp_model.id
         WHERE
             cce.cms_site_id = @site_id
-            AND cce.main_cce_id IS NOT NULL
+            AND sp.main_pid IS NOT NULL
             AND sp.product_type != 'offers'
 
 
@@ -321,7 +323,7 @@ FROM (
         /*товары связанные с ценами*/
         LEFT JOIN cms_content_element as cce on cce.id = sp.id
         /*элементы контента к этим товарам*/
-        INNER JOIN shop_product as main_sp on main_sp.id = cce.main_cce_id
+        INNER JOIN shop_product as main_sp on main_sp.id = sp.main_pid
         /*все это ищем только в главных товарах*/
         LEFT JOIN (
 
@@ -336,14 +338,13 @@ FROM (
         /*привязываем задание на импорт к каждому элементу контента*/
         LEFT JOIN (
             SELECT
-                inner_sp.*,
-                inner_cce.main_cce_id as main_cce_id
+                inner_sp.*
             FROM
                 shop_product as inner_sp
                 LEFT JOIN cms_content_element as inner_cce on inner_cce.id = inner_sp.id
             WHERE
                 inner_cce.cms_site_id = @site_id
-        ) as sp_for_import on sp_for_import.main_cce_id = cce.main_cce_id
+        ) as sp_for_import on sp_for_import.main_pid = sp.main_pid
         /*Привязать товары сайта на который будет идти загрузка цен*/
     WHERE
         cce.cms_site_id IN (
@@ -416,7 +417,7 @@ UPDATE
                 /*товары связанные с ценами*/
                 LEFT JOIN cms_content_element as cce on cce.id = sp.id
                 /*элементы контента к этим товарам*/
-                INNER JOIN shop_product as main_sp on main_sp.id = cce.main_cce_id
+                INNER JOIN shop_product as main_sp on main_sp.id = sp.main_pid
                 /*все это ищем только в главных товарах*/
                 LEFT JOIN (
 
@@ -431,14 +432,13 @@ UPDATE
                 /*привязываем задание на импорт к каждому элементу контента*/
                 LEFT JOIN (
                     SELECT
-                        inner_sp.*,
-                        inner_cce.main_cce_id as main_cce_id
+                        inner_sp.*
                     FROM
                         shop_product as inner_sp
                         LEFT JOIN cms_content_element as inner_cce on inner_cce.id = inner_sp.id
                     WHERE
                         inner_cce.cms_site_id = @site_id
-                ) as sp_for_import on sp_for_import.main_cce_id = cce.main_cce_id
+                ) as sp_for_import on sp_for_import.main_pid = sp.main_pid
                 /*Привязать товары сайта на который будет идти загрузка цен*/
             WHERE
                 cce.cms_site_id IN (
@@ -486,7 +486,7 @@ UPDATE
             cce_parent.cms_site_id as parent_cms_site_id,
 
             sp.id as secondary_product_id,
-            cce_parent.id as secondary_product_pid, /*Такой общий товар долженыть быть*/
+            sp_parent.id as secondary_product_pid, /*Такой общий товар долженыть быть*/
             sp.product_type as secondary_product_type, /*У текущих товаров такой тип*/
 
             main_sp.product_type as main_product_type, /*А должен быть как на портале такой*/
@@ -498,11 +498,11 @@ UPDATE
             LEFT JOIN cms_content_element cce on cce.id = sp.id
             LEFT JOIN shop_site shop_site on shop_site.id = cce.cms_site_id
 
-            INNER JOIN shop_product main_sp on main_sp.id = cce.main_cce_id /*Подтягиваем главные товары портала*/
+            INNER JOIN shop_product main_sp on main_sp.id = sp.main_pid /*Подтягиваем главные товары портала*/
             LEFT JOIN shop_product main_sp_parent on main_sp_parent.id = main_sp.offers_pid /*Общие товары портала*/
 
-            /*LEFT JOIN shop_product sp_parent on sp_parent.main_pid = main_sp_parent.id*/
-            LEFT JOIN cms_content_element cce_parent on cce_parent.id = main_sp.offers_pid
+            LEFT JOIN shop_product sp_parent on sp_parent.main_pid = main_sp_parent.id
+            LEFT JOIN cms_content_element cce_parent on cce_parent.id = sp_parent.id
         WHERE
             /*sp.product_type != main_sp.product_type*/ /*Только товары у которых не совпадает тип с порталом*/
             shop_site.is_receiver = 1 /*Касается только сайтов получаетелей*/

@@ -300,9 +300,9 @@ class ShopOrderItem extends ActiveRecord
 
             $element = $product->cmsContentElement;
             $properties = $product->cmsContentElement->relatedPropertiesModel->toArray();
-            if ($product->main_pid) {
-                $element = $product->shopMainProduct->cmsContentElement;
-                $properties = $product->shopMainProduct->cmsContentElement->relatedPropertiesModel->toArray();
+            if ($element->mainCmsContentElement) {
+                $element = $element->mainCmsContentElement;
+                $properties = $element->relatedPropertiesModel->toArray();
             }
 
             if ($properties) {

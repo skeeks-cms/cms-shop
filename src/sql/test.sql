@@ -212,3 +212,14 @@ FROM
 WHERE
 	sp.offers_pid is not null
 	AND spprice.id is null
+
+
+
+
+
+
+
+
+
+
+

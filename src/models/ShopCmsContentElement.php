@@ -30,6 +30,8 @@ use yii\helpers\ArrayHelper;
  * @property string                  $productName
  * @property CmsSite                 $cmsSite
  *
+ * @property ShopCmsContentElement   $mainCmsContentElement
+ *
  * Class ShopCmsContentElement
  * @package skeeks\cms\shop\models
  */
@@ -91,6 +93,46 @@ class ShopCmsContentElement extends CmsContentElement
         }
     }
 
+    public function rules()
+    {
+        return ArrayHelper::merge(parent::rules(), [
+            [
+                ['main_cce_id'],
+                function ($attribute) {
+
+                    /**
+                     * @var $cce ShopCmsContentElement
+                     * @var $shopProduct ShopProduct
+                     */
+                    $cce = self::find()->where(['id' => $this->main_cce_id])->one();
+                    $shopProduct = $cce->shopProduct;
+                    if (!in_array($shopProduct->product_type, [
+                        ShopProduct::TYPE_SIMPLE,
+                        ShopProduct::TYPE_OFFER,
+                    ])) {
+                        $this->addError("main_cce_id", "Родительский товар должен быть простым или предложением.");
+                        return false;
+                    }
+
+                    if (!$cce->cmsSite->is_default) {
+                        $this->addError("main_cce_id", "Родительский товар, должен относится к главному порталу!!!");
+                        return false;
+                    }
+
+                    //Это товар принадлежит сайту получателю
+                    if ($this->cmsSite->shopSite->is_receiver) {
+                        if ($exist = ShopCmsContentElement::find()
+                            ->cmsSite($this->cmsSite)
+                            ->joinWith('shopProduct as sp', true, "INNER JOIN")
+                            ->andWhere([ShopCmsContentElement::tableName() . '.main_cce_id' => $this->main_cce_id])->one()) {
+                            $this->addError("main_cce_id", "Вы пытаетесь привязать товар к инфо карточке, которая уже есть на вашем сайте. id=" . $exist->id);
+                            return false;
+                        }
+                    }
+                },
+            ],
+        ]);
+    }
     /**
      * @return \yii\db\ActiveQuery
      * @deprecated
@@ -376,8 +418,8 @@ class ShopCmsContentElement extends CmsContentElement
         }
 
         //Если у товара задан главный товар и у него есть картинка, берем ее
-        if ($shopProduct->main_pid && $shopProduct->shopMainProduct) {
-            if ($images = $shopProduct->shopMainProduct->cmsContentElement->images) {
+        if ($this->main_cce_id && $this->mainCmsContentElement) {
+            if ($images = $this->mainCmsContentElement->images) {
                 return $images;
             }
         }
@@ -391,8 +433,8 @@ class ShopCmsContentElement extends CmsContentElement
                 }
 
                 //Если общий товар связан с главным и у него есть картинка берем ее
-                if ($parent->main_pid && $parent->shopMainProduct) {
-                    if ($images = $parent->shopMainProduct->cmsContentElement->images) {
+                if ($parent->cmsContentElement->main_cce_id) {
+                    if ($images = $parent->cmsContentElement->mainCmsContentElement->images) {
                         return $images;
                     }
                 }
@@ -422,8 +464,8 @@ class ShopCmsContentElement extends CmsContentElement
         }
 
         //Если у товара задан главный товар и у него есть картинка, берем ее
-        if ($shopProduct->main_pid && $shopProduct->shopMainProduct) {
-            if ($image = $shopProduct->shopMainProduct->cmsContentElement->image) {
+        if ($this->main_cce_id) {
+            if ($image = $this->mainCmsContentElement->image) {
                 return $image;
             }
         }
@@ -436,8 +478,8 @@ class ShopCmsContentElement extends CmsContentElement
                 }
 
                 //Если общий товар связан с главным и у него есть картинка берем ее
-                if ($parent->main_pid && $parent->shopMainProduct) {
-                    if ($image = $parent->shopMainProduct->cmsContentElement->image) {
+                if ($parent->cmsContentElement->main_cce_id) {
+                    if ($image = $parent->cmsContentElement->mainCmsContentElement->image) {
                         return $image;
                     }
                 }
@@ -465,8 +507,8 @@ class ShopCmsContentElement extends CmsContentElement
         }
 
         //Если у товара задан главный товар и у него есть картинка, берем ее
-        if ($shopProduct->main_pid && $shopProduct->shopMainProduct) {
-            if ($description_short = $shopProduct->shopMainProduct->cmsContentElement->description_short) {
+        if ($this->main_cce_id) {
+            if ($description_short = $this->mainCmsContentElement->description_short) {
                 return $description_short;
             }
         }
@@ -479,8 +521,8 @@ class ShopCmsContentElement extends CmsContentElement
                 }
 
                 //Если общий товар связан с главным и у него есть картинка берем ее
-                if ($parent->main_pid && $parent->shopMainProduct) {
-                    if ($description_short = $parent->shopMainProduct->cmsContentElement->description_short) {
+                if ($parent->cmsContentElement->main_cce_id) {
+                    if ($description_short = $parent->cmsContentElement->mainCmsContentElement->description_short) {
                         return $description_short;
                     }
                 }
@@ -506,8 +548,8 @@ class ShopCmsContentElement extends CmsContentElement
         }
 
         //Если у товара задан главный товар и у него есть картинка, берем ее
-        if ($shopProduct->main_pid && $shopProduct->shopMainProduct) {
-            if ($description_full = trim($shopProduct->shopMainProduct->cmsContentElement->description_full)) {
+        if ($this->main_cce_id) {
+            if ($description_full = trim($this->mainCmsContentElement->description_full)) {
                 return $description_full;
             }
         }
@@ -521,8 +563,8 @@ class ShopCmsContentElement extends CmsContentElement
                 }
 
                 //Если общий товар связан с главным и у него есть картинка берем ее
-                if ($parent->main_pid && $parent->shopMainProduct) {
-                    if ($description_full = $parent->shopMainProduct->cmsContentElement->description_full) {
+                if ($parent->cmsContentElement->main_cce_id) {
+                    if ($description_full = $parent->cmsContentElement->mainCmsContentElement->description_full) {
                         return $description_full;
                     }
                 }
@@ -538,8 +580,8 @@ class ShopCmsContentElement extends CmsContentElement
         //Если это оффер
         if ($this->shopProduct && $this->shopProduct->isOfferProduct) {
             $result = [];
-            if ($this->shopProduct->main_pid) {
-                return $this->shopProduct->shopMainProduct->cmsContentElement->seoName;
+            if ($this->main_cce_id) {
+                return $this->mainCmsContentElement->seoName;
             }
 
             $name = $this->shopProduct->shopProductWhithOffers->cmsContentElement->seoName;
@@ -575,8 +617,8 @@ class ShopCmsContentElement extends CmsContentElement
         //Если это оффер
         if ($this->shopProduct && $this->shopProduct->isOfferProduct) {
             $result = [];
-            if ($this->shopProduct->main_pid) {
-                return $this->shopProduct->shopMainProduct->cmsContentElement->productName;
+            if ($this->main_cce_id) {
+                return $this->mainCmsContentElement->productName;
             }
 
             $name = $this->shopProduct->shopProductWhithOffers->cmsContentElement->name;

@@ -101,7 +101,7 @@ class SupplierController extends Controller
             ->joinWith("cmsSite.shopSite as shopSite")
             ->andWhere(['shopSite.is_supplier' => 1]) //только товары поставщиков
             //->andWhere(['content_id' => 2])
-            ->andWhere(['sp.main_pid' => null]) //которые не привязаны к моделям
+            ->andWhere([ShopCmsContentElement::tableName() . '.main_cce_id' => null]) //которые не привязаны к моделям
             ->orderBy([ShopCmsContentElement::tableName() . '.id' => SORT_DESC])
         ;
         
@@ -181,12 +181,12 @@ class SupplierController extends Controller
                  */
                 if ($globalModel = $find->one()) {
                     $this->stdout("Найдена модель: {$globalModel->id}\n", Console::FG_GREEN);
-                    $sp = $model->shopProduct;
-                    $sp->main_pid = $globalModel->id;
-                    if ($sp->save()) {
+                    //$sp = $model->shopProduct;
+                    $model->main_cce_id = $globalModel->id;
+                    if ($model->save()) {
                         $this->stdout("\t\t Связана\n", Console::FG_GREEN);
                     } else {
-                        $this->stdout("\t\t Не связана!" . print_r($sp->errors, true) . "\n", Console::FG_RED);
+                        $this->stdout("\t\t Не связана!" . print_r($model->errors, true) . "\n", Console::FG_RED);
                         $this->stdout("\t\t Ожидание 5 сек..." . "\n", Console::FG_RED);
                         sleep(5);
                     }

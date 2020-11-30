@@ -13,12 +13,12 @@ $shopSellerProducts = [];
 <? if ($model->shopProduct->isSubProduct) : ?>
     <div class="d-flex flex-row">
 
-        <? if ($model->shopProduct->main_pid) : ?>
+        <? if ($model->main_cce_id) : ?>
             <div class="my-auto text-center" style="margin-right: 5px;">
                 <?
                 \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                     'controllerId' => "/shop/admin-cms-content-element",
-                    'modelId'      => $model->shopProduct->shopMainProduct->id,
+                    'modelId'      => $model->main_cce_id,
                     'options'      => [
                         'style' => 'color: gray; text-align: left;',
                         'class' => '',
@@ -26,7 +26,7 @@ $shopSellerProducts = [];
                 ]);
                 ?>
                 <span style="color: green; font-size: 17px;">
-                        <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Привязан к информационной карточке! <?= $model->shopProduct->shopMainProduct->asText; ?>"></i>
+                        <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Привязан к информационной карточке! <?= $model->mainCmsContentElement->asText; ?>"></i>
                     </span>
                 <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
             </div>
@@ -44,8 +44,8 @@ $shopSellerProducts = [];
             $image = null;
             if ($model->image) {
                 $image = $model->image;
-            } elseif ($model->shopProduct->main_pid) {
-                $image = $model->shopProduct->shopMainProduct->cmsContentElement->image;
+            } elseif ($model->main_cce_id) {
+                $image = $model->mainCmsContentElement->image;
             }
             ?>
             <div class="my-auto mx-auto text-center">
@@ -136,10 +136,10 @@ $shopSellerProducts = [];
         ])->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
 
         $shopSupplierProducts = [];
-        if ($model->shopProduct->shopMainProduct) {
+        if ($model->mainCmsContentElement) {
             $shopSupplierProducts = [];
 
-            $shopSupplierProducts = $model->shopProduct->shopMainProduct->getShopSupplierProducts()
+            $shopSupplierProducts = $model->mainCmsContentElement->shopProduct->getShopSupplierProducts()
                 ->andWhere(['cmsSite.id' => $q])
                 ->all();
         }
@@ -240,7 +240,7 @@ $shopSellerProducts = [];
                         'sender_cms_site_id',
                     ])->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
             
-                    $shopSupplierProducts = $tradeOffer->shopProduct->shopMainProduct->getShopSupplierProducts()
+                    $shopSupplierProducts = $tradeOffer->mainCmsContentElement->shopProduct->getShopSupplierProducts()
                         ->andWhere(['cmsSite.id' => $q])
                         ->all();
                 } else {

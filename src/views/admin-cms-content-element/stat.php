@@ -36,26 +36,31 @@ $qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
             ->joinWith('shopProduct.shopMainProduct as shopMainProduct')
     
             ->andWhere(['c.content_id' => $content->id])
-            ->andWhere(['is not', 'shopProduct.main_pid_by', null])
-            ->andWhere(['!=', 'shopMainProduct.created_at', new \yii\db\Expression("shopProduct.main_pid_at")])
+            ->andWhere(['is not', 'c.main_cce_by', null])
+            ->andWhere(['!=', 'shopMainProduct.created_at', new \yii\db\Expression("c.main_cce_at")])
     
-            ->groupBy(['shopProduct.main_pid_by'])
+            ->groupBy(['c.main_cce_by'])
             ->select([
                 'count'      => new \yii\db\Expression("count(1)"),
-                "main_pid_by" => 'shopProduct.main_pid_by',
+                "main_cce_by" => 'c.main_cce_by',
                 "id" => 'c.id',
-            ]);
+                //"delta" => new \yii\db\Expression("abs(c.created_at - c.main_cce_at)"),
+            ])
+            /*->andHaving([
+                '>=', 'delta', 10
+            ])*/
+;
 
 //print_r($qProducts->createCommand()->rawSql);die;
 if ($dm->from) {
     $start = strtotime($dm->from." 00:00:00");
     $q->andWhere(['>=', 'c.created_at', $start]);
-    $qProducts->andWhere(['>=', 'shopProduct.main_pid_at', $start]);
+    $qProducts->andWhere(['>=', 'c.main_cce_at', $start]);
 }
 if ($dm->to) {
     $to = strtotime($dm->to." 23:59:59");
     $q->andWhere(['<=', 'c.created_at', $to]);
-    $qProducts->andWhere(['<=', 'shopProduct.main_pid_at', $to]);
+    $qProducts->andWhere(['<=', 'c.main_cce_at', $to]);
 }
 
 $all = $q
@@ -64,7 +69,7 @@ $all = $q
 
 $allProducts = $qProducts
     ->asArray()
-    ->indexBy('main_pid_by')
+    ->indexBy('main_cce_by')
     ->all();
 
 
@@ -132,7 +137,7 @@ $allProducts = $qProducts
                 <?php foreach ($allProducts as $data) : ?>
                     <tr>
                         <td style="width: 400px;">
-                            <?php $user = \skeeks\cms\models\CmsUser::findOne($data['main_pid_by']); ?>
+                            <?php $user = \skeeks\cms\models\CmsUser::findOne($data['main_cce_by']); ?>
                             <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                                 'controllerId' => 'cms/admin-user',
                                 'modelId' => $user->id

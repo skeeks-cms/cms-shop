@@ -126,7 +126,7 @@ class ShopOfferChooseHelper extends Component
          * Если есть главный товар
          */
         $hasMainProduct = false;
-        if ($this->shopProduct->main_pid) {
+        if ($this->shopProduct->cmsContentElement->main_cce_id) {
             $hasMainProduct = true;
         }
 
@@ -150,7 +150,8 @@ class ShopOfferChooseHelper extends Component
                 foreach ($offersCsmContentElement as $tradeOfferElement) {
 
                     if ($hasMainProduct) {
-                        $mainCCE = $tradeOfferElement->shopProduct->shopMainProduct->cmsContentElement;
+                        $mainCCE = $tradeOfferElement->mainCmsContentElement;
+                        //$mainCCE = $tradeOfferElement->shopProduct->shopMainProduct->cmsContentElement;
                         if ($mainCCE) {
                             $tradeOfferElement = $mainCCE;
                         }
@@ -218,7 +219,8 @@ class ShopOfferChooseHelper extends Component
                             $selectedValue = $this->chooseModel->{$code};
                             foreach ($tmpAvailableOffers as $key => $availableOffer) {
                                 if ($hasMainProduct) {
-                                    $mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
+                                    $mainCCE = $availableOffer->mainCmsContentElement;
+                                    //$mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
                                     if ($mainCCE) {
                                         $availableOffer = $mainCCE;
                                     }
@@ -241,7 +243,8 @@ class ShopOfferChooseHelper extends Component
                                 foreach ($tmpAvailableOffers as $key => $availableOffer) {
                                     
                                     if ($hasMainProduct) {
-                                        $mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
+                                        $mainCCE = $availableOffer->mainCmsContentElement;
+                                        //$mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
                                         if ($mainCCE) {
                                             $availableOffer = $mainCCE;
                                         }
@@ -270,7 +273,8 @@ class ShopOfferChooseHelper extends Component
                             $selectedValue = $this->chooseModel->{$code};
                             foreach ($tmpAvailableOffers as $key => $availableOffer) {
                                 if ($hasMainProduct) {
-                                    $mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
+                                    $mainCCE = $availableOffer->mainCmsContentElement;
+                                    //$mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
                                     if ($mainCCE) {
                                         $availableOffer = $mainCCE;
                                     }

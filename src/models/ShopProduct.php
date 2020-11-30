@@ -38,9 +38,6 @@ use yii\helpers\Json;
  * @property double                      $length
  * @property double                      $height
  *
- * @property integer|null                $main_pid_at
- * @property integer|null                $main_pid_by
- * @property integer|null                $main_pid
  * @property integer|null                $offers_pid
  *
  * @property string                      $product_type
@@ -258,7 +255,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             }
         }
 
-        if ($this->isAttributeChanged('main_pid')) {
+        /*if ($this->isAttributeChanged('main_pid')) {
             if ($this->main_pid) {
                 $this->main_pid_at = time();
 
@@ -272,7 +269,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $this->main_pid_at = null;
                 $this->main_pid_by = null;
             }
-        }
+        }*/
 
 
     }
@@ -569,16 +566,15 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['supplier_external_jsondata'], 'safe'],
             [['supplier_external_jsondata'], 'default', 'value' => null],
 
-            [['main_pid'], 'integer'],
+            /*[['main_pid'], 'integer'],
             [['main_pid_at'], 'integer'],
-            [['main_pid_by'], 'integer'],
-            [
+            [['main_pid_by'], 'integer'],*/
+            /*[
                 ['main_pid'],
                 function ($attribute) {
 
                     /**
                      * @var $shopProduct ShopProduct
-                     */
                     $shopProduct = ShopProduct::find()->where(['id' => $this->main_pid])->one();
                     if (!in_array($shopProduct->product_type, [
                         self::TYPE_SIMPLE,
@@ -606,9 +602,9 @@ class ShopProduct extends \skeeks\cms\models\Core
                         }
                     }
                 },
-            ],
+            ],*/
 
-            [
+            /*[
                 ['main_pid_at'],
                 'default',
                 'value' => function () {
@@ -632,7 +628,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
                     return null;
                 },
-            ],
+            ],*/
 
             [['offers_pid'], 'integer'],
             [
@@ -665,7 +661,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'length'            => \Yii::t('skeeks/shop/app', 'Length'),
             'height'            => \Yii::t('skeeks/shop/app', 'Height'),
             'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
-            'main_pid'          => \Yii::t('skeeks/shop/app', 'Инфо карточка'),
+            /*'main_pid'          => \Yii::t('skeeks/shop/app', 'Инфо карточка'),*/
 
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
             'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
@@ -734,6 +730,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
 
     /**
+     * @deprecated
      * @return \yii\db\ActiveQuery
      */
     public function getShopProductOffers()
@@ -742,6 +739,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     }
 
     /**
+     * @deprecated
      * @return \yii\db\ActiveQuery
      */
     public function getShopAttachedProducts()

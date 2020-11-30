@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\queryFilter;
 
 use skeeks\cms\eavqueryfilter\CmsEavQueryFilterHandler;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
@@ -53,7 +54,12 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
                 //Если показывается сайт который собирает товары с других сайтов
                 $tmpIds = implode(",", $ids);
                 if (\Yii::$app->skeeks->site->shopSite->is_receiver) {
-                    $mainIds = ShopProduct::find()->select(['main_pid'])->where(new Expression("id in ({$tmpIds})"))->andWhere(['is not', 'main_pid', null])->column();
+                    //$mainIds = ShopProduct::find()->select(['main_pid'])->where(new Expression("id in ({$tmpIds})"))->andWhere(['is not', 'main_pid', null])->column();
+                    $mainIds = ShopCmsContentElement::find()
+                                ->joinWith("shopProduct as sp", true, "INNER JOIN")
+                                ->select(['main_cce_id'])->where(new Expression(ShopCmsContentElement::tableName() . ".id in ({$tmpIds})"))
+                                ->andWhere(['is not', 'main_cce_id', null])->column();
+
                     if ($mainIds) {
                         $ids = array_merge($ids, $mainIds);
                     }
@@ -85,7 +91,7 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
         $activeQuery->joinWith("childrenContentElements as childrenContentElements");
         $activeQuery->andWhere([
             'or',
-            ['in', 'shopProduct.main_pid', $unionQuery],
+            ['in', CmsContentElement::tableName() . '.main_cce_id', $unionQuery],
             ['in', CmsContentElement::tableName().'.id', $unionQuery],
             ['in', 'childrenContentElements.id', $unionQuery],
         ]);

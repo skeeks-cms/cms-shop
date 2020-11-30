@@ -169,27 +169,7 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
         ]); */?><!--
         --><?/*= $form->field($shopProduct, "supplier_external_id"); */?>
 
-        <?/* if ($shopProduct->shop_supplier_id) : */?><!--
-            <?/*= $form->field($shopProduct, 'main_pid')->widget(
-                \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
-                [
-                    'options'     => [
-                        'data-form-reload' => "true",
-                    ],
-                    'content_id'  => $contentModel->id,
-                    'dialogRoute' => [
-                        '/shop/admin-cms-content-element',
-                        'w3-submit-key' => "1",
-                        'findex'        => [
-                            'shop_supplier_id' => [
-                                'mode' => 'empty',
-                            ],
-                        ],
-                    ],
-                ]
-            );
-            */?>
-        --><?/* endif; */?>
+
     <? endif; ?>
 
 

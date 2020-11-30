@@ -229,7 +229,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         $model = $action->model;
 
                         $result = [
-                            'shopProduct.main_pid' => [
+                            'main_cce_id' => [
                                 'class'        => WidgetField::class,
                                 'widgetClass'  => SelectModelDialogContentElementWidget::class,
                                 'widgetConfig' => [
@@ -253,7 +253,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             ],
                         ];
 
-                        if (!$model->shopProduct->main_pid) {
+                        if (!$model->main_cce_id) {
                             $siteClass = \Yii::$app->skeeks->siteClass;
                             /**
                              * @var $defaultSite CmsSite
@@ -1064,9 +1064,9 @@ HTML
 
                     if ($e->field->value) {
                         if ($e->field->value == 'on') {
-                            $query->andWhere(['is not', 'sp.main_pid', null]);
+                            $query->andWhere(['is not', 'main_cce_id', null]);
                         } else {
-                            $query->andWhere(['sp.main_pid' => null]);
+                            $query->andWhere(['main_cce_id' => null]);
                         }
 
                     }
@@ -1422,8 +1422,8 @@ CSS
                         $baseProductPrice = $shopProduct->baseProductPrice;*/
 
                         if ($shopSubproductContentElement) {
-                            $shopSubproductContentElement->shopProduct->main_pid = $shopProduct->id;
-                            $shopSubproductContentElement->shopProduct->save();
+                            $shopSubproductContentElement->main_cce_id = $shopProduct->id;
+                            $shopSubproductContentElement->save();
                         }
 
                         $t->commit();

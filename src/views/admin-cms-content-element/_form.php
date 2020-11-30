@@ -81,7 +81,7 @@ JS
         </div>
 
 
-        <?php if($shopProduct->main_pid) : ?>
+        <?php if($model->main_cce_id) : ?>
             
         <?php else : ?>
         
