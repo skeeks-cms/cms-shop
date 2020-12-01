@@ -151,7 +151,6 @@ class ShopOfferChooseHelper extends Component
 
                     if ($hasMainProduct) {
                         $mainCCE = $tradeOfferElement->mainCmsContentElement;
-                        //$mainCCE = $tradeOfferElement->shopProduct->shopMainProduct->cmsContentElement;
                         if ($mainCCE) {
                             $tradeOfferElement = $mainCCE;
                         }
@@ -220,7 +219,6 @@ class ShopOfferChooseHelper extends Component
                             foreach ($tmpAvailableOffers as $key => $availableOffer) {
                                 if ($hasMainProduct) {
                                     $mainCCE = $availableOffer->mainCmsContentElement;
-                                    //$mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
                                     if ($mainCCE) {
                                         $availableOffer = $mainCCE;
                                     }
@@ -244,7 +242,6 @@ class ShopOfferChooseHelper extends Component
                                     
                                     if ($hasMainProduct) {
                                         $mainCCE = $availableOffer->mainCmsContentElement;
-                                        //$mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
                                         if ($mainCCE) {
                                             $availableOffer = $mainCCE;
                                         }
@@ -274,7 +271,6 @@ class ShopOfferChooseHelper extends Component
                             foreach ($tmpAvailableOffers as $key => $availableOffer) {
                                 if ($hasMainProduct) {
                                     $mainCCE = $availableOffer->mainCmsContentElement;
-                                    //$mainCCE = $availableOffer->shopProduct->shopMainProduct->cmsContentElement;
                                     if ($mainCCE) {
                                         $availableOffer = $mainCCE;
                                     }

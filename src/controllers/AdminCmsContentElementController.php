@@ -691,14 +691,6 @@ HTML
                             return false;
                         }
                         
-                        /*if ($model->cmsSite->shopSite->is_receiver) {
-                            return false;
-                        }*/
-                        /*if ($model->shopProduct->main_pid) {
-                            return false;
-                        }*/
-
-                        //return true;
                         return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $action->model]);
                     },
                 ],
@@ -860,12 +852,12 @@ HTML
                         }
                     }
 
-                    if ($shopSupplierProducts = $shopCmsContentElement->shopProduct->shopSupplierProducts) {
+                    if ($shopSupplierProducts = $shopCmsContentElement->shopSupplierElements) {
 
                         $storesQuantity = [];
-                        foreach ($shopCmsContentElement->shopProduct->shopSupplierProducts as $shopStoreProduct) {
-                            $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity." - ".$shopStoreProduct->cmsContentElement->cmsSite->name, [
-                                'title' => $shopStoreProduct->cmsContentElement->cmsSite->name,
+                        foreach ($shopSupplierProducts as $shopStoreProduct) {
+                            $storesQuantity[] = Html::tag('small', $shopStoreProduct->shopProduct->quantity." - ".$shopStoreProduct->cmsSite->name, [
+                                'title' => $shopStoreProduct->cmsSite->name,
                                 'style' => 'white-space: nowrap; color: gray;',
                             ]);
 

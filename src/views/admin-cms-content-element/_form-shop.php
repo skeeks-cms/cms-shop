@@ -72,7 +72,7 @@ if ($model->isNewRecord) {
 
 } else {
     //Товар не новый уже и у него заданы товары поставщика
-    if ($shopProduct->shopSupplierProducts) {
+    if ($model->shopSupplierElements) {
         $allowChangeProductType = true;
         $isAllowChangeSupplier = false;
         $isShowPrices = false;
@@ -221,7 +221,7 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
         ]); ?>
         Цена по этому товару будет рассчитана автоматически.
         <? $alert::end(); ?>
-    <? elseif ($shopProduct->shopSupplierProducts) : ?>
+    <? elseif ($model->shopSupplierElements) : ?>
         <? $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
@@ -230,9 +230,6 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
         ]); ?>
         Цена по этому товару рассчитывается автоматически из данных поставщиков.
         <? $alert::end(); ?>
-        <? /* foreach ($shopProduct->shopSupplierProducts as $shopSupplierProduct) : */ ?><!--
-            <? /*= $shopSupplierProduct->shopSupplier */ ?>
-        --><? /* endforeach; */ ?>
     <? endif; ?>
 
 
@@ -287,7 +284,7 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
         ]); ?>
         Количество по этому товару будет рассчитано автоматически.
         <? $alert::end(); ?>
-    <? elseif ($shopProduct->shopSupplierProducts) : ?>
+    <? elseif ($model->shopSupplierElements) : ?>
         <? $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
@@ -296,9 +293,6 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
         ]); ?>
         Количество по этому товару будет рассчитано автоматически из данных поставщиков.
         <? $alert::end(); ?>
-        <? /* foreach ($shopProduct->shopSupplierProducts as $shopSupplierProduct) : */ ?><!--
-            <? /*= $shopSupplierProduct->shopSupplier */ ?>
-        --><? /* endforeach; */ ?>
     <? endif; ?>
 
     <? if ($shopStoreProducts && !$shopSubproductContentElement) : ?>

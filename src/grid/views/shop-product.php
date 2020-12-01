@@ -126,8 +126,8 @@ $shopSellerProducts = [];
 <!--Если сайт является приемщиком товаров-->
 <? if (\Yii::$app->skeeks->site->shopSite->is_receiver) : ?>
     <div class="sx-product-controls">
-        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->with('shopProduct')->with('shopProduct.measure')->all()) : ?>
-            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= count($tradeOffers); ?>)</a>
+        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->count()) : ?>
+            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= $tradeOffers; ?>)</a>
         <? endif; ?>
 
         <?
@@ -139,138 +139,30 @@ $shopSellerProducts = [];
         if ($model->mainCmsContentElement) {
             $shopSupplierProducts = [];
 
-            $shopSupplierProducts = $model->mainCmsContentElement->shopProduct->getShopSupplierProducts()
+            $shopSupplierProducts = $model->mainCmsContentElement->getShopSupplierElements()
                 ->andWhere(['cmsSite.id' => $q])
-                ->all();
+                ->count();
         }
         
 
         if ($shopSupplierProducts) : ?>
-            <a href="#" class="sx-supplier-trigger" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= count($shopSupplierProducts); ?>)</a>
+            <a href="#" class="sx-trigger-action" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= $shopSupplierProducts; ?>)</a>
         <? endif; ?>
     </div>
 <? else : ?>
 
     <div class="sx-product-controls">
-        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->with('cmsContent')->with('shopProduct')->with('shopProduct.measure')->all()) : ?>
-            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= count($tradeOffers); ?>)</a>
+        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->count()) : ?>
+            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= $tradeOffers; ?>)</a>
         <? endif; ?>
 
-        <? if ($shopSupplierProducts = $model->shopProduct->shopSupplierProducts) : ?>
-            <a href="#" class="sx-supplier-trigger" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= count($model->shopProduct->shopSupplierProducts); ?>)</a>
+        <? if ($shopSupplierProducts = $model->getShopSupplierElements()->count()) : ?>
+            <a href="#" class="sx-trigger-action" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= $shopSupplierProducts; ?>)</a>
         <? endif; ?>
 
-        <? if ($shopSellerProducts = $model->shopProduct->shopSellerProducts) : ?>
-            <a href="#" class="sx-seller-trigger" style="border-bottom: 1px dashed;"><i class="fas fa-map-marker-alt"></i> Где продается (<?= count($model->shopProduct->shopSellerProducts); ?>)</a>
+        <? if ($shopSellerProducts = $model->getShopSellerElements()->count()) : ?>
+            <a href="#" class="sx-trigger-action" style="border-bottom: 1px dashed;"><i class="fas fa-map-marker-alt"></i> Где продается (<?= $shopSellerProducts; ?>)</a>
         <? endif; ?>
-    </div>
-<? endif; ?>
-
-<? if ($shopSellerProducts) : ?>
-    <div class="sx-hidden-wrapper sx-seller-offers-wrapper">
-        <? foreach ($shopSellerProducts as $shopSupplierProduct) : ?>
-
-            <div style="margin-top: 5px; color: black;">
-                <?
-                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                    'controllerId' => "/shop/admin-cms-content-element",
-                    'modelId'      => $shopSupplierProduct->id,
-                    'options'      => [
-                        'style' => 'color: black; text-align: left;',
-                    ],
-                ]);
-                ?>
-                <i class="fas fa-map-marker-alt"></i>
-                <?= $shopSupplierProduct->cmsContentElement->cmsSite->internalName; ?> -
-                #<?= $shopSupplierProduct->id; ?>
-                 — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
-                
-                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                <a href="<?php echo $shopSupplierProduct->cmsContentElement->url; ?>" class="my-auto" data-pjax="0" target="_blank" style="text-decoration: none; color: black; border-bottom: 0;"><i class="fas fa-external-link-alt"></i></a>
-
-            </div>
-        <? endforeach; ?>
-    </div>
-<? endif; ?>
-
-<? if ($shopSupplierProducts) : ?>
-    <div class="sx-hidden-wrapper sx-supplier-offers-wrapper">
-        <? foreach ($shopSupplierProducts as $shopSupplierProduct) : ?>
-
-            <div style="margin-top: 5px; color: black;">
-                <?
-                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                    'controllerId' => "/shop/admin-cms-content-element",
-                    'modelId'      => $shopSupplierProduct->id,
-                    'options'      => [
-                        'style' => 'color: black; text-align: left;',
-                    ],
-                ]);
-                ?>
-                <i class="fas fa-link" title="Привязан к главному товару"></i>
-                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->internalName; ?> -
-                <?= $shopSupplierProduct->asText; ?> — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
-                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-            </div>
-        <? endforeach; ?>
-    </div>
-<? endif; ?>
-
-<? if ($tradeOffers && 1 == 2) : ?>
-    <div class="sx-hidden-wrapper sx-offers-wrapper">
-        <? foreach ($tradeOffers as $tradeOffer) : ?>
-            <div>
-
-                <?
-                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                    'controllerId' => "/shop/admin-cms-content-element",
-                    'modelId'      => $tradeOffer->id,
-                    'options'      => [
-                        'style' => 'color: black;',
-                    ],
-                ]);
-                ?>
-                <i class="fab fa-product-hunt"></i> <?= $tradeOffer->asText; ?> — [<?= $tradeOffer->shopProduct->quantity; ?><?= $tradeOffer->shopProduct->measure->symbol; ?>]
-                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-
-                <? 
-                if (\Yii::$app->skeeks->site->shopSite->is_receiver)
-                {
-                    $q = \skeeks\cms\shop\models\ShopImportCmsSite::find()->select([
-                        'sender_cms_site_id',
-                    ])->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
-            
-                    $shopSupplierProducts = $tradeOffer->mainCmsContentElement->shopProduct->getShopSupplierProducts()
-                        ->andWhere(['cmsSite.id' => $q])
-                        ->all();
-                } else {
-                    $shopSupplierProducts = $tradeOffer->shopProduct->shopSupplierProducts;
-                }
-                ?>
-                
-                <? if ($shopSupplierProducts) : ?>
-                    <div style="margin-top: 5px; margin-bottom: 5px;">
-                        <? foreach ($shopSupplierProducts as $shopSupplierProduct) : ?>
-                            <div style="margin-left: 20px;">
-                                <?
-                                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                    'controllerId' => "/shop/admin-cms-content-element-sub",
-                                    'modelId'      => $shopSupplierProduct->id,
-                                    'options'      => [
-                                        'style' => 'color: gray;',
-                                    ],
-                                ]);
-                                ?>
-                                <i class="fas fa-truck" style="" title="Поставщик"></i> <?= $shopSupplierProduct->cmsContentElement->cmsSite->internalName; ?> -
-                                <?= $shopSupplierProduct->asText; ?> — [<?= $shopSupplierProduct->quantity; ?><?= $shopSupplierProduct->measure->symbol; ?>]
-                                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                            </div>
-                        <? endforeach; ?>
-                    </div>
-                <? endif; ?>
-
-            </div>
-        <? endforeach; ?>
     </div>
 <? endif; ?>
 

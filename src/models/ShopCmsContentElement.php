@@ -31,6 +31,8 @@ use yii\helpers\ArrayHelper;
  * @property CmsSite                 $cmsSite
  *
  * @property ShopCmsContentElement   $mainCmsContentElement
+ * @property ShopCmsContentElement[] $shopSupplierElements
+ * @property ShopCmsContentElement[] $shopSellerElements
  *
  * Class ShopCmsContentElement
  * @package skeeks\cms\shop\models
@@ -124,8 +126,8 @@ class ShopCmsContentElement extends CmsContentElement
                         if ($exist = ShopCmsContentElement::find()
                             ->cmsSite($this->cmsSite)
                             ->joinWith('shopProduct as sp', true, "INNER JOIN")
-                            ->andWhere([ShopCmsContentElement::tableName() . '.main_cce_id' => $this->main_cce_id])->one()) {
-                            $this->addError("main_cce_id", "Вы пытаетесь привязать товар к инфо карточке, которая уже есть на вашем сайте. id=" . $exist->id);
+                            ->andWhere([ShopCmsContentElement::tableName().'.main_cce_id' => $this->main_cce_id])->one()) {
+                            $this->addError("main_cce_id", "Вы пытаетесь привязать товар к инфо карточке, которая уже есть на вашем сайте. id=".$exist->id);
                             return false;
                         }
                     }
@@ -642,5 +644,34 @@ class ShopCmsContentElement extends CmsContentElement
         }
 
         return $name;
+    }
+
+
+    /**
+     * Товары у поставщиков
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSupplierElements()
+    {
+        $q = $this->getSecondaryCmsContentElements()
+            ->joinWith("cmsSite as cmsSite")
+            ->joinWith("cmsSite.shopSite as shopSite")
+            ->andWhere(['shopSite.is_supplier' => 1]);
+
+        return $q;
+    }
+
+    /**
+     * Товары на сайтах для продажи
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopSellerElements()
+    {
+        $q = $this->getSecondaryCmsContentElements()
+            ->joinWith("cmsSite as cmsSite")
+            ->joinWith("cmsSite.shopSite as shopSite")
+            ->andWhere(['shopSite.is_receiver' => 1]);
+
+        return $q;
     }
 }

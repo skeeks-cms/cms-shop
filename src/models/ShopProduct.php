@@ -70,11 +70,6 @@ use yii\helpers\Json;
  * @property ShopTypePrice               $shopTypePrices
  *
  *
- * @property ShopProduct                 $shopMainProduct
- * @property ShopProduct[]               $shopAttachedProducts
- * @property ShopProduct[]               $shopSupplierProducts
- * @property ShopProduct[]               $shopSellerProducts
- *
  * @property ShopProduct                 $shopProductWhithOffers Товар с предложениями для текущего товара
  * @property ShopProduct[]               $shopProductOffers Предложения для текущего товара
  *
@@ -485,7 +480,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                     }
 
                     //Если у товара есть товары поставщика
-                    if ($this->shopAttachedProducts) {
+                    /*if ($this->shopAttachedProducts) {
                         foreach ($this->shopAttachedProducts as $shopSupplierProduct) {
                             if ($shopSupplierProduct->measure_code != $this->measure_code) {
                                 $m = \Yii::$app->measureClassifier->getMeasureByCode($shopSupplierProduct->measure_code);
@@ -493,7 +488,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                                 $this->addError("measure_code", "У товара задан товар поставщика с единицей измерения: {$m->symbol}. Укажите у текущего товара такую же единицу измерения.");
                             }
                         }
-                    }
+                    }*/
                 },
             ],
 
@@ -715,14 +710,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    /*public function getShopMainProduct()
-    {
-        return $this->hasOne(ShopProduct::class, ['id' => 'main_pid'])->from(['shopMainProduct' => ShopProduct::tableName()]);
-    }*/
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getShopProductWhithOffers()
     {
         return $this->hasOne(ShopProduct::class, ['id' => 'offers_pid'])->from(['shopProductWhithOffers' => ShopProduct::tableName()]);
@@ -738,43 +725,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasOne(ShopProduct::class, ['offers_pid' => 'id'])->from(['shopProductOffers' => ShopProduct::tableName()]);
     }
 
-    /**
-     * @deprecated
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopAttachedProducts()
-    {
-        return $this->hasMany(ShopProduct::class, ['main_pid' => 'id']);
-    }
 
-    /**
-     * Кто поставляет текущий товар
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopSupplierProducts()
-    {
-        $q = $this->getShopAttachedProducts()
-            ->joinWith("cmsContentElement as cmsContentElement")
-            ->joinWith("cmsContentElement.cmsSite as cmsSite")
-            ->joinWith("cmsContentElement.cmsSite.shopSite as shopSite")
-            ->andWhere(['shopSite.is_supplier' => 1]);
-        return $q;
-    }
-    /**
-     * Кто получает и продает текущий товар на сайте
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopSellerProducts()
-    {
-        $q = $this->getShopAttachedProducts()
-            ->joinWith("cmsContentElement as cmsContentElement")
-            ->joinWith("cmsContentElement.cmsSite as cmsSite")
-            ->joinWith("cmsContentElement.cmsSite.shopSite as shopSite")
-            ->andWhere(['shopSite.is_receiver' => 1]);
-        return $q;
-    }
 
     /**
      * @return \yii\db\ActiveQuery

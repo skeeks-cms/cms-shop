@@ -475,10 +475,6 @@ class ShopComponent extends Component implements BootstrapInterface
     public function filterByMainPidContentElementQuery(ActiveQuery $activeQuery)
     {
         if (\Yii::$app->skeeks->site->shopSite->is_receiver && !\Yii::$app->skeeks->site->shopSite->is_show_product_no_main) {
-            /*$activeQuery->joinWith("shopProduct as sp");
-            $activeQuery->andWhere(
-                ['is not', 'sp.main_pid', null]
-            );*/
             $activeQuery->andWhere(
                 ['is not', ShopCmsContentElement::tableName() . '.main_cce_id', null]
             );
@@ -509,14 +505,7 @@ class ShopComponent extends Component implements BootstrapInterface
                         cms_content_element inner_cce 
                     WHERE 
                         inner_cce.main_cce_id is not null
-                    /*SELECT 
-                        inner_sp.id as inner_sp_id 
-                    FROM 
-                        shop_product inner_sp 
-                    WHERE 
-                        inner_sp.main_pid is not null*/
                 ) sp_has_main_pid ON sp_has_main_pid.inner_sp_id = sp.id 
-                /*LEFT JOIN cms_content_element as cce_main on cce_main.id = sp.main_pid*/ 
                 LEFT JOIN shop_product as sp_main on sp_main.id = sp_has_main_pid.main_cce_id 
             SET 
                 sp.`measure_ratio` = sp_main.measure_ratio, 
