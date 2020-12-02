@@ -439,12 +439,30 @@ class ShopComponent extends Component implements BootstrapInterface
      * @param ActiveQuery $activeQuery
      * @return $this
      */
+    public function filterByQuantityQuery(ActiveQuery $activeQuery)
+    {
+        if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
+            $activeQuery->joinWith("shopProduct as shopProduct");
+            $activeQuery->andWhere([
+                '>',
+                'shopProduct.quantity',
+                0,
+            ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ActiveQuery $activeQuery
+     * @return $this
+     */
     public function filterByTypeContentElementQuery(ActiveQuery $activeQuery)
     {
-        $activeQuery->joinWith("shopProduct as sp");
+        $activeQuery->joinWith("shopProduct as shopProduct");
         $activeQuery->andWhere([
             '!=',
-            'sp.product_type',
+            'shopProduct.product_type',
             \skeeks\cms\shop\models\ShopProduct::TYPE_OFFER,
         ]);
         return $this;
