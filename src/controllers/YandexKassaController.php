@@ -289,7 +289,7 @@ class YandexKassaController extends Controller
 
             $discount = 0;
             if ($totalCalcAmount > (float) $money->amount) {
-                $discount = (float) $money->amount - $totalCalcAmount;
+                $discount = abs((float) $money->amount - $totalCalcAmount);
             }
 
             /**
