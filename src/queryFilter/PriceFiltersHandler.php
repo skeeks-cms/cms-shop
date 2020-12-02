@@ -22,6 +22,7 @@ use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -129,9 +130,11 @@ class PriceFiltersHandler extends Model
         $query->joinWith('shopProduct as shopProduct');
         $query->joinWith('shopProduct.shopProductPrices as prices');
         $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
+
         if (!\Yii::$app->skeeks->site->shopSite->is_show_product_no_price) {
             $query->andWhere(['>', 'prices.price', 0]);
         }
+
         $query->orderBy = [];
         $query->groupBy = [];
         $query->with = [];
@@ -188,15 +191,26 @@ class PriceFiltersHandler extends Model
 
         if ($this->type_price_id) {
 
+            /**
+             * @var $query ActiveQuery
+             */
             $query->joinWith('shopProduct as shopProduct');
-            $query->joinWith('shopProduct.shopProductPrices as prices');
-            $query->joinWith('shopProduct.shopProductPrices.currency as currency');
-            $query->andWhere(['prices.type_price_id' => $this->type_price_id]);
+            $query->leftJoin(['prices' => 'shop_product_price'], [
+                'prices.product_id' => new Expression('shopProduct.id'),
+                'prices.type_price_id' => $this->type_price_id
+            ]);
+            $query->leftJoin(['currency' => 'money_currency'], ['currency.code' => new Expression('prices.currency_code')]);
+            /*$query->joinWith('shopProduct.shopProductPrices as prices');*/
+            /*$query->joinWith('shopProduct.shopProductPrices.currency as currency');*/
+
+            //$query->andWhere(['prices.type_price_id' => $this->type_price_id]);
 
             $query->select([
                 'cms_content_element.*',
                 'realPrice' => '( currency.course * prices.price )',
             ]);
+
+            //print_r($query->createCommand()->rawSql);die;
 
             if ($this->to) {
                 $query->andHaving(['<=', 'realPrice', $this->to]);

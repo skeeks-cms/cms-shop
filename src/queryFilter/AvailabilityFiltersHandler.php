@@ -43,6 +43,11 @@ class AvailabilityFiltersHandler extends Model
         return $this->formName;
     }
 
+    public function init()
+    {
+        $this->value = (int) \Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity;
+        return parent::init();
+    }
     /**
      * @return array
      */

@@ -46,10 +46,10 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
                 $string_ids = implode(",", $ids);
 
                 //Добавить к этому предожения по товарам
-                $child_ids = CmsContentElement::find()->select(['id'])->where(new Expression("parent_content_element_id in ({$string_ids})"))->column();
+                /*$child_ids = CmsContentElement::find()->select(['id'])->where(new Expression("parent_content_element_id in ({$string_ids})"))->column();
                 if ($child_ids) {
                     $ids = array_merge($ids, $child_ids);
-                }
+                }*/
 
                 //Если показывается сайт который собирает товары с других сайтов
                 $tmpIds = implode(",", $ids);
@@ -64,15 +64,15 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
                         $ids = array_merge($ids, $mainIds);
                     }
                 }
+                /*print_r($ids);die;*/
 
-                $ids = implode(",", $ids);
+                $this->elementIds = $ids;
+                /*$ids = implode(",", $ids);
                 $this->elementIds = CmsContentElement::find()
                     ->andWhere(new Expression("id in ({$ids})"))
                     ->select(['id'])
-                    
                     ->column()
-                ;
-                
+                ;*/
 
             } else {
                 $this->elementIds = [];
