@@ -275,13 +275,13 @@ return [
                         ],
 
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Payment systems'),
+                            "label" => \Yii::t('skeeks/shop/app', 'Способы оплаты'),
                             "url"   => ["shop/admin-pay-system"],
                             "icon"  => "fab fa-cc-visa",
                         ],
 
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Delivery services'),
+                            "label" => \Yii::t('skeeks/shop/app', 'Способы доставки'),
                             "url"   => ["shop/admin-delivery"],
                             "icon"  => "fas fa-truck",
                         ],

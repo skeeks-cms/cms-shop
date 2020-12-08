@@ -6,13 +6,16 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
+use skeeks\cms\shop\delivery\DeliveryCheckoutModel;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
 use skeeks\cms\shop\models\queries\ShopOrderQuery;
 use skeeks\cms\shop\Module;
 use yii\base\Event;
+use yii\base\Model;
 use yii\base\ModelEvent;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\helpers\Url;
 
 /**
@@ -41,6 +44,7 @@ use yii\helpers\Url;
  * @property integer                    $shop_order_status_id
  * @property string                     $code
  * @property boolean                    $is_created Заказ создан? Если заказ не создан он связан с корзиной пользователя.
+ * @property string                     $delivery_handler_data_jsoned
  *
  * ***
  *
@@ -92,6 +96,8 @@ use yii\helpers\Url;
  * @property string                     $url read-only ссылка на заказ
  *
  * @property int                        $countShopOrderItems
+ * @property array                      $deliveryHandlerData
+ * @property DeliveryCheckoutModel      $deliveryHandlerCheckoutModel
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
@@ -263,6 +269,10 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->recalculate();
         }
 
+        if ($this->isAttributeChanged('delivery_handler_data_jsoned')) {
+            $this->recalculate();
+        }
+
         if ($this->isAttributeChanged('delivery_amount')) {
             $this->recalculate();
         }
@@ -407,6 +417,23 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['code'], 'string'],
             [['code'], 'default', 'value' => \Yii::$app->security->generateRandomString()],
 
+            [['delivery_handler_data_jsoned'], 'string'],
+            [['delivery_handler_data_jsoned'], 'default', 'value' => null],
+            /*[['delivery_handler_data_jsoned'], 'required', 'when' => function () {
+                return (bool) $this->deliveryHandlerCheckoutModel;
+            }],*/
+            [['delivery_handler_data_jsoned'], function() {
+                if (!$this->shopDelivery) {
+                    $this->delivery_handler_data_jsoned = null;
+                    return true;
+                }
+
+                if (!$this->shopDelivery->handler) {
+                    $this->delivery_handler_data_jsoned = null;
+                    return true;
+                }
+            }],
+
             [['is_created'], 'default', 'value' => 0],
             [
                 ['shop_order_status_id'],
@@ -482,7 +509,8 @@ class ShopOrder extends \skeeks\cms\models\Core
 
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Оплата'),
 
-            'is_created' => \Yii::t('skeeks/shop/app', 'Заказ создан?'),
+            'is_created'                   => \Yii::t('skeeks/shop/app', 'Заказ создан?'),
+            'delivery_handler_data_jsoned' => "Данные службы доставки",
         ];
     }
     /**
@@ -812,7 +840,11 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getCalcMoneyDelivery()
     {
         if ($this->shopDelivery) {
-            return $this->shopDelivery->money;
+            if ($this->deliveryHandlerCheckoutModel) {
+                return $this->deliveryHandlerCheckoutModel->money;
+            } else {
+                return $this->shopDelivery->money;
+            }
         }
 
         return new Money("", $this->currency_code);
@@ -833,6 +865,8 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
     /**
+     * Вес товара в граммах
+     *
      * @return int
      */
     public function getWeight()
@@ -845,6 +879,8 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $result;
     }
+
+
     /**
      * Доступные платежные системы
      *
@@ -1138,5 +1174,35 @@ class ShopOrder extends \skeeks\cms\models\Core
     public static function find()
     {
         return new ShopOrderQuery(get_called_class());
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDeliveryHandlerData()
+    {
+        if ($this->delivery_handler_data_jsoned) {
+            return Json::decode($this->delivery_handler_data_jsoned);
+        }
+
+        return [];
+    }
+
+
+    /**
+     * @return Model
+     */
+    public function getDeliveryHandlerCheckoutModel()
+    {
+        $model = null;
+
+        if ($this->shopDelivery && $this->shopDelivery->handler) {
+            $model = $this->shopDelivery->handler->checkoutModel;
+            $model->shopOrder = $this;
+            $model->load($this->deliveryHandlerData, "");
+        }
+
+        return $model;
     }
 }

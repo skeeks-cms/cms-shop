@@ -2,12 +2,16 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\cms\models\behaviors\Serialize;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\money\Money;
+use skeeks\cms\shop\delivery\DeliveryHandler;
 use skeeks\modules\cms\money\models\Currency;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_delivery}}".
@@ -30,7 +34,10 @@ use Yii;
  * @property integer                  $priority
  * @property string                   $description
  * @property integer                  $logo_id
+ * @property string                   $component
+ * @property string                   $component_config
  *
+ * @property DeliveryHandler          $handler
  * @property Money                    $money
  * @property CmsSite                  $site
  * @property Currency                 $currency
@@ -39,7 +46,7 @@ use Yii;
  * @property ShopDelivery2paySystem[] $shopDelivery2paySystems
  * @property ShopPaySystems[]         $shopPaySystems
  */
-class ShopDelivery extends \skeeks\cms\models\Core
+class ShopDelivery extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -48,6 +55,51 @@ class ShopDelivery extends \skeeks\cms\models\Core
     {
         return '{{%shop_delivery}}';
     }
+
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            Serialize::class      => [
+                'class'  => Serialize::class,
+                'fields' => ['component_config'],
+            ],
+            \skeeks\cms\behaviors\RelationalBehavior::class,
+            HasStorageFile::class => [
+                'class'  => HasStorageFile::class,
+                'fields' => ['logo_id'],
+            ],
+        ]);
+    }
+
+    protected $_handler = null;
+
+    /**
+     * @return DeliveryHandler
+     */
+    public function getHandler()
+    {
+        if ($this->_handler !== null) {
+            return $this->_handler;
+        }
+
+        if ($this->component) {
+            try {
+
+                $component = \Yii::createObject($this->component);
+                $component->load($this->component_config, "");
+
+                $this->_handler = $component;
+                return $this->_handler;
+            } catch (\Exception $e) {
+                \Yii::error("Related property handler not found '{$this->component}'", self::class);
+                return null;
+            }
+
+        }
+
+        return null;
+    }
+
 
     /**
      * @inheritdoc
@@ -91,6 +143,11 @@ class ShopDelivery extends \skeeks\cms\models\Core
                 },
             ],
 
+            [['component_config'], 'safe'],
+            [['component'], 'string', 'max' => 255],
+
+            [['component_config', 'component'], 'default', 'value' => null],
+
         ];
     }
 
@@ -122,23 +179,11 @@ class ShopDelivery extends \skeeks\cms\models\Core
             'description'         => \Yii::t('skeeks/shop/app', 'Description'),
             'logo_id'             => \Yii::t('skeeks/shop/app', 'Logo ID'),
             'store'               => \Yii::t('skeeks/shop/app', 'Store'),
+            'component'           => "Внешний обработчик",
             'shopPaySystems'      => \Yii::t('skeeks/shop/app', 'Payment systems'),
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(), [
-            \skeeks\cms\behaviors\RelationalBehavior::class,
-            HasStorageFile::class => [
-                'class'  => HasStorageFile::class,
-                'fields' => ['logo_id'],
-            ],
-        ]);
-    }
 
     /**
      * @return \yii\db\ActiveQuery

@@ -14,9 +14,13 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\shop\components\DeliveryHandlerComponent;
+use skeeks\cms\shop\deliveries\BoxberryDeliveryHandler;
 use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
+use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
@@ -51,10 +55,10 @@ class AdminDeliveryController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
             'index'  => [
                 "backendShowings" => false,
-                "filters" => false,
+                "filters"         => false,
 
-                'grid'    => [
-                    'on init' => function (Event $e) {
+                'grid' => [
+                    'on init'        => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
                          * @var $query ActiveQuery
@@ -64,8 +68,8 @@ class AdminDeliveryController extends BackendModelStandartController
                         $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
                     },
                     'defaultOrder'   => [
-                        'is_active'   => SORT_DESC,
-                        'priority' => SORT_ASC,
+                        'is_active' => SORT_DESC,
+                        'priority'  => SORT_ASC,
                     ],
                     'visibleColumns' => [
                         'checkbox',
@@ -77,11 +81,11 @@ class AdminDeliveryController extends BackendModelStandartController
                         'shopPaySystems',
                     ],
                     'columns'        => [
-                        'name'         => [
-                            'class' => DefaultActionColumn::class,
+                        'name'           => [
+                            'class'         => DefaultActionColumn::class,
                             'viewAttribute' => 'asText',
                         ],
-                        'is_active'         => [
+                        'is_active'      => [
                             'class' => BooleanColumn::class,
                         ],
                         'logo_id'        => [
@@ -103,9 +107,53 @@ class AdminDeliveryController extends BackendModelStandartController
             ],
             "create" => [
                 'fields' => [$this, 'updateFields'],
+                'on beforeSave' => function (Event $e) {
+                    /**
+                     * @var $action BackendModelUpdateAction;
+                     * @var $model CmsUser;
+                     */
+                    $action = $e->sender;
+                    $model = $action->model;
+                    $action->isSaveFormModels = false;
+
+                    if (isset($action->formModels['handler'])) {
+                        $handler = $action->formModels['handler'];
+                        $model->component_config = $handler->toArray();
+                    }
+
+                    if ($model->save()) {
+                        //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                    } else {
+                        throw new Exception(print_r($model->errors, true));
+                    }
+
+                },
             ],
             "update" => [
                 'fields' => [$this, 'updateFields'],
+                'on beforeSave' => function (Event $e) {
+                    /**
+                     * @var $action BackendModelUpdateAction;
+                     * @var $model CmsUser;
+                     */
+                    $action = $e->sender;
+                    $model = $action->model;
+                    $action->isSaveFormModels = false;
+
+                    if (isset($action->formModels['handler'])) {
+                        $handler = $action->formModels['handler'];
+                        $model->component_config = $handler->toArray();
+                    }
+
+
+                    if ($model->save()) {
+                        //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                    } else {
+                        throw new Exception(print_r($model->errors, true));
+                    }
+
+                },
+
             ],
 
             "activate-multi" => [
@@ -120,12 +168,34 @@ class AdminDeliveryController extends BackendModelStandartController
 
     public function updateFields($action)
     {
-        return [
+        $handlerFields = [];
+        /**
+         * @var $handler DeliveryHandlerComponent
+         */
+        if ($action->model && $action->model->handler) {
+            $handler = $action->model->handler;
+            $handlerFields = $handler->getConfigFormFields();
+            $handlerFields = Builder::setModelToFields($handlerFields, $handler);
+
+            $action->formModels['handler'] = $handler;
+            if ($post = \Yii::$app->request->post()) {
+                $handler->load($post);
+            }
+
+        }
+
+        $result = [
             'main' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Main'),
                 'fields' => [
-                    'logo_id' => [
+
+                    'is_active' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+
+                    'logo_id'     => [
                         'class'        => WidgetField::class,
                         'widgetClass'  => AjaxFileUploadWidget::class,
                         'widgetConfig' => [
@@ -133,16 +203,13 @@ class AdminDeliveryController extends BackendModelStandartController
                             'multiple' => false,
                         ],
                     ],
-                    'is_active'  => [
-                        'class'      => BoolField::class,
-                        'allowNull'      => false,
-                    ],
+
 
                     'name',
                     'description' => [
                         'class' => TextareaField::class,
                     ],
-                    
+
                     'priority',
 
 
@@ -155,14 +222,13 @@ class AdminDeliveryController extends BackendModelStandartController
 
                 ],
             ],
-
             'additionally' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Additionally'),
                 'fields' => [
 
 
-                    'weight_from',
+                    /*'weight_from',
                     'weight_to',
 
 
@@ -172,24 +238,40 @@ class AdminDeliveryController extends BackendModelStandartController
                     'order_currency_code' => [
                         'class' => SelectField::class,
                         'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where(['is_active' => 1])->all(), 'code', 'code'),
-                    ],
-
-
-                    
-
+                    ],*/
 
                     'shopPaySystems' => [
                         'class'    => SelectField::class,
-                        'hint'     => \Yii::t('skeeks/shop/app', 'if nothing is selected, it means all'),
+                        'hint'     => "Укажите, для каких способов оплаты, доступен текущий способ доставки. Если не выбраны никакие способы оплаты, то этот способ доставки показывается всегда.",
                         'multiple' => true,
                         'items'    => \yii\helpers\ArrayHelper::map(
                             \skeeks\cms\shop\models\ShopPaySystem::find()->active()->all(), 'id', 'name'
                         ),
                     ],
+
+                    'component' => [
+                        'class'   => SelectField::class,
+                        'items'   => \Yii::$app->shop->getDeliveryHandlersForSelect(),
+                        'elementOptions' => [
+                            RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
+                        ],
+                    ],
                 ],
             ],
-
         ];
+
+        if ($handlerFields) {
+            $result = ArrayHelper::merge($result, [
+                'handler' => [
+                    'class'  => FieldSet::class,
+                    'name'   => "Настройки обработчика",
+                    'fields' => $handlerFields
+                ]
+            ]);
+        }
+
+
+        return $result;
     }
 
 }

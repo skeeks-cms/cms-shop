@@ -1,6 +1,6 @@
 <?php
 
-use skeeks\cms\mail\helpers\Html;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $order \skeeks\cms\shop\models\ShopOrder */
@@ -8,25 +8,24 @@ $url = $order->getPublicUrl();
 $order->refresh();
 ?>
 
-<?= Html::beginTag('h1'); ?>
+<h1>
 <?= \Yii::t('skeeks/shop/app', 'New order'); ?> №<?= $order->id; ?>
-<?= Html::endTag('h1'); ?>
+</h1>
 
-<?= Html::tag('hr'); ?>
+<hr />
 
-<?= Html::beginTag('p'); ?>
+<p>
 Здравствуйте!
-<?= Html::endTag('p'); ?>
+</p>
 
-<?= Html::beginTag('p'); ?>
+<p>
 Благодарим вас за заказ на сайте <a href="<?php echo \yii\helpers\Url::home(true);?>"><?= \Yii::$app->cms->appName ?></a>
-<?= Html::endTag('p'); ?>
+</p>
 
 <div style="text-align: left;">
-    <?= Html::beginTag('h4'); ?>
+    <h4>
     Заказ:
-    <?= Html::endTag('h4'); ?>
-    <?= Html::beginTag('p'); ?>
+    </h4>
 
     <?=
     \yii\grid\GridView::widget([
@@ -153,12 +152,10 @@ $order->refresh();
     ])
     ?>
 
-    <?= Html::endTag('p'); ?>
 
-
-    <?= Html::beginTag('h4'); ?>
+    <h4 style="margin-top: 15px;">
     Покупатель:
-    <?= Html::endTag('h4'); ?>
+    </h4>
 
     <?
     $attributes = [];
@@ -179,9 +176,9 @@ $order->refresh();
     ?>
 
     <? if ($order->shop_pay_system_id) : ?>
-        <?= Html::beginTag('h4'); ?>
+        <h4 style="margin-top: 15px;">
         Оплата:
-        <?= Html::endTag('h4'); ?>
+        </h4>
 
         <?=
         \yii\widgets\DetailView::widget([
@@ -203,9 +200,9 @@ $order->refresh();
     <? endif; ?>
 
     <? if ($order->shop_delivery_id) : ?>
-        <?= Html::beginTag('h4'); ?>
+        <h4 style="margin-top: 15px;">
         Доставка:
-        <?= Html::endTag('h4'); ?>
+        </h4>
 
         <?=
         \yii\widgets\DetailView::widget([
@@ -219,12 +216,27 @@ $order->refresh();
         ]);
         ?>
 
+
+        <?php if ($order->deliveryHandlerCheckoutModel) : ?>
+            <h4 style="margin-top: 15px;">
+            Детали доставки:
+            </h4>
+
+            <?=
+            \yii\widgets\DetailView::widget([
+                'model'      => $order->deliveryHandlerCheckoutModel,
+                'attributes' => $order->deliveryHandlerCheckoutModel->getVisibleAttributes(),
+            ]);
+            ?>
+        <?php endif; ?>
+
+
     <? endif; ?>
 
     <? if ($order->shopDiscountCoupons) : ?>
-        <?= Html::beginTag('h4'); ?>
+        <h4 style="margin-top: 15px;">
         <?= count($order->shopDiscountCoupons) == 1 ? "Скидочный купон:" : "Скидочные купоны:" ;?>
-        <?= Html::endTag('h4'); ?>
+        </h4>
 
 
         <? foreach ($order->shopDiscountCoupons as $shopDiscountCoupon) : ?>
@@ -237,20 +249,20 @@ $order->refresh();
     <? endif; ?>
 
 
-    <?= Html::beginTag('h4'); ?>
+    <h4 style="margin-top: 15px;">
     Итого:
-    <?= Html::endTag('h4'); ?>
+    </h4>
 
-    <?= Html::beginTag('p'); ?>
-    Стоимость товаров: <?= Html::tag('b', (string)$order->calcMoneyItems); ?><br/>
+    <p>
+        Стоимость товаров: <b><?= (string)$order->calcMoneyItems; ?></b><br/>
     <?php if ((float)$order->moneyDelivery->amount > 0) : ?>
-        Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
+        Стоимость доставки: <b><?= (string)$order->moneyDelivery; ?></b><br/>
     <?php endif; ?>
     <?php if ((float)$order->moneyDiscount->amount > 0) : ?>
-        Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
+        Скидка: <b><?= (string)$order->moneyDiscount; ?></b><br/>
     <?php endif; ?>
-    К оплате: <?= Html::tag('b', (string)$order->money); ?>
-    <?= Html::endTag('p'); ?>
+        К оплате: <b><?= (string)$order->money; ?></b>
+    </p>
 
     <?php if ($order->shopOrderStatus->email_notify_description) : ?>
         <div>
@@ -258,7 +270,7 @@ $order->refresh();
         </div>
     <?php endif; ?>
 
-    <?= Html::beginTag('p'); ?>
+    <p style="margin-top: 15px;">
     <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
-    <?= Html::endTag('p'); ?>
+    </p>
 </div>

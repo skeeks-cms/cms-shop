@@ -50,6 +50,16 @@ class ShopComponent extends Component implements BootstrapInterface
     const SESSION_SHOP_USER_NAME = 'SKEEKS_CMS_SHOP_USER';
 
     /**
+     * @var array
+     */
+    public $deliveryHandlers = [];
+
+    /**
+     * @var array
+     */
+    public $paySystemHandlers = [];
+
+    /**
      * Максимальное допустимое количество товаров
      * @var float
      */
@@ -1100,4 +1110,21 @@ SQL
         }
     }
 
+
+    /**
+     * @return array
+     */
+    public function getDeliveryHandlersForSelect()
+    {
+        $result = [];
+
+        if ($this->deliveryHandlers) {
+            foreach ($this->deliveryHandlers as $handlerClass)
+            {
+                $result[$handlerClass] = (new $handlerClass())->descriptor->name;
+            }
+        }
+
+        return $result;
+    }
 }

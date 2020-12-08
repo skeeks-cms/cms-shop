@@ -200,6 +200,35 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
     </div>
 </div>
 
+<?php if ($model->deliveryHandlerCheckoutModel) : ?>
+    <div class="sx-delivery-info" style="
+            margin-top: 20px;
+            /*background: #f8f8f8;*/
+            /*padding: 20px;*/
+        ">
+        <div class="row">
+            <div class="col-12">
+                <h4>Подробнее о доставке</h4>
+            </div>
+        </div>
+        <div class="sx-data">
+            <div class="col-12">
+                <?php foreach ($model->deliveryHandlerCheckoutModel->getVisibleAttributes() as $attribute) : ?>
+
+                    <div class="row sx-data-row">
+                        <div class="col-3"><?php echo $model->deliveryHandlerCheckoutModel->getAttributeLabel($attribute); ?>
+                        </div>
+                        <div class="col-9">
+                            <?php echo $model->deliveryHandlerCheckoutModel->{$attribute}; ?>
+                        </div>
+                    </div>
+
+                <?php endforeach; ?>
+
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <?php if ($model->shopBuyer) : ?>
     <div class="sx-buyer-info" style="
@@ -233,6 +262,18 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
                         </div>
                     </div>
                 <?php endforeach; ?>
+
+                <?php
+/*                $deliveryModel = null;
+                if ($model->shopDelivery && $model->shopDelivery->handler) : */?><!--
+                    <?php
+/*                    $deliveryModel = $model->deliveryHandlerCheckoutModel;
+                    */?>
+                    <div class="sx-delivery-checkout-handler">
+                        <?php /*echo $model->shopDelivery->handler->renderCheckoutForm($form, $model); */?>
+                    </div>
+                --><?php /*endif; */?>
+
             </div>
         </div>
     </div>
@@ -365,12 +406,12 @@ CSS
                     ],
 
                     [
-                        'label' => \Yii::t('skeeks/shop/app', 'Discount, margin'),
+                        'label' => \Yii::t('skeeks/shop/app', 'Discount'),
                         'value' => (string)$model->moneyDiscount,
                     ],
 
                     [
-                        'label' => \Yii::t('skeeks/shop/app', 'Delivery service'),
+                        'label' => \Yii::t('skeeks/shop/app', 'Доставка'),
                         'value' => (string)$model->moneyDelivery,
                     ],
 
@@ -380,14 +421,14 @@ CSS
                     ],
 
                     [
-                        'label' => \Yii::t('skeeks/shop/app', 'Weight'),
+                        'label' => \Yii::t('skeeks/shop/app', 'Вес'),
                         'value' => $model->weightFormatted,
                     ],
 
-                    [
+                    /*[
                         'label' => \Yii::t('skeeks/shop/app', 'Already paid'),
                         'value' => (string)$model->moneySummPaid,
-                    ],
+                    ],*/
 
                     [
                         'label'  => \Yii::t('skeeks/shop/app', 'In total'),
