@@ -15,6 +15,7 @@ use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\UnsetArrayValue;
 
 /**
@@ -45,11 +46,7 @@ class UpaOrderController extends BackendModelStandartController
 
             "index" => [
                 "backendShowings" => false,
-                "filters" => [
-                    "visibleFilters" => [
-                        'id',
-                    ],
-                ],
+                "filters" => false,
                 'grid'    => [
                     'on init' => function (Event $e) {
                         /**
@@ -69,56 +66,21 @@ class UpaOrderController extends BackendModelStandartController
                     ],
 
                     'visibleColumns' => [
-                        //'checkbox',
-                        //'actions',
-                        'id',
-
-                        'updated_at',
-
-                        'shop_order_status_id',
-
-                        'paid_at',
-
-                        //'shop_buyer_id',
-                        //'shop_pay_system_id',
-                        //'shop_delivery_id',
-
-                        //'items',
-
-                        'amount',
-                        //'is_created',
-                        'go',
+                        //'updated_at',
+                        'custom',
+                        //'paid_at',
+                        //'amount',
                     ],
                     'columns'        => [
 
-                        /*'id' => [
-                            'value' => function (ShopOrder $shopOrder) {
-                                $result = [];
-
-                                $result[] = $shopOrder->asText;
-                                return implode("<br />", $result);
-                            },
-                        ],*/
-
-                        'is_created'           => [
-                            'class' => BooleanColumn::class,
-                        ],
                         'paid_at'              => [
-                            'class' => DateTimeColumnData::class,
-                        ],
-                        'go'                   => [
-                            'format' => "raw",
-                            'value'  => function (ShopOrder $shopOrder) {
-                                return \yii\helpers\Html::a('<i class="fas fa-external-link-alt"></i>', $shopOrder->url, [
-                                    'target'    => '_blank',
-                                    'title'     => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                                    'data-pjax' => '0',
-                                    'class'     => 'btn btn-default btn-sm',
-                                ]);
-                            },
-                        ],
-                        
-                        'paid_at'              => [
+                            'headerOptions' => [
+                                'style' => 'width: 80px;'
+                            ],
+                            'contentOptions' => [
+                                'style' => 'width: 80px;'
+                            ],
+
                             'value' => function (ShopOrder $shopOrder, $key) {
                                 $reuslt = "<div>";
                                 if ($shopOrder->paid_at) {
@@ -143,32 +105,53 @@ CSS
                             },
                         ],
                         'updated_at'           => [
-                            'class' => DateTimeColumnData::class,
+                            'headerOptions' => [
+                                'style' => 'width: 120px;'
+                            ],
+                            'contentOptions' => [
+                                'style' => 'width: 120px;'
+                            ],
+                            'value' => function(ShopOrder $shopOrder) {
+                                return \Yii::$app->formatter->asRelativeTime($shopOrder->updated_at);
+                            }
                         ],
 
-                        'shop_order_status_id' => [
+                        'custom' => [
+                            'attribute' => "id",
+                            'format' => "raw",
+                            'label' => "Заказ",
                             'value' => function (ShopOrder $shopOrder) {
+                                $name = "Заказ №" . $shopOrder->id . ' на ' . $shopOrder->money;
                                 if (!$shopOrder->shopOrderStatus) {
-                                    return "-";
+                                    return $name;
                                 }
-                                return \yii\helpers\Html::label($shopOrder->shopOrderStatus->asText, null, [
-                                        'style' => "background: {$shopOrder->shopOrderStatus->color}",
-                                        'class' => "label u-label",
-                                    ])."<br />".
-                                    \yii\helpers\Html::tag("small",
-                                        \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
+
+                                $data = [];
+
+                                $data[] = Html::a($name, $shopOrder->url, [
+                                         //'class' => "sx-trigger-action",
+                                         'target' => "_blank",
+                                         'data-pjax' => "0",
+                                        'style' => "font-size: 18px;",
+                                    ]) . " " .
+                                    \yii\helpers\Html::tag("span", $shopOrder->shopOrderStatus->name, [
+                                        'style' => "background: {$shopOrder->shopOrderStatus->bg_color}; color: {$shopOrder->shopOrderStatus->color}; padding: 5px; 0px;",
+                                        //'class' => "label",
+                                    ]);
+
+                                $data[] = "от " . \yii\helpers\Html::tag("small", \Yii::$app->formatter->asDatetime($shopOrder->created_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->created_at).")");
+
+                                /*if ($shopOrder->shopPaySystem) {
+                                    $data[] = "" . $shopOrder->shopPaySystem->name;
+                                }
+
+                                if ($shopOrder->shopDelivery) {
+                                    $data[] = "" . $shopOrder->shopDelivery->name;
+                                }*/
+                                return implode("<br />", $data);
                             },
                         ],
-                        'amount'               => [
-                            'value' => function (ShopOrder $shopOrder) {
-                                $result = [];
-                                $result[] = "Товары:&nbsp;".$shopOrder->moneyItems;
-                                $result[] = "Доставка:&nbsp;".$shopOrder->moneyDelivery;
-                                $result[] = "Скидка:&nbsp;".$shopOrder->moneyDiscount;
-                                $result[] = "Налог:&nbsp;".$shopOrder->moneyVat;
-                                return "К&nbsp;оплате:&nbsp;<b>".$shopOrder->money."</b><hr style='margin: 0px; padding: 0px;'/>".implode("<br />", $result);
-                            },
-                        ],
+
                     ],
 
                 ],
