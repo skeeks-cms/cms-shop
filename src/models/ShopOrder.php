@@ -422,17 +422,20 @@ class ShopOrder extends \skeeks\cms\models\Core
             /*[['delivery_handler_data_jsoned'], 'required', 'when' => function () {
                 return (bool) $this->deliveryHandlerCheckoutModel;
             }],*/
-            [['delivery_handler_data_jsoned'], function() {
-                if (!$this->shopDelivery) {
-                    $this->delivery_handler_data_jsoned = null;
-                    return true;
-                }
+            [
+                ['delivery_handler_data_jsoned'],
+                function () {
+                    if (!$this->shopDelivery) {
+                        $this->delivery_handler_data_jsoned = null;
+                        return true;
+                    }
 
-                if (!$this->shopDelivery->handler) {
-                    $this->delivery_handler_data_jsoned = null;
-                    return true;
-                }
-            }],
+                    if (!$this->shopDelivery->handler) {
+                        $this->delivery_handler_data_jsoned = null;
+                        return true;
+                    }
+                },
+            ],
 
             [['is_created'], 'default', 'value' => 0],
             [
