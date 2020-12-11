@@ -42,6 +42,7 @@ use yii\helpers\Url;
  * @property string                     $tax_amount
  * @property string                     $paid_amount
  * @property integer                    $shop_order_status_id
+ * @property string                     $external_id
  * @property string                     $code
  * @property boolean                    $is_created Заказ создан? Если заказ не создан он связан с корзиной пользователя.
  * @property string                     $delivery_handler_data_jsoned
@@ -479,6 +480,18 @@ class ShopOrder extends \skeeks\cms\models\Core
                 },
             ],
 
+            [['external_id'], 'default', 'value' => null],
+            [['external_id'], 'string'],
+
+            [
+                ['cms_site_id', 'external_id'],
+                'unique',
+                'targetAttribute' => ['cms_site_id', 'external_id'],
+                'when'            => function (self $model) {
+                    return (bool)$model->external_id;
+                },
+            ],
+
 
         ];
     }
@@ -509,6 +522,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'shop_buyer_id'        => \Yii::t('skeeks/shop/app', 'Buyer'),
             'isNotifyChangeStatus' => \Yii::t('skeeks/shop/app', 'Отправить email уведомление клиенту?'),
             'statusComment'        => \Yii::t('skeeks/shop/app', 'Комментарий к смене статуса'),
+            'external_id'          => "ID из внешней системы",
 
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Оплата'),
 

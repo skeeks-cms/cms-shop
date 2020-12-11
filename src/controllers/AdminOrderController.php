@@ -298,7 +298,7 @@ HTML;
                                         //'class' => "label",
                                     ]);
                                 
-                                $data[] = "от " . \yii\helpers\Html::tag("small", \Yii::$app->formatter->asDatetime($shopOrder->status_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->status_at).")");
+                                $data[] = "от " . \yii\helpers\Html::tag("small", \Yii::$app->formatter->asDatetime($shopOrder->created_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->created_at).")");
                                 
                                 if ($shopOrder->shopPaySystem) {
                                     $data[] = "" . $shopOrder->shopPaySystem->name;

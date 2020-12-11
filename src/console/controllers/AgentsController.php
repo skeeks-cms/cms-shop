@@ -36,6 +36,7 @@ class AgentsController extends Controller
         if ($shopSites = ShopSite::find()->where(['is_receiver' => 1])->all()) {
             $this->stdout("Найдено сайтов получателей: " . count($shopSites) . "\n");
             foreach ($shopSites as $shopSite) {
+                $this->stdout("\tСайт: " . $shopSite->id . "\n");
                 ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
             }
         }
