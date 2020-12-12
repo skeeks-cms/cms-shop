@@ -32,14 +32,12 @@ return [
                     'shop' => [
                         'name'  => ['skeeks/shop/app', 'Orders'],
                         'url'  => ['/shop/upa-order'],
-                        'icon'  => 'fas fa-shopping-cart',
-                        /*'items' => [
-                            [
-                                'name' => ['skeeks/shop/app', 'Orders'],
-                                'url'  => ['/shop/upa-order'],
-                                'icon' => 'fas fa-cart-arrow-down',
-                            ],
-                        ],*/
+                        'icon'  => 'icon-basket',
+                    ],
+                    'favorites' => [
+                        'name'  => "Избранное",
+                        'url'  => ['/shop/upa-favorite'],
+                        'icon'  => 'icon-heart',
                     ],
                 ],
             ],
