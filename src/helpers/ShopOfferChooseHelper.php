@@ -114,9 +114,13 @@ class ShopOfferChooseHelper extends Component
         /**
          * @var ShopCmsContentElement[] $offersCsmContentElement
          */
-        $offersCsmContentElement = $this->shopProduct->getTradeOffers()
-            ->with("shopProduct")
-            ->all();
+        $offersCsmContentElementQuery = $this->shopProduct
+            ->getTradeOffers()
+            ->with("shopProduct");
+
+        \Yii::$app->shop->filterByQuantityQuery($offersCsmContentElementQuery);
+
+        $offersCsmContentElement = $offersCsmContentElementQuery->all();
 
         if (!$offersCsmContentElement) {
             return false;
@@ -203,7 +207,7 @@ class ShopOfferChooseHelper extends Component
             //Если мы выбрали конкретный оффер, то нужно просто его показать и загрузить его данные в опции
             if ($this->_chooseModel->offer_id) {
                 $this->_offerCmsContentElement = ShopCmsContentElement::findOne($this->_chooseModel->offer_id);
-            }else {
+            } else {
                 //Если конкретный офер не указан, нужно его вычислить загрузив опции
                 if ($this->_chooseFields) {
                     $counter = 0;
@@ -239,16 +243,16 @@ class ShopOfferChooseHelper extends Component
                             foreach ($options as $optionKey => $optionValue) {
                                 $availableOptions = [];
                                 foreach ($tmpAvailableOffers as $key => $availableOffer) {
-                                    
+
                                     if ($hasMainProduct) {
                                         $mainCCE = $availableOffer->mainCmsContentElement;
                                         if ($mainCCE) {
                                             $availableOffer = $mainCCE;
                                         }
-                                    } 
-                                         
-                                    $availableOptions[$availableOffer->relatedPropertiesModel->getAttribute($code)] = $availableOffer->relatedPropertiesModel->getAttribute($code);    
-                                    
+                                    }
+
+                                    $availableOptions[$availableOffer->relatedPropertiesModel->getAttribute($code)] = $availableOffer->relatedPropertiesModel->getAttribute($code);
+
                                     /*if ($availableOffer->relatedPropertiesModel->getAttribute($code) != $optionKey) {
                                         $disabledOptions[$optionKey] = $optionKey;
                                     }*/
