@@ -121,8 +121,13 @@ $url = $order->getPublicUrl();
 
 <?= Html::beginTag('p'); ?>
     Стоимость товаров: <?= Html::tag('b', (string)$order->basketsMoney); ?><br/>
-    Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
-    Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
+    <?php if((float) $order->moneyDelivery->amount > 0) : ?>
+        Стоимость доставки: <?= Html::tag('b', (string)$order->moneyDelivery); ?><br/>
+    <?php endif; ?>
+
+    <?php if((float) $order->moneyDiscount->amount > 0) : ?>
+        Скидка: <?= Html::tag('b', (string)$order->moneyDiscount); ?><br/>
+    <?php endif; ?>
     Оплачено: <?= Html::tag('b', (string)$order->money); ?>
 <?= Html::endTag('p'); ?>
 

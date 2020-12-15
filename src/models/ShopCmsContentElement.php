@@ -123,10 +123,16 @@ class ShopCmsContentElement extends CmsContentElement
 
                     //Это товар принадлежит сайту получателю
                     if ($this->cmsSite->shopSite->is_receiver) {
-                        if ($exist = ShopCmsContentElement::find()
+                        $qExist = ShopCmsContentElement::find()
                             ->cmsSite($this->cmsSite)
                             ->joinWith('shopProduct as sp', true, "INNER JOIN")
-                            ->andWhere([ShopCmsContentElement::tableName().'.main_cce_id' => $this->main_cce_id])->one()) {
+                            ->andWhere([ShopCmsContentElement::tableName().'.main_cce_id' => $this->main_cce_id]);
+
+                        if (!$this->isNewRecord) {
+                            $qExist->andWhere(["!=", ShopCmsContentElement::tableName().'.id', $this->id]);
+                        }
+
+                        if ($exist = $qExist->one()) {
                             $this->addError("main_cce_id", "Вы пытаетесь привязать товар к инфо карточке, которая уже есть на вашем сайте. id=".$exist->id);
                             return false;
                         }

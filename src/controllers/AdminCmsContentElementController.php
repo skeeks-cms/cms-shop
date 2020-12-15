@@ -690,7 +690,41 @@ HTML
                         if (!$model->cmsSite->shopSite->is_allow_edit_products) {
                             return false;
                         }
+
+                        if ($model->main_cce_id) {
+                            return false;
+                        }
                         
+                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $action->model]);
+                    },
+                ],
+                
+                
+                "update-attribute" => [
+
+                    'class' => BackendModelAction::class,
+                    'isVisible' => false,
+                    'callback' => [$this, 'actionUpdateAttribute'],
+                    
+                    'accessCallback' => function (BackendModelAction $action) {
+
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
+                        $model = $action->model;
+
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        if (!$model->cmsSite->shopSite->is_allow_edit_products) {
+                            return false;
+                        }
+
                         return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $action->model]);
                     },
                 ],
@@ -1423,7 +1457,7 @@ CSS
 
                         $t->commit();
 
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
+                        //\Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                         $is_saved = true;
 
@@ -1571,9 +1605,10 @@ CSS
 
                         $is_saved = true;
 
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
+                        ///\Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                         if (\Yii::$app->request->post('submit-btn') == 'apply') {
+
                         } else {
 
                             $redirect = $this->url;
@@ -1753,4 +1788,36 @@ JS
 
         return $rr;
     }
+
+    /**
+     * 
+     */
+    public function actionUpdateAttribute()
+    {
+        $rr = new RequestResponse();
+        
+        if ($rr->isRequestAjaxPost()) {
+            $this->model;
+            if (\Yii::$app->request->post("element")) {
+                $attribute = \Yii::$app->request->post("attribute");
+                $this->model->{$attribute} = \Yii::$app->request->post("value");
+
+                try {
+
+                    if (!$this->model->save()) {
+
+                    }
+
+                } catch (\Exception $exception) {
+
+                }
+
+                if ($this->model->save()) {
+
+                }
+            }
+        }
+        return $rr;
+    }
 }
+

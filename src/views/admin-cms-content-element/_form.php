@@ -29,13 +29,12 @@ if ($model->isNewRecord) {
         $defaultSite = $siteClass::find()->where(['is_default' => 1])->one();
         $model->cms_site_id = $defaultSite->id;
     }
-    
+
     if ($tree_id = \Yii::$app->request->get("tree_id")) {
         $model->tree_id = $tree_id;
     }
 }
 ?>
-
 <div class="">
     <div class="sx-main-product-wrapper">
         <?php $form = $action->beginActiveForm(); ?>
@@ -60,8 +59,6 @@ JS
         <? if (@$redirect) : ?>
             <?php $this->registerJs(<<<JS
 window.location.href = '{$redirect}';
-console.log('window.location.href');
-console.log('{$redirect}');
 JS
             ); ?>
         <? endif; ?>
@@ -81,45 +78,54 @@ JS
         </div>
 
 
-        <?php if($model->main_cce_id) : ?>
-            
+        <?php if ($model->main_cce_id) : ?>
+
+            <!--Если указан главный товар то можно редактировать цену-->
+
+            <?= $this->render('_form-has-main-cce', [
+                'form'                         => $form,
+                'contentModel'                 => $contentModel,
+                'model'                        => $model,
+                'shopProduct'                  => $shopProduct,
+                'productPrices'                => $productPrices,
+                'shopStoreProducts'            => $shopStoreProducts,
+                'shopContent'                  => $shopContent,
+                'shopSubproductContentElement' => $shopSubproductContentElement,
+            ]); ?>
+
+
         <?php else : ?>
-        
+
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-main', [
                 'form'         => $form,
                 'contentModel' => $contentModel,
                 'model'        => $model,
             ]); ?>
-    
+
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-images', [
                 'form'         => $form,
                 'contentModel' => $contentModel,
                 'model'        => $model,
             ]); ?>
-    
-    
+
+
             <?= $this->render('_form-shop', [
-                'form'         => $form,
-                'contentModel' => $contentModel,
-                'model'        => $model,
-                'shopProduct'        => $shopProduct,
-                'productPrices'        => $productPrices,
-                'shopStoreProducts'        => $shopStoreProducts,
-                'shopContent'        => $shopContent,
-                'shopSubproductContentElement'        => $shopSubproductContentElement,
+                'form'                         => $form,
+                'contentModel'                 => $contentModel,
+                'model'                        => $model,
+                'shopProduct'                  => $shopProduct,
+                'productPrices'                => $productPrices,
+                'shopStoreProducts'            => $shopStoreProducts,
+                'shopContent'                  => $shopContent,
+                'shopSubproductContentElement' => $shopSubproductContentElement,
             ]); ?>
-    
-    
-    
-    
-    
-    
-    
+
+
             <? if (!$model->isNewRecord) : ?>
                 <? /*= $form->fieldSet(\Yii::t('skeeks/shop/app','Additionally')); */ ?><!--
             <? /*= $form->fieldSelect($model, 'content_id', \skeeks\cms\models\CmsContent::getDataForSelect()); */ ?>
         --><? /*= $form->fieldSetEnd() */ ?>
-    
+
                 <? if ($model->cmsContent->is_access_check_element) : ?>
                     <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Access')); ?>
                     <?= \skeeks\cms\rbac\widgets\adminPermissionForRoles\AdminPermissionForRolesWidget::widget([
@@ -130,25 +136,25 @@ JS
                     <? $fieldSet::end(); ?>
                 <? endif; ?>
             <? endif; ?>
-    
+
             <? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
                     '!=',
                     'id',
                     $shopContent->childrenContent->id,
                 ])->all()
             ) : ?>
-    
+
                 <? $childContents = $model->cmsContent->getChildrenContents()->andWhere([
                     '!=',
                     'id',
                     $shopContent->childrenContent->id,
                 ])->all(); ?>
-    
+
                 <? foreach ($childContents as $childContent) : ?>
                     <? $fieldSet = $form->fieldSet($childContent->name); ?>
-    
+
                     <? if ($model->isNewRecord) : ?>
-    
+
                         <?= \yii\bootstrap\Alert::widget([
                             'options' =>
                                 [
@@ -157,7 +163,7 @@ JS
                             'body'    => \Yii::t('skeeks/shop/app', 'Management will be available after saving'),
                         ]); ?>
                     <? else: ?>
-    
+
                         <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
                             'label'       => $childContent->name,
                             'namespace'   => md5($model->className().$childContent->id),
@@ -166,31 +172,31 @@ JS
                                 'content_id'                => $childContent->id,
                                 'parent_content_element_id' => $model->id,
                             ],
-    
+
                             'sort' => [
                                 'defaultOrder' =>
                                     [
                                         'priority' => 'published_at',
                                     ],
                             ],
-    
+
                             'controllerRoute' => '/shop/admin-cms-content-element',
                             'gridViewOptions' => [
                                 'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
                             ],
                         ]); ?>
-    
+
                     <? endif; ?>
-    
-    
+
+
                     <? $fieldSet::end(); ?>
                 <? endforeach; ?>
             <? endif; ?>
-    
-    
-    
-    
-    
+
+
+
+
+
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-announce', [
                 'form'         => $form,
                 'contentModel' => $contentModel,
@@ -201,21 +207,21 @@ JS
                 'contentModel' => $contentModel,
                 'model'        => $model,
             ]); ?>
-    
-    
+
+
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-sections', [
                 'form'         => $form,
                 'contentModel' => $contentModel,
                 'model'        => $model,
             ]); ?>
-    
+
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-seo', [
                 'form'         => $form,
                 'contentModel' => $contentModel,
                 'model'        => $model,
             ]); ?>
-    
-    
+
+
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-additionaly', [
                 'form'         => $form,
                 'contentModel' => $contentModel,
@@ -224,7 +230,7 @@ JS
 
         <?php endif; ?>
 
-        
+
         <?= $form->buttonsStandart($model); ?>
         <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
         <?php $form::end(); ?>
@@ -274,7 +280,8 @@ CSS
 
             <div class="sx-info-block">
                 <h5><?= $shopSubproductContentElement->name; ?>
-                    <a href="https://market.yandex.ru/search?cvredirect=2&text=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в yandex market" target="_blank" style="color: blue" class="btn btn-xs btn-secondary">
+                    <a href="https://market.yandex.ru/search?cvredirect=2&text=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в yandex market" target="_blank" style="color: blue"
+                       class="btn btn-xs btn-secondary">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
                     <a href="https://yandex.ru/search/?lr=213&text=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в yandex" target="_blank" style="color: red" class="btn btn-xs btn-secondary">
@@ -285,29 +292,29 @@ CSS
                     </a>
                 </h5>
             </div>
-        
+
             <? if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : ?>
                 <hr/>
                 <div class="sx-info-block">
                     <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); ?>
                 </div>
             <? endif; ?>
-        
-            <?/* if ($shopSubproductContentElement->shopProduct->shopSupplier) : */?><!--
+
+            <? /* if ($shopSubproductContentElement->shopProduct->shopSupplier) : */ ?><!--
                 <div class="sx-info-block">
-                    <p><span>Поставщик:</span> <b><?/*= $shopSubproductContentElement->shopProduct->shopSupplier->asText; */?></b></p>
-                    <p><span>Артикул:</span> <b><?/*= $shopSubproductContentElement->shopProduct->supplier_external_id; */?></b></p>
+                    <p><span>Поставщик:</span> <b><? /*= $shopSubproductContentElement->shopProduct->shopSupplier->asText; */ ?></b></p>
+                    <p><span>Артикул:</span> <b><? /*= $shopSubproductContentElement->shopProduct->supplier_external_id; */ ?></b></p>
                 </div>
                 <div class="sx-info-block">
-                    <p><span>Количество:</span> <b><?/*= $shopSubproductContentElement->shopProduct->quantity; */?> <?/*= $shopSubproductContentElement->shopProduct->measure->symbol; */?></b></p>
+                    <p><span>Количество:</span> <b><? /*= $shopSubproductContentElement->shopProduct->quantity; */ ?> <? /*= $shopSubproductContentElement->shopProduct->measure->symbol; */ ?></b></p>
                 </div>
-                <?/* if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : */?>
+                <? /* if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : */ ?>
                     <hr/>
                     <div class="sx-info-block">
-                        <?/*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); */?>
+                        <? /*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); */ ?>
                     </div>
-                <?/* endif; */?>
-            --><?/* endif; */?>
+                <? /* endif; */ ?>
+            --><? /* endif; */ ?>
         <? endif; ?>
 
 
@@ -321,6 +328,6 @@ CSS
 
 
         <? if ($shopSubproductContentElement || $shopProduct->supplier_external_jsondata) : ?>
-            </div>
-        <? endif; ?>
+    </div>
+<? endif; ?>
 </div>

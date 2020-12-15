@@ -7,17 +7,14 @@ $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
 \skeeks\cms\themes\unify\assets\components\UnifyThemeStickAsset::register($this);
+
+
+$jsData = \yii\helpers\Json::encode([
+    'backend' => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content_id' => $model->content_id]),
+]);
+
 $this->registerJs(<<<JS
-
-/*_.delay(function() {
-    $(".slick-slide").on("click", function() {
-    var jElement = $(this).find(".sx-fancybox-gallary");
-    jElement.trigger("click");
-});
-}, 500);*/
-
 $('[data-fancybox="images"]').fancybox({
-    
     thumbs: {
     autoStart: true, // Display thumbnails on opening
     hideOnClose: true, // Hide thumbnail grid when closing animation starts
@@ -29,10 +26,102 @@ $('[data-fancybox="images"]').fancybox({
       },
   },
 });
+
+
+
+(function(sx, $, _)
+{
+    sx.classes.FastEdit = sx.classes.Component.extend({
+   
+        _onDomReady: function()
+        {
+            var self = this;
+            
+            $("body").on("click", ".sx-fast-edit", function() {
+                var jWrapper = $(this);
+                if (jWrapper.hasClass("sx-edit-in-process")) {
+                    return;
+                }
+                
+                jWrapper.addClass('sx-edit-in-process');
+                
+                var model_id = jWrapper.data("model_id");
+                var model = jWrapper.data("model");
+                var attribute = jWrapper.data("attribute");
+                var element = jWrapper.data("element");
+                
+                var jInput = $("<input>", {
+                    'type' : 'text',
+                    'class' : 'form-control sx-fast-edit-value',
+                });
+                
+                var jButton = $("<div>", {
+                    'class' : 'input-group-append',
+                }).append('<button class="btn btn-primary" type="button"><i class="fas fa-check"></i></button>');
+                
+                jButton.on("click", function() {
+                    jInput.trigger("change");
+                });
+                
+                var jGroup = $("<div>", {
+                    "class" : "input-group"
+                });
+                jGroup.append(jInput).append(jButton);
+                jWrapper.empty().append(jGroup);
+                jInput.focus();
+            });
+            
+            /**
+            * Завершить редактирование 
+            */
+            $("body").on("complete-edit", ".sx-fast-edit", function(e, data) {
+                var jWrapper = $(this);
+                jWrapper.removeClass('sx-edit-in-process');
+                $.pjax.reload("#" + jWrapper.closest('[data-pjax-container]').attr("id"));
+            });
+            
+            
+            $("body").on("change", ".sx-fast-edit-value", function() {
+                var jWrapper = $(this).closest(".sx-fast-edit");
+                
+                var AjaxQuery = sx.ajax.preparePostQuery(self.get('backend'));
+                new sx.classes.AjaxHandlerStandartRespose(AjaxQuery);
+                
+                AjaxQuery.setData(_.extend(jWrapper.data(), {
+                    'value' : $(this).val()
+                }));
+                
+                AjaxQuery.on("success", function() {
+                    jWrapper.trigger("complete-edit");
+                    
+                });
+                
+                AjaxQuery.on("error", function() {
+                    jWrapper.trigger("complete-edit");
+                });
+                
+                AjaxQuery.execute();
+            });
+        },
+        
+        
+    });
+})(sx, sx.$, sx._);
+
+new sx.classes.FastEdit({$jsData});
 JS
 );
 
 $this->registerCSS(<<<CSS
+.sx-fast-edit-value {
+    padding: 5px;
+}
+
+.sx-fast-edit {
+    cursor: pointer;
+    min-width: 40px;
+    border-bottom: 1px dashed;
+}
 .js-slide img {
      max-height: 300px;
      margin: auto;
@@ -179,6 +268,8 @@ CSS
 );
 $noValue = "<span style='color: silver;'>—</span>";
 ?>
+
+<?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
 <div class="row no-gutters sx-bg-secondary">
     <div class="col-lg-4 col-sm-6 col-12">
 
@@ -268,7 +359,34 @@ $noValue = "<span style='color: silver;'>—</span>";
 
     <div class="col-lg-8 col-sm-6 col-12">
         <div style="padding: 10px;">
-            <h4 style="line-height: 1.1;"><?php echo $model->productName; ?></h4>
+            <h4 style="line-height: 1.1;">
+                <?php if (
+                $model->cmsSite->shopSite->is_receiver //Если это товар собирает данные от поставщиков
+                ) : ?>
+                    <?php if ($model->main_cce_id) : ?>
+                        <?
+                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            'controllerId' => "/shop/admin-cms-content-element",
+                            'modelId'      => $model->main_cce_id,
+                            'tag'          => 'span',
+                            'options'      => [
+                                'style' => 'color: green; text-align: left;',
+                                'class' => '',
+                            ],
+                        ]);
+                        ?>
+                        <i class="fas fa-link" title="Товар привязан к инфокарточке. Берет описание, фото и характеристики из нее." data-toggle="tooltip" style="margin-left: 5px;"></i>
+                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                    <?php else : ?>
+                        <span style="color: red;">
+                            <i class="fas fa-link" title="Товар не привязан к инфокарточке" data-toggle="tooltip" style="margin-left: 5px;"></i>
+                        </span>
+                    <?php endif; ?>
+
+
+                    <?php echo $model->productName; ?>
+                <? endif; ?>
+            </h4>
 
             <div class="sx-properties-wrapper sx-columns-1" style="max-width: 300px; margin-top: 15px;">
                 <ul class="sx-properties">
@@ -289,12 +407,14 @@ $noValue = "<span style='color: silver;'>—</span>";
                 </span>
                     </li>
                     <li>
-                <span class="sx-properties--name">
-                    Артикул
-                </span>
+                        <span class="sx-properties--name">
+                            Артикул
+                        </span>
                         <span class="sx-properties--value">
-                    <?php echo $model->external_id; ?>
-                </span>
+                            <span class="sx-fast-edit g-color-primary" data-attribute="external_id" data-model="element" data-model_id="<?php echo $model->id; ?>">
+                                <?php echo $model->external_id ? $model->external_id : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+                        </span>
                     </li>
                     <li>
                 <span class="sx-properties--name">
@@ -325,6 +445,7 @@ $noValue = "<span style='color: silver;'>—</span>";
         </div>
     </div>
 </div>
+<?php $pjax::end(); ?>
 
 <?php if (
     (!$model->cmsSite->is_default && \skeeks\cms\models\CmsSite::find()->count() > 0) //Если у нас многосайтовость и этот товар - инфокарточка
@@ -347,7 +468,12 @@ $noValue = "<span style='color: silver;'>—</span>";
                     <tr>
                         <? foreach ($model->cmsSite->shopTypePrices as $shopTypePrice) : ?>
                             <?php $price = $model->shopProduct->getPrice($shopTypePrice); ?>
-                            <td><?php echo $price ? $price->money : $noValue ?></td>
+                            <td>
+                                <span class="sx-fast-edit g-color-primary" data-attribute="value" data-model="price" data-model_id="<?php echo $shopTypePrice->id; ?>">
+                                     <?php echo $price ? $price->money : $noValue ?>
+                                </span>
+                               
+                            </td>
                         <? endforeach; ?>
                         <td><?php echo $noValue; ?></td>
                         <td><?php echo $noValue; ?></td>
@@ -451,20 +577,21 @@ $noValue = "<span style='color: silver;'>—</span>";
                             </tr>
                             <tr>
                                 <td style="text-align: left;">
-                                    <?php echo $shopSupplierProduct->cmsSite->name; ?>
                                     <?
-                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                            'controllerId' => "/shop/admin-cms-content-element",
-                                            'modelId'      => $shopSupplierProduct->id,
-                                            'tag' => 'span',
-                                            'options'      => [
-                                                'style' => 'color: gray; text-align: left;',
-                                                'class' => '',
-                                            ],
-                                        ]);
+                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => "/shop/admin-cms-content-element",
+                                        'modelId'      => $shopSupplierProduct->id,
+                                        'tag'          => 'span',
+                                        'options'      => [
+                                            'style' => 'color: gray; text-align: left;',
+                                            'class' => '',
+                                        ],
+                                    ]);
                                     ?>
                                     <i class="fas fa-link" title="<?php echo $shopSupplierProduct->asText; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
                                     <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                    <?php echo $shopSupplierProduct->cmsSite->name; ?>
+
                                 </td>
                                 <td><?php echo $shopSupplierProduct->external_id ? $shopSupplierProduct->external_id : $noValue; ?></td>
                                 <td><?php echo $shopSupplierProduct->shopProduct->quantity; ?></td>
@@ -482,7 +609,7 @@ $noValue = "<span style='color: silver;'>—</span>";
 
 <!--Если у нас многосайтовость и это портал-->
 <?php if (
-    ($model->cmsSite->is_default && \skeeks\cms\models\CmsSite::find()->count() > 0) //Если у нас многосайтовость и этот товар - инфокарточка
+($model->cmsSite->is_default && \skeeks\cms\models\CmsSite::find()->count() > 0) //Если у нас многосайтовость и этот товар - инфокарточка
 ) : ?>
 
     <?php if (
@@ -512,15 +639,15 @@ $noValue = "<span style='color: silver;'>—</span>";
                                 <td style="text-align: left;">
                                     <?php echo $shopSupplierProduct->cmsSite->name; ?>
                                     <?
-                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                            'controllerId' => "/shop/admin-cms-content-element",
-                                            'modelId'      => $shopSupplierProduct->id,
-                                            'tag' => 'span',
-                                            'options'      => [
-                                                'style' => 'color: gray; text-align: left;',
-                                                'class' => '',
-                                            ],
-                                        ]);
+                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => "/shop/admin-cms-content-element",
+                                        'modelId'      => $shopSupplierProduct->id,
+                                        'tag'          => 'span',
+                                        'options'      => [
+                                            'style' => 'color: gray; text-align: left;',
+                                            'class' => '',
+                                        ],
+                                    ]);
                                     ?>
                                     <i class="fas fa-link" title="<?php echo $shopSupplierProduct->asText; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
                                     <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
@@ -540,7 +667,7 @@ $noValue = "<span style='color: silver;'>—</span>";
 
 
     <?php if (
-        ($model->shopSellerElements) //Если это товар собирает данные от поставщиков
+    ($model->shopSellerElements) //Если это товар собирает данные от поставщиков
     ) : ?>
 
 
@@ -565,19 +692,20 @@ $noValue = "<span style='color: silver;'>—</span>";
                                 <td style="text-align: left;">
                                     <?php echo $shopSupplierProduct->cmsSite->internalName; ?>
                                     <?
-                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                            'controllerId' => "/shop/admin-cms-content-element",
-                                            'modelId'      => $shopSupplierProduct->id,
-                                            'tag' => 'span',
-                                            'options'      => [
-                                                'style' => 'color: gray; text-align: left;',
-                                                'class' => '',
-                                            ],
-                                        ]);
+                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => "/shop/admin-cms-content-element",
+                                        'modelId'      => $shopSupplierProduct->id,
+                                        'tag'          => 'span',
+                                        'options'      => [
+                                            'style' => 'color: gray; text-align: left;',
+                                            'class' => '',
+                                        ],
+                                    ]);
                                     ?>
                                     <i class="fas fa-link" title="<?php echo $shopSupplierProduct->asText; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
                                     <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                    <a class=""  style="margin-left: 5px; border-bottom: 0px; color: gray;" href="<?php echo $shopSupplierProduct->url; ?>" title="Посмотреть на сайте (Откроется в новом окне)" target="_blank"><i class="fas fa-external-link-alt"></i></a>
+                                    <a class="" style="margin-left: 5px; border-bottom: 0px; color: gray;" href="<?php echo $shopSupplierProduct->url; ?>" title="Посмотреть на сайте (Откроется в новом окне)"
+                                       target="_blank"><i class="fas fa-external-link-alt"></i></a>
                                 </td>
                                 <td><?php echo $shopSupplierProduct->id; ?></td>
                                 <td><?php echo $shopSupplierProduct->shopProduct->quantity; ?></td>
@@ -653,7 +781,8 @@ if ($model->main_cce_id) {
     <section class="sx-info-block">
         <div class="row no-gutters">
             <div class="col-12">
-                <div class="sx-title">Прочие данные <i class="far fa-question-circle" title="Неразобранные данные, которые сохранились по товару в момент импорта на сайт" data-toggle="tooltip" style="margin-left: 5px;"></i></div>
+                <div class="sx-title">Прочие данные <i class="far fa-question-circle" title="Неразобранные данные, которые сохранились по товару в момент импорта на сайт" data-toggle="tooltip"
+                                                       style="margin-left: 5px;"></i></div>
                 <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $model->shopProduct]); ?>
             </div>
         </div>
