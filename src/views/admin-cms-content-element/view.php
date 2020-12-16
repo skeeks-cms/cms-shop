@@ -37,72 +37,58 @@ $('[data-fancybox="images"]').fancybox({
         {
             var self = this;
             
-            $("body").on("click", ".sx-fast-edit", function() {
+            $("body").on("click", ".sx-fast-edit-popover", function() {
                 var jWrapper = $(this);
-                if (jWrapper.hasClass("sx-edit-in-process")) {
-                    return;
+                self._createPopover(jWrapper);
+            });
+            
+            
+            /*$("body").on("submit", ".sx-fast-edit-form", function() {
+                event.preventDefault()
+
+                var jForm = $(this);
+                
+                if (jForm.hasClass("sx-save-process")) {
+                    return false;
                 }
-                
-                jWrapper.addClass('sx-edit-in-process');
-                
-                var model_id = jWrapper.data("model_id");
-                var model = jWrapper.data("model");
-                var attribute = jWrapper.data("attribute");
-                var element = jWrapper.data("element");
-                
-                var jInput = $("<input>", {
-                    'type' : 'text',
-                    'class' : 'form-control sx-fast-edit-value',
-                });
-                
-                var jButton = $("<div>", {
-                    'class' : 'input-group-append',
-                }).append('<button class="btn btn-primary" type="button"><i class="fas fa-check"></i></button>');
-                
-                jButton.on("click", function() {
-                    jInput.trigger("change");
-                });
-                
-                var jGroup = $("<div>", {
-                    "class" : "input-group"
-                });
-                jGroup.append(jInput).append(jButton);
-                jWrapper.empty().append(jGroup);
-                jInput.focus();
-            });
-            
-            /**
-            * Завершить редактирование 
-            */
-            $("body").on("complete-edit", ".sx-fast-edit", function(e, data) {
-                var jWrapper = $(this);
-                jWrapper.removeClass('sx-edit-in-process');
-                $.pjax.reload("#" + jWrapper.closest('[data-pjax-container]').attr("id"));
-            });
-            
-            
-            $("body").on("change", ".sx-fast-edit-value", function() {
-                var jWrapper = $(this).closest(".sx-fast-edit");
+                jForm.addClass("sx-save-process");
                 
                 var AjaxQuery = sx.ajax.preparePostQuery(self.get('backend'));
                 new sx.classes.AjaxHandlerStandartRespose(AjaxQuery);
                 
-                AjaxQuery.setData(_.extend(jWrapper.data(), {
-                    'value' : $(this).val()
-                }));
+                AjaxQuery.setData($(this).serializeArray());
                 
                 AjaxQuery.on("success", function() {
-                    jWrapper.trigger("complete-edit");
+                    $.pjax.reload("#" + jWrapper.closest('[data-pjax-container]').attr("id"));
                     
                 });
                 
                 AjaxQuery.on("error", function() {
-                    jWrapper.trigger("complete-edit");
+                    jForm.trigger("complete-edit");
                 });
                 
                 AjaxQuery.execute();
-            });
+                
+                return false;
+            });*/
         },
+        
+        _createPopover(jWrapper) {
+            jWrapper.popover({
+                "html": true,
+                //'container': "body",
+                'trigger': "click",
+                'boundary': 'window',
+                'title': jWrapper.data('title').length ? jWrapper.data('title') : "",
+                'content': $(jWrapper.data('form'))
+            });
+
+            jWrapper.on('show.bs.popover', function (e, data) {
+                jWrapper.addClass('is-rendered');
+            });
+
+            jWrapper.popover('show');
+        }
         
         
     });
@@ -115,6 +101,10 @@ JS
 $this->registerCSS(<<<CSS
 .sx-fast-edit-value {
     padding: 5px;
+}
+
+.sx-fast-edit-form-wrapper {
+    display: none;
 }
 
 .sx-fast-edit {
@@ -411,9 +401,37 @@ $noValue = "<span style='color: silver;'>—</span>";
                             Артикул
                         </span>
                         <span class="sx-properties--value">
-                            <span class="sx-fast-edit g-color-primary" data-attribute="external_id" data-model="element" data-model_id="<?php echo $model->id; ?>">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#external_id-form"
+                                  data-title="Артикул"
+                            >
                                 <?php echo $model->external_id ? $model->external_id : "&nbsp;&nbsp;&nbsp;" ?>
                             </span>
+                            
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "external_id-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model, 'external_id')->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
                         </span>
                     </li>
                     <li>
@@ -425,12 +443,50 @@ $noValue = "<span style='color: silver;'>—</span>";
                 </span>
                     </li>
                     <li>
-                <span class="sx-properties--name">
-                    Категория
-                </span>
+                        <span class="sx-properties--name">
+                            Категория
+                        </span>
                         <span class="sx-properties--value" title="<?php echo $model->cmsTree ? $model->cmsTree->fullName : ""; ?>" data-toggle="tooltip">
-                        <?php echo $model->cmsTree ? $model->cmsTree->name : ""; ?>
-                </span>
+                            
+                        
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#tree_id-form"
+                                  data-title="Категория"
+                            >
+                                <?php echo $model->cmsTree ? $model->cmsTree->name : ""; ?>
+                            </span>
+                            
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "tree_id-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model, 'tree_id')
+                                    ->widget(
+                                        \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class, [
+                                            'visibleInput' => false
+                                        ]
+                                    )
+                                    ->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+                        </span>
+
                     </li>
                     <li>
                 <span class="sx-properties--name">
@@ -445,7 +501,6 @@ $noValue = "<span style='color: silver;'>—</span>";
         </div>
     </div>
 </div>
-<?php $pjax::end(); ?>
 
 <?php if (
     (!$model->cmsSite->is_default && \skeeks\cms\models\CmsSite::find()->count() > 0) //Если у нас многосайтовость и этот товар - инфокарточка
@@ -469,10 +524,56 @@ $noValue = "<span style='color: silver;'>—</span>";
                         <? foreach ($model->cmsSite->shopTypePrices as $shopTypePrice) : ?>
                             <?php $price = $model->shopProduct->getPrice($shopTypePrice); ?>
                             <td>
-                                <span class="sx-fast-edit g-color-primary" data-attribute="value" data-model="price" data-model_id="<?php echo $shopTypePrice->id; ?>">
-                                     <?php echo $price ? $price->money : $noValue ?>
+                                <span class="sx-fast-edit sx-fast-edit-popover"
+                                      data-form="#price-<?php echo $shopTypePrice->id; ?>-form"
+                                      data-title="<?php echo $shopTypePrice->name; ?>"
+                                >
+                                    <?php echo $price && (float)$price->money->amount > 0 ? $price->money : "&nbsp;&nbsp;&nbsp;" ?>
                                 </span>
-                               
+
+                                <div class="sx-fast-edit-form-wrapper">
+                                    <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                        'id'             => "price-{$shopTypePrice->id}-form",
+                                        'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                        'options'        => [
+                                            'class' => 'sx-fast-edit-form',
+                                        ],
+                                        'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                            function (ActiveFormAjaxSubmit) {
+                                                ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                    $.pjax.reload("#{$pjax->id}");
+                                                    $(".sx-fast-edit").popover("hide");
+                                                });
+                                            }
+JS
+                                        ),
+                                    ]); ?>
+                                    <input type="hidden" value="update-price" name="act" class="form-control"/>
+                                    <input type="hidden" value="<?php echo $shopTypePrice->id; ?>" name="shop_type_price_id" class="form-control"/>
+
+                                    <div class="input-group">
+                                        <input type="text" value="<?php echo(($price && (float)$price->money->amount > 0) ? (float)$price->money->amount : ""); ?>" name="price_value" class="form-control"/>
+                                        <?php if (count(\Yii::$app->money->activeCurrencies) > 1) : ?>
+                                            <? echo \yii\helpers\Html::listBox("price_currency_code", $price ? $price->money->currency->code : "", \yii\helpers\ArrayHelper::map(
+                                                \Yii::$app->money->activeCurrencies, 'code', 'code'
+                                            ), ['size' => 1, 'class' => 'form-control']); ?>
+                                        <?php endif; ?>
+                                        <? /* echo \skeeks\cms\widgets\Select::widget([
+                                            'name'          => "price_currency_code",
+                                            'value'         => $price ? $price->money->currency->code : "",
+                                            'allowDeselect' => false,
+                                            'items'         => \yii\helpers\ArrayHelper::map(
+                                                \Yii::$app->money->activeCurrencies, 'code', 'code'
+                                            ),
+                                        ]) */ ?>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <?php $form::end(); ?>
+                                </div>
+
                             </td>
                         <? endforeach; ?>
                         <td><?php echo $noValue; ?></td>
@@ -497,6 +598,12 @@ $noValue = "<span style='color: silver;'>—</span>";
                     </tr>
 
                     <?php if (\Yii::$app->skeeks->site->shopStores) : ?>
+                    
+                        <?php
+                            $totalSummPrice = 0;
+                            $totalSummQuantity = 0;
+                        ?>
+                    
                         <?php foreach (\Yii::$app->skeeks->site->shopStores as $shopStore) : ?>
                             <?php
                             $storeProduct = $model->shopProduct->getStoreProduct($shopStore);
@@ -504,13 +611,52 @@ $noValue = "<span style='color: silver;'>—</span>";
                             $money = $model->shopProduct->baseProductPrice->money;
                             if ($storeProduct) {
                                 $totalPrice = $money->mul((float)$storeProduct->quantity);
+                                $totalSummQuantity = $totalSummQuantity + $storeProduct->quantity;
+
                             }
 
                             ?>
                             <tr>
                                 <td style="text-align: left;"><?php echo $shopStore->name; ?></td>
                                 <td><?php echo $model->shopProduct->baseProductPrice->money; ?></td>
-                                <td><?php echo $storeProduct ? (float)$storeProduct->quantity : $noValue; ?></td>
+                                <td>
+                                    <span class="sx-fast-edit sx-fast-edit-popover"
+                                          data-form="#store-<?php echo $shopStore->id; ?>-form"
+                                          data-title="<?php echo $shopStore->name; ?>"
+                                    >
+                                        <?php echo $storeProduct ? (float) $storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
+                                    </span>
+    
+                                    <div class="sx-fast-edit-form-wrapper">
+                                        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                            'id'             => "store-{$shopStore->id}-form",
+                                            'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                            'options'        => [
+                                                'class' => 'sx-fast-edit-form',
+                                            ],
+                                            'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                                function (ActiveFormAjaxSubmit) {
+                                                    ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                        $.pjax.reload("#{$pjax->id}");
+                                                        $(".sx-fast-edit").popover("hide");
+                                                    });
+                                                }
+JS
+                                            ),
+                                        ]); ?>
+                                        <input type="hidden" value="update-store" name="act" class="form-control"/>
+                                        <input type="hidden" value="<?php echo $shopStore->id; ?>" name="shop_store_id" class="form-control"/>
+                                        <div class="input-group">
+                                            <input type="text" value="<?php echo($storeProduct ? (float)$storeProduct->quantity : ""); ?>" name="store_quantity" class="form-control"/>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
+                                            </div>
+                                        </div>
+    
+                                        <?php $form::end(); ?>
+                                    </div>
+                                        
+                                </td>
                                 <td><?php echo $totalPrice; ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -526,7 +672,7 @@ $noValue = "<span style='color: silver;'>—</span>";
 
                     <tr>
                         <td colspan="2" style="text-align: right;"><b>Итого</b></td>
-                        <td><?php echo $noValue; ?></td>
+                        <td><?php echo $totalSummQuantity ? $totalSummQuantity : $noValue; ?></td>
                         <td><?php echo $noValue; ?></td>
                     </tr>
                 </table>
@@ -788,5 +934,7 @@ if ($model->main_cce_id) {
         </div>
     </section>
 <?php endif; ?>
+
+<?php $pjax::end(); ?>
 
 

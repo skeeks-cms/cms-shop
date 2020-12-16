@@ -1100,4 +1100,38 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         return $productPrice;
     }
+
+    /**
+     * @param $shopStore
+     * @param $quantity
+     * @return ShopStoreProduct|null
+     * @throws Exception
+     */
+    public function saveStoreQuantity($shopStore, $quantity)
+    {
+        $shopStoreId = null;
+        if ($shopStore instanceof ShopStore) {
+            $shopStoreId = $shopStore->id;
+        } else {
+            $shopStoreId = (int)$shopStore;
+        }
+
+        if (!$shopStoreId) {
+            throw new InvalidArgumentException("Need shop store id");
+        }
+
+        if (!$storeProduct = $this->getStoreProduct($shopStoreId)) {
+            $storeProduct = new ShopStoreProduct();
+            $storeProduct->shop_product_id = $this->id;
+            $storeProduct->shop_store_id = $shopStoreId;
+        }
+
+        $storeProduct->quantity = $quantity;
+
+        if (!$storeProduct->save()) {
+            throw new Exception(print_r($storeProduct->errors, true));
+        }
+
+        return $storeProduct;
+    }
 }

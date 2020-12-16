@@ -36,6 +36,7 @@ use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -63,9 +64,9 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public $modelClassName = ShopCmsContentElement::class;
     public $modelShowAttribute = "asText";
 
-
     public function init()
     {
+        $this->modelDefaultAction = 'view';
         $this->name = \Yii::t('skeeks/shop/app', 'Elements');
         parent::init();
     }
@@ -80,8 +81,8 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                 "view" => [
                     'class'    => BackendModelAction::class,
                     'priority' => 80,
-                    'name' => 'Карточка',
-                    'icon' => 'fas fa-info-circle'
+                    'name'     => 'Карточка',
+                    'icon'     => 'fas fa-info-circle',
                 ],
 
                 "offers" => [
@@ -196,6 +197,10 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             return false;
                         }
                         
+                        if ($model->main_cce_id) {
+                            return false;
+                        }
+
 
                         /**
                          * @var $site \skeeks\cms\shop\models\CmsSite
@@ -265,7 +270,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                                 //\Yii::$app->urlManager->hostInfo = $defaultSite->url;
                                 $url = Url::to(['/shop/admin-cms-content-element/create', 'content_id' => $model->content_id, 'shop_sub_product_id' => $model->id], true);
                                 //\Yii::$app->urlManager->hostInfo = $hostInfo;
-                                
+
                                 $result[] = [
                                     'class'   => HtmlBlock::class,
                                     'content' => <<<HTML
@@ -373,9 +378,9 @@ HTML
                             ],
                         ];
                     },
-                    
-                    
-                    'accessCallback'  => function (BackendModelAction $action) {
+
+
+                    'accessCallback' => function (BackendModelAction $action) {
                         $model = $action->model;
                         if (!$model) {
                             return false;
@@ -470,9 +475,9 @@ HTML
                         $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
                     },
-                    'accessCallback' => function (BackendModelAction $action) {
+                    'accessCallback'  => function (BackendModelAction $action) {
                         $model = $action->model;
-                        
+
                         if (!$model) {
                             return false;
                         }
@@ -489,7 +494,7 @@ HTML
                         if ($site->shopSite->is_supplier) {
                             return false;
                         }
-                        
+
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                 ],
@@ -589,7 +594,7 @@ HTML
                 ],
 
                 "orders" => [
-                    'generateAccess' => true,
+                    'generateAccess'  => true,
                     'class'           => BackendGridModelRelatedAction::class,
                     'name'            => ['skeeks/shop/app', 'In orders'],
                     'icon'            => 'fas fa-cart-arrow-down',
@@ -642,10 +647,10 @@ HTML
                 ],
 
                 "update-data" => [
-                    'class' => ViewBackendAction::class,
-                    'icon'  => 'fas fa-sync',
-                    'name'  => 'Обновление данных',
-                    "accessCallback"     => function () {
+                    'class'          => ViewBackendAction::class,
+                    'icon'           => 'fas fa-sync',
+                    'name'           => 'Обновление данных',
+                    "accessCallback" => function () {
                         if (!\Yii::$app->skeeks->site->is_default) {
                             return false;
                         }
@@ -657,17 +662,17 @@ HTML
                 "create" => [
 
                     'accessCallback' => function (BackendAction $action) {
-                    
+
                         if (\Yii::$app->request->get("shop_sub_product_id")) {
-                            return \Yii::$app->user->can($this->permissionName . "/create");
+                            return \Yii::$app->user->can($this->permissionName."/create");
                         }
-                        
+
                         if (!\Yii::$app->skeeks->site->shopSite->is_allow_edit_products) {
                             return false;
                         }
-                        
-                        return \Yii::$app->user->can($this->permissionName . "/create");
-                    }
+
+                        return \Yii::$app->user->can($this->permissionName."/create");
+                    },
                 ],
 
                 "update" => [
@@ -694,18 +699,18 @@ HTML
                         if ($model->main_cce_id) {
                             return false;
                         }
-                        
-                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $action->model]);
+
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
                     },
                 ],
-                
-                
+
+
                 "update-attribute" => [
 
-                    'class' => BackendModelAction::class,
+                    'class'     => BackendModelAction::class,
                     'isVisible' => false,
-                    'callback' => [$this, 'actionUpdateAttribute'],
-                    
+                    'callback'  => [$this, 'actionUpdateAttribute'],
+
                     'accessCallback' => function (BackendModelAction $action) {
 
                         /**
@@ -725,7 +730,7 @@ HTML
                             return false;
                         }
 
-                        return \Yii::$app->user->can($this->permissionName . "/update", ['model' => $action->model]);
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
                     },
                 ],
 
@@ -912,7 +917,6 @@ HTML
             'attribute' => 'id',
             'class'     => ShopProductColumn::class,
         ];
-
 
 
         if (\Yii::$app->shop->shopTypePrices) {
@@ -1190,7 +1194,7 @@ HTML
 
             //$action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), array_keys($filterFieldsLabels));
         }
-        
+
         $visibleColumns = ArrayHelper::merge([
             'checkbox',
             'actions',
@@ -1417,9 +1421,9 @@ CSS
                     $siteClass = \Yii::$app->skeeks->siteClass;
                     \Yii::$app->skeeks->site = $siteClass::find()->where(['is_default' => 1])->one();
                     if ($model->save() && $relatedModel->save()) {
-                        
+
                         \Yii::$app->skeeks->site = $site;
-                            
+
                         $shopProduct->id = $model->id;
                         if (!$shopProduct->save()) {
                             throw new \yii\base\Exception("Товар не сохранен: ".print_r($shopProduct->errors, true));
@@ -1575,7 +1579,7 @@ CSS
                 if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
                     $model->load(\Yii::$app->request->post());
                     $relatedModel->load(\Yii::$app->request->post());
-                    
+
                     if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
 
                         /**
@@ -1637,8 +1641,8 @@ CSS
             throw $e;
         }
 
-                        //die('111');
-                        
+        //die('111');
+
         //return $this->render('@skeeks/cms/shop/views/admin-cms-content-element/_form', [
         return $this->render($this->editForm, [
             'model'             => $model,
@@ -1790,33 +1794,43 @@ JS
     }
 
     /**
-     * 
+     *
      */
     public function actionUpdateAttribute()
     {
         $rr = new RequestResponse();
-        
+        /**
+         * @var $model ShopCmsContentElement
+         */
+        $model = $this->model;
+
         if ($rr->isRequestAjaxPost()) {
-            $this->model;
-            if (\Yii::$app->request->post("element")) {
-                $attribute = \Yii::$app->request->post("attribute");
-                $this->model->{$attribute} = \Yii::$app->request->post("value");
 
-                try {
+            $attribute = \Yii::$app->request->post("attribute");
+            $value = \Yii::$app->request->post("value");
 
-                    if (!$this->model->save()) {
+            try {
 
+                if (\Yii::$app->request->post("act") == "update-price") {
+                    $model->shopProduct->savePrice((int) \Yii::$app->request->post("shop_type_price_id"), (float) \Yii::$app->request->post("price_value"));
+                } elseif(\Yii::$app->request->post("act") == "update-store") {
+                    $model->shopProduct->saveStoreQuantity((int) \Yii::$app->request->post("shop_store_id"), (float) \Yii::$app->request->post("store_quantity"));
+                } else {
+                    $model->load(\Yii::$app->request->post());
+                    if (!$model->save()) {
+                        throw new \yii\base\Exception("Ошибка сохранения: ".print_r($this->model->errors, true));
                     }
-
-                } catch (\Exception $exception) {
-
                 }
 
-                if ($this->model->save()) {
+                $rr->message = "Обновлено";
+                $rr->success = true;
 
-                }
+            } catch (\Exception $exception) {
+                $rr->message = $exception->getMessage();
+                $rr->success = false;
             }
         }
+
         return $rr;
     }
 }
