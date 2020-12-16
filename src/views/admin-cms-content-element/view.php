@@ -597,12 +597,14 @@ JS
                         <th><?php echo \Yii::$app->shop->baseTypePrice->name; ?> (сумма)</th>
                     </tr>
 
+                    <?php
+                        $totalSummPrice = 0;
+                        $totalSummQuantity = 0;
+                    ?>
+                
                     <?php if (\Yii::$app->skeeks->site->shopStores) : ?>
                     
-                        <?php
-                            $totalSummPrice = 0;
-                            $totalSummQuantity = 0;
-                        ?>
+                        
                     
                         <?php foreach (\Yii::$app->skeeks->site->shopStores as $shopStore) : ?>
                             <?php
