@@ -13,6 +13,7 @@ use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -81,6 +82,29 @@ class AdminShopSiteController extends BackendModelController
      */
     public function updateFields()
     {
+
+        $propertyQuery = CmsContentProperty::find()
+                            //->cmsSite()
+
+                            ->orderBy(['priority' => SORT_ASC]);
+
+        if (\Yii::$app->skeeks->site->shopSite->is_receiver) {
+            $defaultSite = CmsSite::find()->default()->one();
+            $propertyQuery->andWhere([
+                'or',
+                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                [CmsContentProperty::tableName().'.cms_site_id' => null],
+                [CmsContentProperty::tableName().'.cms_site_id' => $defaultSite->id],
+            ]);
+        } else {
+            $propertyQuery->andWhere([
+                'or',
+                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+                [CmsContentProperty::tableName().'.cms_site_id' => null],
+            ]);
+        }
+
+
         return [
             /*'is_supplier' => [
                 'class' => BoolField::class,
@@ -161,14 +185,7 @@ class AdminShopSiteController extends BackendModelController
                     'show_filter_property_ids' => [
                         'class'    => SelectField::class,
                         'multiple' => true,
-                        'items'    => ArrayHelper::map(CmsContentProperty::find()
-                            //->cmsSite()
-                            ->andWhere([
-                                'or',
-                                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
-                                [CmsContentProperty::tableName().'.cms_site_id' => null],
-                            ])
-                            ->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                        'items'    => ArrayHelper::map($propertyQuery->all(), 'id', 'asText'),
                     ],
 
                     'open_filter_property_ids' => [

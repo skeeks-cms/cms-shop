@@ -57,7 +57,7 @@ class ShopComponent extends Component implements BootstrapInterface
     /**
      * @var array
      */
-    public $paySystemHandlers = [];
+    public $paysystemHandlers = [];
 
     /**
      * Максимальное допустимое количество товаров
@@ -1120,6 +1120,24 @@ SQL
 
         if ($this->deliveryHandlers) {
             foreach ($this->deliveryHandlers as $handlerClass)
+            {
+                $result[$handlerClass] = (new $handlerClass())->descriptor->name;
+            }
+        }
+
+        return $result;
+    }
+    
+    
+    /**
+     * @return array
+     */
+    public function getPaysystemHandlersForSelect()
+    {
+        $result = [];
+
+        if ($this->paysystemHandlers) {
+            foreach ($this->paysystemHandlers as $handlerClass)
             {
                 $result[$handlerClass] = (new $handlerClass())->descriptor->name;
             }
