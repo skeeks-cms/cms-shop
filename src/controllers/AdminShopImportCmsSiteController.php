@@ -284,6 +284,14 @@ HTML
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
                         ],
                     ],
+                ],
+            ],
+
+
+            'main_price' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Розничная цена',
+                'fields' => [
                     'sender_shop_type_price_id' => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(
@@ -292,6 +300,11 @@ HTML
                             'asText'
                         ),
                     ],
+
+                    "extra_charge"                => [
+                        'class'  => NumberField::class,
+                        'append' => "%",
+                    ],
                 ],
             ],
 
@@ -299,30 +312,10 @@ HTML
                 'class'  => FieldSet::class,
                 'name'   => 'Ваш сайт',
                 'fields' => [
-                    "extra_charge"                => [
-                        'class'  => NumberField::class,
-                        'append' => "%",
-                    ],
+
                     "priority"                => [
                         'class'  => NumberField::class,
                     ],
-                    /*'receiver_shop_type_price_id' => [
-                        'class' => SelectField::class,
-                        'items' => ArrayHelper::map(
-                            \Yii::$app->skeeks->site->shopTypePrices,
-                            'id',
-                            'asText'
-                        ),
-                    ],
-                    'receiver_cms_tree_id' => [
-                        'class' => WidgetField::class,
-                        'widgetClass' => SelectTreeInputWidget::class,
-                        'widgetConfig' => [
-                            'treeWidgetOptions' => [
-                                'models' => \skeeks\cms\models\CmsTree::findRootsForSite()->all(),
-                            ],
-                        ],
-                    ]*/
                 ],
             ],
 
