@@ -185,13 +185,7 @@ class ShopPersonType extends \skeeks\cms\models\Core
         return $this->hasMany(ShopPersonTypeProperty::class,
             ['shop_person_type_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopTaxRates()
-    {
-        return $this->hasMany(ShopTaxRate::class, ['person_type_id' => 'id']);
-    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */

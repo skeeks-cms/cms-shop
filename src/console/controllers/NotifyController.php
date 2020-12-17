@@ -9,7 +9,6 @@
 namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\shop\models\ShopProduct;
-use skeeks\cms\shop\models\ShopProductQuantityChange;
 use skeeks\cms\shop\models\ShopQuantityNoticeEmail;
 use yii\console\Controller;
 use yii\helpers\Console;
@@ -27,6 +26,7 @@ class NotifyController extends Controller
      */
     public function actionQuantityEmails()
     {
+        return false;
         $countEmails = ShopQuantityNoticeEmail::find()
             ->andWhere(['is_notified' => 0])
             ->orderBy(['created_at' => SORT_ASC])

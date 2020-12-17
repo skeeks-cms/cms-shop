@@ -32,7 +32,6 @@ use yii\helpers\Json;
  * @property double                      $measure_ratio
  * @property integer                     $vat_id
  * @property string                      $vat_included
- * @property double                      $quantity_reserved
  * @property string                      $measure_code
  * @property double                      $width
  * @property double                      $length
@@ -59,7 +58,6 @@ use yii\helpers\Json;
  * @property ShopProductPrice            $baseProductPrice
  * @property ShopProductPrice            $minProductPrice
  * @property ShopProductPrice[]          $viewProductPrices
- * @property ShopProductQuantityChange[] $shopProductQuantityChanges
  * @property ShopQuantityNoticeEmail[]   $shopQuantityNoticeEmails
  * @property ShopStoreProduct[]          $shopStoreProducts
  *
@@ -177,43 +175,8 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         $this->on(self::EVENT_AFTER_INSERT, [$this, "_updateParentAfterInsert"]);
 
-        $this->on(self::EVENT_AFTER_INSERT, [$this, "_logQuantityInsert"]);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_logQuantityUpdate"]);
-    }
-    public function _logQuantityInsert($event)
-    {
-        $log = new ShopProductQuantityChange();
-
-        $log->shop_product_id = $this->id;
-        $log->quantity = $this->quantity;
-        $log->quantity_reserved = $this->quantity_reserved;
-        $log->measure_code = $this->measure_code;
-        $log->measure_ratio = $this->measure_ratio;
-
-        $log->save();
     }
 
-    public function _logQuantityUpdate($event)
-    {
-        if (
-            ($this->isAttributeChanged('quantity', false)
-                || $this->isAttributeChanged('quantity_reserved', false)
-                || $this->isAttributeChanged('measure_code', false)
-                || $this->isAttributeChanged('measure_ratio', false))
-            ||
-            !$this->shopProductQuantityChanges
-        ) {
-            $log = new ShopProductQuantityChange();
-
-            $log->shop_product_id = $this->id;
-            $log->quantity = $this->quantity;
-            $log->quantity_reserved = $this->quantity_reserved;
-            $log->measure_code = $this->measure_code;
-            $log->measure_ratio = $this->measure_ratio;
-
-            $log->save();
-        }
-    }
 
     public function _beforeUpdateEvent($event)
     {
@@ -429,7 +392,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                 [
                     'quantity',
                     'weight',
-                    'quantity_reserved',
                     'width',
                     'length',
                     'height',
@@ -524,7 +486,6 @@ class ShopProduct extends \skeeks\cms\models\Core
 
 
             [['quantity'], 'default', 'value' => 1],
-            [['quantity_reserved'], 'default', 'value' => 0],
 
 
             [['measure_matches_jsondata'], 'string'],
@@ -649,7 +610,6 @@ class ShopProduct extends \skeeks\cms\models\Core
             'weight'            => \Yii::t('skeeks/shop/app', 'Вес'),
             'vat_id'            => \Yii::t('skeeks/shop/app', 'VAT rate'),
             'vat_included'      => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
-            'quantity_reserved' => \Yii::t('skeeks/shop/app', 'Reserved quantity'),
             'measure_code'      => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
             'measure_ratio'     => \Yii::t('skeeks/shop/app', 'Минимальное количество продажи'),
             'width'             => \Yii::t('skeeks/shop/app', 'Width'),
@@ -748,14 +708,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getShopViewedProducts()
     {
         return $this->hasMany(ShopViewedProduct::class, ['shop_product_id' => 'id']);
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopProductQuantityChanges()
-    {
-        return $this->hasMany(ShopProductQuantityChange::class,
-            ['shop_product_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
     }
 
     /**

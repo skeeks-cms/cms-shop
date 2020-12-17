@@ -183,7 +183,7 @@ return [
                 ],
             ],
 
-            [
+            /*[
                 'priority' => 50,
                 'label'    => \Yii::t('skeeks/shop/app', 'Reports'),
                 "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/reports.png'],
@@ -202,7 +202,7 @@ return [
 
                     ],
 
-            ],
+            ],*/
 
             [
                 "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
@@ -300,24 +300,8 @@ return [
                         ],*/
                             
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Taxes'),
-                            'items' =>
-                                [
-                                    [
-                                        "label" => \Yii::t('skeeks/shop/app', 'List of taxes'),
-                                        "url"   => ["shop/admin-tax"],
-                                    ],
-
-                                    [
-                                        "label" => \Yii::t('skeeks/shop/app', 'Tax rates'),
-                                        "url"   => ["shop/admin-tax-rate"],
-                                    ],
-
-                                    [
-                                        "label" => \Yii::t('skeeks/shop/app', 'VAT rates'),
-                                        "url"   => ["shop/admin-vat"],
-                                    ],
-                                ],
+                            "label" => \Yii::t('skeeks/shop/app', 'VAT rates'),
+                            "url"   => ["shop/admin-vat"],
                         ],
 
                     ],

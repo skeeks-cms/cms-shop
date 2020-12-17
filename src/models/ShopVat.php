@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\components\Cms;
 use skeeks\cms\models\Core;
 use yii\helpers\ArrayHelper;
 
@@ -22,7 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $updated_at
  * @property string  $name
  * @property integer $priority
- * @property string  $active
+ * @property integer $is_active
  * @property number  $rate
  */
 class ShopVat extends Core
@@ -41,13 +40,10 @@ class ShopVat extends Core
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority', 'is_active'], 'integer'],
             [['name'], 'required'],
             [['rate'], 'number'],
             [['name'], 'string', 'max' => 255],
-            [['active'], 'string', 'max' => 1],
-            [['active'], 'default', 'value' => Cms::BOOL_Y],
-            [['active'], 'in', 'range' => array_keys(\Yii::$app->cms->booleanFormat())],
         ]);
     }
 
@@ -64,7 +60,7 @@ class ShopVat extends Core
             'updated_at' => \Yii::t('skeeks/shop/app', 'Updated At'),
             'name'       => \Yii::t('skeeks/shop/app', 'Name'),
             'priority'   => \Yii::t('skeeks/shop/app', 'Priority'),
-            'active'     => \Yii::t('skeeks/shop/app', 'Active'),
+            'is_active'  => \Yii::t('skeeks/shop/app', 'Active'),
             'rate'       => \Yii::t('skeeks/shop/app', 'Bet'),
         ]);
     }
