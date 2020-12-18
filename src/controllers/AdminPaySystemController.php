@@ -8,14 +8,23 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
+use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
-use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopPaySystem;
+use skeeks\cms\shop\paysystem\PaysystemHandler;
+use skeeks\yii2\form\Builder;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextareaField;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 
@@ -44,10 +53,9 @@ class AdminPaySystemController extends BackendModelStandartController
     {
         return ArrayHelper::merge(parent::actions(),
             [
-                'index' =>
-                    [
+                'index' => [
                         "backendShowings" => false,
-                        "filters" => false,
+                        "filters"         => false,
 
                         'grid' => [
                             'on init' => function (Event $e) {
@@ -56,10 +64,10 @@ class AdminPaySystemController extends BackendModelStandartController
                                  * @var $query ActiveQuery
                                  */
                                 $query = $e->sender->dataProvider->query;
-        
+
                                 $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
                             },
-                                    
+
                             'defaultOrder' => [
                                 'priority' => SORT_ASC,
                             ],
@@ -73,8 +81,8 @@ class AdminPaySystemController extends BackendModelStandartController
                             ],
 
                             "columns" => [
-                                'name'         => [
-                                    'class' => DefaultActionColumn::class,
+                                'name' => [
+                                    'class'         => DefaultActionColumn::class,
                                     'viewAttribute' => 'asText',
                                 ],
                                 'priority',
@@ -96,133 +104,139 @@ class AdminPaySystemController extends BackendModelStandartController
                         ],
                     ],
 
-                'create' =>
-                    [
-                        'callback' => [$this, 'create'],
-                    ],
+                "create" => [
+                    'fields'        => [$this, 'updateFields'],
+                    'on beforeSave' => function (Event $e) {
+                        /**
+                         * @var $action BackendModelUpdateAction;
+                         * @var $model CmsUser;
+                         */
+                        $action = $e->sender;
+                        $model = $action->model;
+                        $action->isSaveFormModels = false;
 
-                'update' =>
-                    [
-                        'callback' => [$this, 'update'],
-                    ],
+                        if (isset($action->formModels['handler'])) {
+                            $handler = $action->formModels['handler'];
+                            $model->component_config = $handler->toArray();
+                        }
+
+                        if ($model->save()) {
+                            //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                        } else {
+                            throw new Exception(print_r($model->errors, true));
+                        }
+
+                    },
+                ],
+                "update" => [
+                    'fields'        => [$this, 'updateFields'],
+                    'on beforeSave' => function (Event $e) {
+                        /**
+                         * @var $action BackendModelUpdateAction;
+                         * @var $model CmsUser;
+                         */
+                        $action = $e->sender;
+                        $model = $action->model;
+                        $action->isSaveFormModels = false;
+
+                        if (isset($action->formModels['handler'])) {
+                            $handler = $action->formModels['handler'];
+                            $model->component_config = $handler->toArray();
+                        }
+
+
+                        if ($model->save()) {
+                            //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
+                        } else {
+                            throw new Exception(print_r($model->errors, true));
+                        }
+
+                    },
+
+                ],
+
+                "activate-multi" => [
+                    'class' => BackendModelMultiActivateAction::class,
+                ],
+
+                "deactivate-multi" => [
+                    'class' => BackendModelMultiDeactivateAction::class,
+                ],
             ]
         );
     }
 
 
-    public function create()
+    public function updateFields($action)
     {
-        $rr = new RequestResponse();
-
-        $modelClass = $this->modelClassName;
+        $handlerFields = [];
         /**
-         * @var CmsContentProperty $model
+         * @var $handler PaysystemHandler
          */
-        $model = new $modelClass();
-        $model->loadDefaultValues();
+        if ($action->model && $action->model->handler) {
+            $handler = $action->model->handler;
+            $handlerFields = $handler->getConfigFormFields();
+            $handlerFields = Builder::setModelToFields($handlerFields, $handler);
 
-        if ($post = \Yii::$app->request->post()) {
-            $model->load($post);
-        }
-
-        $handler = $model->handler;
-
-        if ($handler) {
+            $action->formModels['handler'] = $handler;
             if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
+
         }
 
-        if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
-                $handlerValid = true;
-                if ($handler) {
-                    $model->component_settings = $handler->toArray();
-                    $handler->load(\Yii::$app->request->post());
+        $result = [
+            'main'         => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Main'),
+                'fields' => [
 
-                    $handlerValid = $handler->validate();
-                }
+                    'name',
+
+                    'description' => [
+                        'class' => TextareaField::class,
+                    ],
+
+                    'is_active' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+
+                    'personTypeIds' => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name'),
+                    ],
 
 
-                if ($model->load(\Yii::$app->request->post())
-                    && $model->validate() && $handlerValid
-                ) {
-                    $model->save();
+                    'priority' => [
+                        'class' => NumberField::class
+                    ],
 
-                    \Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/cms', 'Saved'));
+                    'component' => [
+                        'class'   => SelectField::class,
+                        'items'   => \Yii::$app->shop->getPaysystemHandlersForSelect(),
+                        'elementOptions' => [
+                            RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
+                        ],
+                    ],
+                ],
+            ],
 
-                    return $this->redirect(
-                        UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
-                            ->addData([$this->requestPkParamName => $model->{$this->modelPkAttribute}])
-                            ->toString()
-                    );
-                } else {
-                    \Yii::$app->getSession()->setFlash('error', \Yii::t('skeeks/cms', 'Could not save'));
-                }
-            }
+        ];
+
+        if ($handlerFields) {
+            $result = ArrayHelper::merge($result, [
+                'handler' => [
+                    'class'  => FieldSet::class,
+                    'name'   => "Настройки платежной системы",
+                    'fields' => $handlerFields,
+                ],
+            ]);
         }
 
-        return $this->render('_form', [
-            'model'   => $model,
-            'handler' => $handler,
-        ]);
-    }
 
-
-    public function update()
-    {
-        $rr = new RequestResponse();
-
-        $model = $this->model;
-
-        if ($post = \Yii::$app->request->post()) {
-            $model->load($post);
-        }
-
-        $handler = $model->handler;
-        if ($handler) {
-            if ($post = \Yii::$app->request->post()) {
-                $handler->load($post);
-            }
-        }
-
-        if ($rr->isRequestPjaxPost()) {
-            if (!\Yii::$app->request->post($this->notSubmitParam)) {
-                if ($rr->isRequestPjaxPost()) {
-                    $handlerValid = true;
-                    if ($handler) {
-                        $model->component_settings = $handler->toArray();
-                        $handler->load(\Yii::$app->request->post());
-
-                        $handlerValid = $handler->validate();
-                    }
-
-                    if ($model->load(\Yii::$app->request->post())
-                        && $model->validate() && $handlerValid
-                    ) {
-                        $model->save();
-
-                        \Yii::$app->getSession()->setFlash('success', \Yii::t('app', 'Saved'));
-
-                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
-
-                        } else {
-                            return $this->redirect(
-                                $this->url
-                            );
-                        }
-
-                        $model->refresh();
-
-                    }
-                }
-            }
-        }
-
-        return $this->render('_form', [
-            'model'   => $model,
-            'handler' => $handler,
-        ]);
+        return $result;
     }
 
 }

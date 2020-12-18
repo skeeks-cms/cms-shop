@@ -27,6 +27,10 @@ class AdminPaymentController extends BackendModelStandartController
         $this->name = \Yii::t('skeeks/shop/app', 'Платежи по заказам');
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopPayment::class;
+        
+        $this->permissionName = "shop/admin-order";
+        
+        $this->generateAccessActions = false;
 
         parent::init();
     }
@@ -37,7 +41,6 @@ class AdminPaymentController extends BackendModelStandartController
     public function actions()
     {
         $result = ArrayHelper::merge(parent::actions(), [
-
             "index" => [
                 "filters" => [
                     "visibleFilters" => [
@@ -53,10 +56,11 @@ class AdminPaymentController extends BackendModelStandartController
 
                     'visibleColumns' => [
                         //'checkbox',
-                        //'actions',
+                        'actions',
                         'id',
 
                         'created_at',
+                        'paid_at',
 
                         'shop_buyer_id',
                         'shop_order_id',
@@ -73,8 +77,29 @@ class AdminPaymentController extends BackendModelStandartController
                         'created_at'           => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'closed_at'           => [
-                            'class' => DateTimeColumnData::class,
+                        'paid_at'           => [
+                            'value' => function (ShopPayment $shopPayment, $key) {
+                                $reuslt = "<div>";
+                                if ($shopPayment->paid_at) {
+                                    $this->view->registerJs(<<<JS
+$('tr[data-key={$key}]').addClass('sx-tr-green');
+JS
+                                    );
+
+                                    $this->view->registerCss(<<<CSS
+tr.sx-tr-green, tr.sx-tr-green:nth-of-type(odd), tr.sx-tr-green td
+{
+background: #d5ffd5 !important;
+}
+CSS
+                                    );
+                                    $reuslt = "<div style='color: green;'>";
+                                }
+
+                                $reuslt .= $shopPayment->paid_at ? \Yii::$app->formatter->asDatetime($shopPayment->paid_at) : "-";
+                                $reuslt .= "</div>";
+                                return $reuslt;
+                            },
                         ],
                         'amount'           => [
                             'value' => function(ShopPayment $shopPayment) {
@@ -84,50 +109,11 @@ class AdminPaymentController extends BackendModelStandartController
                     ],
                 ]
             ]
-            /*"index" => [
-                "filters" => [
-                    "visibleFilters" => [
-                        'id',
-                        'name',
-                    ],
-                ],
-                'grid'    => [
-                    'defaultOrder' => [
-                        'priority' => SORT_ASC,
-                    ],
-
-                    'visibleColumns' => [
-                        'checkbox',
-                        'actions',
-                        'id',
-
-                        'name',
-
-                        'description',
-
-                        'priority',
-                        'color',
-
-                    ],
-                    'columns'        => [
-                        'name'           => [
-                            'value' => function (ShopOrderStatus $shopOrderStatus) {
-                                return \yii\helpers\Html::label($shopOrderStatus->name, null, [
-                                    'style' => "background: {$shopOrderStatus->color}",
-                                    'class' => "label",
-                                ]);
-                            },
-                        ],
-                    ],
-
-                ],
-            ],*/
-
         ]);
 
         ArrayHelper::remove($result, "create");
         ArrayHelper::remove($result, "update");
-        ArrayHelper::remove($result, "delete");
+        //ArrayHelper::remove($result, "delete");
         ArrayHelper::remove($result, "delete-multi");
 
         return $result;

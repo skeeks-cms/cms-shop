@@ -23,7 +23,7 @@ use yii\helpers\ArrayHelper;
  * @property integer                    $is_active
  * @property string                    $description
  * @property string                    $component
- * @property string                    $component_settings
+ * @property string                    $component_config
  * @property integer                   $cms_site_id
  *
  * @property ShopPaySystemPersonType[] $shopPaySystemPersonTypes
@@ -51,7 +51,7 @@ class ShopPaySystem extends Core
             Serialize::class =>
                 [
                     'class'  => Serialize::class,
-                    'fields' => ['component_settings'],
+                    'fields' => ['component_config'],
                 ],
         ]);
     }
@@ -111,7 +111,7 @@ class ShopPaySystem extends Core
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'priority','cms_site_id'], 'integer'],
             [['name'], 'required'],
             [['description'], 'string'],
-            [['component_settings'], 'safe'],
+            [['component_config'], 'safe'],
             [['name', 'component'], 'string', 'max' => 255],
             [['is_active'], 'integer'],
             [['personTypeIds'], 'safe'],
@@ -195,7 +195,7 @@ class ShopPaySystem extends Core
                 $component = clone $foundComponent;*/
 
                 $component = \Yii::createObject($this->component);
-                $component->load($this->component_settings, "");
+                $component->load($this->component_config, "");
 
                 $this->_handler = $component;
                 return $this->_handler;

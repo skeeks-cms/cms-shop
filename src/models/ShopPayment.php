@@ -90,7 +90,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             'id'                 => Yii::t('skeeks/shop/app', 'ID'),
             'shop_buyer_id'      => Yii::t('skeeks/shop/app', 'Покупатель'),
             'shop_order_id'      => Yii::t('skeeks/shop/app', 'Заказ'),
-            'shop_pay_system_id' => Yii::t('skeeks/shop/app', 'Платежная система'),
+            'shop_pay_system_id' => Yii::t('skeeks/shop/app', 'Способ оплаты'),
             'is_debit'           => Yii::t('skeeks/shop/app', 'Дебет? (иначе кредит)'),
             'paid_at'            => Yii::t('skeeks/shop/app', 'Дата оплаты'),
             'amount'             => Yii::t('skeeks/shop/app', 'Amount'),

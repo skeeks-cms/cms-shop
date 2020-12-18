@@ -13,6 +13,7 @@ use skeeks\cms\filters\CmsAccessControl;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopPayment;
 use yii\base\UserException;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
@@ -157,52 +158,22 @@ class OrderController extends Controller
             throw new NotFoundHttpException;
         }
 
-        $shopBill = new ShopBill();
-        $shopBill->shop_order_id = $shopOrder->id;
-        $shopBill->shop_buyer_id = $shopOrder->shop_buyer_id;
-        $shopBill->shop_pay_system_id = $shopOrder->shop_pay_system_id;
-        $shopBill->amount = $shopOrder->amount;
-        $shopBill->currency_code = $shopOrder->currency_code;
-        $shopBill->isNotifyCreate = false;
-        $shopBill->description = "Оплата по заказу №".$shopOrder->id;
-        if (!$shopBill->save()) {
-            throw new UserException('Не создался счет: '.print_r($shopBill->errors, true));
+        $shopPayment = new ShopPayment();
+
+        $shopPayment->shop_order_id = $shopOrder->id;
+        $shopPayment->shop_buyer_id = $shopOrder->shop_buyer_id;
+        $shopPayment->shop_pay_system_id = $shopOrder->shop_pay_system_id;
+
+        $shopPayment->amount = $shopOrder->amount;
+        $shopPayment->currency_code = $shopOrder->currency_code;
+
+        $shopPayment->comment = "Оплата по заказу №".$shopOrder->id;
+
+        if (!$shopPayment->save()) {
+            throw new UserException('Не создался платеж: '.print_r($shopPayment->errors, true));
         }
 
-        return $shopBill->shopPaySystem->paySystemHandler->actionPaymentResponse($shopBill);
+        return $shopPayment->shopPaySystem->handler->actionPay($shopPayment);
 
     }
-
-    public function actionPayPal()
-    {
-        return $this->render($this->action->id, [
-            'model' => ShopOrder::findOne(\Yii::$app->request->get('id')),
-        ]);
-    }
-
-
-    /**
-     * @deprecated
-     * @return mixed
-     * @throws NotFoundHttpException
-     */
-    public function actionFinishPay()
-    {
-        /**
-         * @var $shopOrder ShopOrder
-         */
-        if (\Yii::$app->request->get('code')) {
-            $shopOrder = ShopOrder::find()->where(['code' => \Yii::$app->request->get('code')])->one();
-        } else {
-            $shopOrder = ShopOrder::findOne(\Yii::$app->request->get('id'));
-        }
-
-        if (!$shopOrder) {
-            throw new NotFoundHttpException;
-        }
-
-        return $shopOrder->paySystem->paySystemHandler->paymentResponse($shopOrder);
-
-    }
-
 }

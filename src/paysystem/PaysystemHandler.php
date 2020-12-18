@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\paysystem;
 
 use skeeks\cms\IHasConfigForm;
 use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use skeeks\cms\traits\TConfigForm;
 use yii\base\Model;
@@ -23,12 +24,11 @@ abstract class PaysystemHandler extends Model implements IHasConfigForm
     use TConfigForm;
 
     /**
-     * @param ShopBill $shopBill
+     * @param ShopPayment $shopPayment
      * @return bool
      */
-    public function actionPaymentResponse(ShopBill $shopBill)
+    public function actionPay(ShopPayment $shopPayment)
     {
         return true;
-        //return \Yii::$app->response->redirect(['shop/sberbank/order-form', 'key' => $shopOrder->key]);;
     }
 }

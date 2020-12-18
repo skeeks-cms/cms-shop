@@ -27,6 +27,9 @@ class AdminBillController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopBill::class;
 
+        $this->permissionName = "shop/admin-order";
+        $this->generateAccessActions = false;
+        
         parent::init();
     }
 
@@ -128,8 +131,8 @@ CSS
 
         ArrayHelper::remove($result, "create");
         ArrayHelper::remove($result, "update");
-        ArrayHelper::remove($result, "delete");
-        ArrayHelper::remove($result, "delete-multi");
+        /*ArrayHelper::remove($result, "delete");*/
+        /*ArrayHelper::remove($result, "delete-multi");*/
 
         return $result;
     }
