@@ -24,6 +24,7 @@ class AdminCartController extends AdminOrderController
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Baskets');
+        $this->generateAccessActions = false;
         parent::init();
     }
 
