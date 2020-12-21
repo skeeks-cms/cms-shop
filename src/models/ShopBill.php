@@ -35,6 +35,8 @@ use yii\helpers\Url;
  * @property string        $currency_code
  * @property string        $description
  * @property string        $code Уникальный код счета
+ * @property string        $external_id
+ * @property string        $external_name
  * @property array         $external_data Внешние данные, например от платежной системы
  *
  * @property MoneyCurrency $currencyCode
@@ -141,6 +143,8 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'paid_at', 'shop_payment_id', 'closed_at'], 'integer'],
             [['shop_buyer_id', 'shop_order_id', 'shop_pay_system_id'], 'required'],
+            [['external_id', 'external_name'], 'default', 'value' => null],
+            [['external_id', 'external_name'], 'string'],
             [['reason_closed', 'description'], 'string'],
             [['external_data'], 'safe'],
             [['amount'], 'number'],
@@ -175,6 +179,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
             'currency_code'      => Yii::t('skeeks/shop/app', 'Currency Code'),
             'description'        => Yii::t('skeeks/shop/app', 'Description'),
             'code'               => Yii::t('skeeks/shop/app', 'Уникальный код счета'),
+            'external_id'        => Yii::t('skeeks/shop/app', 'Идентификатор внешней системы'),
         ]);
     }
 

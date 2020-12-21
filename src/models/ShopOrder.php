@@ -625,6 +625,8 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->hasOne(ShopBuyer::class, ['id' => 'shop_buyer_id']);
     }
+
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -632,6 +634,15 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return $this->hasMany(ShopOrderLog::class,
             ['shop_order_id' => 'id'])->orderBy(['created_at' => SORT_DESC]);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrderBills()
+    {
+        return $this->hasMany(ShopBill::class, ['shop_order_id' => 'id']);
     }
 
 
@@ -785,7 +796,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 if ($shopDiscountCoupon->shopDiscount->assignment_type == ShopDiscount::ASSIGNMENT_TYPE_CART) {
 
                     if ($shopDiscount->min_order_sum) {
-                        if ((float) $this->calcMoneyItems->amount < (float) $shopDiscount->min_order_sum) {
+                        if ((float)$this->calcMoneyItems->amount < (float)$shopDiscount->min_order_sum) {
                             continue;
                         }
                     }
@@ -1197,6 +1208,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return new ShopOrderQuery(get_called_class());
     }
+
 
 
     /**

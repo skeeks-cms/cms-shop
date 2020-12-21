@@ -60,7 +60,6 @@ class AdminPaymentController extends BackendModelStandartController
                         'id',
 
                         'created_at',
-                        'paid_at',
 
                         'shop_buyer_id',
                         'shop_order_id',
@@ -77,7 +76,7 @@ class AdminPaymentController extends BackendModelStandartController
                         'created_at'           => [
                             'class' => DateTimeColumnData::class,
                         ],
-                        'paid_at'           => [
+                        /*'paid_at'           => [
                             'value' => function (ShopPayment $shopPayment, $key) {
                                 $reuslt = "<div>";
                                 if ($shopPayment->paid_at) {
@@ -100,7 +99,7 @@ CSS
                                 $reuslt .= "</div>";
                                 return $reuslt;
                             },
-                        ],
+                        ],*/
                         'amount'           => [
                             'value' => function(ShopPayment $shopPayment) {
                                 return $shopPayment->money;

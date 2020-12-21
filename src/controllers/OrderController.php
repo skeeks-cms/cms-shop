@@ -158,7 +158,7 @@ class OrderController extends Controller
             throw new NotFoundHttpException;
         }
 
-        $shopPayment = new ShopPayment();
+        /*$shopPayment = new ShopPayment();
 
         $shopPayment->shop_order_id = $shopOrder->id;
         $shopPayment->shop_buyer_id = $shopOrder->shop_buyer_id;
@@ -171,9 +171,9 @@ class OrderController extends Controller
 
         if (!$shopPayment->save()) {
             throw new UserException('Не создался платеж: '.print_r($shopPayment->errors, true));
-        }
+        }*/
 
-        return $shopPayment->shopPaySystem->handler->actionPay($shopPayment);
+        return $shopOrder->shopPaySystem->handler->actionPayOrder($shopOrder);
 
     }
 }

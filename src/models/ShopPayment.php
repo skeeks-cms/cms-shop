@@ -26,7 +26,6 @@ use yii\helpers\ArrayHelper;
  * @property int           $shop_order_id Заказ
  * @property int           $shop_pay_system_id Платежная система
  * @property int           $is_debit Дебет? (иначе кредит)
- * @property int           $paid_at Дата оплаты
  * @property string        $amount
  * @property string        $currency_code
  * @property string        $comment
@@ -67,7 +66,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'is_debit', 'paid_at'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'is_debit'], 'integer'],
             [['shop_buyer_id', 'shop_order_id', 'shop_pay_system_id'], 'required'],
             [['amount'], 'number'],
             [['external_data'], 'safe'],
@@ -92,8 +91,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             'shop_order_id'      => Yii::t('skeeks/shop/app', 'Заказ'),
             'shop_pay_system_id' => Yii::t('skeeks/shop/app', 'Способ оплаты'),
             'is_debit'           => Yii::t('skeeks/shop/app', 'Дебет? (иначе кредит)'),
-            'paid_at'            => Yii::t('skeeks/shop/app', 'Дата оплаты'),
-            'amount'             => Yii::t('skeeks/shop/app', 'Amount'),
+            'amount'             => Yii::t('skeeks/shop/app', 'Сумма'),
             'currency_code'      => Yii::t('skeeks/shop/app', 'Currency Code'),
             'comment'            => Yii::t('skeeks/shop/app', 'Comment'),
             'external_name'      => Yii::t('skeeks/shop/app', 'External Name'),
