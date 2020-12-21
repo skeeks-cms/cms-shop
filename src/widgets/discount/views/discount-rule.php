@@ -112,16 +112,12 @@
                         ],
                     ]);
                     ?>
-                <? elseif (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.tree_id', 'element.treeIds'])) : ?>
+                <? elseif (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.name', 'element.id'])) : ?>
                     <?
-                    echo \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::widget([
-                        'name'     => 'value',
-                        'multiple' => true,
-                        'value'    => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
-                        'options'  => [
-                            'data-no-update' => 'true',
-                            'class'          => 'sx-value-element',
-                        ],
+                    echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
+                        'size'  => 1,
+                        'class' => 'form-control sx-value-element',
+                        'data-no-update' => 'true'
                     ]);
                     ?>
                 <? else : ?>
@@ -136,13 +132,13 @@
                     } else {
                         print_r($value);
                     }
-                    /*
-                        echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
+
+                        /*echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
                             'size'  => 1,
                             'class' => 'form-control sx-value-element',
                             'data-no-update' => 'true'
-                        ]);
-                    */ ?>
+                        ]);*/
+                     ?>
                 <? endif; ?>
 
             </div>

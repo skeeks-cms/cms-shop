@@ -17,7 +17,14 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDiscount;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
+use skeeks\cms\shop\widgets\discount\DiscountConditionsWidget;
 use skeeks\cms\widgets\GridView;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -67,7 +74,7 @@ class AdminDiscountController extends BackendModelStandartController
                 ],
 
                 "grid" => [
-                    'on init'        => function (Event $e) {
+                    'on init' => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
                          * @var $query ActiveQuery
@@ -115,15 +122,15 @@ class AdminDiscountController extends BackendModelStandartController
                             },
                             'attribute'            => 'countCoupons',
                             'label'                => 'Количество купонов',
-                            'headerOptions' => [
+                            'headerOptions'        => [
                                 'style' => 'width: 100px;',
                             ],
                             'beforeCreateCallback' => function (GridView $gridView) {
                                 $query = $gridView->dataProvider->query;
 
                                 $qCount = ShopDiscountCoupon::find()->from([
-                                        'sdc' => ShopDiscountCoupon::tableName(),
-                                    ])
+                                    'sdc' => ShopDiscountCoupon::tableName(),
+                                ])
                                     ->select(["total" => "count(*)"])
                                     ->where(['sdc.shop_discount_id' => new Expression(ShopDiscount::tableName().".id")]);
 
@@ -180,13 +187,13 @@ class AdminDiscountController extends BackendModelStandartController
                 },
             ],
 
-            /*"create" => [
+            "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
 
             "update" => [
                 'fields' => [$this, 'updateFields'],
-            ],*/
+            ],
 
             "activate-multi" => [
                 'class' => BackendModelMultiActivateAction::class,
@@ -198,4 +205,129 @@ class AdminDiscountController extends BackendModelStandartController
         ]);
     }
 
+    public function updateFields($action)
+    {
+        /**
+         * @var $model ShopDiscount
+         */
+        $model = $action->model;
+        $disabled = [];
+        if (!$model->isNewRecord) {
+            $disabled = [
+                'disabled' => 'disabled'
+            ];
+        }
+
+        $fields = [
+            'assignment_type' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Тип скидки',
+                'fields' => [
+                    'assignment_type' => [
+                        'class' => SelectField::class,
+                        'items' => \skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(),
+                        'elementOptions' => ArrayHelper::merge([
+                            \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
+                        ], $disabled)
+                    ],
+                ],
+            ],
+
+            'main' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Описание',
+                'fields' => [
+                    'is_active' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'name',
+                    'notes'     => [
+                        'class' => TextareaField::class,
+                    ],
+                    'priority'  => [
+                        'class' => NumberField::class,
+                    ],
+
+                    'is_last' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                ],
+            ],
+
+            'discount' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Величина скидки',
+                'fields' => [
+                    'value_type' => [
+                        'class' => SelectField::class,
+                        'items' => \skeeks\cms\shop\models\ShopDiscount::getValueTypes(),
+                    ],
+
+                    'value' => [
+                        'class' => NumberField::class,
+                    ],
+
+
+                    'max_discount' => [
+                        'class' => NumberField::class,
+                    ],
+
+                    'currency_code' => [
+                        'class' => SelectField::class,
+                        'items' => \yii\helpers\ArrayHelper::map(
+                            \skeeks\cms\money\models\MoneyCurrency::find()->andWhere(['is_active' => true])->all(), 'code', 'code'
+                        ),
+                    ],
+                ],
+            ],
+
+
+
+            'limitations' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Условия',
+                'fields' => [
+                    'typePrices'   => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => \yii\helpers\ArrayHelper::map(
+                            \skeeks\cms\shop\models\ShopTypePrice::find()->cmsSite()->all(), 'id', 'name'
+                        ),
+                    ],
+                    'cmsAuthItems' => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => \yii\helpers\ArrayHelper::map(
+                            \Yii::$app->authManager->getAvailableRoles(), 'name', 'description'
+                        ),
+                    ],
+                ],
+            ],
+
+            'conditions' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Дополнительные условия',
+                'fields' => [
+                    'conditions' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => DiscountConditionsWidget::class,
+                        'widgetConfig' => [
+                            'options' => [
+                                \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        if ($model->assignment_type == ShopDiscount::ASSIGNMENT_TYPE_CART) {
+            unset($fields['limitations']['fields']['typePrices']);
+            unset($fields['conditions']);
+        }
+
+        return $fields;
+    }
 }

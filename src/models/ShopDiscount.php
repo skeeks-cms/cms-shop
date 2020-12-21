@@ -96,6 +96,17 @@ class ShopDiscount extends ActiveRecord
         ];
     }
 
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_FIND, [$this, "_afterFind"]);
+        return parent::init();
+    }
+
+    public function _afterFind($event)
+    {
+        $this->value = (float) $this->value;
+        $this->max_discount = (float) $this->max_discount;
+    }
 
     /**
      * @inheritdoc
@@ -156,6 +167,9 @@ class ShopDiscount extends ActiveRecord
     public function attributeHints()
     {
         return [
+            'is_last' => "Если выбрана эта опция и сработала эта скидка, то другие скидки не будут добавлены к этой.",
+            'max_discount' => "Абсолютное значение, в валюте скидки.",
+            'notes' => "Максимум 255 символов",
             'cmsAuthItems' => \Yii::t('skeeks/shop/app',
                 'Скидка будет доступна пользователям выбранных групп, а так же будет доступна пользователям, которые не входят в выбранные группы но у них есть активный купон этой скидки'),
         ];
@@ -178,15 +192,15 @@ class ShopDiscount extends ActiveRecord
             'active_to'       => \Yii::t('skeeks/shop/app', 'Active to'),
             'name'            => \Yii::t('skeeks/shop/app', 'Name'),
             'max_discount'    => \Yii::t('skeeks/shop/app',
-                'The maximum amount of discount (in currency of discount ; 0 - the discount is not limited to)'),
+                'Максимальная величина скидки'),
             'value_type'      => \Yii::t('skeeks/shop/app', 'Discount Type'),
             'value'           => \Yii::t('skeeks/shop/app', 'Markdown'),
             'currency_code'   => \Yii::t('skeeks/shop/app', 'Currency discount'),
             'min_order_sum'   => \Yii::t('skeeks/shop/app', 'Min Order Sum'),
-            'notes'           => \Yii::t('skeeks/shop/app', 'Short description (up to 255 characters)'),
+            'notes'           => \Yii::t('skeeks/shop/app', 'Описание'),
             'type'            => \Yii::t('skeeks/shop/app', 'Type'),
             'priority'        => \Yii::t('skeeks/shop/app', 'Priority applicability'),
-            'is_last'         => \Yii::t('skeeks/shop/app', 'Stop further application of discounts'),
+            'is_last'         => \Yii::t('skeeks/shop/app', 'Последняя скидка?'),
             'conditions'      => \Yii::t('skeeks/shop/app', 'Conditions'),
             'typePrices'      => \Yii::t('skeeks/shop/app', 'Types of prices, to which the discount is applicable'),
             'cmsAuthItems'    => \Yii::t('skeeks/shop/app', 'Кому доступна скидка?'),
