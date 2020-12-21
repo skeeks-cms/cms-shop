@@ -308,6 +308,26 @@ HTML
                 ],
             ],
 
+            'purchasing_price' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Закупочная цена',
+                'fields' => [
+                    'sender_purchasing_shop_type_price_id' => [
+                        'class' => SelectField::class,
+                        'items' => ArrayHelper::map(
+                            ShopTypePrice::find()->where(['cms_site_id' => $model->sender_cms_site_id ? $model->sender_cms_site_id : null])->all(),
+                            'id',
+                            'asText'
+                        ),
+                    ],
+
+                    "purchasing_extra_charge"                => [
+                        'class'  => NumberField::class,
+                        'append' => "%",
+                    ],
+                ],
+            ],
+
             'site' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Ваш сайт',

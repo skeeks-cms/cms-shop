@@ -10,7 +10,6 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\CmsSite;
-use skeeks\cms\models\CmsTree;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -21,15 +20,22 @@ use yii\helpers\ArrayHelper;
  * @property int|null      $updated_by
  * @property int|null      $created_at
  * @property int|null      $updated_at
+ *
  * @property int           $cms_site_id Сайт получатель
  * @property int           $sender_cms_site_id Сайт отправитель
+ *
  * @property int           $sender_shop_type_price_id Цена на сайте отправителе
  * @property int           $extra_charge Наценка/Уценка
+ *
+ * @property int           $sender_purchasing_shop_type_price_id Цена на сайте отправителе
+ * @property int           $purchasing_extra_charge Наценка/Уценка
+ *
  * @property int           $priority сортировка
  *
  * @property CmsSite       $cmsSite
  * @property CmsSite       $senderCmsSite
  * @property ShopTypePrice $senderShopTypePrice
+ * @property ShopTypePrice $senderPurchasingShopTypePrice
  */
 class ShopImportCmsSite extends ActiveRecord
 {
@@ -48,10 +54,29 @@ class ShopImportCmsSite extends ActiveRecord
     {
         return ArrayHelper::merge(parent::rules(), [
             [
-                ['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'sender_cms_site_id', 'sender_shop_type_price_id', 'extra_charge', 'priority'],
+                [
+                    'sender_purchasing_shop_type_price_id',
+                    'purchasing_extra_charge',
+                    'created_by',
+                    'updated_by',
+                    'created_at',
+                    'updated_at',
+                    'cms_site_id',
+                    'sender_cms_site_id',
+                    'sender_shop_type_price_id',
+                    'extra_charge',
+                    'priority',
+                ],
                 'integer',
             ],
             [['cms_site_id', 'sender_cms_site_id'], 'unique', 'targetAttribute' => ['cms_site_id', 'sender_cms_site_id']],
+            [
+                [
+                    'sender_purchasing_shop_type_price_id',
+                ],
+                'default',
+                'value' => null,
+            ],
             [['sender_cms_site_id', 'sender_shop_type_price_id'], 'required'],
             [['sender_shop_type_price_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopTypePrice::className(), 'targetAttribute' => ['sender_shop_type_price_id' => 'id']],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
@@ -75,19 +100,22 @@ class ShopImportCmsSite extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'cms_site_id' => 'Сайт получатель',
-            'sender_cms_site_id' => 'Поставщик',
-            'sender_shop_type_price_id' => 'Цена поставщика',
-            'extra_charge' => 'Наценка/Уценка',
-            'priority' => 'Приоритет',
+            'cms_site_id'                          => 'Сайт получатель',
+            'sender_cms_site_id'                   => 'Поставщик',
+            'sender_shop_type_price_id'            => 'Цена поставщика',
+            'sender_purchasing_shop_type_price_id' => 'Закупочная цена',
+            'purchasing_extra_charge'              => 'Наценка/Уценка закупочной цены',
+            'extra_charge'                         => 'Наценка/Уценка',
+            'priority'                             => 'Приоритет',
         ]);
     }
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'extra_charge' => 'Если выбрано 100% то цена на вашем сайте будет такой же, как выбранная цена у поставщика',
-            'priority' => 'Чем ниже приоритет тем важнее этот поставщик',
-            'sender_shop_type_price_id' => 'Мы возьмем за основу именно эту цена поставщика, добавим к ней наценку/уценку и заполним базовую ценку на сайте',
+            'extra_charge'                         => 'Если выбрано 100% то розничная цена на вашем сайте будет такой же, как выбранная цена у поставщика',
+            'priority'                             => 'Чем ниже приоритет тем важнее этот поставщик',
+            'sender_shop_type_price_id'            => 'Мы возьмем за основу именно эту цена поставщика, добавим к ней наценку/уценку и заполним розничную цену на сайте',
+            'sender_purchasing_shop_type_price_id' => '',
         ]);
     }
 
@@ -121,5 +149,14 @@ class ShopImportCmsSite extends ActiveRecord
     public function getSenderShopTypePrice()
     {
         return $this->hasOne(ShopTypePrice::className(), ['id' => 'sender_shop_type_price_id']);
+    }
+    /**
+     * Gets query for [[SenderShopTypePrice]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSenderPurchasingShopTypePrice()
+    {
+        return $this->hasOne(ShopTypePrice::className(), ['id' => 'sender_purchasing_shop_type_price_id']);
     }
 }

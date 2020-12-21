@@ -715,12 +715,26 @@ JS
                  * @var $shopSupplierProduct \skeeks\cms\shop\models\ShopCmsContentElement
                  */
                 foreach ($shopSupplierProducts as $shopSupplierProduct) : ?>
+
+                    <?php
+                    /**
+                     * @var $shopImportCmsSite \skeeks\cms\shop\models\ShopImportCmsSite
+                     */
+                        $shopImportCmsSite = \skeeks\cms\shop\models\ShopImportCmsSite::find()
+                            ->andWhere([
+                                'sender_cms_site_id' => $shopSupplierProduct->cms_site_id
+                            ])
+                            ->andWhere(['cms_site_id' => $model->cmsSite->id])
+                            ->one()
+                    ?>
                     <?php /*if ($shopSupplierProduct->quantity > 0) : */ ?>
+
                     <div class="sx-table-wrapper table-responsive" style="margin-bottom: 10px;">
                         <table class="table sx-table">
                             <tr>
                                 <th style="text-align: left; width: 300px;">Поставщик</th>
                                 <th>Код поставщика</th>
+                                <th>Закупочная цена</th>
                                 <th>Количество, <?php echo $model->shopProduct->measure->symbol; ?></th>
                             </tr>
                             <tr>
@@ -742,6 +756,18 @@ JS
 
                                 </td>
                                 <td><?php echo $shopSupplierProduct->external_id ? $shopSupplierProduct->external_id : $noValue; ?></td>
+                                <td><?php
+                                    if ($shopImportCmsSite->sender_purchasing_shop_type_price_id) {
+                                        if ($price = $shopSupplierProduct->shopProduct->getPrice($shopImportCmsSite->sender_purchasing_shop_type_price_id)) {
+                                            echo $price->money->mul($shopImportCmsSite->purchasing_extra_charge / 100);
+                                        } else {
+                                            echo $noValue;
+                                        }
+                                    } else {
+                                        echo $noValue;
+                                    }
+
+                                    ?></td>
                                 <td><?php echo $shopSupplierProduct->shopProduct->quantity; ?></td>
                             </tr>
                         </table>
