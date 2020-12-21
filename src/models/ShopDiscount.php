@@ -106,6 +106,7 @@ class ShopDiscount extends ActiveRecord
     {
         $this->value = (float) $this->value;
         $this->max_discount = (float) $this->max_discount;
+        $this->min_order_sum = (float) $this->min_order_sum;
     }
 
     /**
@@ -167,6 +168,7 @@ class ShopDiscount extends ActiveRecord
     public function attributeHints()
     {
         return [
+            'min_order_sum' => "Сумма стоимости товаров необходимая для того, чтобы подействовала данная скидка.",
             'is_last' => "Если выбрана эта опция и сработала эта скидка, то другие скидки не будут добавлены к этой.",
             'max_discount' => "Абсолютное значение, в валюте скидки.",
             'notes' => "Максимум 255 символов",
@@ -196,7 +198,7 @@ class ShopDiscount extends ActiveRecord
             'value_type'      => \Yii::t('skeeks/shop/app', 'Discount Type'),
             'value'           => \Yii::t('skeeks/shop/app', 'Markdown'),
             'currency_code'   => \Yii::t('skeeks/shop/app', 'Currency discount'),
-            'min_order_sum'   => \Yii::t('skeeks/shop/app', 'Min Order Sum'),
+            'min_order_sum'   => \Yii::t('skeeks/shop/app', 'Минимальная сумма заказа'),
             'notes'           => \Yii::t('skeeks/shop/app', 'Описание'),
             'type'            => \Yii::t('skeeks/shop/app', 'Type'),
             'priority'        => \Yii::t('skeeks/shop/app', 'Priority applicability'),

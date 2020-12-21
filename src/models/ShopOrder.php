@@ -778,12 +778,17 @@ class ShopOrder extends \skeeks\cms\models\Core
         foreach ($this->shopOrderItems as $shopOrderItem) {
             $money = $money->add($shopOrderItem->moneyDiscount->multiply($shopOrderItem->quantity));
         }
-
         //Скидка на корзину
         if ($this->shopDiscountCoupons) {
             foreach ($this->shopDiscountCoupons as $shopDiscountCoupon) {
                 $shopDiscount = $shopDiscountCoupon->shopDiscount;
                 if ($shopDiscountCoupon->shopDiscount->assignment_type == ShopDiscount::ASSIGNMENT_TYPE_CART) {
+
+                    if ($shopDiscount->min_order_sum) {
+                        if ((float) $this->calcMoneyItems->amount < (float) $shopDiscount->min_order_sum) {
+                            continue;
+                        }
+                    }
 
                     if ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
                         $discountMoney = new Money($shopDiscount->value, $shopDiscount->currency_code);

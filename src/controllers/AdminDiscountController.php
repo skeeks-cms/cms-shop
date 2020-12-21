@@ -306,7 +306,21 @@ class AdminDiscountController extends BackendModelStandartController
                 ],
             ],
 
-            'conditions' => [
+        ];
+
+        if ($model->assignment_type == ShopDiscount::ASSIGNMENT_TYPE_CART) {
+            unset($fields['limitations']['fields']['typePrices']);
+            $fields['conditions'] = [
+                'class'  => FieldSet::class,
+                'name'   => 'Дополнительные условия',
+                'fields' => [
+                    'min_order_sum' => [
+                        'class'        => NumberField::class,
+                    ],
+                ],
+            ];
+        } else {
+            $fields['conditions'] = [
                 'class'  => FieldSet::class,
                 'name'   => 'Дополнительные условия',
                 'fields' => [
@@ -320,12 +334,7 @@ class AdminDiscountController extends BackendModelStandartController
                         ],
                     ],
                 ],
-            ],
-        ];
-
-        if ($model->assignment_type == ShopDiscount::ASSIGNMENT_TYPE_CART) {
-            unset($fields['limitations']['fields']['typePrices']);
-            unset($fields['conditions']);
+            ];
         }
 
         return $fields;
