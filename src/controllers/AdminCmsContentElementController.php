@@ -102,6 +102,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                         $helper = new \skeeks\cms\shop\helpers\ShopOfferChooseHelper([
                             'shopProduct' => $controller->model->shopProduct,
+                            'is_filter_by_quantity' => false,
                         ]);
 
                         $action->relatedIndexAction->grid['on init'] = function (Event $e) use ($helper) {

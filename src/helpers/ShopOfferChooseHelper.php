@@ -99,6 +99,11 @@ class ShopOfferChooseHelper extends Component
      */
     public $is_offers_properties = false;
 
+    /**
+     * @var bool 
+     */
+    public $is_filter_by_quantity = true;
+
     public function init()
     {
         parent::init();
@@ -118,7 +123,9 @@ class ShopOfferChooseHelper extends Component
             ->getTradeOffers()
             ->with("shopProduct");
 
-        \Yii::$app->shop->filterByQuantityQuery($offersCsmContentElementQuery);
+        if ($this->is_filter_by_quantity) {
+               \Yii::$app->shop->filterByQuantityQuery($offersCsmContentElementQuery);
+        }
 
         $offersCsmContentElement = $offersCsmContentElementQuery->all();
 
