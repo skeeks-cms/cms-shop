@@ -22,64 +22,65 @@ use yii\helpers\Json;
 /**
  * This is the model class for table "{{%shop_product}}".
  *
- * @property integer                     $id
- * @property integer                     $created_by
- * @property integer                     $updated_by
- * @property integer                     $created_at
- * @property integer                     $updated_at
- * @property double                      $quantity
- * @property double                      $weight
- * @property double                      $measure_ratio
- * @property integer                     $vat_id
- * @property string                      $vat_included
- * @property string                      $measure_code
- * @property double                      $width
- * @property double                      $length
- * @property double                      $height
+ * @property integer                   $id
+ * @property integer                   $created_by
+ * @property integer                   $updated_by
+ * @property integer                   $created_at
+ * @property integer                   $updated_at
+ * @property double                    $quantity
+ * @property double                    $weight
+ * @property double                    $measure_ratio
+ * @property integer                   $vat_id
+ * @property string                    $vat_included
+ * @property string                    $measure_code
+ * @property double                    $width
+ * @property double                    $length
+ * @property double                    $height
  *
- * @property integer|null                $offers_pid
+ * @property integer|null              $offers_pid
  *
- * @property string                      $product_type
- * @property array|null                  $supplier_external_jsondata
- * @property array|null                  $measure_matches_jsondata
+ * @property string                    $product_type
+ * @property array|null                $supplier_external_jsondata
+ * @property array|null                $measure_matches_jsondata
  *
- * @property string                      $productTypeAsText
- * @property CmsMeasure                  $measure
- * @property ShopCmsContentElement       $cmsContentElement
- * @property ShopTypePrice               $trialPrice
- * @property ShopVat                     $vat
- * @property Currency                    $purchasingCurrency
- * @property ShopProductPrice[]          $shopProductPrices
- * @property ShopViewedProduct[]         $shopViewedProducts
+ * @property string                    $productTypeAsText
+ * @property CmsMeasure                $measure
+ * @property ShopCmsContentElement     $cmsContentElement
+ * @property ShopTypePrice             $trialPrice
+ * @property ShopVat                   $vat
+ * @property Currency                  $purchasingCurrency
+ * @property ShopProductPrice[]        $shopProductPrices
+ * @property ShopViewedProduct[]       $shopViewedProducts
  *
- * @property string                      $baseProductPriceValue
- * @property string                      $baseProductPriceCurrency
+ * @property string                    $baseProductPriceValue
+ * @property string                    $baseProductPriceCurrency
  *
- * @property ShopProductPrice            $baseProductPrice
- * @property ShopProductPrice            $minProductPrice
- * @property ShopProductPrice[]          $viewProductPrices
- * @property ShopQuantityNoticeEmail[]   $shopQuantityNoticeEmails
- * @property ShopStoreProduct[]          $shopStoreProducts
+ * @property ShopProductPrice          $baseProductPrice
+ * @property ShopProductPrice          $minProductPrice
+ * @property ShopProductPrice[]        $viewProductPrices
+ * @property ShopQuantityNoticeEmail[] $shopQuantityNoticeEmails
+ * @property ShopStoreProduct[]        $shopStoreProducts
  *
- * @property ShopCmsContentElement[]     $tradeOffers
- * @property ShopOrderItem[]             $shopOrderItems
- * @property ShopOrder[]                 $shopOrders
- * @property ShopSupplier                $shopSupplier
- * @property ShopTypePrice               $shopTypePrices
- *
- *
- * @property ShopProduct                 $shopProductWhithOffers Товар с предложениями для текущего товара
- * @property ShopProduct[]               $shopProductOffers Предложения для текущего товара
+ * @property ShopCmsContentElement[]   $tradeOffers
+ * @property ShopOrderItem[]           $shopOrderItems
+ * @property ShopOrder[]               $shopOrders
+ * @property ShopSupplier              $shopSupplier
+ * @property ShopTypePrice             $shopTypePrices
  *
  *
- * @property boolean                     $isSubProduct
+ * @property ShopProduct               $shopProductWhithOffers Товар с предложениями для текущего товара
+ * @property ShopProduct[]             $shopProductOffers Предложения для текущего товара
  *
- * @property boolean                     $isSimpleProduct
- * @property boolean                     $isOfferProduct
- * @property boolean                     $isOffersProduct
- * @property array                       $measureMatches
  *
- * @property ShopFavoriteProduct[]       $shopFavoriteProducts
+ * @property boolean                   $isSubProduct
+ *
+ * @property boolean                   $isSimpleProduct
+ * @property boolean                   $isOfferProduct
+ * @property boolean                   $isOffersProduct
+ * @property array                     $measureMatches
+ *
+ * @property ShopFavoriteProduct[]     $shopFavoriteProducts
+ * @property ShopProductBarcode[]      $shopProductBarcodes
  */
 class ShopProduct extends \skeeks\cms\models\Core
 {
@@ -316,6 +317,50 @@ class ShopProduct extends \skeeks\cms\models\Core
             }
         }
 
+        /**
+         *
+         */
+        if ($this->_barcodes !== null) {
+
+            $values = ArrayHelper::map($this->_barcodes, 'value', 'value');
+
+            if ($values) {
+                ShopProductBarcode::deleteAll([
+                    'and',
+                    ['shop_product_id' => $this->id],
+                    ['not in', 'value', $values],
+                ]);
+            } else {
+                ShopProductBarcode::deleteAll([
+                    'shop_product_id' => $this->id
+                ]);
+            }
+
+
+            foreach ((array) $this->_barcodes as $barcodeData)
+            {
+                $value = ArrayHelper::getValue($barcodeData, "value");
+                if (!$value) {
+                    continue;
+                }
+                $type = ArrayHelper::getValue($barcodeData, "barcode_type");
+
+                if (!$shopProductBarcode = $this->getShopProductBarcodes()->andWhere([
+                    'value' => $value
+                ])->one()) {
+                    $shopProductBarcode = new ShopProductBarcode();
+                    $shopProductBarcode->shop_product_id = $this->id;
+                }
+
+                $shopProductBarcode->value = $value;
+                $shopProductBarcode->barcode_type = $type;
+
+                if (!$shopProductBarcode->save()) {
+                    throw new Exception("Ошибка сохранения кода: {$shopProductBarcode->value}");
+                }
+            }
+        }
+
         if (in_array('product_type', array_keys((array)$event->changedAttributes))) {
             if ($this->product_type == self::TYPE_OFFER) {
                 if (!$this->shopProductWhithOffers->isOffersProduct) {
@@ -522,70 +567,6 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['supplier_external_jsondata'], 'safe'],
             [['supplier_external_jsondata'], 'default', 'value' => null],
 
-            /*[['main_pid'], 'integer'],
-            [['main_pid_at'], 'integer'],
-            [['main_pid_by'], 'integer'],*/
-            /*[
-                ['main_pid'],
-                function ($attribute) {
-
-                    /**
-                     * @var $shopProduct ShopProduct
-                    $shopProduct = ShopProduct::find()->where(['id' => $this->main_pid])->one();
-                    if (!in_array($shopProduct->product_type, [
-                        self::TYPE_SIMPLE,
-                        self::TYPE_OFFER,
-                    ])) {
-                        $this->addError("main_pid", "Родительский товар должен быть простым или предложением.");
-                        return false;
-                    }
-
-                    if (!$shopProduct->cmsContentElement) {
-                        $this->addError("main_pid", "С родительским товаром проблемы");
-                        return false;
-                    }
-
-                    if (!$shopProduct->cmsContentElement->cmsSite->is_default) {
-                        $this->addError("main_pid", "Родительский товар, должен относится к главному порталу!!!");
-                        return false;
-                    }
-
-                    //Это товар принадлежит сайту получателю
-                    if ($this->cmsContentElement->cmsSite->shopSite->is_receiver) {
-                        if ($exist = ShopCmsContentElement::find()->cmsSite()->joinWith('shopProduct as sp')->andWhere(['sp.main_pid' => $this->main_pid])->one()) {
-                            $this->addError("main_pid", "Вы пытаетесь привязать товар к инфо карточке, которая уже есть на вашем сайте. id=".$exist->id);
-                            return false;
-                        }
-                    }
-                },
-            ],*/
-
-            /*[
-                ['main_pid_at'],
-                'default',
-                'value' => function () {
-                    if ($this->main_pid) {
-                        return time();
-                    }
-
-                    return null;
-                },
-            ],
-
-            [
-                ['main_pid_by'],
-                'default',
-                'value' => function () {
-                    if ($this->main_pid) {
-                        if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
-                            return \Yii::$app->user->id;
-                        }
-                    }
-
-                    return null;
-                },
-            ],*/
-
             [['offers_pid'], 'integer'],
             [
                 ['offers_pid'],
@@ -593,6 +574,40 @@ class ShopProduct extends \skeeks\cms\models\Core
 
                 },
             ],
+
+            [['barcodes'], 'safe'],
+
+            [['barcodes'], function($attribute) {
+                if ($this->barcodes !== null) {
+                    foreach ((array) $this->barcodes as $barcodeData) {
+
+                        if (!ArrayHelper::getValue($barcodeData, 'value')) {
+                            continue;
+                        }
+
+                        if (!$this->isNewRecord) {
+                            if (!$shopProductBarcode = $this->getShopProductBarcodes()->andWhere([
+                                'value' => ArrayHelper::getValue($barcodeData, 'value')
+                            ])->one()) {
+                                $shopProductBarcode = new ShopProductBarcode();
+                                $shopProductBarcode->shop_product_id = $this->id;
+                            }
+                        } else {
+                            $shopProductBarcode = new ShopProductBarcode();
+                            $shopProductBarcode->shop_product_id = $this->id;
+                        }
+
+                        $shopProductBarcode->value = ArrayHelper::getValue($barcodeData, 'value');
+                        $shopProductBarcode->barcode_type = ArrayHelper::getValue($barcodeData, 'barcode_type');
+
+                        if (!$shopProductBarcode->validate()) {
+                            $this->addError($attribute, ArrayHelper::getValue($barcodeData, 'value') . " — некорректный штрихкод: " . Json::encode($shopProductBarcode->errors));
+                            return false;
+                        }
+                    }
+                }
+
+            }],
         ];
     }
     /**
@@ -601,22 +616,23 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'                => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'        => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'        => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'        => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'        => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'quantity'          => \Yii::t('skeeks/shop/app', 'Available quantity'),
-            'weight'            => \Yii::t('skeeks/shop/app', 'Вес'),
-            'vat_id'            => \Yii::t('skeeks/shop/app', 'VAT rate'),
-            'vat_included'      => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
-            'measure_code'      => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
-            'measure_ratio'     => \Yii::t('skeeks/shop/app', 'Минимальное количество продажи'),
-            'width'             => \Yii::t('skeeks/shop/app', 'Width'),
-            'length'            => \Yii::t('skeeks/shop/app', 'Length'),
-            'height'            => \Yii::t('skeeks/shop/app', 'Height'),
-            'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
-            /*'main_pid'          => \Yii::t('skeeks/shop/app', 'Инфо карточка'),*/
+            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'quantity'      => \Yii::t('skeeks/shop/app', 'Available quantity'),
+            'weight'        => \Yii::t('skeeks/shop/app', 'Вес'),
+            'vat_id'        => \Yii::t('skeeks/shop/app', 'VAT rate'),
+            'vat_included'  => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
+            'measure_code'  => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
+            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Минимальное количество продажи'),
+            'width'         => \Yii::t('skeeks/shop/app', 'Width'),
+            'length'        => \Yii::t('skeeks/shop/app', 'Length'),
+            'height'        => \Yii::t('skeeks/shop/app', 'Height'),
+            'barcodes'      => "Штрихкоды",
+            'product_type'  => \Yii::t('skeeks/shop/app', 'Product type'),
+            /*'mainя_pid'          => \Yii::t('skeeks/shop/app', 'Инфо карточка'),*/
 
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
             'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
@@ -677,14 +693,13 @@ class ShopProduct extends \skeeks\cms\models\Core
 
 
     /**
-     * @deprecated
      * @return \yii\db\ActiveQuery
+     * @deprecated
      */
     public function getShopProductOffers()
     {
         return $this->hasOne(ShopProduct::class, ['offers_pid' => 'id'])->from(['shopProductOffers' => ShopProduct::tableName()]);
     }
-
 
 
     /**
@@ -1086,4 +1101,64 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         return $storeProduct;
     }
+
+
+    /**
+     * Gets query for [[ShopProductBarcodes]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopProductBarcodes()
+    {
+        return $this->hasMany(ShopProductBarcode::className(), ['shop_product_id' => 'id']);
+    }
+
+
+    /**
+     * @var null
+     */
+    protected $_barcodes = null;
+
+    /**
+     * @param $barcodes
+     * @return $this
+     */
+    public function setBarcodes($barcodes)
+    {
+        if (is_string($barcodes)) {
+            $barcodes = [$barcodes];
+        } elseif (is_array($barcodes)) {
+        } else {
+            throw new \http\Exception\InvalidArgumentException("barcodes must do string or array");
+        }
+
+        $this->_barcodes = $barcodes;
+
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getBarcodes()
+    {
+        if ($this->_barcodes === null) {
+            if ($this->shopProductBarcodes) {
+                $this->_barcodes = ArrayHelper::map($this->shopProductBarcodes, "value", function ($model) {
+                    /**
+                     * @var ShopProductBarcode $model
+                     */
+                    return [
+                        'barcode_type'  => $model->barcode_type,
+                        'value' => $model->value,
+                    ];
+                });
+            } else {
+                $this->_barcodes = [];
+            }
+        }
+
+        return $this->_barcodes;
+    }
+
 }

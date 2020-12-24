@@ -6,26 +6,25 @@
  * @date 02.03.2016
  */
 /* @var $this yii\web\View */
-/* @var $widget \skeeks\cms\shop\widgets\admin\ProductMeasureMatchesInputWidget */
+/* @var $widget \skeeks\cms\shop\widgets\admin\ProductbarcodeMatchesInputWidget */
 /* @var $model \skeeks\cms\shop\models\ShopProduct */
 
 $widget = $this->context;
 $model = $widget->model;
 
 $this->registerCss(<<<CSS
-.sx-product-measure-matches-wrapper .sx-measure-base-value {
-    width: 220px;
-}
-.sx-product-measure-matches-wrapper .sx-new-value {
-    width: 160px;
-}
-.sx-product-measure-matches-wrapper .sx-new-measure {
+
+.sx-product-barcodes-wrapper .sx-new-barcode {
     width: 40px;
     text-align: center;
 }
-.sx-measure-row {
+.sx-barcode-row {
     padding-top: 3px;
     padding-bottom: 3px;
+}
+
+.popover {
+    max-width: none;
 }
 CSS
 );
@@ -33,46 +32,31 @@ CSS
 
 <?= \yii\helpers\Html::beginTag('div', $widget->options); ?>
     <div style="display: none;">
-        <?= $element; ?>
+        <input type="text" class="form-control" name="<?php echo \yii\helpers\Html::getInputName($widget->model, $widget->attribute); ?>" style="min-width: 200px;">
     </div>
 
     <div class="sx-elements-wrapper">
     </div>
 
     <div style="display: none;">
-        <div class="sx-template d-flex flex-row sx-measure-row">
+        <div class="sx-template d-flex flex-row sx-barcode-row">
 
-            <div class="my-auto sx-measure-base-value">
-                <div class="input-group">
-                    <div class="input-group-prepend" style="min-width: 20px;">
-                        <div class="input-group-text" style="min-width: 20px;">1</div>
-                    </div>
-                    <?= \yii\helpers\Html::listBox("measure", [], \yii\helpers\ArrayHelper::map(
-                        \skeeks\cms\measure\models\CmsMeasure::find()
-                            ->orderBy(['priority' => SORT_ASC])
-                            ->andWhere(['!=', 'code', $model->measure_code])
-                            ->all(),
-                        'code',
-                        'asShortText'
-                    ), [
+            <div class="my-auto sx-barcode-base-value">
+                <div class="input-group" style="min-width: 280px;">
+                    <!--<div class="input-group-prepend" style="min-width: 20px;">
+                        <div class="input-group-text" style="min-width: 20px;">тип</div>
+                    </div>-->
+                    <?= \yii\helpers\Html::listBox('barcode_type', \skeeks\cms\shop\models\ShopProductBarcode::TYPE_EAN13, \skeeks\cms\shop\models\ShopProductBarcode::getBarcodeTypes(), [
                         'class' => 'form-control',
                         'size'  => '1',
+                        'style'  => 'width: 80px; max-width: 80px;',
                     ]); ?>
+
+                    <input type="text" class="form-control" name="value" style="min-width: 200px;">
                 </div>
 
             </div>
-            <div class="my-auto " style="width: 20px; text-align: center;">
-                =
-            </div>
-            <div class="my-auto sx-new-value">
-                <div class="input-group">
-                    <input type="number" class="form-control" name="value" step="0.0000001">
-                    <div class="input-group-append">
-                        <span class="input-group-text"><?= $model->measure ? $model->measure->symbol : ""; ?></span>
-                    </div>
-                </div>
-            </div>
-            <div class="my-auto sx-new-measure">
+            <div class="my-auto sx-new-barcode">
                 <button class="btn btn-xs sx-remove-row-btn"><i class="fa fa-times"></i></button>
             </div>
         </div>
@@ -86,7 +70,10 @@ CSS
 <?
 \yii\jui\Sortable::widget();
 
-$jsOptions = \yii\helpers\Json::encode($widget->clientOptions);
+$jsOptions = \yii\helpers\Json::encode(\yii\helpers\ArrayHelper::merge($widget->clientOptions, [
+        'value' => $widget->model->{$widget->attribute},
+        'attributename' => \yii\helpers\Html::getInputName($widget->model, $widget->attribute)
+]));
 
 $this->registerCss(<<<CSS
 .sx-elements-wrapper .row
@@ -101,7 +88,7 @@ CSS
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
-    sx.classes.FormMeasureMatches = sx.classes.Component.extend({
+    sx.classes.FormBarcodes = sx.classes.Component.extend({
     
         _init: function()
         {
@@ -119,12 +106,12 @@ $this->registerJs(<<<JS
             var value = "";
             var valueObject = {};
             
-            $(".sx-measure-row", self.getJElementsWrapper()).each(function() {
+            $(".sx-barcode-row", self.getJElementsWrapper()).each(function() {
                 
-                var measure = String($("select", $(this)).val());
+                var barcode = String($("select", $(this)).val());
                 var value = Number($("input", $(this)).val());
                 
-                valueObject[measure] = value;
+                valueObject[barcode] = value;
             });
             
             if (_.size(valueObject)) {
@@ -167,9 +154,9 @@ $this->registerJs(<<<JS
             });
             
             self.getJWrapper().on("click", ".sx-remove-row-btn", function() {
-                var jMeasureRow = $(this).closest(".sx-measure-row");
-                console.log(jMeasureRow);
-                jMeasureRow.slideUp().remove();
+                var jbarcodeRow = $(this).closest(".sx-barcode-row");
+                console.log(jbarcodeRow);
+                jbarcodeRow.slideUp().remove();
                 self.trigger("innerUpdate");
                 return false;
             });
@@ -192,12 +179,10 @@ $this->registerJs(<<<JS
                 placeholder: "ui-state-highlight",
             });
             
-            
-            var value = self.getJTextarea().text();
+            var value = self.get("value");
             if (value) {
-                var jsonObject = JSON.parse(value);
-                _.each(jsonObject, function(val, key) {
-                    self._createRow(key, val);
+                _.each(value, function(barcodeData, key) {
+                    self._createRow(barcodeData.type, barcodeData.value);
                 });
             }
         },
@@ -208,7 +193,7 @@ $this->registerJs(<<<JS
         * @param data
         * @private
         */
-        _createRow: function(key, val) {
+        _createRow: function(type, val) {
             var self = this;
             
             var jRow = self.getJTemplate().clone();
@@ -216,8 +201,11 @@ $this->registerJs(<<<JS
             jRow.removeClass("sx-template");
             jRow.appendTo($('.sx-elements-wrapper', self.getJWrapper()));
 
-            if (key) {
-                $("select", jRow).val(key);
+            $("select", jRow).attr("name", this.get('attributename') + "[" + this.counter + "][barcode_type]");
+            $("input", jRow).attr("name", this.get('attributename') + "[" + this.counter + "][value]");
+
+            if (type) {
+                $("select", jRow).val(type);
             }
             
             if (val) {
@@ -227,7 +215,7 @@ $this->registerJs(<<<JS
             this.counter = this.counter + 1;
         }
     });
-    new sx.classes.FormMeasureMatches({$jsOptions});
+    new sx.classes.FormBarcodes({$jsOptions});
 })(sx, sx.$, sx._);
 JS
 ); ?>

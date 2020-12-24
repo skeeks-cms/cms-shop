@@ -197,7 +197,7 @@ ul.sx-properties li {
 ul.sx-properties .sx-properties--value {
     text-align: right;
     max-width: 200px;
-    line-height: 1;
+    line-height: 1.4;
 }
 
 ul.sx-properties .sx-properties--name {
@@ -380,9 +380,51 @@ $noValue = "<span style='color: silver;'>—</span>";
 
             <div class="sx-properties-wrapper sx-columns-1" style="max-width: 300px; margin-top: 15px;">
                 <ul class="sx-properties">
+
+
+                    <li>
+                        <span class="sx-properties--name">
+                            Активность
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#is_active-form"
+                                  data-title="Активность"
+                            >
+                                <?php echo $model->is_active ? '<span class="fa fa-check" data-toggle="tooltip" title="Товар показывается на сайте"  style="color: green;"></span>' : '<span data-toggle="tooltip" title="Товар не активен" class="fa fa-times" style="color: red;"></span>' ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "is_active-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model, 'active')->radioList(\Yii::$app->cms->booleanFormat())->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+
+
                     <li>
                 <span class="sx-properties--name">
-                    Тип товара
+                    Тип товара <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="От типа товара зависит то как он отображается на сайте"></i>
                 </span>
                         <span class="sx-properties--value">
                     <?php echo \skeeks\cms\helpers\StringHelper::strtolower($model->shopProduct->productTypeAsText); ?>
@@ -435,12 +477,45 @@ JS
                         </span>
                     </li>
                     <li>
-                <span class="sx-properties--name">
-                    Щтрих-код
-                </span>
+                        <span class="sx-properties--name">
+                            Щтрих-код
+                        </span>
                         <span class="sx-properties--value">
 
-                </span>
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#barcodes-form"
+                                  data-title="Штрихкод"
+                            >
+                                <?php echo $model->shopProduct->shopProductBarcodes ? implode("<br>", \yii\helpers\ArrayHelper::map($model->shopProduct->shopProductBarcodes, 'value', 'value')) : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "barcodes-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model->shopProduct, 'barcodes')->widget(
+                                    \skeeks\cms\shop\widgets\admin\ProductBarcodesInputWidget::class
+                                )->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
                     </li>
                     <li>
                         <span class="sx-properties--name">

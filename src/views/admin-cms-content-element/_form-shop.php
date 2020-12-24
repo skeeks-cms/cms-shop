@@ -262,6 +262,14 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
         \skeeks\cms\shop\widgets\admin\ProductMeasureMatchesInputWidget::class
     ); ?>
 
+    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+        'content' => \Yii::t('skeeks/shop/app', 'Штрихкоды'),
+    ]); ?>
+
+    <?= $form->field($shopProduct, 'barcodes')->widget(
+        \skeeks\cms\shop\widgets\admin\ProductBarcodesInputWidget::class
+    ); ?>
+
 
     <? if ($isShowMeasureQuantity) : ?>
 

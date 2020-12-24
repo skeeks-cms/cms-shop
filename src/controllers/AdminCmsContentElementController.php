@@ -1818,8 +1818,17 @@ JS
                     $model->shopProduct->saveStoreQuantity((int) \Yii::$app->request->post("shop_store_id"), (float) \Yii::$app->request->post("store_quantity"));
                 } else {
                     $model->load(\Yii::$app->request->post());
+
+                    if (\Yii::$app->request->post("ShopProduct")) {
+                        $model->shopProduct->load(\Yii::$app->request->post());
+
+                        if (!$model->shopProduct->save()) {
+                            throw new \yii\base\Exception("Ошибка сохранения товарных данных: ".print_r($model->shopProduct->errors, true));
+                        }
+                    }
+
                     if (!$model->save()) {
-                        throw new \yii\base\Exception("Ошибка сохранения: ".print_r($this->model->errors, true));
+                        throw new \yii\base\Exception("Ошибка сохранения: ".print_r($model->errors, true));
                     }
                 }
 
