@@ -37,8 +37,19 @@ $('[data-fancybox="images"]').fancybox({
         {
             var self = this;
             
+            $('body').on('click', function (e) {
+                //did not click a popover toggle or popover
+                if ($(e.target).data('toggle') !== 'popover'
+                    && $(e.target).closest('.popover').length === 0
+                    && !$(e.target).hasClass("sx-fast-edit-popover")
+                    ) { 
+                    $('.sx-fast-edit-popover').popover('hide');
+                }
+            });
+            
             $("body").on("click", ".sx-fast-edit-popover", function() {
                 var jWrapper = $(this);
+                $(".sx-fast-edit-popover").popover("hide");
                 self._createPopover(jWrapper);
             });
             
@@ -74,18 +85,22 @@ $('[data-fancybox="images"]').fancybox({
         },
         
         _createPopover(jWrapper) {
-            jWrapper.popover({
-                "html": true,
-                //'container': "body",
-                'trigger': "click",
-                'boundary': 'window',
-                'title': jWrapper.data('title').length ? jWrapper.data('title') : "",
-                'content': $(jWrapper.data('form'))
-            });
-
-            jWrapper.on('show.bs.popover', function (e, data) {
-                jWrapper.addClass('is-rendered');
-            });
+            
+            if (!jWrapper.hasClass('is-rendered')) {
+                jWrapper.popover({
+                    "html": true,
+                    //'container': "body",
+                    'trigger': "click",
+                    'boundary': 'window',
+                    'title': jWrapper.data('title').length ? jWrapper.data('title') : "",
+                    'content': $(jWrapper.data('form'))
+                });
+    
+                jWrapper.on('show.bs.popover', function (e, data) {
+                    jWrapper.addClass('is-rendered');
+                });
+            }
+            
 
             jWrapper.popover('show');
         }
@@ -528,7 +543,7 @@ JS
                                   data-form="#tree_id-form"
                                   data-title="Категория"
                             >
-                                <?php echo $model->cmsTree ? $model->cmsTree->name : ""; ?>
+                                <?php echo $model->cmsTree ? $model->cmsTree->name : "&nbsp;&nbsp;&nbsp;"; ?>
                             </span>
                             
                             <div class="sx-fast-edit-form-wrapper">

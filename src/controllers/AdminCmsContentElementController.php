@@ -818,6 +818,11 @@ HTML
         }
     }
 
+    /**
+     * @param $grid GridView
+     * @param $content
+     * @return \skeeks\cms\controllers\AdminCmsContentElementController|void
+     */
     public function initGridColumns($grid, $content)
     {
         parent::initGridColumns($grid, $content);
@@ -852,6 +857,16 @@ HTML
             },
             'value'                => function (ShopCmsContentElement $shopCmsContentElement) {
                 return $shopCmsContentElement->raw_row['countRelations'];
+            },
+        ];
+
+        $shopColumns["shop.barcodes"] = [
+            'attribute'            => "shop.barcodes",
+            'label'                => 'Штрихкод',
+            'format'               => 'raw',
+
+            'value'                => function (ShopCmsContentElement $shopCmsContentElement) {
+                return implode("<br />", ArrayHelper::map((array) $shopCmsContentElement->shopProduct->shopProductBarcodes, "value", 'value'));
             },
         ];
 
@@ -954,9 +969,30 @@ HTML
             }
         }
 
+        $visibleColumns[] = "shop.quantity";
+        $visibleColumns[] = "shop.barcodes";
+
+        $sortAttributes["shop.quantity"] = [
+            'asc'  => ['sp.quantity' => SORT_ASC],
+            'desc' => ['sp.quantity' => SORT_DESC],
+        ];
+        $sortAttributes["shop.product_type"] = [
+            'asc'  => ['sp.product_type' => SORT_ASC],
+            'desc' => ['sp.product_type' => SORT_DESC],
+        ];
+
         if ($shopColumns) {
             ArrayHelper::remove($grid->columns, 'custom');
             $grid->columns = ArrayHelper::merge($grid->columns, $shopColumns);
+
+            $visibleColumns = ArrayHelper::merge([
+                'checkbox',
+                'actions',
+                'custom',
+            ], $visibleColumns);
+            $visibleColumns = ArrayHelper::merge($visibleColumns, ['active', 'view']);
+            $grid->visibleColumns = $visibleColumns;
+            $grid->sortAttributes = ArrayHelper::merge($grid->sortAttributes, $sortAttributes);
         }
     }
 
@@ -966,7 +1002,6 @@ HTML
         parent::initGridData($action, $content);
 
         $sortAttributes = [];
-        $visibleColumns = [];
         $filterFields = [];
         $filterFieldsLabels = [];
         $filterFieldsRules = [];
@@ -982,13 +1017,9 @@ HTML
         ];
 
 
-        //  $visibleColumns[] = "shop.product_type";
-        $visibleColumns[] = "shop.quantity";
-
         if (\Yii::$app->shop->shopTypePrices) {
 
             foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
-                $visibleColumns[] = 'shop.price'.$shopTypePrice->id;
 
                 $sortAttributes['shop.price'.$shopTypePrice->id] = [
                     'asc'     => ["p{$shopTypePrice->id}.price" => SORT_ASC],
@@ -1195,15 +1226,6 @@ HTML
 
             //$action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), array_keys($filterFieldsLabels));
         }
-
-        $visibleColumns = ArrayHelper::merge([
-            'checkbox',
-            'actions',
-            'custom',
-        ], $visibleColumns);
-        $visibleColumns = ArrayHelper::merge($visibleColumns, ['active', 'view']);
-        $action->grid['visibleColumns'] = $visibleColumns;
-
         //Приджоивание магазинных данных
         $action->grid['on init'] = function (Event $event) {
             /**

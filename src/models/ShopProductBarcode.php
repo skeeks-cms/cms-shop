@@ -65,6 +65,10 @@ class ShopProductBarcode extends \skeeks\cms\base\ActiveRecord
             [['value'], 'trim'],
             [['barcode_type'], 'trim'],
 
+            [['value'], 'string', 'max' => 12, 'min' => 12, "when" => function() {
+                return $this->barcode_type == self::TYPE_UPC;
+            }],
+
             [['value'], 'string', 'max' => 13, 'min' => 13, "when" => function() {
                 return $this->barcode_type == self::TYPE_EAN13;
             }],

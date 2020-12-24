@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
@@ -322,7 +323,7 @@ class ShopProduct extends \skeeks\cms\models\Core
          */
         if ($this->_barcodes !== null) {
 
-            $values = ArrayHelper::map($this->_barcodes, 'value', 'value');
+            $values = ArrayHelper::map((array) $this->_barcodes, 'value', 'value');
 
             if ($values) {
                 ShopProductBarcode::deleteAll([
@@ -1126,11 +1127,50 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function setBarcodes($barcodes)
     {
         if (is_string($barcodes)) {
-            $barcodes = [$barcodes];
+
+            $value = trim((string) $barcodes);
+            if (StringHelper::strlen($value) == 13) {
+                $barcodes = [
+                    [
+                        'value' => $value,
+                        'barcode_type' => ShopProductBarcode::TYPE_EAN13
+                    ]
+                ];
+
+            } elseif (StringHelper::strlen($value) == 12) {
+
+                $barcodes = [
+                    [
+                        'value' => $value,
+                        'barcode_type' => ShopProductBarcode::TYPE_UPC
+                    ]
+                ];
+            }
+
+
         } elseif (is_array($barcodes)) {
+
+
+            foreach ($barcodes as $key => $barcodeData) {
+                if (is_string($barcodeData) || is_int($barcodeData)) {
+                    $value = trim((string) $barcodeData);
+                    if (StringHelper::strlen($value) == 13) {
+                        $barcodes[$key] = [
+                            'value' => $value,
+                            'barcode_type' => ShopProductBarcode::TYPE_EAN13
+                        ];
+                    } elseif (StringHelper::strlen($value) == 12) {
+                        $barcodes[$key] = [
+                            'value' => $value,
+                            'barcode_type' => ShopProductBarcode::TYPE_UPC
+                        ];
+                    }
+                }
+            }
         } else {
             throw new \http\Exception\InvalidArgumentException("barcodes must do string or array");
         }
+
 
         $this->_barcodes = $barcodes;
 
