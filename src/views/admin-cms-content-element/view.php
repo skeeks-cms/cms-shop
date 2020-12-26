@@ -394,7 +394,7 @@ $noValue = "<span style='color: silver;'>—</span>";
                 <? endif; ?>
             </h4>
 
-            <div class="sx-properties-wrapper sx-columns-1" style="max-width: 300px; margin-top: 15px;">
+            <div class="sx-properties-wrapper sx-columns-1" style="max-width: 350px; margin-top: 15px;">
                 <ul class="sx-properties">
 
 
@@ -454,44 +454,7 @@ JS
                     <?php echo $model->id; ?>
                 </span>
                     </li>
-                    <li>
-                        <span class="sx-properties--name">
-                            Артикул
-                        </span>
-                        <span class="sx-properties--value">
-                            <span class="sx-fast-edit sx-fast-edit-popover"
-                                  data-form="#external_id-form"
-                                  data-title="Артикул"
-                            >
-                                <?php echo $model->external_id ? $model->external_id : "&nbsp;&nbsp;&nbsp;" ?>
-                            </span>
-                            
-                            <div class="sx-fast-edit-form-wrapper">
-                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                    'id'             => "external_id-form",
-                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
-                                    'options'        => [
-                                        'class' => 'sx-fast-edit-form',
-                                    ],
-                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
-                                        function (ActiveFormAjaxSubmit) {
-                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
-                                                $.pjax.reload("#{$pjax->id}");
-                                                $(".sx-fast-edit").popover("hide");
-                                            });
-                                        }
-JS
-                                    ),
-                                ]); ?>
-                                <?php echo $form->field($model, 'external_id')->label(false); ?>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
-                                    </div>
-                                <?php $form::end(); ?>
-                            </div>
 
-                        </span>
-                    </li>
                     <li>
                         <span class="sx-properties--name">
                             Щтрих-код
@@ -579,6 +542,46 @@ JS
                         </span>
 
                     </li>
+
+                    <li>
+                        <span class="sx-properties--name">
+                            Внешний код <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="Чаще всего внешний код заполняется автоматически и используется для итеграции с внешними системами"></i>
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#external_id-form"
+                                  data-title="Артикул"
+                            >
+                                <?php echo $model->external_id ? $model->external_id : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "external_id-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model, 'external_id')->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+
                     <li>
                 <span class="sx-properties--name">
                     Создан

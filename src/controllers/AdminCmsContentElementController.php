@@ -992,6 +992,7 @@ HTML
             ], $visibleColumns);
             $visibleColumns = ArrayHelper::merge($visibleColumns, ['active', 'view']);
             $grid->visibleColumns = $visibleColumns;
+
             $grid->sortAttributes = ArrayHelper::merge($grid->sortAttributes, $sortAttributes);
         }
     }
@@ -1248,7 +1249,7 @@ HTML
             if ($this->content) {
                 $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
             }
-            $this->initGridColumns($event->sender, $this->content);
+            //$this->initGridColumns($event->sender, $this->content);
 
             $query->joinWith('shopProduct as sp');
 
