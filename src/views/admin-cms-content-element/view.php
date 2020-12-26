@@ -126,7 +126,7 @@ $this->registerCSS(<<<CSS
 .sx-fast-edit {
     cursor: pointer;
     min-width: 40px;
-    border-bottom: 1px dashed;
+    border-bottom: 1px dotted;
 }
 .js-slide img {
      max-height: 300px;

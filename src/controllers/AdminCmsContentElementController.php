@@ -1111,6 +1111,23 @@ HTML
             },*/
         ];
 
+        $filterFields['barcodes'] = [
+            'class'           => StringFilterField::class,
+            'label'           => 'Штрихкод',
+            'filterAttribute' => 'barcodes.value',
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
+
+                /*if ($e->field->value) {
+                    $query->andWhere(['barcodes.value' => $e->field->value]);
+                }*/
+            },
+        ];
+
 
         //Только для сайта поставщика
         if (\Yii::$app->skeeks->site->shopSite->is_supplier || \Yii::$app->skeeks->site->shopSite->is_receiver) {
@@ -1205,6 +1222,7 @@ HTML
 
 
         $filterFieldsLabels['shop_product_type'] = 'Тип товара';
+        $filterFieldsLabels['barcodes'] = 'Штрихкод';
 
         $filterFieldsLabels['shop_quantity'] = 'Количество';
         $filterFieldsLabels['all_ids'] = 'ID + вложенные';
@@ -1214,6 +1232,7 @@ HTML
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
+        $filterFieldsRules[] = ['barcodes', 'string'];
         $filterFieldsRules[] = ['all_ids', 'safe'];
 
         //Мерж колонок и сортировок
