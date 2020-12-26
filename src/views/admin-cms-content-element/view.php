@@ -620,7 +620,7 @@ JS
                             <td>
                                 <span class="sx-fast-edit sx-fast-edit-popover"
                                       data-form="#price-<?php echo $shopTypePrice->id; ?>-form"
-                                      data-title="<?php echo $shopTypePrice->name; ?>"
+                                      data-title="<?php echo \yii\helpers\Html::encode($shopTypePrice->name); ?>"
                                 >
                                     <?php echo $price && (float)$price->money->amount > 0 ? $price->money : "&nbsp;&nbsp;&nbsp;" ?>
                                 </span>
@@ -718,7 +718,7 @@ JS
                                 <td>
                                     <span class="sx-fast-edit sx-fast-edit-popover"
                                           data-form="#store-<?php echo $shopStore->id; ?>-form"
-                                          data-title="<?php echo $shopStore->name; ?>"
+                                          data-title="<?php echo \yii\helpers\Html::encode($shopStore->name); ?>"
                                     >
                                         <?php echo $storeProduct ? (float) $storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
                                     </span>
@@ -844,7 +844,7 @@ JS
                                         ],
                                     ]);
                                     ?>
-                                    <i class="fas fa-link" title="<?php echo $shopSupplierProduct->asText; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
+                                    <i class="fas fa-link" title="<?php echo \yii\helpers\Html::encode($shopSupplierProduct->asText); ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
                                     <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                                     <?php echo $shopSupplierProduct->cmsSite->name; ?>
 
