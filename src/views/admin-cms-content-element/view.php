@@ -42,6 +42,7 @@ $('[data-fancybox="images"]').fancybox({
                 if ($(e.target).data('toggle') !== 'popover'
                     && $(e.target).closest('.popover').length === 0
                     && !$(e.target).hasClass("sx-fast-edit-popover")
+                    && !$(e.target).closest(".sx-fast-edit-popover").length
                     ) { 
                     $('.sx-fast-edit-popover').popover('hide');
                 }
