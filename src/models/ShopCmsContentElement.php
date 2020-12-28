@@ -359,6 +359,7 @@ class ShopCmsContentElement extends CmsContentElement
                     if ($property->cmsContentProperty) {
                         $code = $property->cmsContentProperty->code;
                         if (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_LIST])) {
+
                             if ($property->import_delimetr) {
                                 $value = explode($property->import_delimetr, $value);
                                 foreach ($value as $k => $v) {
@@ -381,6 +382,7 @@ class ShopCmsContentElement extends CmsContentElement
                                 }
 
                             } else {
+
                                 if ($option = $property->getShopSupplierPropertyOptions()->andWhere(['name' => $value])->one()) {
                                     if ($option->cms_tree_id) {
                                         $model->tree_id = $option->cms_tree_id;
@@ -389,8 +391,6 @@ class ShopCmsContentElement extends CmsContentElement
                                     if ($model->relatedPropertiesModel->hasAttribute($code)) {
                                         $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
                                     }
-
-
                                 }
                             }
                         } elseif (in_array($property->property_type, [ShopSupplierProperty::PROPERTY_TYPE_STRING, ShopSupplierProperty::PROPERTY_TYPE_NUMBER])) {
