@@ -457,7 +457,7 @@ JS
 
                     <li>
                         <span class="sx-properties--name">
-                            Щтрих-код
+                            Штрих-код
                         </span>
                         <span class="sx-properties--value">
 
