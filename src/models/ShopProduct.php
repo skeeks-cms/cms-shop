@@ -234,7 +234,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
     }
     /**
-     * @return \yii\db\ActiveQuery
+     * @return array|\skeeks\cms\query\CmsActiveQuery|\skeeks\cms\query\CmsContentElementActiveQuery
      */
     public function getTradeOffers()
     {
