@@ -917,7 +917,7 @@ JS
                                         ],
                                     ]);
                                     ?>
-                                    <i class="fas fa-link" title="<?php echo $shopSupplierProduct->asText; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
+                                    <i class="fas fa-link" title="<?php echo \yii\helpers\Html::encode($shopSupplierProduct->asText); ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
                                     <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                                 </td>
                                 <td><?php echo $shopSupplierProduct->external_id ? $shopSupplierProduct->external_id : $noValue; ?></td>

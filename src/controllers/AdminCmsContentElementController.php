@@ -36,7 +36,6 @@ use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
-use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -101,7 +100,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         $action->relatedIndexAction->controller->initGridData($action->relatedIndexAction, $action->relatedIndexAction->controller->content);
 
                         $helper = new \skeeks\cms\shop\helpers\ShopOfferChooseHelper([
-                            'shopProduct' => $controller->model->shopProduct,
+                            'shopProduct'           => $controller->model->shopProduct,
                             'is_filter_by_quantity' => false,
                         ]);
 
@@ -197,7 +196,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         if ($model->shopProduct->offers_pid) {
                             return false;
                         }
-                        
+
                         if ($model->main_cce_id) {
                             return false;
                         }
@@ -861,12 +860,12 @@ HTML
         ];
 
         $shopColumns["shop.barcodes"] = [
-            'attribute'            => "shop.barcodes",
-            'label'                => 'Штрихкод',
-            'format'               => 'raw',
+            'attribute' => "shop.barcodes",
+            'label'     => 'Штрихкод',
+            'format'    => 'raw',
 
-            'value'                => function (ShopCmsContentElement $shopCmsContentElement) {
-                return implode("<br />", ArrayHelper::map((array) $shopCmsContentElement->shopProduct->shopProductBarcodes, "value", 'value'));
+            'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+                return implode("<br />", ArrayHelper::map((array)$shopCmsContentElement->shopProduct->shopProductBarcodes, "value", 'value'));
             },
         ];
 
@@ -1115,7 +1114,7 @@ HTML
             'class'           => StringFilterField::class,
             'label'           => 'Штрихкод',
             'filterAttribute' => 'barcodes.value',
-            'on apply' => function (QueryFiltersEvent $e) {
+            'on apply'        => function (QueryFiltersEvent $e) {
                 /**
                  * @var $query ActiveQuery
                  */
@@ -1619,53 +1618,68 @@ CSS
             }
 
             if ($rr->isRequestPjaxPost()) {
-                if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
-                    $model->load(\Yii::$app->request->post());
-                    $relatedModel->load(\Yii::$app->request->post());
+                try {
 
-                    if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
 
-                        /**
-                         * @var $productPrice ShopProductPrice
-                         */
-                        foreach ($productPrices as $productPrice) {
-                            if ($productPrice->save()) {
+                    if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
 
-                            } else {
-                                \Yii::$app->getSession()->setFlash('error',
-                                    \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
+                        $model->load(\Yii::$app->request->post());
+                        $relatedModel->load(\Yii::$app->request->post());
+
+                        if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
+
+
+                            /**
+                             * @var $productPrice ShopProductPrice
+                             */
+                            foreach ($productPrices as $productPrice) {
+                                if ($productPrice->save()) {
+
+                                } else {
+                                    \Yii::$app->getSession()->setFlash('error',
+                                        \Yii::t('skeeks/shop/app', 'Check the correctness of the prices'));
+                                }
+
                             }
 
-                        }
-                        /**
-                         * @var $productPrice ShopProductPrice
-                         */
-                        foreach ($shopStoreProducts as $shopStoreProduct) {
-                            if ($shopStoreProduct->save()) {
 
-                            } else {
-                                \Yii::$app->getSession()->setFlash('error',
-                                    \Yii::t('skeeks/shop/app', 'Check the correctness of the stores: '.print_r($shopStoreProduct->errors, true)));
+
+                            /**
+                             * @var $productPrice ShopProductPrice
+                             */
+                            foreach ($shopStoreProducts as $shopStoreProduct) {
+                                if ($shopStoreProduct->save()) {
+
+                                } else {
+                                    \Yii::$app->getSession()->setFlash('error',
+                                        \Yii::t('skeeks/shop/app', 'Check the correctness of the stores: '.print_r($shopStoreProduct->errors, true)));
+                                }
+
                             }
 
+
+
+                            $is_saved = true;
+
+                            ///\Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
+
+                            if (\Yii::$app->request->post('submit-btn') == 'apply') {
+
+                            } else {
+
+                                $redirect = $this->url;
+
+                            }
+
+                            $model->refresh();
+
                         }
-
-                        $is_saved = true;
-
-                        ///\Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
-
-                        if (\Yii::$app->request->post('submit-btn') == 'apply') {
-
-                        } else {
-
-                            $redirect = $this->url;
-
-                        }
-
-                        $model->refresh();
-
                     }
+                } catch (\Exception $exception) {
+                    print_r($exception->getMessage());
+                    die;
                 }
+
 
             }
 
@@ -1855,9 +1869,9 @@ JS
             try {
 
                 if (\Yii::$app->request->post("act") == "update-price") {
-                    $model->shopProduct->savePrice((int) \Yii::$app->request->post("shop_type_price_id"), (float) \Yii::$app->request->post("price_value"));
-                } elseif(\Yii::$app->request->post("act") == "update-store") {
-                    $model->shopProduct->saveStoreQuantity((int) \Yii::$app->request->post("shop_store_id"), (float) \Yii::$app->request->post("store_quantity"));
+                    $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)\Yii::$app->request->post("price_value"));
+                } elseif (\Yii::$app->request->post("act") == "update-store") {
+                    $model->shopProduct->saveStoreQuantity((int)\Yii::$app->request->post("shop_store_id"), (float)\Yii::$app->request->post("store_quantity"));
                 } else {
                     $model->load(\Yii::$app->request->post());
 
