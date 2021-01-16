@@ -1,6 +1,7 @@
 <?php
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
+/* @var $joinModel \skeeks\cms\shop\models\ShopCmsContentElement */
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 $controller = $this->context;
@@ -276,6 +277,53 @@ $noValue = "<span style='color: silver;'>—</span>";
 ?>
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
+
+<!--Если это сайт поставщика или получателя товаров-->
+<?php if($model->cmsSite->shopSite->is_receiver || $model->cmsSite->shopSite->is_supplier) : ?>
+    <!-- Если товар не привязан к инфокрточке -->
+    <?php if(!$model->main_cce_id) : ?>
+        <?php
+            $joinModels = [];
+            /*Поиск по штрихкоду*/
+            $barcodes = $model->shopProduct->getBarcodes();
+            if ($barcodes) {
+                $barcodeValues = array_keys($barcodes);
+
+                $q = \skeeks\cms\shop\models\ShopCmsContentElement::find()
+                    ->joinWith("shopProduct as shopProduct", true, "INNER JOIN")
+                    ->joinWith("shopProduct.shopProductBarcodes as shopProductBarcodes", true, "INNER JOIN")
+                    ->joinWith("cmsSite as cmsSite")
+                    ->andWhere(['cmsSite.is_default' => 1])
+                    ->andWhere(['shopProductBarcodes.value' => $barcodeValues])
+                ;
+
+                $joinModels = $q->all();
+            }
+        ?>
+
+        <?php if($joinModels) : ?>
+
+        <section class="sx-info-block" style="background: #ceffd0;">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <div class="sx-title">Возможно этот товар уже оформлен</div>
+                </div>
+                <div class="col-12">
+                    <?php foreach($joinModels as $joinModel) : ?>
+
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+
+
+        <?php endif; ?>
+
+    <?php endif; ?>
+<?php endif; ?>
+
+
+
 <div class="row no-gutters sx-bg-secondary">
     <div class="col-lg-4 col-sm-6 col-12">
 

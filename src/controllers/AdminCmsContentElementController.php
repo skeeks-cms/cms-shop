@@ -734,6 +734,15 @@ HTML
                     },
                 ],
 
+
+                'duplicates' => [
+                    'generateAccess' => true,
+                    'class'          => ViewBackendAction::class,
+                    'name'           => 'Дубли',
+                    'icon'           => 'fas fa-arrows-alt-h',
+                    'priority'       => 500,
+                ],
+
             ]
         );
 

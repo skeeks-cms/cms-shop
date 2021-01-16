@@ -9,36 +9,13 @@
  *
  */
 /* @var $this yii\web\View */
-//$shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
 $shopProduct = $model->shopProduct;
-
 //Если этот товар привязан к главному
 $infoModel = $model;
-
-$count = $model->relatedPropertiesModel->getSmartAttribute('reviews2Count');
-$rating = $model->relatedPropertiesModel->getSmartAttribute('reviews2Rating');
-//$v3ProductElement = new \v3toys\parsing\models\V3toysProductContentElement($model->toArray());
-$priceHelper = \Yii::$app->shop->shopUser->getProductPriceHelper($model);
-
 ?>
 <article class="card-prod h-100 to-cart-fly-wrapper">
     <div class="card-prod--labels">
-
-
-        <!--<div class="card-prod--label red">11</div>
-                        <div class="clear"></div>-->
-        <? /*
-                    if ( $enum->id == 141) : */ ?><!--
-                        <div class="card-prod--label red"><? /*=$enum->value;*/ ?></div>
-                        <div class="clear"></div>
-                    <? /* endif; */ ?>
-                    <? /*
-                    if ( $enum->id == 143) : */ ?>
-                        <div class="card-prod--label blue"><? /*=$enum->value;*/ ?></div>
-                        <div class="clear"></div>
-                    --><? /* endif; */ ?>
     </div>
-
     <div class="card-prod--photo">
         <? if ($infoModel->image) : ?>
             <img class="to-cart-fly-img" src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($infoModel->image ? $infoModel->image->src : null,
@@ -51,7 +28,6 @@ $priceHelper = \Yii::$app->shop->shopUser->getProductPriceHelper($model);
         <? else : ?>
             <img class="img-fluid to-cart-fly-img" src="<?= \skeeks\cms\helpers\Image::getCapSrc(); ?>" alt="<?= $infoModel->name; ?>">
         <? endif; ?>
-
     </div>
     <div class="card-prod--inner g-px-10">
         <div class="card-prod--reviews">
@@ -67,4 +43,5 @@ $priceHelper = \Yii::$app->shop->shopUser->getProductPriceHelper($model);
                 <a href="<?= $model->url; ?>" title="<?= $model->name; ?>" data-pjax="0" class="sx-card-prod--title-a sx-main-text-color g-text-underline--none--hover"><?= $infoModel->name; ?></a>
             </div>
         </div>
+    </div>
 </article>
