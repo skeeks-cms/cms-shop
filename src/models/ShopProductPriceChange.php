@@ -16,8 +16,6 @@ use skeeks\modules\cms\money\models\Currency;
  * @property integer          $shop_product_price_id
  * @property string           $price
  * @property string           $currency_code
- * @property integer          $quantity_from
- * @property integer          $quantity_to
  *
  * @property ShopProductPrice $shopProductPrice
  * @property Currency         $currency
@@ -47,8 +45,6 @@ class ShopProductPriceChange extends \skeeks\cms\models\Core
                     'created_at',
                     'updated_at',
                     'shop_product_price_id',
-                    'quantity_from',
-                    'quantity_to',
                 ],
                 'integer',
             ],
@@ -72,8 +68,6 @@ class ShopProductPriceChange extends \skeeks\cms\models\Core
             'shop_product_price_id' => \Yii::t('skeeks/shop/app', 'Shop Product Price ID'),
             'price'                 => \Yii::t('skeeks/shop/app', 'Price'),
             'currency_code'         => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'quantity_from'         => \Yii::t('skeeks/shop/app', 'Quantity From'),
-            'quantity_to'           => \Yii::t('skeeks/shop/app', 'Quantity To'),
         ];
     }
 

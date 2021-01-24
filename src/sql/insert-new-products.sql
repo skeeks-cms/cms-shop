@@ -399,6 +399,7 @@ UPDATE
                         shop_product_price as spp
                     WHERE
                         spp.product_id = sp_for_import.id
+                        AND spp.is_fixed != 1
                         AND spp.type_price_id = (
                             SELECT
                                 id
@@ -470,6 +471,7 @@ UPDATE
 SET
 	price.`price` = calc_price.calc_price_round,
 	price.`currency_code` = calc_price.sender_currency_code
+WHERE calc_price.receiver_price_id is not null
 ;
 
 

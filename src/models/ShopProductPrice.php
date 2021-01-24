@@ -20,10 +20,8 @@ use yii\helpers\ArrayHelper;
  * @property integer                  $product_id
  * @property integer                  $type_price_id
  * @property float                    $price
+ * @property integer                  $is_fixed
  * @property string                   $currency_code
- * @property integer                  $quantity_from
- * @property integer                  $quantity_to
- * @property string                   $tmp_id
  *
  * @property Currency                 $currency
  * @property ShopProduct              $product
@@ -93,44 +91,44 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
             /*if ($parentProduct && $shopParentContent->children_content_id && $shopParentContent->children_content_id == $this->product->cmsContentElement->content_id) {*/
             //if ($parentProduct) {
-                $minPriceValue = $this->price;
-                $minPriceCurrency = $this->currency_code;
+            $minPriceValue = $this->price;
+            $minPriceCurrency = $this->currency_code;
 
-                //У родительского элемента уже есть предложения
-                if ($offers = $parentProduct->tradeOffers) {
-                    //Все цены оферов этого типа
-                    $minPrice = ShopProductPrice::find()
-                        ->where([
-                            'product_id' => ArrayHelper::map($offers, 'id', 'id'),
-                        ])
-                        ->andWhere([
-                            'type_price_id' => $this->type_price_id,
-                        ])
-                        ->orderBy(['price' => SORT_ASC])->one();
+            //У родительского элемента уже есть предложения
+            if ($offers = $parentProduct->tradeOffers) {
+                //Все цены оферов этого типа
+                $minPrice = ShopProductPrice::find()
+                    ->where([
+                        'product_id' => ArrayHelper::map($offers, 'id', 'id'),
+                    ])
+                    ->andWhere([
+                        'type_price_id' => $this->type_price_id,
+                    ])
+                    ->orderBy(['price' => SORT_ASC])->one();
 
-                    if ($minPrice) {
-                        $minPriceValue = $minPrice->price;
-                        $minPriceCurrency = $minPrice->currency_code;
-                    }
-
+                if ($minPrice) {
+                    $minPriceValue = $minPrice->price;
+                    $minPriceCurrency = $minPrice->currency_code;
                 }
 
+            }
 
-                $query = $parentProduct->getShopProductPrices()->andWhere([
-                    'type_price_id' => $this->type_price_id,
-                ]);
-                /**
-                 * @var $price self
-                 */
-                if ($price = $query->one()) {
-                    $price->price = $minPriceValue;
-                    $price->currency_code = $minPriceCurrency;
-                    if (!$price->save()) {
-                        throw new Exception(print_r($price->errors, true));
-                    } else {
-                        //var_dump($minPriceValue);die;
-                    }
+
+            $query = $parentProduct->getShopProductPrices()->andWhere([
+                'type_price_id' => $this->type_price_id,
+            ]);
+            /**
+             * @var $price self
+             */
+            if ($price = $query->one()) {
+                $price->price = $minPriceValue;
+                $price->currency_code = $minPriceCurrency;
+                if (!$price->save()) {
+                    throw new Exception(print_r($price->errors, true));
+                } else {
+                    //var_dump($minPriceValue);die;
                 }
+            }
 
             //}
 
@@ -143,8 +141,6 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
         $shopProductPriceChange->price = $this->price;
         $shopProductPriceChange->currency_code = $this->currency_code;
-        $shopProductPriceChange->quantity_from = $this->quantity_from;
-        $shopProductPriceChange->quantity_to = $this->quantity_to;
 
         if ($shopProductPriceChange->save()) {
             $shopProductPriceChange->link('shopProductPrice', $this);
@@ -153,14 +149,12 @@ class ShopProductPrice extends \skeeks\cms\models\Core
 
     public function afterUpdateCallback()
     {
-        if ($this->isAttributeChanged('price') || $this->isAttributeChanged('currency_code') || $this->isAttributeChanged('quantity_from') || $this->isAttributeChanged('quantity_to')) {
+        if ($this->isAttributeChanged('price') || $this->isAttributeChanged('currency_code')) {
 
             $shopProductPriceChange = new ShopProductPriceChange();
 
             $shopProductPriceChange->price = $this->price;
             $shopProductPriceChange->currency_code = $this->currency_code;
-            $shopProductPriceChange->quantity_from = $this->quantity_from;
-            $shopProductPriceChange->quantity_to = $this->quantity_to;
 
             if ($shopProductPriceChange->save()) {
                 $shopProductPriceChange->link('shopProductPrice', $this);
@@ -184,15 +178,13 @@ class ShopProductPrice extends \skeeks\cms\models\Core
                     'updated_at',
                     'product_id',
                     'type_price_id',
-                    'quantity_from',
-                    'quantity_to',
+                    'is_fixed',
                 ],
                 'integer',
             ],
             [['product_id', 'type_price_id'], 'required'],
             [['price'], 'number'],
             [['currency_code'], 'string', 'max' => 3],
-            [['tmp_id'], 'string', 'max' => 40],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
             [['price'], 'default', 'value' => 0.00],
         ];
@@ -213,9 +205,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             'type_price_id' => \Yii::t('skeeks/shop/app', 'Type Price ID'),
             'price'         => \Yii::t('skeeks/shop/app', 'Price'),
             'currency_code' => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'quantity_from' => \Yii::t('skeeks/shop/app', 'Quantity From'),
-            'quantity_to'   => \Yii::t('skeeks/shop/app', 'Quantity To'),
-            'tmp_id'        => \Yii::t('skeeks/shop/app', 'Tmp ID'),
+            'is_fixed' => \Yii::t('skeeks/shop/app', 'Зафиксирована?'),
         ];
     }
 

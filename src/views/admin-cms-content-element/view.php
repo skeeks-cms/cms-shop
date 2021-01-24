@@ -708,9 +708,15 @@ JS
                                                 \Yii::$app->money->activeCurrencies, 'code', 'code'
                                             ),
                                         ]) */ ?>
+
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
                                         </div>
+                                    </div>
+                                    <div class="input-group" style="margin-top: 10px;">
+                                    <? echo \yii\helpers\Html::checkbox("is_fixed", ($price && $price->is_fixed ? true : false), [
+                                            'label' => 'Зафиксирована?',
+                                    ]); ?>
                                     </div>
 
                                     <?php $form::end(); ?>

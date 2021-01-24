@@ -14,6 +14,7 @@ use common\models\V3pFeature;
 use common\models\V3pFeatureValue;
 use common\models\V3pFtSoption;
 use common\models\V3pProduct;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\yii2\queryfilter\IQueryFilterHandler;
 use v3project\yii2\productfilter\EavFiltersHandler;
 use v3project\yii2\productfilter\IFiltersHandler;
@@ -80,11 +81,38 @@ class AvailabilityFiltersHandler extends Model
     {
         if ($this->value == 1) {
             $activeQuery->joinWith('shopProduct as shopProduct');
-            $activeQuery->andWhere(['>=', 'shopProduct.quantity', 1]);
+            //$activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+
+            $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
+            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+
+            $activeQuery->andWhere([
+                'or',
+                ['>', 'shopStoreProducts.quantity', 0],
+                ['>', 'shopOffersStoreProducts.quantity', 0],
+            ]);
+            $activeQuery->groupBy([ShopCmsContentElement::tableName() . ".id"]);
+        } elseif ($this->value == 2) {
+            $activeQuery->joinWith('shopProduct as shopProduct');
+            $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+
+            $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
+            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+
+            $activeQuery->andWhere([
+                'or',
+                ['>', 'shopProduct.quantity', 0],
+                ['>', 'shopProductOffers.quantity', 0],
+                ['>', 'shopStoreProducts.quantity', 0],
+                ['>', 'shopOffersStoreProducts.quantity', 0],
+            ]);
+            $activeQuery->groupBy([ShopCmsContentElement::tableName() . ".id"]);
         }
 
         return $this;
     }
+
+
     public function getSelected()
     {
 
@@ -106,7 +134,8 @@ class AvailabilityFiltersHandler extends Model
     {
         return [
             0 => 'Все',
-            1 => 'В наличии'
+            1 => 'В наличии',
+            2 => 'В наличии и под заказ',
         ];
     }
 

@@ -622,7 +622,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
             'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
             'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'quantity'      => \Yii::t('skeeks/shop/app', 'Available quantity'),
+            'quantity'      => \Yii::t('skeeks/shop/app', 'Количество под заказ'),
             'weight'        => \Yii::t('skeeks/shop/app', 'Вес'),
             'vat_id'        => \Yii::t('skeeks/shop/app', 'VAT rate'),
             'vat_included'  => \Yii::t('skeeks/shop/app', 'VAT included in the price'),

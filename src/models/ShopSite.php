@@ -104,12 +104,17 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                 [
                     'is_show_product_no_price',
                     'is_show_button_no_price',
-                    'is_show_product_only_quantity',
                     'is_show_quantity_product',
                     'is_allow_edit_products',
                     'is_show_product_no_main',
                 ],
                 'boolean',
+            ],
+            [
+                [
+                    'is_show_product_only_quantity',
+                ],
+                'integer',
             ],
         ]);
     }
@@ -130,7 +135,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
             'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
-            'is_show_product_only_quantity' => "Показывать товары только в наличии на сайте?",
+            'is_show_product_only_quantity' => "Фильтр по наличию",
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
@@ -154,7 +159,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_show_product_no_price'      => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
             'is_show_button_no_price'       => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
             'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
-            'is_show_product_only_quantity' => "Если выбрано «да», то товары которых нет в наличии НЕ будут показываться на сайте.",
+            'is_show_product_only_quantity' => "Выберите как товары будут показываться на сайте по умолчанию",
             'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
             'is_show_product_no_main'       => "Если выбрано «да», то на сайте будут показываться все созданные товары, в том числе и которые не пирвязаны к информационной карточке.",
 

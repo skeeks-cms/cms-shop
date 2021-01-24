@@ -451,14 +451,44 @@ class ShopComponent extends Component implements BootstrapInterface
      */
     public function filterByQuantityQuery(ActiveQuery $activeQuery)
     {
-        if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
+        if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity == 1) {
+            $activeQuery->joinWith('shopProduct as shopProduct');
+            //$activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+
+            $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
+            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+
+            $activeQuery->andWhere([
+                'or',
+                ['>', 'shopStoreProducts.quantity', 0],
+                ['>', 'shopOffersStoreProducts.quantity', 0],
+            ]);
+            $activeQuery->groupBy([ShopCmsContentElement::tableName() . ".id"]);
+        } elseif (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity == 2) {
+            $activeQuery->joinWith('shopProduct as shopProduct');
+            $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+
+            $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
+            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+
+            $activeQuery->andWhere([
+                'or',
+                ['>', 'shopProduct.quantity', 0],
+                ['>', 'shopProductOffers.quantity', 0],
+                ['>', 'shopStoreProducts.quantity', 0],
+                ['>', 'shopOffersStoreProducts.quantity', 0],
+            ]);
+            $activeQuery->groupBy([ShopCmsContentElement::tableName() . ".id"]);
+        }
+
+        /*if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
             $activeQuery->joinWith("shopProduct as shopProduct");
             $activeQuery->andWhere([
                 '>',
                 'shopProduct.quantity',
                 0,
             ]);
-        }
+        }*/
 
         return $this;
     }

@@ -890,52 +890,9 @@ HTML
             },
         ];
 
-        $shopColumns["shop.quantity"] = [
-            'attribute' => "shop.quantity",
-            'label'     => 'Количество',
-            'format'    => 'raw',
-            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
-                if ($shopCmsContentElement->shopProduct) {
-                    $result = $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
 
-                    if (count($shopCmsContentElement->shopProduct->shopStoreProducts) > 1) {
-                        $storesQuantity = [];
-                        foreach ($shopCmsContentElement->shopProduct->shopStoreProducts as $shopStoreProduct) {
-                            if ($shopStoreProduct->quantity > 0) {
-                                $storesQuantity[] = Html::tag('small', $shopStoreProduct->quantity, [
-                                    'title' => $shopStoreProduct->shopStore->name,
-                                    'style' => 'white-space: nowrap; color: gray;',
-                                ]);
-                            }
 
-                        }
 
-                        if ($storesQuantity) {
-                            $result .= "<hr>".implode("<br>", $storesQuantity);
-                        }
-                    }
-
-                    if ($shopSupplierProducts = $shopCmsContentElement->shopSupplierElements) {
-
-                        $storesQuantity = [];
-                        foreach ($shopSupplierProducts as $shopStoreProduct) {
-                            $storesQuantity[] = Html::tag('small', $shopStoreProduct->shopProduct->quantity." - ".$shopStoreProduct->cmsSite->name, [
-                                'title' => $shopStoreProduct->cmsSite->name,
-                                'style' => 'white-space: nowrap; color: gray;',
-                            ]);
-
-                        }
-
-                        if ($storesQuantity) {
-                            $result .= "<hr>".implode("<br>", $storesQuantity);
-                        }
-                    }
-
-                    return $result;
-                }
-                return "—";
-            },
-        ];
 
         $shopColumns["custom"] = [
             'attribute' => 'id',
@@ -963,6 +920,9 @@ HTML
 
                         return null;
                     },
+
+
+
                 ];
 
 
@@ -976,6 +936,63 @@ HTML
                 ];
             }
         }
+
+        /**
+         * @var ShopStore[] $stores
+         */
+        if ($stores = ShopStore::find()->cmsSite()->all()) {
+            foreach ($stores as $store)
+            {
+                $shopColumns["shop.quantity_" . $store->id] = [
+                    'attribute' => "shop.quantity_" . $store->id,
+                    'label'     => $store->name,
+                    'format'    => 'raw',
+
+                    'beforeCreateCallback' => function (GridView $grid) use ($store) {
+                        /**
+                         * @var $query ActiveQuery
+                         */
+                        $query = $grid->dataProvider->query;
+
+                        $subQuery = ShopStoreProduct::find()->select(["quantity"])->andWhere(
+                            ['shop_product_id' => new Expression("sp.id")],
+                        )->andWhere(['shop_store_id' => $store->id]);
+
+                        $query->addSelect([
+                            'quantity_' . $store->id => $subQuery,
+                        ]);
+
+
+                        $grid->sortAttributes["shop.quantity_" . $store->id] = [
+                            'asc'  => ['quantity_' . $store->id => SORT_ASC],
+                            'desc' => ['quantity_' . $store->id => SORT_DESC],
+                        ];
+                    },
+
+                    'value'     => function (ShopCmsContentElement $shopCmsContentElement) use ($store) {
+                        if ($shopCmsContentElement->shopProduct) {
+                            return (float) $shopCmsContentElement->raw_row['quantity_' . $store->id] . " " . $shopCmsContentElement->shopProduct->measure->symbol;
+                        }
+                        return "—";
+                    },
+
+                ];
+
+                $visibleColumns[] = "shop.quantity_" . $store->id;
+            }
+        }
+
+        $shopColumns["shop.quantity"] = [
+            'attribute' => "shop.quantity",
+            'label'     => 'Количество под заказ',
+            'format'    => 'raw',
+            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
+                if ($shopCmsContentElement->shopProduct) {
+                    return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
+                }
+                return "—";
+            },
+        ];
 
         $visibleColumns[] = "shop.quantity";
         $visibleColumns[] = "shop.barcodes";
@@ -1128,12 +1145,42 @@ HTML
                  * @var $query ActiveQuery
                  */
                 $query = $e->dataProvider->query;
+                $query->joinWith("shopProduct as shopProduct");
                 $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
+                $query->groupBy([
+                    ShopCmsContentElement::tableName() . ".id"
+                ]);
 
                 /*if ($e->field->value) {
                     $query->andWhere(['barcodes.value' => $e->field->value]);
                 }*/
             },
+        ];
+
+
+        $filterFields['stores'] = [
+            'class'           => StringFilterField::class,
+            'label'           => 'Магазин/склад',
+            //'filterAttribute' => 'shopStoreProducts.shop_store_id',
+            'on apply'        => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                $query->joinWith("shopProduct.shopStoreProducts as shopStoreProducts");
+                if ($e->field->value) {
+                    $query->andWhere(['shopStoreProducts.shop_store_id' => $e->field->value]);
+                }
+
+                /*if ($e->field->value) {
+                    $query->andWhere(['barcodes.value' => $e->field->value]);
+                }*/
+            },
+
+            'class'    => SelectField::class,
+            'items'    => ArrayHelper::map(ShopStore::find()->cmsSite()->all(), 'id', 'asText'),
+            'multiple' => true,
+
         ];
 
 
@@ -1231,6 +1278,7 @@ HTML
 
         $filterFieldsLabels['shop_product_type'] = 'Тип товара';
         $filterFieldsLabels['barcodes'] = 'Штрихкод';
+        $filterFieldsLabels['stores'] = 'Магазин/склад';
 
         $filterFieldsLabels['shop_quantity'] = 'Количество';
         $filterFieldsLabels['all_ids'] = 'ID + вложенные';
@@ -1241,6 +1289,7 @@ HTML
         $filterFieldsRules[] = ['shop_quantity', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
         $filterFieldsRules[] = ['barcodes', 'string'];
+        $filterFieldsRules[] = ['stores', 'safe'];
         $filterFieldsRules[] = ['all_ids', 'safe'];
 
         //Мерж колонок и сортировок
@@ -1878,7 +1927,11 @@ JS
             try {
 
                 if (\Yii::$app->request->post("act") == "update-price") {
-                    $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)\Yii::$app->request->post("price_value"));
+
+                    $productPrice = $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)\Yii::$app->request->post("price_value"));
+                    $productPrice->is_fixed = (int) \Yii::$app->request->post("is_fixed");
+                    $productPrice->save();
+
                 } elseif (\Yii::$app->request->post("act") == "update-store") {
                     $model->shopProduct->saveStoreQuantity((int)\Yii::$app->request->post("shop_store_id"), (float)\Yii::$app->request->post("store_quantity"));
                 } else {

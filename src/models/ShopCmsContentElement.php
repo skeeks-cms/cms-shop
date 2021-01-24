@@ -473,7 +473,7 @@ class ShopCmsContentElement extends CmsContentElement
 
         //Если у товара задан главный товар и у него есть картинка, берем ее
         if ($this->main_cce_id) {
-            if ($image = $this->mainCmsContentElement->image) {
+            if ($image = $this->mainCmsContentElement->mainProductImage) {
                 return $image;
             }
         }

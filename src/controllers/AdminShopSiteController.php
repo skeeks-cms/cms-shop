@@ -151,9 +151,15 @@ class AdminShopSiteController extends BackendModelController
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
                     'is_show_product_only_quantity' => [
-                        'class'       => BoolField::class,
+                        /*'class'       => BoolField::class,
                         'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,*/
+                        'class'       => SelectField::class,
+                        'items'   => [
+                            0 => 'Все',
+                            1 => 'В наличии',
+                            2 => 'В наличии и под заказ',
+                        ],
                     ],
                     'is_show_button_no_price'       => [
                         'class'       => BoolField::class,
