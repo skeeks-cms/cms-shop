@@ -72,7 +72,16 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             [['name'], 'required'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 255],
+
             ['is_default', 'default', 'value' => null],
+            ['is_default', function() {
+                if ($this->is_default == 0) {
+                    $this->is_default = null;
+                }
+            }],
+
+            ['is_auto', 'default', 'value' => null],
+            ['base_auto_shop_type_price_id', 'default', 'value' => null],
 
             [['external_id'], 'default', 'value' => null],
             //[['external_id', 'shop_supplier_id'], 'unique', 'targetAttribute' => ['external_id', 'shop_supplier_id']],

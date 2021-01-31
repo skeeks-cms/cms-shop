@@ -20,6 +20,7 @@ use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopPersonType;
+use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\shop\models\ShopUser;
 use yii\base\BootstrapInterface;
