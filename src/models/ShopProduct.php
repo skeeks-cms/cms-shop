@@ -729,9 +729,19 @@ class ShopProduct extends \skeeks\cms\models\Core
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopStoreProducts()
+    public function getShopStoreProducts($stores = [])
     {
-        return $this->hasMany(ShopStoreProduct::class, ['shop_product_id' => 'id']);
+        $condition = ['shop_product_id' => 'id'];
+        $q = $this->hasMany(ShopStoreProduct::class, $condition);
+
+        if ($stores) {
+
+            $sotreIds = ArrayHelper::map($stores, "id", "id");
+            $q->andWhere(['shop_store_id' => $sotreIds]);
+            //$condition = ['shop_product_id' => 'id', 'shop_store_id' => $sotreIds];
+        }
+
+        return $q;
     }
 
     /**

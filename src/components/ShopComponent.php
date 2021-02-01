@@ -28,6 +28,7 @@ use yii\base\Component;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 use yii\widgets\ActiveForm;
@@ -45,6 +46,7 @@ use yii\widgets\ActiveForm;
  * @property ShopUser             $shopUser
  *
  * @property CmsContent           $shopContents
+ * @property ShopStore            $stores
  */
 class ShopComponent extends Component implements BootstrapInterface
 {
@@ -98,29 +100,29 @@ class ShopComponent extends Component implements BootstrapInterface
                     $exportImport = ArrayHelper::getValue($backendComponent->menu->data, 'exportImport');
 
                     $backendComponent->menu->data = [
-                        'tree'   => [
+                        'tree'     => [
                             'priority' => 100,
                             "label"    => \Yii::t('skeeks/cms', "Sections"),
                             "url"      => ["cms/admin-tree"],
                             "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
                         ],
-                        'shop'   => self::getAdminShopProductsMenu(),
-                        'import' => [
+                        'shop'     => self::getAdminShopProductsMenu(),
+                        'import'   => [
                             "label" => \Yii::t('skeeks/import', "Import"),
                             "img"   => ['\skeeks\cms\import\assets\ImportAsset', 'icons/import.png'],
                             "url"   => ["cmsImport/admin-import-task"],
                         ],
-                        'agents' => [
+                        'agents'   => [
                             "name"  => ['skeeks/agent', "Agents"],
                             "url"   => ["cmsAgent/admin-cms-agent"],
                             "image" => ['skeeks\cms\agent\assets\CmsAgentAsset', 'icons/clock.png'],
                         ],
-                        'stores' => [
+                        'stores'   => [
                             "label" => \Yii::t('skeeks/shop/app', 'Склады'),
                             "url"   => ["shop/admin-shop-store"],
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                         ],
-                        'prices' => [
+                        'prices'   => [
                             "label" => \Yii::t('skeeks/shop/app', 'Цены'),
                             "url"   => ["shop/admin-type-price"],
                             'icon'  => "fas fa-dollar-sign",
@@ -439,8 +441,7 @@ class ShopComponent extends Component implements BootstrapInterface
         $this
             ->filterByTypeContentElementQuery($activeQuery)
             ->filterByPriceContentElementQuery($activeQuery)
-            ->filterByMainPidContentElementQuery($activeQuery)
-        ;
+            ->filterByMainPidContentElementQuery($activeQuery);
 
         return $this;
     }
@@ -453,24 +454,60 @@ class ShopComponent extends Component implements BootstrapInterface
     public function filterByQuantityQuery(ActiveQuery $activeQuery)
     {
         if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity == 1) {
-            $activeQuery->joinWith('shopProduct as shopProduct');
-            //$activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
 
-            $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
-            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+            $storeIds = [];
+            if ($this->stores) {
+                $storeIds = ArrayHelper::map($storeIds, "id", "id");
+            }
+
+            $activeQuery->joinWith('shopProduct as shopProduct');
+
+            //$activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts', );
+            //$activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+
+            $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [
+                "shopStoreProducts.shop_product_id" => new Expression("shopProduct.id"),
+                "shopStoreProducts.shop_store_id" => $storeIds
+            ]);
+
+            $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+            $activeQuery->leftJoin(["shopOffersStoreProducts" => "shop_store_product"], [
+                "shopOffersStoreProducts.shop_product_id" => new Expression("shopProductOffers.id"),
+                "shopOffersStoreProducts.shop_store_id" => $storeIds
+            ]);
 
             $activeQuery->andWhere([
                 'or',
                 ['>', 'shopStoreProducts.quantity', 0],
                 ['>', 'shopOffersStoreProducts.quantity', 0],
             ]);
-            $activeQuery->groupBy([ShopCmsContentElement::tableName() . ".id"]);
+            $activeQuery->groupBy([ShopCmsContentElement::tableName().".id"]);
+
+
         } elseif (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity == 2) {
+
+            $storeIds = [];
+            if ($this->stores) {
+                $storeIds = ArrayHelper::map($storeIds, "id", "id");
+            }
+
             $activeQuery->joinWith('shopProduct as shopProduct');
+
+            $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [
+                "shopStoreProducts.shop_product_id" => new Expression("shopProduct.id"),
+                "shopStoreProducts.shop_store_id" => $storeIds
+            ]);
+
             $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+            $activeQuery->leftJoin(["shopOffersStoreProducts" => "shop_store_product"], [
+                "shopOffersStoreProducts.shop_product_id" => new Expression("shopProductOffers.id"),
+                "shopOffersStoreProducts.shop_store_id" => $storeIds
+            ]);
+
+            /*$activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
 
             $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
-            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');*/
 
             $activeQuery->andWhere([
                 'or',
@@ -479,7 +516,7 @@ class ShopComponent extends Component implements BootstrapInterface
                 ['>', 'shopStoreProducts.quantity', 0],
                 ['>', 'shopOffersStoreProducts.quantity', 0],
             ]);
-            $activeQuery->groupBy([ShopCmsContentElement::tableName() . ".id"]);
+            $activeQuery->groupBy([ShopCmsContentElement::tableName().".id"]);
         }
 
         /*if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
@@ -535,7 +572,7 @@ class ShopComponent extends Component implements BootstrapInterface
     {
         if (\Yii::$app->skeeks->site->shopSite->is_receiver && !\Yii::$app->skeeks->site->shopSite->is_show_product_no_main) {
             $activeQuery->andWhere(
-                ['is not', ShopCmsContentElement::tableName() . '.main_cce_id', null]
+                ['is not', ShopCmsContentElement::tableName().'.main_cce_id', null]
             );
         }
 
@@ -1150,16 +1187,15 @@ SQL
         $result = [];
 
         if ($this->deliveryHandlers) {
-            foreach ($this->deliveryHandlers as $handlerClass)
-            {
+            foreach ($this->deliveryHandlers as $handlerClass) {
                 $result[$handlerClass] = (new $handlerClass())->descriptor->name;
             }
         }
 
         return $result;
     }
-    
-    
+
+
     /**
      * @return array
      */
@@ -1168,12 +1204,41 @@ SQL
         $result = [];
 
         if ($this->paysystemHandlers) {
-            foreach ($this->paysystemHandlers as $handlerClass)
-            {
+            foreach ($this->paysystemHandlers as $handlerClass) {
                 $result[$handlerClass] = (new $handlerClass())->descriptor->name;
             }
         }
 
         return $result;
     }
+
+
+    /**
+     * @var array
+     */
+    protected $_stores = null;
+
+
+    /**
+     * @return ShopStore[]
+     */
+    public function getStores()
+    {
+        if ($this->_stores === null) {
+            $this->_stores = ShopStore::find()->cmsSite()->all();
+        }
+
+        return $this->_stores;
+    }
+
+    /**
+     * @param array $shopStores
+     * @return $this
+     */
+    public function setStores($shopStores = [])
+    {
+        $this->_stores = $shopStores;
+        return $this;
+    }
+
 }

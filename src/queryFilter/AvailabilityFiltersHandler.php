@@ -20,6 +20,7 @@ use v3project\yii2\productfilter\EavFiltersHandler;
 use v3project\yii2\productfilter\IFiltersHandler;
 use yii\base\Model;
 use yii\data\DataProviderInterface;
+use yii\db\Expression;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -83,8 +84,24 @@ class AvailabilityFiltersHandler extends Model
             $activeQuery->joinWith('shopProduct as shopProduct');
             //$activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
 
-            $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
-            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+            $storeIds = [];
+            if (\Yii::$app->shop->stores) {
+                $storeIds = ArrayHelper::map(\Yii::$app->shop->stores, "id", "id");
+            }
+
+            $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [
+                "shopStoreProducts.shop_product_id" => new Expression("shopProduct.id"),
+                "shopStoreProducts.shop_store_id" => $storeIds
+            ]);
+
+            $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+            $activeQuery->leftJoin(["shopOffersStoreProducts" => "shop_store_product"], [
+                "shopOffersStoreProducts.shop_product_id" => new Expression("shopProductOffers.id"),
+                "shopOffersStoreProducts.shop_store_id" => $storeIds
+            ]);
+
+            //$activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
+            //$activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
 
             $activeQuery->andWhere([
                 'or',
@@ -92,12 +109,31 @@ class AvailabilityFiltersHandler extends Model
                 ['>', 'shopOffersStoreProducts.quantity', 0],
             ]);
             $activeQuery->groupBy([ShopCmsContentElement::tableName() . ".id"]);
+
         } elseif ($this->value == 2) {
+
+
             $activeQuery->joinWith('shopProduct as shopProduct');
             $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
 
-            $activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
-            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');
+            /*$activeQuery->joinWith('shopProduct.shopStoreProducts as shopStoreProducts');
+            $activeQuery->joinWith('shopProduct.shopProductOffers.shopStoreProducts as shopOffersStoreProducts');*/
+
+            $storeIds = [];
+            if (\Yii::$app->shop->stores) {
+                $storeIds = ArrayHelper::map(\Yii::$app->shop->stores, "id", "id");
+            }
+
+            $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [
+                "shopStoreProducts.shop_product_id" => new Expression("shopProduct.id"),
+                "shopStoreProducts.shop_store_id" => $storeIds
+            ]);
+
+            $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+            $activeQuery->leftJoin(["shopOffersStoreProducts" => "shop_store_product"], [
+                "shopOffersStoreProducts.shop_product_id" => new Expression("shopProductOffers.id"),
+                "shopOffersStoreProducts.shop_store_id" => $storeIds
+            ]);
 
             $activeQuery->andWhere([
                 'or',
