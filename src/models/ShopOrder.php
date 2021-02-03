@@ -1072,6 +1072,8 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'prices.product_id' => new Expression('shopProduct.id'),
                     'prices.type_price_id' => $ids,
                 ]);
+                
+                \Yii::$app->shop->filterByQuantityQuery($query);
                 $query->leftJoin(['currency' => 'money_currency'], ['currency.code' => new Expression('prices.currency_code')]);
                 $query->select([
                     'cms_content_element.*',
