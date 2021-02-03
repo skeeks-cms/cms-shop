@@ -168,11 +168,21 @@ class AvailabilityFiltersHandler extends Model
 
     public function getOptions()
     {
-        return [
-            0 => 'Все',
-            1 => 'В наличии',
-            2 => 'В наличии и под заказ',
-        ];
+        if (\Yii::$app->shop->stores) {
+            return [
+                0 => 'Все',
+                1 => 'В наличии',
+                2 => 'В наличии и под заказ',
+            ];
+
+        } else {
+            return [
+                0 => 'Все',
+                //1 => 'В наличии',
+                2 => 'В наличии',
+            ];
+        }
+
     }
 
     public function render(ActiveForm $form)

@@ -1026,7 +1026,7 @@ JS
                                     ?>
                                     <i class="fas fa-link" title="<?php echo $shopSupplierProduct->asText; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
                                     <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                    <a class="" style="margin-left: 5px; border-bottom: 0px; color: gray;" href="<?php echo $shopSupplierProduct->url; ?>" title="Посмотреть на сайте (Откроется в новом окне)"
+                                    <a class="" style="margin-left: 5px; border-bottom: 0px; color: gray;" href="<?php echo $shopSupplierProduct->url; ?>" data-pjax="0" title="Посмотреть на сайте (Откроется в новом окне)"
                                        target="_blank"><i class="fas fa-external-link-alt"></i></a>
                                 </td>
                                 <td><?php echo $shopSupplierProduct->id; ?></td>
