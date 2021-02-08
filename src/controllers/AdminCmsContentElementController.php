@@ -1309,7 +1309,10 @@ HTML
              * @var $query ActiveQuery
              */
             $query = $event->sender->dataProvider->query;
-            $query->select([ShopCmsContentElement::tableName().".*"]);
+
+            $query->select([
+                ShopCmsContentElement::tableName().".*"
+            ]);
 
             $query->with("image");
             $query->with("cmsContent");
@@ -1328,6 +1331,8 @@ HTML
             //$this->initGridColumns($event->sender, $this->content);
 
             $query->joinWith('shopProduct as sp');
+            //$query->joinWith('shopProduct.shopProductOffers as shopProductOffers');
+            //$query->groupBy([ShopCmsContentElement::tableName().".id"]);
 
             if (\Yii::$app->skeeks->site->shopTypePrices) {
                 foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
