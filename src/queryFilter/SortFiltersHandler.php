@@ -101,7 +101,10 @@ class SortFiltersHandler extends Model
         if ($this->value) {
             switch ($this->value) {
                 case ('-popular'):
-                    $query->orderBy([CmsContentElement::tableName().'.show_counter' => SORT_DESC]);
+                    $query->orderBy([
+                        CmsContentElement::tableName(). '.priority' => SORT_ASC,
+                        CmsContentElement::tableName().'.show_counter' => SORT_DESC
+                    ]);
                     break;
 
                 case ('-new'):
