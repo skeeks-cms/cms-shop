@@ -605,6 +605,7 @@ class ShopComponent extends Component implements BootstrapInterface
                 LEFT JOIN shop_product as sp_main on sp_main.id = sp_has_main_pid.main_cce_id 
             SET 
                 sp.`measure_ratio` = sp_main.measure_ratio, 
+                sp.`measure_ratio_min` = sp_main.measure_ratio_min, 
                 sp.`measure_matches_jsondata` = sp_main.measure_matches_jsondata, 
                 sp.`measure_code` = sp_main.measure_code, 
                 sp.`width` = sp_main.width, 

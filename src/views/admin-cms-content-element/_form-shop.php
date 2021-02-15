@@ -256,6 +256,11 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
                 'dynamicReload' => true,
                 'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : "",
             ]); ?>
+        <?= $form->field($shopProduct, 'measure_ratio_min')
+            ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                //'dynamicReload' => true,
+                'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : "",
+            ]); ?>
     <? endif; ?>
 
     <?= $form->field($shopProduct, 'measure_matches_jsondata')->widget(

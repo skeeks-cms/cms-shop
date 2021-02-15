@@ -1456,6 +1456,7 @@ HTML
 
                 $shopProduct->measure_code = $subShopProduct->measure_code;
                 $shopProduct->measure_ratio = $subShopProduct->measure_ratio;
+                $shopProduct->measure_ratio_min = $subShopProduct->measure_ratio_min;
                 $shopProduct->height = $subShopProduct->height;
                 $shopProduct->width = $subShopProduct->width;
                 $shopProduct->length = $subShopProduct->length;

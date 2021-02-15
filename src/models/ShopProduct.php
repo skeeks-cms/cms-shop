@@ -31,6 +31,7 @@ use yii\helpers\Json;
  * @property double                    $quantity
  * @property double                    $weight
  * @property double                    $measure_ratio
+ * @property double                    $measure_ratio_min
  * @property integer                   $vat_id
  * @property string                    $vat_included
  * @property string                    $measure_code
@@ -442,6 +443,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'length',
                     'height',
                     'measure_ratio',
+                    'measure_ratio_min',
                 ],
                 'number',
             ],
@@ -455,6 +457,27 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['weight', 'width', 'length', 'height'], 'default', 'value' => 0],
             [['measure_ratio'], 'default', 'value' => 1],
             [['measure_ratio'], 'number', 'min' => 0.0001, 'max' => 9999999],
+
+            [['measure_ratio_min'], 'default', 'value' => function() {
+                return $this->measure_ratio;
+            }],
+            [['measure_ratio_min'], 'number', 'min' => 0.0001, 'max' => 9999999],
+            [['measure_ratio_min'], function() {
+                if ($this->measure_ratio > $this->measure_ratio_min) {
+                    $this->measure_ratio_min = $this->measure_ratio;
+                    //$this->addError("measure_ratio_min", "Минимальное количество продажи должно быть больше чем шаг продажи");
+                    //return false;
+                }
+                /*print_r($this->measure_ratio_min);
+                            die;*/
+
+            }],
+            [['measure_ratio_min'], function() {
+                if ($this->measure_ratio_min % $this->measure_ratio != 0) {
+                    $this->addError("measure_ratio_min", "Минимальное количество продажи должно быть кратно шагу продажи.");
+                    return false;
+                }
+            }],
 
             [['baseProductPriceValue'], 'number'],
             [['baseProductPriceValue'], 'default', 'value' => 0.00],
@@ -627,7 +650,8 @@ class ShopProduct extends \skeeks\cms\models\Core
             'vat_id'        => \Yii::t('skeeks/shop/app', 'VAT rate'),
             'vat_included'  => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
             'measure_code'  => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
-            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Минимальное количество продажи'),
+            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Шаг количества продажи'),
+            'measure_ratio_min' => \Yii::t('skeeks/shop/app', 'Минимальное количество продажи'),
             'width'         => \Yii::t('skeeks/shop/app', 'Width'),
             'length'        => \Yii::t('skeeks/shop/app', 'Length'),
             'height'        => \Yii::t('skeeks/shop/app', 'Height'),
@@ -646,6 +670,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         return [
             'measure_code'  => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
             'measure_ratio' => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
+            'measure_ratio_min' => \Yii::t('skeeks/shop/app', 'Нажимая кнопку плюс и минус для добавления в корзину будет добавлятся именно это количество'),
         ];
     }
     /**

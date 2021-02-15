@@ -123,10 +123,18 @@ class CartController extends Controller
                 ]);
             }
 
+
             $shopBasket->quantity = $shopBasket->quantity + $quantity;
+            if ($product->measure_ratio_min > $shopBasket->quantity) {
+                $shopBasket->quantity = $product->measure_ratio_min;
+            }
 
             $int = round($shopBasket->quantity / $product->measure_ratio);
             $shopBasket->quantity = $int * $product->measure_ratio;
+
+            if ($product->measure_ratio_min > $shopBasket->quantity) {
+                $shopBasket->quantity = $product->measure_ratio_min;
+            }
 
 
             if (!$shopBasket->recalculate()->save()) {
@@ -233,6 +241,10 @@ class CartController extends Controller
                     }
 
                     $shopBasket->quantity = $quantity;
+                    if ($product->measure_ratio_min > $shopBasket->quantity) {
+                        $shopBasket->quantity = $product->measure_ratio_min;
+                    }
+
                     if ($shopBasket->recalculate()->save()) {
                         $rr->success = true;
                         $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
