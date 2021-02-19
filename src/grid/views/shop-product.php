@@ -123,48 +123,12 @@ $shopSellerProducts = [];
 
 <? endif; ?>
 
-<!--Если сайт является приемщиком товаров-->
-<? if (\Yii::$app->skeeks->site->shopSite->is_receiver) : ?>
-    <div class="sx-product-controls">
-        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->count()) : ?>
-            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= $tradeOffers; ?>)</a>
-        <? endif; ?>
 
-        <?
-        $q = \skeeks\cms\shop\models\ShopImportCmsSite::find()->select([
-            'sender_cms_site_id',
-        ])->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
-
-        $shopSupplierProducts = [];
-        if ($model->mainCmsContentElement) {
-            $shopSupplierProducts = [];
-
-            $shopSupplierProducts = $model->mainCmsContentElement->getShopSupplierElements()
-                ->andWhere(['cmsSite.id' => $q])
-                ->count();
-        }
-        
-
-        if ($shopSupplierProducts) : ?>
-            <a href="#" class="sx-trigger-action" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= $shopSupplierProducts; ?>)</a>
-        <? endif; ?>
-    </div>
-<? else : ?>
-
-    <div class="sx-product-controls">
-        <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->count()) : ?>
-            <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= $tradeOffers; ?>)</a>
-        <? endif; ?>
-
-        <? if ($shopSupplierProducts = $model->getShopSupplierElements()->count()) : ?>
-            <a href="#" class="sx-trigger-action" style="border-bottom: 1px dashed;"><i class="fas fa-truck"></i> Поставщики (<?= $shopSupplierProducts; ?>)</a>
-        <? endif; ?>
-
-        <? if ($shopSellerProducts = $model->getShopSellerElements()->count()) : ?>
-            <a href="#" class="sx-trigger-action" style="border-bottom: 1px dashed;"><i class="fas fa-map-marker-alt"></i> Где продается (<?= $shopSellerProducts; ?>)</a>
-        <? endif; ?>
-    </div>
-<? endif; ?>
+<div class="sx-product-controls">
+    <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->count()) : ?>
+        <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= $tradeOffers; ?>)</a>
+    <? endif; ?>
+</div>
 
 
 

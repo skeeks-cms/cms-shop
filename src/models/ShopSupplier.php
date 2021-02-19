@@ -8,31 +8,27 @@
 
 namespace skeeks\cms\shop\models;
 
-use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\StorageFile;
-use skeeks\cms\money\models\MoneyCurrency;
-use skeeks\cms\money\Money;
-use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property integer|null $created_at
- * @property integer|null $updated_at
- * @property integer|null $created_by
- * @property integer|null $updated_by
- * @property string       $name
- * @property string|null  $description
- * @property string|null  $description_internal
- * @property integer|null $cms_image_id
- * @property integer      $is_active
- * @property integer      $is_main
- * @property string|null      $external_id
+ * @property integer|null           $created_at
+ * @property integer|null           $updated_at
+ * @property integer|null           $created_by
+ * @property integer|null           $updated_by
+ * @property string                 $name
+ * @property string|null            $description
+ * @property string|null            $description_internal
+ * @property integer|null           $cms_image_id
+ * @property integer                $cms_site_id
+ * @property integer                $is_active
+ * @property string|null            $external_id
  *
- * @property StorageFile  $cmsImage
- * @property ShopStore[]  $shopStores
- * @property ShopTypePrice[]  $shopTypePrices
- * @property ShopProduct[]  $shopProducts
+ * @property StorageFile            $cmsImage
+ * @property ShopStore[]            $shopStores
+ * @property ShopTypePrice[]        $shopTypePrices
+ * @property ShopProduct[]          $shopProducts
  * @property ShopSupplierProperty[] $shopSupplierProperties
  *
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -70,19 +66,39 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
 
             [['name'], 'string', 'max' => 255],
             [['name'], 'required'],
-            [['name'], 'unique'],
 
             [['description_internal'], 'string'],
             [['description'], 'string'],
 
             [['is_active'], 'integer'],
-            [['is_main'], 'integer'],
 
-            [['external_id'], 'unique'],
             [['external_id'], 'string'],
             [['external_id'], 'default', 'value' => null],
-            
+
             [['cms_image_id'], 'safe'],
+
+            [['cms_site_id'], 'integer'],
+
+            [['external_id', 'cms_site_id'], 'unique', 'targetAttribute' => ['external_id', 'cms_site_id']],
+            
+            [
+                'cms_site_id',
+                'default',
+                'value' => function () {
+                    if (\Yii::$app->skeeks->site) {
+                        return \Yii::$app->skeeks->site->id;
+                    }
+                },
+            ],
+
+            [
+                ['cms_site_id', 'external_id'],
+                'unique',
+                'targetAttribute' => ['cms_site_id', 'external_id'],
+                'when'            => function (self $model) {
+                    return (bool)$model->external_id;
+                },
+            ],
         ]);
     }
 
@@ -92,13 +108,12 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'name'         => "Название",
-            'description'  => "Описание",
-            'description_internal'  => "Описание (внутреннее)",
-            'cms_image_id' => "Изображение",
-            'is_active'    => "Активность",
-            'external_id'    => "ID из внешней системы",
-            'is_main'    => "Основной поставщик?",
+            'name'                 => "Название",
+            'description'          => "Описание",
+            'description_internal' => "Описание (внутреннее)",
+            'cms_image_id'         => "Изображение",
+            'is_active'            => "Активность",
+            'external_id'          => "ID из внешней системы",
         ]);
     }
     /**
@@ -107,8 +122,7 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'description_internal'  => "Это описание не видят клиенты",
-            'is_main'  => "Товары основного поставщика показываются и продаются на сайте, если же поставщик не основной, то его товары необходимо привязывать к товаров основного поставщика.",
+            'description_internal' => "Это описание не видят клиенты",
         ]);
     }
 
@@ -128,7 +142,7 @@ class ShopSupplier extends \skeeks\cms\base\ActiveRecord
     {
         return $this->hasMany(ShopStore::class, ['shop_supplier_id' => 'id']);
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
