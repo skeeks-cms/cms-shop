@@ -209,6 +209,40 @@ return [
                 "url"   => ["shop/admin-shop-import-cms-site"],
                 "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
             ],
+            /*[
+                "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
+                "url"   => ["shop/admin-shop-supplier"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
+            ],*/
+            
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Склады'),
+                "url"   => ["shop/admin-shop-store"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+            ],
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
+                "url"   => ["shop/admin-shop-store-supplier"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
+            ],
+            
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Способы оплаты'),
+                "url"   => ["shop/admin-pay-system"],
+                "icon"  => "fab fa-cc-visa",
+            ],
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Способы доставки'),
+                "url"   => ["shop/admin-delivery"],
+                "icon"  => "fas fa-truck",
+            ],
+            
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Цены'),
+                "url"   => ["shop/admin-type-price"],
+                'icon'  => "fas fa-dollar-sign",
+            ],
 
         ],
     ],
@@ -241,11 +275,11 @@ return [
                         ],*/
 
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Склады'),
                             "url"   => ["shop/admin-shop-store"],
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-                        ],
+                        ],*/
 
                         [
                             "label" => \Yii::t('skeeks/shop/app', 'Content settings'),
@@ -262,11 +296,11 @@ return [
                             "url"   => ["shop/admin-order-status"],
                         ],
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Цены'),
                             "url"   => ["shop/admin-type-price"],
                             'icon'  => "fas fa-dollar-sign",
-                        ],
+                        ],*/
 
                         [
                             "label" => \Yii::t('skeeks/shop/app', 'Покупатели'),
@@ -274,7 +308,7 @@ return [
                             "icon"  => "fas fa-user-friends",
                         ],
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Способы оплаты'),
                             "url"   => ["shop/admin-pay-system"],
                             "icon"  => "fab fa-cc-visa",
@@ -284,7 +318,7 @@ return [
                             "label" => \Yii::t('skeeks/shop/app', 'Способы доставки'),
                             "url"   => ["shop/admin-delivery"],
                             "icon"  => "fas fa-truck",
-                        ],
+                        ],*/
                         
                         [
                             "label" => \Yii::t('skeeks/shop/app', 'Свойства поставщика'),

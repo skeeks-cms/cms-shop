@@ -118,11 +118,11 @@ class AdminShopSiteController extends BackendModelController
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Основное'),
                 'fields' => [
-                    'catalog_cms_tree_id' => [
+                    /*'catalog_cms_tree_id' => [
                         'class'       => WidgetField::class,
                         'widgetClass' => SelectModelDialogTreeWidget::class,
                     ],
-                    
+                    */
                     'notify_emails'         => [
                         'class' => TextareaField::class,
                     ],

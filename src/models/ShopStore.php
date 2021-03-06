@@ -8,6 +8,8 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
+use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
@@ -20,6 +22,14 @@ use yii\helpers\ArrayHelper;
  * @property bool               $is_active
  * @property string|null        $external_id
  * @property integer|null       $cms_site_id
+ * @property string|null        $address Полный адрес
+ * @property float|null         $latitude Широта
+ * @property float|null         $longitude Долгота
+ * @property string|null        $work_time Рабочее время
+ * @property int                $priority
+ * @property bool               $is_supplier
+ *
+ * @property string             $coordinates
  *
  * @property CmsStorageFile     $cmsImage
  * @property CmsSite            $cmsSite
@@ -39,17 +49,38 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+
+            HasStorageFile::class              => [
+                'class'  => HasStorageFile::class,
+                'fields' => ['cms_image_id'],
+            ],
+            HasJsonFieldsBehavior::className() => [
+                'class'  => HasJsonFieldsBehavior::className(),
+                'fields' => ['work_time'],
+            ],
+        ]);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            [['priority'], 'integer'],
 
             [['name'], 'string', 'max' => 255],
             [['name'], 'required'],
 
             [['description'], 'string'],
+            [['address'], 'string'],
+            [['address'], 'default', 'value' => null],
 
             [['is_active'], 'integer'],
 
@@ -60,6 +91,8 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
 
             [['cms_site_id'], 'integer'],
+            [['is_supplier'], 'integer'],
+            [['is_supplier'], 'default', 'value' => 0],
 
             [
                 'cms_site_id',
@@ -79,9 +112,25 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
                     return (bool)$model->external_id;
                 },
             ],
-            
+
             [['name', 'cms_site_id'], 'unique', 'targetAttribute' => ['name', 'cms_site_id']],
 
+            [['latitude', 'longitude'], 'number'],
+            [['work_time'], 'safe'],
+
+            [
+                [
+                    'latitude',
+                    'longitude',
+                ],
+                function ($attribute) {
+                    if ($this->{$attribute} && $this->{$attribute} <= 0) {
+                        $this->addError($attribute, 'Адрес указан некорректно');
+                        return false;
+                    }
+                    return true;
+                },
+            ],
         ]);
     }
 
@@ -92,11 +141,18 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
 
-            'name'             => "Название",
-            'description'      => "Описание",
-            'cms_image_id'     => "Изображение",
-            'is_active'        => "Активность",
-            'external_id'      => "ID из внешней системы",
+            'name'         => "Название",
+            'description'  => "Описание",
+            'cms_image_id' => "Изображение",
+            'is_active'    => "Активность",
+            'external_id'  => "ID из внешней системы",
+            'priority'     => "Сортировка",
+            'work_time'    => 'Время работы',
+            'latitude'     => 'Широта',
+            'longitude'    => 'Долгота',
+            'address'      => 'Адрес',
+            'coordinates'  => '',
+            'is_supplier'  => 'Поставщик?',
         ]);
     }
 
@@ -137,6 +193,32 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function getShopProducts()
     {
         return $this->hasMany(ShopProduct::className(), ['id' => 'shop_product_id'])->viaTable('shop_store_product', ['shop_store_id' => 'id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCoordinates()
+    {
+        if (!$this->latitude || !$this->longitude) {
+            return '';
+        }
+
+        return $this->latitude.",".$this->longitude;
+    }
+
+    /**
+     * Режим работы
+     *
+     * @return array|string|null
+     */
+    public function getWorkTime()
+    {
+        if ($this->work_time) {
+            return $this->work_time;
+        }
+
+        return "";
     }
 
 }

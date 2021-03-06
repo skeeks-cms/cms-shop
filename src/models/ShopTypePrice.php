@@ -21,7 +21,8 @@ use yii\helpers\ArrayHelper;
  * @property integer      $priority
  * @property integer|null $cms_site_id
  * @property integer|null $is_default
- * 
+ * @property integer|null $is_purchase
+ *
  * @property integer $is_auto
  * @property integer $base_auto_shop_type_price_id
  * @property integer $auto_extra_charge
@@ -79,6 +80,12 @@ class ShopTypePrice extends \skeeks\cms\models\Core
                     $this->is_default = null;
                 }
             }],
+            ['is_purchase', 'default', 'value' => null],
+            ['is_purchase', function() {
+                if ($this->is_purchase == 0) {
+                    $this->is_purchase = null;
+                }
+            }],
 
             ['is_auto', 'default', 'value' => null],
             ['base_auto_shop_type_price_id', 'default', 'value' => null],
@@ -132,7 +139,8 @@ class ShopTypePrice extends \skeeks\cms\models\Core
             'priority'         => \Yii::t('skeeks/shop/app', 'Priority'),
             'external_id'      => "ID из внешней системы",
             'cms_site_id'      => "Сайт",
-            'is_default'      => "Главная цена",
+            'is_default'      => "Розничная цена",
+            'is_purchase'      => "Закупочная цена",
             'is_auto'    => \Yii::t('skeeks/shop/app', 'Цена обновляется автоматически?'),
             'base_auto_shop_type_price_id'    => \Yii::t('skeeks/shop/app', 'Базовая цена от которой идет рассчет'),
             'auto_extra_charge'    => \Yii::t('skeeks/shop/app', 'Наценка/Уценка'),
@@ -146,7 +154,8 @@ class ShopTypePrice extends \skeeks\cms\models\Core
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'is_default'      => "Обычно это розничная цена доступная всем покупателям",
+            'is_default'      => "Базовая розничная цена, доступная всем покупателям",
+            'is_purchase'      => "Закупочная цена",
             //'cmsUserRoles'      => "Если ничего не выбрано, то могут все.",
             //'viewCmsUserRoles'      => "Если ничего не выбрано, то видят все клиенты.",
         ]);

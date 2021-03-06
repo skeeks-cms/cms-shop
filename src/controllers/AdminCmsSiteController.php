@@ -115,12 +115,12 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                         'priority',
                         //'name',
                         'countDomains',
-                        'is_supplier',
+                        /*'is_supplier',
                         'is_receiver',
 
                         'countShopStores',
                         'countShopTypePrices',
-                        'countShopProducts',
+                        'countShopProducts',*/
                     ],
 
                     'columns' => [

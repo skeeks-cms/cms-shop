@@ -37,7 +37,7 @@ $qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
     
             ->andWhere(['c.content_id' => $content->id])
             ->andWhere(['is not', 'c.main_cce_by', null])
-            ->andWhere(['!=', 'mainCmsContentElement.created_at', new \yii\db\Expression("c.main_cce_at")])
+            ->andWhere(['!=', 'mainCmsContentElement.created_by', new \yii\db\Expression("c.main_cce_by")])
     
             ->groupBy(['c.main_cce_by'])
             ->select([
@@ -48,11 +48,10 @@ $qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
                 //"delta" => new \yii\db\Expression("abs(mainCmsContentElement.created_at - c.main_cce_at)"),
             ])
             /*->andHaving([
-                '>=', 'delta', 1
+                '>=', 'delta', 60
             ])*/
 ;
 
-//print_r($qProducts->createCommand()->rawSql);die;
 if ($dm->from) {
     $start = strtotime($dm->from." 00:00:00");
     $q->andWhere(['>=', 'c.created_at', $start]);
@@ -63,6 +62,7 @@ if ($dm->to) {
     $q->andWhere(['<=', 'c.created_at', $to]);
     $qProducts->andWhere(['<=', 'c.main_cce_at', $to]);
 }
+//print_r($qProducts->createCommand()->rawSql);die;
 
 $all = $q
     ->asArray()

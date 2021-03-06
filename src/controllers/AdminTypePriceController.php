@@ -96,7 +96,14 @@ HTML
                             'value'     => function (ShopTypePrice $model) {
 
                                 $data = [];
-                                $data[] = ($model->is_default ? '<span class="fa fa-check text-success" title="Цена по умолчанию"></span> ' : '').Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $name = '';
+                                if ($model->is_default) {
+                                    $name = '<span class="fas fa-lock" title="Базовая розничная цена" style="margin-right: 5px;"></span>';
+                                }
+                                if ($model->is_purchase) {
+                                    $name = '<span class="fas fa-lock" title="Закупочная цена" style="margin-right: 5px;"></span>';
+                                }
+                                $data[] = $name . Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
                                 if ($model->description) {
                                     $data[] = $model->description;
                                 }
@@ -133,6 +140,27 @@ HTML
 
         $model->load(\Yii::$app->request->get());
 
+        if (ShopTypePrice::find()->cmsSite()->andWhere(['is_default' => 1])->exists()) {
+            \Yii::$app->view->registerCss(<<<CSS
+.field-shoptypeprice-is_default {
+    display: none;
+}
+CSS
+            );
+        }
+
+        if (ShopTypePrice::find()->cmsSite()->andWhere(['is_purchase' => 1])->exists()) {
+            \Yii::$app->view->registerCss(<<<CSS
+.field-shoptypeprice-is_purchase {
+    display: none;
+}
+CSS
+            );
+        }
+
+        if ($model->isNewRecord) {
+
+        }
 
         $result = [
             'main' => [
@@ -141,7 +169,10 @@ HTML
                 'fields' => [
                     'is_default'  => [
                         'class'       => BoolField::class,
-                        'formElement' => BoolField::ELEMENT_CHECKBOX,
+                        'allowNull'   => false,
+                    ],
+                    'is_purchase'  => [
+                        'class'       => BoolField::class,
                         'allowNull'   => false,
                     ],
                     'name',

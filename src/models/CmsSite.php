@@ -128,7 +128,7 @@ class CmsSite extends \skeeks\cms\models\CmsSite
      */
     public function getShopStores()
     {
-        return $this->hasMany(ShopStore::className(), ['cms_site_id' => 'id']);
+        return $this->hasMany(ShopStore::className(), ['cms_site_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 
     /**

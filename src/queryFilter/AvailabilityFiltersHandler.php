@@ -123,6 +123,10 @@ class AvailabilityFiltersHandler extends Model
             if (\Yii::$app->shop->stores) {
                 $storeIds = ArrayHelper::map(\Yii::$app->shop->stores, "id", "id");
             }
+            if (\Yii::$app->shop->supplierStores) {
+                $supploerStoreIds = ArrayHelper::map(\Yii::$app->shop->supplierStores, "id", "id");
+                $storeIds = ArrayHelper::merge($storeIds, $supploerStoreIds);
+            }
 
             $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [
                 "shopStoreProducts.shop_product_id" => new Expression("shopProduct.id"),
@@ -137,8 +141,6 @@ class AvailabilityFiltersHandler extends Model
 
             $activeQuery->andWhere([
                 'or',
-                ['>', 'shopProduct.quantity', 0],
-                ['>', 'shopProductOffers.quantity', 0],
                 ['>', 'shopStoreProducts.quantity', 0],
                 ['>', 'shopOffersStoreProducts.quantity', 0],
             ]);

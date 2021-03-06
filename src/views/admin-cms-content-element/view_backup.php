@@ -645,7 +645,8 @@ JS
 </div>
 
 <?php if (
-    !$model->shopProduct->isOffersProduct //И если это товар без предложений
+    (!$model->cmsSite->is_default && \skeeks\cms\models\CmsSite::find()->count() > 0) //Если у нас многосайтовость и этот товар - инфокарточка
+    && !$model->shopProduct->isOffersProduct //И если это товар без предложений
 ) : ?>
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
@@ -749,24 +750,25 @@ JS
                         $totalSummQuantity = 0;
                     ?>
                 
-                    <?php if ($shopStores = \Yii::$app->skeeks->site->getShopStores()->andWhere(['is_supplier' => 0])->all()) : ?>
-                        <?php foreach ($shopStores as $shopStore) : ?>
+                    <?php if (\Yii::$app->skeeks->site->shopStores) : ?>
+                    
+                        
+                    
+                        <?php foreach (\Yii::$app->skeeks->site->shopStores as $shopStore) : ?>
                             <?php
                             $storeProduct = $model->shopProduct->getStoreProduct($shopStore);
                             $totalPrice = $noValue;
-                            $money = $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : null;
+                            $money = $model->shopProduct->baseProductPrice->money;
                             if ($storeProduct) {
-                                if ($money) {
-                                    $totalPrice = $money->mul((float)$storeProduct->quantity);
-                                }
-
+                                $totalPrice = $money->mul((float)$storeProduct->quantity);
                                 $totalSummQuantity = $totalSummQuantity + $storeProduct->quantity;
+
                             }
 
                             ?>
                             <tr>
                                 <td style="text-align: left;"><?php echo $shopStore->name; ?></td>
-                                <td><?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?></td>
+                                <td><?php echo $model->shopProduct->baseProductPrice->money; ?></td>
                                 <td>
                                     <span class="sx-fast-edit sx-fast-edit-popover"
                                           data-form="#store-<?php echo $shopStore->id; ?>-form"
@@ -827,107 +829,226 @@ JS
             </div>
         </div>
     </div>
+<?php endif; ?>
+
+<?php if (
+    ($model->cmsSite->shopSite->is_receiver) //Если это товар собирает данные от поставщиков
+    && !$model->shopProduct->isOffersProduct //И если это товар без предложений
+) : ?>
+
+    <?php
+
+    $q = \skeeks\cms\shop\models\ShopImportCmsSite::find()->select([
+        'sender_cms_site_id',
+    ])->andWhere(['cms_site_id' => $model->cmsSite->id]);
+
+    $shopSupplierProducts = [];
+    if ($model->mainCmsContentElement) {
+        $shopSupplierProducts = [];
+
+        $shopSupplierProducts = $model->mainCmsContentElement->getShopSupplierElements()
+            ->andWhere(['cmsSite.id' => $q])
+            ->all();
+    };
+    ?>
+    <?php if ($shopSupplierProducts) : ?>
 
 
+        <div class="row no-gutters" style="margin-top: 10px;">
+            <div class="col-12">
+                <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b></div>
 
-    <div class="row no-gutters" style="margin-top: 10px;">
-        <div class="col-12">
-            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b></div>
-            <div class="sx-table-wrapper table-responsive">
-                <table class="table sx-table">
-                    <tr>
-                        <th style="text-align: left;">Поставщик</th>
-                        <th>Код</th>
-                        <th>Остаток, <?php echo $model->shopProduct->measure->symbol; ?></th>
-                        <th>Закупочная цена</th>
-                    </tr>
+                <?
+                /**
+                 * @var $shopSupplierProduct \skeeks\cms\shop\models\ShopCmsContentElement
+                 */
+                foreach ($shopSupplierProducts as $shopSupplierProduct) : ?>
 
                     <?php
-                        $totalSummPrice = 0;
-                        $totalSummQuantity = 0;
+                    /**
+                     * @var $shopImportCmsSite \skeeks\cms\shop\models\ShopImportCmsSite
+                     */
+                        $shopImportCmsSite = \skeeks\cms\shop\models\ShopImportCmsSite::find()
+                            ->andWhere([
+                                'sender_cms_site_id' => $shopSupplierProduct->cms_site_id
+                            ])
+                            ->andWhere(['cms_site_id' => $model->cmsSite->id])
+                            ->one()
                     ?>
+                    <?php /*if ($shopSupplierProduct->quantity > 0) : */ ?>
 
-                    <?php if ($shopStores = \Yii::$app->skeeks->site->getShopStores()->andWhere(['is_supplier' => 1])->all()) : ?>
-                        <?php foreach ($shopStores as $shopStore) : ?>
-                            <?php
-                            $storeProduct = $model->shopProduct->getStoreProduct($shopStore);
-                            $totalPrice = $noValue;
-                            $money = $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : "";
-                            if ($storeProduct) {
-                                if ($money) {
-                                    $totalPrice = $money->mul((float)$storeProduct->quantity);
-                                }
-                                $totalSummQuantity = $totalSummQuantity + $storeProduct->quantity;
-
-                            }
-                            ?>
+                    <div class="sx-table-wrapper table-responsive" style="margin-bottom: 10px;">
+                        <table class="table sx-table">
                             <tr>
-                                <td style="text-align: left;"><?php echo $shopStore->name; ?></td>
-                                <td><?php echo $storeProduct ? $storeProduct->external_id : "&nbsp;&nbsp;&nbsp;"; ?></td>
-                                <td>
-                                    <span class=""
-                                    >
-                                        <?php echo $storeProduct ? (float) $storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
-                                    </span>
-
-                                    <div class="sx-fast-edit-form-wrapper">
-                                        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                            'id'             => "store-{$shopStore->id}-form",
-                                            'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
-                                            'options'        => [
-                                                'class' => 'sx-fast-edit-form',
-                                            ],
-                                            'clientCallback' => new \yii\web\JsExpression(<<<JS
-                                                function (ActiveFormAjaxSubmit) {
-                                                    ActiveFormAjaxSubmit.on('success', function(e, response) {
-                                                        $.pjax.reload("#{$pjax->id}");
-                                                        $(".sx-fast-edit").popover("hide");
-                                                    });
-                                                }
-JS
-                                            ),
-                                        ]); ?>
-                                        <input type="hidden" value="update-store" name="act" class="form-control"/>
-                                        <input type="hidden" value="<?php echo $shopStore->id; ?>" name="shop_store_id" class="form-control"/>
-                                        <div class="input-group">
-                                            <input type="text" value="<?php echo($storeProduct ? (float)$storeProduct->quantity : ""); ?>" name="store_quantity" class="form-control"/>
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
-                                            </div>
-                                        </div>
-
-                                        <?php $form::end(); ?>
-                                    </div>
+                                <th style="text-align: left; width: 300px;">Поставщик</th>
+                                <th>Код поставщика</th>
+                                <th>Закупочная цена</th>
+                                <th>Количество, <?php echo $model->shopProduct->measure->symbol; ?></th>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <?
+                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => "/shop/admin-cms-content-element",
+                                        'modelId'      => $shopSupplierProduct->id,
+                                        'tag'          => 'span',
+                                        'options'      => [
+                                            'style' => 'color: gray; text-align: left;',
+                                            'class' => '',
+                                        ],
+                                    ]);
+                                    ?>
+                                    <i class="fas fa-link" title="<?php echo \yii\helpers\Html::encode($shopSupplierProduct->asText); ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
+                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                    <?php echo $shopSupplierProduct->cmsSite->name; ?>
 
                                 </td>
-                                <td><?php echo $storeProduct ? $storeProduct->purchase_price : "&nbsp;&nbsp;&nbsp;"; ?></td>
+                                <td><?php echo $shopSupplierProduct->external_id ? $shopSupplierProduct->external_id : $noValue; ?></td>
+                                <td><?php
+                                    if ($shopImportCmsSite->sender_purchasing_shop_type_price_id) {
+                                        if ($price = $shopSupplierProduct->shopProduct->getPrice($shopImportCmsSite->sender_purchasing_shop_type_price_id)) {
+                                            echo $price->money->mul($shopImportCmsSite->purchasing_extra_charge / 100);
+                                        } else {
+                                            echo $noValue;
+                                        }
+                                    } else {
+                                        echo $noValue;
+                                    }
+
+                                    ?></td>
+                                <td><?php echo $shopSupplierProduct->shopProduct->quantity; ?></td>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <tr>
-                            <td><?php echo $noValue; ?></td>
-                            <td><?php echo $noValue; ?></td>
-                            <td><?php echo $noValue; ?></td>
-                            <td><?php echo $noValue; ?></td>
-                        </tr>
-                    <?php endif; ?>
-
-
-                    <tr>
-                        <td colspan="2" style="text-align: right;"><b>Итого</b></td>
-                        <td><?php echo $totalSummQuantity ? $totalSummQuantity : $noValue; ?></td>
-                        <td><?php echo $noValue; ?></td>
-                    </tr>
-                </table>
+                        </table>
+                    </div>
+                    <?php /*endif; */ ?>
+                <? endforeach; ?>
             </div>
         </div>
-    </div>
+    <?php endif; ?>
+
 <?php endif; ?>
 
 
+<!--Если у нас многосайтовость и это портал-->
+<?php /*if (
+($model->cmsSite->is_default && \skeeks\cms\models\CmsSite::find()->count() > 0) //Если у нас многосайтовость и этот товар - инфокарточка
+) : */?>
+
+    <?php if (
+        ($model->shopSupplierElements) //Если это товар собирает данные от поставщиков
+        &&
+        !$model->shopProduct->isOffersProduct //И если это товар без предложений
+    ) : ?>
+
+
+        <div class="row no-gutters" style="margin-top: 10px;">
+            <div class="col-12">
+                <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b></div>
+
+                <?
+                /**
+                 * @var $shopSupplierProduct \skeeks\cms\shop\models\ShopCmsContentElement
+                 */
+                foreach ($model->shopSupplierElements as $shopSupplierProduct) : ?>
+                    <?php /*if ($shopSupplierProduct->quantity > 0) : */ ?>
+                    <div class="sx-table-wrapper table-responsive" style="margin-bottom: 10px;">
+                        <table class="table sx-table">
+                            <tr>
+                                <th style="text-align: left; width: 300px;">Поставщик</th>
+                                <th>Код поставщика</th>
+                                <th>Количество, <?php echo $model->shopProduct->measure->symbol; ?></th>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <?php echo $shopSupplierProduct->cmsSite->name; ?>
+                                    <?
+                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => "/shop/admin-cms-content-element",
+                                        'modelId'      => $shopSupplierProduct->id,
+                                        'tag'          => 'span',
+                                        'options'      => [
+                                            'style' => 'color: gray; text-align: left;',
+                                            'class' => '',
+                                        ],
+                                    ]);
+                                    ?>
+                                    <i class="fas fa-link" title="<?php echo \yii\helpers\Html::encode($shopSupplierProduct->asText); ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
+                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                </td>
+                                <td><?php echo $shopSupplierProduct->external_id ? $shopSupplierProduct->external_id : $noValue; ?></td>
+                                <td><?php echo $shopSupplierProduct->shopProduct->quantity; ?></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <?php /*endif; */ ?>
+                <? endforeach; ?>
+            </div>
+        </div>
+
+
+    <?php endif; ?>
+
+
+    <?php if (
+    ($model->shopSellerElements) //Если это товар собирает данные от поставщиков
+    ) : ?>
+
+
+        <div class="row no-gutters" style="margin-top: 10px;">
+            <div class="col-12">
+                <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Где продается</b></div>
+
+                <?
+                /**
+                 * @var $shopSupplierProduct \skeeks\cms\shop\models\ShopCmsContentElement
+                 */
+                foreach ($model->shopSellerElements as $shopSupplierProduct) : ?>
+                    <?php /*if ($shopSupplierProduct->quantity > 0) : */ ?>
+                    <div class="sx-table-wrapper table-responsive" style="margin-bottom: 10px;">
+                        <table class="table sx-table">
+                            <tr>
+                                <th style="text-align: left; width: 300px;">Сайт</th>
+                                <th>Id на сайте</th>
+                                <th>Количество, <?php echo $model->shopProduct->measure->symbol; ?></th>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <?php echo $shopSupplierProduct->cmsSite->internalName; ?>
+                                    <?
+                                    \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId' => "/shop/admin-cms-content-element",
+                                        'modelId'      => $shopSupplierProduct->id,
+                                        'tag'          => 'span',
+                                        'options'      => [
+                                            'style' => 'color: gray; text-align: left;',
+                                            'class' => '',
+                                        ],
+                                    ]);
+                                    ?>
+                                    <i class="fas fa-link" title="<?php echo $shopSupplierProduct->asText; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
+                                    <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                    <a class="" style="margin-left: 5px; border-bottom: 0px; color: gray;" href="<?php echo $shopSupplierProduct->url; ?>" data-pjax="0" title="Посмотреть на сайте (Откроется в новом окне)"
+                                       target="_blank"><i class="fas fa-external-link-alt"></i></a>
+                                </td>
+                                <td><?php echo $shopSupplierProduct->id; ?></td>
+                                <td><?php echo $shopSupplierProduct->shopProduct->quantity; ?></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <?php /*endif; */ ?>
+                <? endforeach; ?>
+            </div>
+        </div>
+
+
+    <?php endif; ?>
+<?php /*endif; */?>
 
 <?php
 $infoModel = $model;
+if ($model->main_cce_id) {
+    $infoModel = $model->mainCmsContentElement;
+}
 ?>
 
 <section class="sx-info-block">

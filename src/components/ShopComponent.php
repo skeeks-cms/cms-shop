@@ -46,7 +46,9 @@ use yii\widgets\ActiveForm;
  * @property ShopUser             $shopUser
  *
  * @property CmsContent           $shopContents
- * @property ShopStore            $stores
+ * @property ShopStore[]          $stores
+ * @property ShopStore[]          $supplierStores
+ * @property ShopStore[]          $allStores
  */
 class ShopComponent extends Component implements BootstrapInterface
 {
@@ -457,7 +459,7 @@ class ShopComponent extends Component implements BootstrapInterface
 
             $storeIds = [];
             if ($this->stores) {
-                $storeIds = ArrayHelper::map($storeIds, "id", "id");
+                $storeIds = ArrayHelper::map($this->stores, "id", "id");
             }
 
             $activeQuery->joinWith('shopProduct as shopProduct');
@@ -467,13 +469,13 @@ class ShopComponent extends Component implements BootstrapInterface
 
             $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [
                 "shopStoreProducts.shop_product_id" => new Expression("shopProduct.id"),
-                "shopStoreProducts.shop_store_id" => $storeIds
+                "shopStoreProducts.shop_store_id"   => $storeIds,
             ]);
 
             $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
             $activeQuery->leftJoin(["shopOffersStoreProducts" => "shop_store_product"], [
                 "shopOffersStoreProducts.shop_product_id" => new Expression("shopProductOffers.id"),
-                "shopOffersStoreProducts.shop_store_id" => $storeIds
+                "shopOffersStoreProducts.shop_store_id"   => $storeIds,
             ]);
 
             $activeQuery->andWhere([
@@ -488,20 +490,24 @@ class ShopComponent extends Component implements BootstrapInterface
 
             $storeIds = [];
             if ($this->stores) {
-                $storeIds = ArrayHelper::map($storeIds, "id", "id");
+                $storeIds = ArrayHelper::map($this->stores, "id", "id");
+            }
+            if ($this->supplierStores) {
+                $supploerStoreIds = ArrayHelper::map($this->supplierStores, "id", "id");
+                $storeIds = ArrayHelper::merge($storeIds, $supploerStoreIds);
             }
 
             $activeQuery->joinWith('shopProduct as shopProduct');
 
             $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [
                 "shopStoreProducts.shop_product_id" => new Expression("shopProduct.id"),
-                "shopStoreProducts.shop_store_id" => $storeIds
+                "shopStoreProducts.shop_store_id"   => $storeIds,
             ]);
 
             $activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
             $activeQuery->leftJoin(["shopOffersStoreProducts" => "shop_store_product"], [
                 "shopOffersStoreProducts.shop_product_id" => new Expression("shopProductOffers.id"),
-                "shopOffersStoreProducts.shop_store_id" => $storeIds
+                "shopOffersStoreProducts.shop_store_id"   => $storeIds,
             ]);
 
             /*$activeQuery->joinWith('shopProduct.shopProductOffers as shopProductOffers');
@@ -511,22 +517,11 @@ class ShopComponent extends Component implements BootstrapInterface
 
             $activeQuery->andWhere([
                 'or',
-                ['>', 'shopProduct.quantity', 0],
-                ['>', 'shopProductOffers.quantity', 0],
                 ['>', 'shopStoreProducts.quantity', 0],
                 ['>', 'shopOffersStoreProducts.quantity', 0],
             ]);
             $activeQuery->groupBy([ShopCmsContentElement::tableName().".id"]);
         }
-
-        /*if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
-            $activeQuery->joinWith("shopProduct as shopProduct");
-            $activeQuery->andWhere([
-                '>',
-                'shopProduct.quantity',
-                0,
-            ]);
-        }*/
 
         return $this;
     }
@@ -967,9 +962,9 @@ SQL
             throw new Exception("Сайт не настроен зайдите в основные настройким магазина и заполните недостающие настройки магазина");
         }
 
-        if (!$cmsSite->shopSite->catalogCmsTree) {
+        /*if (!$cmsSite->shopSite->catalogCmsTree) {
             throw new Exception("В основных настройках сайта укажите каталог для товаров");
-        }
+        }*/
 
         //1) Создаем необходимые категории на сайте
         $data = \Yii::$app->db->createCommand(<<<SQL
@@ -1219,6 +1214,14 @@ SQL
      */
     protected $_stores = null;
 
+    /**
+     * @return array
+     */
+    public function getAllStores()
+    {
+        $stores = $this->stores;
+        return ArrayHelper::merge($stores, $this->supplierStores);
+    }
 
     /**
      * @return ShopStore[]
@@ -1226,7 +1229,7 @@ SQL
     public function getStores()
     {
         if ($this->_stores === null) {
-            $this->_stores = ShopStore::find()->cmsSite()->all();
+            $this->_stores = ShopStore::find()->cmsSite()->andWhere(['is_supplier' => 0])->all();
         }
 
         return $this->_stores;
@@ -1239,6 +1242,35 @@ SQL
     public function setStores($shopStores = [])
     {
         $this->_stores = $shopStores;
+        return $this;
+    }
+
+
+    /**
+     * @var array
+     */
+    protected $_supplierStores = null;
+
+
+    /**
+     * @return ShopStore[]
+     */
+    public function getSupplierStores()
+    {
+        if ($this->_supplierStores === null) {
+            $this->_supplierStores = ShopStore::find()->cmsSite()->andWhere(['is_supplier' => 1])->all();
+        }
+
+        return $this->_supplierStores;
+    }
+
+    /**
+     * @param array $shopStores
+     * @return $this
+     */
+    public function setSupplierStores($shopStores = [])
+    {
+        $this->_supplierStores = $shopStores;
         return $this;
     }
 

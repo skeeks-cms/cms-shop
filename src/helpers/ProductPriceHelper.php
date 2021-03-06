@@ -289,7 +289,7 @@ class ProductPriceHelper extends Component
             return false;
         }
         
-        return (bool) ((float) $this->basePrice->money->amount != (float) $this->minMoney->amount);
+        return (bool) (round((float) $this->basePrice->money->amount) != round((float) $this->minMoney->amount));
     }
 
     /**

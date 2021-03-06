@@ -978,11 +978,15 @@ HTML
 
                 ];
 
-                $visibleColumns[] = "shop.quantity_" . $store->id;
+                if (!$store->is_supplier) {
+                    $visibleColumns[] = "shop.quantity_" . $store->id;
+                }
+
+
             }
         }
 
-        $shopColumns["shop.quantity"] = [
+        /*$shopColumns["shop.quantity"] = [
             'attribute' => "shop.quantity",
             'label'     => 'Количество под заказ',
             'format'    => 'raw',
@@ -992,15 +996,15 @@ HTML
                 }
                 return "—";
             },
-        ];
+        ];*/
 
-        $visibleColumns[] = "shop.quantity";
+        //$visibleColumns[] = "shop.quantity";
         $visibleColumns[] = "shop.barcodes";
 
-        $sortAttributes["shop.quantity"] = [
+        /*$sortAttributes["shop.quantity"] = [
             'asc'  => ['sp.quantity' => SORT_ASC],
             'desc' => ['sp.quantity' => SORT_DESC],
-        ];
+        ];*/
         $sortAttributes["shop.product_type"] = [
             'asc'  => ['sp.product_type' => SORT_ASC],
             'desc' => ['sp.product_type' => SORT_DESC],

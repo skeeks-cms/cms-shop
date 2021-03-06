@@ -14,6 +14,7 @@ use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
@@ -33,11 +34,11 @@ use yii\helpers\Html;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class AdminShopStoreController extends BackendModelStandartController
+class AdminShopStoreSupplierController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = "Склады";
+        $this->name = "Поставщики";
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopStore::class;
 
@@ -62,7 +63,7 @@ class AdminShopStoreController extends BackendModelStandartController
                         ],
 
                         'body' => <<<HTML
-Добавьте Ваш склад или магазин, для того чтобы указывать наличие по товарам.
+Добавьте склады для того чтобы указывать наличие по товарам на них.
 HTML
                         ,
                     ]);
@@ -73,12 +74,12 @@ HTML
                     'on init'        => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
-                         * @var $query ActiveQuery
+                         * @var $query CmsActiveQuery
                          */
                         $query = $e->sender->dataProvider->query;
 
                         $query->cmsSite();
-                        $query->andWhere(['is_supplier' => 0]);
+                        $query->andWhere(['is_supplier' => 1]);
                     },
                     'defaultOrder'   => [
                         'priority' => SORT_ASC,
@@ -244,7 +245,7 @@ HTML
     public function updateFields($action)
     {
         $action->model->load(\Yii::$app->request->get());
-        $action->model->is_supplier = 0;
+        $action->model->is_supplier = 1;
         \Yii::$app->view->registerCss(<<<CSS
 .field-shopstore-is_supplier {
     display: none;
