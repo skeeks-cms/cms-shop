@@ -159,6 +159,18 @@ return [
                         'name'        => 'shop/admin-cart',
                         'description' => 'Корзины пользователей',
                     ],
+                    [
+                        'name'        => 'shop/admin-shop-store',
+                        'description' => 'Склады',
+                    ],
+                    [
+                        'name'        => 'shop/admin-shop-store-supplier',
+                        'description' => 'Поставщики',
+                    ],
+                    [
+                        'name'        => 'shop/admin-shop-store-product',
+                        'description' => 'Товары склада',
+                    ],
                 ],
             ],
         ],

@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
@@ -228,6 +229,14 @@ HTML;
                     ],
                 ],
             ],
+
+            "view" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 80,
+                'name'     => 'Карточка',
+                'icon'     => 'fas fa-info-circle',
+            ],
+
             "create" => [
                 'fields' => [$this, 'updateFields'],
             ],

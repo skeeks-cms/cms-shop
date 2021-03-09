@@ -154,9 +154,15 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
     public function asText()
     {
         if ($this->shopProduct) {
-            return $this->shopProduct->asText;
+            $name = $this->shopProduct->asText;
+        } else {
+            $name = $this->name;
         }
 
-        return parent::asText();
+        /*if ($this->external_id) {
+            $name = $name . ", " . $this->external_id;
+        }*/
+
+        return $name;
     }
 }
