@@ -130,6 +130,7 @@ return [
                         'child' => [
                             'permissions' => [
                                 'shop/upa-order',
+                                'shop/upa-favorite',
                             ],
                         ],
                     ],
