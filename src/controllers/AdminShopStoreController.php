@@ -16,6 +16,7 @@ use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\store\StoreUrlRule;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\GridView;
 use skeeks\cms\ya\map\widgets\YaMapInput;
@@ -29,6 +30,7 @@ use yii\bootstrap\Alert;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -97,8 +99,29 @@ HTML
 
                         'countProducts',
                         'countReadyProducts',
+                        
+                        'panel',
                     ],
                     'columns'        => [
+                        
+                        'panel' => [
+                            'label' => '',
+                            'format' => 'raw',
+                            'headerOptions' => [
+                                'style' => 'width: 120px;',
+                            ],
+                            'value' => function(ShopStore $shopStore) {
+                                return Html::a('Панель <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/store-product', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
+                                    'class' => 'btn btn-secondary',
+                                    'data-pjax' => 0,
+                                    'target' => '_blank',
+                                    'title' => 'Открыть интерфейс управления в новой вкладке',
+                                    'data-toggle' => 'tooltip'
+                                ]);
+                            }
+                        ],
+
+                        
                         'priority'  => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',

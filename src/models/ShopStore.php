@@ -35,6 +35,7 @@ use yii\helpers\ArrayHelper;
  * @property CmsSite            $cmsSite
  * @property ShopStoreProduct[] $shopStoreProducts
  * @property ShopProduct[]      $shopProducts
+ * * @property ShopStoreProperty[] $shopStoreProperties
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -219,6 +220,18 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
         }
 
         return "";
+    }
+
+
+
+    /**
+     * Gets query for [[ShopSupplierProperties]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopStoreProperties()
+    {
+        return $this->hasMany(ShopStoreProperty::className(), ['shop_store_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 
 }

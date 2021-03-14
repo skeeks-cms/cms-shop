@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -35,7 +36,7 @@ class StoreProductController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopStoreProduct::class;
 
-        $this->permissionName = '';
+        $this->permissionName = Cms::UPA_PERMISSION;
 
         parent::init();
     }

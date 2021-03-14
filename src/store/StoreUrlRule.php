@@ -6,7 +6,7 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 
-namespace skeeks\cms\shop\components;
+namespace skeeks\cms\shop\store;
 
 
 use skeeks\cms\backend\BackendUrlRule;

@@ -48,12 +48,17 @@ return [
 
         'storeBackend' => [
             'id'    => 'storeBackend',
-            'class' => \skeeks\cms\shop\components\StoreBackendComponent::class,
+            'class' => \skeeks\cms\shop\store\StoreBackendComponent::class,
             'menu' => [
                 'data' => [
                     'products' => [
                         'name'  => ['skeeks/shop/app', 'Товары'],
                         'url'  => ['/shop/store-product'],
+                        'icon'  => 'icon-list',
+                    ],
+                    'property' => [
+                        'name'  => ['skeeks/shop/app', 'Характеристики'],
+                        'url'  => ['/shop/store-property'],
                         'icon'  => 'icon-list',
                     ],
                 ],

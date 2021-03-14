@@ -6,9 +6,8 @@
  * @date 11.03.2017
  */
 
-namespace skeeks\cms\shop\components;
+namespace skeeks\cms\shop\store;
 
-use http\Url;
 use skeeks\assets\unify\base\UnifyIconSimpleLineAsset;
 use skeeks\cms\admin\AdminComponent;
 use skeeks\cms\backend\BackendComponent;
@@ -40,6 +39,7 @@ class StoreBackendComponent extends BackendComponent
         $theme = new \skeeks\cms\themes\unify\admin\UnifyThemeAdmin();
         $theme->pathMap = [
             '@app/views' => [
+                '@skeeks/cms/shop/store/views',
                 '@skeeks/cms/admin/views',
                 '@skeeks/cms/themes/unify/admin/views',
             ],

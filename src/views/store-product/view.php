@@ -101,7 +101,7 @@ CSS
                     <?php if ($model->name) : ?>
                         <li>
                             <span class="sx-properties--name">
-                                Название
+                                Название у поставщика
                             </span>
                             <span class="sx-properties--value">
                             <?php echo $model->name; ?>
@@ -162,7 +162,7 @@ CSS
 
     <div class="sx-bg-secondary" style="padding-top: 10px;">
         <div class="col-12">
-            <pre><?php print_r($model->external_data); ?></pre>
+            <?= \skeeks\cms\shop\widgets\admin\StoreProductExternalDataWidget::widget(['storeProduct' => $model]); ?>
         </div>
     </div>
 

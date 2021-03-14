@@ -33,7 +33,7 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
 {
     public function init()
     {
-        $this->name = "Опции поставщиков";
+        $this->name = "Опции";
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopSupplierPropertyOption::class;
 

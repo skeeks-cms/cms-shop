@@ -148,6 +148,7 @@ class AdminShopStoreProductController extends BackendModelStandartController
                         'quantity',
                         'purchase_price',
                         'selling_price',
+                        
                     ],
                     'columns'        => [
                         'quantity' => [
@@ -155,7 +156,8 @@ class AdminShopStoreProductController extends BackendModelStandartController
                                 'style' => 'width: 100px;',
                             ],
                         ],
-
+                        
+                        
                         'external_id'    => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
