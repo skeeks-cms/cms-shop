@@ -63,7 +63,7 @@ class AdminShopStoreSupplierController extends BackendModelStandartController
                         ],
 
                         'body' => <<<HTML
-Добавьте склады для того чтобы указывать наличие по товарам на них.
+Управляйте вашими поставщиками в этом разделе.
 HTML
                         ,
                     ]);
@@ -129,13 +129,13 @@ HTML
                                 }
                                 $info = implode("<br />", $data);
 
-                                return "<div class='row no-gutters'>
-                                                <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
+                                return "<div class='d-flex no-gutters'>
+                                                <div class='sx-trigger-action my-auto' style='width: 50px;'>
+                                                    <a href='#' style='text-decoration: none; border-bottom: 0;'>
+                                                        <img src='".($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc())."' style='max-width: 40px; max-height: 40px; border-radius: 5px;' />
+                                                    </a>
                                                 </div>
-                                                <div style='margin-left: 5px;'>".$info."</div></div>";;
+                                                <div style='margin-left: 5px;' class='my-auto'>".$info."</div></div>";;
                             },
                         ],
 

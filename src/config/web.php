@@ -6,6 +6,9 @@
  * @date 27.08.2015
  */
 return [
+
+    'bootstrap' => ['storeBackend'],
+
     'components' => [
         'admin' => [
             'dashboards' => [
@@ -38,6 +41,20 @@ return [
                         'name'  => "Избранное",
                         'url'  => ['/shop/upa-favorite'],
                         'icon'  => 'icon-heart',
+                    ],
+                ],
+            ],
+        ],
+
+        'storeBackend' => [
+            'id'    => 'storeBackend',
+            'class' => \skeeks\cms\shop\components\StoreBackendComponent::class,
+            'menu' => [
+                'data' => [
+                    'products' => [
+                        'name'  => ['skeeks/shop/app', 'Товары'],
+                        'url'  => ['/shop/store-product'],
+                        'icon'  => 'icon-list',
                     ],
                 ],
             ],

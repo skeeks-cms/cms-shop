@@ -1860,10 +1860,10 @@ JS
         $rr->message = "Данные успешно загружены";
 
         try {
-            \Yii::$app->shop->updateAllSubproducts();
-            \Yii::$app->shop->updateAllQuantities();
+            //\Yii::$app->shop->updateAllSubproducts();
+            //\Yii::$app->shop->updateAllQuantities();
             \Yii::$app->shop->updateAllTypes();
-            \Yii::$app->shop->updateOffersPrice();
+            //\Yii::$app->shop->updateOffersPrice();
         } catch (\Exception $e) {
             $rr->success = false;
             $rr->message = "Ошибка загрузки данных: ".$e->getMessage();

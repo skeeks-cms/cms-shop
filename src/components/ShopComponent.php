@@ -49,6 +49,8 @@ use yii\widgets\ActiveForm;
  * @property ShopStore[]          $stores
  * @property ShopStore[]          $supplierStores
  * @property ShopStore[]          $allStores
+ *
+ * @property ShopStore          $backendShopStore
  */
 class ShopComponent extends Component implements BootstrapInterface
 {
@@ -739,6 +741,8 @@ SQL
 SQL
         )->execute();
 
+        return $this;
+
         //У товаров на сайта приемщиках должны быть заданы правильно разделы и названия
         $result = \Yii::$app->db->createCommand(<<<SQL
 UPDATE 
@@ -748,14 +752,7 @@ UPDATE
 			ce.id, 
 			ce.cms_site_id, 
 			ce_main.name as model_name, 
-			
-			/*ce_main.code as model_code, 
-								ce_main.content_id as model_content_id, 
-								ce_main.id as model_id, */
 			ce.name, 
-			
-			/*source_tree.id as source_tree_id, 
-							source_tree.name as source_tree_name,*/
 			ce.tree_id, 
 			new_cms_tree.id as new_tree_id 
 		FROM 
@@ -775,7 +772,6 @@ UPDATE
 			shopSite.is_receiver = 1 
 			AND ce.main_cce_id is not NULL 
 			AND new_cms_tree.cms_site_id = ce.cms_site_id 
-			/*AND ce_main.name != ce.name */
 			AND (
 				ce.tree_id is NULL 
 				OR ce.tree_id != new_cms_tree.id 
@@ -1271,6 +1267,30 @@ SQL
     public function setSupplierStores($shopStores = [])
     {
         $this->_supplierStores = $shopStores;
+        return $this;
+    }
+
+
+    /**
+     * @var null|ShopStore
+     */
+    protected $_shopStore = null;
+
+    /**
+     * @return ShopStore|null
+     */
+    public function getBackendShopStore()
+    {
+        return $this->_shopStore;
+    }
+
+    /**
+     * @param ShopStore $shopStore
+     * @return $this
+     */
+    public function setBackendShopStore(ShopStore $shopStore)
+    {
+        $this->_shopStore = $shopStore;
         return $this;
     }
 

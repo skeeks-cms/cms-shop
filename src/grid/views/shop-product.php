@@ -54,8 +54,8 @@ $shopSellerProducts = [];
         </div>
         <div class="my-auto d-flex flex-row" style="height: 50px;">
             <div class="my-auto">
-                <div style="max-height: 40px; overflow: hidden;">
-                    <a class="sx-trigger-action" href="#" title="<?= $model->asText; ?>"><?= $model->asText; ?></a>
+                <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
+                    <a class="sx-trigger-action" style="border-bottom: 0;" href="#" title="<?= $model->asText; ?>"><?= $model->asText; ?></a>
                 </div>
                 <? if ($model->tree_id) : ?>
                     <div style="">
@@ -91,13 +91,13 @@ $shopSellerProducts = [];
             }
             ?>
             <div class="my-auto mx-auto text-center">
-                <img src='<?= $image ? $image->src : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 50px; max-height: 50px; border-radius: 5px;'/>
+                <img src='<?= $image ? $image->src : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 40px; max-height: 40px; border-radius: 5px;'/>
             </div>
         </div>
         <div class="my-auto d-flex flex-row" style="height: 50px;">
             <div class="my-auto">
-                <div style="max-height: 40px; overflow: hidden;">
-                    <a class="sx-trigger-action" href="#" title="<?= $model->asText; ?>"><?= $model->asText; ?></a>
+                <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
+                    <a class="sx-trigger-action" style="border-bottom: none;" href="#" title="<?= $model->asText; ?>"><?= $model->asText; ?></a>
                 </div>
                 <? if ($model->tree_id) : ?>
                     <div style="">
