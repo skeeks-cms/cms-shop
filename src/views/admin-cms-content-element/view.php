@@ -765,7 +765,25 @@ JS
 
                             ?>
                             <tr>
-                                <td style="text-align: left;"><?php echo $shopStore->name; ?></td>
+                                <td style="text-align: left;">
+                                    <?php if($storeProduct) : ?>
+                                        <?
+                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                            'controllerId' => "/shop/store-product",
+                                            'modelId'      => $storeProduct->id,
+                                            'tag'          => 'span',
+                                            'options'      => [
+                                                'style' => 'text-align: left;',
+                                                'class' => 'sx-fast-edit',
+                                            ],
+                                        ]);
+                                        ?>
+                                            <?php echo $shopStore->name; ?>
+                                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                    <?php else : ?>
+                                        <?php echo $shopStore->name; ?>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?></td>
                                 <td>
                                     <span class="sx-fast-edit sx-fast-edit-popover"
@@ -862,8 +880,44 @@ JS
                             }
                             ?>
                             <tr>
-                                <td style="text-align: left;"><?php echo $shopStore->name; ?></td>
-                                <td><?php echo $storeProduct ? $storeProduct->external_id : "&nbsp;&nbsp;&nbsp;"; ?></td>
+                                <td style="text-align: left;">
+                                    <?php if($storeProduct) : ?>
+                                        <?
+                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                            'controllerId' => "/shop/store-product",
+                                            'modelId'      => $storeProduct->id,
+                                            'tag'          => 'span',
+                                            'options'      => [
+                                                'style' => 'text-align: left;',
+                                                'class' => 'sx-fast-edit',
+                                            ],
+                                        ]);
+                                        ?>
+                                            <?php echo $shopStore->name; ?>
+                                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                    <?php else : ?>
+                                        <?php echo $shopStore->name; ?>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if($storeProduct) : ?>
+                                        <?
+                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                            'controllerId' => "/shop/store-product",
+                                            'modelId'      => $storeProduct->id,
+                                            'tag'          => 'span',
+                                            'options'      => [
+                                                'style' => 'text-align: left;',
+                                                'class' => 'sx-fast-edit',
+                                            ],
+                                        ]);
+                                        ?>
+                                            <?php echo $storeProduct ? $storeProduct->external_id : "&nbsp;&nbsp;&nbsp;"; ?>
+                                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                    <?php else : ?>
+                                    &nbsp;&nbsp;&nbsp;
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <span class=""
                                     >

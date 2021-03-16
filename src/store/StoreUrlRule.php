@@ -29,7 +29,7 @@ class StoreUrlRule extends BackendUrlRule
             if (\Yii::$app->shop->backendShopStore) {
                 $params[self::STORE_PARAM_NAME] = \Yii::$app->shop->backendShopStore->id;
             } else {
-                $params[self::STORE_PARAM_NAME] = ShopStore::find()->one();
+                $params[self::STORE_PARAM_NAME] = ShopStore::find()->one()->id;
             }
 
         }
