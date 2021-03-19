@@ -11,7 +11,7 @@
 */
 $this->registerCss(<<<CSS
 .sx-discount-coupon-wrapper {
-    padding: 150px;
+    padding: 150px 10px;
 }
 .sx-discount-coupon-wrapper {
     background: black;
@@ -22,6 +22,10 @@ $this->registerCss(<<<CSS
 }
 .sx-qrcode {
     background: white;
+}
+
+.sx-qrcode {
+    min-width: 200px;
 }
 
 CSS
