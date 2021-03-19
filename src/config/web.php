@@ -26,21 +26,22 @@ return [
                 '~shop-<_a:(checkout|payment)>' => 'shop/cart/<_a>',
                 '~shop-<_a:(finish)>'           => 'shop/order/<_a>',
                 '~shop-order/<_a>'              => 'shop/order/<_a>',
+                '~spc'                         => 'shop/coupon',
             ],
         ],
 
         'upaBackend' => [
             'menu' => [
                 'data' => [
-                    'shop' => [
-                        'name'  => ['skeeks/shop/app', 'Orders'],
+                    'shop'      => [
+                        'name' => ['skeeks/shop/app', 'Orders'],
                         'url'  => ['/shop/upa-order'],
-                        'icon'  => 'icon-basket',
+                        'icon' => 'icon-basket',
                     ],
                     'favorites' => [
-                        'name'  => "Избранное",
+                        'name' => "Избранное",
                         'url'  => ['/shop/upa-favorite'],
-                        'icon'  => 'icon-heart',
+                        'icon' => 'icon-heart',
                     ],
                 ],
             ],
@@ -49,17 +50,17 @@ return [
         'storeBackend' => [
             'id'    => 'storeBackend',
             'class' => \skeeks\cms\shop\store\StoreBackendComponent::class,
-            'menu' => [
+            'menu'  => [
                 'data' => [
                     'products' => [
-                        'name'  => ['skeeks/shop/app', 'Товары'],
+                        'name' => ['skeeks/shop/app', 'Товары'],
                         'url'  => ['/shop/store-product'],
-                        'icon'  => 'icon-list',
+                        'icon' => 'icon-list',
                     ],
                     'property' => [
-                        'name'  => ['skeeks/shop/app', 'Характеристики'],
+                        'name' => ['skeeks/shop/app', 'Характеристики'],
                         'url'  => ['/shop/store-property'],
-                        'icon'  => 'icon-list',
+                        'icon' => 'icon-list',
                     ],
                 ],
             ],
@@ -70,7 +71,7 @@ return [
         'cms' => [
             'controllerMap' => [
                 'content-element' => \skeeks\cms\shop\controllers\ContentElementController::class,
-                'admin-cms-site' => \skeeks\cms\shop\controllers\AdminCmsSiteController::class,
+                'admin-cms-site'  => \skeeks\cms\shop\controllers\AdminCmsSiteController::class,
             ],
         ],
     ],

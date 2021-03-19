@@ -14,7 +14,9 @@ use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopDiscount;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
 use skeeks\cms\shop\models\ShopOrder;
@@ -99,18 +101,30 @@ class AdminDiscountCouponController extends BackendModelStandartController
                         'actions',
 
                         'coupon',
-                        'shop_discount_id',
+                        //'shop_discount_id',
+                        'cms_user_id',
+
                         'is_active',
                         'countOrders',
                     ],
                     'columns'        => [
-                        'coupon'    => [
+                        /*'coupon'    => [
                             'class' => DefaultActionColumn::class,
-                        ],
+                        ],*/
                         'is_active' => [
                             'class' => BooleanColumn::class,
                         ],
+                        'cms_user_id' => [
+                            'class' => UserColumnData::class,
+                        ],
 
+                        'coupon' => [
+                            'value'                => function (ShopDiscountCoupon $model) {
+                                return \yii\helpers\Html::a($model->coupon, "#", [
+                                    'class' => "sx-trigger-action",
+                                ]) . "<br /><small>{$model->shopDiscount->name}</small>" ;
+                            },
+                        ],
                         'countOrders' => [
                             'value'                => function (ShopDiscountCoupon $cmsSite) {
                                 return $cmsSite->raw_row['countOrders'];
@@ -252,6 +266,21 @@ CSS
                     'description',
                     'max_use'          => [
                         'class' => NumberField::class,
+                    ],
+                    'cms_user_id'          => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => \Yii::$app->user->identityClass,
+                            'searchQuery' => function($word = '') {
+                                $identityClass = \Yii::$app->user->identityClass;
+                                $query = $identityClass::find();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ]
                     ],
                 ],
             ],

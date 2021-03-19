@@ -25,6 +25,7 @@ use Yii;
  * @property integer                    $cms_user_id
  * @property string                     $description
  *
+ * @property string                     $publicUrl
  * @property CmsUser                    $cmsUser
  * @property ShopDiscount               $shopDiscount
  * @property ShopOrder2discountCoupon[] $shopOrder2discountCoupons
@@ -188,5 +189,13 @@ class ShopDiscountCoupon extends ActiveRecord
     public function asText()
     {
         return $this->coupon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPublicUrl()
+    {
+        return \yii\helpers\Url::to(['/shop/coupon', 'c' => $this->coupon], true);
     }
 }
