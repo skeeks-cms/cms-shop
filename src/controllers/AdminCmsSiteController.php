@@ -47,7 +47,7 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
 
                         $query->joinWith('cmsSiteDomains as cmsSiteDomains');
 
-                        $qCountDomains = CmsSiteDomain::find()->select(["total" => "count(*)"])->where(['cms_site_id' => new Expression(CmsSite::tableName().".id")]);
+                        $qCountDomains = CmsSiteDomain::find()->select(["total" => "count(cms_site_domain.id)"])->where(['cms_site_id' => new Expression(CmsSite::tableName().".id")]);
 
                         $query->groupBy(CmsSite::tableName().".id");
 
@@ -59,11 +59,11 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                         $shopStoreQuery = ShopStore::find()->select(['count(*) as inner_count'])->where([
                             'cms_site_id' => new Expression(CmsSite::tableName().".id"),
                         ]);
-                        $shopProductQuery = ShopProduct::find()->joinWith("cmsContentElement as cmsContentElement")->select(['count(*) as inner_count'])->where([
+                        $shopProductQuery = ShopProduct::find()->joinWith("cmsContentElement as cmsContentElement")->select(['count(shop_product.id) as inner_count'])->where([
                             'cmsContentElement.cms_site_id' => new Expression(CmsSite::tableName().".id"),
                         ]);
 
-                        $shopProductConnectedQuery = ShopProduct::find()->joinWith("cmsContentElement as cmsContentElement")->select(['count(*) as inner_count1'])->where([
+                        $shopProductConnectedQuery = ShopProduct::find()->joinWith("cmsContentElement as cmsContentElement")->select(['count(shop_product.id) as inner_count1'])->where([
                             'cmsContentElement.cms_site_id' => new Expression(CmsSite::tableName().".id"),
                         ])->andWhere([
                             'is not',

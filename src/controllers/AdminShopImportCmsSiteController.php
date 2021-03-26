@@ -8,13 +8,16 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\events\ViewRenderEvent;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\shop\components\ShopComponent;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopImportCmsSite;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -25,6 +28,7 @@ use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -230,6 +234,11 @@ HTML
                 'fields' => [$this, 'updateFields'],
             ],
 
+            /*"view" => [
+                'class' => BackendModelAction::class,
+                ''
+            ],*/
+
         ]);
     }
 
@@ -268,6 +277,35 @@ HTML
 
         $model->load(\Yii::$app->request->get());
 
+        $options = [];
+        if (!$model->isNewRecord) {
+            $options = [
+                'disabled' => 'disabled'
+            ];
+
+            /*brandsQuery = ShopCmsContentElement::find()
+                ->select(["id" => "cmsContentElementProperties.value_element_id"])
+                ->cmsSite($model->senderCmsSite)
+                ->joinWith("shopProduct as shopProduct",  true, "INNER JOIN")
+                ->joinWith("cmsContentElementProperties as cmsContentElementProperties",  true, "INNER JOIN")
+                ->joinWith("cmsContentElementProperties.valueCmsContentElement as valueCmsContentElement",  true, "INNER JOIN")
+                ->andWhere(["cmsContentElementProperties.property_id" => 28])
+                ->groupBy(['cmsContentElementProperties.value_element_id'])
+                //->all()
+
+            //print_r($brandsQuery);die;
+
+            $brands = CmsContentElement::find()
+                ->innerJoin(['tmp' => $brandsQuery], ['tmp.id' => new Expression(ShopCmsContentElement::tableName() . ".id")])
+                //->all()
+            ;
+
+            /*print_r($brands->createCommand()->rawSql);die;
+            print_r(count($brands));die;*/
+
+
+        }
+
         $result = [
             'supplier' => [
                 'class'  => FieldSet::class,
@@ -280,9 +318,9 @@ HTML
                             'id',
                             'asText'
                         ),
-                        'elementOptions' => [
+                        'elementOptions' => ArrayHelper::merge([
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
-                        ],
+                        ], $options),
                     ],
                 ],
             ],
