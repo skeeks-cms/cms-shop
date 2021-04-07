@@ -11,10 +11,12 @@ use yii\helpers\Html;
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 /* @var $shopContent \skeeks\cms\shop\models\ShopContent */
 /* @var $shopSubproductContentElement \skeeks\cms\shop\models\ShopCmsContentElement */
+/* @var $shopStoreProduct \skeeks\cms\shop\models\ShopStoreProduct */
 
 
 //Товар поставщика, из которого создается главный товар
-$shopSubproductContentElement = @$shopSubproductContentElement;
+//$shopSubproductContentElement = @$shopSubproductContentElement;
+$shopStoreProduct = @$shopStoreProduct;
 
 $controller = $this->context;
 $action = $controller->action;
@@ -24,11 +26,11 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 
 if ($model->isNewRecord) {
 
-    if ($shopSubproductContentElement) {
+    /*if ($shopSubproductContentElement) {
         $siteClass = \Yii::$app->skeeks->siteClass;
         $defaultSite = $siteClass::find()->where(['is_default' => 1])->one();
         $model->cms_site_id = $defaultSite->id;
-    }
+    }*/
 
     if ($tree_id = \Yii::$app->request->get("tree_id")) {
         $model->tree_id = $tree_id;
@@ -78,23 +80,7 @@ JS
         </div>
 
 
-        <?php if ($model->main_cce_id) : ?>
 
-            <!--Если указан главный товар то можно редактировать цену-->
-
-            <?= $this->render('_form-has-main-cce', [
-                'form'                         => $form,
-                'contentModel'                 => $contentModel,
-                'model'                        => $model,
-                'shopProduct'                  => $shopProduct,
-                'productPrices'                => $productPrices,
-                'shopStoreProducts'            => $shopStoreProducts,
-                'shopContent'                  => $shopContent,
-                'shopSubproductContentElement' => $shopSubproductContentElement,
-            ]); ?>
-
-
-        <?php else : ?>
 
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-main', [
                 'form'         => $form,
@@ -117,7 +103,8 @@ JS
                 'productPrices'                => $productPrices,
                 'shopStoreProducts'            => $shopStoreProducts,
                 'shopContent'                  => $shopContent,
-                'shopSubproductContentElement' => $shopSubproductContentElement,
+                //'shopSubproductContentElement' => $shopSubproductContentElement,
+                'shopStoreProduct' => $shopStoreProduct,
             ]); ?>
 
 
@@ -228,8 +215,6 @@ JS
                 'model'        => $model,
             ]); ?>
 
-        <?php endif; ?>
-
 
         <?= $form->buttonsStandart($model); ?>
         <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
@@ -237,7 +222,7 @@ JS
     </div>
 
 
-    <? if ($shopSubproductContentElement || $shopProduct->supplier_external_jsondata && 1 == 2) : ?>
+    <? if ($shopStoreProduct || $shopProduct->supplier_external_jsondata && 1 == 2) : ?>
 <?
 $this->registerCss(<<<CSS
 .sx-main-col {
@@ -276,45 +261,30 @@ CSS
         <? endif; ?>
 
 
-        <? if ($shopSubproductContentElement) : ?>
+        <? if ($shopStoreProduct) : ?>
 
             <div class="sx-info-block">
-                <h5><?= $shopSubproductContentElement->name; ?>
-                    <a href="https://market.yandex.ru/search?cvredirect=2&text=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в yandex market" target="_blank" style="color: blue"
+                <h5><?= $shopStoreProduct->name; ?>
+                    <a href="https://market.yandex.ru/search?cvredirect=2&text=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в yandex market" target="_blank" style="color: blue"
                        class="btn btn-xs btn-secondary">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
-                    <a href="https://yandex.ru/search/?lr=213&text=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в yandex" target="_blank" style="color: red" class="btn btn-xs btn-secondary">
+                    <a href="https://yandex.ru/search/?lr=213&text=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в yandex" target="_blank" style="color: red" class="btn btn-xs btn-secondary">
                         <i class="fab fa-yandex"></i>
                     </a>
-                    <a href="https://www.google.com/search?q=<?= urlencode($shopSubproductContentElement->name); ?>" title="Поиск в google" target="_blank" style="" class="btn btn-xs btn-secondary">
+                    <a href="https://www.google.com/search?q=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в google" target="_blank" style="" class="btn btn-xs btn-secondary">
                         <i class="fab fa-google"></i>
                     </a>
                 </h5>
             </div>
 
-            <? if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : ?>
-                <hr/>
-                <div class="sx-info-block">
-                    <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); ?>
-                </div>
-            <? endif; ?>
+            <hr/>
+            <div class="sx-info-block">
+                <?= \skeeks\cms\shop\widgets\admin\StoreProductExternalDataWidget::widget([
+                    'storeProduct' => $shopStoreProduct
+                ]); ?>
+            </div>
 
-            <? /* if ($shopSubproductContentElement->shopProduct->shopSupplier) : */ ?><!--
-                <div class="sx-info-block">
-                    <p><span>Поставщик:</span> <b><? /*= $shopSubproductContentElement->shopProduct->shopSupplier->asText; */ ?></b></p>
-                    <p><span>Артикул:</span> <b><? /*= $shopSubproductContentElement->shopProduct->supplier_external_id; */ ?></b></p>
-                </div>
-                <div class="sx-info-block">
-                    <p><span>Количество:</span> <b><? /*= $shopSubproductContentElement->shopProduct->quantity; */ ?> <? /*= $shopSubproductContentElement->shopProduct->measure->symbol; */ ?></b></p>
-                </div>
-                <? /* if ($data = $shopSubproductContentElement->shopProduct->supplier_external_jsondata) : */ ?>
-                    <hr/>
-                    <div class="sx-info-block">
-                        <? /*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopSubproductContentElement->shopProduct]); */ ?>
-                    </div>
-                <? /* endif; */ ?>
-            --><? /* endif; */ ?>
         <? endif; ?>
 
 
@@ -327,7 +297,7 @@ CSS
 
 
 
-        <? if ($shopSubproductContentElement || $shopProduct->supplier_external_jsondata) : ?>
+        <? if ($shopStoreProduct || $shopProduct->supplier_external_jsondata) : ?>
     </div>
 <? endif; ?>
 </div>

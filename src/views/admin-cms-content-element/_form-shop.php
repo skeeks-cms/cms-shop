@@ -14,12 +14,12 @@
 /* @var $shopStoreProducts \skeeks\cms\shop\models\ShopStoreProduct[] */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
 /* @var $shopContent \skeeks\cms\shop\models\ShopContent */
-/* @var $shopSubproductContentElement \skeeks\cms\shop\models\ShopCmsContentElement */
+/* @var $shopStoreProduct \skeeks\cms\shop\models\ShopStoreProduct */
 
 //Родительский общий товар, указан если создается предложение к товару
 $parent_content_element_id = null;
 //Товар поставщика, из которого создается главный товар
-$shopSubproductContentElement = @$shopSubproductContentElement;
+$shopStoreProduct = @$shopStoreProduct;
 
 //Разрешено ли менять тип товара?
 $allowChangeProductType = true;
@@ -58,13 +58,13 @@ if ($model->isNewRecord) {
     }
 
     //Если создается новый товар и указан товар поставщика
-    if ($shopSubproductContentElement) {
+    if ($shopStoreProduct) {
         $allowChangeProductType = false;
         $isShowPrices = false;
         $isShowNdsSettings = false;
         $isShowMeasureQuantity = false;
         $isShowMeasureRatio = true;
-        $isShowMeasureCode = false;
+        $isShowMeasureCode = true;
         $isShowQuantity = false;
     }
 
@@ -102,12 +102,12 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
 <? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Товарные данные')); ?>
 
 <?
-if ($shopSubproductContentElement && $model->isNewRecord) {
+/*if ($shopStoreProduct && $model->isNewRecord) {
     $siteClass = \Yii::$app->skeeks->siteClass;
     $defaultSite = $siteClass::find()->where(['is_default' => 1])->one();
     $model->cms_site_id = $defaultSite->id;
     echo "<div style='display: none;'>" . $form->field($model, 'cms_site_id') . "</div>";
-}
+}*/
 ?>
 
 <? if ($allowChangeProductType === false) : ?>
@@ -173,13 +173,15 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
     <? endif; ?>
 
 
-    <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
-    ]) ?>
+
 
 
     <? if ($isShowPrices) : ?>
         <? if ($productPrices) : ?>
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
+        ]) ?>
+
             <? foreach ($productPrices as $productPrice) : ?>
                 <div class="form-group">
                     <div class="row sx-inline-row">
@@ -212,24 +214,26 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
             <? endforeach; ?>
 
         <? endif; ?>
-    <? elseif ($shopSubproductContentElement): ?>
-        <? $alert = \yii\bootstrap\Alert::begin([
+
+    <?/* elseif ($shopStoreProduct): */?><!--
+        <?/* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); ?>
+        ]); */?>
         Цена по этому товару будет рассчитана автоматически.
-        <? $alert::end(); ?>
-    <? elseif ($model->shopSupplierElements) : ?>
-        <? $alert = \yii\bootstrap\Alert::begin([
+        <?/* $alert::end(); */?>
+
+    <?/* elseif ($model->shopSupplierElements) : */?>
+        <?/* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); ?>
+        ]); */?>
         Цена по этому товару рассчитывается автоматически из данных поставщиков.
-        <? $alert::end(); ?>
+        --><?/* $alert::end(); */?>
     <? endif; ?>
 
 
@@ -276,39 +280,38 @@ if ($shopSubproductContentElement && $model->isNewRecord) {
     ); ?>
 
 
-    <? if ($isShowMeasureQuantity) : ?>
+    <?/* if ($isShowMeasureQuantity) : */?><!--
 
-        <?= $form->field($shopProduct, "quantity")
+        <?/*= $form->field($shopProduct, "quantity")
             ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
                 'options' => [
                     'step' => 0.0001,
                 ],
                 'append'  => $shopProduct->measure ? $shopProduct->measure->symbol : "",
             ]);
-        //->label("Доступное количество " . $shopProduct->measure->symbol);
-        ?>
+        */?>
 
-    <? elseif ($shopSubproductContentElement): ?>
-        <? $alert = \yii\bootstrap\Alert::begin([
+    <?/* elseif ($shopStoreProduct): */?>
+        <?/* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); ?>
+        ]); */?>
         Количество по этому товару будет рассчитано автоматически.
-        <? $alert::end(); ?>
-    <? elseif ($model->shopSupplierElements) : ?>
-        <? $alert = \yii\bootstrap\Alert::begin([
+        <?/* $alert::end(); */?>
+    <?/* elseif ($model->shopSupplierElements) : */?>
+        <?/* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); ?>
+        ]); */?>
         Количество по этому товару будет рассчитано автоматически из данных поставщиков.
-        <? $alert::end(); ?>
-    <? endif; ?>
+        <?/* $alert::end(); */?>
+    --><?/* endif; */?>
 
-    <? if ($shopStoreProducts && !$shopSubproductContentElement) : ?>
+    <? if ($shopStoreProducts && !$shopStoreProduct) : ?>
         <?
         /**
          * @var $shopSuppliers \skeeks\cms\shop\models\ShopSupplier[]

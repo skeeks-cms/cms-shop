@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\Image;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopBasket;
@@ -82,13 +83,19 @@ class StoreProductController extends BackendModelStandartController
                                     $query = $e->dataProvider->query;
 
                                     if ($e->field->value) {
-                                        $query->andWhere([
-                                            'or',
-                                            ['like', ShopStoreProduct::tableName().'.id', $e->field->value],
-                                            ['like', ShopStoreProduct::tableName().'.name', $e->field->value],
-                                            ['like', ShopStoreProduct::tableName().'.external_id', $e->field->value],
-                                            ['like', ShopStoreProduct::tableName().'.external_data', $e->field->value],
-                                        ]);
+                                        $query
+                                            ->andWhere([
+                                                'or',
+                                                ['like', ShopStoreProduct::tableName().'.id', $e->field->value],
+                                                ['like', ShopStoreProduct::tableName().'.name', $e->field->value],
+                                                ['like', ShopStoreProduct::tableName().'.external_id', $e->field->value],
+                                                ['like', ShopStoreProduct::tableName().'.external_data', $e->field->value],
+                                                ['like', 'element.name', $e->field->value],
+                                            ])
+                                        ;
+
+                                        $query->joinWith("shopProduct as shopProduct");
+                                        $query->joinWith("shopProduct.cmsContentElement as element");
 
                                         $query->groupBy([ShopStoreProduct::tableName().'.id']);
                                     }
@@ -244,6 +251,22 @@ HTML;
                 'fields' => [$this, 'updateFields'],
             ],
         ]);
+    }
+
+    public function actionSaveMain()
+    {
+        $rr = new RequestResponse();
+        if ($rr->isRequestAjaxPost()) {
+            $model = $this->model;
+
+            $model->load(\Yii::$app->request->post());
+            if (!$model->save()) {
+                $rr->success = false;
+                $rr->message = print_r($model->errors, true);
+            }
+            $rr->success = true;
+        }
+        return $rr;
     }
 
     public function updateFields($action)

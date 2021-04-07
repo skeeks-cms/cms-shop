@@ -1415,15 +1415,16 @@ HTML
         $shopStoreProducts = [];
 
 
+        /**
         if ($shopStores = ShopStore::find()->where(['cms_site_id' => \Yii::$app->skeeks->site->id])->all()) {
             foreach ($shopStores as $shopStore) {
-                $shopStoreProduct = new ShopStoreProduct([
+                $ssp = new ShopStoreProduct([
                     'shop_store_id' => $shopStore->id,
                 ]);
 
-                $shopStoreProducts[] = $shopStoreProduct;
+                $shopStoreProducts[] = $ssp;
             }
-        }
+        }*/
 
 
         $modelClassName = $this->modelClassName;
@@ -1441,12 +1442,10 @@ HTML
         $rr = new RequestResponse();
 
 
-        //Если нужно создавать товар из поддтовара
-        $shopSubproductContentElement = null;
+        //Если нужно создавать товар из товара поставщика
+        /*$shopSubproductContentElement = null;
         if ($shop_sub_product_id = \Yii::$app->request->get("shop_sub_product_id")) {
-            /**
              * @var $shopSubproductContentElement ShopCmsContentElement
-             */
             $shopSubproductContentElement = ShopCmsContentElement::find()->where(['id' => $shop_sub_product_id])->one();
 
             if ($shopSubproductContentElement) {
@@ -1466,8 +1465,37 @@ HTML
                 $shopProduct->length = $subShopProduct->length;
                 $shopProduct->width = $subShopProduct->width;
             }
-        }
+        }*/
 
+
+
+        $shopStoreProduct = null;
+        if ($store_product_id = \Yii::$app->request->get("store_product_id")) {
+            /**
+             * @var $shopStoreProduct ShopStoreProduct
+             */
+            $shopStoreProduct = ShopStoreProduct::find()->where(['id' => $store_product_id])->one();
+
+            if ($shopStoreProduct) {
+
+                $shopStoreProduct->loadDataToElementProduct($model);
+                /*$subShopProduct = $shopSubproductContentElement->shopProduct;
+                $shopSubproductContentElement->loadDataToMainModel($model);
+                $siteClass = \Yii::$app->skeeks->siteClass;
+                if (!$defaultSite = $siteClass::find()->andWhere(['is_default' => 1])->one()) {
+                    throw new Exception("Нет сайта по умолчанию");
+                }
+                $model->cms_site_id = $defaultSite->id;
+
+                $shopProduct->measure_code = $subShopProduct->measure_code;
+                $shopProduct->measure_ratio = $subShopProduct->measure_ratio;
+                $shopProduct->measure_ratio_min = $subShopProduct->measure_ratio_min;
+                $shopProduct->height = $subShopProduct->height;
+                $shopProduct->width = $subShopProduct->width;
+                $shopProduct->length = $subShopProduct->length;
+                $shopProduct->width = $subShopProduct->width;*/
+            }
+        }
 
         //Если создаем товар предложение
         if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
@@ -1555,18 +1583,22 @@ CSS
 
                         }
 
-                        foreach ($shopStoreProducts as $shopStoreProduct) {
-                            $data = ArrayHelper::getValue($post, 'stores.'.$shopStoreProduct->shop_store_id);
-                            $shopStoreProduct->load($data, "");
-                            $shopStoreProduct->shop_product_id = $shopProduct->id;
-                            $shopStoreProduct->save();
-                        }
+                        /*foreach ($shopStoreProducts as $ssp) {
+                            $data = ArrayHelper::getValue($post, 'stores.'.$ssp->shop_store_id);
+                            $ssp->load($data, "");
+                            $ssp->shop_product_id = $shopProduct->id;
+                            $ssp->save();
+                        }*/
                         /*$shopProduct->getBaseProductPriceValue();
                         $baseProductPrice = $shopProduct->baseProductPrice;*/
 
-                        if ($shopSubproductContentElement) {
+                        /*if ($shopSubproductContentElement) {
                             $shopSubproductContentElement->main_cce_id = $shopProduct->id;
                             $shopSubproductContentElement->save();
+                        }*/
+                        if ($shopStoreProduct) {
+                            $shopStoreProduct->shop_product_id = $shopProduct->id;
+                            $shopStoreProduct->save();
                         }
 
                         $t->commit();
@@ -1606,7 +1638,8 @@ CSS
             'is_saved'                     => $is_saved,
             'submitBtn'                    => \Yii::$app->request->post('submit-btn'),
             'redirect'                     => $redirect,
-            'shopSubproductContentElement' => $shopSubproductContentElement,
+            //'shopSubproductContentElement' => $shopSubproductContentElement,
+            'shopStoreProduct' => $shopStoreProduct,
         ]);
     }
 
