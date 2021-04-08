@@ -1,0 +1,98 @@
+.sx-import-table-wrapper table {
+    width: 100%;
+}
+
+.sx-import-table-wrapper table tbody {
+    height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.sx-import-table-wrapper table th select {
+    width: 100%;
+    border: 0;
+    font-weight: bold;
+}
+
+.sx-import-table-wrapper table th select:focus {
+    outline: none;
+}
+
+.sx-max-height-100 {
+    overflow: auto;
+}
+
+.sx-import-table-wrapper table tr:hover td.sx-styled {
+    background: #f7f7f7;
+}
+.sx-import-table-wrapper table .sx-remove-tr-btn {
+    display: none;
+    font-size: 12px;
+    cursor: pointer;
+}
+.sx-import-table-wrapper table tr:hover .sx-remove-tr-btn {
+    display: block;
+}
+
+.sx-import-table-wrapper table td.sx-remove-td {
+    width: 20px;
+    min-width: 20px;
+}
+
+
+
+.sx-import-table-wrapper table .sx-styled
+{
+    text-align: left;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.1);
+    min-width: 160px;
+    max-width: 160px;
+    min-height: 24px;
+    height: 24px;
+    padding: 3px;
+    cursor: default;
+    outline: none;
+    outline-offset: -2px;
+    position: relative;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+    font-size: 12px;
+    line-height: 1.1;
+}
+
+.sx-import-table-wrapper table td.sx-counter-td {
+    width: auto;
+    min-width: auto;
+    white-space: nowrap;
+}
+
+.sx-import-table-wrapper table tr.sx-active-tr td.sx-styled {
+    background: #ffbb0026;
+}
+
+.sx-value-td textarea {
+    width: 100%;
+    border: none;
+    resize: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    outline: 2px solid rgb(82,146,247);
+}
+.sx-value-td textarea:focus {
+    border: none;
+    outline: 2px solid rgb(82,146,247);
+}
+
+.sx-import-values-wrapper {
+    display: none;
+}

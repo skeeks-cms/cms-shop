@@ -33,11 +33,13 @@ class m210314_130601__create_table__shop_store_property_option extends Migration
 
             'cms_content_property_enum_id' => $this->integer(),
             'cms_content_element_id' => $this->integer(),
+            'cms_tree_id' => $this->integer(),
 
         ], $tableOptions);
 
         $this->createIndex($tableName.'__cms_content_property_enum_id', $tableName, 'cms_content_property_enum_id');
         $this->createIndex($tableName.'__cms_content_element_id', $tableName, 'cms_content_element_id');
+        $this->createIndex($tableName.'__cms_tree_id', $tableName, 'cms_tree_id');
 
         $this->createIndex($tableName.'__property2name', $tableName, ['shop_store_property_id', 'name'], true);
 
@@ -50,9 +52,15 @@ class m210314_130601__create_table__shop_store_property_option extends Migration
             "{$tableName}__cms_content_property_enum_id", $tableName,
             'cms_content_property_enum_id', '{{%cms_content_property_enum}}', 'id', 'SET NULL', 'SET NULL'
         );
+
         $this->addForeignKey(
             "{$tableName}__cms_content_element_id", $tableName,
             'cms_content_element_id', '{{%cms_content_element}}', 'id', 'SET NULL', 'SET NULL'
+        );
+
+        $this->addForeignKey(
+            "{$tableName}__cms_tree_id", $tableName,
+            'cms_tree_id', '{{%cms_tree}}', 'id', 'SET NULL', 'SET NULL'
         );
     }
 

@@ -9,9 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
-use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
@@ -31,13 +29,12 @@ use yii\helpers\Html;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class StoreProductController extends BackendModelStandartController
+class StoreProductImportController extends BackendModelStandartController
 {
     public function init()
     {
-        $this->name = \Yii::t('skeeks/shop/app', 'Товары');
+        $this->name = \Yii::t('skeeks/shop/app', 'Импорт');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopStoreProduct::class;
 
         $this->permissionName = Cms::UPA_PERMISSION;
 
@@ -249,15 +246,8 @@ HTML;
             "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
-
             "update" => [
                 'fields' => [$this, 'updateFields'],
-            ],
-
-            "import" => [
-                'class' => ViewBackendAction::class,
-                'icon' => 'far fa-file-excel',
-                'name' => 'Импорт из excel',
             ],
         ]);
     }
