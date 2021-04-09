@@ -240,7 +240,7 @@ HTML
             ],
 
 
-            "products" => [
+            /*"products" => [
                 'class'           => BackendGridModelRelatedAction::class,
                 'name'            => ['skeeks/shop/app', 'Товары'],
                 'icon'            => 'fas fa-list',
@@ -250,7 +250,6 @@ HTML
                 'on gridInit'     => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
-                     */
                     $action = $e->sender;
                     $action->relatedIndexAction->backendShowings = false;
                     $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
@@ -259,7 +258,7 @@ HTML
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
                 },
-            ],
+            ],*/
         ]);
     }
 
