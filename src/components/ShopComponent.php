@@ -870,6 +870,8 @@ SQL
 
 
     /**
+     * @deprecated ;
+     *
      * Обновляет наличие у товаров поставщиков у которых есть склады.
      * Обновляет количество у главных товаров, к которым привязаны товары поставщиков.
      * Обновляет количество у общих товаров (складывает предложения)
@@ -879,6 +881,7 @@ SQL
      */
     public function updateAllQuantities()
     {
+        return false;
 
         //Обновляет количество у товаров у которых есть склады, и они являются поставщиками
         $result = \Yii::$app->db->createCommand(<<<SQL
@@ -944,6 +947,19 @@ SQL
 
 
     /**
+     * @param CmsSite|null $cmsSite
+     */
+    static public function updateProductPrices(CmsSite $cmsSite)
+    {
+        $sqlFile = \Yii::getAlias('@skeeks/cms/shop/sql/update-product-from-store-products.sql');
+        $sql = file_get_contents($sqlFile);
+        $sql = str_replace("{site_id}", $cmsSite->id, $sql);
+
+        \Yii::$app->db->createCommand($sql)->execute();
+    }
+
+    /**
+     * @deprecated
      * @param CmsSite|null $cmsSite
      */
     static public function importNewProductsOnSite(CmsSite $cmsSite = null)

@@ -29,6 +29,7 @@ use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\assets\admin\AdminShopProductAsset;
+use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
@@ -1896,6 +1897,7 @@ JS
             //\Yii::$app->shop->updateAllSubproducts();
             //\Yii::$app->shop->updateAllQuantities();
             \Yii::$app->shop->updateAllTypes();
+            ShopComponent::updateProductPrices(\Yii::$app->skeeks->site);
             //\Yii::$app->shop->updateOffersPrice();
         } catch (\Exception $e) {
             $rr->success = false;

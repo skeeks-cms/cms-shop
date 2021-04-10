@@ -28,6 +28,25 @@ class AgentsController extends Controller
      * 
      * @throws \yii\base\Exception
      */
+    public function actionUpdateProductPricesFromStoreProducts()
+    {
+        /**
+         * @var $shopSite ShopSite
+         */
+        if ($count = ShopSite::find()->count()) {
+            $this->stdout("Найдено сайтов получателей: " . $count . "\n");
+            foreach (ShopSite::find()->each(10) as $shopSite) {
+                $this->stdout("\tСайт: " . $shopSite->id . "\n");
+                ShopComponent::updateProductPrices($shopSite->cmsSite);
+            }
+        }
+    }
+
+    /**
+     * Добавляет новые товары на сайты получатели
+     *
+     * @throws \yii\base\Exception
+     */
     public function actionUpdateReceiverSites()
     {
         /**
