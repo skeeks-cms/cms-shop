@@ -201,6 +201,8 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
 
+
+
         if (in_array("paid_at", array_keys($event->changedAttributes)) && $this->paid_at) {
 
 
@@ -266,6 +268,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             $this->created_at = time();
             $this->recalculate();
         }
+
         if ($this->isAttributeChanged('shop_delivery_id') && !$this->isAttributeChanged('delivery_amount')) {
             $this->delivery_amount = $this->calcMoneyDelivery->amount;
             $this->recalculate();
