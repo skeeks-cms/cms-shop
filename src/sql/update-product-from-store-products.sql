@@ -89,6 +89,7 @@ SET
     spp_update.price = inner_spp.purchase_price
 WHERE
     spp_update.is_fixed = 0
+    AND inner_spp.purchase_price > 0
 ;
 
 
@@ -184,6 +185,7 @@ SET
     spp_update.price = inner_spp.price
 WHERE
     spp_update.is_fixed = 0
+    AND inner_spp.price > 0
 ;
 
 
