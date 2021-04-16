@@ -668,9 +668,9 @@ HTML
                             return \Yii::$app->user->can($this->permissionName."/create");
                         }
 
-                        if (!\Yii::$app->skeeks->site->shopSite->is_allow_edit_products) {
+                        /*if (!\Yii::$app->skeeks->site->shopSite->is_allow_edit_products) {
                             return false;
-                        }
+                        }*/
 
                         return \Yii::$app->user->can($this->permissionName."/create");
                     },
@@ -693,9 +693,9 @@ HTML
                             return false;
                         }
 
-                        if (!$model->cmsSite->shopSite->is_allow_edit_products) {
+                        /*if (!$model->cmsSite->shopSite->is_allow_edit_products) {
                             return false;
-                        }
+                        }*/
 
                         if ($model->main_cce_id) {
                             return false;
@@ -727,9 +727,9 @@ HTML
                             return false;
                         }
 
-                        if (!$model->cmsSite->shopSite->is_allow_edit_products) {
+                        /*if (!$model->cmsSite->shopSite->is_allow_edit_products) {
                             return false;
-                        }
+                        }*/
 
                         return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
                     },

@@ -445,7 +445,8 @@ class ShopComponent extends Component implements BootstrapInterface
         $this
             ->filterByTypeContentElementQuery($activeQuery)
             ->filterByPriceContentElementQuery($activeQuery)
-            ->filterByMainPidContentElementQuery($activeQuery);
+            //->filterByMainPidContentElementQuery($activeQuery)
+        ;
 
         return $this;
     }
@@ -565,16 +566,16 @@ class ShopComponent extends Component implements BootstrapInterface
      * @param ActiveQuery $activeQuery
      * @return $this
      */
-    public function filterByMainPidContentElementQuery(ActiveQuery $activeQuery)
-    {
-        if (\Yii::$app->skeeks->site->shopSite->is_receiver && !\Yii::$app->skeeks->site->shopSite->is_show_product_no_main) {
+    //public function filterByMainPidContentElementQuery(ActiveQuery $activeQuery)
+   // {
+        /*if (\Yii::$app->skeeks->site->shopSite->is_receiver && !\Yii::$app->skeeks->site->shopSite->is_show_product_no_main) {
             $activeQuery->andWhere(
                 ['is not', ShopCmsContentElement::tableName().'.main_cce_id', null]
             );
-        }
+        }*/
 
-        return $this;
-    }
+        //return $this;
+    //}
 
 
     /**

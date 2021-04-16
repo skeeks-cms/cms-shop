@@ -88,21 +88,11 @@ class AdminShopSiteController extends BackendModelController
 
                             ->orderBy(['priority' => SORT_ASC]);
 
-        if (\Yii::$app->skeeks->site->shopSite->is_receiver) {
-            $defaultSite = CmsSite::find()->default()->one();
-            $propertyQuery->andWhere([
-                'or',
-                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
-                [CmsContentProperty::tableName().'.cms_site_id' => null],
-                [CmsContentProperty::tableName().'.cms_site_id' => $defaultSite->id],
-            ]);
-        } else {
-            $propertyQuery->andWhere([
-                'or',
-                [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
-                [CmsContentProperty::tableName().'.cms_site_id' => null],
-            ]);
-        }
+        $propertyQuery->andWhere([
+            'or',
+            [CmsContentProperty::tableName().'.cms_site_id' => \Yii::$app->skeeks->site->id],
+            [CmsContentProperty::tableName().'.cms_site_id' => null],
+        ]);
 
 
         return [
@@ -171,11 +161,11 @@ class AdminShopSiteController extends BackendModelController
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
-                    'is_show_product_no_main'      => [
+                    /*'is_show_product_no_main'      => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],
+                    ],*/
 
 
                 ],

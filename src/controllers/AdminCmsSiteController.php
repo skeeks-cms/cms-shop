@@ -210,18 +210,18 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'shopSite.is_allow_edit_products'  => [
+                    /*'shopSite.is_allow_edit_products'  => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
-                    ],
+                    ],*/
                     'shopSite.is_receiver'             => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'shopSite.is_show_product_no_main' => [
+                    /*'shopSite.is_show_product_no_main' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
-                    ],
+                    ],*/
                     'shopSite.description_internal'    => [
                         'class'       => WidgetField::class,
                         'widgetClass' => Ckeditor::class,
