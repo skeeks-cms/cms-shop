@@ -6,7 +6,6 @@
  * @date 27.08.2015
  */
 return [
-
     'bootstrap' => ['storeBackend'],
 
     'components' => [

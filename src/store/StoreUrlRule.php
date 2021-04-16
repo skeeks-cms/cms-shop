@@ -25,17 +25,19 @@ class StoreUrlRule extends BackendUrlRule
      */
     public function createUrl($manager, $route, $params)
     {
+        /*print_r($route);
+        print_r($params);
+                die;*/
+
         if (!isset($params[self::STORE_PARAM_NAME])) {
             if (\Yii::$app->shop->backendShopStore) {
                 $params[self::STORE_PARAM_NAME] = \Yii::$app->shop->backendShopStore->id;
             } else {
-                $shopStore = ShopStore::find()->one();
+                /*$shopStore = ShopStore::find()->one();
                 if ($shopStore) {
                     $params[self::STORE_PARAM_NAME] = $shopStore->id;
-                }
-
+                }*/
             }
-
         }
 
         return parent::createUrl($manager, $route, $params);
