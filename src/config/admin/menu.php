@@ -204,11 +204,11 @@ return [
 
             ],*/
 
-            [
+            /*[
                 "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
                 "url"   => ["shop/admin-shop-import-cms-site"],
                 "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
-            ],
+            ],*/
             /*[
                 "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
                 "url"   => ["shop/admin-shop-supplier"],
