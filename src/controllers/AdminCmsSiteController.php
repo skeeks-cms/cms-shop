@@ -124,12 +124,7 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                     ],
 
                     'columns' => [
-                        'is_supplier' => [
-                            'label' => 'Поставщик?',
-                            'value' => function (CmsSite $model) {
-                                return $model->shopSite->is_supplier ? "Да" : "";
-                            },
-                        ],
+                        
                         'is_receiver' => [
                             'label' => 'Получает товары?',
                             'value' => function (CmsSite $model) {
@@ -206,22 +201,12 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                 'class'  => FieldSet::class,
                 'name'   => 'Эти поля не могут редатировать владельцы сайтов',
                 'fields' => [
-                    'shopSite.is_supplier'             => [
-                        'class'     => BoolField::class,
-                        'allowNull' => false,
-                    ],
-                    /*'shopSite.is_allow_edit_products'  => [
-                        'class'     => BoolField::class,
-                        'allowNull' => false,
-                    ],*/
+
                     'shopSite.is_receiver'             => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    /*'shopSite.is_show_product_no_main' => [
-                        'class'     => BoolField::class,
-                        'allowNull' => false,
-                    ],*/
+
                     'shopSite.description_internal'    => [
                         'class'       => WidgetField::class,
                         'widgetClass' => Ckeditor::class,

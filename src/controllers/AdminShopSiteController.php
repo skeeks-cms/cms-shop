@@ -161,13 +161,6 @@ class AdminShopSiteController extends BackendModelController
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
-                    /*'is_show_product_no_main'      => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],*/
-
-
                 ],
             ],
 

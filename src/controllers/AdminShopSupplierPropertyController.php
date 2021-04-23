@@ -54,13 +54,7 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                 return false;
             }
 
-            /**
-             *
-             */
-            if (!$shopSite->is_supplier) {
-                return false;
-            }
-
+          
             /*if (!$shopSite->is_receiver) {
                 return false;
             }*/

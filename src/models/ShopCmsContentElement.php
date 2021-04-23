@@ -31,7 +31,6 @@ use yii\helpers\ArrayHelper;
  * @property CmsSite                 $cmsSite
  *
  * @property ShopCmsContentElement   $mainCmsContentElement
- * @property ShopCmsContentElement[] $shopSupplierElements
  * @property ShopCmsContentElement[] $shopSellerElements
  *
  * Class ShopCmsContentElement
@@ -652,20 +651,6 @@ class ShopCmsContentElement extends CmsContentElement
         return $name;
     }
 
-
-    /**
-     * Товары у поставщиков
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopSupplierElements()
-    {
-        $q = $this->getSecondaryCmsContentElements()
-            ->joinWith("cmsSite as cmsSite")
-            ->joinWith("cmsSite.shopSite as shopSite")
-            ->andWhere(['shopSite.is_supplier' => 1]);
-
-        return $q;
-    }
 
     /**
      * Товары на сайтах для продажи

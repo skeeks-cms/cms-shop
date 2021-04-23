@@ -207,10 +207,6 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        //Если сайт поставщик убираем эту кнопку
-                        if ($site->shopSite->is_supplier) {
-                            return false;
-                        }
 
                         return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
 
@@ -309,7 +305,7 @@ HTML
                          */
                         $site = $model->cmsSite;
                         //Показываем только для сайтов которые являются поставщиками
-                        if (!$site->shopSite->is_supplier && !$site->shopSite->is_receiver) {
+                        if (!$site->shopSite->is_receiver) {
                             return false;
                         }
 
@@ -395,10 +391,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        //Если сайт поставщик убираем эту кнопку
-                        if ($site->shopSite->is_supplier) {
-                            return false;
-                        }
+                       
                         return \Yii::$app->user->can($this->permissionName."/copy", ['model' => $model]);
                     },
                 ],
@@ -491,10 +484,6 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        //Если сайт поставщик убираем эту кнопку
-                        if ($site->shopSite->is_supplier) {
-                            return false;
-                        }
 
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
@@ -516,10 +505,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        //Если сайт поставщик убираем эту кнопку
-                        if ($site->shopSite->is_supplier) {
-                            return false;
-                        }
+                        
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
 
@@ -558,10 +544,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        //Если сайт поставщик убираем эту кнопку
-                        if ($site->shopSite->is_supplier) {
-                            return false;
-                        }
+                       
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                     'name'            => ['skeeks/shop/app', 'In baskets'],
@@ -639,10 +622,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        //Если сайт поставщик убираем эту кнопку
-                        if ($site->shopSite->is_supplier) {
-                            return false;
-                        }
+                        
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                 ],
@@ -668,10 +648,6 @@ HTML
                             return \Yii::$app->user->can($this->permissionName."/create");
                         }
 
-                        /*if (!\Yii::$app->skeeks->site->shopSite->is_allow_edit_products) {
-                            return false;
-                        }*/
-
                         return \Yii::$app->user->can($this->permissionName."/create");
                     },
                 ],
@@ -692,10 +668,6 @@ HTML
                         if (!$model->shopProduct) {
                             return false;
                         }
-
-                        /*if (!$model->cmsSite->shopSite->is_allow_edit_products) {
-                            return false;
-                        }*/
 
                         if ($model->main_cce_id) {
                             return false;
@@ -726,10 +698,6 @@ HTML
                         if (!$model->shopProduct) {
                             return false;
                         }
-
-                        /*if (!$model->cmsSite->shopSite->is_allow_edit_products) {
-                            return false;
-                        }*/
 
                         return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
                     },
@@ -1190,7 +1158,7 @@ HTML
 
 
         //Только для сайта поставщика
-        if (\Yii::$app->skeeks->site->shopSite->is_supplier || \Yii::$app->skeeks->site->shopSite->is_receiver) {
+        if (\Yii::$app->skeeks->site->shopSite->is_receiver) {
             $filterFields['is_ready'] = [
                 'class'    => SelectField::class,
                 'items'    => [

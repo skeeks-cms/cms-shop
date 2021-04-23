@@ -1,3 +1,7 @@
+START TRANSACTION;
+
+SET AUTOCOMMIT = 0;
+
 SET @site_id = {site_id};
 /**
  * Создание недостающих закупочных цен
@@ -187,5 +191,7 @@ WHERE
     spp_update.is_fixed = 0
     AND inner_spp.price > 0
 ;
+
+COMMIT;
 
 

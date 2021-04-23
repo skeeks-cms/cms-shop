@@ -72,7 +72,7 @@ if ($model->isNewRecord) {
 
 } else {
     //Товар не новый уже и у него заданы товары поставщика
-    if ($model->shopSupplierElements) {
+    /*if ($model->shopSupplierElements) {
         $allowChangeProductType = true;
         $isAllowChangeSupplier = false;
         $isShowPrices = false;
@@ -83,7 +83,7 @@ if ($model->isNewRecord) {
         $isShowMeasureQuantity = false;
 
         \yii\helpers\ArrayHelper::remove($possibleProductTypes, \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS);
-    }
+    }*/
 }
 
 if ($shopProduct->tradeOffers) {
@@ -259,11 +259,17 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
             ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
                 'dynamicReload' => true,
                 'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : "",
+                'options' => [
+                    'step' => 0.0001
+                ]
             ]); ?>
         <?= $form->field($shopProduct, 'measure_ratio_min')
             ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
                 //'dynamicReload' => true,
                 'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : "",
+                'options' => [
+                    'step' => 0.0001
+                ]
             ]); ?>
     <? endif; ?>
 

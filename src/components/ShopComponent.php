@@ -96,50 +96,6 @@ class ShopComponent extends Component implements BootstrapInterface
             Event::on(BackendComponent::class, "beforeRun", function (Event $e) {
                 $backendComponent = $e->sender;
                 //Если это сайт поставщика, у него будет свое меню
-                if ($backendComponent instanceof AdminComponent && \Yii::$app->skeeks->site->shopSite->is_supplier) {
-                    ArrayHelper::remove($backendComponent->menu->data, 'dashboard');
-                    ArrayHelper::remove($backendComponent->menu->data, 'content');
-                    ArrayHelper::remove($backendComponent->menu->data, 'site-users');
-
-                    $exportImport = ArrayHelper::getValue($backendComponent->menu->data, 'exportImport');
-
-                    $backendComponent->menu->data = [
-                        'tree'     => [
-                            'priority' => 100,
-                            "label"    => \Yii::t('skeeks/cms', "Sections"),
-                            "url"      => ["cms/admin-tree"],
-                            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/sections.png'],
-                        ],
-                        'shop'     => self::getAdminShopProductsMenu(),
-                        'import'   => [
-                            "label" => \Yii::t('skeeks/import', "Import"),
-                            "img"   => ['\skeeks\cms\import\assets\ImportAsset', 'icons/import.png'],
-                            "url"   => ["cmsImport/admin-import-task"],
-                        ],
-                        'agents'   => [
-                            "name"  => ['skeeks/agent', "Agents"],
-                            "url"   => ["cmsAgent/admin-cms-agent"],
-                            "image" => ['skeeks\cms\agent\assets\CmsAgentAsset', 'icons/clock.png'],
-                        ],
-                        'stores'   => [
-                            "label" => \Yii::t('skeeks/shop/app', 'Склады'),
-                            "url"   => ["shop/admin-shop-store"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-                        ],
-                        'prices'   => [
-                            "label" => \Yii::t('skeeks/shop/app', 'Цены'),
-                            "url"   => ["shop/admin-type-price"],
-                            'icon'  => "fas fa-dollar-sign",
-                        ],
-                        'supplier' => [
-                            "label" => \Yii::t('skeeks/shop/app', 'Свойства поставщика'),
-                            "url"   => ["shop/admin-shop-supplier-property"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
-                        ],
-                    ];
-
-
-                }
             });
         }
     }
@@ -562,21 +518,6 @@ class ShopComponent extends Component implements BootstrapInterface
         return $this;
     }
 
-    /**
-     * @param ActiveQuery $activeQuery
-     * @return $this
-     */
-    //public function filterByMainPidContentElementQuery(ActiveQuery $activeQuery)
-   // {
-        /*if (\Yii::$app->skeeks->site->shopSite->is_receiver && !\Yii::$app->skeeks->site->shopSite->is_show_product_no_main) {
-            $activeQuery->andWhere(
-                ['is not', ShopCmsContentElement::tableName().'.main_cce_id', null]
-            );
-        }*/
-
-        //return $this;
-    //}
-
 
     /**
      * Товарные данные обновляются из главных товаров
@@ -871,83 +812,6 @@ SQL
 
 
     /**
-     * @deprecated ;
-     *
-     * Обновляет наличие у товаров поставщиков у которых есть склады.
-     * Обновляет количество у главных товаров, к которым привязаны товары поставщиков.
-     * Обновляет количество у общих товаров (складывает предложения)
-     *
-     * @return $this
-     * @throws \yii\db\Exception
-     */
-    public function updateAllQuantities()
-    {
-        return false;
-
-        //Обновляет количество у товаров у которых есть склады, и они являются поставщиками
-        $result = \Yii::$app->db->createCommand(<<<SQL
-            UPDATE 
-                `shop_product` as sp 
-                INNER JOIN
-                (
-                    /*Товары у которых задан поставщик и количество на их складах*/
-                   SELECT inner_sp.id as inner_sp_id, SUM(ssp.quantity) as sum_quantity
-                   FROM shop_product inner_sp
-                       LEFT JOIN shop_store_product ssp on ssp.shop_product_id = inner_sp.id 
-                       LEFT JOIN cms_content_element cce on inner_sp.id = cce.id 
-                       LEFT JOIN cms_site as site on site.id = cce.cms_site_id 
-                       LEFT JOIN shop_site as shopSite on site.id = shopSite.id 
-                       WHERE shopSite.is_supplier = 1
-                   GROUP BY inner_sp.id
-                ) sp_has_supplier ON sp.id = sp_has_supplier.inner_sp_id
-            SET 
-                sp.`quantity` = if(sp_has_supplier.sum_quantity is null, 0, sp_has_supplier.sum_quantity)
-SQL
-        )->execute();
-
-
-        //Обновление количества у главных товаров моделей, к которым привязаны товары поставщиков
-        \Yii::$app->db->createCommand("
-            UPDATE 
-                `shop_product` as sp 
-                INNER JOIN
-                (
-                   SELECT inner_cce.main_cce_id, SUM(inner_sp.quantity) as sum_quantity
-                   FROM shop_product as inner_sp
-                   LEFT JOIN cms_content_element as inner_cce ON inner_cce.id = inner_sp.id
-                   LEFT JOIN cms_site as inner_cms_site_id ON inner_cms_site_id.id = inner_cce.cms_site_id
-                   LEFT JOIN shop_site as inner_shop_site ON inner_shop_site.id = inner_cms_site_id.id
-                   WHERE inner_shop_site.is_supplier = 1 AND inner_cce.main_cce_id is not null
-                   GROUP BY inner_cce.main_cce_id
-                ) sp_has_main ON sp.id = sp_has_main.main_cce_id
-            SET 
-                sp.`quantity` = sp_has_main.sum_quantity
-            WHERE 
-                sp_has_main.main_cce_id is not null
-        ")->execute();
-
-
-        //Обновления количества у общих товаров
-        \Yii::$app->db->createCommand("
-            UPDATE 
-                `shop_product` as sp 
-                INNER JOIN
-                (
-                    /*Товары у которых задан общий товар*/
-                   SELECT inner_sp.offers_pid as inner_sp_id, SUM(inner_sp.quantity) as sum_quantity
-                   FROM shop_product inner_sp
-                   WHERE inner_sp.offers_pid is not null
-                   GROUP BY inner_sp.offers_pid
-                ) sp_has_parent ON sp.id = sp_has_parent.inner_sp_id
-            SET 
-                sp.`quantity` = sp_has_parent.sum_quantity
-        ")->execute();
-
-        return $this;
-    }
-
-
-    /**
      * @param CmsSite|null $cmsSite
      */
     static public function updateProductPrices(CmsSite $cmsSite)
@@ -965,6 +829,8 @@ SQL
      */
     static public function importNewProductsOnSite(CmsSite $cmsSite = null)
     {
+        return false;
+        
         ini_set("memory_limit", "1024M");
 
         if ($cmsSite === null) {

@@ -56,7 +56,7 @@ class AgentsController extends Controller
             $this->stdout("Найдено сайтов получателей: " . count($shopSites) . "\n");
             foreach ($shopSites as $shopSite) {
                 $this->stdout("\tСайт: " . $shopSite->id . "\n");
-                ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
+                \common\modules\sitika\components\ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
             }
         }
     }
@@ -157,29 +157,6 @@ SQL
     public function actionUpdateProductType()
     {
         \Yii::$app->shop->updateAllTypes();
-    }
-
-    /**
-     * Обновление количества товаров
-     * 
-     * @throws \yii\db\Exception
-     */
-    public function actionUpdateQuantity()
-    {
-        //Обновление количества товаров у которых заданы склады
-        /*\Yii::$app->db->createCommand("
-            UPDATE 
-                `shop_product` as sp
-                LEFT JOIN shop_store_product ssp on ssp.shop_product_id = sp.id 
-            SET 
-                sp.`quantity` = (select sum(ssp_inner.quantity) from shop_store_product as ssp_inner WHERE ssp_inner.shop_product_id = sp.id )
-            WHERE 
-                ssp.id is not null
-        ")->execute();*/
-
-
-        \Yii::$app->shop->updateAllQuantities();
-        
     }
 
     /**

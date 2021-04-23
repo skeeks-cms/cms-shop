@@ -17,7 +17,6 @@ use yii\helpers\ArrayHelper;
  * @property int         $id
  * @property string|null $description
  * @property string|null $description_internal
- * @property int         $is_supplier
  * @property int         $is_receiver Сайт получает товары от поставщиков?
  * @property int|null    $catalog_cms_tree_id Главный раздел для товаров
  * @property string|null $notify_emails Email адреса для уведомлений о заказах
@@ -28,7 +27,6 @@ use yii\helpers\ArrayHelper;
  * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
  * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
  * @property int         $is_allow_edit_products Разрешено редактировать и добавлять товары?
- * @property int         $is_show_product_no_main
  *
  * @property CmsSite     $cmsSite
  * @property CmsTree     $catalogCmsTree
@@ -65,7 +63,6 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['is_supplier'], 'integer'],
             [['is_receiver'], 'integer'],
 
             //[['catalog_cms_tree_id'], 'integer'],
@@ -105,8 +102,6 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     'is_show_product_no_price',
                     'is_show_button_no_price',
                     'is_show_quantity_product',
-                    //'is_allow_edit_products',
-                    //'is_show_product_no_main',
                 ],
                 'boolean',
             ],
@@ -128,7 +123,6 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 
             'description'          => "Описание",
             'description_internal' => "Скрытое описание",
-            'is_supplier'          => "Поставщик товаров?",
             'is_receiver'          => "Разрешено получать товары от постащиков",
             //'catalog_cms_tree_id'  => "Основной раздел для товаров",
 
@@ -139,8 +133,6 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
-            //'is_allow_edit_products'        => "Разрешено редактировать и добавлять товары?",
-            //'is_show_product_no_main'       => "Показывать товары на сайте без информационной карточки?",
         ]);
     }
 
@@ -150,7 +142,6 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_supplier'         => "Этот сайт является поставщиком товаров для других сайтов. Значит товары на этом сайте необходимо привязывать к главным товарам портала.",
             'is_receiver'         => "Если эта опция включена то на сайте появляется раздел «Поставщики»",
             //'catalog_cms_tree_id' => "Основной раздел сайта, в который будут попадать товары по умолчанию, если раздел для них не задан.",
 
@@ -161,7 +152,6 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
             'is_show_product_only_quantity' => "Выберите как товары будут показываться на сайте по умолчанию",
             'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
-            //'is_show_product_no_main'       => "Если выбрано «да», то на сайте будут показываться все созданные товары, в том числе и которые не пирвязаны к информационной карточке.",
 
         ]);
     }

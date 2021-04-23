@@ -61,12 +61,6 @@ class AdminShopImportCmsSiteController extends BackendModelStandartController
                 return false;
             }
 
-            /**
-             *
-             */
-            if ($shopSite->is_supplier) {
-                return false;
-            }
 
             if (!$shopSite->is_receiver) {
                 return false;
@@ -307,24 +301,6 @@ HTML
         }
 
         $result = [
-            'supplier' => [
-                'class'  => FieldSet::class,
-                'name'   => 'Поставщик',
-                'fields' => [
-                    'sender_cms_site_id'        => [
-                        'class'          => SelectField::class,
-                        'items'          => ArrayHelper::map(
-                            ShopSite::find()->where(['is_supplier' => 1])->all(),
-                            'id',
-                            'asText'
-                        ),
-                        'elementOptions' => ArrayHelper::merge([
-                            RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
-                        ], $options),
-                    ],
-                ],
-            ],
-
 
             'main_price' => [
                 'class'  => FieldSet::class,

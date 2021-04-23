@@ -13,6 +13,8 @@ use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\components\Cms;
+use skeeks\cms\grid\DateColumn;
+use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
@@ -159,6 +161,12 @@ class StoreProductController extends BackendModelStandartController
                         'selling_price',
                     ],
                     'columns'        => [
+                        'created_at' => [
+                            'class' => DateTimeColumnData::class
+                        ],
+                        'updated_at' => [
+                            'class' => DateTimeColumnData::class
+                        ],
                         'quantity' => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
