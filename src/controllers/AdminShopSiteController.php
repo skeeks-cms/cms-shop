@@ -111,8 +111,8 @@ class AdminShopSiteController extends BackendModelController
                     /*'catalog_cms_tree_id' => [
                         'class'       => WidgetField::class,
                         'widgetClass' => SelectModelDialogTreeWidget::class,
-                    ],
-                    */
+                    ],*/
+
                     'notify_emails'         => [
                         'class' => TextareaField::class,
                     ],
