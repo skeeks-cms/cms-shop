@@ -106,7 +106,7 @@ JS
 );
 ?>
 
-<? if ($model->shopStore->is_supplier) : ?>
+<?/* if ($model->shopStore->is_supplier) : */?>
     <div style="margin-bottom: 20px;">
         <div class="col-12">
             <div style="margin-bottom: 10px;">
@@ -314,4 +314,4 @@ JS
     </div>
 
 
-<? endif; ?>
+<?/* endif; */?>

@@ -723,6 +723,9 @@ JS
 
                             </td>
                         <? endforeach; ?>
+
+
+
                         <td><?php echo $noValue; ?></td>
                         <td><?php echo $noValue; ?></td>
                         <td><?php echo $noValue; ?></td>
