@@ -65,8 +65,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::rules(), [
             [['is_receiver'], 'integer'],
 
-            //[['catalog_cms_tree_id'], 'integer'],
-            //[['catalog_cms_tree_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsTree::className(), 'targetAttribute' => ['catalog_cms_tree_id' => 'id']],
+            [['catalog_cms_tree_id'], 'integer'],
+            [['catalog_cms_tree_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsTree::className(), 'targetAttribute' => ['catalog_cms_tree_id' => 'id']],
 
             [['description'], 'string'],
             [['description_internal'], 'string'],
@@ -81,7 +81,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                 },
             ],
 
-            /*[
+            [
                 'catalog_cms_tree_id',
                 function () {
                     if ($this->catalog_cms_tree_id) {
@@ -91,7 +91,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     }
 
                 },
-            ],*/
+            ],
 
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
@@ -124,7 +124,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'description'          => "Описание",
             'description_internal' => "Скрытое описание",
             'is_receiver'          => "Разрешено получать товары от постащиков",
-            //'catalog_cms_tree_id'  => "Основной раздел для товаров",
+            'catalog_cms_tree_id'  => "Основной раздел для товаров",
 
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
@@ -143,7 +143,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeHints(), [
             'is_receiver'         => "Если эта опция включена то на сайте появляется раздел «Поставщики»",
-            //'catalog_cms_tree_id' => "Основной раздел сайта, в который будут попадать товары по умолчанию, если раздел для них не задан.",
+            'catalog_cms_tree_id' => "Основной раздел сайта, в который будут попадать товары по умолчанию, если раздел для них не задан.",
 
             'notify_emails'                 => \Yii::t('skeeks/shop/app',
                 'Enter email addresses, separated by commas, they will come on new orders information'),

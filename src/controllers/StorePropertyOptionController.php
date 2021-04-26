@@ -17,6 +17,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
+use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
 use skeeks\cms\shop\models\ShopSupplierProperty;
 use skeeks\yii2\form\fields\FieldSet;
@@ -100,7 +101,7 @@ HTML
                     'visibleFilters' => [
                         'id',
                         'name',
-                        'shop_supplier_property_id',
+                        'shop_store_property_id',
                     ],
                 ],
                 'grid'    => [
@@ -123,7 +124,7 @@ HTML
                         'actions',
 
                         //'id',
-                        'shop_supplier_property_id',
+                        'shop_store_property_id',
                         'name',
                         'connect',
                         'cms_tree_id',
@@ -195,9 +196,9 @@ HTML
                 'widgetClass' => SelectModelDialogTreeWidget::class,
             ],
         ];
-        if ($model->shopSupplierProperty) {
+        if ($model->shopStoreProperty) {
 
-            $property = $model->shopSupplierProperty;
+            $property = $model->shopStoreProperty;
             if ($property->cmsContentProperty) {
 
                 $contentProperty = $property->cmsContentProperty;
@@ -234,13 +235,13 @@ HTML
                 'class'  => FieldSet::class,
                 'name'   => 'От поставщика',
                 'fields' => [
-                    'shop_supplier_property_id' => [
+                    'shop_store_property_id' => [
                         'class'          => SelectField::class,
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
                         ],
                         'items'          => ArrayHelper::map(
-                            ShopSupplierProperty::find()->all(),
+                            ShopStoreProperty::find()->all(),
                             'id',
                             'asText'
                         ),
