@@ -11,6 +11,8 @@ namespace skeeks\cms\shop\store;
 use skeeks\assets\unify\base\UnifyIconSimpleLineAsset;
 use skeeks\cms\admin\AdminComponent;
 use skeeks\cms\backend\BackendComponent;
+use skeeks\cms\rbac\CmsManager;
+use yii\web\ForbiddenHttpException;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -56,5 +58,11 @@ class StoreBackendComponent extends BackendComponent
         UnifyIconSimpleLineAsset::register(\Yii::$app->view);
         \skeeks\cms\themes\unify\admin\UnifyThemeAdmin::initBeforeRender();
         \Yii::$app->view->theme = $theme;
+
+        $cmsManager = new CmsManager();
+        $cmsManager->cmsSite = \Yii::$app->shop->backendShopStore->cmsSite;
+        if (!$cmsManager->checkAccess(\Yii::$app->user->id, "shop/admin-shop-store-supplier")) {
+            throw new ForbiddenHttpException("Нет доступа");
+        }
     }
 }
