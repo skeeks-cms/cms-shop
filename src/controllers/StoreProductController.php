@@ -18,9 +18,14 @@ use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopBasket;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\models\ShopStoreProperty;
+use skeeks\cms\shop\models\ShopStorePropertyOption;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
@@ -254,6 +259,13 @@ HTML;
                 'icon'     => 'fas fa-info-circle',
             ],
 
+            "join" => [
+                'class'    => ViewBackendAction::class,
+                'priority' => 80,
+                'name'     => 'Связать',
+                'icon'     => 'fas fa-link',
+            ],
+
             "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
@@ -305,6 +317,136 @@ HTML;
             ],
 
         ];
+    }
+
+    public function actionJoinByVendor()
+    {
+        $rr = new RequestResponse();
+
+
+        set_time_limit(0);
+        ini_set("memory_limit", "2G");
+
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $added = 0;
+
+            $shopCmsContentPropertyVendor = \skeeks\cms\shop\models\ShopCmsContentProperty::find()
+                ->innerJoinWith('cmsContentProperty as cmsContentProperty')
+                ->andWhere(['cmsContentProperty.cms_site_id' => \Yii::$app->skeeks->site->id])
+                ->andWhere(['is_vendor' => 1])
+                ->one();
+
+            $shopCmsContentPropertyVendorCode = \skeeks\cms\shop\models\ShopCmsContentProperty::find()
+                ->innerJoinWith('cmsContentProperty as cmsContentProperty')
+                ->andWhere(['cmsContentProperty.cms_site_id' => \Yii::$app->skeeks->site->id])
+                ->andWhere(['is_vendor_code' => 1])
+                ->one();
+
+            $isBrand = false;
+            if ($shopCmsContentPropertyVendor && $shopCmsContentPropertyVendorCode) {
+                /**
+                 * @var $shopStorePropertyVendor ShopStoreProperty
+                 */
+                $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
+                $shopStorePropertyVendor = $qShopStoreProperties->andWhere(['cms_content_property_id' => $shopCmsContentPropertyVendor->cms_content_property_id])->one();
+
+                $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
+                $shopStorePropertyVendorCode = $qShopStoreProperties->andWhere(['cms_content_property_id' => $shopCmsContentPropertyVendorCode->cms_content_property_id])->one();
+
+                if ($shopStorePropertyVendor && $shopStorePropertyVendorCode) {
+                    $rr->success = true;
+                    $rr->message = "Данные обновлены";
+
+                    /**
+                     * @var $vendorOption ShopStorePropertyOption
+                     * @var $storeProduct ShopStoreProduct
+                     */
+                    $storeProducts = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => null]);
+                    foreach ($storeProducts->each() as $storeProduct)
+                    {
+                        if ($storeProduct->external_data) {
+                            $vendorValue = ArrayHelper::getValue($storeProduct->external_data, $shopStorePropertyVendor->external_code);
+                            $vendorCodeValue = ArrayHelper::getValue($storeProduct->external_data, $shopStorePropertyVendorCode->external_code);
+
+                            if ($vendorValue && $vendorCodeValue) {
+                                $vendorOption = $shopStorePropertyVendor->getShopStorePropertyOptions()->andWhere(['name' => trim($vendorValue)])->one();
+
+                                /*print_r($storeProduct->id);
+                                print_r($vendorOption->name);
+                                print_r($vendorCodeValue);
+                                print_r($vendorOption->cms_content_element_id);
+
+                                die;*/
+
+
+                                $find = ShopCmsContentElement::find()
+                                    ->cmsSite()
+                                    ->innerJoinWith("shopProduct as sp")
+                                ;
+
+
+                                $find1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                            ->where([
+                                                "value_element_id"  => $vendorOption->cms_content_element_id,
+                                                "property_id" => $shopCmsContentPropertyVendor->cms_content_property_id,
+                                            ]);
+                                $find2 = CmsContentElementProperty::find()->select(['element_id as id'])
+                                            ->where([
+                                                "value"  => $vendorCodeValue,
+                                                "property_id" => $shopCmsContentPropertyVendorCode->cms_content_property_id,
+                                            ]);
+
+
+                                /*if ($find2->one()) {
+                                    print_r($find2->one());die;
+                                }*/
+
+                                $find->andWhere([
+                                    CmsContentElement::tableName().".id" => $find1,
+                                ]);
+
+                                $find->andWhere([
+                                    CmsContentElement::tableName().".id" => $find2,
+                                ]);
+
+                                if ($find->count() == 1) {
+                                    $infoModel = $find->one();
+
+                                    /*print_r($storeProduct->toArray());
+                                    print_r($infoModel->toArray());die;*/
+
+                                    if ($infoModel) {
+                                        $storeProduct->shop_product_id = $infoModel->id;
+                                        try {
+                                            if ($storeProduct->save(false)) {
+                                                $added ++;
+                                            }
+                                        } catch (\Exception $exception) {
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+
+                    if ($added > 0) {
+                        $rr->message = "Связано товаров: {$added}";
+                        $rr->data = [
+                            'added' => $added
+                        ];
+                    }
+
+                }
+            }
+        }
+
+        return $rr;
     }
 
 }
