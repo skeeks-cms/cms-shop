@@ -473,9 +473,21 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             }],
             [['measure_ratio_min'], function() {
-                if ($this->measure_ratio_min % $this->measure_ratio != 0) {
-                    $this->addError("measure_ratio_min", "Минимальное количество продажи должно быть кратно шагу продажи.");
-                    return false;
+                if ((float) $this->measure_ratio != 0 && (float) $this->measure_ratio_min != 0) {
+                    try {
+                        $one = (float) $this->measure_ratio_min;
+                        $two = (float) $this->measure_ratio;
+                        if ($one < 1 || $two < 1) {
+                            $one = $one * 10000;
+                            $two = $two * 10000;
+                        }
+                        if ($one % $two != 0) {
+                            $this->addError("measure_ratio_min", "Минимальное количество продажи должно быть кратно шагу продажи.");
+                            return false;
+                        }
+                    } catch (\Exception $e){
+                    }
+
                 }
             }],
 
