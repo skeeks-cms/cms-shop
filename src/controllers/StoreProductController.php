@@ -367,9 +367,20 @@ HTML;
                     foreach ($storeProducts->each() as $storeProduct)
                     {
                         if ($storeProduct->external_data) {
-                            $vendorValue = ArrayHelper::getValue($storeProduct->external_data, $shopStorePropertyVendor->external_code);
-                            $vendorCodeValue = ArrayHelper::getValue($storeProduct->external_data, $shopStorePropertyVendorCode->external_code);
+                            $externalData = [];
+                            foreach ($storeProduct->external_data as $key => $val)
+                            {
+                                $externalData[trim($key)] = $val;
+                            }
+                            $vendorValue = ArrayHelper::getValue($externalData, trim($shopStorePropertyVendor->external_code));
+                            $vendorCodeValue = ArrayHelper::getValue($externalData, trim($shopStorePropertyVendorCode->external_code));
 
+
+                            /*print_r($storeProduct->id);
+                            print_r($storeProduct->external_data);
+                            print_r($shopStorePropertyVendor->external_code);
+                            print_r($shopStorePropertyVendorCode->external_code);
+                            die;*/
                             if ($vendorValue && $vendorCodeValue) {
                                 $vendorOption = $shopStorePropertyVendor->getShopStorePropertyOptions()->andWhere(['name' => trim($vendorValue)])->one();
 
@@ -410,6 +421,7 @@ HTML;
                                 $find->andWhere([
                                     CmsContentElement::tableName().".id" => $find2,
                                 ]);
+
 
                                 if ($find->count() == 1) {
                                     $infoModel = $find->one();
