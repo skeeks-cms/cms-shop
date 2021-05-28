@@ -360,6 +360,33 @@ class AdminPersonTypePropertyController extends BackendModelStandartController
                             );
                         },
                     ],
+                    'is_user_name'  => [
+                        'class'    => BoolField::class,
+                        //'allowNull'    => false,
+                        'trueValue'    => "Y",
+                        'falseValue'    => "N",
+                    ],
+                    'is_user_username'  => [
+                        'class'    => BoolField::class,
+                        //'allowNull'    => false,
+
+                        'trueValue'    => "Y",
+                        'falseValue'    => "N",
+                    ],
+                    'is_user_phone'  => [
+                        'class'    => BoolField::class,
+                        //'allowNull'    => false,
+
+                        'trueValue'    => "Y",
+                        'falseValue'    => "N",
+                    ],
+                    'is_user_email'  => [
+                        'class'    => BoolField::class,
+                        //'allowNull'    => false,
+
+                        'trueValue'    => "Y",
+                        'falseValue'    => "N",
+                    ],
                 ],
             ],
         ];

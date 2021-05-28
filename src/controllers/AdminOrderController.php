@@ -185,16 +185,16 @@ class AdminOrderController extends BackendModelStandartController
                                     $data[] = $shopOrder->shopBuyer->asText;
 
                                     if ($shopOrder->shopBuyer->cmsUser) {
-                                        $data[] = '<i class="fas fa-user"></i> ' . $shopOrder->shopBuyer->cmsUser->asText;
+                                        $data[] = '<i class="fas fa-user"></i>&nbsp;' . $shopOrder->shopBuyer->cmsUser->asText;
                                     } else {
-                                        $data[] = '<i class="fas fa-user"></i> Неавторизован';
+                                        $data[] = '<small style="color: gray;"><i class="fas fa-user"></i>&nbsp;Неавторизован</small>';
                                     }
 
                                 } else {
                                     if ($shopOrder->shopCart && $shopOrder->shopCart->cmsUser) {
-                                        $data[] = '<i class="fas fa-user"></i> ' . $shopOrder->shopCart->cmsUser->asText;
+                                        $data[] = '<i class="fas fa-user"></i>&nbsp;' . $shopOrder->shopCart->cmsUser->asText;
                                     } else {
-                                        $data[] = '<i class="fas fa-user"></i> ' . "Неавторизован";
+                                        $data[] = '<small style="color: gray;"><i class="fas fa-user"></i>&nbsp;' . "Неавторизован</small>";
                                     }
                                 }
 
