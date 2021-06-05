@@ -328,8 +328,8 @@ class ShopOfferChooseHelper extends Component
                 /**
                  * @var $property RelatedPropertyModel
                  */
-                $property = $data['property'];
-                $options = $data['options'];
+                $property = ArrayHelper::getValue($data, "property");
+                $options = (array) ArrayHelper::getValue($data, "options");
 
                 if ($property && $options && $property->property_type == PropertyType::CODE_LIST) {
                     $options = $property->getEnums()->andWhere(['id' => array_keys($options)])->orderBy(['priority' => SORT_ASC])->all();
