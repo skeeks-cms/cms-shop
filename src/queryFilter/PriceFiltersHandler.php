@@ -23,6 +23,7 @@ use yii\base\Model;
 use yii\data\DataProviderInterface;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
+use yii\db\Query;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
@@ -146,16 +147,44 @@ class PriceFiltersHandler extends Model
         $query->andWhere('cms_content_element.id IN ('.$this->cms_content_element_ids.")");*/
 
         $query->joinWith('shopProduct.shopProductPrices.currency as currency');
+
         $query->select([
-            //'min(price) as min', 'max(price) as max',
-            'min(currency.course * prices.price) as min',
-            'max(currency.course * prices.price) as max',
-            //'realPrice' => '( currency.course * prices.price )',
-            //'realPrice' => '( (SELECT course FROM money_currency WHERE money_currency.code = prices.currency_code) * prices.price )',
+                        'min' => "IF(shopProduct.product_type != 'offers', 
+                           (currency.course * prices.price), 
+                          (
+                                SELECT MIN(p.price) FROM shop_product_price as p 
+                                LEFT JOIN `shop_product` spo ON spo.`id` = p.product_id
+                                
+                                WHERE  
+                                p.`type_price_id` = {$this->type_price_id}
+                                AND spo.offers_pid = cms_content_element.id 
+                            )
+                          )",
+                        'max' => "IF(shopProduct.product_type != 'offers', 
+                           (currency.course * prices.price), 
+                          (
+                                SELECT MIN(p.price) FROM shop_product_price as p 
+                                LEFT JOIN `shop_product` spo ON spo.`id` = p.product_id
+                                WHERE  
+                                p.`type_price_id` = {$this->type_price_id}
+                                AND spo.offers_pid = cms_content_element.id 
+                            )
+                          )",
         ]);
 
+
+        /*$query->select([
+            'min(currency.course * prices.price) as min',
+            'max(currency.course * prices.price) as max',
+        ]);*/
+
+        $outerQuery = (new Query())->from(['inner' => $query])->select([
+            'min' => 'min(min)',
+            'max' => 'max(max)'
+        ]);
+        //echo $outerQuery->createCommand()->rawSql;die;
         //echo $query->createCommand()->rawSql;die;
-        $data = $query->createCommand()->queryOne();
+        $data = $outerQuery->createCommand()->queryOne();
 
         $this->_min_max_data = [
             round(ArrayHelper::getValue($data, 'min'), 2),
@@ -207,10 +236,27 @@ class PriceFiltersHandler extends Model
 
             $query->select([
                 'cms_content_element.*',
-                'realPrice' => '( currency.course * prices.price )',
+                //'realPrice' => "( currency.course * prices.price )',
+                'realPrice' => "IF(shopProduct.product_type != 'offers', 
+   (
+        currency.course * prices.price
+    ), 
+  (
+        SELECT MIN(p.price) FROM shop_product_price as p 
+        LEFT JOIN `shop_product` spo ON spo.`id` = p.product_id
+        LEFT JOIN `shop_store_product` `shopStoreProductsInner` ON
+        (
+            `shopStoreProductsInner`.`shop_product_id` = p.product_id
+        )
+        WHERE  
+        p.`type_price_id` = {$this->type_price_id} 
+        AND spo.offers_pid = cms_content_element.id 
+        AND (`shopStoreProductsInner`.`quantity` > 0)
+    )
+  )",
             ]);
 
-            //print_r($query->createCommand()->rawSql);die;
+//            print_r($query->createCommand()->rawSql);die;
 
             if ($this->to) {
                 $query->andHaving(['<=', 'realPrice', $this->to]);
@@ -218,6 +264,8 @@ class PriceFiltersHandler extends Model
             if ($this->from) {
                 $query->andHaving(['>=', 'realPrice', $this->from]);
             }
+            
+            //print_r($query->createCommand()->rawSql);die;
         }
 
         return $this;
