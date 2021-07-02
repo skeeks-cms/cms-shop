@@ -226,7 +226,7 @@ JS
 <?
 $this->registerCss(<<<CSS
 .sx-main-col {
-    margin-right: 400px;
+    padding-right: 400px !important;
 }
 
 .sx-subproduct-info hr{
@@ -234,12 +234,12 @@ $this->registerCss(<<<CSS
     margin-bottom: 0px;
 }
 .sx-subproduct-info {
-width: 400px;
-position: fixed;
-top: 0px;
-right: 0px;
-height: 100%;
-overflow-y: auto;
+    width: 400px;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    overflow-y: auto;
 }
 .sx-info-block {
     font-size: 10px;
@@ -254,10 +254,27 @@ overflow-y: auto;
 .sx-info-block p {
     margin-bottom: 0px;
 }
+
+@media (max-width: 1300px) {
+    .sx-subproduct-info {
+        width: 300px;
+    }
+    .sx-main-col {
+        padding-right: 300px !important;
+    }
+}
+@media (max-width: 1100px) {
+    .sx-subproduct-info {
+        width: 200px;
+    }
+    .sx-main-col {
+        padding-right: 200px !important;
+    }
+}
 CSS
 );
 ?>
-    <div class="sx-subproduct-info g-bg-gray-light-v8">
+    <div class="sx-subproduct-info sx-bg-secondary">
         <? endif; ?>
 
 
