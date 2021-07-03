@@ -182,7 +182,7 @@ $this->registerJs(<<<JS
             var value = self.get("value");
             if (value) {
                 _.each(value, function(barcodeData, key) {
-                    self._createRow(barcodeData.type, barcodeData.value);
+                    self._createRow(barcodeData.barcode_type, barcodeData.value);
                 });
             }
         },

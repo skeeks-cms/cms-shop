@@ -357,6 +357,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $shopProductBarcode->value = $value;
                 $shopProductBarcode->barcode_type = $type;
 
+                //print_r($shopProductBarcode->toArray());
                 if (!$shopProductBarcode->save()) {
                     throw new Exception("Ошибка сохранения кода: {$shopProductBarcode->value}");
                 }
