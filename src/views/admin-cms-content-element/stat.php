@@ -28,7 +28,28 @@ $q = \skeeks\cms\models\CmsContentElement::find()->from([
     ]);
 
 
-$qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
+$qProducts = \skeeks\cms\shop\models\ShopStoreProduct::find()
+    ->from([
+        'ssp' => \skeeks\cms\shop\models\ShopStoreProduct::tableName(),
+    ])
+    ->joinWith('shopProduct as shopProduct')
+    ->joinWith('shopProduct.cmsContentElement as cce')
+    ->andWhere(['!=', 'shopProduct.created_by', new \yii\db\Expression("ssp.updated_by")])
+    //->andWhere(['=', 'cce.cms_site_id', \Yii::$app->skeeks->site->id])
+    ->groupBy(['ssp.updated_by'])
+    ->select([
+        'count'      => new \yii\db\Expression("count(1)"),
+        "main_cce_by" => 'ssp.updated_by',
+        "shop_product_id" => 'ssp.shop_product_id',
+        "id" => 'ssp.id',
+        //"delta" => new \yii\db\Expression("abs(ssp.updated_at - shopProduct.updated_at)"),
+    ])
+    /*->andHaving([
+        '>=', 'delta', 60
+    ])*/
+;
+
+/*$qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
                 'c' => \skeeks\cms\models\CmsContentElement::tableName(),
             ])
             //->cmsSite()
@@ -49,18 +70,18 @@ $qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
             ])
             /*->andHaving([
                 '>=', 'delta', 60
-            ])*/
-;
+            ])
+;*/
 
 if ($dm->from) {
     $start = strtotime($dm->from." 00:00:00");
     $q->andWhere(['>=', 'c.created_at', $start]);
-    $qProducts->andWhere(['>=', 'c.main_cce_at', $start]);
+    $qProducts->andWhere(['>=', 'ssp.updated_at', $start]);
 }
 if ($dm->to) {
     $to = strtotime($dm->to." 23:59:59");
     $q->andWhere(['<=', 'c.created_at', $to]);
-    $qProducts->andWhere(['<=', 'c.main_cce_at', $to]);
+    $qProducts->andWhere(['<=', 'ssp.updated_at', $to]);
 }
 //print_r($qProducts->createCommand()->rawSql);die;
 
