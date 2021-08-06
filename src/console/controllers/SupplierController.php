@@ -16,6 +16,9 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopStore;
+use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopSupplier;
 use skeeks\cms\shop\models\ShopSupplierProperty;
 use skeeks\cms\shop\models\ShopSupplierPropertyOption;
@@ -74,6 +77,134 @@ class SupplierController extends Controller
         echo $q->createCommand()->rawSql . PHP_EOL;
     }
 
+    /**
+     *
+     * Берет товары производителя и связывает их с моделями по артикулу и производителю
+     *
+     * @param null $cms_site_id
+     */
+    public function actionJoinStoreProducts($shop_store_id = null)
+    {
+        /**
+         * @var $vendor ShopCmsContentProperty
+         * @var $vendorCode ShopCmsContentProperty
+         * @var ShopStoreProperty $shopStorePropertyVendor
+         * @var ShopStoreProperty $shopStorePropertyVendorCode
+         * @var ShopStore $shopStore
+         **/
+        $vendor = ShopCmsContentProperty::find()->where(['is_vendor' => 1])->one();
+        $vendorCode = ShopCmsContentProperty::find()->where(['is_vendor_code' => 1])->one();
+
+        if (!$vendor || !$vendorCode) {
+            $this->stdout("Не настроено свойство производителя и артикула производителя", Console::FG_RED);
+            die;
+        }
+
+        $shopStore = ShopStore::findOne($shop_store_id);
+
+        $query = ShopStoreProduct::find()
+            ->andWhere(['shop_store_id' => $shop_store_id])
+            ->andWhere(['shop_product_id' => null])
+            ->orderBy([ShopStoreProduct::tableName() . '.id' => SORT_DESC])
+        ;
+
+        $this->stdout("Товаров не привязано: {$query->count()}\n");
+        sleep(3);
+
+        $shopStorePropertyVendor = $shopStore->getShopStoreProperties()->andWhere(['cms_content_property_id' => $vendor->cms_content_property_id])->one();
+        $shopStorePropertyVendorCode = $shopStore->getShopStoreProperties()->andWhere(['cms_content_property_id' => $vendorCode->cms_content_property_id])->one();
+
+        if (!$shopStorePropertyVendor || !$shopStorePropertyVendorCode) {
+            $this->stdout("Не настроена связь свойств поставщика и сайта", Console::FG_RED);
+            die;
+        }
+
+
+        /**
+         * @var ShopStoreProduct $model
+         * @var ShopSupplierPropertyOption $shopStorePropertyOption
+         */
+        foreach ($query->each(10) as $model)
+        {
+            $this->stdout($model->id . "\n");
+
+            $valVendor = trim(ArrayHelper::getValue($model->external_data, $shopStorePropertyVendor->external_code));
+            $valVendorCode = trim(ArrayHelper::getValue($model->external_data, $shopStorePropertyVendorCode->external_code));
+
+            if (!$valVendor || !$valVendorCode) {
+                $this->stdout("\tНет данные о коде или поставщике\n");
+                continue;
+            }
+
+            $shopStorePropertyOption = $shopStorePropertyVendor->getShopStorePropertyOptions()->andWhere(['name' => $valVendor])->one();
+            if (!$shopStorePropertyOption) {
+                $this->stdout("\tОпция не найдена\n");
+                continue;
+            }
+
+            if (!$shopStorePropertyOption->cms_content_element_id) {
+                $this->stdout("\tОпция найдена но не привязана с cms\n");
+                continue;
+            }
+
+
+
+            try {
+                $find = ShopCmsContentElement::find()
+                    ->joinWith("shopProduct as sp")
+                    ->joinWith("cmsSite as cmsSite")
+                    ->andWhere(['cmsSite.is_default' => 1])
+                ;
+
+
+                $find1 = CmsContentElementProperty::find()->select(['element_id as id'])
+                            ->where([
+                                "value_element_id"  => $shopStorePropertyOption->cms_content_element_id,
+                                "property_id" => $vendor->cmsContentProperty->id,
+                            ]);
+                $find2 = CmsContentElementProperty::find()->select(['element_id as id'])
+                            ->where([
+                                "value"  => $valVendorCode,
+                                "property_id" => $vendorCode->cmsContentProperty->id,
+                            ]);
+
+                $find->andWhere([
+                    CmsContentElement::tableName().".id" => $find1,
+                ]);
+
+                $find->andWhere([
+                    CmsContentElement::tableName().".id" => $find2,
+                ]);
+
+                /**
+                 * @var $globalModel ShopCmsContentElement
+                 */
+                if ($globalModel = $find->one()) {
+                    $this->stdout("\tНайдена модель: {$globalModel->id}\n", Console::FG_GREEN);
+                    //$sp = $model->shopProduct;
+                    $model->shop_product_id = $globalModel->id;
+                    if ($model->save()) {
+                        $this->stdout("\t\t Связана\n", Console::FG_GREEN);
+                    } else {
+                        $this->stdout("\t\t Не связана!" . print_r($model->errors, true) . "\n", Console::FG_RED);
+                        $this->stdout("\t\t Ожидание 5 сек..." . "\n", Console::FG_RED);
+                        //sleep(5);
+                    }
+                    //die;
+                } else {
+                    $this->stdout("\tНе найдена модель\n", Console::FG_RED);
+                }
+            } catch (\Exception $exception) {
+                $this->stdout($exception->getMessage() . "\n", Console::FG_RED);
+            }
+
+
+            //$this->stdout("\t" . $valVendor . "\n");
+            //$this->stdout("\t" . $valVendorCode . "\n");
+            //die;
+        }
+
+    }
     /**
      *
      * Берет товары производителя и связывает их с моделями по артикулу и производителю
