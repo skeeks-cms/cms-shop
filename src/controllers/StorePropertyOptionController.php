@@ -219,7 +219,7 @@ HTML
                     $connect['connect']['fields']['cms_content_element_id'] = [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(
-                            CmsContentElement::find()->andWhere(['content_id' => $content_id])->all(),
+                            CmsContentElement::find()->cmsSite()->andWhere(['content_id' => $content_id])->all(),
                             'id',
                             'asText'
                         ),

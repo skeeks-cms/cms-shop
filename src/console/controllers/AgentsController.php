@@ -8,12 +8,21 @@
 
 namespace skeeks\cms\shop\console\controllers;
 
+use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsContentElementProperty;
+use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsTree;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\shop\components\ShopComponent;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\shop\models\ShopUser;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\console\Controller;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
@@ -57,6 +66,233 @@ class AgentsController extends Controller
             foreach ($shopSites as $shopSite) {
                 $this->stdout("\tСайт: " . $shopSite->id . "\n");
                 \common\modules\sitika\components\ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
+            }
+        }
+    }
+
+
+    /**
+     * @param null $cms_site_id какой сайт обновлять
+     * @param int  $is_all 1 - все товары, 0 - только новые
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionUpdateProductsReceiverSites($cms_site_id = null, $is_all = 0)
+    {
+        $this->actionUpdatePropertyReceiverSites($cms_site_id);
+        /**
+         * @var $shopSites ShopSite[]
+         */
+        $shopSites = ShopSite::find()->where(['is_receiver' => 1]);
+        //$shopSites->andWhere(['>=', 'id', 103]);
+        if ($cms_site_id) {
+            $shopSites->andWhere(['id' => $cms_site_id]);
+        }
+
+        $shopSites = $shopSites->all();
+        $defaultCmsSite = CmsSite::find()->default()->one();
+        if (!$defaultCmsSite) {
+            $this->stdout("\tНет сайта по умолчанию\n");
+            return false;
+        }
+
+        //Сначала нужно создать характеристики
+        if ($shopSites) {
+            $this->stdout("Найдено сайтов получателей: ".count($shopSites)."\n");
+            foreach ($shopSites as $shopSite) {
+                $this->stdout("Сайт: ".$shopSite->id."\n");
+
+                $query = ShopCmsContentElement::find()
+                    ->cmsSite($shopSite->cmsSite)
+                    ->joinWith("shopProduct as sp", true, "INNER JOIN")
+                    ->joinWith("mainCmsContentElement as mainCCE", true, "INNER JOIN")
+                ;
+                
+                if ($is_all == 0) {
+                    $query->andWhere([
+                        'or',
+                        ['>=', "mainCCE.updated_at", new Expression(CmsContentElement::tableName(). ".updated_at")],
+                        [CmsContentElement::tableName(). ".updated_at" => null]
+                    ]);
+                }
+                
+                $this->stdout("\tТоваров: " . $query->count() . "\n");
+                //$this->stdout("\tСтарт через 5 сек... \n");
+                //print_r($query->createCommand()->rawSql);die;
+                //sleep(5);
+                $total = $query->count();
+                Console::startProgress(0,$total);
+
+
+
+                /**
+                 * @var $shopCmsContentElement ShopCmsContentElement
+                 */
+                $counter = 0;
+                foreach ($query->each(10) as $shopCmsContentElement)
+                {
+                    $counter ++;
+                    Console::updateProgress($counter,$total);
+                    //$this->stdout("\tТовар: {$shopCmsContentElement->id}\n");
+                    //die;
+
+                    //Модель
+                    $mainCmsContentElement = $shopCmsContentElement->mainCmsContentElement;
+                    $mainCmsContentElement->relatedPropertiesModel->initAllProperties();
+                    $mainData = $mainCmsContentElement->relatedPropertiesModel->toArray();
+                    if (!$mainData) {
+                        continue;
+                    }
+
+                    //Текущий товар
+                    $newElementProperties = $shopCmsContentElement->relatedPropertiesModel;
+                    $newElementProperties->initAllProperties();
+                    $newData = $newElementProperties->toArray();
+
+                    foreach ($newData as $code => $valueNull)
+                    {
+                        $value = ArrayHelper::getValue($mainData, $code);
+                        /**
+                         * @var CmsContentElementProperty $property
+                         */
+                        $property = $mainCmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
+                        $propertyNew = $newElementProperties->getRelatedProperty($code);
+                        if ($property->property_type == PropertyType::CODE_ELEMENT) {
+
+
+                            if (is_array($value)) {
+                                $newValue = [];
+                                foreach ($value as $valueId)
+                                {
+                                    $element = CmsContentElement::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cce_id' => (int) $valueId])->one();
+                                    if (!$element) {
+                                        $mainValueElement = CmsContentElement::find()->cmsSite($defaultCmsSite)->andWhere(['id' => (int) $valueId])->one();
+
+                                        $element = new CmsContentElement();
+                                        $element->content_id = $mainValueElement->content_id;
+                                        $element->cms_site_id = $shopSite->cmsSite->id;
+                                        $element->main_cce_id = (int) $valueId;
+                                        $element->name = $mainValueElement->name;
+                                        if (!$element->save()) {
+                                            print_r($element->errors, true);
+                                        }
+                                    }
+
+                                    $newValue[] = $element->id;
+                                }
+                            } else {
+                                $newValue = null;
+                                $element = CmsContentElement::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cce_id' => (int) $value])->one();
+                                if (!$element) {
+                                    $mainValueElement = CmsContentElement::find()->cmsSite($defaultCmsSite)->andWhere(['id' => (int) $value])->one();
+
+                                    $element = new CmsContentElement();
+                                    $element->content_id = $mainValueElement->content_id;
+                                    $element->cms_site_id = $shopSite->cmsSite->id;
+                                    $element->main_cce_id = (int) $value;
+                                    $element->name = $mainValueElement->name;
+                                    if (!$element->save()) {
+                                        print_r($element->errors, true);
+                                    }
+                                }
+
+                                $newValue = $element->id;
+                            }
+
+                            $newElementProperties->setAttribute($code, $newValue);
+
+                        } elseif ($property->property_type == PropertyType::CODE_LIST) {
+                            if (is_array($value)) {
+                                $newValue = [];
+                                foreach ($value as $valueId)
+                                {
+
+                                    $mainEnum = $property->getEnums()->andWhere(['id' => $valueId])->one();
+                                    $enum = $propertyNew->getEnums()->andWhere(['code' => $mainEnum->code])->one();
+                                    if (!$enum) {
+
+                                        $enum = new CmsContentPropertyEnum();
+                                        $enum->property_id = $propertyNew->id;
+                                        $enum->code = $mainEnum->code;
+                                        $enum->value = $mainEnum->value;
+                                        if (!$enum->save()) {
+                                            print_r($enum->errors, true);
+                                        }
+                                    }
+
+                                    $newValue[] = $enum->id;
+                                }
+                            } else {
+                                $newValue = null;
+                                $mainEnum = $property->getEnums()->andWhere(['id' => $valueId])->one();
+                                $enum = $propertyNew->getEnums()->andWhere(['code' => $mainEnum->code])->one();
+                                if (!$enum) {
+                                    $mainEnum = CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->andWhere(['code' => $valueId])->one();
+
+                                    $enum = new CmsContentPropertyEnum();
+                                    $enum->property_id = $propertyNew->id;
+                                    $enum->code = $mainEnum->code;
+                                    $enum->value = $mainEnum->value;
+                                    if (!$enum->save()) {
+                                        print_r($enum->errors, true);
+                                    }
+                                }
+
+                                $newValue = $enum->id;
+                            }
+
+                            $newElementProperties->setAttribute($code, $newValue);
+                        } else {
+                            $newElementProperties->setAttribute($code, $value);
+                        }
+                    }
+
+
+
+
+                    if (!$newElementProperties->save())
+                    {
+                        $this->stdout("model: {$mainCmsContentElement->id}\n");
+                        $this->stdout("product: {$shopCmsContentElement->id}\n");
+                        $this->stdout("error!!!\n");
+                        print_r($newElementProperties->errors);
+
+                        $error = print_r($newElementProperties->errors, true);
+                        \Yii::error("Ошибка сохранения свойств model: {$mainCmsContentElement->id}, product: {$shopCmsContentElement->id}, error: {$error}", self::class);
+                        continue;
+                    }
+                    $shopCmsContentElement->updated_at = time();
+                    $shopCmsContentElement->update(['updated_at']);
+                    //die;
+
+
+                }
+
+                Console::endProgress("end".PHP_EOL);
+
+            }
+        }
+    }
+
+    public function actionUpdatePropertyReceiverSites($cms_site_id = null)
+    {
+        $shopSites = ShopSite::find()->where(['is_receiver' => 1]);
+        if ($cms_site_id) {
+            $shopSites->andWhere(['id' => $cms_site_id]);
+        }
+        
+        /**
+         * @var $shopSites ShopSite[]
+         */
+        $shopSites = $shopSites->all();
+
+        //Сначала нужно создать характеристики
+        if ($shopSites) {
+            $this->stdout("Найдено сайтов получателей: " . count($shopSites) . "\n");
+            foreach ($shopSites as $shopSite) {
+                $this->stdout("\tСайт: " . $shopSite->id . "\n");
+                \common\modules\sitika\components\ShopComponent::importPropertiesOnSite($shopSite->cmsSite);
             }
         }
     }

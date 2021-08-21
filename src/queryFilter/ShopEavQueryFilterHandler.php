@@ -52,7 +52,7 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
                 }*/
 
                 //Если показывается сайт который собирает товары с других сайтов
-                $tmpIds = implode(",", $ids);
+                /*$tmpIds = implode(",", $ids);
                 if (\Yii::$app->skeeks->site->shopSite->is_receiver) {
                     //$mainIds = ShopProduct::find()->select(['main_pid'])->where(new Expression("id in ({$tmpIds})"))->andWhere(['is not', 'main_pid', null])->column();
                     $mainIds = ShopCmsContentElement::find()
@@ -63,7 +63,7 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
                     if ($mainIds) {
                         $ids = array_merge($ids, $mainIds);
                     }
-                }
+                }*/
                 /*print_r($ids);die;*/
 
                 $this->elementIds = $ids;

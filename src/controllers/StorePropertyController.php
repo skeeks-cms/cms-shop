@@ -340,7 +340,7 @@ HTML
                     'cms_content_property_id' => [
                         'class' => SelectField::class,
                         'items' => ArrayHelper::map(
-                            CmsContentProperty::find()->all(),
+                            CmsContentProperty::find()->cmsSite()->all(),
                             'id',
                             'asText'
                         ),
