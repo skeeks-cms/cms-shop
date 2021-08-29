@@ -26,6 +26,7 @@ use yii\widgets\ActiveForm;
 
 /**
  * @property string $valueAsText
+ * @property string $currentValue
  * 
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -48,7 +49,9 @@ class SortFiltersHandler extends Model
 
     public function init()
     {
+        $this->value = $this->currentValue;
         parent::init();
+
 
         if (!$this->type_price_id) {
             $typePrice = \Yii::$app->shop->baseTypePrice;
@@ -56,6 +59,30 @@ class SortFiltersHandler extends Model
                 $this->type_price_id = $typePrice->id;
             }
         }
+    }
+
+    public function load($data, $formName = NULL)
+    {
+        $result = parent::load($data, $formName);
+        \Yii::$app->session->set("sx-sort-value", $this->value);
+
+        return $result;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentValue()
+    {
+        if (\Yii::$app->session->offsetExists("sx-sort-value")) {
+            $value = (string) \Yii::$app->session->get("sx-sort-value");
+            $options = $this->getSortOptions();
+            if (isset($options[$value])) {
+                return $value;
+            }
+        }
+
+        return '-popular';
     }
 
     /**

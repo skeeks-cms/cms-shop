@@ -27,6 +27,7 @@ use yii\widgets\ActiveForm;
 
 /**
  * @property string $valueAsText
+ * @property int $currentValue
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -47,8 +48,24 @@ class AvailabilityFiltersHandler extends Model
 
     public function init()
     {
-        $this->value = (int) \Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity;
+        $this->value = $this->currentValue;
         return parent::init();
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentValue()
+    {
+        if (\Yii::$app->session->offsetExists("sx-available-value")) {
+            $value = (int) \Yii::$app->session->get("sx-available-value");
+            $options = $this->getOptions();
+            if (isset($options[$value])) {
+                return $value;
+            }
+        }
+
+        return (int) \Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity;
     }
     /**
      * @return array
@@ -73,6 +90,14 @@ class AvailabilityFiltersHandler extends Model
     public function applyToDataProvider(DataProviderInterface $dataProvider)
     {
         return $this->applyToQuery($dataProvider->query);
+    }
+
+    public function load($data, $formName = NULL)
+    {
+        $result = parent::load($data, $formName);
+        \Yii::$app->session->set("sx-available-value", $this->value);
+
+        return $result;
     }
     /**
      * @param QueryInterface $activeQuery
