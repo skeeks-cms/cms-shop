@@ -40,6 +40,9 @@ abstract class PaysystemHandler extends Model implements IHasConfigForm
     {
         if (!$shopBill = $shopOrder->getShopOrderBills()
             ->andWhere([
+                'closed_at' => null
+            ])
+            ->andWhere([
                 'paid_at' => null
             ])
             ->andWhere([
