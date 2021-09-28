@@ -152,10 +152,9 @@ class SortFiltersHandler extends Model
                             'cms_content_element.*',
                             //'realPrice' => '( currency.course * prices.price )',
                         ]);
-                        $query->andHaving([
+                        /*$query->andHaving([
                             '>', 'realPrice', 0,
-                            //'realPrice' => '( currency.course * prices.price )',
-                        ]);
+                        ]);*/
 
                         $query->orderBy(['realPrice' => SORT_ASC]);
 
@@ -175,6 +174,9 @@ class SortFiltersHandler extends Model
                             'cms_content_element.*',
                             //'realPrice' => '( currency.course * prices.price )',
                         ]);
+                        /*$query->andHaving([
+                            '>', 'realPrice', 0,
+                        ]);*/
 
                         $query->orderBy(['realPrice' => SORT_DESC]);
                     }

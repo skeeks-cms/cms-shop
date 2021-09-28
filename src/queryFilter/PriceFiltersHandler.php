@@ -234,6 +234,11 @@ class PriceFiltersHandler extends Model
 
             //$query->andWhere(['prices.type_price_id' => $this->type_price_id]);
 
+            $quantitySql = '';
+            if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
+                $quantitySql = "AND (`shopStoreProductsInner`.`quantity` > 0)";
+            }
+            
             $query->select([
                 'cms_content_element.*',
                 //'realPrice' => "( currency.course * prices.price )',
@@ -251,7 +256,7 @@ class PriceFiltersHandler extends Model
         WHERE  
         p.`type_price_id` = {$this->type_price_id} 
         AND spo.offers_pid = cms_content_element.id 
-        AND (`shopStoreProductsInner`.`quantity` > 0)
+        {$quantitySql}
     )
   )",
             ]);

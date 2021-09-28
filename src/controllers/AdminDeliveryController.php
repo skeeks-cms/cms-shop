@@ -220,6 +220,10 @@ class AdminDeliveryController extends BackendModelStandartController
                         'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where(['is_active' => 1])->all(), 'code', 'code'),
                     ],
 
+                                        'order_price_from',
+                                        'order_price_to',
+
+
                 ],
             ],
             'additionally' => [
