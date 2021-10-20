@@ -63,13 +63,13 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                             'cmsContentElement.cms_site_id' => new Expression(CmsSite::tableName().".id"),
                         ]);
 
-                        $shopProductConnectedQuery = ShopProduct::find()->joinWith("cmsContentElement as cmsContentElement")->select(['count(shop_product.id) as inner_count1'])->where([
+                        /*$shopProductConnectedQuery = ShopProduct::find()->joinWith("cmsContentElement as cmsContentElement")->select(['count(shop_product.id) as inner_count1'])->where([
                             'cmsContentElement.cms_site_id' => new Expression(CmsSite::tableName().".id"),
                         ])->andWhere([
                             'is not',
                             'cmsContentElement.main_cce_id',
                             null,
-                        ]);
+                        ]);*/
 
 
                         $query->select([
@@ -79,7 +79,7 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                             'countShopStores'            => $shopStoreQuery,
                             'countShopTypePrices'        => $shopTypePricesQuery,
                             'countShopProducts'          => $shopProductQuery,
-                            'countShopProductsConnected' => $shopProductConnectedQuery,
+                            //'countShopProductsConnected' => $shopProductConnectedQuery,
                         ]);
                     },
 
@@ -142,12 +142,12 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                                 } else {
                                     $result = $cmsSite->raw_row['countShopProducts'];
 
-                                    if ($cmsSite->raw_row['countShopProductsConnected']) {
+                                    /*if ($cmsSite->raw_row['countShopProductsConnected']) {
                                         $result .= " (".Html::tag('b', $cmsSite->raw_row['countShopProductsConnected'], [
                                                 'title' => 'Количество привязанных/продаваемых товаров',
                                                 'style' => 'color: green;',
                                             ]).")";
-                                    }
+                                    }*/
 
 
                                     return $result;
