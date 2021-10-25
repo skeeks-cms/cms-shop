@@ -842,9 +842,9 @@ class ShopProduct extends \skeeks\cms\models\Core
                 ['>', 'price', 0],
                 ['type_price_id' => ArrayHelper::map($basPriceTypes, 'id', 'id')],
             ])
-            ->orWhere(
+            /*->orWhere(
                 ['type_price_id' => \Yii::$app->shop->baseTypePrice->id]
-            )
+            )*/
             ->orderBy(['realPrice' => SORT_ASC]);
     }
 
