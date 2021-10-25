@@ -19,6 +19,7 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
+use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -35,9 +36,9 @@ class AdminShopCmsContentPropertyController extends BackendModelStandartControll
         $this->generateAccessActions = false;
 
         $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
+            /*if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
-            }
+            }*/
             return \Yii::$app->user->can($this->uniqueId);
         };
 
@@ -67,6 +68,19 @@ HTML
                 "backendShowings" => false,
                 "filters"         => false,
                 "grid"            => [
+
+                    'on init' => function (Event $e) {
+
+                        $query = $e->sender->dataProvider->query;
+
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query->joinWith('cmsContentProperty as cmsContentProperty', true, "INNER JOIN");
+                        $query->andWhere(['cmsContentProperty.cms_site_id' => \Yii::$app->skeeks->site->id]);
+                    },
+
 
                     'visibleColumns' => [
                         'checkbox',
@@ -116,7 +130,7 @@ HTML
         return [
             'cms_content_property_id'          => [
                 'class' => SelectField::class,
-                'items' => ArrayHelper::map(CmsContentProperty::find()->all(), 'id', 'asText'),
+                'items' => ArrayHelper::map(CmsContentProperty::find()->cmsSite()->all(), 'id', 'asText'),
             ],
             'is_offer_property'          => [
                 'class' => BoolField::class,
