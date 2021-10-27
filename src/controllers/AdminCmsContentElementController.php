@@ -669,9 +669,9 @@ HTML
                             return false;
                         }
 
-                        if ($model->main_cce_id) {
+                        /*if ($model->main_cce_id) {
                             return false;
-                        }
+                        }*/
 
                         return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
                     },
@@ -721,7 +721,9 @@ HTML
 
         if (isset($actions['shop'])) {
             unset($actions['shop']);
-
+        }
+        if (isset($actions['connect-to-main'])) {
+            unset($actions['connect-to-main']);
         }
 
         return $actions;
