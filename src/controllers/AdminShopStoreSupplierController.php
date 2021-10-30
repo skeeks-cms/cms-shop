@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
@@ -23,8 +22,10 @@ use skeeks\cms\widgets\GridView;
 use skeeks\cms\ya\map\widgets\YaMapInput;
 use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
@@ -121,20 +122,20 @@ HTML
                         ],
 
                         'panel' => [
-                            'label' => '',
-                            'format' => 'raw',
+                            'label'         => '',
+                            'format'        => 'raw',
                             'headerOptions' => [
                                 'style' => 'width: 120px;',
                             ],
-                            'value' => function(ShopStore $shopStore) {
+                            'value'         => function (ShopStore $shopStore) {
                                 return Html::a('Панель <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/store-product', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
-                                    'class' => 'btn btn-secondary',
-                                    'data-pjax' => 0,
-                                    'target' => '_blank',
-                                    'title' => 'Открыть интерфейс управления в новой вкладке',
-                                    'data-toggle' => 'tooltip'
+                                    'class'       => 'btn btn-secondary',
+                                    'data-pjax'   => 0,
+                                    'target'      => '_blank',
+                                    'title'       => 'Открыть интерфейс управления в новой вкладке',
+                                    'data-toggle' => 'tooltip',
                                 ]);
-                            }
+                            },
                         ],
 
                         'custom' => [
@@ -274,95 +275,172 @@ CSS
         );
 
         return [
-            'cms_image_id' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => AjaxFileUploadWidget::class,
-                'widgetConfig' => [
-                    'accept'   => 'image/*',
-                    'multiple' => false,
+            'main' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Main'),
+                'fields' => [
+                    'cms_image_id' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxFileUploadWidget::class,
+                        'widgetConfig' => [
+                            'accept'   => 'image/*',
+                            'multiple' => false,
+                        ],
+                    ],
+
+                    'name',
+
+
                 ],
             ],
-            'is_active'    => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
+            'selling_price' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Формирование розничной цены'),
+                'fields' => [
+                    'source_selling_price' => [
+                        'class' => SelectField::class,
+                        'allowNull' => false,
+                        'items' => [
+                            'purchase_price' => 'Закупочная цена',
+                            'selling_price' => 'Розничная цена',
+                        ]
+                    ],
+                    'selling_extra_charge' => [
+                        'class' => NumberField::class,
+                        'append' => "%",
+                        'step' => 0.01
+                    ],
+                ],
             ],
-            'is_supplier'  => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
+            'purchase_price' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Формирование закупочной цены'),
+                'elementOptions' => [
+                    'isOpen' => false
+                ],
+                'fields' => [
+                    'source_purchase_price' => [
+                        'class' => SelectField::class,
+                        'allowNull' => false,
+                        'items' => [
+                            'purchase_price' => 'Закупочная цена',
+                            'selling_price' => 'Розничная цена',
+                        ]
+                    ],
+                    'purchase_extra_charge' => [
+                        'class' => NumberField::class,
+                        'append' => "%",
+                        'step' => 0.01
+                    ],
+                ],
             ],
-            'name',
+
+            'additional' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Дополнительно'),
+                'elementOptions' => [
+                    'isOpen' => false
+                ],
+                'fields' => [
+                    'is_active'    => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'is_supplier'  => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'external_id',
+                    'priority'    => [
+                        'class' => NumberField::class,
+                    ],
+                ]
+            ],
 
             'description' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => CKEditorWidget::class,
-                'widgetConfig' => [
-                    'preset'        => false,
-                    'clientOptions' => [
-                        'enterMode'      => 2,
-                        'height'         => 300,
-                        'allowedContent' => true,
-                        'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
-                        'toolbar'        => [
-                            ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
-                        ],
-                    ],
-
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Описание'),
+                'elementOptions' => [
+                    'isOpen' => false
                 ],
-            ],
+                'fields' => [
+                    'description' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => CKEditorWidget::class,
+                        'widgetConfig' => [
+                            'preset'        => false,
+                            'clientOptions' => [
+                                'enterMode'      => 2,
+                                'height'         => 300,
+                                'allowedContent' => true,
+                                'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
+                                'toolbar'        => [
+                                    ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
+                                ],
+                            ],
 
-            'external_id',
-            'priority'    => [
-                'class' => NumberField::class,
-            ],
-
-
-            'coordinates' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => YaMapInput::class,
-                'widgetConfig' => [
-                    'YaMapWidgetOptions' => [
-                        'options' => [
-                            'style' => 'height: 400px;',
                         ],
                     ],
+                ]
+            ],
+            'addresses' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Контакты'),
+                'elementOptions' => [
+                    'isOpen' => false
+                ],
+                'fields' => [
+                    'coordinates' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => YaMapInput::class,
+                        'widgetConfig' => [
+                            'YaMapWidgetOptions' => [
+                                'options' => [
+                                    'style' => 'height: 400px;',
+                                ],
+                            ],
 
-                    'clientOptions' => [
-                        'select' => new \yii\web\JsExpression(<<<JS
-        function(e, data)
-        {
-            var lat = data.coords[0];
-            var long = data.coords[1];
-            var address = data.address;
-            var phone = data.phone;
-            var email = data.email;
-
-            $('#shopstore-address').val(address);
-            $('#shopstore-latitude').val(lat);
-            $('#shopstore-longitude').val(long);
-        }
+                            'clientOptions' => [
+                                'select' => new \yii\web\JsExpression(<<<JS
+            function(e, data)
+            {
+                var lat = data.coords[0];
+                var long = data.coords[1];
+                var address = data.address;
+                var phone = data.phone;
+                var email = data.email;
+        
+                $('#shopstore-address').val(address);
+                $('#shopstore-latitude').val(lat);
+                $('#shopstore-longitude').val(long);
+            }
 JS
-                        ),
+                                ),
+                            ],
+                        ],
+                    ],
+
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => '<div style="display: block;">',
+                    ],
+                    'address',
+                    'latitude',
+                    'longitude',
+
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => '</div>',
+                    ],
+
+                    'work_time' => [
+                        'class'       => WidgetField::class,
+                        'widgetClass' => \skeeks\yii2\scheduleInputWidget\ScheduleInputWidget::class,
                     ],
                 ],
             ],
 
-            [
-                'class'   => HtmlBlock::class,
-                'content' => '<div style="display: block;">',
-            ],
-            'address',
-            'latitude',
-            'longitude',
 
-            [
-                'class'   => HtmlBlock::class,
-                'content' => '</div>',
-            ],
-
-            'work_time' => [
-                'class'       => WidgetField::class,
-                'widgetClass' => \skeeks\yii2\scheduleInputWidget\ScheduleInputWidget::class,
-            ],
         ];
     }
 

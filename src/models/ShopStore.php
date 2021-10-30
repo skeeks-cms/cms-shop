@@ -28,6 +28,10 @@ use yii\helpers\ArrayHelper;
  * @property string|null        $work_time Рабочее время
  * @property int                $priority
  * @property bool               $is_supplier
+ * @property string             $source_selling_price
+ * @property string             $source_purchase_price
+ * @property float              $purchase_extra_charge
+ * @property float              $selling_extra_charge
  *
  * @property string             $coordinates
  *
@@ -47,6 +51,15 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public static function tableName()
     {
         return '{{%shop_store}}';
+    }
+
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_FIND, function() {
+            $this->selling_extra_charge = (float) $this->selling_extra_charge;
+            $this->purchase_extra_charge = (float) $this->purchase_extra_charge;
+        });
+        return parent::init();
     }
 
     /**
@@ -132,6 +145,28 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
                     return true;
                 },
             ],
+
+            [['source_selling_price', 'source_purchase_price'], 'string', 'max' => 255],
+
+            [[
+                'purchase_extra_charge', 'selling_extra_charge',
+                'source_selling_price', 'source_purchase_price'
+            ], 'required'],
+
+            [['purchase_extra_charge', 'selling_extra_charge'], 'number'],
+            /*[
+                ['purchase_extra_charge', 'selling_extra_charge'],
+                'in',
+                [
+                    'selling_price',
+                    'purchase_price',
+                ],
+            ],*/
+
+            [['source_selling_price'], 'default', 'value' => "selling_price"],
+            [['source_purchase_price'], 'default', 'value' => "purchase_price"],
+
+            [['purchase_extra_charge', 'selling_extra_charge'], 'default', 'value' => 100],
         ]);
     }
 
@@ -142,18 +177,22 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
 
-            'name'         => "Название",
-            'description'  => "Описание",
-            'cms_image_id' => "Изображение",
-            'is_active'    => "Активность",
-            'external_id'  => "ID из внешней системы",
-            'priority'     => "Сортировка",
-            'work_time'    => 'Время работы',
-            'latitude'     => 'Широта',
-            'longitude'    => 'Долгота',
-            'address'      => 'Адрес',
-            'coordinates'  => '',
-            'is_supplier'  => 'Поставщик?',
+            'name'                  => "Название",
+            'description'           => "Описание",
+            'cms_image_id'          => "Изображение",
+            'is_active'             => "Активность",
+            'external_id'           => "ID из внешней системы",
+            'priority'              => "Сортировка",
+            'work_time'             => 'Время работы',
+            'latitude'              => 'Широта',
+            'longitude'             => 'Долгота',
+            'address'               => 'Адрес',
+            'coordinates'           => '',
+            'is_supplier'           => 'Поставщик?',
+            'source_selling_price'  => 'Цена поставщика',
+            'source_purchase_price' => 'Цена поставщика',
+            'purchase_extra_charge' => 'Наценка',
+            'selling_extra_charge'  => 'Наценка',
         ]);
     }
 
@@ -221,7 +260,6 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
         return "";
     }
-
 
 
     /**

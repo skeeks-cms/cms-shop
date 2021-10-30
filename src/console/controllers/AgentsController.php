@@ -37,14 +37,18 @@ class AgentsController extends Controller
      * 
      * @throws \yii\base\Exception
      */
-    public function actionUpdateProductPricesFromStoreProducts()
+    public function actionUpdateProductPricesFromStoreProducts($cms_site_id = null)
     {
+        $q = ShopSite::find();
+        if ($cms_site_id) {
+            $q->andWhere(['id' => $cms_site_id]);
+        }
         /**
          * @var $shopSite ShopSite
          */
-        if ($count = ShopSite::find()->count()) {
+        if ($count = $q->count()) {
             $this->stdout("Найдено сайтов получателей: " . $count . "\n");
-            foreach (ShopSite::find()->each(10) as $shopSite) {
+            foreach ($q->each(10) as $shopSite) {
                 $this->stdout("\tСайт: " . $shopSite->id . "\n");
                 ShopComponent::updateProductPrices($shopSite->cmsSite);
             }

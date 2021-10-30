@@ -20,7 +20,7 @@ FROM (
         ce.id as product_id,
         (
             SELECT
-                ssp.purchase_price
+                (if(store.source_purchase_price = 'purchase_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as purchase_price
             FROM
                 shop_store_product as ssp
                 INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
@@ -66,7 +66,8 @@ UPDATE
                 spp.id,
                 (
                     SELECT
-                        if(ssp.purchase_price is null, 0, ssp.purchase_price) as purchase_price
+                        /*if(ssp.purchase_price is null, 0, ssp.purchase_price) as purchase_price*/
+                        (if(store.source_purchase_price = 'purchase_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as purchase_price
                     FROM
                         shop_store_product as ssp
                         INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
@@ -116,7 +117,8 @@ FROM (
         ce.id as product_id,
         (
             SELECT
-                ssp.selling_price
+                /*ssp.selling_price*/
+                (if(store.source_selling_price = 'selling_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as selling_price
             FROM
                 shop_store_product as ssp
                 INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
@@ -162,7 +164,8 @@ UPDATE
                 spp.id,
                 (
                     SELECT
-                        if(ssp.selling_price is null, 0, ssp.selling_price) as selling_price
+                        /*if(ssp.selling_price is null, 0, ssp.selling_price) as selling_price*/
+                        (if(store.source_selling_price = 'selling_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as selling_price
                     FROM
                         shop_store_product as ssp
                         INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
