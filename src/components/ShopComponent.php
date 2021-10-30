@@ -814,8 +814,12 @@ SQL
     /**
      * @param CmsSite|null $cmsSite
      */
-    static public function updateProductPrices(CmsSite $cmsSite)
+    static public function updateProductPrices(CmsSite $cmsSite = null)
     {
+        if ($cmsSite === null) {
+            $cmsSite = \Yii::$app->skeeks->site;
+        }
+
         $sqlFile = \Yii::getAlias('@skeeks/cms/shop/sql/update-product-from-store-products.sql');
         $sql = file_get_contents($sqlFile);
         $sql = str_replace("{site_id}", $cmsSite->id, $sql);

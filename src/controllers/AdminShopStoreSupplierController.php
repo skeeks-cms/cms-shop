@@ -12,8 +12,10 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
+use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\query\CmsActiveQuery;
+use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\store\StoreUrlRule;
@@ -59,6 +61,50 @@ class AdminShopStoreSupplierController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'on beforeRender' => function (Event $e) {
+
+                        $backendUrl = Url::to(['update-prices']);
+                        \Yii::$app->view->registerJs(<<<JS
+$(".sx-import").on("click", function() {
+    var jBtn = $(this);
+    if (jBtn.hasClass("disabled")) {
+        return false;
+    }
+    var Blocker = sx.block($(".sx-main-col"));
+    jBtn.addClass("disabled");
+    
+    var AjaxQuery = sx.ajax.preparePostQuery("{$backendUrl}");
+    var AjaxHandler = new sx.classes.AjaxHandlerStandartRespose(AjaxQuery);
+    
+    AjaxHandler.on("success", function () {
+        setTimeout(function() {
+            sx.notify.info("Страница сейчас будет перезагружена");
+        }, 1000)
+        
+        setTimeout(function() {
+            window.location.reload();
+        }, 3000)
+        
+        /*Blocker.unblock();
+        jBtn.removeClass("disabled");*/
+    });
+    AjaxHandler.on("error", function () {
+        Blocker.unblock();
+        jBtn.removeClass("disabled");
+    });
+    
+    AjaxQuery.execute();
+    
+    return false;
+});
+JS
+                        );
+
+                        $btn = Html::button("<i class='fas fa-sync'></i> Обновить цены", [
+                            'class' => 'btn btn-primary sx-import',
+                            'title' => 'Эта кнопка запускает обновление цен товаров на сайте',
+                            'data-toggle' => 'tooltip'
+                        ]);
+
                     $e->content = Alert::widget([
                         'closeButton' => false,
                         'options'     => [
@@ -66,7 +112,7 @@ class AdminShopStoreSupplierController extends BackendModelStandartController
                         ],
 
                         'body' => <<<HTML
-Управляйте вашими поставщиками в этом разделе.
+<p>{$btn}</p>
 HTML
                         ,
                     ]);
@@ -444,4 +490,26 @@ JS
         ];
     }
 
+
+    /**
+     * Загрузка данных поставщика на сайт
+     *
+     * @return RequestResponse
+     */
+    public function actionUpdatePrices()
+    {
+        $rr = new RequestResponse();
+        $rr->success = true;
+        $rr->message = "Данные успешно обновлены";
+
+        try {
+            ShopComponent::updateProductPrices();
+        } catch (\Exception $e) {
+            throw $e;
+            $rr->success = false;
+            $rr->message = "Ошибка загрузки данных: " . $e->getMessage();
+        }
+
+        return $rr;
+    }
 }
