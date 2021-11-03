@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\CmsSite;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -45,6 +46,7 @@ class ShopImportCmsSite extends ActiveRecord
     {
         $this->on(self::EVENT_AFTER_INSERT, function() {
 
+
             $shopStore = new ShopStore();
 
             $shopStore->cms_site_id = $this->cms_site_id;
@@ -54,8 +56,13 @@ class ShopImportCmsSite extends ActiveRecord
 
             if (!$shopStore->save()) {
                 $this->delete();
+                /*print_r($shopStore->errors);
+                die('22222');*/
+                //throw new Exception("Ошибка добавления поставщика-склада: " . print_r($shopStore->errors, true));
                 return false;
-            }
+            } 
+
+
 
             $this->receiver_shop_store_id = $shopStore->id;
             $this->save();

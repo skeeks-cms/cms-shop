@@ -148,10 +148,10 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
             [['source_selling_price', 'source_purchase_price'], 'string', 'max' => 255],
 
-            [[
+            /*[[
                 'purchase_extra_charge', 'selling_extra_charge',
                 'source_selling_price', 'source_purchase_price'
-            ], 'required'],
+            ], 'required'],*/
 
             [['purchase_extra_charge', 'selling_extra_charge'], 'number'],
             /*[
