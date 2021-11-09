@@ -403,7 +403,7 @@ SQL
      * Удаление пустых корзин старше
      * @param int $days количество дней
      */
-    public function actionDeleteEmptyCarts($days = 1)
+    public function actionDeleteEmptyCarts($days = 3)
     {
         $condition = [
             //'and',
@@ -420,13 +420,14 @@ SQL
             ),*/
         ];
         //$forDelete = ShopOrder::find()->where($condition)->count(1);
-        $forDeleteQuery = ShopOrder::find()->joinWith('shopOrderItems as shopOrderItems')
+        $forDeleteQuery = ShopOrder::find()
+            //->joinWith('shopOrderItems as shopOrderItems')
             ->andWhere([
                 'and',
                 ['shop_order.is_created' => 0], //Не созданные заказы
                 ['<=', 'shop_order.created_at', time() - 3600 * 24 * $days] //старше 1 дня
             ])
-            ->andWhere(['shopOrderItems.id' => null])//У которых нет ничего в корзине
+            //->andWhere(['shopOrderItems.id' => null])//У которых нет ничего в корзине
             ->limit(5000)
             ->orderBy(['shop_order.id' => SORT_ASC])
             ->select(["shop_order.id"])

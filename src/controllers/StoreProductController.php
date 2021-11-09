@@ -26,12 +26,14 @@ use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -164,6 +166,9 @@ class StoreProductController extends BackendModelStandartController
                         'quantity',
                         'purchase_price',
                         'selling_price',
+                        
+                        'marginality_abs',
+                        'marginality_per',
                     ],
                     'columns'        => [
                         'created_at' => [
@@ -190,6 +195,100 @@ class StoreProductController extends BackendModelStandartController
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
                             ],
+                            'value'                => function (ShopStoreProduct $shopStoreProduct) {
+                                return $shopStoreProduct->purchase_price ? \Yii::$app->formatter->asDecimal($shopStoreProduct->purchase_price) : "";
+                            },
+                        ],
+                        'selling_price' => [
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'value'                => function (ShopStoreProduct $shopStoreProduct) {
+                                return $shopStoreProduct->selling_price ? \Yii::$app->formatter->asDecimal($shopStoreProduct->selling_price) : "";
+                            },
+                        ],
+
+                        'marginality_abs' => [
+                            'attribute' => 'marginality_abs',
+                            'label' => 'Маржинальность, значение',
+                            'format'    => 'raw',
+                            
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+                
+                                $query->addSelect([
+                                    'marginality_abs' => new Expression("selling_price - purchase_price"),
+                                ]);
+                
+                
+                                $grid->sortAttributes["marginality_abs"] = [
+                                    'asc'  => ['marginality_abs' => SORT_ASC],
+                                    'desc' => ['marginality_abs' => SORT_DESC],
+                                ];
+                            },
+                            'value'                => function (ShopStoreProduct $shopStoreProduct) {
+                                $result = $shopStoreProduct->raw_row['marginality_abs'] ? \Yii::$app->formatter->asDecimal($shopStoreProduct->raw_row['marginality_abs']) : "";
+                                $color = "red";
+                                if ($result < 0) {
+                                    $color = "red";
+                                }
+                                if ($result > 0) {
+                                    $color = "green";
+                                }
+                                
+                                return Html::tag("div", $result, [
+                                    'style' => "color: {$color}"
+                                ]);
+                            },
+                        ],
+                        
+                        'marginality_per' => [
+                            'attribute' => 'marginality_per',
+                            'label' => 'Маржинальность, %',
+                            'format'    => 'raw',
+                            
+                            'headerOptions' => [
+                                'style' => 'width: 50px;',
+                            ],
+                            
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+                
+                                $query->addSelect([
+                                    'marginality_per' => new Expression("(selling_price - purchase_price) / selling_price * 100"),
+                                ]);
+                
+                
+                                $grid->sortAttributes["marginality_per"] = [
+                                    'asc'  => ['marginality_per' => SORT_ASC],
+                                    'desc' => ['marginality_per' => SORT_DESC],
+                                ];
+                            },
+                            'value'                => function (ShopStoreProduct $shopStoreProduct) {
+                                $result = $shopStoreProduct->raw_row['marginality_per'] ? \Yii::$app->formatter->asDecimal($shopStoreProduct->raw_row['marginality_per']) : "";
+                                $color = "red";
+                                if ($result < 0) {
+                                    $color = "red";
+                                }
+                                if ($result > 0) {
+                                    $color = "green";
+                                }
+                                
+                                return Html::tag("div", $result, [
+                                    'style' => "color: {$color}"
+                                ]);
+                                
+                            },
                         ],
 
                         'custom' => [

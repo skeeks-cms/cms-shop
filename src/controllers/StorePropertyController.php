@@ -20,6 +20,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\shop\models\ShopStoreProduct;
@@ -152,8 +153,47 @@ HTML
 
                 "filters" => [
                     'visibleFilters' => [
-                        'id',
-                        'name',
+                        'q',
+                    ],
+
+                    'filtersModel' => [
+                        'rules' => [
+                            ['q', 'safe'],
+                        ],
+
+                        'attributeDefines' => [
+                            'q',
+                        ],
+
+
+                        'fields' => [
+
+                            'q' => [
+                                'label'          => 'Поиск',
+                                'elementOptions' => [
+                                    'placeholder' => 'Поиск',
+                                ],
+                                'on apply'       => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        $query
+                                            ->andWhere([
+                                                'or',
+                                                ['like', ShopStoreProperty::tableName().'.id', $e->field->value],
+                                                ['like', ShopStoreProperty::tableName().'.name', $e->field->value],
+                                                ['like', ShopStoreProperty::tableName().'.external_code', $e->field->value],
+                                            ]);
+
+                                        $query->groupBy([ShopStoreProperty::tableName().'.id']);
+                                    }
+                                },
+                            ],
+
+                        ],
                     ],
                 ],
                 'grid'    => [
@@ -209,9 +249,9 @@ HTML
                         'actions',
 
                         //'id',
-                        'external_code',
+                        'custom',
+
                         /*'shop_supplier_id',*/
-                        'name',
 
                         'property_type',
                         'cms_content_property_id',
@@ -223,9 +263,31 @@ HTML
                         'is_visible' => [
                             'class' => BooleanColumn::class,
                         ],
+                        'priority'   => [
+                            'headerOptions' => [
+                                'style' => 'width: 60px;',
+                            ],
+                        ],
 
                         'external_code'           => [
                             'class' => DefaultActionColumn::class,
+                        ],
+                        'custom'                  => [
+                            'format'    => 'raw',
+                            'label'     => 'Характеристика',
+                            'attribute' => 'external_code',
+                            'value'     => function (ShopStoreProperty $property) {
+                                $result = [];
+                                $result[] = \yii\helpers\Html::a($property->external_code, "#", [
+                                    'class' => "sx-trigger-action",
+                                ]);;
+
+                                if ($property->name) {
+                                    $result[] = $property->name;
+                                }
+
+                                return implode("<br />", $result);
+                            },
                         ],
                         'name'                    => [
                             'value' => function (ShopStoreProperty $property) {
@@ -313,29 +375,21 @@ HTML
 
             'supplier' => [
                 'class'  => FieldSet::class,
-                'name'   => 'От поставщика',
+                'name'   => 'Название и описание характеристики',
                 'fields' => [
                     'external_code',
-                ],
-            ],
-            'main'     => [
-                'class'  => FieldSet::class,
-                'name'   => 'Настройки свойства',
-                'fields' => [
-
+                    'name',
+                    
                     'property_type' => [
                         'class' => SelectField::class,
                         'items' => ShopStoreProperty::getPopertyTypeOptions(),
                     ],
-
-                    'is_visible' => [
-                        'class'     => BoolField::class,
-                        'allowNull' => false,
-                    ],
-
-
-                    'name',
-                    'priority',
+                ],
+            ],
+            'main'     => [
+                'class'  => FieldSet::class,
+                'name'   => 'Связь характеристики поставщика с данными сайта.',
+                'fields' => [
 
                     'cms_content_property_id' => [
                         'class' => SelectField::class,
@@ -352,12 +406,23 @@ HTML
 
             'import' => [
                 'class'  => FieldSet::class,
-                'name'   => 'Настройки импорта/преобразования',
+                'name'   => 'Разделители значений',
                 'fields' => [
                     'import_delimetr' => [
                         'class' => TextareaField::class,
                     ],
 
+                ],
+            ],
+            'other'  => [
+                'class'  => FieldSet::class,
+                'name'   => 'Дополнительные настройки',
+                'fields' => [
+                    'is_visible' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'priority',
                 ],
             ],
 
