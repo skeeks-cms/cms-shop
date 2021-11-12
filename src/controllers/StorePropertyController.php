@@ -39,6 +39,8 @@ use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
+use yii\widgets\ActiveField;
+use yii\widgets\ActiveForm;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -325,6 +327,10 @@ HTML
             "create"        => new UnsetArrayValue(),
             "update"        => [
                 'fields' => [$this, 'updateFields'],
+
+                /*'activeFormConfig' => [
+                    'fieldClass' => ActiveField::class
+                ]*/
             ],
             "is-visible"    => [
                 'class'     => BackendModelMultiActivateAction::class,

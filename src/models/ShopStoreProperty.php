@@ -61,6 +61,17 @@ class ShopStoreProperty extends ActiveRecord
         ];
     }
 
+    public function asText()
+    {
+        $result = parent::asText();
+
+        if ($this->name) {
+            $result = $result . " ({$this->external_code})";
+        } else {
+            $result = $result . $this->external_code;
+        }
+        return $result;
+    }
     /**
      * @return string
      */
