@@ -175,12 +175,12 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
         if ($this->external_data) {
 
-            foreach ($this->external_data as $key => $value) {
+            //foreach ($this->external_data as $key => $value) {
                 /**
                  * @var $property ShopStoreProperty
                  * @var $option ShopStorePropertyOption
                  */
-                if ($property = $this->shopStore->getShopStoreProperties()->andWhere(['external_code' => $key])->one()) {
+                /*if ($property = $this->shopStore->getShopStoreProperties()->andWhere(['external_code' => $key])->one()) {
                     if ($property->cmsContentProperty) {
                         $code = $property->cmsContentProperty->code;
                         if (in_array($property->property_type, [ShopStoreProperty::PROPERTY_TYPE_LIST])) {
@@ -219,7 +219,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                         }
                     }
                 }
-            }
+            }*/
 
 
             //print_r($model->relatedPropertiesModel->toArray());
@@ -236,8 +236,12 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                  * @var $option ShopStorePropertyOption
                  */
                 if ($property = $this->shopStore->getShopStoreProperties()->andWhere(['external_code' => $key])->one()) {
-                    if ($property->cmsContentProperty) {
-                        $code = $property->cmsContentProperty->code;
+                    //if ($property->cmsContentProperty) {
+                        $code = "";
+                        if ($property->cmsContentProperty) {
+                            $code = $property->cmsContentProperty->code;
+                        }
+
                         if (in_array($property->property_type, [ShopStoreProperty::PROPERTY_TYPE_LIST])) {
 
                             if ($property->import_delimetr) {
@@ -257,7 +261,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                                         $data[] = $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id;
                                     }
                                 }
-                                if ($model->relatedPropertiesModel->hasAttribute($code)) {
+                                if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
                                     $model->relatedPropertiesModel->setAttribute($code, $data);
                                 }
 
@@ -268,7 +272,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                                         $model->tree_id = $option->cms_tree_id;
                                     }
 
-                                    if ($model->relatedPropertiesModel->hasAttribute($code)) {
+                                    if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
                                         $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
                                     }
                                 }
@@ -277,12 +281,12 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                             if (is_array($value)) {
 
                             } else {
-                                if ($model->relatedPropertiesModel->hasAttribute($code)) {
+                                if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
                                     $model->relatedPropertiesModel->setAttribute($code, $value);
                                 }
                             }
                         }
-                    }
+                    //}
                 }
             }
         }
