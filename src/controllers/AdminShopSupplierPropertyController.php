@@ -137,7 +137,7 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                         'name',
 
                         'property_type',
-                        'cms_content_property_id',
+                        'cms_property',
 
                         'priority',
                         'is_visible',
@@ -167,6 +167,19 @@ class AdminShopSupplierPropertyController extends BackendModelStandartController
                                 }
 
                                 return implode(" ", $result);
+                            },
+                        ],
+
+                        'cms_property' => [
+                            'label' => 'Свойство сайта',
+                            'value' => function (ShopSupplierProperty $property) {
+                                $result = "";
+
+                                if ($property->cms_content_property_id) {
+                                    $result = $property->cmsContentProperty->asText;
+                                }
+
+                                return $result;
                             },
                         ],
                     ],

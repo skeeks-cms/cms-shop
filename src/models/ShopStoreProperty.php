@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 /**
  *
@@ -23,13 +24,17 @@ use yii\helpers\ArrayHelper;
  * @property int                       $is_visible
  * @property int                       $priority
  * @property int|null                  $cms_content_property_id
+ * @property string|null               $property_nature
  * @property string|null               $import_delimetr
+ * @property float|null                $import_multiply
+ * @property int                       $is_options
  *
  * @property CmsContentProperty        $cmsContentProperty
  * @property ShopStore                 $shopStore
  * @property ShopStorePropertyOption[] $shopStorePropertyOptions
  *
  * @property string                    $propertyTypeAsText
+ * @property string                    $propertyNatureAsText
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -40,6 +45,16 @@ class ShopStoreProperty extends ActiveRecord
     const PROPERTY_TYPE_NUMBER = "number";
     const PROPERTY_TYPE_ARRAY = "array";
 
+    const PROPERTY_NATURE_BARCODE = "barcode";
+    const PROPERTY_NATURE_HEIGHT = "height";
+    const PROPERTY_NATURE_WEIGHT = "weight";
+    const PROPERTY_NATURE_WIDTH = "width";
+    const PROPERTY_NATURE_LENGTH = "length";
+    const PROPERTY_NATURE_EAV = "eav";
+    const PROPERTY_NATURE_TREE = "tree";
+    const PROPERTY_NATURE_IMAGE = "image";
+    const PROPERTY_NATURE_SECOND_IMAGE = "second_image";
+
     /**
      * @inheritdoc
      */
@@ -48,16 +63,63 @@ class ShopStoreProperty extends ActiveRecord
         return '{{%shop_store_property}}';
     }
 
+    public function init()
+    {
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, '_beforeUpdate']);
+        return parent::init();
+    }
+
+    public function _beforeUpdate()
+    {
+        if (in_array($this->property_nature, [
+            self::PROPERTY_NATURE_TREE,
+        ])) {
+            $this->is_options = 1;
+        }
+
+        if (in_array($this->property_nature, [
+            self::PROPERTY_NATURE_EAV,
+        ])) {
+            if (in_array($this->cmsContentProperty->property_type, [
+                PropertyType::CODE_LIST,
+                PropertyType::CODE_ELEMENT,
+            ])) {
+                $this->is_options = 1;
+                return;
+            }
+        }
+    }
+
+
     /**
      * @return array
      */
-    static public function getPopertyTypeOptions()
+    /*static public function getPopertyTypeOptions()
     {
         return [
-            self::PROPERTY_TYPE_LIST   => 'Список',
-            self::PROPERTY_TYPE_STRING => 'Строка',
-            self::PROPERTY_TYPE_NUMBER => 'Число',
-            self::PROPERTY_TYPE_ARRAY  => 'Массив',
+            //self::PROPERTY_TYPE_LIST   => 'Список',
+            //self::PROPERTY_TYPE_STRING => 'Строка',
+            //self::PROPERTY_TYPE_NUMBER => 'Число',
+            //self::PROPERTY_TYPE_ARRAY  => 'Массив',
+        ];
+    }*/
+
+
+    /**
+     * @return array
+     */
+    static public function getPropertyNatureOptions()
+    {
+        return [
+            self::PROPERTY_NATURE_EAV          => 'Характеристика',
+            self::PROPERTY_NATURE_SECOND_IMAGE => 'Вторые фото',
+            self::PROPERTY_NATURE_IMAGE        => 'Главное фото',
+            self::PROPERTY_NATURE_BARCODE      => 'Штрихкод',
+            self::PROPERTY_NATURE_WEIGHT       => 'Вес, г',
+            self::PROPERTY_NATURE_WIDTH        => 'Ширина, мм',
+            self::PROPERTY_NATURE_LENGTH       => 'Длина, мм',
+            self::PROPERTY_NATURE_HEIGHT       => 'Высота, мм',
+            self::PROPERTY_NATURE_TREE         => 'Раздел',
         ];
     }
 
@@ -66,19 +128,26 @@ class ShopStoreProperty extends ActiveRecord
         $result = parent::asText();
 
         if ($this->name) {
-            $result = $result . " ({$this->external_code})";
+            $result = $result." ({$this->external_code})";
         } else {
-            $result = $result . $this->external_code;
+            $result = $result.$this->external_code;
         }
         return $result;
     }
     /**
      * @return string
      */
-    public function getPropertyTypeAsText()
+    public function getPropertyNatureAsText()
+    {
+        return (string)ArrayHelper::getValue(self::getPropertyNatureOptions(), $this->property_nature);
+    }
+    /**
+     * @return string
+     */
+    /*public function getPropertyTypeAsText()
     {
         return (string)ArrayHelper::getValue(self::getPopertyTypeOptions(), $this->property_type);
-    }
+    }*/
 
     /**
      * @inheritdoc
@@ -87,13 +156,17 @@ class ShopStoreProperty extends ActiveRecord
     {
         return ArrayHelper::merge(parent::rules(), [
             [['external_code'], 'required'],
+            [['import_multiply'], 'number'],
+            [['is_options'], 'number'],
             [['priority'], 'integer'],
             [['external_code'], 'trim'],
             [['property_type'], 'string'],
+            [['property_nature'], 'string'],
             [['import_delimetr'], 'string'],
-            [['property_type'], 'in', 'range' => array_keys(self::getPopertyTypeOptions())],
+            //[['property_type'], 'in', 'range' => array_keys(self::getPopertyTypeOptions())],
             [['shop_store_id', 'is_visible', 'cms_content_property_id'], 'integer'],
             [['external_code', 'name'], 'string', 'max' => 255],
+            [['import_multiply'], 'default', 'value' => null],
             [['cms_content_property_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentProperty::className(), 'targetAttribute' => ['cms_content_property_id' => 'id']],
 
             [
@@ -104,6 +177,48 @@ class ShopStoreProperty extends ActiveRecord
                     return (bool)$model->external_code;
                 },
             ],
+            [
+                ['cms_content_property_id'],
+                'required',
+                'when' => function (self $model) {
+                    return (bool)($model->property_nature == self::PROPERTY_NATURE_EAV);
+                },
+            ],
+
+            /*[
+                ['property_type'],
+                function() {
+                    $this->property_type = self::PROPERTY_TYPE_STRING;
+                },
+                'when'  => function (self $model) {
+                    if ($model->cmsContentProperty) {
+                        if ($model->cmsContentProperty->property_type == PropertyType::CODE_STRING) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+            ],*/
+            /*[
+                ['property_type'],
+                function() {
+                    $this->property_type = self::PROPERTY_TYPE_NUMBER;
+                },
+                'when'  => function (self $model) {
+                    if (in_array($model->shop_property_code, [
+                        self::SHOP_PROPETY_WIDTH,
+                        self::SHOP_PROPETY_LENGTH,
+                        self::SHOP_PROPETY_HEIGHT,
+                        self::SHOP_PROPETY_WEIGHT,
+                    ])) {
+                        die;
+                        return true;
+                    }
+
+                    return false;
+                },
+            ],*/
 
         ]);
     }
@@ -118,10 +233,13 @@ class ShopStoreProperty extends ActiveRecord
             'external_code'           => 'Код характеристики',
             'name'                    => 'Название',
             'is_visible'              => 'Видимость',
-            'cms_content_property_id' => 'Характеристика на сайте',
+            'cms_content_property_id' => 'Какая характеристика?',
             'priority'                => 'Сортировка',
             'property_type'           => 'Тип свойства',
             'shop_store_id'           => 'Склад',
+            'import_multiply'         => 'Умножить значение на',
+            'property_nature'         => 'На сайте это',
+            'is_options'              => 'Собирать опции',
 
             'import_delimetr' => 'Разделители',
         ]);

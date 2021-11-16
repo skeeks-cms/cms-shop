@@ -66,11 +66,11 @@ class ShopStorePropertyOption extends ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id'                           => 'ID',
-            'shop_store_property_id'       => 'Свойство',
-            'name'                         => 'Название',
-            'cms_content_property_enum_id' => 'Опция',
-            'cms_content_element_id'       => 'Опция',
-            'cms_tree_id'                  => 'Раздел',
+            'shop_store_property_id'       => 'Характеристика',
+            'name'                         => 'Название у поставщика',
+            'cms_content_property_enum_id' => 'Опция на сайте',
+            'cms_content_element_id'       => 'Опция на сайте',
+            'cms_tree_id'                  => 'Раздел на сайте',
         ]);
     }
 

@@ -1413,33 +1413,6 @@ HTML
         $rr = new RequestResponse();
 
 
-        //Если нужно создавать товар из товара поставщика
-        /*$shopSubproductContentElement = null;
-        if ($shop_sub_product_id = \Yii::$app->request->get("shop_sub_product_id")) {
-             * @var $shopSubproductContentElement ShopCmsContentElement
-            $shopSubproductContentElement = ShopCmsContentElement::find()->where(['id' => $shop_sub_product_id])->one();
-
-            if ($shopSubproductContentElement) {
-                $subShopProduct = $shopSubproductContentElement->shopProduct;
-                $shopSubproductContentElement->loadDataToMainModel($model);
-                $siteClass = \Yii::$app->skeeks->siteClass;
-                if (!$defaultSite = $siteClass::find()->andWhere(['is_default' => 1])->one()) {
-                    throw new Exception("Нет сайта по умолчанию");
-                }
-                $model->cms_site_id = $defaultSite->id;
-
-                $shopProduct->measure_code = $subShopProduct->measure_code;
-                $shopProduct->measure_ratio = $subShopProduct->measure_ratio;
-                $shopProduct->measure_ratio_min = $subShopProduct->measure_ratio_min;
-                $shopProduct->height = $subShopProduct->height;
-                $shopProduct->width = $subShopProduct->width;
-                $shopProduct->length = $subShopProduct->length;
-                $shopProduct->width = $subShopProduct->width;
-            }
-        }*/
-
-
-
         $shopStoreProduct = null;
         if ($store_product_id = \Yii::$app->request->get("store_product_id")) {
             /**
@@ -1449,7 +1422,7 @@ HTML
 
             if ($shopStoreProduct) {
 
-                $shopStoreProduct->loadDataToElementProduct($model);
+                $shopStoreProduct->loadDataToElementProduct($model, $shopProduct);
                 /*$subShopProduct = $shopSubproductContentElement->shopProduct;
                 $shopSubproductContentElement->loadDataToMainModel($model);
                 $siteClass = \Yii::$app->skeeks->siteClass;

@@ -22,6 +22,15 @@ $this->registerCss(<<<CSS
     padding-top: 3px;
     padding-bottom: 3px;
 }
+.sx-barcode-row .sx-remove-row-btn {
+    cursor: pointer;
+    font-size: 16px;
+    color: black;
+    opacity: 0.5;
+}
+.sx-barcode-row .sx-remove-row-btn:hover {
+    opacity: 0.8;
+}
 
 .popover {
     max-width: none;
@@ -57,7 +66,9 @@ CSS
 
             </div>
             <div class="my-auto sx-new-barcode">
-                <button class="btn btn-xs sx-remove-row-btn"><i class="fa fa-times"></i></button>
+                <div class="sx-remove-row-btn">
+                    ×
+                </div>
             </div>
         </div>
     </div>

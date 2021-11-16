@@ -22,6 +22,7 @@ use skeeks\cms\shop\models\ShopStorePropertyOption;
 use skeeks\cms\shop\models\ShopSupplierProperty;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
@@ -99,9 +100,9 @@ HTML
 
                 "filters" => [
                     'visibleFilters' => [
-                        'id',
+                        //'id',
                         'name',
-                        'shop_store_property_id',
+                        //'shop_store_property_id',
                     ],
                 ],
                 'grid'    => [
@@ -127,13 +128,12 @@ HTML
                         'shop_store_property_id',
                         'name',
                         'connect',
-                        'cms_tree_id',
                     ],
                     'columns'        => [
 
                         'connect'       => [
                             'format' => 'raw',
-                            'label'  => 'CMS опция',
+                            'label'  => 'Опция на сайте',
                             'value'  => function (ShopStorePropertyOption $property) {
                                 if ($property->cms_content_element_id) {
                                     return $property->cmsContentElement->asText;
@@ -142,10 +142,14 @@ HTML
                                     return $property->cmsContentPropertyEnum->asText;
                                 }
 
+                                if ($property->cms_tree_id) {
+                                    return $property->cmsTree->fullName;
+                                }
+
                                 return '';
                             },
                         ],
-                        'cms_tree_id'   => [
+                        /*'cms_tree_id'   => [
                             'format' => 'raw',
                             'label'  => 'CMS раздел',
                             'value'  => function (ShopStorePropertyOption $property) {
@@ -154,7 +158,7 @@ HTML
                                 }
                                 return '';
                             },
-                        ],
+                        ],*/
                         'property_type' => [
                             'value' => function (ShopStorePropertyOption $property) {
                                 return $property->propertyTypeAsText;
@@ -186,20 +190,24 @@ HTML
         $connect = [
             'connect' => [
                 'class' => FieldSet::class,
-                'name'  => 'Связь с опциями cms',
+                'name'  => 'Связь с опциями сайта',
             ],
         ];
 
-        $connect['connect']['fields'] = [
-            'cms_tree_id' => [
-                'class'       => WidgetField::class,
-                'widgetClass' => SelectModelDialogTreeWidget::class,
-            ],
-        ];
+
+
         if ($model->shopStoreProperty) {
 
             $property = $model->shopStoreProperty;
-            if ($property->cmsContentProperty) {
+
+            if ($property->property_nature == ShopStoreProperty::PROPERTY_NATURE_TREE) {
+                $connect['connect']['fields'] = [
+                    'cms_tree_id' => [
+                        'class'       => WidgetField::class,
+                        'widgetClass' => SelectModelDialogTreeWidget::class,
+                    ],
+                ];
+            } elseif ($property->cmsContentProperty) {
 
                 $contentProperty = $property->cmsContentProperty;
                 if ($contentProperty->handler instanceof PropertyTypeList) {
@@ -239,6 +247,7 @@ HTML
                         'class'          => SelectField::class,
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
+                            'disabled' => 'disabled'
                         ],
                         'items'          => ArrayHelper::map(
                             ShopStoreProperty::find()->all(),
@@ -246,7 +255,10 @@ HTML
                             'asText'
                         ),
                     ],
-                    'name',
+                    /*'name' => [
+                        'class' => TextField::class,
+
+                    ],*/
                 ],
             ],
         ];

@@ -79,20 +79,23 @@ class AdminShopSupplierPropertyOptionController extends BackendModelStandartCont
                         //'id',
                         'shop_supplier_property_id',
                         'name',
+
                         'connect',
-                        'cms_tree_id',
                     ],
                     'columns'        => [
 
                         'connect'       => [
                             'format' => 'raw',
-                            'label'  => 'CMS опция',
+                            'label'  => 'Опция на сайте',
                             'value'  => function (ShopSupplierPropertyOption $property) {
                                 if ($property->cms_content_element_id) {
                                     return $property->cmsContentElement->asText;
                                 }
                                 if ($property->cms_content_property_enum_id) {
                                     return $property->cmsContentPropertyEnum->asText;
+                                }
+                                if ($property->cms_tree_id) {
+                                    return $property->cmsTree->fullName;
                                 }
 
                                 return '';

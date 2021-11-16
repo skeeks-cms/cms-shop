@@ -28,8 +28,10 @@ use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\TextField;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\bootstrap\Alert;
@@ -39,8 +41,6 @@ use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
-use yii\widgets\ActiveField;
-use yii\widgets\ActiveForm;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -52,7 +52,6 @@ class StorePropertyController extends BackendModelStandartController
         $this->name = "Характеристики";
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopStoreProperty::class;
-
 
         $this->permissionName = Cms::UPA_PERMISSION;
 
@@ -217,6 +216,7 @@ HTML
                             'and',
                             ['cms_content_property_enum_id' => null],
                             ['cms_content_element_id' => null],
+                            ['cms_tree_id' => null],
                         ]);
 
                         $optionsConnectQuery = ShopStorePropertyOption::find()->select(['count(*) as inner_count1'])->where([
@@ -225,6 +225,7 @@ HTML
                             'or',
                             ['is not', 'cms_content_property_enum_id', null],
                             ['is not', 'cms_content_element_id', null],
+                            ['is not', 'cms_tree_id', null],
                         ]);
 
                         $query->groupBy(ShopStoreProperty::tableName().".id");
@@ -255,8 +256,8 @@ HTML
 
                         /*'shop_supplier_id',*/
 
-                        'property_type',
-                        'cms_content_property_id',
+                        //'property_type',
+                        'cms_property',
 
                         'priority',
                         'is_visible',
@@ -302,10 +303,91 @@ HTML
                             },
                         ],
 
+                        'cms_property' => [
+                            'label'  => 'Связь с сайтом',
+                            'format' => 'raw',
+                            'value'  => function (ShopStoreProperty $property, $key) {
+
+                                $isRed = false;
+                                $isGreen = false;
+                                \Yii::$app->view->registerCss(<<<CSS
+                                    tr.sx-tr-green, tr.sx-tr-green:nth-of-type(odd), tr.sx-tr-green td
+                                    {
+                                    background: #d9fbd9;
+                                    }
+                                    tr.sx-tr-red, tr.sx-tr-red:nth-of-type(odd), tr.sx-tr-red td
+                                    {
+                                    background: #fbf3f3;
+                                    }
+                                    tr.sx-tr-inactive, tr.sx-tr-inactive:nth-of-type(odd), tr.sx-tr-inactive td
+                                    {
+                                    opacity: 0.6;
+                                    }
+CSS
+                                );
+
+                                $result = [];
+                                if ($property->property_nature == ShopStoreProperty::PROPERTY_NATURE_EAV && $property->cms_content_property_id) {
+                                    $result[] = $property->cmsContentProperty->asText;
+                                } else if ($property->property_nature) {
+                                    $result[] = $property->propertyNatureAsText;
+                                    $isGreen = true;
+                                }
+
+                                $propertyType = '';
+                                /*if ($property->propertyTypeAsText) {
+                                    $propertyType = "<small style='color: gray;'>".$property->propertyTypeAsText."</small>";
+                                }*/
+                                
+
+                                if ($property->is_options) {
+                                    $countOptions = ArrayHelper::getValue($property->raw_row, 'countOptions');
+                                    $countConnectOptions = ArrayHelper::getValue($property->raw_row, 'countConnectOptions');
+                                    $countNotConnectOptions = ArrayHelper::getValue($property->raw_row, 'countNotConnectOptions');
+
+                                    if ($countNotConnectOptions == 0) {
+                                        $isGreen = true;
+                                        $propertyType .= "<small>Опций: <span title='Всего опций'> {$countOptions}</span> (<span style='color:green;' title='Все привязаны!'><span class='fa fa-check'></span></span>)</small>";
+                                    } else {
+                                        $isRed = true;
+                                        $propertyType .= "<small>Опций: <span title='Всего опций'> {$countOptions}</span> (<span style='color:red;' title='Не привязанных'>{$countNotConnectOptions}</span>)</small>";
+                                    }
+
+                                }
+
+                                if ($isRed) {
+                                    \Yii::$app->view->registerJs(<<<JS
+                                    $('tr[data-key={$key}]').addClass('sx-tr-red');
+JS
+                                    );
+                                }
+                                
+                                if ($isGreen) {
+                                    \Yii::$app->view->registerJs(<<<JS
+                                    $('tr[data-key={$key}]').addClass('sx-tr-green');
+JS
+                                    );
+                                }
+                                
+                                if (!$property->is_visible) {
+                                    \Yii::$app->view->registerJs(<<<JS
+                                    $('tr[data-key={$key}]').addClass('sx-tr-inactive');
+JS
+                                    );
+                                }
+
+                                if ($propertyType) {
+                                    $result[] = $propertyType;
+                                }
+
+                                return implode(" / ", $result);
+                            },
+                        ],
+
                         'property_type' => [
                             'value' => function (ShopStoreProperty $property) {
-                                $result[] = $property->propertyTypeAsText;
-                                if ($property->property_type == ShopStoreProperty::PROPERTY_TYPE_LIST) {
+                                //$result[] = $property->propertyTypeAsText;
+                                if ($property->is_options) {
                                     $countOptions = ArrayHelper::getValue($property->raw_row, 'countOptions');
                                     $countConnectOptions = ArrayHelper::getValue($property->raw_row, 'countConnectOptions');
                                     $countNotConnectOptions = ArrayHelper::getValue($property->raw_row, 'countNotConnectOptions');
@@ -377,40 +459,57 @@ HTML
          */
         $model = $action->model;
 
+        if ($model->property_nature == ShopStoreProperty::PROPERTY_NATURE_EAV) {
+            $cms_content_property_id = [
+                'class' => SelectField::class,
+                'items' => ArrayHelper::map(
+                    CmsContentProperty::find()->cmsSite()->all(),
+                    'id',
+                    'asText'
+                ),
+            ];
+        } else {
+            $cms_content_property_id = new UnsetArrayValue();
+        }
+
+
         return [
 
             'supplier' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Название и описание характеристики',
                 'fields' => [
-                    'external_code',
-                    'name',
-                    
-                    'property_type' => [
-                        'class' => SelectField::class,
-                        'items' => ShopStoreProperty::getPopertyTypeOptions(),
+                    'external_code' => [
+                        'class'          => TextField::class,
+                        'elementOptions' => [
+                            'disabled' => 'disabled',
+                        ],
                     ],
+
+                    'name',
+
+
                 ],
             ],
             'main'     => [
                 'class'  => FieldSet::class,
-                'name'   => 'Связь характеристики поставщика с данными сайта.',
+                'name'   => 'Связь данных поставщика с данными сайта.',
                 'fields' => [
 
-                    'cms_content_property_id' => [
-                        'class' => SelectField::class,
-                        'items' => ArrayHelper::map(
-                            CmsContentProperty::find()->cmsSite()->all(),
-                            'id',
-                            'asText'
-                        ),
+                    'property_nature' => [
+                        'class'          => SelectField::class,
+                        'items'          => ShopStoreProperty::getPropertyNatureOptions(),
+                        'elementOptions' => [
+                            'data-form-reload' => 'true',
+                        ],
+
                     ],
 
-
+                    'cms_content_property_id' => $cms_content_property_id,
                 ],
             ],
 
-            'import' => [
+            'delimetr' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Разделители значений',
                 'fields' => [
@@ -420,10 +519,31 @@ HTML
 
                 ],
             ],
+
+            'import' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Преобразование значений',
+                'fields' => [
+                    'import_multiply' => [
+                        'class' => NumberField::class,
+                        'step'  => 0.000000001,
+                    ],
+
+                ],
+            ],
             'other'  => [
                 'class'  => FieldSet::class,
                 'name'   => 'Дополнительные настройки',
                 'fields' => [
+                    /*'property_type' => [
+                        'class' => SelectField::class,
+                        'items' => ShopStoreProperty::getPopertyTypeOptions(),
+                    ],*/
+
+                    'is_options' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
                     'is_visible' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
@@ -523,7 +643,7 @@ HTML
                     throw new Exception('Товаров нет');
                 }
 
-                if (!$properties = ShopStoreProperty::find()->andWhere(['property_type' => ShopStoreProperty::PROPERTY_TYPE_LIST])
+                if (!$properties = ShopStoreProperty::find()->andWhere(['is_options' => 1])
                     ->andWhere(['shop_store_id' => \Yii::$app->shop->backendShopStore->id])->all()) {
                     throw new Exception('Нет свойств типа список');
                 }
@@ -617,7 +737,7 @@ HTML
                 }
 
                 if (!$properties = ShopStoreProperty::find()
-                    ->andWhere(['property_type' => ShopStoreProperty::PROPERTY_TYPE_LIST])
+                    ->andWhere(['is_options' => 1])
                     ->andWhere(['is not', 'cms_content_property_id', null])
                     ->andWhere(['shop_store_id' => \Yii::$app->shop->backendShopStore->id])->all()) {
 
