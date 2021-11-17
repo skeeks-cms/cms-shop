@@ -270,7 +270,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
                         } elseif (in_array($property->property_nature, [
                             ShopStoreProperty::PROPERTY_NATURE_EAV
-                        ])) {
+                        ]) || $property->cmsContentProperty) {
                             $code = "";
                             if ($property->cmsContentProperty) {
                                 $code = $property->cmsContentProperty->code;
