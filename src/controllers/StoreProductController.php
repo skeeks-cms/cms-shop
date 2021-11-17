@@ -9,19 +9,24 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
-use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\components\Cms;
-use skeeks\cms\grid\DateColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
+use skeeks\cms\queryfilters\filters\FilterField;
+use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
+use skeeks\cms\queryfilters\filters\modes\FilterModeGt;
+use skeeks\cms\queryfilters\filters\modes\FilterModeGte;
+use skeeks\cms\queryfilters\filters\modes\FilterModeLt;
+use skeeks\cms\queryfilters\filters\modes\FilterModeLte;
+use skeeks\cms\queryfilters\filters\modes\FilterModeNe;
+use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
-use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProperty;
@@ -29,7 +34,6 @@ use skeeks\cms\shop\models\ShopStorePropertyOption;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
-use skeeks\yii2\form\fields\SelectField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -59,12 +63,18 @@ class StoreProductController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
-            'index'  => [
+            'index' => [
                 "filters"         => [
                     'visibleFilters' => [
                         'q',
                         'has_shop_product',
                         'quantity',
+
+                        'selling_price',
+                        'purchase_price',
+
+                        'marginality_per_filter',
+                        'marginality_filter',
                         //'component',
                     ],
 
@@ -72,11 +82,15 @@ class StoreProductController extends BackendModelStandartController
                         'rules' => [
                             ['q', 'safe'],
                             ['has_shop_product', 'safe'],
+                            ['marginality_per_filter', 'safe'],
+                            ['marginality_filter', 'safe'],
                         ],
 
                         'attributeDefines' => [
                             'q',
                             'has_shop_product',
+                            'marginality_per_filter',
+                            'marginality_filter',
                         ],
 
 
@@ -102,8 +116,7 @@ class StoreProductController extends BackendModelStandartController
                                                 ['like', ShopStoreProduct::tableName().'.external_id', $e->field->value],
                                                 ['like', ShopStoreProduct::tableName().'.external_data', $e->field->value],
                                                 ['like', 'element.name', $e->field->value],
-                                            ])
-                                        ;
+                                            ]);
 
                                         $query->joinWith("shopProduct as shopProduct");
                                         $query->joinWith("shopProduct.cmsContentElement as element");
@@ -136,6 +149,64 @@ class StoreProductController extends BackendModelStandartController
                                     }
                                 },
                             ],
+
+                            'marginality_per_filter' => [
+                                'label'           => 'Маржинальность, %',
+                                'class'           => NumberFilterField::class,
+                                'field'           => [
+                                    'class' => NumberField::class
+                                ],
+                                'isAddAttributeTableName' => false,
+                                'beforeModeApplyCallback' => function(QueryFiltersEvent $e, NumberFilterField $field) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1")) {
+
+                                        $field->setIsHaving();
+                                        //$field->attr = 'marginality_per_filter';
+
+                                        $query->addSelect([
+                                            'marginality_per_filter' => new Expression("(selling_price - purchase_price) / selling_price * 100"),
+                                        ]);
+                                        $query->groupBy([ShopStoreProduct::tableName().'.id']);
+                                    }
+
+
+                                    return true;
+                                },
+                            ],
+
+                            'marginality_filter' => [
+                                'label'           => 'Маржинальность, значение',
+                                'class'           => NumberFilterField::class,
+                                'field'           => [
+                                    'class' => NumberField::class
+                                ],
+                                'isAddAttributeTableName' => false,
+                                'beforeModeApplyCallback' => function(QueryFiltersEvent $e, NumberFilterField $field) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1")) {
+
+                                        $field->setIsHaving();
+                                        //$field->attr = 'marginality_per_filter';
+
+                                        $query->addSelect([
+                                            'marginality_filter' => new Expression("(selling_price - purchase_price)"),
+                                        ]);
+                                        $query->groupBy([ShopStoreProduct::tableName().'.id']);
+                                    }
+
+
+                                    return true;
+                                },
+                            ],
                         ],
                     ],
                 ],
@@ -166,18 +237,18 @@ class StoreProductController extends BackendModelStandartController
                         'quantity',
                         'purchase_price',
                         'selling_price',
-                        
+
                         'marginality_abs',
                         'marginality_per',
                     ],
                     'columns'        => [
                         'created_at' => [
-                            'class' => DateTimeColumnData::class
+                            'class' => DateTimeColumnData::class,
                         ],
                         'updated_at' => [
-                            'class' => DateTimeColumnData::class
+                            'class' => DateTimeColumnData::class,
                         ],
-                        'quantity' => [
+                        'quantity'   => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
                             ],
@@ -195,39 +266,39 @@ class StoreProductController extends BackendModelStandartController
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
                             ],
-                            'value'                => function (ShopStoreProduct $shopStoreProduct) {
+                            'value'         => function (ShopStoreProduct $shopStoreProduct) {
                                 return $shopStoreProduct->purchase_price ? \Yii::$app->formatter->asDecimal($shopStoreProduct->purchase_price) : "";
                             },
                         ],
-                        'selling_price' => [
+                        'selling_price'  => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
                             ],
-                            'value'                => function (ShopStoreProduct $shopStoreProduct) {
+                            'value'         => function (ShopStoreProduct $shopStoreProduct) {
                                 return $shopStoreProduct->selling_price ? \Yii::$app->formatter->asDecimal($shopStoreProduct->selling_price) : "";
                             },
                         ],
 
                         'marginality_abs' => [
                             'attribute' => 'marginality_abs',
-                            'label' => 'Маржинальность, значение',
+                            'label'     => 'Маржинальность, значение',
                             'format'    => 'raw',
-                            
+
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
                             ],
-                            
+
                             'beforeCreateCallback' => function (GridView $grid) {
                                 /**
                                  * @var $query ActiveQuery
                                  */
                                 $query = $grid->dataProvider->query;
-                
+
                                 $query->addSelect([
                                     'marginality_abs' => new Expression("selling_price - purchase_price"),
                                 ]);
-                
-                
+
+
                                 $grid->sortAttributes["marginality_abs"] = [
                                     'asc'  => ['marginality_abs' => SORT_ASC],
                                     'desc' => ['marginality_abs' => SORT_DESC],
@@ -242,33 +313,33 @@ class StoreProductController extends BackendModelStandartController
                                 if ($result > 0) {
                                     $color = "green";
                                 }
-                                
+
                                 return Html::tag("div", $result, [
-                                    'style' => "color: {$color}"
+                                    'style' => "color: {$color}",
                                 ]);
                             },
                         ],
-                        
+
                         'marginality_per' => [
                             'attribute' => 'marginality_per',
-                            'label' => 'Маржинальность, %',
+                            'label'     => 'Маржинальность, %',
                             'format'    => 'raw',
-                            
+
                             'headerOptions' => [
                                 'style' => 'width: 50px;',
                             ],
-                            
+
                             'beforeCreateCallback' => function (GridView $grid) {
                                 /**
                                  * @var $query ActiveQuery
                                  */
                                 $query = $grid->dataProvider->query;
-                
+
                                 $query->addSelect([
                                     'marginality_per' => new Expression("(selling_price - purchase_price) / selling_price * 100"),
                                 ]);
-                
-                
+
+
                                 $grid->sortAttributes["marginality_per"] = [
                                     'asc'  => ['marginality_per' => SORT_ASC],
                                     'desc' => ['marginality_per' => SORT_DESC],
@@ -283,11 +354,11 @@ class StoreProductController extends BackendModelStandartController
                                 if ($result > 0) {
                                     $color = "green";
                                 }
-                                
+
                                 return Html::tag("div", $result, [
-                                    'style' => "color: {$color}"
+                                    'style' => "color: {$color}",
                                 ]);
-                                
+
                             },
                         ],
 
@@ -316,12 +387,13 @@ class StoreProductController extends BackendModelStandartController
                                             'style' => 'color: gray; text-align: left;',
                                             'class' => '',
                                         ],
-                                        'content' => <<<HTML
+                                        'content'      => <<<HTML
 
 <span style="color: green; font-size: 17px;">
     <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Товар оформлен {$model->asText}"></i>
 </span>
 HTML
+                                        ,
 
                                     ]);
                                     $attched .= "</div>";
@@ -375,8 +447,8 @@ HTML;
 
             "import" => [
                 'class' => ViewBackendAction::class,
-                'icon' => 'far fa-file-excel',
-                'name' => 'Импорт из excel',
+                'icon'  => 'far fa-file-excel',
+                'name'  => 'Импорт из excel',
             ],
         ]);
     }
@@ -405,14 +477,14 @@ HTML;
 
             'name',
             'external_id',
-            'quantity' => [
-                'class' => NumberField::class
+            'quantity'       => [
+                'class' => NumberField::class,
             ],
             'purchase_price' => [
-                'class' => NumberField::class
+                'class' => NumberField::class,
             ],
-            'selling_price' => [
-                'class' => NumberField::class
+            'selling_price'  => [
+                'class' => NumberField::class,
             ],
 
         ];
@@ -463,12 +535,10 @@ HTML;
                      * @var $storeProduct ShopStoreProduct
                      */
                     $storeProducts = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => null]);
-                    foreach ($storeProducts->each() as $storeProduct)
-                    {
+                    foreach ($storeProducts->each() as $storeProduct) {
                         if ($storeProduct->external_data) {
                             $externalData = [];
-                            foreach ($storeProduct->external_data as $key => $val)
-                            {
+                            foreach ($storeProduct->external_data as $key => $val) {
                                 $externalData[trim($key)] = $val;
                             }
                             $vendorValue = ArrayHelper::getValue($externalData, trim($shopStorePropertyVendor->external_code));
@@ -493,20 +563,19 @@ HTML;
 
                                 $find = ShopCmsContentElement::find()
                                     ->cmsSite()
-                                    ->innerJoinWith("shopProduct as sp")
-                                ;
+                                    ->innerJoinWith("shopProduct as sp");
 
 
                                 $find1 = CmsContentElementProperty::find()->select(['element_id as id'])
-                                            ->where([
-                                                "value_element_id"  => $vendorOption->cms_content_element_id,
-                                                "property_id" => $shopCmsContentPropertyVendor->cms_content_property_id,
-                                            ]);
+                                    ->where([
+                                        "value_element_id" => $vendorOption->cms_content_element_id,
+                                        "property_id"      => $shopCmsContentPropertyVendor->cms_content_property_id,
+                                    ]);
                                 $find2 = CmsContentElementProperty::find()->select(['element_id as id'])
-                                            ->where([
-                                                "value"  => $vendorCodeValue,
-                                                "property_id" => $shopCmsContentPropertyVendorCode->cms_content_property_id,
-                                            ]);
+                                    ->where([
+                                        "value"       => $vendorCodeValue,
+                                        "property_id" => $shopCmsContentPropertyVendorCode->cms_content_property_id,
+                                    ]);
 
 
                                 /*if ($find2->one()) {
@@ -532,7 +601,7 @@ HTML;
                                         $storeProduct->shop_product_id = $infoModel->id;
                                         try {
                                             if ($storeProduct->save(false)) {
-                                                $added ++;
+                                                $added++;
                                             }
                                         } catch (\Exception $exception) {
 
@@ -549,7 +618,7 @@ HTML;
                     if ($added > 0) {
                         $rr->message = "Связано товаров: {$added}";
                         $rr->data = [
-                            'added' => $added
+                            'added' => $added,
                         ];
                     }
 
