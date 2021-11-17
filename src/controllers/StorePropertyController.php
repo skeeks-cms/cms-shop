@@ -514,7 +514,7 @@ JS
                 'name'   => 'Разделители значений',
                 'fields' => [
                     'import_delimetr' => [
-                        'class' => TextareaField::class,
+                        'class' => TextField::class,
                     ],
 
                 ],
@@ -548,7 +548,9 @@ JS
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'priority',
+                    'priority' => [
+                        'class' => NumberField::class
+                    ],
                 ],
             ],
 

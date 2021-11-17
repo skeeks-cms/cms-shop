@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
+use skeeks\cms\relatedProperties\PropertyType;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -179,6 +180,8 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                  * @var $property ShopStoreProperty
                  * @var $option ShopStorePropertyOption
                  */
+                $key = trim($key);
+
                 if ($property = $this->shopStore->getShopStoreProperties()->andWhere(['external_code' => $key])->one()) {
                     //if ($property->cmsContentProperty) {
 
@@ -315,6 +318,31 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                                 if (is_array($value)) {
     
                                 } else {
+
+                                    $isNumber = false;
+
+                                    if ($cmsProperty = $model->relatedPropertiesModel->getRelatedProperty($code)) {
+                                        if ($cmsProperty->property_type == PropertyType::CODE_NUMBER) {
+                                            $isNumber = true;
+                                        }
+                                    }
+
+                                    $value = trim($value);
+
+                                    if ($isNumber) {
+                                        $value = str_replace(" ", "", $value);
+                                        $value = str_replace(",", ".", $value);
+                                        $value = (float) $value;
+                                    }
+
+                                    if ($property->import_multiply) {
+                                        $value = str_replace(" ", "", $value);
+                                        $value = str_replace(",", ".", $value);
+                                        $value = ((float) $value) * $property->import_multiply;
+                                    }
+
+
+
                                     if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
                                         $model->relatedPropertiesModel->setAttribute($code, $value);
                                     }
