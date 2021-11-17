@@ -21,6 +21,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\shop\models\ShopStoreProduct;
@@ -329,6 +330,12 @@ CSS
                                 $result = [];
                                 if ($property->property_nature == ShopStoreProperty::PROPERTY_NATURE_EAV && $property->cms_content_property_id) {
                                     $result[] = $property->cmsContentProperty->asText;
+                                    if (in_array($property->cmsContentProperty->property_type, [
+                                        PropertyType::CODE_NUMBER,
+                                        PropertyType::CODE_STRING
+                                    ])) {
+                                        $isGreen = true;
+                                    }
                                 } else if ($property->property_nature) {
                                     $result[] = $property->propertyNatureAsText;
                                     $isGreen = true;

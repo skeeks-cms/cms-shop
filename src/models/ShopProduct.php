@@ -66,7 +66,6 @@ use yii\helpers\Json;
  * @property ShopCmsContentElement[]   $tradeOffers
  * @property ShopOrderItem[]           $shopOrderItems
  * @property ShopOrder[]               $shopOrders
- * @property ShopSupplier              $shopSupplier
  * @property ShopTypePrice             $shopTypePrices
  *
  *
@@ -522,17 +521,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                     if (!$this->measure) {
                         $this->addError("measure_code", "Указан код валюты '{$this->measure_code}', которой нет в базе.");
                     }
-
-                    //Если у товара есть товары поставщика
-                    /*if ($this->shopAttachedProducts) {
-                        foreach ($this->shopAttachedProducts as $shopSupplierProduct) {
-                            if ($shopSupplierProduct->measure_code != $this->measure_code) {
-                                $m = \Yii::$app->measureClassifier->getMeasureByCode($shopSupplierProduct->measure_code);
-
-                                $this->addError("measure_code", "У товара задан товар поставщика с единицей измерения: {$m->symbol}. Укажите у текущего товара такую же единицу измерения.");
-                            }
-                        }
-                    }*/
                 },
             ],
 

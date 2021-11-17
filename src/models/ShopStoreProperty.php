@@ -55,6 +55,10 @@ class ShopStoreProperty extends ActiveRecord
     const PROPERTY_NATURE_IMAGE = "image";
     const PROPERTY_NATURE_SECOND_IMAGE = "second_image";
 
+    const PROPERTY_NATURE_MEASURE_CODE = "measure_code";
+    const PROPERTY_NATURE_MEASURE_RATIO = "measure_ratio";
+    const PROPERTY_NATURE_MEASURE_RATIO_MIN = "measure_ratio_min";
+
     /**
      * @inheritdoc
      */
@@ -111,15 +115,18 @@ class ShopStoreProperty extends ActiveRecord
     static public function getPropertyNatureOptions()
     {
         return [
-            self::PROPERTY_NATURE_EAV          => 'Характеристика',
-            self::PROPERTY_NATURE_SECOND_IMAGE => 'Вторые фото',
-            self::PROPERTY_NATURE_IMAGE        => 'Главное фото',
-            self::PROPERTY_NATURE_BARCODE      => 'Штрихкод',
-            self::PROPERTY_NATURE_WEIGHT       => 'Вес, г',
-            self::PROPERTY_NATURE_WIDTH        => 'Ширина, мм',
-            self::PROPERTY_NATURE_LENGTH       => 'Длина, мм',
-            self::PROPERTY_NATURE_HEIGHT       => 'Высота, мм',
-            self::PROPERTY_NATURE_TREE         => 'Раздел',
+            self::PROPERTY_NATURE_EAV               => 'Характеристика',
+            self::PROPERTY_NATURE_SECOND_IMAGE      => 'Вторые фото',
+            self::PROPERTY_NATURE_IMAGE             => 'Главное фото',
+            self::PROPERTY_NATURE_BARCODE           => 'Штрихкод',
+            self::PROPERTY_NATURE_WEIGHT            => 'Вес, г',
+            self::PROPERTY_NATURE_WIDTH             => 'Ширина, мм',
+            self::PROPERTY_NATURE_LENGTH            => 'Длина, мм',
+            self::PROPERTY_NATURE_HEIGHT            => 'Высота, мм',
+            self::PROPERTY_NATURE_TREE              => 'Раздел',
+            self::PROPERTY_NATURE_MEASURE_CODE      => 'Единица измерений',
+            self::PROPERTY_NATURE_MEASURE_RATIO     => 'Шаг количества продажи',
+            self::PROPERTY_NATURE_MEASURE_RATIO_MIN => 'Минимальное количество продажи',
         ];
     }
 
@@ -241,7 +248,7 @@ class ShopStoreProperty extends ActiveRecord
             'property_nature'         => 'На сайте это',
             'is_options'              => 'Собирать опции',
 
-            'import_delimetr' => 'Разделители',
+            'import_delimetr' => 'Разделитель',
         ]);
     }
     /**

@@ -83,9 +83,6 @@
     ?>
 
     <?
-    /**
-     * @var $shopSuppliers \skeeks\cms\shop\models\ShopSupplier[]
-     */
     if ($model->cms_site_id) {
         $site_id = $model->cms_site_id;
     } else {

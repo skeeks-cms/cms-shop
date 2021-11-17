@@ -114,9 +114,6 @@ JS
                     if (is_string($row)) {
 
                         if ($supplierProperty->cmsContentProperty) {
-                            /**
-                             * @var $shopSupplierPropertyOption \skeeks\cms\shop\models\ShopSupplierPropertyOption
-                             */
                             $shopSupplierPropertyOption = $supplierProperty->getShopStorePropertyOptions()->andWhere(['name' => $row])->one();
                             if ($shopSupplierPropertyOption) {
                                 if ($shopSupplierPropertyOption->cmsContentElement) {

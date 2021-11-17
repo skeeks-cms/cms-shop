@@ -1408,8 +1408,9 @@ HTML
 
         $relatedModel = $model->relatedPropertiesModel;
         $shopProduct = new ShopProduct();
-
         $shopProduct->loadDefaultValues();
+        $shopProduct->validate();
+
         $rr = new RequestResponse();
 
 

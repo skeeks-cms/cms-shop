@@ -19,7 +19,6 @@ namespace skeeks\cms\shop\models;
  * @property ShopSite               $shopSite
  * @property ShopStore[]            $shopStores
  * @property ShopTypePrice[]        $shopTypePrices
- * @property ShopSupplierProperty[] $shopSupplierProperties
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -146,8 +145,8 @@ class CmsSite extends \skeeks\cms\models\CmsSite
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getShopSupplierProperties()
+    /*public function getShopSupplierProperties()
     {
         return $this->hasMany(ShopSupplierProperty::className(), ['cms_site_id' => 'id']);
-    }
+    }*/
 }

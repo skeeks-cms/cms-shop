@@ -19,18 +19,14 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
-use skeeks\cms\shop\models\ShopSupplierProperty;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
-use yii\bootstrap\Alert;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 use yii\helpers\UnsetArrayValue;
-use yii\helpers\Url;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -171,7 +167,7 @@ HTML
                     ],
                 ],
             ],
-            "create"        => new UnsetArrayValue(),
+            "create" => new UnsetArrayValue(),
             "update" => [
                 'fields' => [$this, 'updateFields'],
             ],
@@ -193,7 +189,6 @@ HTML
                 'name'  => 'Связь с опциями сайта',
             ],
         ];
-
 
 
         if ($model->shopStoreProperty) {
@@ -247,7 +242,7 @@ HTML
                         'class'          => SelectField::class,
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
-                            'disabled' => 'disabled'
+                            'disabled'                                    => 'disabled',
                         ],
                         'items'          => ArrayHelper::map(
                             ShopStoreProperty::find()->all(),

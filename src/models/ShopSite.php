@@ -166,13 +166,6 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
         return $this->hasOne($class, ['id' => 'id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getShopSupplier()
-    {
-        return $this->hasOne(ShopSupplier::class, ['id' => 'shop_supplier_id']);
-    }
 
     /**
      * @return string
