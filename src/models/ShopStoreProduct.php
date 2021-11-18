@@ -45,7 +45,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
     public function _afterFind($event)
     {
-        $this->quantity = (float) $this->quantity;
+        $this->quantity = (float)$this->quantity;
     }
 
 
@@ -88,13 +88,23 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
             [['name'], 'default', 'value' => null],
             [['shop_product_id'], 'default', 'value' => null],
 
-            [['shop_store_id', 'shop_product_id'], 'unique', 'targetAttribute' => ['shop_store_id', 'shop_product_id'], 'when' => function() {
-                return $this->shop_product_id;
-            }],
+            [
+                ['shop_store_id', 'shop_product_id'],
+                'unique',
+                'targetAttribute' => ['shop_store_id', 'shop_product_id'],
+                'when'            => function () {
+                    return $this->shop_product_id;
+                },
+            ],
 
-            [['shop_store_id', 'external_id'], 'unique', 'targetAttribute' => ['shop_store_id', 'external_id'], 'when' => function() {
-                return $this->external_id;
-            }],
+            [
+                ['shop_store_id', 'external_id'],
+                'unique',
+                'targetAttribute' => ['shop_store_id', 'external_id'],
+                'when'            => function () {
+                    return $this->external_id;
+                },
+            ],
 
             [
                 ['name'],
@@ -127,8 +137,8 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
             'shop_product_id' => "Товар",
             'name'            => "Название",
             'external_id'     => "Код",
-            'purchase_price'     => "Закупочная цена",
-            'selling_price'     => "Цена продажи",
+            'purchase_price'  => "Закупочная цена",
+            'selling_price'   => "Цена продажи",
         ]);
     }
 
@@ -168,13 +178,67 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
     }
 
 
-
-
     public function loadDataToElementProduct(ShopCmsContentElement $model, ShopProduct $shopProduct)
     {
         $model->name = $this->name;
 
         if ($this->external_data) {
+            //Это нужно для определения раздела
+            foreach ($this->external_data as $key => $value) {
+                /**
+                 * @var $property ShopStoreProperty
+                 * @var $option ShopStorePropertyOption
+                 */
+                $key = trim($key);
+
+                if ($property = $this->shopStore->getShopStoreProperties()->andWhere(['external_code' => $key])->one()) {
+                    if (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_TREE,
+                    ])) {
+
+
+                        $code = "";
+                        if ($property->cmsContentProperty) {
+                            $code = $property->cmsContentProperty->code;
+                        }
+
+                        if ($property->is_options) {
+
+                            if ($property->import_delimetr) {
+                                $value = explode($property->import_delimetr, $value);
+                                foreach ($value as $k => $v) {
+                                    $value[$k] = trim($v);
+                                }
+                            }
+
+                            if (is_array($value)) {
+                                $data = [];
+                                foreach ($value as $k => $v) {
+                                    if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $v])->one()) {
+                                        if ($option->cms_tree_id) {
+                                            $model->tree_id = $option->cms_tree_id;
+                                        }
+                                    }
+                                }
+                                if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
+                                    $model->relatedPropertiesModel->setAttribute($code, $data);
+                                }
+
+                            } else {
+
+                                if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $value])->one()) {
+                                    if ($option->cms_tree_id) {
+                                        $model->tree_id = $option->cms_tree_id;
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+                }
+            }
+
             foreach ($this->external_data as $key => $value) {
                 /**
                  * @var $property ShopStoreProperty
@@ -185,170 +249,119 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                 if ($property = $this->shopStore->getShopStoreProperties()->andWhere(['external_code' => $key])->one()) {
                     //if ($property->cmsContentProperty) {
 
-                        if (in_array($property->property_nature, [
-                            ShopStoreProperty::PROPERTY_NATURE_WIDTH,
-                            ShopStoreProperty::PROPERTY_NATURE_HEIGHT,
-                            ShopStoreProperty::PROPERTY_NATURE_LENGTH,
-                            ShopStoreProperty::PROPERTY_NATURE_WEIGHT,
-                        ])) {
-                            if (is_string($value)) {
+                    if (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_WIDTH,
+                        ShopStoreProperty::PROPERTY_NATURE_HEIGHT,
+                        ShopStoreProperty::PROPERTY_NATURE_LENGTH,
+                        ShopStoreProperty::PROPERTY_NATURE_WEIGHT,
+                    ])) {
+                        if (is_string($value)) {
+                            $value = trim($value);
+                            $value = str_replace(" ", "", $value);
+                            $value = str_replace(",", ".", $value);
+
+                            if ($property->import_multiply) {
+                                $value = ((float)$value) * $property->import_multiply;
+                            }
+
+                            if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
+                                $model->relatedPropertiesModel->setAttribute($code, $value);
+                            }
+
+                            $shopProduct->{$property->property_nature} = $value;
+                        }
+
+                    } elseif (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_BARCODE,
+                    ])) {
+
+                        $delimetr = ",";
+                        if ($property->import_delimetr) {
+                            $delimetr = $property->import_delimetr;
+                        }
+
+                        $value = explode($delimetr, $value);
+                        foreach ($value as $k => $v) {
+                            $value[$k] = trim($v);
+                        }
+
+                        if (is_array($value)) {
+
+                            $shopProduct->setBarcodes($value);
+                        }
+
+
+                    }  elseif (in_array($property->property_nature, [
+                            ShopStoreProperty::PROPERTY_NATURE_EAV,
+                        ]) || $property->cmsContentProperty) {
+
+                        $code = "";
+                        if ($property->cmsContentProperty) {
+                            $code = $property->cmsContentProperty->code;
+                        }
+
+                        if ($property->is_options) {
+
+                            if ($property->import_delimetr) {
+                                $value = explode($property->import_delimetr, $value);
+                                foreach ($value as $k => $v) {
+                                    $value[$k] = trim($v);
+                                }
+                            }
+
+                            if (is_array($value)) {
+                                $data = [];
+                                foreach ($value as $k => $v) {
+                                    if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $v])->one()) {
+                                        $data[] = (string)($option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
+                                    }
+                                }
+                                if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
+                                    $model->relatedPropertiesModel->setAttribute($code, $data);
+                                }
+
+                            } else {
+
+                                if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $value])->one()) {
+                                    if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
+                                        $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
+                                    }
+                                }
+                            }
+                        } else {
+                            if (is_array($value)) {
+
+                            } else {
+
+                                $isNumber = false;
+
+                                if ($cmsProperty = $model->relatedPropertiesModel->getRelatedProperty($code)) {
+                                    if ($cmsProperty->property_type == PropertyType::CODE_NUMBER) {
+                                        $isNumber = true;
+                                    }
+                                }
+
                                 $value = trim($value);
-                                $value = str_replace(" ", "", $value);
-                                $value = str_replace(",", ".", $value);
+
+                                if ($isNumber) {
+                                    $value = str_replace(" ", "", $value);
+                                    $value = str_replace(",", ".", $value);
+                                    $value = (float)$value;
+                                }
 
                                 if ($property->import_multiply) {
-                                    $value = ((float) $value) * $property->import_multiply;
+                                    $value = str_replace(" ", "", $value);
+                                    $value = str_replace(",", ".", $value);
+                                    $value = ((float)$value) * $property->import_multiply;
                                 }
+
 
                                 if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
                                     $model->relatedPropertiesModel->setAttribute($code, $value);
                                 }
-
-                                $shopProduct->{$property->property_nature} = $value;
-                            }
-
-                        } elseif (in_array($property->property_nature, [
-                            ShopStoreProperty::PROPERTY_NATURE_BARCODE
-                        ])) {
-
-                            $delimetr = ",";
-                            if ($property->import_delimetr) {
-                                $delimetr = $property->import_delimetr;
-                            }
-
-                            $value = explode($delimetr, $value);
-                            foreach ($value as $k => $v) {
-                                $value[$k] = trim($v);
-                            }
-
-                            if (is_array($value)) {
-
-                                $shopProduct->setBarcodes($value);
-                            }
-
-
-                        } elseif (in_array($property->property_nature, [
-                            ShopStoreProperty::PROPERTY_NATURE_TREE
-                        ])) {
-
-
-                            $code = "";
-                            if ($property->cmsContentProperty) {
-                                $code = $property->cmsContentProperty->code;
-                            }
-
-                            if ($property->is_options) {
-
-                                if ($property->import_delimetr) {
-                                    $value = explode($property->import_delimetr, $value);
-                                    foreach ($value as $k => $v) {
-                                        $value[$k] = trim($v);
-                                    }
-                                }
-
-                                if (is_array($value)) {
-                                    $data = [];
-                                    foreach ($value as $k => $v) {
-                                        if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $v])->one()) {
-                                            if ($option->cms_tree_id) {
-                                                $model->tree_id = $option->cms_tree_id;
-                                            }
-                                        }
-                                    }
-                                    if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
-                                        $model->relatedPropertiesModel->setAttribute($code, $data);
-                                    }
-
-                                } else {
-
-                                    if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $value])->one()) {
-                                        if ($option->cms_tree_id) {
-                                            $model->tree_id = $option->cms_tree_id;
-                                        }
-                                    }
-                                }
-                            }
-
-
-
-                        } elseif (in_array($property->property_nature, [
-                            ShopStoreProperty::PROPERTY_NATURE_EAV
-                        ]) || $property->cmsContentProperty) {
-                            $code = "";
-                            if ($property->cmsContentProperty) {
-                                $code = $property->cmsContentProperty->code;
-                            }
-
-                            if ($property->is_options) {
-
-                                if ($property->import_delimetr) {
-                                    $value = explode($property->import_delimetr, $value);
-                                    foreach ($value as $k => $v) {
-                                        $value[$k] = trim($v);
-                                    }
-                                }
-
-                                if (is_array($value)) {
-                                    $data = [];
-                                    foreach ($value as $k => $v) {
-                                        if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $v])->one()) {
-                                            /*if ($option->cms_tree_id) {
-                                                $model->tree_id = $option->cms_tree_id;
-                                            }*/
-                                            $data[] = $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id;
-                                        }
-                                    }
-                                    if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
-                                        $model->relatedPropertiesModel->setAttribute($code, $data);
-                                    }
-
-                                } else {
-
-                                    if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $value])->one()) {
-                                        /*if ($option->cms_tree_id) {
-                                            $model->tree_id = $option->cms_tree_id;
-                                        }*/
-
-                                        if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
-                                            $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
-                                        }
-                                    }
-                                }
-                            } else {
-                                if (is_array($value)) {
-    
-                                } else {
-
-                                    $isNumber = false;
-
-                                    if ($cmsProperty = $model->relatedPropertiesModel->getRelatedProperty($code)) {
-                                        if ($cmsProperty->property_type == PropertyType::CODE_NUMBER) {
-                                            $isNumber = true;
-                                        }
-                                    }
-
-                                    $value = trim($value);
-
-                                    if ($isNumber) {
-                                        $value = str_replace(" ", "", $value);
-                                        $value = str_replace(",", ".", $value);
-                                        $value = (float) $value;
-                                    }
-
-                                    if ($property->import_multiply) {
-                                        $value = str_replace(" ", "", $value);
-                                        $value = str_replace(",", ".", $value);
-                                        $value = ((float) $value) * $property->import_multiply;
-                                    }
-
-
-
-                                    if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
-                                        $model->relatedPropertiesModel->setAttribute($code, $value);
-                                    }
-                                }
                             }
                         }
+                    }
                 }
             }
         }

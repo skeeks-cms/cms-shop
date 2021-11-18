@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use yii\helpers\ArrayHelper;
 /**
  *
@@ -189,6 +190,32 @@ class ShopStoreProperty extends ActiveRecord
                 'required',
                 'when' => function (self $model) {
                     return (bool)($model->property_nature == self::PROPERTY_NATURE_EAV);
+                },
+            ],
+
+            [
+                ['cms_content_property_id'],
+                function ($attribute) {
+
+
+                    if ($this->cmsContentProperty) {
+
+                        if (in_array($this->cmsContentProperty->property_type, [
+                            PropertyTypeList::CODE_ELEMENT,
+                            PropertyTypeList::CODE_LIST
+                        ])) {
+                            //Значит значение массив
+
+
+
+                            if ($this->import_delimetr) {
+                                if (!$this->cmsContentProperty->handler->isMultiple) {
+                                    $this->addError($attribute, "Указан разделитель, а значит значений будет несколько, в свойстве сайта необходимо выбрать множественное значение");
+                                    return false;
+                                }
+                            }
+                        }
+                    }
                 },
             ],
 

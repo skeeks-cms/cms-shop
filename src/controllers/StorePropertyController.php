@@ -31,7 +31,6 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\TextField;
 use yii\base\Event;
 use yii\base\Exception;
@@ -40,6 +39,7 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
 
@@ -72,8 +72,53 @@ class StorePropertyController extends BackendModelStandartController
                     $url = Url::to(['update-properties']);
                     $urlOptions = Url::to(['update-options']);
                     $urlConnectOptions = Url::to(['connect-options']);
+                    $urlConnectPropertyOptions = Url::to(['connect-property-options']);
 
                     \Yii::$app->view->registerJs(<<<JS
+
+$("body").on("click", ".sx-join-properties", function() {
+    var ajaxQuery = new sx.ajax.preparePostQuery('{$urlConnectPropertyOptions}');
+    ajaxQuery.setData($(this).data());
+    
+    new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+        'blockerSelector' : 'body',
+        'enableBlocker' : true,
+    }).on("success", function() {
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
+    });
+    
+    ajaxQuery.execute();
+    
+    return false;
+});
+
+$("body").on("click", ".sx-join-and-create-properties", function() {
+    var ajaxQuery = new sx.ajax.preparePostQuery('{$urlConnectPropertyOptions}');
+    
+    ajaxQuery.setData(
+        $.extend($(this).data(), {
+            'is_auto_create' : 1
+        })
+    );
+    
+    
+    new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+        'blockerSelector' : 'body',
+        'enableBlocker' : true,
+    }).on("success", function() {
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
+    });
+    
+    ajaxQuery.execute();
+    
+    return false;
+});
+
+
 $(".sx-update-properties").on("click", function() {
     
     var ajaxQuery = new sx.ajax.preparePostQuery('{$url}');
@@ -332,7 +377,7 @@ CSS
                                     $result[] = $property->cmsContentProperty->asText;
                                     if (in_array($property->cmsContentProperty->property_type, [
                                         PropertyType::CODE_NUMBER,
-                                        PropertyType::CODE_STRING
+                                        PropertyType::CODE_STRING,
                                     ])) {
                                         $isGreen = true;
                                     }
@@ -345,7 +390,7 @@ CSS
                                 /*if ($property->propertyTypeAsText) {
                                     $propertyType = "<small style='color: gray;'>".$property->propertyTypeAsText."</small>";
                                 }*/
-                                
+
 
                                 if ($property->is_options) {
                                     $countOptions = ArrayHelper::getValue($property->raw_row, 'countOptions');
@@ -368,14 +413,14 @@ CSS
 JS
                                     );
                                 }
-                                
+
                                 if ($isGreen) {
                                     \Yii::$app->view->registerJs(<<<JS
                                     $('tr[data-key={$key}]').addClass('sx-tr-green');
 JS
                                     );
                                 }
-                                
+
                                 if (!$property->is_visible) {
                                     \Yii::$app->view->registerJs(<<<JS
                                     $('tr[data-key={$key}]').addClass('sx-tr-inactive');
@@ -385,6 +430,27 @@ JS
 
                                 if ($propertyType) {
                                     $result[] = $propertyType;
+                                }
+
+                                if ($property->cmsContentProperty && in_array($property->cmsContentProperty->property_type, [
+                                        PropertyType::CODE_LIST,
+                                        PropertyType::CODE_ELEMENT,
+                                    ]) && $isGreen === false) {
+                                     $result[] = "<br />" . Html::button("Связать", [
+                                         'class' => 'btn btn-xs btn-default sx-join-properties',
+                                         'data' => [
+                                             'id' => $property->id
+                                         ],
+                                         'style' => 'background: #c9c9c9;',
+                                         'title' => 'Только связывает опции по названию'
+                                     ]) . Html::button("Связать и создать", [
+                                         'class' => 'btn btn-xs btn-default sx-join-and-create-properties',
+                                         'style' => 'margin-left: 5px; background: #c9c9c9;',
+                                         'data' => [
+                                             'id' => $property->id
+                                         ],
+                                         'title' => 'Сначала связывает опции по названию далее создает несвязанные'
+                                     ]);
                                 }
 
                                 return implode(" / ", $result);
@@ -442,7 +508,9 @@ JS
                 'controllerRoute' => "/shop/store-property-option",
                 'relation'        => ['shop_store_property_id' => 'id'],
                 'priority'        => 600,
-                'on gridInit'     => function ($e) {
+
+
+                'on gridInit' => function ($e) {
                     /**
                      * @var $action BackendGridModelRelatedAction
                      */
@@ -555,8 +623,8 @@ JS
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'priority' => [
-                        'class' => NumberField::class
+                    'priority'   => [
+                        'class' => NumberField::class,
                     ],
                 ],
             ],
@@ -785,6 +853,153 @@ JS
                                     //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
                                 } else {
                                     //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                }
+                            }
+                        } else {
+                            if ($enum = $contentProperty->getEnums()->andWhere(['value' => $option->name])->one()) {
+                                $option->cms_content_property_enum_id = $enum->id;
+                                if ($option->save()) {
+                                    //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                } else {
+                                    //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                }
+                            } else {
+                                if ($is_auto_create) {
+                                    $enum = new CmsContentPropertyEnum();
+                                    $enum->value = $option->name;
+                                    $enum->property_id = $contentProperty->id;
+
+                                    if (!$enum->save()) {
+                                        throw new Exception("Не создалась опция: ".print_r($enum->errors, true));
+                                    }
+
+                                    //$this->stdout("\t\tСоздана характеристика\n", Console::FG_GREEN);
+
+                                    $option->cms_content_property_enum_id = $enum->id;
+                                    if ($option->save()) {
+                                        //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                    } else {
+                                        //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+
+                $rr->message = 'Данные обновлены';
+                $rr->success = true;
+
+            } catch (\Exception $exception) {
+
+                $rr->message = $exception->getMessage();
+                $rr->success = false;
+            }
+
+        }
+
+        return $rr;
+
+
+    }
+
+    /**
+     * Связывает опции поставщика и опции cms
+     *
+     * @param int $is_auto_create будет создавать опции в cms или нет?
+     * @return bool
+     * @throws Exception
+     */
+    public function actionConnectPropertyOptions()
+    {
+        $is_auto_create = 0;
+
+        set_time_limit(0);
+        ini_set("memory_limit", "2G");
+
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            /**
+             * @var $model ShopStoreProperty
+             */
+            $model = $this->model;
+
+            if (\Yii::$app->request->post("is_auto_create")) {
+                $is_auto_create = 1;
+            }
+
+
+            if (!$id = \Yii::$app->request->post("id")) {
+                $rr->success = false;
+                return $rr;
+            }
+
+
+            try {
+                if (!$properties = ShopStoreProperty::find()
+                    ->andWhere(['id' => $id])
+                    ->andWhere(['is_options' => 1])
+                    ->andWhere(['is not', 'cms_content_property_id', null])
+                    ->andWhere(['shop_store_id' => \Yii::$app->shop->backendShopStore->id])->all()) {
+
+                    throw new Exception('Нет свойств типа список');
+                }
+
+                foreach ($properties as $property) {
+
+                    $queryOptions = $property->getShopStorePropertyOptions()->where([
+                        'and',
+                        ['cms_content_property_enum_id' => null],
+                        ['cms_content_element_id' => null],
+                    ]);
+                    $count = $queryOptions->count();
+                    if (!$count) {
+                        //$this->stdout("\tВсе опции связаны\n");
+                        continue;
+                    }
+                    //$this->stdout("\tНе связанных опций: {$count}\n");
+
+                    $content_id = null;
+                    $contentProperty = $property->cmsContentProperty;
+                    if ($property->cmsContentProperty->handler instanceof PropertyTypeList) {
+
+                    } elseif ($property->cmsContentProperty->handler instanceof PropertyTypeElement) {
+                        $content_id = $property->cmsContentProperty->handler->content_id;
+                    }
+
+                    foreach ($queryOptions->each(10) as $option) {
+                        //$this->stdout("\tОпция: {$option->asText}\n");
+
+                        if ($content_id) {
+                            if ($element = CmsContentElement::find()->andWhere(['content_id' => $content_id])->andWhere(['name' => $option->name])->one()) {
+                                $option->cms_content_element_id = $element->id;
+                                if ($option->save()) {
+                                    //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                } else {
+                                    //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                }
+                            } else {
+                                if ($is_auto_create) {
+                                    $element = new CmsContentElement();
+                                    $element->name = $option->name;
+                                    $element->content_id = $content_id;
+
+                                    if (!$element->save()) {
+                                        throw new Exception("Не создалась опция: ".print_r($element->errors, true));
+                                    }
+
+                                    //$this->stdout("\t\tСоздана характеристика\n", Console::FG_GREEN);
+
+                                    $option->cms_content_element_id = $element->id;
+                                    if ($option->save()) {
+                                        //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                    } else {
+                                        //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                    }
                                 }
                             }
                         } else {

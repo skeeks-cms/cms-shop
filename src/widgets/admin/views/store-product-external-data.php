@@ -114,14 +114,41 @@ JS
                     if (is_string($row)) {
 
                         if ($supplierProperty->cmsContentProperty) {
-                            $shopSupplierPropertyOption = $supplierProperty->getShopStorePropertyOptions()->andWhere(['name' => $row])->one();
-                            if ($shopSupplierPropertyOption) {
-                                if ($shopSupplierPropertyOption->cmsContentElement) {
-                                    $isGreen = true;
-                                } else {
-                                    $isRed = true;
+                            if ($supplierProperty->import_delimetr) {
+                                $value = explode($supplierProperty->import_delimetr, $row);
+                                foreach ($value as $k => $v) {
+                                    $value[$k] = trim($v);
+                                }
+
+                                /**
+                                 * @var $shopSupplierPropertyOption \skeeks\cms\shop\models\ShopStorePropertyOption
+                                 */
+                                $shopSupplierPropertyOptions = $supplierProperty->getShopStorePropertyOptions()->andWhere(['name' => $value])->all();
+                                if ($shopSupplierPropertyOptions) {
+                                    foreach ($shopSupplierPropertyOptions as $shopSupplierPropertyOption) {
+                                        if ($shopSupplierPropertyOption->cmsContentElement || $shopSupplierPropertyOption->cmsContentPropertyEnum) {
+                                            $isGreen = true;
+                                        } else {
+                                            $isRed = true;
+                                        }
+                                    }
+
+                                }
+
+                            } else {
+                                /**
+                                 * @var $shopSupplierPropertyOption \skeeks\cms\shop\models\ShopStorePropertyOption
+                                 */
+                                $shopSupplierPropertyOption = $supplierProperty->getShopStorePropertyOptions()->andWhere(['name' => $row])->one();
+                                if ($shopSupplierPropertyOption) {
+                                    if ($shopSupplierPropertyOption->cmsContentElement || $shopSupplierPropertyOption->cmsContentPropertyEnum) {
+                                        $isGreen = true;
+                                    } else {
+                                        $isRed = true;
+                                    }
                                 }
                             }
+
 
                             if ($supplierProperty->cmsContentProperty->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_STRING) {
                                 $isGreen = true;
@@ -179,6 +206,13 @@ JS
                                             <a href="#" class="btn btn-xs sx-copy btn-secondary" data-toggle="tooltip" title="" data-original-title="Скопировать">
                                                 <i class="fas fa-copy" style="cursor: pointer;"></i>
                                                 <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->cmsContentElement->name; ?>" style="position: absolute; left: -20000px;">
+                                            </a>
+                                        <? endif; ?>
+                                        <? if ($shopSupplierPropertyOption && $shopSupplierPropertyOption->cmsContentPropertyEnum) : ?>
+                                            <?= $shopSupplierPropertyOption->cmsContentPropertyEnum->value; ?>
+                                            <a href="#" class="btn btn-xs sx-copy btn-secondary" data-toggle="tooltip" title="" data-original-title="Скопировать">
+                                                <i class="fas fa-copy" style="cursor: pointer;"></i>
+                                                <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->cmsContentPropertyEnum->value; ?>" style="position: absolute; left: -20000px;">
                                             </a>
                                         <? endif; ?>
                                     <? endif; ?>

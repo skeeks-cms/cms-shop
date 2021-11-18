@@ -429,7 +429,7 @@ $noValue = "<span style='color: silver;'>—</span>";
                             ],
                         ]);
                         ?>
-                        <i class="fas fa-link" title="Товар привязан к инфокарточке. Берет описание, фото и характеристики из нее." data-toggle="tooltip" style="margin-left: 5px;"></i>
+                        <i class="fas fa-link" title="Товар привязан к инфокарточке. Берет описание, фото и характеристики из нее. <?php echo $model->main_cce_id; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
                         <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                     <?php else : ?>
                         <span style="color: red;">
