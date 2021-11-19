@@ -16,6 +16,10 @@ $supplierProperties = $widget->storeProduct->shopStore->getShopStoreProperties()
     ->all();
 
 $this->registerCss(<<<CSS
+
+.sx-fast-edit {
+    opacity: 0;
+}
 .sx-supplier-properies-hidden {
 display: none;
 }
@@ -45,6 +49,11 @@ display: none;
 .sx-red {
     background: #ffe9e9;
 }
+
+.sx-propery-row:hover .sx-fast-edit {
+    opacity: 1;
+}
+
 CSS
 );
 
@@ -99,6 +108,35 @@ JS
             <div class="sx-supplier-properies-visible">
                 <? foreach ($supplierProperties as $supplierProperty) : ?>
                     <?
+                    $formCode = "";
+                    if ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_EAV) {
+                        if ($supplierProperty->cmsContentProperty) {
+                            $formCode = strtolower("field-relatedpropertiesmodel-".$supplierProperty->cmsContentProperty->code);
+                        }
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_TREE) {
+                        $formCode = "field-shopcmscontentelement-tree_id";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_BARCODE) {
+                        $formCode = "field-shopproduct-barcodes";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_IMAGE) {
+                        $formCode = "field-shopcmscontentelement-image_id";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_SECOND_IMAGE) {
+                        $formCode = "field-shopcmscontentelement-imageids";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_WEIGHT) {
+                        $formCode = "field-shopproduct-weight";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_LENGTH) {
+                        $formCode = "field-shopproduct-length";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_HEIGHT) {
+                        $formCode = "field-shopproduct-height";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_WIDTH) {
+                        $formCode = "field-shopproduct-width";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_MEASURE_CODE) {
+                        $formCode = "field-shopproduct-measure_code";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_MEASURE_RATIO_MIN) {
+                        $formCode = "field-shopproduct-measure_ratio_min";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_MEASURE_RATIO) {
+                        $formCode = "field-shopproduct-measure_ratio";
+                    }
+
                     $row = \yii\helpers\ArrayHelper::getValue($data, $supplierProperty->external_code);
                     \yii\helpers\ArrayHelper::remove($data, $supplierProperty->external_code);
 
@@ -173,8 +211,11 @@ JS
 
 
                     <? if ($row) : ?>
-                        <div class="sx-propery-row d-flex <?php echo implode(" ", $cssClasses); ?>">
+                        <div class="sx-propery-row d-flex <?php echo implode(" ", $cssClasses); ?>" data-form-code="<?php echo $formCode; ?>">
                             <div class="sx-propery-row-inner">
+
+
+
                             <span>
 
                             <? if ($isReady) : ?>
@@ -188,29 +229,29 @@ JS
                                 <? endif; ?>
                                 :
                             </span>
-                            <? if (is_string($row)) : ?>
-                                <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
-                                    <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
+                                <? if (is_string($row)) : ?>
+                                    <? if (filter_var($row, FILTER_VALIDATE_URL)) : ?>
+                                        <b><a href="<?= $row; ?>" target="_blank"><?= $row; ?></a></b>
+                                    <? else : ?>
+                                        <b><?= $row; ?></b>
+                                    <? endif; ?>
                                 <? else : ?>
-                                    <b><?= $row; ?></b>
+                                    <pre><?= print_r($row, true); ?></pre>
                                 <? endif; ?>
-                            <? else : ?>
-                                <pre><?= print_r($row, true); ?></pre>
-                            <? endif; ?>
 
-                            <span style="float: right;" title="Правильное название в нашей системе">
+                                <span style="float: right;" title="Правильное название в нашей системе">
                                 <? if (is_string($row)) : ?>
                                     <? if ($supplierProperty->cmsContentProperty) : ?>
                                         <? if ($shopSupplierPropertyOption && $shopSupplierPropertyOption->cmsContentElement) : ?>
                                             <?= $shopSupplierPropertyOption->cmsContentElement->name; ?>
-                                            <a href="#" class="btn btn-xs sx-copy btn-secondary" data-toggle="tooltip" title="" data-original-title="Скопировать">
+                                            <a href="#" class="btn btn-xs sx-copy btn-default" data-toggle="tooltip" title="" data-original-title="Скопировать">
                                                 <i class="fas fa-copy" style="cursor: pointer;"></i>
                                                 <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->cmsContentElement->name; ?>" style="position: absolute; left: -20000px;">
                                             </a>
                                         <? endif; ?>
                                         <? if ($shopSupplierPropertyOption && $shopSupplierPropertyOption->cmsContentPropertyEnum) : ?>
                                             <?= $shopSupplierPropertyOption->cmsContentPropertyEnum->value; ?>
-                                            <a href="#" class="btn btn-xs sx-copy btn-secondary" data-toggle="tooltip" title="" data-original-title="Скопировать">
+                                            <a href="#" class="btn btn-xs sx-copy btn-default" data-toggle="tooltip" title="" data-original-title="Скопировать">
                                                 <i class="fas fa-copy" style="cursor: pointer;"></i>
                                                 <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->cmsContentPropertyEnum->value; ?>" style="position: absolute; left: -20000px;">
                                             </a>
@@ -218,6 +259,21 @@ JS
                                     <? endif; ?>
                                 <? endif; ?>
                             </span>
+
+
+                                <?
+                                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => "/shop/store-property/",
+                                    'modelId'      => $supplierProperty->id,
+                                    'tag'          => 'span',
+                                    'options' => [
+                                        'class' => 'sx-fast-edit'
+                                    ]
+                                ]);
+                                ?>
+                                <i class="fas fa-pencil-alt" data-toggle="tooltip" style="color: gray;" title="" data-original-title=""></i>
+                                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+
                             </div>
                         </div>
 
@@ -244,6 +300,30 @@ JS
                             <? else : ?>
                                 <pre><?= print_r($row, true); ?></pre>
                             <? endif; ?>
+
+                            <?php
+                            $supplierProperty = $widget->storeProduct->shopStore->getShopStoreProperties()
+                                ->andWhere(['in', 'external_code', trim($key)])
+                                ->one();
+                            ?>
+                            <? if ($supplierProperty) : ?>
+
+                                <?
+                                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => "/shop/store-property/",
+                                    'modelId'      => $supplierProperty->id,
+                                    'tag'          => 'span',
+                                    'options' => [
+                                        'class' => 'sx-fast-edit'
+                                    ]
+                                ]);
+                                ?>
+                                <i class="fas fa-pencil-alt" data-toggle="tooltip" style="color: gray;" title="" data-original-title=""></i>
+                                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+
+                            <? endif; ?>
+
+
                         </div>
                     <? endif; ?>
                 <? endforeach; ?>

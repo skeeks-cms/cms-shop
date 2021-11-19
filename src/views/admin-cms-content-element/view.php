@@ -1036,17 +1036,17 @@ $infoModel = $model;
     </div>
 </section>
 
-<?php if ($model->shopProduct->supplier_external_jsondata) : ?>
+<?php /*if ($model->shopProduct->supplier_external_jsondata) : */?><!--
     <section class="sx-info-block">
         <div class="row no-gutters">
             <div class="col-12">
                 <div class="sx-title">Прочие данные <i class="far fa-question-circle" title="Неразобранные данные, которые сохранились по товару в момент импорта на сайт" data-toggle="tooltip"
                                                        style="margin-left: 5px;"></i></div>
-                <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $model->shopProduct]); ?>
+                <?/*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $model->shopProduct]); */?>
             </div>
         </div>
     </section>
-<?php endif; ?>
+--><?php /*endif; */?>
 
 <?php $pjax::end(); ?>
 

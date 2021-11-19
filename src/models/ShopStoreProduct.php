@@ -255,6 +255,12 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                         ShopStoreProperty::PROPERTY_NATURE_LENGTH,
                         ShopStoreProperty::PROPERTY_NATURE_WEIGHT,
                     ])) {
+                        
+                        $code = "";
+                        if ($property->cmsContentProperty) {
+                            $code = $property->cmsContentProperty->code;
+                        }
+                        
                         if (is_string($value)) {
                             $value = trim($value);
                             $value = str_replace(" ", "", $value);
@@ -343,6 +349,8 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
                                 $value = trim($value);
 
+                                
+
                                 if ($isNumber) {
                                     $value = str_replace(" ", "", $value);
                                     $value = str_replace(",", ".", $value);
@@ -355,15 +363,32 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                                     $value = ((float)$value) * $property->import_multiply;
                                 }
 
+                                
 
                                 if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
+                                    
+                                    
+                                        
                                     $model->relatedPropertiesModel->setAttribute($code, $value);
+                                    
+                                    /*if ($cmsProperty->code == "property46f67780555a0733c7df75b83a537f9e") {
+                                        print_r($code);
+                                        var_dump($value);
+                                        //print_r($model->relatedPropertiesModel->toArray());die;
+                                    }*/
+                                    
+                                    /*if ($cmsProperty->name == "Диаметр") {
+                                        print_r($model->relatedPropertiesModel->getAttribute($code));
+                                        
+                                    }*/
                                 }
                             }
                         }
                     }
                 }
             }
+            
+            //print_r($model->relatedPropertiesModel->toArray());die;
         }
     }
 }

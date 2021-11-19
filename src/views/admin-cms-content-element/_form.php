@@ -224,7 +224,40 @@ JS
 
     <? if ($shopStoreProduct || $shopProduct->supplier_external_jsondata && 1 == 2) : ?>
 <?
+$this->registerJs(<<<JS
+$(".sx-propery-row").click(
+    function() {
+        var formCode = $(this).data('form-code');
+        var jElement = $("." + formCode);
+        console.log("." + formCode);
+        console.log(jElement);
+        
+        if(jElement.length) { // проверяем существование
+            $('html').animate({ 
+                scrollTop: jElement.offset().top // прокручиваем страницу к требуемому элементу
+            }, 500 // скорость прокрутки
+            );
+        }
+            
+    },
+);
+$(".sx-propery-row").hover(
+    function() {
+        var formCode = $(this).data('form-code');
+        $("." + formCode).addClass("sx-hover");
+    },
+    function() {
+        var formCode = $(this).data('form-code');
+        $("." + formCode).removeClass("sx-hover");
+    }
+);
+JS
+);
+
 $this->registerCss(<<<CSS
+.sx-hover {
+background: #d9fbd9;
+}
 .sx-main-col {
     padding-right: 400px !important;
 }
@@ -274,7 +307,7 @@ $this->registerCss(<<<CSS
 CSS
 );
 ?>
-    <div class="sx-subproduct-info sx-bg-secondary">
+    <div class="sx-subproduct-info js-scrollbar sx-bg-secondary">
         <? endif; ?>
 
 
@@ -283,20 +316,23 @@ CSS
             <div class="sx-info-block">
                 <h5><?= $shopStoreProduct->name; ?>
                     <a href="https://market.yandex.ru/search?cvredirect=2&text=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в yandex market" target="_blank" style="color: blue"
-                       class="btn btn-xs btn-secondary">
+                       class="btn btn-xs btn-default">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
-                    <a href="https://yandex.ru/search/?lr=213&text=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в yandex" target="_blank" style="color: red" class="btn btn-xs btn-secondary">
+                    <a href="https://yandex.ru/search/?lr=213&text=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в yandex" target="_blank" style="color: red" class="btn btn-xs btn-default">
                         <i class="fab fa-yandex"></i>
                     </a>
-                    <a href="https://www.google.com/search?q=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в google" target="_blank" style="" class="btn btn-xs btn-secondary">
+                    <a href="https://www.google.com/search?q=<?= urlencode($shopStoreProduct->name); ?>" title="Поиск в google" target="_blank" style="" class="btn btn-xs btn-default">
                         <i class="fab fa-google"></i>
                     </a>
                 </h5>
             </div>
 
             <hr/>
-            <div class="sx-info-block">
+            <div class="sx-info-block ">
+                <?
+                \skeeks\assets\unify\base\UnifyHsScrollbarAsset::register($this);
+                ?>
                 <?= \skeeks\cms\shop\widgets\admin\StoreProductExternalDataWidget::widget([
                     'storeProduct' => $shopStoreProduct
                 ]); ?>
@@ -305,11 +341,11 @@ CSS
         <? endif; ?>
 
 
-        <? if ($shopProduct->supplier_external_jsondata) : ?>
+        <?/* if ($shopProduct->supplier_external_jsondata) : */?><!--
             <div class="sx-info-block">
-                <?= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopProduct]); ?>
+                <?/*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $shopProduct]); */?>
             </div>
-        <? endif; ?>
+        --><?/* endif; */?>
 
 
 
