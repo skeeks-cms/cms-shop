@@ -351,7 +351,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
                                 
 
-                                if ($isNumber) {
+                                if ($isNumber && $value) {
                                     $value = str_replace(" ", "", $value);
                                     $value = str_replace(",", ".", $value);
                                     $value = (float)$value;

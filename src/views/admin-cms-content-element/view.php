@@ -455,7 +455,7 @@ $noValue = "<span style='color: silver;'>—</span>";
                                   data-form="#is_active-form"
                                   data-title="Активность"
                             >
-                                <?php echo $model->is_active ? '<span class="fa fa-check" data-toggle="tooltip" title="Товар показывается на сайте"  style="color: green;"></span>' : '<span data-toggle="tooltip" title="Товар не активен" class="fa fa-times" style="color: red;"></span>' ?>
+                                <?php echo $model->is_active ? '<span data-toggle="tooltip" title="Товар показывается на сайте"  style="color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red;">x</span>' ?>
                             </span>
 
                             <div class="sx-fast-edit-form-wrapper">

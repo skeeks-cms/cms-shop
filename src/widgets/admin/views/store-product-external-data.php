@@ -19,6 +19,8 @@ $this->registerCss(<<<CSS
 
 .sx-fast-edit {
     opacity: 0;
+    transition: 1s;
+    cursor: pointer;
 }
 .sx-supplier-properies-hidden {
 display: none;
@@ -245,14 +247,14 @@ JS
                                         <? if ($shopSupplierPropertyOption && $shopSupplierPropertyOption->cmsContentElement) : ?>
                                             <?= $shopSupplierPropertyOption->cmsContentElement->name; ?>
                                             <a href="#" class="btn btn-xs sx-copy btn-default" data-toggle="tooltip" title="" data-original-title="Скопировать">
-                                                <i class="fas fa-copy" style="cursor: pointer;"></i>
+                                                <i class="fas fa-copy" style="cursor: pointer; color: gray;"></i>
                                                 <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->cmsContentElement->name; ?>" style="position: absolute; left: -20000px;">
                                             </a>
                                         <? endif; ?>
                                         <? if ($shopSupplierPropertyOption && $shopSupplierPropertyOption->cmsContentPropertyEnum) : ?>
                                             <?= $shopSupplierPropertyOption->cmsContentPropertyEnum->value; ?>
                                             <a href="#" class="btn btn-xs sx-copy btn-default" data-toggle="tooltip" title="" data-original-title="Скопировать">
-                                                <i class="fas fa-copy" style="cursor: pointer;"></i>
+                                                <i class="fas fa-copy" style="cursor: pointer; color: gray;"></i>
                                                 <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->cmsContentPropertyEnum->value; ?>" style="position: absolute; left: -20000px;">
                                             </a>
                                         <? endif; ?>

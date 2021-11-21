@@ -399,7 +399,7 @@ CSS
 
                                     if ($countNotConnectOptions == 0) {
                                         $isGreen = true;
-                                        $propertyType .= "<small>Опций: <span title='Всего опций'> {$countOptions}</span> (<span style='color:green;' title='Все привязаны!'><span class='fa fa-check'></span></span>)</small>";
+                                        $propertyType .= "<small>Опций: <span title='Всего опций'> {$countOptions}</span> (<span style='color:green;' title='Все привязаны!'>✓</span>)</small>";
                                     } else {
                                         $isRed = true;
                                         $propertyType .= "<small>Опций: <span title='Всего опций'> {$countOptions}</span> (<span style='color:red;' title='Не привязанных'>{$countNotConnectOptions}</span>)</small>";
@@ -466,7 +466,7 @@ JS
                                     $countNotConnectOptions = ArrayHelper::getValue($property->raw_row, 'countNotConnectOptions');
 
                                     if ($countNotConnectOptions == 0) {
-                                        $result[] = "<span title='Всего опций'> {$countOptions}</span> (<span style='color:green;' title='Все привязаны!'><span class='fa fa-check'></span></span>)";
+                                        $result[] = "<span title='Всего опций'> {$countOptions}</span> (<span style='color:green;' title='Все привязаны!'>✓</span>)";
                                     } else {
                                         $result[] = "<span title='Всего опций'> {$countOptions}</span> (<span style='color:red;' title='Не привязанных'>{$countNotConnectOptions}</span>)";
                                     }
