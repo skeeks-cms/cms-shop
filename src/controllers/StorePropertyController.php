@@ -535,6 +535,7 @@ JS
         $model = $action->model;
 
         if ($model->property_nature == ShopStoreProperty::PROPERTY_NATURE_EAV) {
+
             $cms_content_property_id = [
                 'class' => SelectField::class,
                 'items' => ArrayHelper::map(
@@ -562,8 +563,6 @@ JS
                     ],
 
                     'name',
-
-
                 ],
             ],
             'main'     => [
