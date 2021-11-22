@@ -111,7 +111,7 @@ JS
                 <? foreach ($supplierProperties as $supplierProperty) : ?>
                     <?
                     $formCode = "";
-                    if ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_EAV) {
+                    if ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_EAV || $supplierProperty->cmsContentProperty) {
                         if ($supplierProperty->cmsContentProperty) {
                             $formCode = strtolower("field-relatedpropertiesmodel-".$supplierProperty->cmsContentProperty->code);
                         }
