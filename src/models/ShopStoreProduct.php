@@ -330,7 +330,22 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
                                 if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => $value])->one()) {
                                     if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
-                                        $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
+                                        $relatedProperty = $model->relatedPropertiesModel->getRelatedProperty($code);
+                                        $val = $model->relatedPropertiesModel->getAttribute($code);
+
+
+                                        if ($val && $relatedProperty->is_multiple) {
+                                            $newVal = $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id;
+                                            if (!is_array($val)) {
+                                                $val = [$val];
+                                            }
+                                            $val = ArrayHelper::merge($val, [$newVal]);
+
+                                            $model->relatedPropertiesModel->setAttribute($code, $val);
+                                        } else {
+                                            $model->relatedPropertiesModel->setAttribute($code, $option->cms_content_element_id ? $option->cms_content_element_id : $option->cms_content_property_enum_id);
+                                        }
+
                                     }
                                 }
                             }
@@ -349,8 +364,6 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
                                 $value = trim($value);
 
-                                
-
                                 if ($isNumber && $value) {
                                     $value = str_replace(" ", "", $value);
                                     $value = str_replace(",", ".", $value);
@@ -363,24 +376,8 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                                     $value = ((float)$value) * $property->import_multiply;
                                 }
 
-                                
-
                                 if ($code && $model->relatedPropertiesModel->hasAttribute($code)) {
-                                    
-                                    
-                                        
                                     $model->relatedPropertiesModel->setAttribute($code, $value);
-                                    
-                                    /*if ($cmsProperty->code == "property46f67780555a0733c7df75b83a537f9e") {
-                                        print_r($code);
-                                        var_dump($value);
-                                        //print_r($model->relatedPropertiesModel->toArray());die;
-                                    }*/
-                                    
-                                    /*if ($cmsProperty->name == "Диаметр") {
-                                        print_r($model->relatedPropertiesModel->getAttribute($code));
-                                        
-                                    }*/
                                 }
                             }
                         }

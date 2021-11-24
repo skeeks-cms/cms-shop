@@ -42,6 +42,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
+use yii\web\JsExpression;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -538,10 +539,45 @@ JS
 
             $cms_content_property_id = [
                 'class' => SelectField::class,
+                'widgetConfig' => [
+                    'pluginOptions' => [
+                        'templateResult' => new JsExpression(<<<JS
+function formatState (state) {
+    console.log(state);
+  if (!state.id) {
+    return state.text;
+  }
+  var state = $("<div>", {"style": "line-height: 1;"}).append(state.text);
+  return state;
+}
+JS)
+                        ,
+            'templateSelection' => new JsExpression(<<<JS
+function formatState (state) {
+    console.log(state);
+  if (!state.id) {
+    return state.text;
+  }
+  var state = $("<div>", {"style": ""}).append(state.text);
+  $("small", state).remove();
+  return state;
+}
+JS)
+
+                    ]
+                ],
                 'items' => ArrayHelper::map(
                     CmsContentProperty::find()->cmsSite()->all(),
                     'id',
-                    'asText'
+                    function(CmsContentProperty $model) {
+                        $treeSting = "";
+                        if ($model->cmsTrees) {
+                            $trees = ArrayHelper::map($model->cmsTrees, "id", "name");
+                            $treeSting = "<br /><small>(" . implode(", ", $trees) . ")</small>";
+                        }
+
+                        return $model->asText . $treeSting;
+                    }
                 ),
             ];
         } else {
