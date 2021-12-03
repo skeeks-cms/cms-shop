@@ -15,6 +15,7 @@ use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\query\CmsActiveQuery;
+use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
@@ -117,7 +118,53 @@ HTML
                         ,
                     ]);
                 },
-                "filters"         => false,
+                "filters"         => [
+                    'visibleFilters' => [
+                        'q',
+                    ],
+
+                    'filtersModel' => [
+                        'rules' => [
+                            ['q', 'safe'],
+                        ],
+
+                        'attributeDefines' => [
+                            'q',
+                        ],
+
+
+                        'fields' => [
+
+                            'q'                => [
+                                'label'          => 'Поиск',
+                                'elementOptions' => [
+                                    'placeholder' => 'Поиск',
+                                ],
+                                'on apply'       => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value) {
+                                        $query
+                                            ->andWhere([
+                                                'or',
+                                                ['like', ShopStore::tableName().'.id', $e->field->value],
+                                                ['like', ShopStore::tableName().'.name', $e->field->value],
+                                                ['like', ShopStore::tableName().'.description', $e->field->value],
+                                                ['like', ShopStore::tableName().'.external_id', $e->field->value],
+                                            ]);
+
+                                        $query->groupBy([ShopStore::tableName().'.id']);
+                                    }
+                                },
+                            ],
+
+
+                        ],
+                    ],
+                ],
                 "backendShowings" => false,
                 'grid'            => [
                     'on init'        => function (Event $e) {
