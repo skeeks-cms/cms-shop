@@ -57,7 +57,7 @@ class AdminOrderController extends BackendModelStandartController
                     'style'  => "margin-bottom: 0px;",
                 ])
                 .
-                "<h4 style='color: gray;'>от " . Html::tag("span", \Yii::$app->formatter->asDatetime($model->created_at)) . "</h4>";
+                "<h6 style='color: gray;'>от " . Html::tag("span", \Yii::$app->formatter->asDatetime($model->created_at)) . "</h6>";
                 ;
         };
 

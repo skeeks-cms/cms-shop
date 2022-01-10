@@ -1323,9 +1323,10 @@ HTML
 
             if ($urlHelper->getBackenParam("sx-to-main")) {
 
-                $siteClass = \Yii::$app->skeeks->siteClass;
+                /*$siteClass = \Yii::$app->skeeks->siteClass;
                 $site = $siteClass::find()->where(['is_default' => 1])->one();
-                $site_id = $site->id;
+                $site_id = $site->id;*/
+                $site_id = \Yii::$app->skeeks->site->id;
                 $query->andWhere([
                     'in',
                     'sp.product_type',

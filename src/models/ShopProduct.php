@@ -812,11 +812,11 @@ class ShopProduct extends \skeeks\cms\models\Core
 
 
         if (!$shopUser) {
-            $basPriceTypes = [\Yii::$app->shop->baseTypePrice->id];
+            $basPriceTypes = [\Yii::$app->shop->baseTypePrice];
         } else {
             $basPriceTypes = $shopUser->buyTypePrices;
         }
-
+        
         return $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
         ])
