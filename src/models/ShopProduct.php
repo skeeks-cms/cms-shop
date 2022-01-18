@@ -617,15 +617,17 @@ class ShopProduct extends \skeeks\cms\models\Core
                                 $shopProductBarcode = new ShopProductBarcode();
                                 $shopProductBarcode->shop_product_id = $this->id;
                             }
+                            $validateAttributes = [];
                         } else {
                             $shopProductBarcode = new ShopProductBarcode();
                             $shopProductBarcode->shop_product_id = $this->id;
+                            $validateAttributes = ['value', 'barcode_type'];
                         }
 
                         $shopProductBarcode->value = ArrayHelper::getValue($barcodeData, 'value');
                         $shopProductBarcode->barcode_type = ArrayHelper::getValue($barcodeData, 'barcode_type');
 
-                        if (!$shopProductBarcode->validate()) {
+                        if (!$shopProductBarcode->validate($validateAttributes)) {
                             $this->addError($attribute, ArrayHelper::getValue($barcodeData, 'value') . " — некорректный штрихкод: " . Json::encode($shopProductBarcode->errors));
                             return false;
                         }
