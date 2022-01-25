@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\shop\components;
 
-use skeeks\cms\admin\AdminComponent;
 use skeeks\cms\backend\BackendComponent;
 use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\models\CmsAgent;
@@ -50,7 +49,7 @@ use yii\widgets\ActiveForm;
  * @property ShopStore[]          $supplierStores
  * @property ShopStore[]          $allStores
  *
- * @property ShopStore          $backendShopStore
+ * @property ShopStore            $backendShopStore
  */
 class ShopComponent extends Component implements BootstrapInterface
 {
@@ -400,8 +399,7 @@ class ShopComponent extends Component implements BootstrapInterface
     {
         $this
             ->filterByTypeContentElementQuery($activeQuery)
-            ->filterByPriceContentElementQuery($activeQuery)
-            //->filterByMainPidContentElementQuery($activeQuery)
+            ->filterByPriceContentElementQuery($activeQuery)//->filterByMainPidContentElementQuery($activeQuery)
         ;
 
         return $this;
@@ -828,13 +826,13 @@ SQL
     }
 
     /**
-     * @deprecated
      * @param CmsSite|null $cmsSite
+     * @deprecated
      */
     static public function importNewProductsOnSite(CmsSite $cmsSite = null)
     {
         return false;
-        
+
         ini_set("memory_limit", "1024M");
 
         if ($cmsSite === null) {
@@ -1041,16 +1039,19 @@ SQL
 
         if (count($result) > 1) {
             return [
-                'priority' => 20,
-                'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
-                "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+                'products' => [
+                    'priority' => 260,
+                    'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
+                    "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
 
-                'items' => $result,
+                    'items' => $result,
+                ],
             ];
         } else {
             if (isset($result[0])) {
-                $result[0]['priority'] = 20;
-                return $result[0];
+                $result[0]['priority'] = 260;
+                $result[0]['label'] = "Товары и услуги";
+                return ['products' => $result[0]];
             }
 
             return [];

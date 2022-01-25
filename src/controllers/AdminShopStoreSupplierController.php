@@ -63,8 +63,8 @@ class AdminShopStoreSupplierController extends BackendModelStandartController
             'index' => [
                 'on beforeRender' => function (Event $e) {
 
-                        $backendUrl = Url::to(['update-prices']);
-                        \Yii::$app->view->registerJs(<<<JS
+                    $backendUrl = Url::to(['update-prices']);
+                    \Yii::$app->view->registerJs(<<<JS
 $(".sx-import").on("click", function() {
     var jBtn = $(this);
     if (jBtn.hasClass("disabled")) {
@@ -98,13 +98,13 @@ $(".sx-import").on("click", function() {
     return false;
 });
 JS
-                        );
+                    );
 
-                        $btn = Html::button("<i class='fas fa-sync'></i> Обновить цены", [
-                            'class' => 'btn btn-primary sx-import',
-                            'title' => 'Эта кнопка запускает обновление цен товаров на сайте',
-                            'data-toggle' => 'tooltip'
-                        ]);
+                    $btn = Html::button("<i class='fas fa-sync'></i> Обновить цены", [
+                        'class'       => 'btn btn-primary sx-import',
+                        'title'       => 'Эта кнопка запускает обновление цен товаров на сайте',
+                        'data-toggle' => 'tooltip',
+                    ]);
 
                     $e->content = Alert::widget([
                         'closeButton' => false,
@@ -135,7 +135,7 @@ HTML
 
                         'fields' => [
 
-                            'q'                => [
+                            'q' => [
                                 'label'          => 'Поиск',
                                 'elementOptions' => [
                                     'placeholder' => 'Поиск',
@@ -192,6 +192,7 @@ HTML
 
                         'is_active',
 
+                        'lastProductUpdate',
                         'countProducts',
                         'countReadyProducts',
 
@@ -254,7 +255,42 @@ HTML
                             },
                         ],
 
-                        'countProducts' => [
+                        'lastProductUpdate' => [
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'format' => 'raw',
+                            'value'         => function (ShopStore $shopStore) {
+                                return $shopStore->raw_row['lastProductUpdate'] ? "<span data-toggle='tooltip' title='" . \Yii::$app->formatter->asDatetime($shopStore->raw_row['lastProductUpdate']) . "'>" . \Yii::$app->formatter->asRelativeTime($shopStore->raw_row['lastProductUpdate']) . "</span>" : "";
+                            },
+                            'attribute'     => 'lastProductUpdate',
+                            'label'         => 'Время последнего обновления',
+
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery = ShopStoreProduct::find()
+                                    ->select(["max_updated_at" => new Expression("max(updated_at)")])
+                                    ->where([
+                                        'shop_store_id' => new Expression(ShopStore::tableName().".id"),
+                                    ])->limit(1)
+                                //    ->orderBy([ShopStore::tableName().".updated_at" => SORT_DESC])
+                                ;
+
+                                $query->addSelect([
+                                    'lastProductUpdate' => $subQuery,
+                                ]);
+
+                                $grid->sortAttributes["lastProductUpdate"] = [
+                                    'asc'  => ['lastProductUpdate' => SORT_ASC],
+                                    'desc' => ['lastProductUpdate' => SORT_DESC],
+                                ];
+                            },
+                        ],
+                        'countProducts'     => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
                             ],
@@ -368,7 +404,7 @@ CSS
         );
 
         return [
-            'main' => [
+            'main'           => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Main'),
                 'fields' => [
@@ -386,60 +422,60 @@ CSS
 
                 ],
             ],
-            'selling_price' => [
+            'selling_price'  => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Формирование розничной цены'),
                 'fields' => [
                     'source_selling_price' => [
-                        'class' => SelectField::class,
+                        'class'     => SelectField::class,
                         'allowNull' => false,
-                        'items' => [
+                        'items'     => [
                             'purchase_price' => 'Закупочная цена',
-                            'selling_price' => 'Розничная цена',
-                        ]
+                            'selling_price'  => 'Розничная цена',
+                        ],
                     ],
                     'selling_extra_charge' => [
-                        'class' => NumberField::class,
+                        'class'  => NumberField::class,
                         'append' => "%",
-                        'step' => 0.01
+                        'step'   => 0.01,
                     ],
                 ],
             ],
             'purchase_price' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Формирование закупочной цены'),
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Формирование закупочной цены'),
                 'elementOptions' => [
-                    'isOpen' => false
+                    'isOpen' => false,
                 ],
-                'fields' => [
+                'fields'         => [
                     'source_purchase_price' => [
-                        'class' => SelectField::class,
+                        'class'     => SelectField::class,
                         'allowNull' => false,
-                        'items' => [
+                        'items'     => [
                             'purchase_price' => 'Закупочная цена',
-                            'selling_price' => 'Розничная цена',
-                        ]
+                            'selling_price'  => 'Розничная цена',
+                        ],
                     ],
                     'purchase_extra_charge' => [
-                        'class' => NumberField::class,
+                        'class'  => NumberField::class,
                         'append' => "%",
-                        'step' => 0.01
+                        'step'   => 0.01,
                     ],
                 ],
             ],
 
             'additional' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Дополнительно'),
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Дополнительно'),
                 'elementOptions' => [
-                    'isOpen' => false
+                    'isOpen' => false,
                 ],
-                'fields' => [
-                    'is_active'    => [
+                'fields'         => [
+                    'is_active'   => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    'is_supplier'  => [
+                    'is_supplier' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
@@ -447,16 +483,16 @@ CSS
                     'priority'    => [
                         'class' => NumberField::class,
                     ],
-                ]
+                ],
             ],
 
             'description' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Описание'),
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Описание'),
                 'elementOptions' => [
-                    'isOpen' => false
+                    'isOpen' => false,
                 ],
-                'fields' => [
+                'fields'         => [
                     'description' => [
                         'class'        => WidgetField::class,
                         'widgetClass'  => CKEditorWidget::class,
@@ -474,15 +510,15 @@ CSS
 
                         ],
                     ],
-                ]
-            ],
-            'addresses' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Контакты'),
-                'elementOptions' => [
-                    'isOpen' => false
                 ],
-                'fields' => [
+            ],
+            'addresses'   => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Контакты'),
+                'elementOptions' => [
+                    'isOpen' => false,
+                ],
+                'fields'         => [
                     'coordinates' => [
                         'class'        => WidgetField::class,
                         'widgetClass'  => YaMapInput::class,
@@ -554,7 +590,7 @@ JS
         } catch (\Exception $e) {
             throw $e;
             $rr->success = false;
-            $rr->message = "Ошибка загрузки данных: " . $e->getMessage();
+            $rr->message = "Ошибка загрузки данных: ".$e->getMessage();
         }
 
         return $rr;

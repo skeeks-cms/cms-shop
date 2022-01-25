@@ -882,7 +882,7 @@ JS)
                         //$this->stdout("\tОпция: {$option->asText}\n");
 
                         if ($content_id) {
-                            if ($element = CmsContentElement::find()->andWhere(['content_id' => $content_id])->andWhere(['name' => $option->name])->one()) {
+                            if ($element = CmsContentElement::find()->cmsSite()->andWhere(['content_id' => $content_id])->andWhere(['name' => $option->name])->one()) {
                                 $option->cms_content_element_id = $element->id;
                                 if ($option->save()) {
                                     //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
@@ -1010,7 +1010,7 @@ JS)
                         //$this->stdout("\tОпция: {$option->asText}\n");
 
                         if ($content_id) {
-                            if ($element = CmsContentElement::find()->andWhere(['content_id' => $content_id])->andWhere(['name' => $option->name])->one()) {
+                            if ($element = CmsContentElement::find()->cmsSite()->andWhere(['content_id' => $content_id])->andWhere(['name' => $option->name])->one()) {
                                 $option->cms_content_element_id = $element->id;
                                 if ($option->save()) {
                                     //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);

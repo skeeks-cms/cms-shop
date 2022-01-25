@@ -1321,7 +1321,7 @@ HTML
             $urlHelper = new BackendUrlHelper();
             $urlHelper->setBackendParamsByCurrentRequest();
 
-            if ($urlHelper->getBackenParam("sx-to-main")) {
+            if ($urlHelper->getBackenParam("sx-to-main") || $urlHelper->getBackenParam("all-items")) {
 
                 /*$siteClass = \Yii::$app->skeeks->siteClass;
                 $site = $siteClass::find()->where(['is_default' => 1])->one();

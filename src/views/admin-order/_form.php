@@ -655,7 +655,11 @@ $form->field($model, 'delivery_amount')->label("Стоимость достав�
 <div style="display: none;">
     <?=
     \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
-        'dialogRoute'            => ['/shop/admin-cms-content-element/index'],
+        'dialogRoute'            => ['/shop/admin-cms-content-element/index', 'content_id' => \Yii::$app->shop->shopContents[0]->id,
+            \skeeks\cms\backend\helpers\BackendUrlHelper::BACKEND_PARAM_NAME => [
+                'all-items' => "true",
+            ],
+            ],
         'name'                   => 'sx-add-product',
         'id'                     => 'sx-add-product',
         'closeDialogAfterSelect' => false,
