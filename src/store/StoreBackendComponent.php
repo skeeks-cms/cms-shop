@@ -59,8 +59,9 @@ class StoreBackendComponent extends BackendComponent
         \skeeks\cms\themes\unify\admin\UnifyThemeAdmin::initBeforeRender();
         \Yii::$app->view->theme = $theme;
 
-        $cmsManager = new CmsManager();
-        $cmsManager->cmsSite = \Yii::$app->shop->backendShopStore->cmsSite;
+        $cmsManager = \Yii::$app->authManager;
+        //$cmsManager = new CmsManager();
+        //$cmsManager->cmsSite = \Yii::$app->shop->backendShopStore->cmsSite;
         if (!$cmsManager->checkAccess(\Yii::$app->user->id, "shop/admin-shop-store-supplier")) {
             throw new ForbiddenHttpException("Нет доступа");
         }
