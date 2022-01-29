@@ -279,49 +279,47 @@ $noValue = "<span style='color: silver;'>—</span>";
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
 
 <!--Если это сайт поставщика или получателя товаров-->
-<?php if($model->cmsSite->shopSite->is_receiver) : ?>
+<?php if ($model->cmsSite->shopSite->is_receiver) : ?>
     <!-- Если товар не привязан к инфокрточке -->
-    <?php if(!$model->main_cce_id) : ?>
+    <?php if (!$model->main_cce_id) : ?>
         <?php
-            $joinModels = [];
-            /*Поиск по штрихкоду*/
-            $barcodes = $model->shopProduct->getBarcodes();
-            if ($barcodes) {
-                $barcodeValues = array_keys($barcodes);
+        $joinModels = [];
+        /*Поиск по штрихкоду*/
+        $barcodes = $model->shopProduct->getBarcodes();
+        if ($barcodes) {
+            $barcodeValues = array_keys($barcodes);
 
-                $q = \skeeks\cms\shop\models\ShopCmsContentElement::find()
-                    ->joinWith("shopProduct as shopProduct", true, "INNER JOIN")
-                    ->joinWith("shopProduct.shopProductBarcodes as shopProductBarcodes", true, "INNER JOIN")
-                    ->joinWith("cmsSite as cmsSite")
-                    ->andWhere(['cmsSite.is_default' => 1])
-                    ->andWhere(['shopProductBarcodes.value' => $barcodeValues])
-                ;
+            $q = \skeeks\cms\shop\models\ShopCmsContentElement::find()
+                ->joinWith("shopProduct as shopProduct", true, "INNER JOIN")
+                ->joinWith("shopProduct.shopProductBarcodes as shopProductBarcodes", true, "INNER JOIN")
+                ->joinWith("cmsSite as cmsSite")
+                ->andWhere(['cmsSite.is_default' => 1])
+                ->andWhere(['shopProductBarcodes.value' => $barcodeValues]);
 
-                $joinModels = $q->all();
-            }
+            $joinModels = $q->all();
+        }
         ?>
 
-        <?php if($joinModels) : ?>
+        <?php if ($joinModels) : ?>
 
-        <section class="sx-info-block" style="background: #ceffd0;">
-            <div class="row no-gutters">
-                <div class="col-12">
-                    <div class="sx-title">Возможно этот товар уже оформлен</div>
-                </div>
-                <div class="col-12">
-                    <?php foreach($joinModels as $joinModel) : ?>
+            <section class="sx-info-block" style="background: #ceffd0;">
+                <div class="row no-gutters">
+                    <div class="col-12">
+                        <div class="sx-title">Возможно этот товар уже оформлен</div>
+                    </div>
+                    <div class="col-12">
+                        <?php foreach ($joinModels as $joinModel) : ?>
 
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
 
         <?php endif; ?>
 
     <?php endif; ?>
 <?php endif; ?>
-
 
 
 <div class="row no-gutters sx-bg-secondary">
@@ -578,7 +576,7 @@ JS
                                 <?php echo $form->field($model, 'tree_id')
                                     ->widget(
                                         \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class, [
-                                            'visibleInput' => false
+                                            'visibleInput' => false,
                                         ]
                                     )
                                     ->label(false); ?>
@@ -593,7 +591,8 @@ JS
 
                     <li>
                         <span class="sx-properties--name">
-                            Внешний код <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="Чаще всего внешний код заполняется автоматически и используется для итеграции с внешними системами"></i>
+                            Внешний код <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
+                                           title="Чаще всего внешний код заполняется автоматически и используется для итеграции с внешними системами"></i>
                         </span>
                         <span class="sx-properties--value">
                             <span class="sx-fast-edit sx-fast-edit-popover"
@@ -645,7 +644,7 @@ JS
 </div>
 
 <?php if (
-    !$model->shopProduct->isOffersProduct //И если это товар без предложений
+!$model->shopProduct->isOffersProduct //И если это товар без предложений
 ) : ?>
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
@@ -713,9 +712,9 @@ JS
                                         </div>
                                     </div>
                                     <div class="input-group" style="margin-top: 10px;">
-                                    <? echo \yii\helpers\Html::checkbox("is_fixed", ($price && $price->is_fixed ? true : false), [
+                                        <? echo \yii\helpers\Html::checkbox("is_fixed", ($price && $price->is_fixed ? true : false), [
                                             'label' => 'Зафиксирована?',
-                                    ]); ?>
+                                        ]); ?>
                                     </div>
 
                                     <?php $form::end(); ?>
@@ -723,7 +722,6 @@ JS
 
                             </td>
                         <? endforeach; ?>
-
 
 
                         <td><?php echo $noValue; ?></td>
@@ -748,10 +746,10 @@ JS
                     </tr>
 
                     <?php
-                        $totalSummPrice = 0;
-                        $totalSummQuantity = 0;
+                    $totalSummPrice = 0;
+                    $totalSummQuantity = 0;
                     ?>
-                
+
                     <?php if ($shopStores = \Yii::$app->skeeks->site->getShopStores()->andWhere(['is_supplier' => 0])->all()) : ?>
                         <?php foreach ($shopStores as $shopStore) : ?>
                             <?php
@@ -769,7 +767,7 @@ JS
                             ?>
                             <tr>
                                 <td style="text-align: left;">
-                                    <?php if($storeProduct) : ?>
+                                    <?php if ($storeProduct) : ?>
                                         <?
                                         \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                                             'controllerId' => "/shop/store-product",
@@ -781,7 +779,7 @@ JS
                                             ],
                                         ]);
                                         ?>
-                                            <?php echo $shopStore->name; ?>
+                                        <?php echo $shopStore->name; ?>
                                         <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
                                     <?php else : ?>
                                         <?php echo $shopStore->name; ?>
@@ -793,9 +791,9 @@ JS
                                           data-form="#store-<?php echo $shopStore->id; ?>-form"
                                           data-title="<?php echo \yii\helpers\Html::encode($shopStore->name); ?>"
                                     >
-                                        <?php echo $storeProduct ? (float) $storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
+                                        <?php echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
                                     </span>
-    
+
                                     <div class="sx-fast-edit-form-wrapper">
                                         <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                                             'id'             => "store-{$shopStore->id}-form",
@@ -821,10 +819,10 @@ JS
                                                 <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
                                             </div>
                                         </div>
-    
+
                                         <?php $form::end(); ?>
                                     </div>
-                                        
+
                                 </td>
                                 <td><?php echo $totalPrice; ?></td>
                             </tr>
@@ -850,7 +848,6 @@ JS
     </div>
 
 
-
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
             <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b></div>
@@ -864,8 +861,8 @@ JS
                     </tr>
 
                     <?php
-                        $totalSummPrice = 0;
-                        $totalSummQuantity = 0;
+                    $totalSummPrice = 0;
+                    $totalSummQuantity = 0;
                     ?>
 
                     <?php if ($shopStores = \Yii::$app->skeeks->site->getShopStores()->andWhere(['is_supplier' => 1])->all()) : ?>
@@ -882,59 +879,60 @@ JS
 
                             }
                             ?>
-                            <tr>
-                                <td style="text-align: left;">
-                                    <?php if($storeProduct) : ?>
-                                        <?
-                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                            'controllerId' => "/shop/store-product",
-                                            'modelId'      => $storeProduct->id,
-                                            'tag'          => 'span',
-                                            'options'      => [
-                                                'style' => 'text-align: left;',
-                                                'class' => 'sx-fast-edit',
-                                            ],
-                                        ]);
-                                        ?>
+                            <? if ($storeProduct) : ?>
+                                <tr>
+                                    <td style="text-align: left;">
+                                        <?php if ($storeProduct) : ?>
+                                            <?
+                                            \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                                'controllerId' => "/shop/store-product",
+                                                'modelId'      => $storeProduct->id,
+                                                'tag'          => 'span',
+                                                'options'      => [
+                                                    'style' => 'text-align: left;',
+                                                    'class' => 'sx-fast-edit',
+                                                ],
+                                            ]);
+                                            ?>
                                             <?php echo $shopStore->name; ?>
-                                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                    <?php else : ?>
-                                        <?php echo $shopStore->name; ?>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if($storeProduct) : ?>
-                                        <?
-                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                            'controllerId' => "/shop/store-product",
-                                            'modelId'      => $storeProduct->id,
-                                            'tag'          => 'span',
-                                            'options'      => [
-                                                'style' => 'text-align: left;',
-                                                'class' => 'sx-fast-edit',
-                                            ],
-                                        ]);
-                                        ?>
+                                            <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                        <?php else : ?>
+                                            <?php echo $shopStore->name; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($storeProduct) : ?>
+                                            <?
+                                            \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                                'controllerId' => "/shop/store-product",
+                                                'modelId'      => $storeProduct->id,
+                                                'tag'          => 'span',
+                                                'options'      => [
+                                                    'style' => 'text-align: left;',
+                                                    'class' => 'sx-fast-edit',
+                                                ],
+                                            ]);
+                                            ?>
                                             <?php echo $storeProduct ? $storeProduct->external_id : "&nbsp;&nbsp;&nbsp;"; ?>
-                                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                                    <?php else : ?>
-                                    &nbsp;&nbsp;&nbsp;
-                                    <?php endif; ?>
-                                </td>
-                                <td>
+                                            <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                        <?php else : ?>
+                                            &nbsp;&nbsp;&nbsp;
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                     <span class=""
                                     >
-                                        <?php echo $storeProduct ? (float) $storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
+                                        <?php echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
                                     </span>
 
-                                    <div class="sx-fast-edit-form-wrapper">
-                                        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                            'id'             => "store-{$shopStore->id}-form",
-                                            'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
-                                            'options'        => [
-                                                'class' => 'sx-fast-edit-form',
-                                            ],
-                                            'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        <div class="sx-fast-edit-form-wrapper">
+                                            <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                                'id'             => "store-{$shopStore->id}-form",
+                                                'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                                'options'        => [
+                                                    'class' => 'sx-fast-edit-form',
+                                                ],
+                                                'clientCallback' => new \yii\web\JsExpression(<<<JS
                                                 function (ActiveFormAjaxSubmit) {
                                                     ActiveFormAjaxSubmit.on('success', function(e, response) {
                                                         $.pjax.reload("#{$pjax->id}");
@@ -942,23 +940,25 @@ JS
                                                     });
                                                 }
 JS
-                                            ),
-                                        ]); ?>
-                                        <input type="hidden" value="update-store" name="act" class="form-control"/>
-                                        <input type="hidden" value="<?php echo $shopStore->id; ?>" name="shop_store_id" class="form-control"/>
-                                        <div class="input-group">
-                                            <input type="text" value="<?php echo($storeProduct ? (float)$storeProduct->quantity : ""); ?>" name="store_quantity" class="form-control"/>
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
+                                                ),
+                                            ]); ?>
+                                            <input type="hidden" value="update-store" name="act" class="form-control"/>
+                                            <input type="hidden" value="<?php echo $shopStore->id; ?>" name="shop_store_id" class="form-control"/>
+                                            <div class="input-group">
+                                                <input type="text" value="<?php echo($storeProduct ? (float)$storeProduct->quantity : ""); ?>" name="store_quantity" class="form-control"/>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
+                                                </div>
                                             </div>
+
+                                            <?php $form::end(); ?>
                                         </div>
 
-                                        <?php $form::end(); ?>
-                                    </div>
+                                    </td>
+                                    <td><?php echo $storeProduct ? $storeProduct->purchase_price : "&nbsp;&nbsp;&nbsp;"; ?></td>
+                                </tr>
+                            <? endif; ?>
 
-                                </td>
-                                <td><?php echo $storeProduct ? $storeProduct->purchase_price : "&nbsp;&nbsp;&nbsp;"; ?></td>
-                            </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
@@ -1036,17 +1036,17 @@ $infoModel = $model;
     </div>
 </section>
 
-<?php /*if ($model->shopProduct->supplier_external_jsondata) : */?><!--
+<?php /*if ($model->shopProduct->supplier_external_jsondata) : */ ?><!--
     <section class="sx-info-block">
         <div class="row no-gutters">
             <div class="col-12">
                 <div class="sx-title">Прочие данные <i class="far fa-question-circle" title="Неразобранные данные, которые сохранились по товару в момент импорта на сайт" data-toggle="tooltip"
                                                        style="margin-left: 5px;"></i></div>
-                <?/*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $model->shopProduct]); */?>
+                <? /*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $model->shopProduct]); */ ?>
             </div>
         </div>
     </section>
---><?php /*endif; */?>
+--><?php /*endif; */ ?>
 
 <?php $pjax::end(); ?>
 

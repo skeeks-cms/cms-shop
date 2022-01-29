@@ -55,7 +55,7 @@ $shopSellerProducts = [];
         <div class="my-auto d-flex flex-row" style="height: 50px;">
             <div class="my-auto">
                 <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
-                    <a class="sx-trigger-action" style="border-bottom: 0;" href="#" title="<?= $model->asText; ?>"><?= $model->asText; ?></a>
+                    <a class="sx-trigger-action" style="border-bottom: 0;" href="#" title="id: <?= $model->id; ?>" data-toggle="tooltip"><?= $model->name; ?></a>
                 </div>
                 <? if ($model->tree_id) : ?>
                     <div style="">
@@ -97,7 +97,7 @@ $shopSellerProducts = [];
         <div class="my-auto d-flex flex-row" style="height: 50px;">
             <div class="my-auto">
                 <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
-                    <a class="sx-trigger-action" style="border-bottom: none;" href="#" title="<?= $model->asText; ?>"><?= $model->asText; ?></a>
+                    <a class="sx-trigger-action" style="border-bottom: none;" href="#" title="id: <?= $model->id; ?>" data-toggle="tooltip"><?= $model->name; ?></a>
                 </div>
                 <? if ($model->tree_id) : ?>
                     <div style="">
@@ -108,7 +108,7 @@ $shopSellerProducts = [];
                             'options'      => [
                                 'title' => $model->cmsTree->fullName,
                                 'class' => "",
-                                'style' => "display: inline-block; color: gray; cursor: pointer; white-space: nowrap;",
+                                'style' => "display: inline-block; color: silver; cursor: pointer; white-space: nowrap;",
                             ],
                         ]);
                         ?>

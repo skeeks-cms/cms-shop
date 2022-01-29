@@ -62,7 +62,7 @@ use yii\helpers\Url;
 class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsContentElementController
 {
     public $modelClassName = ShopCmsContentElement::class;
-    public $modelShowAttribute = "asText";
+    public $modelShowAttribute = "name";
 
     public function init()
     {
@@ -867,6 +867,10 @@ HTML
 
         $shopColumns["custom"] = [
             'attribute' => 'id',
+            'label' => 'Товар/Услуга',
+            'headerOptions' => [
+                'style' => 'min-width: 300px;'
+            ],
             'class'     => ShopProductColumn::class,
         ];
 
