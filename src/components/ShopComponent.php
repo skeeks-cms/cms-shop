@@ -454,6 +454,7 @@ class ShopComponent extends Component implements BootstrapInterface
                 $storeIds = ArrayHelper::merge($storeIds, $supploerStoreIds);
             }
 
+
             $activeQuery->joinWith('shopProduct as shopProduct');
 
             $activeQuery->leftJoin(["shopStoreProducts" => "shop_store_product"], [

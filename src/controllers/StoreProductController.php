@@ -33,7 +33,9 @@ use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\TextField;
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -438,7 +440,7 @@ HTML;
             ],
 
             "create" => [
-                'fields' => [$this, 'updateFields'],
+                'fields' => [$this, 'createFields'],
             ],
 
             "update" => [
@@ -486,6 +488,39 @@ HTML;
             'selling_price'  => [
                 'class' => NumberField::class,
             ],
+
+        ];
+    }
+    public function createFields($action)
+    {
+        $action->model->load(\Yii::$app->request->get());
+        $action->model->shop_store_id = \Yii::$app->shop->backendShopStore->id;
+
+        return [
+
+            'name',
+            'external_id',
+            'quantity'       => [
+                'class' => NumberField::class,
+            ],
+            'purchase_price' => [
+                'class' => NumberField::class,
+            ],
+            'selling_price'  => [
+                'class' => NumberField::class,
+            ],
+            [
+                'class'   => HtmlBlock::class,
+                'content' => "<div style='display: none;'>",
+            ],
+            'shop_store_id'  => [
+                'class' => TextField::class,
+            ],
+            [
+                'class'   => HtmlBlock::class,
+                'content' => "</div>",
+            ],
+            
 
         ];
     }
