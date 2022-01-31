@@ -14,7 +14,7 @@
 
 
 <div class="sx-import-wrapper">
-    <div class="sx-info">
+    <div class="row sx-info">
         <div class="col-12">
             <?
             $alert = \yii\bootstrap\Alert::begin([
@@ -45,17 +45,46 @@
     </div>
 
     <div class="sx-import-values-wrapper">
+
+
         <div class="row" style="margin-bottom: 10px;">
-            <div class="col">
-                <button class="btn btn-primary">Импорт</button>
+            <div class="col-6">
+                <div class="sx-bg-secondary sx-import-form-wrapper">
+                    <ol style="color: gray; font-size: 12px; padding-left: 15px;">
+                        <li>Выберите соответствие колонок вашей таблицы и данных сайта.</li>
+                        <li>Удалите лишние строки данных</li>
+                        <li>Нажмите кнопку "Запустить импорт"</li>
+                    </ol>
+
+                    <button class="btn btn-primary sx-start-import">Запустить импорт</button>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="sx-bg-secondary sx-import-form-wrapper">
+
+                    <div class="sx-progress-tasks" id="sx-progress-tasks" style="display: none;">
+                        <span style="vertical-align:middle;"><h3>Процесс импорта: <span class="sx-executing-ptc"></span>%</h3></span>
+                        <span style="vertical-align:middle;"><span class="sx-executing-task-name"></span></span>
+                        <div>
+                            <div class="progress progress-striped active">
+                                <div class="progress-bar progress-bar-success"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
+
+
         <div class="sx-max-width-100">
             <div class="sx-max-height-100">
                 <div class="sx-import-table-wrapper">
                 </div>
             </div>
         </div>
+
+
     </div>
     <div style="opacity: 0;
         position: fixed;
@@ -75,11 +104,16 @@
 
 <?
 \skeeks\cms\shop\assets\ShopStoreImportCopyAsset::register($this);
-
+$url = \yii\helpers\Url::to(['import-row']);
 $this->registerJs(<<<JS
 (function(sx, $, _)
 {
-    new sx.classes.Import();
+    new sx.classes.Import({
+        'backend_element': '{$url}',
+        'required_matches' : [
+            'external_id'
+        ]
+    });
 })(sx, sx.$, sx._);
 JS
 );

@@ -18,13 +18,6 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
-use skeeks\cms\queryfilters\filters\FilterField;
-use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
-use skeeks\cms\queryfilters\filters\modes\FilterModeGt;
-use skeeks\cms\queryfilters\filters\modes\FilterModeGte;
-use skeeks\cms\queryfilters\filters\modes\FilterModeLt;
-use skeeks\cms\queryfilters\filters\modes\FilterModeLte;
-use skeeks\cms\queryfilters\filters\modes\FilterModeNe;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\shop\models\ShopCmsContentElement;
@@ -37,6 +30,7 @@ use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\TextField;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
@@ -153,13 +147,13 @@ class StoreProductController extends BackendModelStandartController
                             ],
 
                             'marginality_per_filter' => [
-                                'label'           => 'Маржинальность, %',
-                                'class'           => NumberFilterField::class,
-                                'field'           => [
-                                    'class' => NumberField::class
+                                'label'                   => 'Маржинальность, %',
+                                'class'                   => NumberFilterField::class,
+                                'field'                   => [
+                                    'class' => NumberField::class,
                                 ],
                                 'isAddAttributeTableName' => false,
-                                'beforeModeApplyCallback' => function(QueryFiltersEvent $e, NumberFilterField $field) {
+                                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) {
                                     /**
                                      * @var $query ActiveQuery
                                      */
@@ -182,13 +176,13 @@ class StoreProductController extends BackendModelStandartController
                             ],
 
                             'marginality_filter' => [
-                                'label'           => 'Маржинальность, значение',
-                                'class'           => NumberFilterField::class,
-                                'field'           => [
-                                    'class' => NumberField::class
+                                'label'                   => 'Маржинальность, значение',
+                                'class'                   => NumberFilterField::class,
+                                'field'                   => [
+                                    'class' => NumberField::class,
                                 ],
                                 'isAddAttributeTableName' => false,
-                                'beforeModeApplyCallback' => function(QueryFiltersEvent $e, NumberFilterField $field) {
+                                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) {
                                     /**
                                      * @var $query ActiveQuery
                                      */
@@ -450,7 +444,7 @@ HTML;
             "import" => [
                 'class' => ViewBackendAction::class,
                 'icon'  => 'far fa-file-excel',
-                'name'  => 'Импорт из excel',
+                'name'  => 'Импорт',
             ],
         ]);
     }
@@ -520,9 +514,90 @@ HTML;
                 'class'   => HtmlBlock::class,
                 'content' => "</div>",
             ],
-            
+
 
         ];
+    }
+
+    public function actionImportRow()
+    {
+        $rr = new RequestResponse();
+        $matches = \Yii::$app->request->post("matches");
+        $row_data = \Yii::$app->request->post("row_data");
+        try {
+            if (!$matches || !$row_data) {
+                throw new Exception("Не хватает данных");
+            }
+
+            $data = [];
+            foreach ($matches as $key => $code) {
+                $data[$code] = ArrayHelper::getValue($row_data, $key);
+            }
+
+            $external_id = trim(ArrayHelper::getValue($data, 'external_id'));
+            if (!$external_id) {
+                throw new Exception("Уникальный код не задан");
+            }
+
+            $isUpdate = true;
+            if (!$storeProduct = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['external_id' => $external_id])->one()) {
+                $storeProduct = new ShopStoreProduct();
+                $storeProduct->shop_store_id = \Yii::$app->shop->backendShopStore->id;
+                $storeProduct->external_id = $external_id;
+
+                $isUpdate = false;
+            }
+
+            ArrayHelper::remove($data, "external_id");
+
+            foreach ($data as $key => $value)
+            {
+                if (!$key) {
+                    continue;
+                }
+
+                if (in_array($key, ['purchase_price', 'selling_price', 'quantity'])) {
+
+                    $value = trim($value);
+                    $value = str_replace(" ", "", $value);
+                    $value = str_replace("&nbsp", "", $value);
+                    $value = str_replace("руб.", "", $value);
+                    $value = str_replace("руб", "", $value);
+                    $value = str_replace("р.", "", $value);
+                    $value = str_replace("р", "", $value);
+                    $value = str_replace(",", ".", $value);
+
+                    $value = (float) $value;
+
+                } else {
+                    $value = trim($value);
+                }
+                if (!$storeProduct->hasAttribute($key)) {
+                    continue;
+                }
+                $storeProduct->{$key} = trim($value);
+            }
+
+            $message = '';
+            if ($storeProduct->save()) {
+                if ($isUpdate) {
+                    $message = "Товар обновлен: {$storeProduct->id}";
+                } else {
+                    $message = "Товар создан: {$storeProduct->id}";
+                }
+            } else {
+                throw new Exception(print_r($storeProduct->errors, true));
+            }
+
+            $rr->success = true;
+            $rr->message = $message;
+
+        } catch (\Exception $exception) {
+            $rr->success = false;
+            $rr->message = $exception->getMessage();
+        }
+
+        return $rr;
     }
 
     public function actionJoinByVendor()

@@ -96,3 +96,20 @@
 .sx-import-values-wrapper {
     display: none;
 }
+
+
+.sx-import-form-wrapper {
+    padding: 10px;
+}
+.sx-result-th {
+    color: silver;
+}
+.sx-error-tr {
+    background: #ffd2d2;
+}
+.sx-success-tr {
+    background: #edffed;
+}
+.progress-bar {
+    min-height: 12px !important;
+}

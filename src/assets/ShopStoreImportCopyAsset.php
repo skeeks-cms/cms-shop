@@ -10,7 +10,9 @@ namespace skeeks\cms\shop\assets;
 
 use common\themes\lex\assets\LexThemeFontsAsset;
 use skeeks\assets\unify\base\UnifyIconHsAsset;
+use skeeks\cms\assets\JsTaskManagerAsset;
 use skeeks\cms\base\AssetBundle;
+use skeeks\cms\themes\unify\admin\assets\UnifyAdminAppAsset;
 use skeeks\cms\themes\unify\admin\assets\UnifyAdminAsset;
 use skeeks\sx\assets\Custom;
 
@@ -29,7 +31,8 @@ class ShopStoreImportCopyAsset extends AssetBundle
 
     public $depends = [
         Custom::class,
-        UnifyAdminAsset::class,
+        JsTaskManagerAsset::class,
+        UnifyAdminAppAsset::class,
         UnifyIconHsAsset::class
     ];
 }

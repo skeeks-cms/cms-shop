@@ -58,7 +58,7 @@ class ShopProductBarcode extends \skeeks\cms\base\ActiveRecord
             [['barcode_type'], 'string', 'max' => 12],
             [['value'], 'string', 'max' => 128],
             [['shop_product_id', 'value'], 'unique', 'targetAttribute' => ['shop_product_id', 'value']],
-            [['shop_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopProduct::class, 'targetAttribute' => ['shop_product_id' => 'id']],
+            //[['shop_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopProduct::class, 'targetAttribute' => ['shop_product_id' => 'id']],
 
             [['barcode_type'], 'default', 'value' => self::TYPE_EAN13],
 
