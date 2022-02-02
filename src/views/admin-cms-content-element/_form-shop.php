@@ -39,10 +39,10 @@ $shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' 
 /*if ($shopContent->childrenContent) {
     $allowChangeProductType = true;*/
 
-    /*if ($shopProduct->shop_supplier_id) {
-        $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE;
-        $allowChangeProductType = false;
-    }*/
+/*if ($shopProduct->shop_supplier_id) {
+    $shopProduct->product_type = \skeeks\cms\shop\models\ShopProduct::TYPE_SIMPLE;
+    $allowChangeProductType = false;
+}*/
 /*}*/
 
 
@@ -131,21 +131,21 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
 
     <? if ($isChangeParrentElement) : ?>
         <?= $form->field($shopProduct, 'offers_pid')->widget(
-            /*\skeeks\cms\widgets\AjaxSelectModel::class,
-            [
-                'modelClass' => \skeeks\cms\shop\models\ShopCmsContentElement::class,
-                'searchQuery' => function($word = '') {
-                    $query = \skeeks\cms\shop\models\ShopCmsContentElement::find()->cmsSite()->joinWith("shopProduct as sp");
-                    $query->andWhere(['sp.product_type' => \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS]);
-                    
-                    if ($word) {
-                        $query->search($word);
-                    }
-                    
-                    return $query;
-                },
-            ]*/
-                
+        /*\skeeks\cms\widgets\AjaxSelectModel::class,
+        [
+            'modelClass' => \skeeks\cms\shop\models\ShopCmsContentElement::class,
+            'searchQuery' => function($word = '') {
+                $query = \skeeks\cms\shop\models\ShopCmsContentElement::find()->cmsSite()->joinWith("shopProduct as sp");
+                $query->andWhere(['sp.product_type' => \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS]);
+
+                if ($word) {
+                    $query->search($word);
+                }
+
+                return $query;
+            },
+        ]*/
+
             \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
             [
                 'content_id'  => $model->content_id,
@@ -161,26 +161,23 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
     <? endif; ?>
 
     <? if ($isAllowChangeSupplier) : ?>
-        <?/*= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
+        <? /*= $form->fieldSelect($shopProduct, "shop_supplier_id", \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopSupplier::find()->all(), 'id', 'name'), [
             'allowDeselect' => true,
             'options'       => [
                 'data-form-reload' => "true",
             ],
-        ]); */?><!--
-        --><?/*= $form->field($shopProduct, "supplier_external_id"); */?>
+        ]); */ ?><!--
+        --><? /*= $form->field($shopProduct, "supplier_external_id"); */ ?>
 
 
     <? endif; ?>
 
 
-
-
-
     <? if ($isShowPrices) : ?>
         <? if ($productPrices) : ?>
-        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-            'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
-        ]) ?>
+            <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+                'content' => \Yii::t('skeeks/shop/app', 'Main prices'),
+            ]) ?>
 
             <? foreach ($productPrices as $productPrice) : ?>
                 <div class="form-group">
@@ -215,25 +212,25 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
 
         <? endif; ?>
 
-    <?/* elseif ($shopStoreProduct): */?><!--
-        <?/* $alert = \yii\bootstrap\Alert::begin([
+        <? /* elseif ($shopStoreProduct): */ ?><!--
+        <? /* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); */?>
+        ]); */ ?>
         Цена по этому товару будет рассчитана автоматически.
-        <?/* $alert::end(); */?>
+        <? /* $alert::end(); */ ?>
 
-    <?/* elseif ($model->shopSupplierElements) : */?>
-        <?/* $alert = \yii\bootstrap\Alert::begin([
+    <? /* elseif ($model->shopSupplierElements) : */ ?>
+        <? /* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); */?>
+        ]); */ ?>
         Цена по этому товару рассчитывается автоматически из данных поставщиков.
-        --><?/* $alert::end(); */?>
+        --><? /* $alert::end(); */ ?>
     <? endif; ?>
 
 
@@ -242,80 +239,89 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
         'content' => \Yii::t('skeeks/shop/app', 'The number and account'),
     ]); ?>
 
-    <? if ($isShowMeasureCode) : ?>
-        <?= $form->fieldSelect($shopProduct, 'measure_code', \yii\helpers\ArrayHelper::map(
-            \skeeks\cms\measure\models\CmsMeasure::find()->orderBy(['priority' => SORT_ASC])->all(),
-            'code',
-            'asShortText'
-        ), [
-            "options" => [
-                \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
-            ],
-        ]); ?>
-    <? endif; ?>
+    <div class="row no-gutters">
 
-    <? if ($isShowMeasureRatio) : ?>
-        <?= $form->field($shopProduct, 'measure_ratio')
-            ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
-                'dynamicReload' => true,
-                'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : "",
-                'options' => [
-                    'step' => 0.0001
-                ]
-            ]); ?>
-        <?= $form->field($shopProduct, 'measure_ratio_min')
-            ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
-                //'dynamicReload' => true,
-                'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : "",
-                'options' => [
-                    'step' => 0.0001
-                ]
-            ]); ?>
-    <? endif; ?>
+        <? if ($isShowMeasureCode) : ?>
+            <div class="col-md-4">
+                <?= $form->fieldSelect($shopProduct, 'measure_code', \yii\helpers\ArrayHelper::map(
+                    \skeeks\cms\measure\models\CmsMeasure::find()->orderBy(['priority' => SORT_ASC])->all(),
+                    'code',
+                    'asShortText'
+                ), [
+                    "options" => [
+                        \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
+                    ],
+                ]); ?>
+            </div>
+        <? endif; ?>
+
+        <? if ($isShowMeasureRatio) : ?>
+            <div class="col-md-4">
+                <?= $form->field($shopProduct, 'measure_ratio')
+                    ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                        'dynamicReload' => true,
+                        'append'        => $shopProduct->measure ? $shopProduct->measure->symbol : "",
+                        'options'       => [
+                            'step' => 0.0001,
+                        ],
+                    ]); ?>
+            </div>
+            <div class="col-md-4">
+                <?= $form->field($shopProduct, 'measure_ratio_min')
+                    ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                        //'dynamicReload' => true,
+                        'append'  => $shopProduct->measure ? $shopProduct->measure->symbol : "",
+                        'options' => [
+                            'step' => 0.0001,
+                        ],
+                    ]); ?>
+            </div>
+        <? endif; ?>
+    </div>
 
     <?= $form->field($shopProduct, 'measure_matches_jsondata')->widget(
         \skeeks\cms\shop\widgets\admin\ProductMeasureMatchesInputWidget::class
     ); ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Штрихкоды'),
+        'content' => \Yii::t('skeeks/shop/app', 'Штрихкод'),
     ]); ?>
 
-    <?= $form->field($shopProduct, 'barcodes')->widget(
+    <?= $form->field($shopProduct, 'barcodes')->label(false)->widget(
         \skeeks\cms\shop\widgets\admin\ProductBarcodesInputWidget::class
     ); ?>
 
 
-    <?/* if ($isShowMeasureQuantity) : */?><!--
+    <? /* if ($isShowMeasureQuantity) : */ ?><!--
 
-        <?/*= $form->field($shopProduct, "quantity")
+        <? /*= $form->field($shopProduct, "quantity")
             ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
                 'options' => [
                     'step' => 0.0001,
                 ],
                 'append'  => $shopProduct->measure ? $shopProduct->measure->symbol : "",
             ]);
-        */?>
+        */ ?>
 
-    <?/* elseif ($shopStoreProduct): */?>
-        <?/* $alert = \yii\bootstrap\Alert::begin([
+    <? /* elseif ($shopStoreProduct): */ ?>
+        <? /* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); */?>
+        ]); */ ?>
         Количество по этому товару будет рассчитано автоматически.
-        <?/* $alert::end(); */?>
-    <?/* elseif ($model->shopSupplierElements) : */?>
-        <?/* $alert = \yii\bootstrap\Alert::begin([
+        <? /* $alert::end(); */ ?>
+    <? /* elseif ($model->shopSupplierElements) : */ ?>
+        <? /* $alert = \yii\bootstrap\Alert::begin([
             'closeButton' => false,
             'options'     => [
                 'class' => 'alert-default text-center',
             ],
-        ]); */?>
+        ]); */ ?>
         Количество по этому товару будет рассчитано автоматически из данных поставщиков.
-        <?/* $alert::end(); */?>
-    --><?/* endif; */?>
+        <? /* $alert::end(); */ ?>
+    --><? /* endif; */ ?>
 
     <? if ($shopStoreProducts && !$shopStoreProduct) : ?>
         <?
@@ -324,8 +330,8 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
         } else {
             $site_id = \Yii::$app->skeeks->site->id;
         }
-        
-        
+
+
         $shopStores = \skeeks\cms\shop\models\ShopStore::find()->where(['cms_site_id' => $site_id])->all();
         ?>
 
@@ -361,7 +367,7 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
     <? endif; ?>
 
     <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
-        'content' => \Yii::t('skeeks/shop/app', 'Вес и размеры товара за '.$shopProduct->measure_ratio." ".($shopProduct->measure ? $shopProduct->measure->symbol : "")),
+        'content' => \Yii::t('skeeks/shop/app', 'Габариты товара за '.$shopProduct->measure_ratio." ".($shopProduct->measure ? $shopProduct->measure->symbol : "")),
     ]); ?>
 
     <?= $form->field($shopProduct, 'weight')->widget(
