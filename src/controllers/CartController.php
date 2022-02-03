@@ -152,7 +152,7 @@ class CartController extends Controller
             \Yii::$app->shop->shopUser->shopOrder->refresh();
 
             $productData = ShopComponent::productDataForJsEvent($product->cmsContentElement);
-            $productData['quantity'] = $quantity;
+            $productData['quantity'] = (float) $quantity;
             $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
                 'product' => $productData,
             ]);
@@ -188,7 +188,7 @@ class CartController extends Controller
                     $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
 
                     $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
-                    $productData['quantity'] = $shopBasket->quantity;
+                    $productData['quantity'] = (float) $shopBasket->quantity;
 
                     $eventData['event'] = 'remove';
                     $eventData['product'] = $productData;
@@ -296,7 +296,7 @@ class CartController extends Controller
                     $eventData['event'] = 'remove';
                     if ($shopBasket->shopProduct) {
                         $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
-                        $productData['quantity'] = $shopBasket->quantity;
+                        $productData['quantity'] = (float) $shopBasket->quantity;
                         $eventData['product'] = $productData;
                     }
 

@@ -201,8 +201,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
 
-
-
         if (in_array("paid_at", array_keys($event->changedAttributes)) && $this->paid_at) {
 
 
@@ -1060,55 +1058,54 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'price'         => 0,
             ]),
         ]);;
-        
+
         $sp = $shopCmsContentElement->shopProduct;
         if ($sp) {
             $offerElement = null;
             if ($sp->isOffersProduct) {
-                
+
                 /*ShopProductPrice::find()
                     ->andWhere(['type_price_id' => $ids]);*/
-                
+
                 $query = $sp->getTradeOffers()->active();
                 //$query->joinWith('shopProduct as shopProduct');
                 $query->leftJoin(['prices' => 'shop_product_price'], [
-                    'prices.product_id' => new Expression('shopProduct.id'),
+                    'prices.product_id'    => new Expression('shopProduct.id'),
                     'prices.type_price_id' => $ids,
                 ]);
-                
+
                 \Yii::$app->shop->filterByQuantityQuery($query);
                 $query->leftJoin(['currency' => 'money_currency'], ['currency.code' => new Expression('prices.currency_code')]);
                 $query->select([
                     'cms_content_element.*',
                     'realPrice' => '( currency.course * prices.price )',
                 ])
-                ->andWhere(['>', 'prices.price', 0])
-                ->limit(1)
-                ;
+                    ->andWhere(['>', 'prices.price', 0])
+                    ->limit(1);
                 $offerElement = $query->one();
                 if ($offerElement) {
                     return $this->getProductPriceHelper($offerElement);
                 }
-                    
-            } 
-            
+
+            }
+
             if (!$offerElement) {
                 if ($sp->shopProductPrices) {
                     foreach ($sp->shopProductPrices as $price) {
                         if (in_array($price->type_price_id, $ids)) {
-        
+
                             $ph = new ProductPriceHelper([
                                 'shopCmsContentElement' => $shopCmsContentElement,
                                 'shopOrder'             => $this,
                                 'price'                 => $price,
                             ]);
-        
+
                             if ($minPh === null) {
                                 $minPh = $ph;
                                 continue;
                             }
-        
-        
+
+
                             if ((float)$minPh->minMoney->amount == 0) {
                                 $minPh = $ph;
                             } elseif ((float)$minPh->minMoney->amount > (float)$ph->minMoney->amount && (float)$ph->minMoney->amount > 0) {
@@ -1119,7 +1116,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 }
             }
         }
-        
+
 
         return $minPh;
     }
@@ -1245,7 +1242,6 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return new ShopOrderQuery(get_called_class());
     }
-
 
 
     /**
