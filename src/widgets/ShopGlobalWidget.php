@@ -58,7 +58,7 @@ class ShopGlobalWidget extends Widget
      */
     public function run()
     {
-        if (static::$isRegisteredAssets === false) {
+        if (static::$isRegisteredAssets === false && !\Yii::$app->request->isPjax) {
             ShopAsset::register($this->getView());
             $options = (array)$this->clientOptions;
             $options['cartData'] = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();

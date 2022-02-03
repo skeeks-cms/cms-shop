@@ -278,8 +278,6 @@
                         'product': data.response.data.product,
                     });
                 }
-
-
             });
 
             return ajax;
