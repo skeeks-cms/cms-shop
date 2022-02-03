@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
 use skeeks\cms\shop\models\ShopOrder2discountCoupon;
@@ -149,7 +150,13 @@ class CartController extends Controller
 
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             \Yii::$app->shop->shopUser->shopOrder->refresh();
-            $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
+
+            $productData = ShopComponent::productDataForJsEvent($product->cmsContentElement);
+            $productData['quantity'] = $quantity;
+            $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
+                'product' => $productData,
+            ]);
+
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -170,16 +177,30 @@ class CartController extends Controller
         if ($rr->isRequestAjaxPost()) {
             $basket_id = \Yii::$app->request->post('basket_id');
 
+            $eventData = [];
+
             $shopBasket = ShopOrderItem::find()->where(['id' => $basket_id])->one();
             if ($shopBasket) {
+
+
                 if ($shopBasket->delete()) {
                     $rr->success = true;
                     $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
+
+                    $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
+                    $productData['quantity'] = $shopBasket->quantity;
+
+                    $eventData['event'] = 'remove';
+                    $eventData['product'] = $productData;
                 }
+
             }
 
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
-            $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
+            $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
+                'eventData' => $eventData,
+            ]);
+
             return (array)$rr;
         } else {
             return $this->goBack();
@@ -226,12 +247,14 @@ class CartController extends Controller
             $basket_id = (int)\Yii::$app->request->post('basket_id');
             $quantity = (float)\Yii::$app->request->post('quantity');
 
+            $eventData = [];
             /**
              * @var $shopBasket ShopBasket
              */
             $shopBasket = ShopOrderItem::find()->where(['id' => $basket_id])->one();
             if ($shopBasket) {
                 if ($quantity > 0) {
+                    //Обновление корзины, это может быть как добавление позиции так и удаление
                     $product = $shopBasket->product;
 
                     if ($product->measure_ratio > 1) {
@@ -239,6 +262,24 @@ class CartController extends Controller
                             $quantity = $product->measure_ratio;
                         }
                     }
+
+                    if ($shopBasket->shopProduct) {
+                        $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
+
+                        if ($shopBasket->quantity < $quantity) {
+                            //Стало больше, товары добавлены
+                            $eventData['event'] = 'add';
+                            $productData['quantity'] = $quantity - $shopBasket->quantity;
+
+                        } else {
+                            //Стало меньше товары удалены
+                            $eventData['event'] = 'remove';
+                            $productData['quantity'] = $shopBasket->quantity - $quantity;
+                        }
+
+                        $eventData['product'] = $productData;
+                    }
+
 
                     $shopBasket->quantity = $quantity;
                     if ($product->measure_ratio_min > $shopBasket->quantity) {
@@ -251,17 +292,28 @@ class CartController extends Controller
                     }
 
                 } else {
+                    //Удаление товаров из корзины
+                    $eventData['event'] = 'remove';
+                    if ($shopBasket->shopProduct) {
+                        $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
+                        $productData['quantity'] = $shopBasket->quantity;
+                        $eventData['product'] = $productData;
+                    }
+
+
                     if ($shopBasket->delete()) {
                         $rr->success = true;
                         $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
                     }
                 }
-
             }
 
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             \Yii::$app->shop->shopUser->shopOrder->refresh();
-            $rr->data = \Yii::$app->shop->shopUser->shopOrder->jsonSerialize();
+
+            $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
+                'eventData' => $eventData,
+            ]);
             return (array)$rr;
         } else {
             return $this->goBack();

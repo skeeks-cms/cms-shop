@@ -11,7 +11,7 @@
      * @events:
      *
      * viewProduct
-     * 
+     *
      * beforeAddProduct
      * addProduct
      *
@@ -28,6 +28,12 @@
      * removeDiscountCoupon
      *
      * change
+     *
+     *
+     * detail просмотр страницы товара
+     * add товар добавлен в корзину
+     * remove товар удален из корзины
+     *
      *
      */
     sx.classes.shop._App = sx.classes.Component.extend({
@@ -265,6 +271,14 @@
                     'quantity': quantity,
                     'response': data.response,
                 });
+
+                if (data.response.data.product) {
+                    self.trigger('add', {
+                        'product': data.response.data.product,
+                    });
+                }
+
+
             });
 
             return ajax;
@@ -400,6 +414,13 @@
                     'basket_id': basket_id,
                     'response': data.response,
                 });
+
+                self.trigger('remove', {
+                    'product': data.response.data.eventData.product,
+                });
+
+                console.log(data.response.data.eventData.product);
+
             });
 
             return ajax;
@@ -438,6 +459,19 @@
                     'quantity': quantity,
                     'response': data.response,
                 });
+
+                if (data.response.data.eventData) {
+                    if (data.response.data.eventData.event == 'add') {
+                        self.trigger('add', {
+                            'product': data.response.data.eventData.product,
+                        });
+                    }
+                    if (data.response.data.eventData.event == 'remove') {
+                        self.trigger('remove', {
+                            'product': data.response.data.eventData.product,
+                        });
+                    }
+                }
             });
 
             return ajax;

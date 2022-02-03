@@ -1183,4 +1183,35 @@ SQL
         return $this;
     }
 
+    /**
+     * Получение данных для отправки в js событие
+     *
+     * @param ShopCmsContentElement $cmsContentElement
+     * @return array
+     */
+    static public function productDataForJsEvent(ShopCmsContentElement $cmsContentElement)
+    {
+        $data = [
+            'id' => $cmsContentElement->id,
+            "name" => $cmsContentElement->seoName,
+            "price" => (float) $cmsContentElement->shopProduct->minProductPrice->money->amount,
+        ];
+
+        if ($cmsContentElement->cmsTree) {
+            $data['category'] = $cmsContentElement->cmsTree->name;
+        }
+
+         if ($shopCmsContentProperty = \skeeks\cms\shop\models\ShopCmsContentProperty::find()->where(['is_vendor' => 1])->one()) {
+             $brandId = $cmsContentElement->relatedPropertiesModel->getAttribute($shopCmsContentProperty->cmsContentProperty->code);
+             if ($brandId) {
+                 if ($brand = \skeeks\cms\models\CmsContentElement::findOne((int)$brandId)) {
+                     $data['brand'] = $brand->name;
+                 }
+             }
+
+         }
+
+        return $data;
+
+    }
 }
