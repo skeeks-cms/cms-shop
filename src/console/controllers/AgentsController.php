@@ -62,12 +62,13 @@ class AgentsController extends Controller
      */
     public function actionUpdateReceiverSites()
     {
+        $q = ShopSite::find()->where(['is_receiver' => 1])->orderBy(['id' => SORT_DESC]);
         /**
          * @var $shopSite ShopSite
          */
-        if ($shopSites = ShopSite::find()->where(['is_receiver' => 1])->all()) {
-            $this->stdout("Найдено сайтов получателей: " . count($shopSites) . "\n");
-            foreach ($shopSites as $shopSite) {
+        if ($q->count()) {
+            $this->stdout("Найдено сайтов получателей: " . $q->count() . "\n");
+            foreach ($q->each(10) as $shopSite) {
                 $this->stdout("\tСайт: " . $shopSite->id . "\n");
                 \common\modules\sitika\components\ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
             }
@@ -84,17 +85,18 @@ class AgentsController extends Controller
      */
     public function actionUpdateProductsReceiverSites($cms_site_id = null, $is_all = 0)
     {
+        ini_set("memory_limit", "2048M");
+        
         $this->actionUpdatePropertyReceiverSites($cms_site_id);
         /**
          * @var $shopSites ShopSite[]
          */
-        $shopSites = ShopSite::find()->where(['is_receiver' => 1]);
+        $shopSitesQ = ShopSite::find()->andWhere(['is_receiver' => 1])->orderBy(['id' => SORT_DESC]);
         //$shopSites->andWhere(['>=', 'id', 103]);
         if ($cms_site_id) {
             $shopSites->andWhere(['id' => $cms_site_id]);
         }
 
-        $shopSites = $shopSites->all();
         $defaultCmsSite = CmsSite::find()->default()->one();
         if (!$defaultCmsSite) {
             $this->stdout("\tНет сайта по умолчанию\n");
@@ -102,9 +104,9 @@ class AgentsController extends Controller
         }
 
         //Сначала нужно создать характеристики
-        if ($shopSites) {
-            $this->stdout("Найдено сайтов получателей: ".count($shopSites)."\n");
-            foreach ($shopSites as $shopSite) {
+        if ($shopSitesQ->count()) {
+            $this->stdout("Найдено сайтов получателей: ".$shopSitesQ->count()."\n");
+            foreach ($shopSitesQ->each(10) as $shopSite) {
                 $this->stdout("Сайт: ".$shopSite->id."\n");
 
                 $query = ShopCmsContentElement::find()
@@ -281,20 +283,15 @@ class AgentsController extends Controller
 
     public function actionUpdatePropertyReceiverSites($cms_site_id = null)
     {
-        $shopSites = ShopSite::find()->where(['is_receiver' => 1]);
+        $shopSitesQ = ShopSite::find()->where(['is_receiver' => 1])->orderBy(['id' => SORT_DESC]);
         if ($cms_site_id) {
             $shopSites->andWhere(['id' => $cms_site_id]);
         }
         
-        /**
-         * @var $shopSites ShopSite[]
-         */
-        $shopSites = $shopSites->all();
-
         //Сначала нужно создать характеристики
-        if ($shopSites) {
-            $this->stdout("Найдено сайтов получателей: " . count($shopSites) . "\n");
-            foreach ($shopSites as $shopSite) {
+        if ($shopSitesQ->count()) {
+            $this->stdout("Найдено сайтов получателей: " . $shopSitesQ->count() . "\n");
+            foreach ($shopSitesQ->each(10) as $shopSite) {
                 $this->stdout("\tСайт: " . $shopSite->id . "\n");
                 \common\modules\sitika\components\ShopComponent::importPropertiesOnSite($shopSite->cmsSite);
             }

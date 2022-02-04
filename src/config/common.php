@@ -184,6 +184,14 @@ return [
         'skeeks' => [
             'siteClass' => \skeeks\cms\shop\models\CmsSite::class,
         ],
+
+        'cmsExport' => [
+            'handlers' => [
+                \skeeks\cms\shop\export\ExportFacebookCsvContentHandler::class => [
+                    'class' => \skeeks\cms\shop\export\ExportFacebookCsvContentHandler::class,
+                ],
+            ],
+        ],
     ],
 
     'modules' => [
