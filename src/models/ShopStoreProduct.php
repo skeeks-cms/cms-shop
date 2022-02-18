@@ -46,6 +46,8 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
     public function _afterFind($event)
     {
         $this->quantity = (float)$this->quantity;
+        $this->purchase_price = (float)$this->purchase_price;
+        $this->selling_price = (float)$this->selling_price;
     }
 
 
