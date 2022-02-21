@@ -1075,14 +1075,22 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ]);
 
                 \Yii::$app->shop->filterByQuantityQuery($query);
+                
                 $query->leftJoin(['currency' => 'money_currency'], ['currency.code' => new Expression('prices.currency_code')]);
                 $query->select([
                     'cms_content_element.*',
                     'realPrice' => '( currency.course * prices.price )',
                 ])
+                    ->orderBy(['realPrice' => SORT_ASC])
                     ->andWhere(['>', 'prices.price', 0])
-                    ->limit(1);
+                    ->limit(1)
+                ;
+                /*if (YII_ENV_DEV) {
+                    print_r($query->createCommand()->rawSql);
+                }*/
+                
                 $offerElement = $query->one();
+                
                 if ($offerElement) {
                     return $this->getProductPriceHelper($offerElement);
                 }

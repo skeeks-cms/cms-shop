@@ -64,6 +64,8 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public $modelClassName = ShopCmsContentElement::class;
     public $modelShowAttribute = "name";
 
+    public $editForm = '@skeeks/cms/shop/views/admin-cms-content-element/_form';
+
     public function init()
     {
         $this->modelDefaultAction = 'view';

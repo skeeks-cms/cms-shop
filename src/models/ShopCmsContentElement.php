@@ -28,6 +28,7 @@ use yii\helpers\ArrayHelper;
  * @property string                  $productDescriptionShort
  * @property string                  $productDescriptionFull
  * @property string                  $productName
+ * @property string                  $variantName
  * @property CmsSite                 $cmsSite
  *
  * @property ShopCmsContentElement   $mainCmsContentElement
@@ -520,6 +521,42 @@ class ShopCmsContentElement extends CmsContentElement
 
             if ($result) {
                 $name = trim($name).", ".implode(", ", $result);
+            }
+        }
+
+        return $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVariantName()
+    {
+        $name = "";
+        //Если это оффер
+        if ($this->shopProduct && $this->shopProduct->isOfferProduct) {
+            $result = [];
+            if ($this->main_cce_id) {
+                return $this->mainCmsContentElement->variantName;
+            }
+
+            $name = $this->shopProduct->shopProductWhithOffers->cmsContentElement->name;
+            if (\Yii::$app->shop->offerCmsContentProperties) {
+                foreach (\Yii::$app->shop->offerCmsContentProperties as $cmsContentProperty) {
+                    if ($value = $this->relatedPropertiesModel->getAttribute($cmsContentProperty->code)) {
+                        if ($measure = $cmsContentProperty->cmsMeasure) {
+                            $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code).$measure->symbol);
+                        } else {
+
+                            $result[] = StringHelper::strtolower($this->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code));
+                        }
+
+                    }
+                }
+            }
+
+            if ($result) {
+                $name = implode(", ", $result);
             }
         }
 
