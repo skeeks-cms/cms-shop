@@ -129,7 +129,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
             'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
-            'is_show_product_only_quantity' => "Фильтр по наличию",
+            'is_show_product_only_quantity' => "Учет наличия",
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",

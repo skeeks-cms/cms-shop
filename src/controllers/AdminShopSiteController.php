@@ -96,14 +96,7 @@ class AdminShopSiteController extends BackendModelController
 
 
         return [
-            /*'is_supplier' => [
-                'class' => BoolField::class,
-                'allowNull' => false
-            ],
-            'is_receiver' => [
-                'class' => BoolField::class,
-                'allowNull' => false
-            ],*/
+
             'main' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Основное'),
@@ -119,16 +112,6 @@ class AdminShopSiteController extends BackendModelController
                 ],
             ],
 
-            /*'description' => [
-                'class' => WidgetField::class,
-                'widgetClass' => Ckeditor::class
-            ],
-            'description_internal' => [
-                'class' => WidgetField::class,
-                'widgetClass' => Ckeditor::class
-            ],*/
-
-
             'catalog' => [
                 'class' => FieldSet::class,
                 'name'  => \Yii::t('skeeks/shop/app', 'Каталог'),
@@ -140,22 +123,24 @@ class AdminShopSiteController extends BackendModelController
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
+                    'is_show_button_no_price'       => [
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
+
                     'is_show_product_only_quantity' => [
                         /*'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,*/
                         'class'       => SelectField::class,
                         'items'   => [
-                            0 => 'Все',
-                            1 => 'В наличии',
-                            2 => 'В наличии и под заказ',
+                            0 => 'Показывать все товары',
+                            1 => 'Показывать только в наличии',
+                            2 => 'Показывать В наличии и под заказ',
                         ],
                     ],
-                    'is_show_button_no_price'       => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
-                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
-                    ],
+
                     'is_show_quantity_product'      => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
@@ -163,7 +148,6 @@ class AdminShopSiteController extends BackendModelController
                     ],
                 ],
             ],
-
 
             'filters' => [
                 'class' => FieldSet::class,
