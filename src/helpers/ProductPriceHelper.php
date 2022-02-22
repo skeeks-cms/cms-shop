@@ -171,7 +171,8 @@ class ProductPriceHelper extends Component
             }
         }
 
-        $money->amount = round((float) $money->amount);
+        $money->amount = (float) $money->amount;
+        //$money->amount = round((float) $money->amount);
         $this->_minMoney = $money;
         $this->_minPrice = $price;
         $this->_applyedDiscounts = $applyedShopDiscounts;
@@ -289,7 +290,8 @@ class ProductPriceHelper extends Component
             return false;
         }
         
-        return (bool) (round((float) $this->basePrice->money->amount) != round((float) $this->minMoney->amount));
+        //return (bool) (round((float) $this->basePrice->money->amount) != round((float) $this->minMoney->amount));
+        return (bool) ((float) $this->basePrice->money->amount != (float) $this->minMoney->amount);
     }
 
     /**
