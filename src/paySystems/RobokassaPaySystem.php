@@ -11,6 +11,9 @@ namespace skeeks\cms\shop\paySystems;
 use skeeks\cms\shop\components\PaySystemHandlerComponent;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\paysystem\PaysystemHandler;
+use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -21,7 +24,8 @@ use yii\widgets\ActiveForm;
  * Class RobokassaPaySystem
  * @package skeeks\cms\shop\paySystems
  */
-class RobokassaPaySystem extends PaySystemHandlerComponent
+//class RobokassaPaySystem extends PaySystemHandlerComponent
+class RobokassaPaySystem extends PaysystemHandler
 {
     public $isLive = true; //https://auth.robokassa.ru/Merchant/Index.aspx
     public $sMerchantLogin = '';
@@ -87,7 +91,17 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
     {
         return $this->getMerchant()->payment($shopBill->money->amount, $shopBill->id, \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopBill->shopOrder->email);
     }
-    
+
+    /**
+     * @param ShopOrder $shopOrder
+     * @return bool
+     */
+    public function actionPayOrder(ShopOrder $shopOrder)
+    {
+        $shopBill = $this->getShopBill($shopOrder);
+        return $this->getMerchant()->payment($shopBill->money->amount, $shopBill->id, \Yii::t('skeeks/shop/app', 'Payment order'), null, $shopBill->shopOrder->email);
+    }
+
     /**
      * @return \skeeks\cms\shop\paySystems\robokassa\Merchant
      * @throws \yii\base\InvalidConfigException
@@ -108,6 +122,30 @@ class RobokassaPaySystem extends PaySystemHandlerComponent
         ]));
 
         return $merchant;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigFormFields()
+    {
+        return [
+            'main' => [
+                'class'  => FieldSet::class,
+                'name'   => 'Основные',
+                'fields' => [
+                    'isLive' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'sMerchantLogin',
+                    'sMerchantPass1',
+                    'sMerchantPass2',
+
+                ],
+            ],
+
+        ];
     }
 
 
