@@ -13,40 +13,55 @@ SELECT
     UNIX_TIMESTAMP(),
     product_id,
     type_price_id,
-    if(purchase_price is null, 0, purchase_price) as purchase_price,
+    if(price is null, 0, price) as price,
     "RUB"
 FROM (
     SELECT
         ce.id as product_id,
-        (
+        price_data.price,
+    	tp.id as type_price_id
+    FROM
+        cms_content_element as ce
+
+        INNER JOIN shop_product as sp on sp.id = ce.id
+
+        INNER JOIN (
             SELECT
-                (if(store.source_purchase_price = 'purchase_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as purchase_price
+            tp_inner.id as id
+            FROM
+            shop_type_price as tp_inner
+            WHERE tp_inner.is_purchase = 1 AND tp_inner.cms_site_id = @site_id
+        ) as tp
+
+        INNER JOIN (
+
+            SELECT
+                (if(store.source_purchase_price = 'purchase_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as price,
+                (
+                    IF(
+                        ssp.quantity > 0,
+                        0,
+                        1
+                    )
+                ) AS is_quantity,
+                ssp.shop_product_id
             FROM
                 shop_store_product as ssp
                 INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
             WHERE
                 store.cms_site_id = @site_id
                 AND store.is_supplier = 1
-                AND ssp.shop_product_id = ce.id
                 /*AND ssp.purchase_price > 0*/
             ORDER BY
+                is_quantity,
                 store.priority
-            LIMIT 1
 
-        ) as purchase_price,
-    	tp.id as type_price_id
-    FROM
-        cms_content_element as ce
-    INNER JOIN shop_product as sp on sp.id = ce.id
-    INNER JOIN (
-        SELECT
-        tp_inner.id as id
-        FROM
-        shop_type_price as tp_inner
-        WHERE tp_inner.is_purchase = 1 AND tp_inner.cms_site_id = @site_id
-    ) as tp
+        )  as price_data ON price_data.shop_product_id = ce.id
+
     WHERE
         ce.cms_site_id = @site_id
+
+    GROUP BY ce.id
 ) as q
 ;
 
@@ -60,25 +75,12 @@ UPDATE
     INNER JOIN (
         SELECT
             subq.id,
-            if(subq.purchase_price is null, 0, subq.purchase_price) as purchase_price
+            if(subq.price is null, 0, subq.price) as price
         FROM
         (SELECT
                 spp.id,
-                (
-                    SELECT
-                        /*if(ssp.purchase_price is null, 0, ssp.purchase_price) as purchase_price*/
-                        (if(store.source_purchase_price = 'purchase_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as purchase_price
-                    FROM
-                        shop_store_product as ssp
-                        INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
-                    WHERE
-                        ssp.shop_product_id = spp.product_id
-                        AND store.is_supplier = 1
-                        /*AND ssp.purchase_price > 0*/
-                    ORDER BY
-                        store.priority
-                    LIMIT 1
-                ) as purchase_price
+                spp.is_fixed,
+                price_data.price
             FROM
                 `shop_product_price` as spp
             INNER JOIN (
@@ -88,15 +90,40 @@ UPDATE
                     shop_type_price as tp_inner
                 WHERE tp_inner.is_purchase = 1 AND tp_inner.cms_site_id = @site_id
             ) as tp ON spp.type_price_id = tp.id
+
+
+            INNER JOIN (
+                SELECT
+                    /*if(ssp.selling_price is null, 0, ssp.selling_price) as selling_price*/
+                    (if(store.source_selling_price = 'purchase_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as price,
+                    (
+                        IF(
+                            ssp.quantity > 0,
+                            0,
+                            1
+                        )
+                    ) AS is_quantity,
+                    ssp.shop_product_id
+                FROM
+                    shop_store_product as ssp
+                    INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
+                WHERE
+                    store.cms_site_id = @site_id
+                    AND store.is_supplier = 1
+                ORDER BY
+                    is_quantity,
+                    store.priority
+            ) as price_data ON price_data.shop_product_id = spp.product_id
+
         ) as subq
+        WHERE
+            subq.is_fixed = 0
+            AND subq.price > 0
+        GROUP BY subq.id
     ) as inner_spp ON inner_spp.id = spp_update.id
 SET
-    spp_update.price = inner_spp.purchase_price
-WHERE
-    spp_update.is_fixed = 0
-    AND inner_spp.purchase_price > 0
+    spp_update.price = inner_spp.price
 ;
-
 
 
 
@@ -115,27 +142,12 @@ SELECT
 FROM (
     SELECT
         ce.id as product_id,
-        (
-            SELECT
-                /*ssp.selling_price*/
-                (if(store.source_selling_price = 'selling_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as selling_price
-            FROM
-                shop_store_product as ssp
-                INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
-            WHERE
-                store.cms_site_id = @site_id
-                AND store.is_supplier = 1
-                AND ssp.shop_product_id = ce.id
-                /*AND ssp.purchase_price > 0*/
-            ORDER BY
-                store.priority
-            LIMIT 1
-
-        ) as price,
+        price_data.price,
     	tp.id as type_price_id
     FROM
         cms_content_element as ce
     INNER JOIN shop_product as sp on sp.id = ce.id
+
     INNER JOIN (
         SELECT
         tp_inner.id as id
@@ -143,8 +155,37 @@ FROM (
         shop_type_price as tp_inner
         WHERE tp_inner.is_default = 1 AND tp_inner.cms_site_id = @site_id
     ) as tp
+
+    INNER JOIN (
+
+        SELECT
+            (if(store.source_purchase_price = 'selling_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as price,
+            (
+                IF(
+                    ssp.quantity > 0,
+                    0,
+                    1
+                )
+            ) AS is_quantity,
+            ssp.shop_product_id
+        FROM
+            shop_store_product as ssp
+            INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
+        WHERE
+            store.cms_site_id = @site_id
+            AND store.is_supplier = 1
+            /*AND ssp.purchase_price > 0*/
+        ORDER BY
+            is_quantity,
+            store.priority
+
+    )  as price_data ON price_data.shop_product_id = ce.id
+
     WHERE
         ce.cms_site_id = @site_id
+
+    GROUP BY ce.id
+
 ) as q
 ;
 
@@ -162,21 +203,8 @@ UPDATE
         FROM
         (SELECT
                 spp.id,
-                (
-                    SELECT
-                        /*if(ssp.selling_price is null, 0, ssp.selling_price) as selling_price*/
-                        (if(store.source_selling_price = 'selling_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as selling_price
-                    FROM
-                        shop_store_product as ssp
-                        INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
-                    WHERE
-                        ssp.shop_product_id = spp.product_id
-                        AND store.is_supplier = 1
-                        /*AND ssp.purchase_price > 0*/
-                    ORDER BY
-                        store.priority
-                    LIMIT 1
-                ) as price
+                spp.is_fixed,
+                price_data.price
             FROM
                 `shop_product_price` as spp
             INNER JOIN (
@@ -186,13 +214,37 @@ UPDATE
                     shop_type_price as tp_inner
                 WHERE tp_inner.is_default = 1 AND tp_inner.cms_site_id = @site_id
             ) as tp ON spp.type_price_id = tp.id
+
+            INNER JOIN (
+                SELECT
+                    /*if(ssp.selling_price is null, 0, ssp.selling_price) as selling_price*/
+                    (if(store.source_selling_price = 'selling_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as price,
+                    (
+                        IF(
+                            ssp.quantity > 0,
+                            0,
+                            1
+                        )
+                    ) AS is_quantity,
+                    ssp.shop_product_id
+                FROM
+                    shop_store_product as ssp
+                    INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
+                WHERE
+                    store.cms_site_id = @site_id
+                    AND store.is_supplier = 1
+                ORDER BY
+                    is_quantity,
+                    store.priority
+            ) as price_data ON price_data.shop_product_id = spp.product_id
         ) as subq
+        WHERE
+            subq.is_fixed = 0
+            AND subq.price > 0
+        GROUP BY subq.id
     ) as inner_spp ON inner_spp.id = spp_update.id
 SET
     spp_update.price = inner_spp.price
-WHERE
-    spp_update.is_fixed = 0
-    AND inner_spp.price > 0
 ;
 
 COMMIT;
