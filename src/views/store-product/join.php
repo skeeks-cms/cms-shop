@@ -8,6 +8,7 @@ $action = $controller->action;
 
 $url = \yii\helpers\Url::to(['join-by-vendor']);
 $urlBarcode = \yii\helpers\Url::to(['join-by-barcode']);
+$urlModelBarcode = \yii\helpers\Url::to(['join-by-model-barcode']);
 
 $this->registerJs(<<<JS
 
@@ -28,6 +29,21 @@ $(".sx-join-by-brand-trigger").on("click", function() {
 
 $(".sx-join-by-barcode-trigger").on("click", function() {
     var ajaxQuery = sx.ajax.preparePostQuery("{$urlBarcode}");
+    
+    new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+        'blockerSelector' : 'body',
+        'enableBlocker' : true,
+    }).on("success", function(e, response) {
+        if (response.data.added) {
+            $(".sx-vendor-result").empty().append("Связано товаров: " + response.data.added);
+        }
+    });
+    
+    ajaxQuery.execute();
+});
+
+$(".sx-join-by-model-barcode-trigger").on("click", function() {
+    var ajaxQuery = sx.ajax.preparePostQuery("{$urlModelBarcode}");
     
     new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
         'blockerSelector' : 'body',
@@ -70,6 +86,14 @@ if ($shopCmsContentPropertyVendor && $shopCmsContentPropertyVendorCode) {
     }
 }
 
+/*\skeeks\cms\shop\models\ShopCmsContentElement::find()
+    ->cmsSite()
+    ->innerJoinWith("shopProduct as sp")
+    ->andWhere(['is not', \skeeks\cms\shop\models\ShopCmsContentElement::tableName() . ".main_cce_id", null])
+;*/
+
+
+
 $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
 $shopStorePropertyBarcode = $qShopStoreProperties->andWhere(['property_nature' => \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_BARCODE])->one();
 if ($shopStorePropertyBarcode) {
@@ -93,6 +117,11 @@ if ($shopStorePropertyBarcode) {
 
             <?php if ($isBarcode) : ?>
                 <button type="submit" class="btn btn-primary sx-join-by-barcode-trigger">Запустить по штрихкоду</button>
+
+                <?php if(\Yii::$app->skeeks->site->shopSite->is_receiver) : ?>
+                    <button type="submit" class="btn btn-primary sx-join-by-model-barcode-trigger">Запустить по штрихкоду через модели</button>
+                <?php endif; ?>
+
             <?php endif; ?>
 
 

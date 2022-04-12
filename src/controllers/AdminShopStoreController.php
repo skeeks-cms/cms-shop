@@ -22,8 +22,10 @@ use skeeks\cms\widgets\GridView;
 use skeeks\cms\ya\map\widgets\YaMapInput;
 use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
+use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
@@ -259,12 +261,195 @@ HTML
                     ArrayHelper::removeValue($visibleColumns, 'shop_store_id');
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
-                },
+                 },
             ],
         ]);
     }
 
+
+
     public function updateFields($action)
+    {
+        $action->model->load(\Yii::$app->request->get());
+        $action->model->is_supplier = 0;
+        \Yii::$app->view->registerCss(<<<CSS
+.field-shopstore-is_supplier {
+    display: none;
+}
+CSS
+        );
+
+        return [
+            'main'           => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Main'),
+                'fields' => [
+                    'cms_image_id' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxFileUploadWidget::class,
+                        'widgetConfig' => [
+                            'accept'   => 'image/*',
+                            'multiple' => false,
+                        ],
+                    ],
+
+                    'name',
+
+
+                ],
+            ],
+            'selling_price'  => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Формирование розничной цены'),
+                'fields' => [
+                    'source_selling_price' => [
+                        'class'     => SelectField::class,
+                        'allowNull' => false,
+                        'items'     => [
+                            'purchase_price' => 'Закупочная цена',
+                            'selling_price'  => 'Розничная цена',
+                        ],
+                    ],
+                    'selling_extra_charge' => [
+                        'class'  => NumberField::class,
+                        'append' => "%",
+                        'step'   => 0.01,
+                    ],
+                ],
+            ],
+            'purchase_price' => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Формирование закупочной цены'),
+                'elementOptions' => [
+                    'isOpen' => false,
+                ],
+                'fields'         => [
+                    'source_purchase_price' => [
+                        'class'     => SelectField::class,
+                        'allowNull' => false,
+                        'items'     => [
+                            'purchase_price' => 'Закупочная цена',
+                            'selling_price'  => 'Розничная цена',
+                        ],
+                    ],
+                    'purchase_extra_charge' => [
+                        'class'  => NumberField::class,
+                        'append' => "%",
+                        'step'   => 0.01,
+                    ],
+                ],
+            ],
+
+            'additional' => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Дополнительно'),
+                'elementOptions' => [
+                    'isOpen' => false,
+                ],
+                'fields'         => [
+                    'is_active'   => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'is_supplier' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'external_id',
+                    'priority'    => [
+                        'class' => NumberField::class,
+                    ],
+                ],
+            ],
+
+            'description' => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Описание'),
+                'elementOptions' => [
+                    'isOpen' => false,
+                ],
+                'fields'         => [
+                    'description' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => CKEditorWidget::class,
+                        'widgetConfig' => [
+                            'preset'        => false,
+                            'clientOptions' => [
+                                'enterMode'      => 2,
+                                'height'         => 300,
+                                'allowedContent' => true,
+                                'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
+                                'toolbar'        => [
+                                    ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
+                                ],
+                            ],
+
+                        ],
+                    ],
+                ],
+            ],
+            'addresses'   => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Контакты'),
+                'elementOptions' => [
+                    'isOpen' => false,
+                ],
+                'fields'         => [
+                    'coordinates' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => YaMapInput::class,
+                        'widgetConfig' => [
+                            'YaMapWidgetOptions' => [
+                                'options' => [
+                                    'style' => 'height: 400px;',
+                                ],
+                            ],
+
+                            'clientOptions' => [
+                                'select' => new \yii\web\JsExpression(<<<JS
+            function(e, data)
+            {
+                var lat = data.coords[0];
+                var long = data.coords[1];
+                var address = data.address;
+                var phone = data.phone;
+                var email = data.email;
+        
+                $('#shopstore-address').val(address);
+                $('#shopstore-latitude').val(lat);
+                $('#shopstore-longitude').val(long);
+            }
+JS
+                                ),
+                            ],
+                        ],
+                    ],
+
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => '<div style="display: block;">',
+                    ],
+                    'address',
+                    'latitude',
+                    'longitude',
+
+                    [
+                        'class'   => HtmlBlock::class,
+                        'content' => '</div>',
+                    ],
+
+                    'work_time' => [
+                        'class'       => WidgetField::class,
+                        'widgetClass' => \skeeks\yii2\scheduleInputWidget\ScheduleInputWidget::class,
+                    ],
+                ],
+            ],
+
+
+        ];
+    }
+
+    public function updateFields1($action)
     {
         $action->model->load(\Yii::$app->request->get());
         $action->model->is_supplier = 0;

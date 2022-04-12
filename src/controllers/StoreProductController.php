@@ -681,6 +681,107 @@ HTML;
         return $rr;
     }
 
+
+    public function actionJoinByModelBarcode()
+    {
+
+        $rr = new RequestResponse();
+
+
+        set_time_limit(0);
+        ini_set("memory_limit", "2G");
+
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $added = 0;
+            /**
+             * @var $shopStorePropertyVendor ShopStoreProperty
+             */
+            $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
+            $shopStorePropertyBarcode = $qShopStoreProperties->andWhere(['property_nature' => ShopStoreProperty::PROPERTY_NATURE_BARCODE])->one();
+
+            if ($shopStorePropertyBarcode) {
+                $rr->success = true;
+                $rr->message = "Данные обновлены";
+
+                /**
+                 * @var $vendorOption ShopStorePropertyOption
+                 * @var $storeProduct ShopStoreProduct
+                 */
+                $storeProducts = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => null]);
+                foreach ($storeProducts->each() as $storeProduct) {
+                    if ($storeProduct->external_data) {
+                        $externalData = [];
+                        foreach ($storeProduct->external_data as $key => $val) {
+                            $externalData[trim($key)] = $val;
+                        }
+                        $barcodeValue = ArrayHelper::getValue($externalData, trim($shopStorePropertyBarcode->external_code));
+
+                        if ($barcodeValue) {
+
+                            $find = ShopCmsContentElement::find()
+                                ->cmsSite()
+
+                                ->innerJoinWith("mainCmsContentElement as mainCCE")
+                                ->innerJoinWith("mainCmsContentElement.shopProduct as mainCCESp")
+                                ->innerJoinWith("mainCmsContentElement.shopProduct.shopProductBarcodes as mainBarcodes")
+
+                                /*->innerJoinWith("shopProduct as sp")
+                                ->innerJoinWith("shopProduct.shopProductBarcodes as barcodes")*/
+                                ->andWhere(["mainBarcodes.value" => $barcodeValue])
+
+                                ->groupBy([ShopCmsContentElement::tableName().".id"]);
+
+                                /*$find = ShopCmsContentElement::find()
+                                ->cmsSite(CmsSite::find()->default()->one())
+
+                                ->innerJoinWith("shopProduct as sp")
+                                ->innerJoinWith("shopProduct.shopProductBarcodes as barcodes")
+
+                                ->andWhere(["barcodes.value" => $barcodeValue])
+
+                                ->groupBy([ShopCmsContentElement::tableName().".id"]);
+                                */
+
+                            /*print_r($find->createCommand()->rawSql);die;*/
+
+                            if ($find->count() == 1) {
+                                $infoModel = $find->one();
+
+                                /*print_r($storeProduct->toArray());
+                                print_r($infoModel->toArray());die;*/
+
+                                if ($infoModel) {
+                                    $storeProduct->shop_product_id = $infoModel->id;
+                                    try {
+                                        if ($storeProduct->save(false)) {
+                                            $added++;
+                                        }
+                                    } catch (\Exception $exception) {
+
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+
+                if ($added > 0) {
+                    $rr->message = "Связано товаров: {$added}";
+                    $rr->data = [
+                        'added' => $added,
+                    ];
+                }
+            }
+        }
+
+        return $rr;
+    }
+
     public function actionJoinByVendor()
     {
         $rr = new RequestResponse();
