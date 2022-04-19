@@ -109,6 +109,16 @@ class AdminShopSiteController extends BackendModelController
                     'notify_emails'         => [
                         'class' => TextareaField::class,
                     ],
+                    'is_show_cart'      => [
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
+                    'is_show_prices'      => [
+                        'class'       => BoolField::class,
+                        'allowNull'   => false,
+                        'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
                 ],
             ],
 

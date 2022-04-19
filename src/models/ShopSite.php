@@ -20,6 +20,8 @@ use yii\helpers\ArrayHelper;
  * @property int         $is_receiver Сайт получает товары от поставщиков?
  * @property int|null    $catalog_cms_tree_id Главный раздел для товаров
  * @property string|null $notify_emails Email адреса для уведомлений о заказах
+ * @property int         $is_show_cart Показывать корзину?
+ * @property int         $is_show_prices Показывать цены?
  * @property int         $is_show_product_no_price Показывать товары с нулевыми ценами?
  * @property int         $is_show_button_no_price Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?
  * @property int         $is_show_product_only_quantity Показывать товары только в наличии на сайте?
@@ -102,6 +104,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     'is_show_product_no_price',
                     'is_show_button_no_price',
                     'is_show_quantity_product',
+                    'is_show_cart',
+                    'is_show_prices',
                 ],
                 'boolean',
             ],
@@ -133,6 +137,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
+            'is_show_cart'                  => "Показывать корзину на сайте?",
+            'is_show_prices'                  => "Показывать цены на сайте?",
         ]);
     }
 
@@ -152,6 +158,11 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
             'is_show_product_only_quantity' => "Выберите как товары будут показываться на сайте по умолчанию",
             'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
+            'is_show_cart'      => "Если выбрано «да», то на сайте будет показана корзина, а возле товаров кнопка «в корзину»<br />
+Если выбрано «нет», то фактически на сайте будет отключена корзина
+",
+            'is_show_prices'      => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены
+",
 
         ]);
     }

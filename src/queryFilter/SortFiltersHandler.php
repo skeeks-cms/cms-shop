@@ -104,12 +104,24 @@ class SortFiltersHandler extends Model
 
     public function getSortOptions()
     {
-        return [
-            '-popular' => \Yii::t("skeeks/unify", "Сначала популярные"),
-            'price'    => \Yii::t("skeeks/unify-shop", "Cheap first"),
-            '-price'   => \Yii::t("skeeks/unify-shop", "Dear first"),
-            '-new'     => \Yii::t("skeeks/unify", "Сначала новые"),
-        ];
+        if (\Yii::$app->cms->cmsSite->shopSite->is_show_prices) {
+
+            return [
+                '-popular' => \Yii::t("skeeks/unify", "Сначала популярные"),
+                'price'    => \Yii::t("skeeks/unify-shop", "Cheap first"),
+                '-price'   => \Yii::t("skeeks/unify-shop", "Dear first"),
+                '-new'     => \Yii::t("skeeks/unify", "Сначала новые"),
+            ];
+
+        } else {
+
+            return [
+                '-popular' => \Yii::t("skeeks/unify", "Сначала популярные"),
+                '-new'     => \Yii::t("skeeks/unify", "Сначала новые"),
+            ];
+
+        }
+
     }
     /**
      * @param DataProviderInterface $dataProvider
