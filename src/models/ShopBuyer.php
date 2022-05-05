@@ -27,6 +27,8 @@ use skeeks\cms\relatedProperties\models\RelatedElementModel;
  * @property ShopOrder[]         $shopOrders
  *
  * @property string              $email read-only
+ * @property string              $phone read-only
+ * @property string              $registerName read-only
  */
 class ShopBuyer extends RelatedElementModel
 {
@@ -180,6 +182,57 @@ class ShopBuyer extends RelatedElementModel
         if ($this->cmsUser && $this->cmsUser->email) {
             return $this->cmsUser->email;
         }
+
+        return null;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getPhone()
+    {
+        $this->relatedPropertiesModel->initAllProperties();
+        if ($properties = $this->relatedPropertiesModel->properties) {
+            /**
+             * @var $property ShopPersonTypeProperty
+             */
+            foreach ($properties as $property) {
+                if ($property->is_user_phone == "Y") {
+                    $value = $this->relatedPropertiesModel->getAttribute($property->code);
+                    if ($value) {
+                        return (string)$value;
+                    }
+                }
+            }
+        }
+
+        if ($this->cmsUser && $this->cmsUser->phone) {
+            return $this->cmsUser->phone;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getRegisterName()
+    {
+        $this->relatedPropertiesModel->initAllProperties();
+        if ($properties = $this->relatedPropertiesModel->properties) {
+            /**
+             * @var $property ShopPersonTypeProperty
+             */
+            foreach ($properties as $property) {
+                if ($property->is_buyer_name == "Y") {
+                    $value = $this->relatedPropertiesModel->getAttribute($property->code);
+                    if ($value) {
+                        return (string)$value;
+                    }
+                }
+            }
+        }
+
 
         return null;
     }

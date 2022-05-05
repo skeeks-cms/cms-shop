@@ -2,6 +2,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
@@ -10,6 +11,7 @@ use skeeks\cms\shop\delivery\DeliveryCheckoutModel;
 use skeeks\cms\shop\helpers\ProductPriceHelper;
 use skeeks\cms\shop\models\queries\ShopOrderQuery;
 use skeeks\cms\shop\Module;
+use skeeks\cms\validators\PhoneValidator;
 use yii\base\Event;
 use yii\base\Model;
 use yii\base\ModelEvent;
@@ -18,6 +20,7 @@ use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\validators\EmailValidator;
 
 /**
  * This is the model class for table "{{%shop_order}}".
@@ -47,6 +50,10 @@ use yii\helpers\Url;
  * @property string                     $code
  * @property boolean                    $is_created Заказ создан? Если заказ не создан он связан с корзиной пользователя.
  * @property string                     $delivery_handler_data_jsoned
+ *
+ * @property integer|null               $cms_user_id
+ * @property string|null                $contact_phone
+ * @property string|null                $contact_email
  *
  * ***
  *
@@ -93,7 +100,6 @@ use yii\helpers\Url;
  * @property string                     $weightFormatted
  *
  *
- * @property string                     $email read-only
  * @property string                     $payUrl read-only ссылка на оплату
  * @property string                     $url read-only ссылка на заказ
  *
@@ -354,6 +360,8 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'status_at',
                     'shop_pay_system_id',
                     'shop_order_status_id',
+
+                    'cms_user_id',
                 ],
                 'integer',
             ],
@@ -494,7 +502,28 @@ class ShopOrder extends \skeeks\cms\models\Core
                 },
             ],
 
+            [['contact_phone'], 'string'],
+            [['contact_phone'], "filter", 'filter' => 'trim'],
+            [
+                ['contact_phone'],
+                "filter",
+                'filter' => function ($value) {
+                    return StringHelper::strtolower($value);
+                },
+            ],
+            [['contact_phone'], PhoneValidator::class],
 
+            [['contact_email'], 'string'],
+            [['contact_email'], 'string'],
+            [['contact_email'], "filter", 'filter' => 'trim'],
+            [
+                ['contact_email'],
+                "filter",
+                'filter' => function ($value) {
+                    return StringHelper::strtolower($value);
+                },
+            ],
+            [['contact_email'], EmailValidator::class],
         ];
     }
 
@@ -525,6 +554,8 @@ class ShopOrder extends \skeeks\cms\models\Core
             'isNotifyChangeStatus' => \Yii::t('skeeks/shop/app', 'Отправить email уведомление клиенту?'),
             'statusComment'        => \Yii::t('skeeks/shop/app', 'Комментарий к смене статуса'),
             'external_id'          => "ID из внешней системы",
+            'contact_email'                => "Email",
+            'contact_phone'                => "Телефон",
 
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Оплата'),
 
@@ -532,6 +563,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             'delivery_handler_data_jsoned' => "Данные службы доставки",
         ];
     }
+
     /**
      * @return null|string
      */
@@ -1075,7 +1107,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ]);
 
                 \Yii::$app->shop->filterByQuantityQuery($query);
-                
+
                 $query->leftJoin(['currency' => 'money_currency'], ['currency.code' => new Expression('prices.currency_code')]);
                 $query->select([
                     'cms_content_element.*',
@@ -1083,14 +1115,13 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ])
                     ->orderBy(['realPrice' => SORT_ASC])
                     ->andWhere(['>', 'prices.price', 0])
-                    ->limit(1)
-                ;
+                    ->limit(1);
                 /*if (YII_ENV_DEV) {
                     print_r($query->createCommand()->rawSql);
                 }*/
-                
+
                 $offerElement = $query->one();
-                
+
                 if ($offerElement) {
                     return $this->getProductPriceHelper($offerElement);
                 }
@@ -1186,6 +1217,9 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getCmsUser()
     {
+        $class = \Yii::$app->user->identityClass;
+        return $this->hasOne($class, ['id' => 'cms_user_id']);
+
         if ($this->shopBuyer) {
             return $this->shopBuyer->cmsUser;
         }
