@@ -31,7 +31,12 @@ class UtilsController extends Controller
      */
     public function actionOrderUpdateToUsers()
     {
-        $q = ShopOrder::find()->isCreated()->andWhere(['cms_user_id' => null]);
+        $q = ShopOrder::find()->isCreated()
+            //->andWhere(['cms_user_id' => null])
+            ->andWhere(['not in', 'cms_site_id', [
+                1
+            ]])
+        ;
 
         $this->stdout("Found: {$q->count()}!\n", Console::BOLD);
         if ($q->count() == 0) {
@@ -45,6 +50,9 @@ class UtilsController extends Controller
          */
         foreach ($q->each() as $order) {
             $this->stdout("\t{$order->id}\n");
+            $this->stdout("\t{$order->cms_site_id}\n");
+
+            $cmsSite = $order->cmsSite;
 
             //В заказе указан покупатель
             if ($order->shopBuyer) {
@@ -64,7 +72,7 @@ class UtilsController extends Controller
                     if ($dm->validate()) {
                         $order->contact_phone = $newPhone;
                         if ($cmsUser === null) {
-                            $cmsUser = CmsUser::find()->phone($newPhone)->one();
+                            $cmsUser = CmsUser::find()->cmsSite($cmsSite)->phone($newPhone)->one();
                         }
                     } else {
                         $this->stdout("\t\tТелефон некорректный!\n");
@@ -83,7 +91,7 @@ class UtilsController extends Controller
                     if ($dm->validate()) {
                         $order->contact_email = $email;
                         if ($cmsUser === null) {
-                            $cmsUser = CmsUser::find()->email($email)->one();
+                            $cmsUser = CmsUser::find()->cmsSite($cmsSite)->email($email)->one();
                         }
                     } else {
                         $this->stdout("\t\tEmail некорректный!\n");
@@ -103,6 +111,8 @@ class UtilsController extends Controller
                         $this->stdout("\tСоздать пользователя\n");
 
                         $cmsUser = new CmsUser();
+                        $cmsUser->cms_site_id = $cmsSite->id;
+                        $this->stdout("\t\tСайт: {$cmsUser->cms_site_id}\n");
 
                         if ($order->contact_phone) {
                             $this->stdout("\t\t{$order->contact_phone}\n");
