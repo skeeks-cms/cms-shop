@@ -37,6 +37,8 @@ class ShopGlobalWidget extends Widget
     public function baseClientOptions()
     {
         return [
+            'backend-order-update'            => UrlHelper::construct('shop/cart/order-update')->toString(),
+
             'backend-add-product'            => UrlHelper::construct('shop/cart/add-product')->toString(),
             'backend-remove-basket'          => UrlHelper::construct('shop/cart/remove-basket')->toString(),
             'backend-update-basket'          => UrlHelper::construct('shop/cart/update-basket')->toString(),
@@ -48,7 +50,7 @@ class ShopGlobalWidget extends Widget
             'backend-favorite-remove-product' => UrlHelper::construct('shop/favorite/remove-product')->toString(),
             'backend-favorite'                => UrlHelper::construct('shop/favorite')->toString(),
 
-            'currencyCode'                => \Yii::$app->money->currency_code,
+            'currencyCode' => \Yii::$app->money->currency_code,
         ];
     }
 
@@ -71,7 +73,7 @@ class ShopGlobalWidget extends Widget
         sx.Shop = new sx.classes.shop.App($options);
     })(sx, sx.$, sx._);
 JS
-            , View::POS_END
+                , View::POS_END
             );
             static::$isRegisteredAssets = true;
         }

@@ -202,11 +202,11 @@ class AdminPaySystemController extends BackendModelStandartController
                         'allowNull' => false,
                     ],
 
-                    'personTypeIds' => [
+                    /*'personTypeIds' => [
                         'class'    => SelectField::class,
                         'multiple' => true,
                         'items'    => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopPersonType::find()->all(), 'id', 'name'),
-                    ],
+                    ],*/
 
 
                     'priority' => [

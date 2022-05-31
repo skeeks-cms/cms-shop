@@ -227,11 +227,11 @@ return \yii\helpers\ArrayHelper::merge([
                             'icon'  => "fas fa-dollar-sign",
                         ],*/
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Покупатели'),
                             "url"   => ["shop/admin-person-type"],
                             "icon"  => "fas fa-user-friends",
-                        ],
+                        ],*/
 
                         /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Способы оплаты'),
@@ -265,7 +265,7 @@ return \yii\helpers\ArrayHelper::merge([
 
 
                         [
-                            'priority' => 40,
+                            //'priority' => 40,
                             'label'    => \Yii::t('skeeks/shop/app', 'Marketing'),
                             "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
@@ -308,7 +308,7 @@ return \yii\helpers\ArrayHelper::merge([
 
 
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Склады'),
+                            "label" => \Yii::t('skeeks/shop/app', 'Склады/Магазины'),
                             "url"   => ["shop/admin-shop-store"],
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                         ],

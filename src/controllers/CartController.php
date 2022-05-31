@@ -13,6 +13,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
+use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrder2discountCoupon;
 use skeeks\cms\shop\models\ShopOrderItem;
 use skeeks\cms\shop\models\ShopProduct;
@@ -70,6 +71,41 @@ class CartController extends Controller
         return $this->render($this->action->id);
     }
 
+
+    public function actionOrderUpdate()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $order = null;
+            if ($shopOrderId = \Yii::$app->request->post("shop_order_id")) {
+                $order = ShopOrder::find()->cmsSite()->andWhere(['id' => $shopOrderId])->one();
+            }
+
+            if (!$order) {
+                $order = \Yii::$app->shop->shopUser->shopOrder;
+            }
+
+            $data = \Yii::$app->request->post("data");
+
+            try {
+                $order->setAttributes($data, false);
+                if (!$order->save(true, array_keys($data))) {
+                    throw new Exception(print_r($order->errors, true));
+                }
+
+                $rr->data = ArrayHelper::merge($order->jsonSerialize(), []);
+                $rr->success = true;
+            } catch (\Exception $exception) {
+                $rr->message = $exception->getMessage();
+                $rr->success = false;
+            }
+
+        }
+
+        return $rr;
+    }
 
     /**
      * Adding a product to the cart.

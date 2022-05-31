@@ -52,8 +52,14 @@ use yii\validators\EmailValidator;
  * @property string                     $delivery_handler_data_jsoned
  *
  * @property integer|null               $cms_user_id
+ * @property integer|null               $shop_store_id
+ *
  * @property string|null                $contact_phone
  * @property string|null                $contact_email
+ * @property string|null                $contact_first_name
+ * @property string|null                $contact_last_name
+ *
+ * @property string                     $comment
  *
  * ***
  *
@@ -89,6 +95,8 @@ use yii\validators\EmailValidator;
  * @property Money                      $moneyDiscount Цена скидки
  * @property Money                      $moneyItems Цена всех товаров без скидки
  * @property Money                      $moneyPaid
+ *
+ * @property ShopStore                  $shopStore
  *
  * @property Money                      $calcMoney          Итоговая цена к оплате
  * @property Money                      $calcMoneyDelivery  Цена доставки
@@ -513,6 +521,12 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
             [['contact_phone'], PhoneValidator::class],
 
+            [['contact_first_name'], 'string'],
+            [['contact_last_name'], 'string'],
+            [['comment'], 'string'],
+
+            [['shop_store_id'], 'integer'],
+
             [['contact_email'], 'string'],
             [['contact_email'], 'string'],
             [['contact_email'], "filter", 'filter' => 'trim'],
@@ -554,8 +568,8 @@ class ShopOrder extends \skeeks\cms\models\Core
             'isNotifyChangeStatus' => \Yii::t('skeeks/shop/app', 'Отправить email уведомление клиенту?'),
             'statusComment'        => \Yii::t('skeeks/shop/app', 'Комментарий к смене статуса'),
             'external_id'          => "ID из внешней системы",
-            'contact_email'                => "Email",
-            'contact_phone'                => "Телефон",
+            'contact_email'        => "Email",
+            'contact_phone'        => "Телефон",
 
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Оплата'),
 
@@ -601,6 +615,13 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getCurrency()
     {
         return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopStore()
+    {
+        return $this->hasOne(ShopStore::class, ['id' => 'shop_store_id']);
     }
 
     /**
@@ -1030,11 +1051,20 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDelivery)]),
             'moneyDiscount' => ArrayHelper::merge($this->moneyDiscount->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyDiscount)]),
-            'moneyOriginal' => ArrayHelper::merge($this->moneyOriginal->jsonSerialize(),
+            'moneyOriginal' => ArrayHelper::merge($this->moneyOriginal->jsonSerialize(), [
+                'convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyOriginal),
+                'is_deprecated'    => 1,
+            ]),
+            'moneyItems'    => ArrayHelper::merge($this->moneyItems->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyOriginal)]),
             'moneyVat'      => ArrayHelper::merge($this->moneyVat->jsonSerialize(), [
                 'convertAndFormat' => \Yii::$app->money->convertAndFormat($this->moneyVat),
             ]),
+            'weight'        => [
+                'convertAndFormat' => $this->weightFormatted,
+                'value'            => $this->weight,
+            ],
+
         ]);
     }
     /**
@@ -1046,7 +1076,6 @@ class ShopOrder extends \skeeks\cms\models\Core
             'shopOrderItems',
             'quantity',
             'countShopOrderItems',
-
             'countShopBaskets',
         ];
     }

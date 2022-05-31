@@ -43,7 +43,7 @@
             var self = this;
             this.carts = [];
 
-            this.bind('removeBasket addProduct updateBasket clearCart addDiscountCoupon removeDiscountCoupon', function (e, data) {
+            this.bind('removeBasket addProduct updateBasket clearCart addDiscountCoupon removeDiscountCoupon updateOrder', function (e, data) {
                 self.trigger('change', {
                     'Shop': self
                 });
@@ -431,6 +431,24 @@
          * @param basket_id
          * @returns {*|sx.classes.AjaxQuery}
          */
+        createAjaxUpdateOrder: function (data) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-order-update'));
+
+            ajax.setData(data);
+            ajax.onSuccess(function (e, data) {
+                self.set('cartData', data.response.data);
+                self.trigger('updateOrder');
+            });
+
+            return ajax;
+        },
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
         createAjaxUpdateBasket: function (basket_id, quantity, additional) {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-update-basket'));
@@ -526,6 +544,12 @@
         },
 
 
+        /**
+         * @returns {*}
+         */
+        getCartData: function() {
+            return this.get('cartData');
+        },
         /**
          * Number of items in basket
          *
