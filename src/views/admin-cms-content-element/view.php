@@ -278,6 +278,8 @@ $noValue = "<span style='color: silver;'>—</span>";
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
 
+<?php echo \skeeks\cms\widgets\Alert::widget(); ?>
+
 <!--Если это сайт поставщика или получателя товаров-->
 <?php if ($model->cmsSite->shopSite->is_receiver) : ?>
     <!-- Если товар не привязан к инфокрточке -->

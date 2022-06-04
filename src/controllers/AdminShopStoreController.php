@@ -19,6 +19,7 @@ use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\store\StoreUrlRule;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\GridView;
+use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
 use skeeks\cms\ya\map\widgets\YaMapInput;
 use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
@@ -395,41 +396,19 @@ CSS
                     'isOpen' => false,
                 ],
                 'fields'         => [
-                    'coordinates' => [
-                        'class'        => WidgetField::class,
-                        'widgetClass'  => YaMapInput::class,
+                    'address' => [
+                        'class' => WidgetField::class,
+                        'widgetClass' => YaMapDecodeInput::class,
                         'widgetConfig' => [
-                            'YaMapWidgetOptions' => [
-                                'options' => [
-                                    'style' => 'height: 400px;',
-                                ],
-                            ],
-
-                            'clientOptions' => [
-                                'select' => new \yii\web\JsExpression(<<<JS
-            function(e, data)
-            {
-                var lat = data.coords[0];
-                var long = data.coords[1];
-                var address = data.address;
-                var phone = data.phone;
-                var email = data.email;
-        
-                $('#shopstore-address').val(address);
-                $('#shopstore-latitude').val(lat);
-                $('#shopstore-longitude').val(long);
-            }
-JS
-                                ),
-                            ],
-                        ],
+                            'modelLatitudeAttr' => 'latitude',
+                            'modelLongitudeAttr' => 'longitude',
+                        ]
                     ],
 
                     [
                         'class'   => HtmlBlock::class,
-                        'content' => '<div style="display: block;">',
+                        'content' => '<div style="display: none;">',
                     ],
-                    'address',
                     'latitude',
                     'longitude',
 

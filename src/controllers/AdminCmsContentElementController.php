@@ -79,7 +79,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
-
+                
                 "view" => [
                     'class'    => BackendModelAction::class,
                     'priority' => 80,
@@ -1558,6 +1558,7 @@ CSS
                         //\Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                         $is_saved = true;
+                        \Yii::$app->getSession()->setFlash('success', $this->action->successMessage);
 
                         if (\Yii::$app->request->post('submit-btn') == 'apply') {
                             $redirect = UrlHelper::constructCurrent()->setCurrentRef()->enableAdmin()->setRoute($this->modelDefaultAction)->normalizeCurrentRoute()
@@ -1585,6 +1586,7 @@ CSS
             'shopProduct'       => $shopProduct,
             'productPrices'     => $productPrices,
             'shopStoreProducts' => $shopStoreProducts,
+            'is_create'  => true,
             //'baseProductPrice' => $baseProductPrice,
 
             'is_saved'                     => $is_saved,
@@ -1714,6 +1716,7 @@ CSS
 
                             $is_saved = true;
 
+                            \Yii::$app->getSession()->setFlash('success', $this->action->successMessage);
                             ///\Yii::$app->getSession()->setFlash('success', \Yii::t('skeeks/shop/app', 'Saved'));
 
                             if (\Yii::$app->request->post('submit-btn') == 'apply') {
