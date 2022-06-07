@@ -9,10 +9,8 @@
 namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\base\DynamicModel;
-use skeeks\cms\models\CmsComponentSettings;
-use skeeks\cms\models\CmsTheme;
 use skeeks\cms\models\CmsUser;
-use skeeks\cms\shop\models\CmsSite;
+use skeeks\cms\models\CmsUserAddress;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\validators\PhoneValidator;
 use yii\base\Exception;
@@ -33,7 +31,7 @@ class UtilsController extends Controller
     public function actionOrderUpdateToUsers()
     {
         $q = ShopOrder::find()->isCreated()
-            ->andWhere(['id' => '312594'])
+            //->andWhere(['id' => '312594'])
             //->andWhere(['cms_user_id' => null])
             /*->andWhere(['not in', 'cms_site_id', [
                 1
@@ -61,6 +59,9 @@ class UtilsController extends Controller
 
                 $shopBuyer = $order->shopBuyer;
 
+                /**
+                 * @var $cmsUser CmsUser
+                 */
                 $cmsUser = null;
                 if ($shopBuyer->phone) {
                     $this->stdout("\tУ покупателя есть телефон: {$shopBuyer->phone}");
@@ -105,26 +106,7 @@ class UtilsController extends Controller
                     $order->contact_first_name = $name;
                 }
 
-                if ($address = $shopBuyer->address) {
-                    $decodeUrl = \Yii::$app->yaMap->createDecodeUrlByAddress($address);
 
-                    $client = new Client();
-
-                    $response = $client->createRequest()
-                        ->setMethod('GET')
-                        ->setUrl($decodeUrl)
-                        ->send()
-                    ;
-
-                    if ($response->isOk) {
-                        $data = ArrayHelper::getValue($response->data, 'response.GeoObjectCollection.featureMember.0');
-                        print_r($data);
-                        $address = ArrayHelper::getValue($response->data, 'response.GeoObjectCollection.featureMember.0.GeoObject.metaDataProperty.GeocoderMetaData.Address.formatted');
-                        print_r($address);
-                        die;
-                    }
-
-                }
 
                 $t = \Yii::$app->db->beginTransaction();
 
@@ -192,6 +174,70 @@ class UtilsController extends Controller
                     }
 
                     $order->cms_user_id = $cmsUser->id;
+
+
+                    $address = $shopBuyer->address;
+
+                if ($address) {
+                    $decodeUrl = \Yii::$app->yaMap->createDecodeUrlByAddress($address);
+
+                    $client = new Client();
+
+                    $response = $client->createRequest()
+                        ->setMethod('GET')
+                        ->setUrl($decodeUrl)
+                        ->send()
+                    ;
+
+                    if ($response->isOk) {
+                        $data = ArrayHelper::getValue($response->data, 'response.GeoObjectCollection.featureMember.0');
+                        $pointData = [];
+
+                        $address = ArrayHelper::getValue($data, 'GeoObject.metaDataProperty.GeocoderMetaData.Address.formatted');
+                        $point = ArrayHelper::getValue($data, 'GeoObject.Point.pos');
+                        if ($point) {
+                            $pointData = explode(" ", $point);
+                        }
+
+                        if ($pointData && $address) {
+                            $order->delivery_longitude = ArrayHelper::getValue($pointData, "0");
+                            $order->delivery_latitude = ArrayHelper::getValue($pointData, "1");
+                            $order->delivery_address = $address;
+
+                            /**
+                             * @var CmsUser $cmsUser
+                             */
+                            if ($cmsUser) {
+                                $cmsUserAddress = $cmsUser->getCmsUserAddresses()
+                                    ->andWhere(['value' => $address])
+                                    ->one();
+
+                                if (!$cmsUserAddress) {
+                                    $cmsUserAddress = new CmsUserAddress();
+
+                                    $cmsUserAddress->cms_site_id = $cmsSite->id;
+                                    $cmsUserAddress->cms_user_id = $cmsUser->id;
+                                    $cmsUserAddress->value = $address;
+                                    $cmsUserAddress->value = $address;
+                                    $cmsUserAddress->latitude = $order->delivery_latitude;
+                                    $cmsUserAddress->longitude = $order->delivery_longitude;
+
+                                    if (!$cmsUserAddress->save()) {
+                                        print_r($cmsUserAddress->errors);
+                                        die;
+                                    }
+                                }
+
+                                $order->cms_user_address_id = $cmsUserAddress->id;
+                            }
+                        }
+                    }
+
+                }
+
+
+
+
                     if (!$order->save()) {
                         throw new Exception("Ошибка обновления заказа: " . print_r($order->errors, true));
                     }
