@@ -30,6 +30,7 @@ abstract class DeliveryCheckoutModel extends Model
      */
     public function getMoney()
     {
+        return $this->shopOrder->shopDelivery->money;
         return new Money("", $this->shopOrder->currency_code);
     }
 
@@ -38,6 +39,17 @@ abstract class DeliveryCheckoutModel extends Model
      */
     public function getVisibleAttributes()
     {
-        return array_keys($this->toArray());
+        return [];
+    }
+
+    /**
+     * Установить необходимые данные по заказу
+     * Вызывается перед сохранением заказа
+     *
+     * @return $this
+     */
+    public function modifyOrder(ShopOrder $order)
+    {
+        return $this;
     }
 }

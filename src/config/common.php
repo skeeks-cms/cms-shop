@@ -7,10 +7,18 @@
  */
 return [
 
-    'bootstrap' => ['shop'],
+    'bootstrap'  => ['shop'],
     'components' => [
         'shop'        => [
-            'class' => 'skeeks\cms\shop\components\ShopComponent',
+            'class'            => 'skeeks\cms\shop\components\ShopComponent',
+            'deliveryHandlers' => [
+                'pickup' => [
+                    'class' => \skeeks\cms\shop\delivery\pickup\PickupDeliveryHandler::class
+                ],
+                'simple' => [
+                    'class' => \skeeks\cms\shop\delivery\simple\SimpleDeliveryHandler::class
+                ]
+            ],
         ],
         'i18n'        => [
             'translations' =>
@@ -52,7 +60,7 @@ return [
                     'interval' => 60 * 5,
                 ],
 
-                'shop/agents/update-product-type' => [
+                'shop/agents/update-product-type'                       => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление типа товаров'],
                     'interval' => 60 * 60,
@@ -67,7 +75,7 @@ return [
                     'name'     => ['skeeks/shop/app', 'Обновление данных по вложенным товарам'],
                     'interval' => 60 * 5,
                 ],*/
-                'shop/agents/update-auto-prices'  => [
+                'shop/agents/update-auto-prices'                        => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление цен, которые рассчитываются автоматически'],
                     'interval' => 60 * 5,

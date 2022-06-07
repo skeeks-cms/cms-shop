@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
@@ -18,8 +19,11 @@ use skeeks\cms\shop\models\ShopOrder2discountCoupon;
 use skeeks\cms\shop\models\ShopOrderItem;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Exception;
+use yii\base\UserException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use yii\helpers\Json;
 
 /**
  * Class CartController
@@ -72,6 +76,155 @@ class CartController extends Controller
     }
 
 
+    public function actionOrderCheckout()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+                $order = \Yii::$app->shop->shopUser->shopOrder;
+                if (!$order) {
+                    throw new Exception("Обновите страницу заказ уже не найден");
+                }
+                $rr->success = true;
+
+                //Сначала проверка корректности данных по заказу
+                if (!$order->validate()) {
+                    $errors = $order->getFirstErrors();
+                    if ($errors) {
+                        $codes = array_keys($errors);
+                        $error = array_shift($errors);
+                        $error_code = array_shift($codes);
+                        
+                        $rr->data = [
+                            'error_code' => $error_code,
+                        ];
+                        $rr->message = $error;
+                        $rr->success = false;
+                        return $rr;
+                    }
+                }
+                
+                $deliveryHandlerCheckoutModel = null;
+                if ($order->deliveryHandlerCheckoutModel) {
+                    $deliveryHandlerCheckoutModel = $order->deliveryHandlerCheckoutModel;
+                    if (!$deliveryHandlerCheckoutModel->validate()) {
+                        $errors = $deliveryHandlerCheckoutModel->getFirstErrors();
+                        if ($errors) {
+                            
+                            $codes = array_keys($errors);
+                            $error = array_shift($errors);
+                            $error_code = array_shift($codes);
+                            
+                            $errorElementId = Html::getInputId($deliveryHandlerCheckoutModel, $error_code);
+                            
+                            $rr->data = [
+                                'error_code' => $error_code,
+                                'error_element_id' => $errorElementId,
+                            ];
+                            $rr->message = $error;
+                            $rr->success = false;
+                            return $rr;
+                        }
+                    }
+                }
+
+
+
+                if (!$order->cms_user_id) {
+                    //Нужно создать пользователя
+                    $cmsUser = null;
+                    if ($order->contact_phone) {
+                        $cmsUser = CmsUser::find()->cmsSite()->phone($order->contact_phone)->one();
+                    }
+                    if ($order->contact_email) {
+                        $cmsUser = CmsUser::find()->cmsSite()->email($order->contact_email)->one();
+                    }
+                    
+                    if (!$cmsUser) {
+                        $cmsUser = new CmsUser();
+                        $cmsUser->phone = $order->contact_phone;
+                        $cmsUser->email = $order->contact_email;
+                        $cmsUser->first_name = $order->contact_first_name;
+                        $cmsUser->last_name = $order->contact_last_name;
+                        
+                        if (!$cmsUser->save()) {
+                            throw new Exception(print_r($cmsUser->errors, true));
+                        }
+                    }
+                    
+                    $order->cms_user_id = $cmsUser->id;
+                } else {
+                    $cmsUser = $order->cmsUser;
+                    $order->contact_phone = $cmsUser->phone;
+                    $order->contact_email = $cmsUser->email;
+                    $order->contact_first_name = $cmsUser->first_name;
+                    $order->contact_last_name = $cmsUser->last_name;
+                }
+                
+                
+                //Если указаны данные получателя, то нужно создать поьлзователя
+                if ($order->hasReceiver) {
+                    if (!$order->receiver_cms_user_id) {
+                        $receiverCmsUser = null;
+                        
+                        if ($order->receiver_phone) {
+                            $receiverCmsUser = CmsUser::find()->cmsSite()->phone($order->receiver_phone)->one();
+                        }
+                        if ($order->contact_email) {
+                            $receiverCmsUser = CmsUser::find()->cmsSite()->email($order->receiver_email)->one();
+                        }
+                        
+                        if (!$receiverCmsUser) {
+                            $receiverCmsUser = new CmsUser();
+                            $receiverCmsUser->phone = $order->receiver_phone;
+                            $receiverCmsUser->email = $order->receiver_email;
+                            $receiverCmsUser->first_name = $order->receiver_first_name;
+                            $receiverCmsUser->last_name = $order->receiver_last_name;
+                            
+                            if (!$receiverCmsUser->save()) {
+                                throw new Exception(print_r($receiverCmsUser->errors, true));
+                            }
+                        }
+                        
+                        $order->receiver_cms_user_id = $receiverCmsUser->id;
+                        
+                    }
+                }
+
+                $deliveryHandlerCheckoutModel->modifyOrder($order);
+
+                $order->is_created = 1;
+                if (!$order->save()) {
+                    throw new UserException(print_r($order->errors, true));
+                }
+                
+                
+                $orderUrl = $order->getUrl(['is_created' => 'true']);
+                $rr->success = true;
+                $rr->redirect = $orderUrl;
+                
+                \Yii::$app->shop->shopUser->shop_order_id = null;
+                \Yii::$app->shop->shopUser->save();
+                
+                $t->commit();
+                
+                
+                /*$order->shopCart->shop_order_id = null;
+                $order->shopCart->save();*/
+
+            } catch (\Exception $exception) {
+                $t->rollBack();
+
+                $rr->message = $exception->getMessage();
+                $rr->success = false;
+            }
+        }
+        return $rr;
+    }
+
     public function actionOrderUpdate()
     {
         $rr = new RequestResponse();
@@ -90,10 +243,50 @@ class CartController extends Controller
             $data = \Yii::$app->request->post("data");
 
             try {
-                $order->setAttributes($data, false);
-                if (!$order->save(true, array_keys($data))) {
+
+                $attributeForUpdate = [];
+
+                //Изменения по доставке обрабатываются особенно
+                $deliveryString = (string)ArrayHelper::getValue($data, 'delivery_nandler');
+                $deliveryData = [];
+
+                if ($deliveryString) {
+                    parse_str($deliveryString, $deliveryData);
+                }
+
+                $deliveryId = (int)ArrayHelper::getValue($data, 'shop_delivery_id');
+                if ($deliveryId) {
+                    $order->shop_delivery_id = $deliveryId;
+                    $order->delivery_handler_data_jsoned = null;
+
+                    $attributeForUpdate = [
+                        'shop_delivery_id',
+                        'delivery_handler_data_jsoned',
+                        'delivery_amount',
+                    ];
+                    //Если у этого способа есть своя доставка
+                    if ($order->shopDelivery->handler) {
+                        if ($deliveryData) {
+                            $checkoutModel = $order->deliveryHandlerCheckoutModel;
+                            $checkoutModel->load($deliveryData);
+                            $order->delivery_handler_data_jsoned = Json::encode($checkoutModel->toArray());
+                        }
+                    }
+                } else {
+                    $order->setAttributes($data, false);
+                    $attributeForUpdate = array_keys($data);
+                }
+
+                if (!$order->save(true, $attributeForUpdate)) {
+                    $errors = $order->getFirstErrors();
+                    if ($errors) {
+                        $error = array_shift($errors);
+                        $message = $error;
+                        throw new Exception($message);
+                    }
                     throw new Exception(print_r($order->errors, true));
                 }
+
 
                 $rr->data = ArrayHelper::merge($order->jsonSerialize(), []);
                 $rr->success = true;
@@ -188,7 +381,7 @@ class CartController extends Controller
             \Yii::$app->shop->shopUser->shopOrder->refresh();
 
             $productData = ShopComponent::productDataForJsEvent($product->cmsContentElement);
-            $productData['quantity'] = (float) $quantity;
+            $productData['quantity'] = (float)$quantity;
             $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
                 'product' => $productData,
             ]);
@@ -224,7 +417,7 @@ class CartController extends Controller
                     $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
 
                     $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
-                    $productData['quantity'] = (float) $shopBasket->quantity;
+                    $productData['quantity'] = (float)$shopBasket->quantity;
 
                     $eventData['event'] = 'remove';
                     $eventData['product'] = $productData;
@@ -332,7 +525,7 @@ class CartController extends Controller
                     $eventData['event'] = 'remove';
                     if ($shopBasket->shopProduct) {
                         $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
-                        $productData['quantity'] = (float) $shopBasket->quantity;
+                        $productData['quantity'] = (float)$shopBasket->quantity;
                         $eventData['product'] = $productData;
                     }
 

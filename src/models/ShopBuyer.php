@@ -2,6 +2,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasRelatedProperties;
 use skeeks\cms\models\behaviors\traits\HasRelatedPropertiesTrait;
 use skeeks\cms\models\CmsUser;
@@ -29,6 +30,7 @@ use skeeks\cms\relatedProperties\models\RelatedElementModel;
  * @property string              $email read-only
  * @property string              $phone read-only
  * @property string              $registerName read-only
+ * @property string              $address read-only
  */
 class ShopBuyer extends RelatedElementModel
 {
@@ -209,6 +211,29 @@ class ShopBuyer extends RelatedElementModel
         if ($this->cmsUser && $this->cmsUser->phone) {
             return $this->cmsUser->phone;
         }
+
+        return null;
+    }
+    /**
+     * @return null|string
+     */
+    public function getAddress()
+    {
+        $this->relatedPropertiesModel->initAllProperties();
+        if ($properties = $this->relatedPropertiesModel->properties) {
+            /**
+             * @var $property ShopPersonTypeProperty
+             */
+            foreach ($properties as $property) {
+                if (StringHelper::strtolower($property->name) == "адрес") {
+                    $value = $this->relatedPropertiesModel->getAttribute($property->code);
+                    if ($value) {
+                        return (string)$value;
+                    }
+                }
+            }
+        }
+
 
         return null;
     }

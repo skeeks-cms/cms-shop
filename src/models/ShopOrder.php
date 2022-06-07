@@ -50,6 +50,13 @@ use yii\validators\EmailValidator;
  * @property string                     $code
  * @property boolean                    $is_created Заказ создан? Если заказ не создан он связан с корзиной пользователя.
  * @property string                     $delivery_handler_data_jsoned
+ * @property string|null                $delivery_address
+ * @property number|null                $delivery_latitude
+ * @property number|null                $delivery_longitude
+ * @property string|null                $delivery_entrance
+ * @property string|null                $delivery_floor
+ * @property string|null                $delivery_apartment_number
+ * @property string|null                $delivery_comment
  *
  * @property integer|null               $cms_user_id
  * @property integer|null               $shop_store_id
@@ -58,6 +65,13 @@ use yii\validators\EmailValidator;
  * @property string|null                $contact_email
  * @property string|null                $contact_first_name
  * @property string|null                $contact_last_name
+ *
+ * @property string|null                $receiver_phone
+ * @property string|null                $receiver_email
+ * @property string|null                $receiver_first_name
+ * @property string|null                $receiver_last_name
+ * @property integer|null               $receiver_cms_user_id
+ * @property integer|null               $cms_user_address_id
  *
  * @property string                     $comment
  *
@@ -74,6 +88,7 @@ use yii\validators\EmailValidator;
  *
  * @property ShopUser                   $shopCart
  * @property CmsUser|null               $cmsUser
+ * @property CmsUser|null               $receiverCmsUser
  *
  * @property CmsContentElement          $store
  * @property Currency                   $currency
@@ -114,6 +129,7 @@ use yii\validators\EmailValidator;
  * @property int                        $countShopOrderItems
  * @property array                      $deliveryHandlerData
  * @property DeliveryCheckoutModel      $deliveryHandlerCheckoutModel
+ * @property boolean                    $hasReceiver Получатель заказа указан? Если не указан, получателем является оформитель заказа.
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
@@ -373,6 +389,33 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ],
                 'integer',
             ],
+
+            [
+                [
+                    'delivery_entrance',
+                    'delivery_floor',
+                    'delivery_apartment_number',
+                    'delivery_comment',
+                    'delivery_address',
+                ],
+                'string',
+            ],
+
+            [['delivery_latitude', 'delivery_longitude'], 'number'],
+
+            [
+                [
+                    'delivery_address',
+                    'delivery_floor',
+                    'delivery_apartment_number',
+                    'delivery_entrance',
+                    'delivery_comment',
+                ],
+                "filter",
+                'filter' => 'trim',
+            ],
+
+
             [
                 [
                     'is_created',
@@ -510,6 +553,14 @@ class ShopOrder extends \skeeks\cms\models\Core
                 },
             ],
 
+
+            [
+                ['contact_phone'],
+                'required',
+                'when' => function () {
+                    return !$this->cms_user_id;
+                },
+            ],
             [['contact_phone'], 'string'],
             [['contact_phone'], "filter", 'filter' => 'trim'],
             [
@@ -521,13 +572,35 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
             [['contact_phone'], PhoneValidator::class],
 
+            [
+                ['receiver_phone'],
+                'required',
+                'when' => function () {
+                    return $this->hasReceiver;
+                },
+            ],
+            [['receiver_phone'], 'string'],
+            [['receiver_phone'], "filter", 'filter' => 'trim'],
+            [
+                ['receiver_phone'],
+                "filter",
+                'filter' => function ($value) {
+                    return StringHelper::strtolower($value);
+                },
+            ],
+            [['receiver_phone'], PhoneValidator::class],
+
+
             [['contact_first_name'], 'string'],
             [['contact_last_name'], 'string'],
+
+            [['receiver_first_name'], 'string'],
+            [['receiver_last_name'], 'string'],
+
             [['comment'], 'string'],
 
             [['shop_store_id'], 'integer'],
 
-            [['contact_email'], 'string'],
             [['contact_email'], 'string'],
             [['contact_email'], "filter", 'filter' => 'trim'],
             [
@@ -537,7 +610,22 @@ class ShopOrder extends \skeeks\cms\models\Core
                     return StringHelper::strtolower($value);
                 },
             ],
-            [['contact_email'], EmailValidator::class],
+            [['contact_email'], 'email'],
+
+
+            [['receiver_email'], EmailValidator::class],
+            [['receiver_email'], 'string'],
+            [['receiver_email'], "filter", 'filter' => 'trim'],
+            [
+                ['receiver_email'],
+                "filter",
+                'filter' => function ($value) {
+                    return StringHelper::strtolower($value);
+                },
+            ],
+            [['receiver_email'], "email"],
+
+            [['cms_user_address_id'], 'integer'],
         ];
     }
 
@@ -568,8 +656,24 @@ class ShopOrder extends \skeeks\cms\models\Core
             'isNotifyChangeStatus' => \Yii::t('skeeks/shop/app', 'Отправить email уведомление клиенту?'),
             'statusComment'        => \Yii::t('skeeks/shop/app', 'Комментарий к смене статуса'),
             'external_id'          => "ID из внешней системы",
-            'contact_email'        => "Email",
-            'contact_phone'        => "Телефон",
+
+            'contact_email'      => "Email",
+            'contact_phone'      => "Телефон",
+            'contact_last_name'  => "Фамилия",
+            'contact_first_name' => "Имя",
+
+            'receiver_email'      => "Email получателя",
+            'receiver_phone'      => "Телефон получателя",
+            'receiver_last_name'  => "Фамилия получателя",
+            'receiver_first_name' => "Имя получателя",
+
+            'delivery_address'          => "Адрес",
+            'delivery_latitude'         => "Широта",
+            'delivery_longitude'        => "Долгота",
+            'delivery_entrance'         => "Подъезд",
+            'delivery_floor'            => "Этаж",
+            'delivery_apartment_number' => "Номер квартиры",
+            'delivery_comment'          => "Комментарий",
 
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Оплата'),
 
@@ -579,7 +683,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
     /**
-     * @return null|string
+     * @deprecated
      */
     public function getEmail()
     {
@@ -587,10 +691,8 @@ class ShopOrder extends \skeeks\cms\models\Core
             return $this->_email;
         }
 
-        if ($this->shopBuyer) {
-            if ($this->shopBuyer->email) {
-                return $this->shopBuyer->email;
-            }
+        if ($this->contact_email) {
+            return $this->contact_email;
         }
 
         if ($this->cmsUser && $this->cmsUser->email) {
@@ -600,7 +702,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         return null;
     }
     /**
-     * @return null|string
+     * @deprecated
      */
     public function setEmail($email)
     {
@@ -1248,16 +1350,15 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $class = \Yii::$app->user->identityClass;
         return $this->hasOne($class, ['id' => 'cms_user_id']);
+    }
 
-        if ($this->shopBuyer) {
-            return $this->shopBuyer->cmsUser;
-        }
-
-        if ($this->shopCart) {
-            return $this->shopCart->cmsUser;
-        }
-
-        return null;
+    /**
+     * @return null|CmsUser
+     */
+    public function getReceiverCmsUser()
+    {
+        $class = \Yii::$app->user->identityClass;
+        return $this->hasOne($class, ['id' => 'cms_user_id']);
     }
 
 
@@ -1342,5 +1443,63 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         return $model;
+    }
+
+    /**
+     * Получатель заказа указан? Если не указан, получателем является оформитель заказа.
+     *
+     * @return bool
+     */
+    public function getHasReceiver()
+    {
+        if ($this->receiver_email || $this->receiver_first_name || $this->receiver_last_name || $this->receiver_phone) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContactAttributes()
+    {
+        $contactAttributes = [];
+        if ($this->contact_first_name) {
+            $contactAttributes[] = "contact_first_name";
+        }
+        if ($this->contact_last_name) {
+            $contactAttributes[] = "contact_last_name";
+        }
+        if ($this->contact_phone) {
+            $contactAttributes[] = "contact_phone";
+        }
+        if ($this->contact_email) {
+            $contactAttributes[] = "contact_email";
+        }
+
+        return $contactAttributes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReceiverAttributes()
+    {
+        $receiverAttributes = [];
+        if ($this->receiver_first_name) {
+            $receiverAttributes[] = "receiver_first_name";
+        }
+        if ($this->receiver_last_name) {
+            $receiverAttributes[] = "receiver_last_name";
+        }
+        if ($this->receiver_phone) {
+            $receiverAttributes[] = "receiver_phone";
+        }
+        if ($this->receiver_email) {
+            $receiverAttributes[] = "receiver_email";
+        }
+
+        return $receiverAttributes;
     }
 }

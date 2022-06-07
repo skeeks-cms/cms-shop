@@ -19,6 +19,7 @@ use yii\base\Exception;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
+use yii\httpclient\Client;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -32,10 +33,11 @@ class UtilsController extends Controller
     public function actionOrderUpdateToUsers()
     {
         $q = ShopOrder::find()->isCreated()
+            ->andWhere(['id' => '312594'])
             //->andWhere(['cms_user_id' => null])
-            ->andWhere(['not in', 'cms_site_id', [
+            /*->andWhere(['not in', 'cms_site_id', [
                 1
-            ]])
+            ]])*/
         ;
 
         $this->stdout("Found: {$q->count()}!\n", Console::BOLD);
@@ -96,8 +98,32 @@ class UtilsController extends Controller
                     } else {
                         $this->stdout("\t\tEmail некорректный!\n");
                     }
-                    
-                   
+                }
+
+                if ($shopBuyer->registerName) {
+                    $name = trim($shopBuyer->registerName);
+                    $order->contact_first_name = $name;
+                }
+
+                if ($address = $shopBuyer->address) {
+                    $decodeUrl = \Yii::$app->yaMap->createDecodeUrlByAddress($address);
+
+                    $client = new Client();
+
+                    $response = $client->createRequest()
+                        ->setMethod('GET')
+                        ->setUrl($decodeUrl)
+                        ->send()
+                    ;
+
+                    if ($response->isOk) {
+                        $data = ArrayHelper::getValue($response->data, 'response.GeoObjectCollection.featureMember.0');
+                        print_r($data);
+                        $address = ArrayHelper::getValue($response->data, 'response.GeoObjectCollection.featureMember.0.GeoObject.metaDataProperty.GeocoderMetaData.Address.formatted');
+                        print_r($address);
+                        die;
+                    }
+
                 }
 
                 $t = \Yii::$app->db->beginTransaction();
@@ -126,6 +152,7 @@ class UtilsController extends Controller
                         if ($shopBuyer->name) {
                             $this->stdout("\t\t{$shopBuyer->name}\n");
                             $cmsUser->first_name = $shopBuyer->name;
+
                         }
 
                         if (!$cmsUser->save()) {
@@ -184,7 +211,7 @@ class UtilsController extends Controller
 
             } else {
                 $this->stdout("\t\tНет покупателя\n");
-                sleep(1);
+                //sleep(1);
             }
 
         }

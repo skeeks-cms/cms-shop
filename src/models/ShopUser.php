@@ -115,7 +115,7 @@ class ShopUser extends ActiveRecord
                 $shopOrder = $this->shopOrder;
 
                 if ($shopOrder->isNewRecord) {
-                    if (!$shopOrder->save()) {
+                    if (!$shopOrder->save(false)) {
                         throw new UserException("Заказ-черновик не создан: ".print_r($shopOrder->errors, true));
                     }
                 }
@@ -189,13 +189,14 @@ class ShopUser extends ActiveRecord
                 $order->cms_site_id = \Yii::$app->skeeks->site->id;
             }
 
-                //Для того чтобы применились default rules
-            if (!$order->save()) {
-                throw new Exception("Заказ черновик не создан");
+            //Для того чтобы применились default rules
+            $order->validate();
+            if (!$order->save(false)) {
+                throw new Exception("Заказ черновик не создан: " . print_r($order->errors, true));
             }
 
             $this->shop_order_id = $order->id;
-            if (!$this->save()) {
+            if (!$this->save(false)) {
                 throw new Exception("Заказ черновик не создан");
             }
 

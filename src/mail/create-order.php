@@ -9,22 +9,22 @@ $order->refresh();
 ?>
 
 <h1>
-<?= \Yii::t('skeeks/shop/app', 'New order'); ?> №<?= $order->id; ?>
+    <?= \Yii::t('skeeks/shop/app', 'New order'); ?> №<?= $order->id; ?>
 </h1>
 
-<hr />
+<hr/>
 
 <p>
-Здравствуйте!
+    Здравствуйте!
 </p>
 
 <p>
-Благодарим вас за заказ на сайте <a href="<?php echo \yii\helpers\Url::home(true);?>"><?= \Yii::$app->cms->appName ?></a>
+    Благодарим вас за заказ на сайте <a href="<?php echo \yii\helpers\Url::home(true); ?>"><?= \Yii::$app->cms->appName ?></a>
 </p>
 
 <div style="text-align: left;">
     <h4>
-    Заказ:
+        Заказ:
     </h4>
 
     <?=
@@ -44,47 +44,46 @@ $order->refresh();
                 ],*/
 
                 [
-                    'headerOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'headerOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
 
-                    'contentOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'contentOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
-                    'class'  => \yii\grid\DataColumn::class,
-                    'format' => 'raw',
-                    'value'  => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
+                    'class'          => \yii\grid\DataColumn::class,
+                    'format'         => 'raw',
+                    'value'          => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         if ($shopBasket->image) {
                             return Html::img($shopBasket->image->absoluteSrc, ['width' => 80]);
                         }
                     },
                 ],
                 [
-                    'headerOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'headerOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
 
-                    'contentOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'contentOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
-                    'class'     => \yii\grid\DataColumn::class,
-                    'attribute' => 'name',
-                    'format'    => 'raw',
-                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
+                    'class'          => \yii\grid\DataColumn::class,
+                    'attribute'      => 'name',
+                    'format'         => 'raw',
+                    'value'          => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         $result = [];
                         if ($shopBasket->url) {
-                            $result[] =  Html::a($shopBasket->name, $shopBasket->absoluteUrl, [
+                            $result[] = Html::a($shopBasket->name, $shopBasket->absoluteUrl, [
                                 'target'    => '_blank',
                                 'titla'     => "Смотреть на сайте",
                                 'data-pjax' => 0,
                             ]);
                         } else {
-                            $result[] =  $shopBasket->name;
+                            $result[] = $shopBasket->name;
                         }
 
                         if ($shopBasket->shopOrderItemProperties) {
-                            foreach ($shopBasket->shopOrderItemProperties as $prop)
-                            {
+                            foreach ($shopBasket->shopOrderItemProperties as $prop) {
                                 $result[] = "<small style='color: gray;'>{$prop->name}: {$prop->value}</small>";
                             }
                         }
@@ -95,33 +94,33 @@ $order->refresh();
                 ],
 
                 [
-                    'headerOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'headerOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
 
-                    'contentOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'contentOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
-                    'class'     => \yii\grid\DataColumn::class,
-                    'attribute' => 'quantity',
-                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
+                    'class'          => \yii\grid\DataColumn::class,
+                    'attribute'      => 'quantity',
+                    'value'          => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         return $shopBasket->quantity." ".$shopBasket->measure_name;
                     },
                 ],
 
                 [
-                    'headerOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'headerOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
 
-                    'contentOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'contentOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
-                    'class'     => \yii\grid\DataColumn::class,
-                    'label'     => \Yii::t('skeeks/shop/app', 'Price'),
-                    'attribute' => 'price',
-                    'format'    => 'raw',
-                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
+                    'class'          => \yii\grid\DataColumn::class,
+                    'label'          => \Yii::t('skeeks/shop/app', 'Price'),
+                    'attribute'      => 'price',
+                    'format'         => 'raw',
+                    'value'          => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         if ($shopBasket->discount_value) {
                             return "<span style='text-decoration: line-through;'>".(string)$shopBasket->moneyOriginal."</span><br />".Html::tag('small',
                                     $shopBasket->notes)."<br />".(string)$shopBasket->money."<br />".Html::tag('small',
@@ -134,16 +133,16 @@ $order->refresh();
                 ],
                 [
                     'headerOptions'  => [
-                        'style' => 'padding: 15px;'
+                        'style' => 'padding: 15px;',
                     ],
-                    'contentOptions'  => [
-                        'style' => 'padding: 15px;'
+                    'contentOptions' => [
+                        'style' => 'padding: 15px;',
                     ],
-                    'class'     => \yii\grid\DataColumn::class,
-                    'label'     => \Yii::t('skeeks/shop/app', 'Sum'),
-                    'attribute' => 'price',
-                    'format'    => 'raw',
-                    'value'     => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
+                    'class'          => \yii\grid\DataColumn::class,
+                    'label'          => \Yii::t('skeeks/shop/app', 'Sum'),
+                    'attribute'      => 'price',
+                    'format'         => 'raw',
+                    'value'          => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         $money = $shopBasket->money;
                         return (string)$money->mul($shopBasket->quantity);
                     },
@@ -151,33 +150,35 @@ $order->refresh();
             ],
     ])
     ?>
-
-
+    
     <h4 style="margin-top: 15px;">
-    Покупатель:
+        Контактные данные:
     </h4>
-
     <?
-    $attributes = [];
-    if ($order->shopBuyer->relatedPropertiesModel->toArray()) {
-        foreach ($order->shopBuyer->relatedPropertiesModel->toArray() as $key => $value) {
-            $attributes[] = [
-                'attribute' => $key,
-                'value'     => $order->shopBuyer->relatedPropertiesModel->getSmartAttribute($key),
-            ];
-        }
-    }
+        $contactAttributes = $order->getContactAttributes();
+        $receiverAttributes = $order->getReceiverAttributes();
+
+        echo \yii\widgets\DetailView::widget([
+            'model'      => $order,
+            'attributes' => $contactAttributes,
+        ]);
     ?>
-    <?=
-    \yii\widgets\DetailView::widget([
-        'model'      => $order->shopBuyer->relatedPropertiesModel,
-        'attributes' => $attributes,
-    ]);
-    ?>
+    
+    <?php if($receiverAttributes) : ?>
+        <h4 style="margin-top: 15px;">
+            Данные получателя:
+        </h4>
+        <?php echo \yii\widgets\DetailView::widget([
+            'model'      => $order,
+            'attributes' => $receiverAttributes,
+        ]);; ?>
+    <?php endif; ?>
+    
+
 
     <? if ($order->shop_pay_system_id) : ?>
         <h4 style="margin-top: 15px;">
-        Оплата:
+            Оплата:
         </h4>
 
         <?=
@@ -201,7 +202,7 @@ $order->refresh();
 
     <? if ($order->shop_delivery_id) : ?>
         <h4 style="margin-top: 15px;">
-        Доставка:
+            Способ получения:
         </h4>
 
         <?=
@@ -217,17 +218,18 @@ $order->refresh();
         ?>
 
 
-        <?php if ($order->deliveryHandlerCheckoutModel) : ?>
-            <h4 style="margin-top: 15px;">
-            Детали доставки:
-            </h4>
-
-            <?=
-            \yii\widgets\DetailView::widget([
-                'model'      => $order->deliveryHandlerCheckoutModel,
-                'attributes' => $order->deliveryHandlerCheckoutModel->getVisibleAttributes(),
-            ]);
-            ?>
+        <?php if ($order->deliveryHandlerCheckoutModel && $order->deliveryHandlerCheckoutModel->getVisibleAttributes()) : ?>
+            <h5 style="margin-top: 15px;">
+                Детали доставки:
+            </h5>
+            <table>
+                <? foreach ($order->deliveryHandlerCheckoutModel->getVisibleAttributes() as $code => $data) : ?>
+                    <tr>
+                        <td><?php echo \yii\helpers\ArrayHelper::getValue($data, 'label'); ?></td>
+                        <td><?php echo \yii\helpers\ArrayHelper::getValue($data, 'value'); ?></td>
+                    </tr>
+                <? endforeach; ?>
+            </table>
         <?php endif; ?>
 
 
@@ -235,32 +237,32 @@ $order->refresh();
 
     <? if ($order->shopDiscountCoupons) : ?>
         <h4 style="margin-top: 15px;">
-        <?= count($order->shopDiscountCoupons) == 1 ? "Скидочный купон:" : "Скидочные купоны:" ;?>
+            <?= count($order->shopDiscountCoupons) == 1 ? "Скидочный купон:" : "Скидочные купоны:"; ?>
         </h4>
 
 
         <? foreach ($order->shopDiscountCoupons as $shopDiscountCoupon) : ?>
             <b><?= $shopDiscountCoupon->coupon ?></b> -
-                <? if ($shopDiscountCoupon->shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_F) : ?>
-                    <?= new \skeeks\cms\money\Money($shopDiscountCoupon->shopDiscount->value, $order->currency_code); ?>
-                <? else: ?>
-                <? endif; ?>
+            <? if ($shopDiscountCoupon->shopDiscount->value_type == \skeeks\cms\shop\models\ShopDiscount::VALUE_TYPE_F) : ?>
+                <?= new \skeeks\cms\money\Money($shopDiscountCoupon->shopDiscount->value, $order->currency_code); ?>
+            <? else: ?>
+            <? endif; ?>
         <? endforeach; ?>
     <? endif; ?>
 
 
     <h4 style="margin-top: 15px;">
-    Итого:
+        Итого:
     </h4>
 
     <p>
         Стоимость товаров: <b><?= (string)$order->calcMoneyItems; ?></b><br/>
-    <?php if ((float)$order->moneyDelivery->amount > 0) : ?>
-        Стоимость доставки: <b><?= (string)$order->moneyDelivery; ?></b><br/>
-    <?php endif; ?>
-    <?php if ((float)$order->moneyDiscount->amount > 0) : ?>
-        Скидка: <b><?= (string)$order->moneyDiscount; ?></b><br/>
-    <?php endif; ?>
+        <?php if ((float)$order->moneyDelivery->amount > 0) : ?>
+            Стоимость доставки: <b><?= (string)$order->moneyDelivery; ?></b><br/>
+        <?php endif; ?>
+        <?php if ((float)$order->moneyDiscount->amount > 0) : ?>
+            Скидка: <b><?= (string)$order->moneyDiscount; ?></b><br/>
+        <?php endif; ?>
         К оплате: <b><?= (string)$order->money; ?></b>
     </p>
 
@@ -271,6 +273,6 @@ $order->refresh();
     <?php endif; ?>
 
     <p style="margin-top: 15px;">
-    <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
+        <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>
     </p>
 </div>

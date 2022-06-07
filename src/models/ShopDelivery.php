@@ -22,11 +22,15 @@ use yii\helpers\ArrayHelper;
  * @property integer                  $created_at
  * @property integer                  $updated_at
  * @property integer                  $cms_site_id
+ *
  * @property integer                  $weight_from
  * @property integer                  $weight_to
+ *
  * @property string                   $name
+ *
  * @property string                   $order_price_from
  * @property string                   $order_price_to
+ *
  * @property string                   $order_currency_code
  * @property boolean                  $is_active
  * @property string                   $price
@@ -85,7 +89,9 @@ class ShopDelivery extends ActiveRecord
         if ($this->component) {
             try {
 
-                $component = \Yii::createObject($this->component);
+                $componentConfig = ArrayHelper::getValue(\Yii::$app->shop->deliveryHandlers, $this->component);
+
+                $component = \Yii::createObject($componentConfig);
                 $component->load($this->component_config, "");
 
                 $this->_handler = $component;
@@ -154,6 +160,17 @@ class ShopDelivery extends ActiveRecord
     /**
      * @inheritdoc
      */
+    public function attributeHints()
+    {
+        return [
+            'shopPaySystems' => 'Выберите те способы оплаты, которые будут доступы при выборе этого способа доставки.'
+        ];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels()
     {
         return [
@@ -180,7 +197,7 @@ class ShopDelivery extends ActiveRecord
             'logo_id'             => \Yii::t('skeeks/shop/app', 'Logo ID'),
             'store'               => \Yii::t('skeeks/shop/app', 'Store'),
             'component'           => "Внешний обработчик",
-            'shopPaySystems'      => \Yii::t('skeeks/shop/app', 'Payment systems'),
+            'shopPaySystems'      => "Способы оплаты",
         ];
     }
 

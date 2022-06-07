@@ -13,6 +13,7 @@ use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
+use skeeks\cms\shop\models\queries\ShopStoreQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -272,4 +273,11 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
         return $this->hasMany(ShopStoreProperty::className(), ['shop_store_id' => 'id'])->orderBy(['priority' => SORT_ASC]);
     }
 
+    /**
+     * @return \skeeks\cms\query\CmsActiveQuery|ShopStoreQuery
+     */
+    public static function find()
+    {
+        return new ShopStoreQuery(get_called_class());
+    }
 }

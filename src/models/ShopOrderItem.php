@@ -98,7 +98,7 @@ class ShopOrderItem extends ActiveRecord
     {
         //Эта позиция привязана к заказу, после ее обновления нужно обновить заказ целиком
         if ($this->shopOrder) {
-            $this->shopOrder->recalculate()->save();
+            $this->shopOrder->recalculate()->save(false);
         }
     }
 

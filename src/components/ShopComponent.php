@@ -1068,8 +1068,13 @@ SQL
         $result = [];
 
         if ($this->deliveryHandlers) {
-            foreach ($this->deliveryHandlers as $handlerClass) {
-                $result[$handlerClass] = (new $handlerClass())->descriptor->name;
+            foreach ($this->deliveryHandlers as $id => $handlerClass) {
+
+                if (is_array($handlerClass)) {
+                    $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
+                }
+
+                $result[$id] = (new $handlerClass())->descriptor->name;
             }
         }
 
@@ -1085,8 +1090,12 @@ SQL
         $result = [];
 
         if ($this->paysystemHandlers) {
-            foreach ($this->paysystemHandlers as $handlerClass) {
-                $result[$handlerClass] = (new $handlerClass())->descriptor->name;
+            foreach ($this->paysystemHandlers as $id => $handlerClass) {
+                if (is_array($handlerClass)) {
+                    $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
+                }
+                
+                $result[$id] = (new $handlerClass())->descriptor->name;
             }
         }
 

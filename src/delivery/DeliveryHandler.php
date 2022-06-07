@@ -13,6 +13,7 @@ use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use skeeks\cms\traits\TConfigForm;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
@@ -29,14 +30,29 @@ abstract class DeliveryHandler extends Model implements IHasConfigForm
      * @var string
      */
     public $checkoutModelClass = '';
+    public $checkoutWidgetClass = '';
+    public $checkoutWidgetConfig = [];
+
+
+    /**
+     * @var ShopOrder
+     */
+    public $shopOrder = null;
 
     /**
      * @param ActiveForm $activeForm
      * @return string
      */
-    public function renderCheckoutForm(ActiveForm $activeForm, ShopOrder $shopOrder)
+    public function renderWidget(ShopOrder $shopOrder)
     {
-        return "";
+        $widgetClass = $this->checkoutWidgetClass;
+
+        $config = ArrayHelper::merge($this->checkoutWidgetConfig, [
+            'deliveryHandler' => $this,
+            'shopOrder' => $shopOrder
+        ]);
+
+        return $widgetClass::widget($config);
     }
 
     /**

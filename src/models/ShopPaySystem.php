@@ -194,7 +194,9 @@ class ShopPaySystem extends Core
                 //TODO:: Подумать! Нужно чтобы создавался новый экземляр класса потому что в него передается property объект. В то же время хотелось бы чтобы объект handler собирался согласно настройкам конфига.
                 $component = clone $foundComponent;*/
 
-                $component = \Yii::createObject($this->component);
+                $componentConfig = ArrayHelper::getValue(\Yii::$app->shop->paysystemHandlers, $this->component);
+                
+                $component = \Yii::createObject($componentConfig);
                 $component->load($this->component_config, "");
 
                 $this->_handler = $component;

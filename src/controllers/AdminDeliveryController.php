@@ -23,6 +23,7 @@ use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
@@ -185,6 +186,8 @@ class AdminDeliveryController extends BackendModelStandartController
         }
 
         $result = [
+
+
             'main' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Main'),
@@ -205,48 +208,44 @@ class AdminDeliveryController extends BackendModelStandartController
                     ],
 
 
+
                     'name',
                     'description' => [
                         'class' => TextareaField::class,
+                        'elementOptions' => [
+                            'placeholder' => 'Это описание выводится клиенту при оформлении заказа'
+                        ]
                     ],
 
-                    'priority',
 
 
-                    'price',
+                    'price' => NumberField::class,
 
                     'currency_code' => [
                         'class' => SelectField::class,
                         'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where(['is_active' => 1])->all(), 'code', 'code'),
                     ],
 
-                                        'order_price_from',
-                                        'order_price_to',
-
-
+                    'priority' => NumberField::class,
                 ],
             ],
+
+            'filter' => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Условия показа'),
+                'fields' => [
+                    'order_price_from' => NumberField::class,
+                    'order_price_to' => NumberField::class,
+                ]
+            ],
+
             'additionally' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Additionally'),
                 'fields' => [
 
-
-                    /*'weight_from',
-                    'weight_to',
-
-
-                    'order_price_from',
-                    'order_price_to',
-
-                    'order_currency_code' => [
-                        'class' => SelectField::class,
-                        'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where(['is_active' => 1])->all(), 'code', 'code'),
-                    ],*/
-
                     'shopPaySystems' => [
                         'class'    => SelectField::class,
-                        'hint'     => "Укажите, для каких способов оплаты, доступен текущий способ доставки. Если не выбраны никакие способы оплаты, то этот способ доставки показывается всегда.",
                         'multiple' => true,
                         'items'    => \yii\helpers\ArrayHelper::map(
                             \skeeks\cms\shop\models\ShopPaySystem::find()->active()->all(), 'id', 'name'
@@ -260,6 +259,7 @@ class AdminDeliveryController extends BackendModelStandartController
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
                         ],
                     ],
+
                 ],
             ],
         ];
