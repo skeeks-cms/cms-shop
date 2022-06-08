@@ -161,11 +161,11 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
 
                 </a>
 
-                <?php if ((float) $model->moneyDelivery->amount > 0) : ?>
-                <span style="margin-left: 10px;">
+                <?php if ((float)$model->moneyDelivery->amount > 0) : ?>
+                    <span style="margin-left: 10px;">
                         <?php echo $model->moneyDelivery; ?>
                 </span>
-                    <? endif; ?>
+                <? endif; ?>
 
             </div>
         </div>
@@ -200,84 +200,177 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
     </div>
 </div>
 
-<?php if ($model->deliveryHandlerCheckoutModel) : ?>
-    <div class="sx-delivery-info" style="
+<?php if ($cmsUser = $model->cmsUser) : ?>
+        <div class="sx-contact-info" style="
+            margin-top: 20px;
+            /*background: #f8f8f8;*/
+            /*padding: 20px;*/
+        ">
+            <div class="row">
+                <div class="col-12">
+                    <h5>Профиль покупателя в CRM</h5>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <? echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget(['cmsUser' => $cmsUser]); ?>
+                </div>
+            </div>
+
+        </div>
+<?php endif; ?>
+
+<?
+
+$contactAttributes = $model->getContactAttributes();
+$receiverAttributes = $model->getReceiverAttributes();
+?>
+<?php if ($contactAttributes) : ?>
+    <div class="sx-contact-info" style="
             margin-top: 20px;
             /*background: #f8f8f8;*/
             /*padding: 20px;*/
         ">
         <div class="row">
             <div class="col-12">
-                <h4>Подробнее о доставке</h4>
+                <h5>Данные покупателя</h5>
             </div>
         </div>
         <div class="sx-data">
             <div class="col-12">
-                <?php foreach ($model->deliveryHandlerCheckoutModel->getVisibleAttributes() as $attribute) : ?>
-
+                <?php foreach ($contactAttributes as $attribute) : ?>
                     <div class="row sx-data-row">
-                        <div class="col-3"><?php echo $model->deliveryHandlerCheckoutModel->getAttributeLabel($attribute); ?>
+                        <div class="col-3"><?php echo $model->getAttributeLabel($attribute); ?>
                         </div>
                         <div class="col-9">
-                            <?php echo $model->deliveryHandlerCheckoutModel->{$attribute}; ?>
+                            <?php echo $model->getAttribute($attribute); ?>
                         </div>
                     </div>
-
                 <?php endforeach; ?>
-
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+<?php if ($receiverAttributes) : ?>
+    <div class="sx-receiver-info" style="
+            margin-top: 20px;
+            /*background: #f8f8f8;*/
+            /*padding: 20px;*/
+        ">
+        <div class="row">
+            <div class="col-12">
+                <h5>Получатель заказа</h5>
+            </div>
+        </div>
+        <div class="sx-data">
+            <div class="col-12">
+                <?php foreach ($receiverAttributes as $attribute) : ?>
+                    <div class="row sx-data-row">
+                        <div class="col-3"><?php echo $model->getAttributeLabel($attribute); ?>
+                        </div>
+                        <div class="col-9">
+                            <?php echo $model->getAttribute($attribute); ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
 <?php endif; ?>
 
-<?php if ($model->shopBuyer) : ?>
-    <div class="sx-buyer-info" style="
+<?php if ($model->deliveryHandlerCheckoutModel && $model->deliveryHandlerCheckoutModel->getVisibleAttributes()) : ?>
+    <div class="sx-delivery-info" style="
                     margin-top: 20px;
                     /*background: #f8f8f8;*/
                     /*padding: 20px;*/
                 ">
         <div class="row">
             <div class="col-12">
-                <h4>Данные покупателя
-                    <span style="color: gray;" title="Пользователь сайта">
-                        [
-                <?php if ($model->cmsUser) : ?>
-                    <?php echo $model->cmsUser->shortDisplayName; ?>
-                <?php else: ?>
-                    пользователь неавторизован
-                <?php endif; ?>
-                        ]
-                    </span>
-                </h4>
+                <h5>Детали доставки</h5>
             </div>
         </div>
         <div class="sx-data">
             <div class="col-12">
-                <?php foreach ($model->shopBuyer->relatedPropertiesModel->toArray() as $k => $v) : ?>
+                <?php foreach ($model->deliveryHandlerCheckoutModel->getVisibleAttributes() as $attribute => $data) : ?>
+
                     <div class="row sx-data-row">
-                        <div class="col-3"><?php echo \yii\helpers\ArrayHelper::getValue($model->shopBuyer->relatedPropertiesModel->attributeLabels(), $k); ?>
+                        <div class="col-3"><?php echo \yii\helpers\ArrayHelper::getValue($data, 'label'); ?>
                         </div>
                         <div class="col-9">
-                            <?php echo $v; ?>
+                            <?php echo \yii\helpers\ArrayHelper::getValue($data, 'value'); ?>
                         </div>
                     </div>
-                <?php endforeach; ?>
 
-                <?php
-/*                $deliveryModel = null;
-                if ($model->shopDelivery && $model->shopDelivery->handler) : */?><!--
-                    <?php
-/*                    $deliveryModel = $model->deliveryHandlerCheckoutModel;
-                    */?>
-                    <div class="sx-delivery-checkout-handler">
-                        <?php /*echo $model->shopDelivery->handler->renderCheckoutForm($form, $model); */?>
-                    </div>
-                --><?php /*endif; */?>
+                <?php endforeach; ?>
 
             </div>
         </div>
     </div>
+<?php else : ?>
+    <?php if ($model->delivery_address) : ?>
+        <div class="sx-delivery-info" style="
+                    margin-top: 20px;
+                ">
+            <div class="row">
+                <div class="col-12">
+                    <h5>Детали доставки</h5>
+                </div>
+            </div>
+            <div class="sx-data">
+                <div class="col-12">
+                    <div class="row sx-data-row">
+                        <div class="col-3">Адрес
+                        </div>
+                        <div class="col-9">
+                            <?php echo $model->delivery_address; ?>
+                        </div>
+                    </div>
+                    <?php if ($model->delivery_entrance) : ?>
+                        <div class="row sx-data-row">
+                            <div class="col-3">Подъезд
+                            </div>
+                            <div class="col-9">
+                                <?php echo $model->delivery_entrance; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($model->delivery_floor) : ?>
+                        <div class="row sx-data-row">
+                            <div class="col-3">Этаж
+                            </div>
+                            <div class="col-9">
+                                <?php echo $model->delivery_floor; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($model->delivery_apartment_number) : ?>
+                        <div class="row sx-data-row">
+                            <div class="col-3">Номер квартиры
+                            </div>
+                            <div class="col-9">
+                                <?php echo $model->delivery_apartment_number; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($model->delivery_comment) : ?>
+                        <div class="row sx-data-row">
+                            <div class="col-3">Коментарий
+                            </div>
+                            <div class="col-9">
+                                <?php echo $model->delivery_comment; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 <?php endif; ?>
+
+
+
 
 
 <div style="height: 20px;"></div>
@@ -632,7 +725,7 @@ $form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
         });
     }
 JS
-)
+    ),
 
 ]); ?>
 
@@ -655,11 +748,13 @@ $form->field($model, 'delivery_amount')->label("Стоимость достав�
 <div style="display: none;">
     <?=
     \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
-        'dialogRoute'            => ['/shop/admin-cms-content-element/index', 'content_id' => \Yii::$app->shop->shopContents[0]->id,
+        'dialogRoute'            => [
+            '/shop/admin-cms-content-element/index',
+            'content_id'                                                     => \Yii::$app->shop->shopContents[0]->id,
             \skeeks\cms\backend\helpers\BackendUrlHelper::BACKEND_PARAM_NAME => [
                 'all-items' => "true",
             ],
-            ],
+        ],
         'name'                   => 'sx-add-product',
         'id'                     => 'sx-add-product',
         'closeDialogAfterSelect' => false,
