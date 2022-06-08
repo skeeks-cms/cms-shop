@@ -48,13 +48,16 @@ sx.classes.SimpleWidget = sx.classes.Component.extend({
         
         $("#simplecheckoutmodel-cms_user_address_id").on("change", function () {
             var jAddressData = $(".sx-address[data-id='" + $(this).val() + "']");
-            $("#simplecheckoutmodel-address").val(jAddressData.data("address"))
+            
+            $("#simplecheckoutmodel-address").val(jAddressData.data("address"));
             $("#simplecheckoutmodel-latitude").val(jAddressData.data("latitude"));
             $("#simplecheckoutmodel-longitude").val(jAddressData.data("longitude"));
             $("#simplecheckoutmodel-entrance").val(jAddressData.data("entrance"));
             $("#simplecheckoutmodel-floor").val(jAddressData.data("floor"));
             $("#simplecheckoutmodel-apartment_number").val(jAddressData.data("apartment_number"));
             $("#simplecheckoutmodel-comment").val(jAddressData.data("comment"));
+            
+            $("#simplecheckoutmodel-address").trigger("change");
             
             $("input, textarea", $(".sx-address-fields")).each(function() {
                 
@@ -77,9 +80,24 @@ sx.classes.SimpleWidget = sx.classes.Component.extend({
         });
         
         $("select, input, textarea", ".sx-address-fields").on("change", function () {
-            $("#simplecheckoutmodel-cms_user_address_id").val("");
-            $(".btn-check", $(".sx-simple-widget")).removeClass("sx-checked");
-            $(".sx-checked-icon", $(".sx-simple-widget")).empty();
+            
+            //Если выбран адрес пользователя
+            if ($("#simplecheckoutmodel-cms_user_address_id").val()) {
+                 var jAddressData = $(".sx-address[data-id='" + $("#simplecheckoutmodel-cms_user_address_id").val() + "']");
+                 if (
+                     $("#simplecheckoutmodel-address").val() != jAddressData.data("address") 
+                    || $("#simplecheckoutmodel-entrance").val() != jAddressData.data("entrance") 
+                    || $("#simplecheckoutmodel-floor").val() != jAddressData.data("floor") 
+                    || $("#simplecheckoutmodel-apartment_number").val() != jAddressData.data("apartment_number") 
+                 ) {
+                     $("#simplecheckoutmodel-cms_user_address_id").val("");
+                    $(".btn-check", $(".sx-simple-widget")).removeClass("sx-checked");
+                    $(".sx-checked-icon", $(".sx-simple-widget")).empty();
+                 }
+            }
+            
+                
+            
             
             setTimeout(function() {
                 self.getJForm().submit();
