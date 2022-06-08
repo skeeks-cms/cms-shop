@@ -22,7 +22,7 @@ if (!$checkoutModel instanceof $checkoutModelCurrent) {
 
 }*/
 
-$q = \skeeks\cms\shop\models\ShopStore::find()->sort()->active()->isSupplier(false);
+$q = \skeeks\cms\shop\models\ShopStore::find()->cmsSite()->sort()->active()->isSupplier(false);
 $this->registerJs(<<<JS
 
 $(".sx-pickup-widget").on("click", ".btn-check", function() {
