@@ -48,8 +48,25 @@ abstract class DeliveryCheckoutModel extends Model
      *
      * @return $this
      */
+    /**
+     * Установить необходимые данные по заказу
+     * Вызывается перед сохранением заказа
+     *
+     * @return $this
+     */
     public function modifyOrder(ShopOrder $order)
     {
+        //Чистка данных по пункту вывоза
+        $order->shop_store_id = null;
+
+        $order->delivery_address = $this->address;
+        $order->delivery_latitude = $this->latitude;
+        $order->delivery_longitude = $this->longitude;
+        $order->delivery_entrance = $this->entrance;
+        $order->delivery_apartment_number = $this->apartment_number;
+        $order->delivery_floor = $this->floor;
+        $order->delivery_comment = $this->comment;
+
         return $this;
     }
 }

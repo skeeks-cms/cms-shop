@@ -194,7 +194,10 @@ class CartController extends Controller
                     }
                 }
 
-                $deliveryHandlerCheckoutModel->modifyOrder($order);
+                if ($deliveryHandlerCheckoutModel) {
+                    $deliveryHandlerCheckoutModel->modifyOrder($order);
+                }
+
 
                 $order->is_created = 1;
                 if (!$order->save()) {
