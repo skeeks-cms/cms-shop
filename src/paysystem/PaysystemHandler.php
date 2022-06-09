@@ -14,6 +14,7 @@ use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use skeeks\cms\traits\TConfigForm;
 use yii\base\Model;
+use yii\base\UserException;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -73,9 +74,9 @@ abstract class PaysystemHandler extends Model implements IHasConfigForm
     {
         $shopBill = new ShopBill();
 
-        $shopBill->shop_order_id = $shopOrder->id;
-        $shopBill->shop_buyer_id = $shopOrder->shop_buyer_id;
+        $shopBill->cms_user_id = $shopOrder->cms_user_id;
         $shopBill->shop_pay_system_id = $shopOrder->shop_pay_system_id;
+        $shopBill->shop_order_id = $shopOrder->id;
 
         $shopBill->amount = $shopOrder->amount;
         $shopBill->currency_code = $shopOrder->currency_code;
@@ -83,7 +84,7 @@ abstract class PaysystemHandler extends Model implements IHasConfigForm
         $shopBill->description = "Оплата по заказу №".$shopOrder->id;
 
         if (!$shopBill->save()) {
-            throw new UserException('Не создался платеж: '.print_r($shopPayment->errors, true));
+            throw new UserException('Не создался платеж: '.print_r($shopBill->errors, true));
         }
 
         return $shopBill;

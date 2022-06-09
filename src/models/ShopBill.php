@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
 use Yii;
@@ -24,7 +25,8 @@ use yii\helpers\Url;
  * @property int           $updated_by
  * @property int           $created_at
  * @property int           $updated_at
- * @property int           $shop_buyer_id Покупатель
+ * @property int           $cms_user_id Покупатель
+ * @property int           $shop_buyer_id deprecated
  * @property int           $shop_order_id Заказ
  * @property int           $shop_pay_system_id Платежная система
  * @property int           $paid_at Дата оплаты
@@ -40,7 +42,8 @@ use yii\helpers\Url;
  * @property array         $external_data Внешние данные, например от платежной системы
  *
  * @property MoneyCurrency $currencyCode
- * @property ShopBuyer     $shopBuyer
+ * @property ShopBuyer     $shopBuyer deprecated
+ * @property CmsUser       $cmsUser
  * @property ShopOrder     $shopOrder
  * @property ShopPayment   $shopPayment
  * @property ShopPaySystem $shopPaySystem
@@ -141,8 +144,12 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'paid_at', 'shop_payment_id', 'closed_at'], 'integer'],
-            [['shop_buyer_id', 'shop_order_id', 'shop_pay_system_id'], 'required'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_user_id', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'paid_at', 'shop_payment_id', 'closed_at'], 'integer'],
+
+            [['shop_buyer_id'], 'default', 'value' => null],
+            [['cms_user_id'], 'default', 'value' => null],
+
+            [['shop_order_id', 'shop_pay_system_id'], 'required'],
             [['external_id', 'external_name'], 'default', 'value' => null],
             [['external_id', 'external_name'], 'string'],
             [['reason_closed', 'description'], 'string'],
@@ -151,7 +158,9 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
             [['currency_code'], 'string', 'max' => 3],
             [['code'], 'string', 'max' => 255],
             [['code'], 'unique'],
+
             [['currency_code'], 'exist', 'skipOnError' => true, 'targetClass' => MoneyCurrency::class, 'targetAttribute' => ['currency_code' => 'code']],
+            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::class, 'targetAttribute' => ['cms_user_id' => 'id']],
             [['shop_buyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopBuyer::class, 'targetAttribute' => ['shop_buyer_id' => 'id']],
             [['shop_order_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopOrder::class, 'targetAttribute' => ['shop_order_id' => 'id']],
             [['shop_payment_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopPayment::class, 'targetAttribute' => ['shop_payment_id' => 'id']],
@@ -168,6 +177,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id'                 => Yii::t('skeeks/shop/app', 'ID'),
+            'cms_user_id'        => Yii::t('skeeks/shop/app', 'Покупатель'),
             'shop_buyer_id'      => Yii::t('skeeks/shop/app', 'Покупатель'),
             'shop_order_id'      => Yii::t('skeeks/shop/app', 'Заказ'),
             'shop_pay_system_id' => Yii::t('skeeks/shop/app', 'Платежная система'),
@@ -193,10 +203,19 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
 
     /**
      * @return \yii\db\ActiveQuery
+     * @deprecated
      */
     public function getShopBuyer()
     {
         return $this->hasOne(ShopBuyer::class, ['id' => 'shop_buyer_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsUser()
+    {
+        $userClass = \Yii::$app->user->identityClass;
+        return $this->hasOne($userClass, ['id' => 'cms_user_id']);
     }
 
     /**

@@ -209,6 +209,8 @@ class CartController extends Controller
                 \Yii::$app->shop->shopUser->shop_order_id = null;
                 \Yii::$app->shop->shopUser->save();
                 
+                \Yii::$app->session->setFlash("order", $order->id);
+                
                 $t->commit();
                 
                 

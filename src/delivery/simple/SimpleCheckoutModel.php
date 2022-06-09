@@ -118,18 +118,23 @@ class SimpleCheckoutModel extends DeliveryCheckoutModel
         if ($this->cms_user_address_id) {
             $order->cms_user_address_id = $this->cms_user_address_id;
         } else {
-            $cmsUserAddress = new CmsUserAddress();
-            $cmsUserAddress->cms_user_id = $order->cms_user_id;
-            $cmsUserAddress->value = $this->address;
-            $cmsUserAddress->latitude = $this->latitude;
-            $cmsUserAddress->longitude = $this->longitude;
-            $cmsUserAddress->entrance = $this->entrance;
-            $cmsUserAddress->floor = $this->floor;
-            $cmsUserAddress->comment = $this->comment;
-            $cmsUserAddress->apartment_number = $this->apartment_number;
-            if (!$cmsUserAddress->save()) {
-                throw new Exception(print_r($cmsUserAddress->errors, true));
+            if ($order->cmsUser) {
+                if (!$order->cmsUser->getCmsUserAddresses()->andWhere(['value' => trim($this->address)])->exists()) {
+                    $cmsUserAddress = new CmsUserAddress();
+                    $cmsUserAddress->cms_user_id = $order->cms_user_id;
+                    $cmsUserAddress->value = $this->address;
+                    $cmsUserAddress->latitude = $this->latitude;
+                    $cmsUserAddress->longitude = $this->longitude;
+                    $cmsUserAddress->entrance = $this->entrance;
+                    $cmsUserAddress->floor = $this->floor;
+                    $cmsUserAddress->comment = $this->comment;
+                    $cmsUserAddress->apartment_number = $this->apartment_number;
+                    if (!$cmsUserAddress->save()) {
+                        throw new Exception(print_r($cmsUserAddress->errors, true));
+                    }
+                }
             }
+            
         }
 
         return $this;

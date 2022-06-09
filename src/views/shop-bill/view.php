@@ -24,7 +24,7 @@ CSS
                 <b>Счет №<?= $model->id; ?> от <?= \Yii::$app->formatter->asDate($model->created_at); ?></b>
             </h1>
             <div class="sx-data" style="margin-bottom: 15px;">
-                <p>Плательщик: <b><?= $model->shopBuyer->name; ?></b></p>
+                <p>Плательщик: <b><?= $model->cmsUser->shortDisplayName; ?></b></p>
                 <? if ($model->shopOrder) : ?>
                     <p>Заказ: <b><a href="<?= $model->shopOrder->url; ?>" data-pjax="0">№<?= $model->shopOrder->id; ?></a></b></p>
                 <? endif; ?>
