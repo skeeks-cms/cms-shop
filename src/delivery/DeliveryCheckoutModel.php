@@ -26,6 +26,11 @@ abstract class DeliveryCheckoutModel extends Model
     public $shopOrder = null;
 
     /**
+     * @var DeliveryHandler
+     */
+    public $deliveryHandler = null;
+
+    /**
      * @return Money
      */
     public function getMoney()

@@ -1439,6 +1439,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         if ($this->shopDelivery && $this->shopDelivery->handler) {
             $model = $this->shopDelivery->handler->checkoutModel;
             $model->shopOrder = $this;
+            $model->deliveryHandler = $this->shopDelivery->handler;
             $model->load($this->deliveryHandlerData, "");
         }
 
