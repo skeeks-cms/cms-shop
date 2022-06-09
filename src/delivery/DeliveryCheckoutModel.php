@@ -59,13 +59,13 @@ abstract class DeliveryCheckoutModel extends Model
         //Чистка данных по пункту вывоза
         $order->shop_store_id = null;
 
-        $order->delivery_address = $this->address;
-        $order->delivery_latitude = $this->latitude;
-        $order->delivery_longitude = $this->longitude;
-        $order->delivery_entrance = $this->entrance;
-        $order->delivery_apartment_number = $this->apartment_number;
-        $order->delivery_floor = $this->floor;
-        $order->delivery_comment = $this->comment;
+        $order->delivery_address = null;
+        $order->delivery_latitude = null;
+        $order->delivery_longitude = null;
+        $order->delivery_entrance = null;
+        $order->delivery_apartment_number = null;
+        $order->delivery_floor = null;
+        $order->delivery_comment = null;
 
         return $this;
     }

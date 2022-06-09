@@ -133,6 +133,7 @@ class CartController extends Controller
 
 
 
+
                 if (!$order->cms_user_id) {
                     //Нужно создать пользователя
                     $cmsUser = null;
@@ -222,6 +223,8 @@ class CartController extends Controller
 
             } catch (\Exception $exception) {
                 $t->rollBack();
+
+                /*throw $exception;*/
 
                 $rr->message = $exception->getMessage();
                 $rr->success = false;
