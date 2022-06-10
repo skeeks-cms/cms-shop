@@ -165,7 +165,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         if ($this->email) {
             \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-            \Yii::$app->mailer->compose('create-order', [
+            $result = \Yii::$app->mailer->compose('create-order', [
                 'order' => $this,
             ])
                 ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
