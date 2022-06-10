@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
 use Yii;
@@ -22,7 +23,8 @@ use yii\helpers\ArrayHelper;
  * @property int           $updated_by
  * @property int           $created_at
  * @property int           $updated_at
- * @property int           $shop_buyer_id Покупатель
+ * @property int           $cms_user_id Покупатель
+ * @property int           $shop_buyer_id deprecated
  * @property int           $shop_order_id Заказ
  * @property int           $shop_pay_system_id Платежная система
  * @property int           $is_debit Дебет? (иначе кредит)
@@ -33,6 +35,7 @@ use yii\helpers\ArrayHelper;
  * @property string        $external_id
  * @property string        $external_data
  *
+ * @property CmsUser       $cmsUser
  * @property ShopBill[]    $shopBills
  * @property MoneyCurrency $currencyCode
  * @property ShopBuyer     $shopBuyer
@@ -66,14 +69,19 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     public function rules()
     {
         return [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'is_debit'], 'integer'],
-            [['shop_buyer_id', 'shop_order_id', 'shop_pay_system_id'], 'required'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_user_id', 'shop_buyer_id', 'shop_order_id', 'shop_pay_system_id', 'is_debit'], 'integer'],
+            [['shop_order_id', 'shop_pay_system_id'], 'required'],
+
+            [['shop_buyer_id'], 'default', 'value' => null],
+            [['cms_user_id'], 'default', 'value' => null],
+
             [['amount'], 'number'],
             [['external_data'], 'safe'],
             [['comment'], 'string'],
             [['currency_code'], 'string', 'max' => 3],
             [['external_name', 'external_id'], 'string', 'max' => 255],
             [['currency_code'], 'exist', 'skipOnError' => true, 'targetClass' => MoneyCurrency::class, 'targetAttribute' => ['currency_code' => 'code']],
+            [['cms_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::class, 'targetAttribute' => ['cms_user_id' => 'id']],
             [['shop_buyer_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopBuyer::class, 'targetAttribute' => ['shop_buyer_id' => 'id']],
             [['shop_order_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopOrder::class, 'targetAttribute' => ['shop_order_id' => 'id']],
             [['shop_pay_system_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopPaySystem::class, 'targetAttribute' => ['shop_pay_system_id' => 'id']],
@@ -88,6 +96,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id'                 => Yii::t('skeeks/shop/app', 'ID'),
             'shop_buyer_id'      => Yii::t('skeeks/shop/app', 'Покупатель'),
+            'cms_user_id'        => Yii::t('skeeks/shop/app', 'Покупатель'),
             'shop_order_id'      => Yii::t('skeeks/shop/app', 'Заказ'),
             'shop_pay_system_id' => Yii::t('skeeks/shop/app', 'Способ оплаты'),
             'is_debit'           => Yii::t('skeeks/shop/app', 'Дебет? (иначе кредит)'),
@@ -123,6 +132,16 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     {
         return $this->hasOne(ShopBuyer::class, ['id' => 'shop_buyer_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsUser()
+    {
+        $userClass = \Yii::$app->user->identityClass;
+        return $this->hasOne($userClass, ['id' => 'cms_user_id']);
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery

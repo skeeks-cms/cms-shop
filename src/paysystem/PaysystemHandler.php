@@ -53,7 +53,7 @@ abstract class PaysystemHandler extends Model implements IHasConfigForm
                 'amount' => $shopOrder->amount,
             ])
             ->andWhere([
-                'shop_buyer_id' => $shopOrder->shop_buyer_id,
+                'cms_user_id' => $shopOrder->cms_user_id,
             ])
             ->andWhere([
                 'currency_code' => $shopOrder->currency_code,

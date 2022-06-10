@@ -54,9 +54,10 @@ class UpaOrderController extends BackendModelStandartController
                          * @var $query ActiveQuery
                          */
                         $query = $e->sender->dataProvider->query;
+                        $query->andWhere(['cms_user_id' => \Yii::$app->user->identity->id]);
 
-                        $subQuery = ShopBuyer::find()->where(['cms_user_id' => \Yii::$app->user->identity->id])->select(['id']);
-                        $query->andWhere(['in', 'shop_buyer_id', $subQuery]);
+                        /*$subQuery = ShopBuyer::find()->where(['cms_user_id' => \Yii::$app->user->identity->id])->select(['id']);
+                        $query->andWhere(['in', 'shop_buyer_id', $subQuery]);*/
                     },
 
 

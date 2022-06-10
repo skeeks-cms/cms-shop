@@ -20,6 +20,7 @@ use skeeks\cms\shop\components\DeliveryHandlerComponent;
 use skeeks\cms\shop\deliveries\BoxberryDeliveryHandler;
 use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
+use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -211,10 +212,8 @@ class AdminDeliveryController extends BackendModelStandartController
 
                     'name',
                     'description' => [
-                        'class' => TextareaField::class,
-                        'elementOptions' => [
-                            'placeholder' => 'Это описание выводится клиенту при оформлении заказа'
-                        ]
+                        'class' => WidgetField::class,
+                        'widgetClass' => ComboTextInputWidget::class,
                     ],
 
 
