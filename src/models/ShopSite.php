@@ -29,6 +29,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
  * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
  * @property int         $is_allow_edit_products Разрешено редактировать и добавлять товары?
+ * @property number         $order_free_shipping_from_price Бесплатная доставка от
  *
  * @property CmsSite     $cmsSite
  * @property CmsTree     $catalogCmsTree
@@ -46,6 +47,19 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     {
         return '{{%shop_site}}';
     }
+
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_FIND, [$this, "_afterFind"]);
+        return parent::init();
+    }
+
+    public function _afterFind($event)
+    {
+        $this->order_free_shipping_from_price = (float) $this->order_free_shipping_from_price;
+    }
+
+
 
     public function behaviors()
     {
@@ -66,6 +80,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::rules(), [
             [['is_receiver'], 'integer'],
+            [['order_free_shipping_from_price'], 'number'],
 
             [['catalog_cms_tree_id'], 'integer'],
             [['catalog_cms_tree_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsTree::className(), 'targetAttribute' => ['catalog_cms_tree_id' => 'id']],
@@ -126,6 +141,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
 
             'description'          => "Описание",
+            'order_free_shipping_from_price'          => "Бесплатная доставка при заказе от",
             'description_internal' => "Скрытое описание",
             'is_receiver'          => "Разрешено получать товары от постащиков",
             'catalog_cms_tree_id'  => "Основной раздел для товаров",
@@ -161,8 +177,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_show_cart'      => "Если выбрано «да», то на сайте будет показана корзина, а возле товаров кнопка «в корзину»<br />
 Если выбрано «нет», то фактически на сайте будет отключена корзина
 ",
-            'is_show_prices'      => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены
-",
+            'is_show_prices'      => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены",
+            'order_free_shipping_from_price'      => "Бесплатная доставка при оформлении заказа от указанной суммы в валюте заказа",
 
         ]);
     }

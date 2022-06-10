@@ -62,6 +62,12 @@ class CartController extends Controller
      */
     public function actionCart()
     {
+        if (\Yii::$app->shop->shopUser->isNewRecord) {
+            \Yii::$app->shop->shopUser->save();
+            \Yii::$app->getSession()->set(\Yii::$app->shop->sessionFuserName, \Yii::$app->shop->shopUser->id);
+        }
+
+
         $this->view->title = \Yii::t('skeeks/shop/app', 'Basket').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }

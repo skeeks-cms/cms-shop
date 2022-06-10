@@ -298,7 +298,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         if ($this->isAttributeChanged('shop_delivery_id') && !$this->isAttributeChanged('delivery_amount')) {
-            $this->delivery_amount = $this->calcMoneyDelivery->amount;
+
             $this->recalculate();
         }
 
@@ -1029,6 +1029,11 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getCalcMoneyDelivery()
     {
+        $order_free_shipping_from_price = \Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price;
+        if ((float)$this->moneyItems->amount > $order_free_shipping_from_price) {
+            return new Money("", $this->currency_code);
+        }
+
         if ($this->shopDelivery) {
             if ($this->deliveryHandlerCheckoutModel) {
                 return $this->deliveryHandlerCheckoutModel->money;
@@ -1101,6 +1106,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $this->tax_amount = $this->calcMoneyVat->amount;
         $this->amount = $this->calcMoney->amount;
         $this->discount_amount = $this->calcMoneyDiscount->amount;
+        $this->delivery_amount = $this->calcMoneyDelivery->amount;
 
         $this->trigger(self::EVENT_AFTER_RECALCULATE, new Event());
 
@@ -1146,7 +1152,9 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function jsonSerialize()
     {
-        return ArrayHelper::merge($this->toArray([], $this->extraFields()), [
+
+
+        $result = ArrayHelper::merge($this->toArray([], $this->extraFields()), [
             'money'         => ArrayHelper::merge($this->money->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
             'moneyDelivery' => ArrayHelper::merge($this->moneyDelivery->jsonSerialize(),
@@ -1168,6 +1176,26 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
 
         ]);
+
+        if (\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price) {
+            $m = new \skeeks\cms\money\Money((string)\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price, $this->currency_code);
+            $needMoney = $m->sub($this->moneyItems);
+
+            $result['freeDelivery'] = [
+                'is_active'     => true,
+                'sx_need_price' => [
+                    'amount'           => (float)$needMoney->amount,
+                    'convertAndFormat' => \Yii::$app->money->convertAndFormat($needMoney),
+                ],
+            ];
+
+        } else {
+            $result['freeDelivery'] = [
+                'is_active' => false,
+            ];
+        }
+
+        return $result;
     }
     /**
      * @return array
