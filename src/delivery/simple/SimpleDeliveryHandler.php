@@ -21,7 +21,7 @@ class SimpleDeliveryHandler extends DeliveryHandler
     public $checkoutModelClass = SimpleCheckoutModel::class;
     public $checkoutWidgetClass = SimpleCheckoutWidget::class;
 
-    public $is_check_default = true;
+    public $is_show_user_addresses = true;
 
     /**
      * @return array
@@ -37,21 +37,21 @@ class SimpleDeliveryHandler extends DeliveryHandler
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['is_check_default'], 'integer'],
+            [['is_show_user_addresses'], 'boolean'],
         ]);
     }
 
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'is_check_default' => "Выбирать первый пункт по умолчанию?",
+            'is_show_user_addresses' => "Показывать выбор адресов пользователя?",
         ]);
     }
 
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'is_check_default' => "Если выбрано да, то будет выбран первый пункт выдачи по умолчанию.",
+            'is_show_user_addresses' => "При повторном оформлении заказа, клиент может выбрать один из своих адресов",
         ]);
     }
 
@@ -63,7 +63,7 @@ class SimpleDeliveryHandler extends DeliveryHandler
     {
         return [
 
-            'is_check_default' => [
+            'is_show_user_addresses' => [
                 'class' => BoolField::class,
             ],
         ];

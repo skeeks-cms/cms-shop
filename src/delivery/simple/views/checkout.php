@@ -144,7 +144,7 @@ CSS
         <?php echo $form->field($checkoutModel, 'cms_user_address_id'); ?>
     </div>
     <?php if ($cmsUser = $widget->shopOrder->cmsUser) : ?>
-        <?php if ($cmsUser->cmsUserAddresses) : ?>
+        <?php if ($cmsUser->cmsUserAddresses && $widget->deliveryHandler->is_show_user_addresses) : ?>
             <div class="row">
                 <div class="col-12">
                     <? foreach ($cmsUser->cmsUserAddresses as $cmsUserAddress) : ?>
