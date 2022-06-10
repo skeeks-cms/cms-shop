@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use chillerlan\QRCode\Data\Number;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
@@ -17,6 +18,7 @@ use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
@@ -182,6 +184,19 @@ class AdminShopSiteController extends BackendModelController
                                 [CmsContentProperty::tableName().'.cms_site_id' => null],
                             ])
                             ->orderBy(['priority' => SORT_ASC])->all(), 'id', 'asText'),
+                    ],
+                ],
+
+            ],
+
+            'cart' => [
+                'class' => FieldSet::class,
+                'name'  => \Yii::t('skeeks/shop/app', 'Оформление заказа'),
+
+                'fields' => [
+
+                    'order_free_shipping_from_price' => [
+                        'class'    => NumberField::class,
                     ],
                 ],
 
