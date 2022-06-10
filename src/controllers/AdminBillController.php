@@ -60,7 +60,7 @@ class AdminBillController extends BackendModelStandartController
 
                         'created_at',
 
-                        'shop_buyer_id',
+                        'cms_user_id',
                         'shop_order_id',
 
                         'shop_pay_system_id',
