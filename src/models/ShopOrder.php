@@ -1083,10 +1083,8 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getPaySystems()
     {
-        $q = $this->shopPersonType->getPaySystems()
-            ->andWhere([ShopPaySystem::tableName().".is_active" => 1])
-            ->andWhere([ShopPaySystem::tableName().".cms_site_id" => $this->cms_site_id])
-            ->orderBy([ShopPaySystem::tableName().".priority" => SORT_ASC]);
+        $q = ShopPaySystem::find()->cmsSite()->active()->sort();
+        $q->multiple = true;
 
         //Если в заказе выбран способ доставки, и у способа доставки заданы способы оплаты, то накладываем доп фильтрацию
         if ($this->shopDelivery) {

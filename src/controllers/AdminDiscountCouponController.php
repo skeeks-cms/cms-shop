@@ -256,7 +256,14 @@ CSS
                         'widgetClass'  => AjaxSelectModel::class,
                         'widgetConfig' => [
                             'modelClass' => ShopDiscount::class,
-                            'options' => $options
+                            'options' => $options,
+                            'searchQuery' => function($word = '') {
+                                $query = ShopDiscount::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
                         ],
 
                     ],
