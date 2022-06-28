@@ -247,7 +247,7 @@ class AdminDeliveryController extends BackendModelStandartController
                         'class'    => SelectField::class,
                         'multiple' => true,
                         'items'    => \yii\helpers\ArrayHelper::map(
-                            \skeeks\cms\shop\models\ShopPaySystem::find()->active()->all(), 'id', 'name'
+                            \skeeks\cms\shop\models\ShopPaySystem::find()->cmsSite()->active()->all(), 'id', 'name'
                         ),
                     ],
 
