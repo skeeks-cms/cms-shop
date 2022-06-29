@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\delivery;
 
 use skeeks\cms\money\Money;
+use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Model;
 
@@ -31,11 +32,16 @@ abstract class DeliveryCheckoutModel extends Model
     public $deliveryHandler = null;
 
     /**
+     * @var ShopDelivery
+     */
+    public $delivery = null;
+
+    /**
      * @return Money
      */
     public function getMoney()
     {
-        return $this->shopOrder->shopDelivery->money;
+        return $this->delivery->money;
         return new Money("", $this->shopOrder->currency_code);
     }
 

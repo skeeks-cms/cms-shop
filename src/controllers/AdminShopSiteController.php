@@ -189,7 +189,7 @@ class AdminShopSiteController extends BackendModelController
 
             ],
 
-            'cart' => [
+            /*'cart' => [
                 'class' => FieldSet::class,
                 'name'  => \Yii::t('skeeks/shop/app', 'Оформление заказа'),
 
@@ -200,7 +200,7 @@ class AdminShopSiteController extends BackendModelController
                     ],
                 ],
 
-            ],
+            ],*/
 
         ];
     }

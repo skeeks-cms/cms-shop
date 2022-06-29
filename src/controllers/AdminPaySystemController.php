@@ -17,12 +17,14 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopPaySystem;
 use skeeks\cms\shop\paysystem\PaysystemHandler;
+use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\grid\DataColumn;
@@ -194,7 +196,8 @@ class AdminPaySystemController extends BackendModelStandartController
                     'name',
 
                     'description' => [
-                        'class' => TextareaField::class,
+                        'class'       => WidgetField::class,
+                        'widgetClass' => ComboTextInputWidget::class,
                     ],
 
                     'is_active' => [

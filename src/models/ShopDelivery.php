@@ -16,39 +16,43 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%shop_delivery}}".
  *
- * @property integer                  $id
- * @property integer                  $created_by
- * @property integer                  $updated_by
- * @property integer                  $created_at
- * @property integer                  $updated_at
- * @property integer                  $cms_site_id
+ * @property integer                         $id
+ * @property integer                         $created_by
+ * @property integer                         $updated_by
+ * @property integer                         $created_at
+ * @property integer                         $updated_at
+ * @property integer                         $cms_site_id
  *
- * @property integer                  $weight_from
- * @property integer                  $weight_to
+ * @property integer                         $weight_from
+ * @property integer                         $weight_to
  *
- * @property string                   $name
+ * @property string                          $name
  *
- * @property string                   $order_price_from
- * @property string                   $order_price_to
+ * @property float                           $order_price_from
+ * @property float                           $order_price_to
  *
- * @property string                   $order_currency_code
- * @property boolean                  $is_active
- * @property string                   $price
- * @property string                   $currency_code
- * @property integer                  $priority
- * @property string                   $description
- * @property integer                  $logo_id
- * @property string                   $component
- * @property string                   $component_config
+ * @property float                           $free_price_from
  *
- * @property DeliveryHandler          $handler
- * @property Money                    $money
- * @property CmsSite                  $site
- * @property Currency                 $currency
- * @property CmsStorageFile           $logo
- * @property Currency                 $orderCurrency
- * @property ShopDelivery2paySystem[] $shopDelivery2paySystems
- * @property ShopPaySystems[]         $shopPaySystems
+ * @property string                          $order_currency_code
+ * @property boolean                         $is_active
+ * @property string                          $price
+ * @property string                          $currency_code
+ * @property integer                         $priority
+ * @property string                          $description
+ * @property integer                         $logo_id
+ * @property string                          $component
+ * @property string                          $component_config
+ * @property float                           $freeOrderPriceFrom
+ *
+ * @property DeliveryHandler                 $handler
+ * @property Money                           $money
+ * @property CmsSite                         $site
+ * @property Currency                        $currency
+ * @property CmsStorageFile                  $logo
+ * @property Currency                        $orderCurrency
+ * @property ShopDelivery2paySystem[]        $shopDelivery2paySystems
+ * @property ShopPaySystems[]                $shopPaySystems
+ * @property \skeeks\cms\shop\models\CmsSite $cmsSite
  */
 class ShopDelivery extends ActiveRecord
 {
@@ -129,7 +133,7 @@ class ShopDelivery extends ActiveRecord
                 'integer',
             ],
             [['name'], 'required'],
-            [['order_price_from', 'order_price_to', 'price'], 'number'],
+            [['order_price_from', 'order_price_to', 'free_price_from', 'price'], 'number'],
             [['description', 'name'], 'string'],
             [['priority'], 'default', 'value' => 1],
             [['order_currency_code', 'currency_code'], 'string', 'max' => 3],
@@ -163,8 +167,12 @@ class ShopDelivery extends ActiveRecord
     public function attributeHints()
     {
         return [
-            'shopPaySystems' => 'Выберите те способы оплаты, которые будут доступы при выборе этого способа доставки.',
-            'description' => 'Это описание выводится на странице оформления заказа, когда человек выбирает этот способ доставки.'
+            'shopPaySystems'   => 'Выберите те способы оплаты, которые будут доступы при выборе этого способа доставки.',
+            'description'      => 'Это описание выводится на странице оформления заказа, когда человек выбирает этот способ доставки.',
+            'free_price_from'  => 'Если сумма товаров будет больше указанной суммы, то стоимость доставки будет бесплатной.',
+            'priority'         => 'Доставки выстраиваются по порядку. Эта цифра задает порядок. Маленькая цифра - начало.',
+            'order_price_from' => 'В валюте заказа',
+            'order_price_to'   => 'В валюте заказа',
         ];
     }
 
@@ -187,13 +195,14 @@ class ShopDelivery extends ActiveRecord
             'period_type'         => \Yii::t('skeeks/shop/app', 'Period Type'),
             'weight_from'         => \Yii::t('skeeks/shop/app', 'Weight From'),
             'weight_to'           => \Yii::t('skeeks/shop/app', 'Weight To'),
-            'order_price_from'    => \Yii::t('skeeks/shop/app', 'Order price from'),
-            'order_price_to'      => \Yii::t('skeeks/shop/app', 'Order price to'),
+            'order_price_from'    => \Yii::t('skeeks/shop/app', 'Стоимость товаров. До'),
+            'order_price_to'      => \Yii::t('skeeks/shop/app', 'Стоимость товаров. От'),
+            'free_price_from'     => \Yii::t('skeeks/shop/app', 'Бесплатная доставка от'),
             'order_currency_code' => \Yii::t('skeeks/shop/app', 'Order currency code'),
             'is_active'           => \Yii::t('skeeks/shop/app', 'Active'),
             'price'               => \Yii::t('skeeks/shop/app', 'Price'),
             'currency_code'       => \Yii::t('skeeks/shop/app', 'Currency Code'),
-            'priority'            => \Yii::t('skeeks/shop/app', 'Priority'),
+            'priority'            => \Yii::t('skeeks/shop/app', 'Сортировка'),
             'description'         => \Yii::t('skeeks/shop/app', 'Description'),
             'logo_id'             => \Yii::t('skeeks/shop/app', 'Logo ID'),
             'store'               => \Yii::t('skeeks/shop/app', 'Store'),
@@ -208,7 +217,8 @@ class ShopDelivery extends ActiveRecord
      */
     public function getCmsSite()
     {
-        return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
+        $siteClass = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($siteClass, ['id' => 'cms_site_id']);
     }
 
 
@@ -252,6 +262,34 @@ class ShopDelivery extends ActiveRecord
     public function getMoney()
     {
         return new Money($this->price, $this->currency_code);
+    }
+
+    /**
+     * Цена для текущего заказа.
+     *
+     * @param ShopOrder $order
+     * @return Money
+     */
+    public function getMoneyForOrder(ShopOrder $order)
+    {
+        //Если делать доставку от определенной суммы это нужно учесть
+        if ($this->freeOrderPriceFrom) {
+            if ((float)$order->moneyItems->amount > $this->freeOrderPriceFrom) {
+                return new Money("0", $order->currency_code);
+            }
+        }
+
+        if ($this->handler) {
+            $model = $this->handler->checkoutModel;
+            $model->shopOrder = $order;
+            $model->deliveryHandler = $this->handler;
+            $model->delivery = $this;
+            $model->load($order->deliveryHandlerData, "");
+
+            return $model->money;
+        }
+
+        return $this->money;
     }
 
     /**
@@ -337,6 +375,18 @@ class ShopDelivery extends ActiveRecord
         }
 
         return true;
+    }
+
+    /**
+     * @return float
+     */
+    public function getFreeOrderPriceFrom()
+    {
+        if ($this->free_price_from) {
+            return (float) $this->free_price_from;
+        }
+
+        return (float) $this->cmsSite->shopSite->order_free_shipping_from_price;
     }
 
 }

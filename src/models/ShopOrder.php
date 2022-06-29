@@ -1029,17 +1029,19 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function getCalcMoneyDelivery()
     {
-        $order_free_shipping_from_price = \Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price;
-        if ((float)$this->moneyItems->amount > $order_free_shipping_from_price) {
-            return new Money("", $this->currency_code);
-        }
-
         if ($this->shopDelivery) {
+            return $this->shopDelivery->getMoneyForOrder($this);
+
+            /*$order_free_shipping_from_price = \Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price;
+            if ((float)$this->moneyItems->amount > $order_free_shipping_from_price) {
+                return new Money("", $this->currency_code);
+            }
+
             if ($this->deliveryHandlerCheckoutModel) {
                 return $this->deliveryHandlerCheckoutModel->money;
             } else {
                 return $this->shopDelivery->money;
-            }
+            }*/
         }
 
         return new Money("", $this->currency_code);
@@ -1087,13 +1089,13 @@ class ShopOrder extends \skeeks\cms\models\Core
         $q->multiple = true;
 
         //Если в заказе выбран способ доставки, и у способа доставки заданы способы оплаты, то накладываем доп фильтрацию
-        if ($this->shopDelivery) {
+        /*if ($this->shopDelivery) {
             if ($shopDelivery2paySystems = $this->shopDelivery->shopDelivery2paySystems) {
                 $ids = ArrayHelper::map($shopDelivery2paySystems, "pay_system_id", "pay_system_id");;
                 $q->andWhere([ShopPaySystem::tableName().".id" => $ids]);
 
             }
-        }
+        }*/
         return $q;
     }
     /**
@@ -1150,8 +1152,6 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function jsonSerialize()
     {
-
-
         $result = ArrayHelper::merge($this->toArray([], $this->extraFields()), [
             'money'         => ArrayHelper::merge($this->money->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
@@ -1172,11 +1172,11 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'convertAndFormat' => $this->weightFormatted,
                 'value'            => $this->weight,
             ],
-
         ]);
 
-        if (\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price) {
-            $m = new \skeeks\cms\money\Money((string)\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price, $this->currency_code);
+        if ($this->shopDelivery && $this->shopDelivery->freeOrderPriceFrom) {
+
+            $m = new \skeeks\cms\money\Money((string)$this->shopDelivery->freeOrderPriceFrom, $this->currency_code);
             $needMoney = $m->sub($this->moneyItems);
 
             $result['freeDelivery'] = [
@@ -1188,10 +1188,76 @@ class ShopOrder extends \skeeks\cms\models\Core
             ];
 
         } else {
-            $result['freeDelivery'] = [
-                'is_active' => false,
-            ];
+            if (\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price && (float) $this->shopDelivery->money->amount > 0) {
+
+                $m = new \skeeks\cms\money\Money((string)\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price, $this->currency_code);
+                $needMoney = $m->sub($this->moneyItems);
+
+                $result['freeDelivery'] = [
+                    'is_active'     => true,
+                    'sx_need_price' => [
+                        'amount'           => (float)$needMoney->amount,
+                        'convertAndFormat' => \Yii::$app->money->convertAndFormat($needMoney),
+                    ],
+                ];
+
+            } else {
+                $result['freeDelivery'] = [
+                    'is_active' => false,
+                ];
+            }
         }
+
+        /**
+         * @var $deliveries ShopDelivery[]
+         * @var $paysystems ShopPaySystem[]
+         */
+        $deliveries = \skeeks\cms\shop\models\ShopDelivery::find()->cmsSite()->active()->sort()->all();
+        $deliveriesData = [];
+        if ($deliveries) {
+            foreach ($deliveries as $deliveriy)
+            {
+
+                $money = $deliveriy->getMoneyForOrder($this);
+                $baseMoney = $deliveriy->money;
+
+                $deliveriesData[] = [
+                    'is_allow' => true, //todo:сделать проверки доступна или нет
+                    'id' => $deliveriy->id, //todo:сделать проверки доступна или нет
+                    'name' => $deliveriy->name, //todo:сделать проверки доступна или нет
+                    'sx_need_price' => [
+                        'amount'           => (float)$money->amount,
+                        'convertAndFormat' => \Yii::$app->money->convertAndFormat($money),
+                    ],
+                    'price' => [
+                        'amount'           => (float)$baseMoney->amount,
+                        'convertAndFormat' => \Yii::$app->money->convertAndFormat($baseMoney),
+                    ]
+                ];
+            }
+        }
+
+        $paysystems = ShopPaySystem::find()->cmsSite()->active()->sort()->all();
+        $paysystemsData = [];
+        if ($deliveries) {
+            foreach ($paysystems as $paysystem)
+            {
+                $paysystemsData[] = [
+                    'id' => $paysystem->id, //todo:сделать проверки доступна или нет
+                    'name' => $paysystem->name, //todo:сделать проверки доступна или нет
+
+                    'is_allow' => $paysystem->isAllowForOrder($this), //todo:сделать проверки доступна или нет
+                    'is_allow_message' => $paysystem->getNotAllowMessage($this), //todo:сделать проверки доступна или нет
+                ];
+            }
+        }
+
+
+        $result['deliveries'] = $deliveriesData;
+        $result['paysystems'] = $paysystemsData;
+
+
+
 
         return $result;
     }
@@ -1466,6 +1532,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             $model = $this->shopDelivery->handler->checkoutModel;
             $model->shopOrder = $this;
             $model->deliveryHandler = $this->shopDelivery->handler;
+            $model->delivery = $this->shopDelivery;
             $model->load($this->deliveryHandlerData, "");
         }
 

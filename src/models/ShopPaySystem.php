@@ -218,4 +218,47 @@ class ShopPaySystem extends Core
     {
         return $this->hasOne(CmsSite::class, ['id' => 'cms_site_id']);
     }
+
+
+    /**
+     * @param ShopOrder $shopOrder
+     * @return bool
+     */
+    public function isAllowForOrder(ShopOrder $shopOrder)
+    {
+        if ($shopOrder->shopDelivery) {
+
+            if ($shopDelivery2paySystems = $shopOrder->shopDelivery->shopDelivery2paySystems) {
+                $ids = ArrayHelper::map($shopDelivery2paySystems, "pay_system_id", "pay_system_id");
+                if (in_array($this->id, (array) $ids)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ShopOrder $shopOrder
+     * @return string
+     */
+    public function getNotAllowMessage(ShopOrder $shopOrder)
+    {
+        if ($shopOrder->shopDelivery) {
+
+            if ($shopDelivery2paySystems = $shopOrder->shopDelivery->shopDelivery2paySystems) {
+                $ids = ArrayHelper::map($shopDelivery2paySystems, "pay_system_id", "pay_system_id");
+                if (in_array($this->id, (array) $ids)) {
+                    return "";
+                } else {
+                    return "Недоступно для выбранного способа получения.";
+                }
+            }
+        }
+
+        return "";
+    }
 }
