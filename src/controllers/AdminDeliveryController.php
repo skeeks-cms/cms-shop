@@ -22,11 +22,14 @@ use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\yii2\form\Builder;
+use skeeks\yii2\form\elements\HtmlColBegin;
+use skeeks\yii2\form\elements\HtmlColEnd;
+use skeeks\yii2\form\elements\HtmlRowBegin;
+use skeeks\yii2\form\elements\HtmlRowEnd;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
@@ -108,7 +111,7 @@ class AdminDeliveryController extends BackendModelStandartController
                 ],
             ],
             "create" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'        => [$this, 'updateFields'],
                 'on beforeSave' => function (Event $e) {
                     /**
                      * @var $action BackendModelUpdateAction;
@@ -132,7 +135,7 @@ class AdminDeliveryController extends BackendModelStandartController
                 },
             ],
             "update" => [
-                'fields' => [$this, 'updateFields'],
+                'fields'        => [$this, 'updateFields'],
                 'on beforeSave' => function (Event $e) {
                     /**
                      * @var $action BackendModelUpdateAction;
@@ -199,7 +202,7 @@ class AdminDeliveryController extends BackendModelStandartController
                         'allowNull' => false,
                     ],
 
-                    'logo_id'     => [
+                    'logo_id'  => [
                         'class'        => WidgetField::class,
                         'widgetClass'  => AjaxFileUploadWidget::class,
                         'widgetConfig' => [
@@ -209,34 +212,77 @@ class AdminDeliveryController extends BackendModelStandartController
                     ],
 
 
-
                     'name',
+                    'priority' => NumberField::class,
+
+
                     'description' => [
-                        'class' => WidgetField::class,
+                        'class'       => WidgetField::class,
                         'widgetClass' => ComboTextInputWidget::class,
                     ],
 
 
+                    ['class' => HtmlRowBegin::class],
+
+                    [
+                        'class'    => HtmlColBegin::class,
+                        'colClass' => 'col-3',
+                    ],
 
                     'price' => NumberField::class,
+
+                    ['class' => HtmlColEnd::class],
+
+                    [
+                        'class'    => HtmlColBegin::class,
+                        'colClass' => 'col-3',
+                    ],
 
                     'currency_code' => [
                         'class' => SelectField::class,
                         'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where(['is_active' => 1])->all(), 'code', 'code'),
                     ],
 
-                    'priority' => NumberField::class,
+                    ['class' => HtmlColEnd::class],
+
+                    ['class' => HtmlRowEnd::class],
+
+                    'free_price_from' => [
+                        'class' => NumberField::class
+                    ]
+
                 ],
             ],
 
-            'filter' => [
+            /*'filter' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Условия показа'),
                 'fields' => [
+                    ['class' => HtmlRowBegin::class],
+
+                    [
+                        'class'    => HtmlColBegin::class,
+                        'colClass' => 'col-3',
+                    ],
+
                     'order_price_from' => NumberField::class,
-                    'order_price_to' => NumberField::class,
-                ]
-            ],
+                    ['class' => HtmlColEnd::class],
+
+                    [
+                        'class'    => HtmlColBegin::class,
+                        'colClass' => 'col-3',
+                    ],
+
+
+                    'order_price_to'   => NumberField::class,
+
+                    ['class' => HtmlColEnd::class],
+
+                    ['class' => HtmlRowEnd::class],
+
+
+                ],
+            ],*/
 
             'additionally' => [
                 'class'  => FieldSet::class,
@@ -252,8 +298,8 @@ class AdminDeliveryController extends BackendModelStandartController
                     ],
 
                     'component' => [
-                        'class'   => SelectField::class,
-                        'items'   => \Yii::$app->shop->getDeliveryHandlersForSelect(),
+                        'class'          => SelectField::class,
+                        'items'          => \Yii::$app->shop->getDeliveryHandlersForSelect(),
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
                         ],
@@ -268,8 +314,8 @@ class AdminDeliveryController extends BackendModelStandartController
                 'handler' => [
                     'class'  => FieldSet::class,
                     'name'   => "Настройки обработчика",
-                    'fields' => $handlerFields
-                ]
+                    'fields' => $handlerFields,
+                ],
             ]);
         }
 
