@@ -29,7 +29,8 @@ use yii\helpers\ArrayHelper;
  * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
  * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
  * @property int         $is_allow_edit_products Разрешено редактировать и добавлять товары?
- * @property number         $order_free_shipping_from_price Бесплатная доставка от
+ * @property number      $order_free_shipping_from_price Бесплатная доставка от
+ * @property array       $order_required_fields Бесплатная доставка от
  *
  * @property CmsSite     $cmsSite
  * @property CmsTree     $catalogCmsTree
@@ -48,6 +49,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
         return '{{%shop_site}}';
     }
 
+
     public function init()
     {
         $this->on(self::EVENT_AFTER_FIND, [$this, "_afterFind"]);
@@ -56,9 +58,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 
     public function _afterFind($event)
     {
-        $this->order_free_shipping_from_price = (float) $this->order_free_shipping_from_price;
+        $this->order_free_shipping_from_price = (float)$this->order_free_shipping_from_price;
     }
-
 
 
     public function behaviors()
@@ -69,6 +70,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                 'fields' => [
                     'show_filter_property_ids',
                     'open_filter_property_ids',
+                    'order_required_fields',
                 ],
             ],
         ]);
@@ -112,6 +114,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
+            [['order_required_fields'], 'safe'],
+            [['order_required_fields'], 'required'],
 
             ['notify_emails', 'string'],
             [
@@ -140,11 +144,11 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
 
-            'description'          => "Описание",
-            'order_free_shipping_from_price'          => "Бесплатная доставка при заказе от",
-            'description_internal' => "Скрытое описание",
-            'is_receiver'          => "Разрешено получать товары от постащиков",
-            'catalog_cms_tree_id'  => "Основной раздел для товаров",
+            'description'                    => "Описание",
+            'order_free_shipping_from_price' => "Бесплатная доставка при заказе от",
+            'description_internal'           => "Скрытое описание",
+            'is_receiver'                    => "Разрешено получать товары от постащиков",
+            'catalog_cms_tree_id'            => "Основной раздел для товаров",
 
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
@@ -154,7 +158,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
             'is_show_cart'                  => "Показывать корзину на сайте?",
-            'is_show_prices'                  => "Показывать цены на сайте?",
+            'is_show_prices'                => "Показывать цены на сайте?",
+            'order_required_fields'         => "Поля обязательные при оформлении заказа заказа",
         ]);
     }
 
@@ -167,18 +172,18 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_receiver'         => "Если эта опция включена то на сайте появляется раздел «Поставщики»",
             'catalog_cms_tree_id' => "Основной раздел сайта, в который будут попадать товары по умолчанию, если раздел для них не задан.",
 
-            'notify_emails'                 => \Yii::t('skeeks/shop/app',
+            'notify_emails'                  => \Yii::t('skeeks/shop/app',
                 'Enter email addresses, separated by commas, they will come on new orders information'),
-            'is_show_product_no_price'      => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
-            'is_show_button_no_price'       => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
-            'show_filter_property_ids'      => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
-            'is_show_product_only_quantity' => "Выберите как товары будут показываться на сайте по умолчанию",
-            'is_show_quantity_product'      => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
-            'is_show_cart'      => "Если выбрано «да», то на сайте будет показана корзина, а возле товаров кнопка «в корзину»<br />
+            'is_show_product_no_price'       => "Если выбрано «да», то товары с нулевой ценой будут показывать на сайте",
+            'is_show_button_no_price'        => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
+            'show_filter_property_ids'       => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
+            'is_show_product_only_quantity'  => "Выберите как товары будут показываться на сайте по умолчанию",
+            'is_show_quantity_product'       => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
+            'is_show_cart'                   => "Если выбрано «да», то на сайте будет показана корзина, а возле товаров кнопка «в корзину»<br />
 Если выбрано «нет», то фактически на сайте будет отключена корзина
 ",
-            'is_show_prices'      => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены",
-            'order_free_shipping_from_price'      => "Бесплатная доставка при оформлении заказа от указанной суммы в валюте заказа",
+            'is_show_prices'                 => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены",
+            'order_free_shipping_from_price' => "Бесплатная доставка при оформлении заказа от указанной суммы в валюте заказа",
 
         ]);
     }

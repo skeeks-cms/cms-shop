@@ -555,12 +555,38 @@ class ShopOrder extends \skeeks\cms\models\Core
 
 
             [
+                ['contact_last_name'],
+                'required',
+                'when' => function () {
+                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    return !$this->cms_user_id && in_array('last_name', $requiredFields);
+                },
+            ],
+            [
+                ['contact_first_name'],
+                'required',
+                'when' => function () {
+                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    return !$this->cms_user_id && in_array('first_name', $requiredFields);
+                },
+            ],
+            [
+                ['contact_email'],
+                'required',
+                'when' => function () {
+                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    return !$this->cms_user_id && in_array('email', $requiredFields);
+                },
+            ],
+            [
                 ['contact_phone'],
                 'required',
                 'when' => function () {
-                    return !$this->cms_user_id;
+                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    return !$this->cms_user_id && in_array('phone', $requiredFields);
                 },
             ],
+            
             [['contact_phone'], 'string'],
             [['contact_phone'], "filter", 'filter' => 'trim'],
             [

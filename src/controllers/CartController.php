@@ -31,6 +31,8 @@ use yii\helpers\Json;
  */
 class CartController extends Controller
 {
+    public $enableCsrfValidation = false;
+    
     public $defaultAction = 'cart';
 
     /**
