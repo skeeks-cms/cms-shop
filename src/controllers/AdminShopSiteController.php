@@ -189,18 +189,28 @@ class AdminShopSiteController extends BackendModelController
 
             ],
 
-            /*'cart' => [
+            'cart' => [
                 'class' => FieldSet::class,
                 'name'  => \Yii::t('skeeks/shop/app', 'Оформление заказа'),
 
                 'fields' => [
 
-                    'order_free_shipping_from_price' => [
+                    'order_required_fields' => [
+                        'class' => SelectField::class,
+                        'multiple' => true,
+                        'items' => [
+                            'phone' => 'Телефон',
+                            'email' => 'Email',
+                            'first_name' => 'Имя',
+                            'last_name' => 'Фамилия',
+                        ]
+                    ]
+                    /*'order_free_shipping_from_price' => [
                         'class'    => NumberField::class,
-                    ],
+                    ],*/
                 ],
 
-            ],*/
+            ],
 
         ];
     }
