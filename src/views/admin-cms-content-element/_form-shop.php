@@ -391,7 +391,37 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
             'value'   => \skeeks\cms\components\Cms::BOOL_Y,
         ]); ?>
     <? endif; ?>
+
+
+        <?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+            'content' => \Yii::t('skeeks/shop/app', 'Рейтинг товара'),
+        ]); ?>
+
+            
+        
+
 <? endif; ?>
+
+<div class="row">
+            <div class="col-md-4">
+                <?= $form->field($shopProduct, 'rating_value')
+                    ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                        'options'       => [
+                            'step' => 0.0001,
+                        ],
+                    ]); ?>
+            </div>
+            <div class="col-md-4">
+                <?= $form->field($shopProduct, 'rating_count')
+                    ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                        //'dynamicReload' => true,
+                        'append'  => "шт",
+                        'options' => [
+                            'step' => 1,
+                        ],
+                    ]); ?>
+            </div>
+        </div>
 
 
 <? if ($shopContent->childrenContent && $shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS) : ?>
