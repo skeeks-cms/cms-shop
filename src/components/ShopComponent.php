@@ -19,6 +19,7 @@ use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopPersonType;
+use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\shop\models\ShopUser;
@@ -26,8 +27,10 @@ use yii\base\BootstrapInterface;
 use yii\base\Component;
 use yii\base\Event;
 use yii\base\Exception;
+use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 use yii\widgets\ActiveForm;
@@ -1222,5 +1225,150 @@ SQL
 
         return $data;
 
+    }
+
+    /**
+     * @param ActiveQuery $q
+     * @return array
+     */
+    static public function getAgregateCategoryData(ActiveQuery $q, $model)
+    {
+        $r = new \ReflectionClass($model);
+        $className = $r->getShortName();
+        $cacheName = "agregateData_v1_" . $className . "_" . $model->id;
+        
+        //Если данные в кэше берем их оттуда
+        if ($result = \Yii::$app->cache->get($cacheName)) {
+            return $result;
+        }
+        $result = [];
+
+        
+        $q0 = clone $q;
+        $q0->andWhere(['shopProduct.product_type' => [
+            ShopProduct::TYPE_SIMPLE,
+            ShopProduct::TYPE_OFFER,
+        ]]);
+        $q0->groupBy("shopProduct.id");
+        $q0->orderBy(false);
+        
+        $result['offerCount'] = $q0->count();
+        
+        //Если товаров нет, то ничего не делаем
+        if (!$result['offerCount']) {
+            return [];
+        }
+        
+        
+        $q1 = clone $q;
+        $q1->select(['price' => new Expression("max(prices.price)")]);
+        $q1->groupBy(false);
+        $q1->orderBy(false);
+
+        
+        $maxPrice = $q1->asArray()->one();
+
+        if ($maxPrice) {
+            $result['highPrice'] = ArrayHelper::getValue($maxPrice, "price");
+        }
+    
+        
+        $q2 = clone $q;
+        $q2->select(['price' => new Expression("min(prices.price)")]);
+        $q2->andWhere(['>', 'prices.price', 0]);
+        $q2->orderBy(false);
+        $q2->groupBy(false);
+
+        $minPrice = $q2->asArray()->one();
+        if ($minPrice) {
+            $result['lowPrice'] = ArrayHelper::getValue($minPrice, "price");
+        }
+
+
+        $q3 = clone $q;
+        $q3->select([
+            'id' => new Expression("shopProduct.id"),
+            'rating_count' => new Expression("shopProduct.rating_count"),
+        ]);
+        $q3->andWhere(['shopProduct.product_type' => [
+            ShopProduct::TYPE_SIMPLE,
+            ShopProduct::TYPE_OFFER,
+        ]]);
+        $q3->groupBy("shopProduct.id");
+        $q3->orderBy(false);
+
+        $ratingValueQ = new Query();
+        $ratingValueQ->select(['rating_count' => new Expression("sum(rating_count)")])->from(['p' => $q3]);
+            
+        $reviewValue = $ratingValueQ->one();
+        if ($reviewValue) {
+            $result['reviewCount'] = ArrayHelper::getValue($reviewValue, "rating_count", 0);
+        }
+        
+
+        if (ArrayHelper::getValue($result, "reviewCount", 0) > 0) {
+            
+            $q4 = clone $q;
+            $q4->select([
+                'id' => new Expression("shopProduct.id"),
+                'rating_value' => new Expression("shopProduct.rating_value"),
+            ]);
+            $q4->andWhere(['shopProduct.product_type' => [
+                ShopProduct::TYPE_SIMPLE,
+                ShopProduct::TYPE_OFFER,
+            ]]);
+            $q4->groupBy("shopProduct.id");
+            $q4->orderBy(false);
+            
+            $ratingValueQ = new Query();
+            $ratingValueQ->select(['rating_value' => new Expression("sum(rating_value)")])->from(['p' => $q4]);
+            
+            //print_r($q4->createCommand()->rawSql);die;
+            $ratingValue = $ratingValueQ->one();
+            if ($ratingValue) {
+                $result['ratingValue'] = round(ArrayHelper::getValue($ratingValue, "rating_value", 0) / $result['offerCount'], 4);
+            }
+        }
+        
+        
+        
+        $q5 = clone $q;
+        $q5->select(['min_rating' => new Expression("min(shopProduct.rating_value)")]);
+        $q5->andWhere(['shopProduct.product_type' => [
+            ShopProduct::TYPE_SIMPLE,
+            ShopProduct::TYPE_OFFER,
+        ]]);
+        $q5->groupBy(false);
+        $q5->orderBy(false);
+
+        $minRatingValue = $q5->asArray()->one();
+        if ($minRatingValue) {
+            $result['worsRating'] = ArrayHelper::getValue($minRatingValue, "min_rating", 0);
+        }
+
+        
+        $q6 = clone $q;
+        $q6->select(['max_rating' => new Expression("max(shopProduct.rating_value)")]);
+        $q6->andWhere(['shopProduct.product_type' => [
+            ShopProduct::TYPE_SIMPLE,
+            ShopProduct::TYPE_OFFER,
+        ]]);
+        $q6->groupBy(false);
+        $q6->orderBy(false);
+
+        $minRatingValue = $q6->asArray()->one();
+        if ($minRatingValue) {
+            $result['bestRating'] = ArrayHelper::getValue($minRatingValue, "max_rating", 0);
+        }
+
+        \Yii::$app->cache->set($cacheName, $result, 3600*24, new TagDependency([
+            'tags' => [
+                \Yii::$app->skeeks->site->cacheTag,
+            ],
+        ]));
+        
+        
+        
+        return $result;
     }
 }
