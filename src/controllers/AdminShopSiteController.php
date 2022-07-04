@@ -212,6 +212,42 @@ class AdminShopSiteController extends BackendModelController
 
             ],
 
+            'rating' => [
+                'class' => FieldSet::class,
+                'name'  => \Yii::t('skeeks/shop/app', 'Рейтинг товаров'),
+
+                'fields' => [
+
+                    'max_product_rating_value' => [
+                        'class' => NumberField::class,
+                    ],
+                    'is_generate_product_rating' => [
+                        'class' => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    
+                    'generate_min_product_rating_value' => [
+                        'class' => NumberField::class,
+                        'step' => 0.0001,
+                    ],
+                    'generate_max_product_rating_value' => [
+                        'class' => NumberField::class,
+                        'step' => 0.0001,
+                    ],
+                    'generate_min_product_rating_count' => [
+                        'class' => NumberField::class,
+                    ],
+                    'generate_max_product_rating_count' => [
+                        'class' => NumberField::class,
+                    ],
+                    
+                    /*'order_free_shipping_from_price' => [
+                        'class'    => NumberField::class,
+                    ],*/
+                ],
+
+            ],
+
         ];
     }
 

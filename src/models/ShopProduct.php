@@ -38,6 +38,8 @@ use yii\helpers\Json;
  * @property double                    $width
  * @property double                    $length
  * @property double                    $height
+ * @property double                    $rating_value
+ * @property integer                    $rating_count
  *
  * @property integer|null              $offers_pid
  *
@@ -457,6 +459,22 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['weight', 'width', 'length', 'height'], 'default', 'value' => 0],
             [['measure_ratio'], 'default', 'value' => 1],
             [['measure_ratio'], 'number', 'min' => 0.0001, 'max' => 9999999],
+            
+            [['rating_value'], 'number', 'min' => 0, 'max' => 5],
+            [['rating_count'], 'integer', 'min' => 0],
+            
+            [['rating_count'], 'required', 'when' => function() {
+                return $this->rating_value;
+            }],
+
+            [['rating_count'], function($attribute) {
+                if ($this->rating_value > 0 && $this->rating_count == 0) {
+                    $this->addError($attribute, "Необходимо указать количество отзывов. Потому что указан рейтинг товара.");
+                    return false;
+                }
+                
+                return true;
+            }],
 
             [['measure_ratio_min'], 'default', 'value' => function() {
                 return $this->measure_ratio;
@@ -659,6 +677,8 @@ class ShopProduct extends \skeeks\cms\models\Core
             'length'        => \Yii::t('skeeks/shop/app', 'Length'),
             'height'        => \Yii::t('skeeks/shop/app', 'Height'),
             'barcodes'      => "Штрихкоды",
+            'rating_value'      => "Рейтинг товара",
+            'rating_count'      => "Количество отзывов",
             'product_type'  => \Yii::t('skeeks/shop/app', 'Product type'),
             /*'mainя_pid'          => \Yii::t('skeeks/shop/app', 'Инфо карточка'),*/
 

@@ -80,6 +80,11 @@ return [
                     'name'     => ['skeeks/shop/app', 'Обновление цен, которые рассчитываются автоматически'],
                     'interval' => 60 * 5,
                 ],
+                'shop/agents/update-product-rating'                        => [
+                    'class'    => \skeeks\cms\agent\CmsAgent::class,
+                    'name'     => ['skeeks/shop/app', 'Обновление рейтинга, которые рассчитываются автоматически'],
+                    'interval' => 3600,
+                ],
             ],
         ],
         'authManager' => [

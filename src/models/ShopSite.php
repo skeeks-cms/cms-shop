@@ -29,8 +29,16 @@ use yii\helpers\ArrayHelper;
  * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
  * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
  * @property int         $is_allow_edit_products Разрешено редактировать и добавлять товары?
+ *
  * @property number      $order_free_shipping_from_price Бесплатная доставка от
  * @property array       $order_required_fields Бесплатная доставка от
+ *
+ * @property int         $max_product_rating_value Максимальное значение рейтинга товаров
+ * @property int         $is_generate_product_rating Генерировать рейтинг товара?
+ * @property number      $generate_min_product_rating_value Минимальное значение рейтинга
+ * @property number      $generate_max_product_rating_value Максимальное значение рейтинга
+ * @property int         $generate_min_product_rating_count Минимальное количество отзывов
+ * @property int         $generate_max_product_rating_count Максимальное количество отзывов
  *
  * @property CmsSite     $cmsSite
  * @property CmsTree     $catalogCmsTree
@@ -134,6 +142,26 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                 ],
                 'integer',
             ],
+
+
+            [
+                [
+                    'max_product_rating_value',
+                    'is_generate_product_rating',
+                    'generate_min_product_rating_count',
+                    'generate_max_product_rating_count',
+                ],
+                'integer',
+            ],
+            [
+                [
+                    'generate_min_product_rating_value',
+                    'generate_max_product_rating_value',
+                ],
+                'number',
+            ],
+
+
         ]);
     }
 
@@ -160,6 +188,13 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_show_cart'                  => "Показывать корзину на сайте?",
             'is_show_prices'                => "Показывать цены на сайте?",
             'order_required_fields'         => "Поля обязательные при оформлении заказа заказа",
+
+            'max_product_rating_value'          => "Максимальное значение рейтинга товаров",
+            'is_generate_product_rating'        => "Генерировать рейтинг товара?",
+            'generate_min_product_rating_value' => "Минимальное значение рейтинга (при генерации)",
+            'generate_max_product_rating_value' => "Максимальное значение рейтинга (при генерации)",
+            'generate_min_product_rating_count' => "Минимальное количество отзывов (при генерации)",
+            'generate_max_product_rating_count' => "Максимальное количество отзывов (при генерации)",
         ]);
     }
 
@@ -184,6 +219,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 ",
             'is_show_prices'                 => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены",
             'order_free_shipping_from_price' => "Бесплатная доставка при оформлении заказа от указанной суммы в валюте заказа",
+            'is_generate_product_rating'     => "Если рейтинг товара не заполнен, то он будет сгенерирован автоматически. Это полезно для продвижения сайта.",
+            'is_generate_product_rating'     => "Если рейтинг товара не заполнен, то он будет сгенерирован автоматически. Это полезно для продвижения сайта.",
 
         ]);
     }
