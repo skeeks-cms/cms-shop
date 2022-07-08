@@ -8,10 +8,13 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
+use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\components\Cms;
+use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
@@ -116,6 +119,29 @@ class StoreProductController extends BackendModelStandartController
 
                                         $query->joinWith("shopProduct as shopProduct");
                                         $query->joinWith("shopProduct.cmsContentElement as element");
+
+                                        $query->groupBy([ShopStoreProduct::tableName().'.id']);
+                                    }
+                                },
+                            ],
+                            'is_active' => [
+                                'class'    => BoolField::class,
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+
+                                    if ($e->field->value == 1) {
+                                        $query->andWhere(
+                                            [ShopStoreProduct::tableName().'.is_active' => 1],
+                                        );
+
+                                        $query->groupBy([ShopStoreProduct::tableName().'.id']);
+                                    } else if ($e->field->value == "0") {
+                                        $query->andWhere(
+                                            [ShopStoreProduct::tableName().'.is_active' => 0],
+                                        );
 
                                         $query->groupBy([ShopStoreProduct::tableName().'.id']);
                                     }
@@ -238,6 +264,9 @@ class StoreProductController extends BackendModelStandartController
                         'marginality_per',
                     ],
                     'columns'        => [
+                        'is_active' => [
+                            'class' => BooleanColumn::class,
+                        ],
                         'created_at' => [
                             'class' => DateTimeColumnData::class,
                         ],
@@ -445,6 +474,31 @@ HTML;
                 'class' => ViewBackendAction::class,
                 'icon'  => 'far fa-file-excel',
                 'name'  => 'Импорт',
+            ],
+            
+            "activate-multi"   => [
+                'class'   => BackendModelMultiActivateAction::class,
+                'value' => '1',
+                'attribute' => 'is_active',
+
+                /*"eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
+                },
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/update");
+                },*/
+            ],
+            "deactivate-multi"   => [
+                'class'   => BackendModelMultiDeactivateAction::class,
+                'value' => '0',
+                'attribute' => 'is_active',
+
+                /*"eachAccessCallback" => function ($model) {
+                    return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
+                },
+                "accessCallback"     => function () {
+                    return \Yii::$app->user->can($this->permissionName."/update");
+                },*/
             ],
         ]);
     }

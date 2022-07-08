@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property array        $external_data
  * @property float        $purchase_price
  * @property float        $selling_price
+ * @property integer      $is_active
  *
  * @property ShopProduct  $shopProduct
  * @property ShopStore    $shopStore
@@ -84,6 +85,8 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
             [['shop_store_id'], 'integer'],
             [['shop_product_id'], 'integer'],
             [['quantity'], 'default', 'value' => 0],
+            [['is_active'], 'integer'],
+            [['is_active'], 'default', 'value' => 1],
 
             [['external_id'], 'default', 'value' => null],
             [['external_data'], 'default', 'value' => null],
@@ -141,6 +144,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
             'external_id'     => "Код",
             'purchase_price'  => "Закупочная цена",
             'selling_price'   => "Цена продажи",
+            'is_active'   => "Активность",
         ]);
     }
 
@@ -257,12 +261,12 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                         ShopStoreProperty::PROPERTY_NATURE_LENGTH,
                         ShopStoreProperty::PROPERTY_NATURE_WEIGHT,
                     ])) {
-                        
+
                         $code = "";
                         if ($property->cmsContentProperty) {
                             $code = $property->cmsContentProperty->code;
                         }
-                        
+
                         if (is_string($value)) {
                             $value = trim($value);
                             $value = str_replace(" ", "", $value);
@@ -299,7 +303,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                         }
 
 
-                    }  elseif (in_array($property->property_nature, [
+                    } elseif (in_array($property->property_nature, [
                             ShopStoreProperty::PROPERTY_NATURE_EAV,
                         ]) || $property->cmsContentProperty) {
 
@@ -386,7 +390,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                     }
                 }
             }
-            
+
             //print_r($model->relatedPropertiesModel->toArray());die;
         }
     }
