@@ -74,6 +74,7 @@ class StoreProductController extends BackendModelStandartController
 
                         'marginality_per_filter',
                         'marginality_filter',
+                        'is_active',
                         //'component',
                     ],
 
