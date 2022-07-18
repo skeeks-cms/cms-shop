@@ -62,8 +62,8 @@ class StoreBackendComponent extends BackendComponent
         $cmsManager = \Yii::$app->authManager;
         //$cmsManager = new CmsManager();
         //$cmsManager->cmsSite = \Yii::$app->shop->backendShopStore->cmsSite;
-        if (!$cmsManager->checkAccess(\Yii::$app->user->id, "shop/admin-shop-store-supplier")) {
+        /*if (!$cmsManager->checkAccess(\Yii::$app->user->id, "shop/admin-shop-store-supplier")) {
             throw new ForbiddenHttpException("Нет доступа");
-        }
+        }*/
     }
 }
