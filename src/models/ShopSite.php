@@ -22,8 +22,11 @@ use yii\helpers\ArrayHelper;
  * @property string|null $notify_emails Email адреса для уведомлений о заказах
  * @property int         $is_show_cart Показывать корзину?
  * @property int         $is_show_prices Показывать цены?
+ *
  * @property int         $is_show_product_no_price Показывать товары с нулевыми ценами?
  * @property int         $is_show_button_no_price Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?
+ * @property int         $is_show_product_no_quantity Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?
+ *
  * @property int         $is_show_product_only_quantity Показывать товары только в наличии на сайте?
  * @property int         $is_show_quantity_product Показывать оставшееся количество товаров на складе?
  * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
@@ -130,6 +133,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                 [
                     'is_show_product_no_price',
                     'is_show_button_no_price',
+                    'is_show_product_no_quantity',
                     'is_show_quantity_product',
                     'is_show_cart',
                     'is_show_prices',
@@ -181,6 +185,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
             'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
+            'is_show_product_no_quantity'       => "Показывать кнопку «добавить в корзину» для товаров не в наличии?",
             'is_show_product_only_quantity' => "Учет наличия",
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",

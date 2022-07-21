@@ -6,7 +6,7 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 
-namespace skeeks\cms\shop\store;
+namespace skeeks\cms\shop\cashier;
 
 
 use skeeks\cms\backend\BackendUrlRule;
@@ -14,7 +14,7 @@ use skeeks\cms\shop\models\ShopStore;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
-class StoreUrlRule extends BackendUrlRule
+class CashierUrlRule extends BackendUrlRule
 {
     const STORE_PARAM_NAME = '__shop_store_id';
     /**

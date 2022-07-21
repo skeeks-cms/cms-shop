@@ -40,7 +40,10 @@ use yii\helpers\ArrayHelper;
  * @property CmsSite            $cmsSite
  * @property ShopStoreProduct[] $shopStoreProducts
  * @property ShopProduct[]      $shopProducts
- * * @property ShopStoreProperty[] $shopStoreProperties
+ * @property ShopStoreProperty[] $shopStoreProperties
+ *
+ * @property ShopCashebox[]     $shopCasheboxes
+ * @property ShopOrder[]        $shopOrders
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -56,9 +59,9 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
     public function init()
     {
-        $this->on(self::EVENT_AFTER_FIND, function() {
-            $this->selling_extra_charge = (float) $this->selling_extra_charge;
-            $this->purchase_extra_charge = (float) $this->purchase_extra_charge;
+        $this->on(self::EVENT_AFTER_FIND, function () {
+            $this->selling_extra_charge = (float)$this->selling_extra_charge;
+            $this->purchase_extra_charge = (float)$this->purchase_extra_charge;
         });
         return parent::init();
     }
@@ -279,5 +282,26 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public static function find()
     {
         return new ShopStoreQuery(get_called_class());
+    }
+
+
+     /**
+     * Gets query for [[ShopCasheboxes]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCasheboxes()
+    {
+        return $this->hasMany(ShopCashebox::className(), ['shop_store_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopOrders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrders()
+    {
+        return $this->hasMany(ShopOrder::className(), ['shop_store_id' => 'id']);
     }
 }

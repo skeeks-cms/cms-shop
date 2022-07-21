@@ -111,7 +111,7 @@ HTML
                             'label' => '',
                             'format' => 'raw',
                             'headerOptions' => [
-                                'style' => 'width: 120px;',
+                                'style' => 'width: 320px;',
                             ],
                             'value' => function(ShopStore $shopStore) {
                                 return Html::a('Панель <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/store-product', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
@@ -119,6 +119,13 @@ HTML
                                     'data-pjax' => 0,
                                     'target' => '_blank',
                                     'title' => 'Открыть интерфейс управления в новой вкладке',
+                                    'data-toggle' => 'tooltip'
+                                ]) . Html::a('Интерфейс кассира <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/cashier', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
+                                    'class' => 'btn btn-secondary',
+                                    'data-pjax' => 0,
+                                    'target' => '_blank',
+                                    'style' => 'margin-left: 20px; ',
+                                    'title' => 'Открыть интерфейс кассира',
                                     'data-toggle' => 'tooltip'
                                 ]);
                             }

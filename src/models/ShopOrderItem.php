@@ -87,7 +87,11 @@ class ShopOrderItem extends ActiveRecord
     {
         parent::init();
 
-        //$this->on(self::EVENT_BEFORE_INSERT,    [$this, "beforeSaveEvent"]);
+        $this->on(self::EVENT_AFTER_FIND,    function () {
+            $this->quantity = (float) $this->quantity;
+            $this->discount_amount = (float) $this->discount_amount;
+            $this->amount = (float) $this->amount;
+        });
 
         $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveCallback"]);
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveCallback"]);
@@ -262,7 +266,7 @@ class ShopOrderItem extends ActiveRecord
         
 
 
-        $productPrice = $product->minProductPrice;
+        $productPrice = $product->minProductPrice ? $product->minProductPrice : $product->baseProductPrice;
         $productPriceMoney = $productPrice->money->convertToCurrency(\Yii::$app->money->currencyCode);
 
         $this->measure_name = $product->measure->symbol;
@@ -424,4 +428,32 @@ class ShopOrderItem extends ActiveRecord
     {
         return $this->getShopOrderItemProperties();
     }
+
+    /**
+     * @return array
+     */
+    public function extraFields()
+    {
+        return [
+            'itemMoney',
+            'totalMoney',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getItemMoney()
+    {
+        return $this->money->jsonSerialize();
+    }
+
+    /**
+     * @return array
+     */
+    public function getTotalMoney()
+    {
+        return $this->money->mul($this->quantity)->jsonSerialize();
+    }
+
 }

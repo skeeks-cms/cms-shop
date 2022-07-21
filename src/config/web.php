@@ -6,7 +6,7 @@
  * @date 27.08.2015
  */
 return [
-    'bootstrap' => ['storeBackend'],
+    'bootstrap' => ['storeBackend', 'cacheboxBackend'],
 
     'components' => [
         'admin' => [
@@ -63,6 +63,10 @@ return [
                     ],
                 ],
             ],
+        ],
+        'cacheboxBackend' => [
+            'id'    => 'cacheboxBackend',
+            'class' => \skeeks\cms\shop\cashier\CashierBackendComponent::class
         ],
     ],
 

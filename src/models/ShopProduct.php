@@ -838,7 +838,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         } else {
             $basPriceTypes = $shopUser->buyTypePrices;
         }
-        
+
         return $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
         ])

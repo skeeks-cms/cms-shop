@@ -308,15 +308,33 @@ return \yii\helpers\ArrayHelper::merge([
 
 
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Склады/Магазины'),
-                            "url"   => ["shop/admin-shop-store"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-                        ],
-                        [
                             "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
                             "url"   => ["shop/admin-shop-store-supplier"],
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
                         ],
+
+                        [
+                            "label" => \Yii::t('skeeks/shop/app', 'Склады/Магазины'),
+                            "url"   => ["shop/admin-shop-store"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+                        ],
+
+                        [
+                            "label" => \Yii::t('skeeks/shop/app', 'Облачные кассы'),
+                            "url"   => ["shop/admin-shop-cloudkassa"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+                        ],
+                        [
+                            "label" => \Yii::t('skeeks/shop/app', 'Кассы'),
+                            "url"   => ["shop/admin-shop-cashebox"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+                        ],
+                        [
+                            "label" => \Yii::t('skeeks/shop/app', 'Смены'),
+                            "url"   => ["shop/admin-shop-cashebox-shift"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+                        ],
+
 
                         [
                             "label" => \Yii::t('skeeks/shop/app', 'Способы оплаты'),

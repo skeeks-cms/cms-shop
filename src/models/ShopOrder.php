@@ -143,6 +143,16 @@ class ShopOrder extends \skeeks\cms\models\Core
      * @var bool
      */
     public $isNotifyChangeStatus = true;
+    /**
+     * Уведомить по email об оплате?
+     * @var bool
+     */
+    public $isNotifyEmailPayed = true;
+
+    /**
+     * @var bool
+     */
+    public $isNotifyEmailCreated = true;
 
     /**
      * Сообщение привязанное к смене статуса
@@ -182,7 +192,11 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        //$this->on(self::EVENT_AFTER_UPDATE,    [$this, "afterUpdateCallback"]);
+        $this->on(self::EVENT_AFTER_FIND,    function() {
+            $this->amount = (float) $this->amount;
+            $this->discount_amount = (float) $this->discount_amount;
+            $this->delivery_amount = (float) $this->delivery_amount;
+        });
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "_afterUpdateCallback"]);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeUpdateCallback"]);
 
@@ -200,33 +214,36 @@ class ShopOrder extends \skeeks\cms\models\Core
                 'shop_order_id' => $this->id,
             ]))->save();
 
-            try {
-                //Notify admins
-                if ($emails = $this->cmsSite->shopSite->notifyEmails) {
+            if ($this->isNotifyEmailCreated) {
+                try {
+                    //Notify admins
+                    if ($emails = $this->cmsSite->shopSite->notifyEmails) {
 
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-                    \Yii::$app->mailer->compose('create-order', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
-                        ->setTo($emails)
-                        ->setSubject(\Yii::t('skeeks/shop/app', 'New order').' №'.$this->id)
-                        ->send();
+                        \Yii::$app->mailer->compose('create-order', [
+                            'order' => $this,
+                        ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
+                            ->setTo($emails)
+                            ->setSubject(\Yii::t('skeeks/shop/app', 'New order').' №'.$this->id)
+                            ->send();
+                    }
+                } catch (\Exception $e) {
+                    \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
                 }
-            } catch (\Exception $e) {
-                \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
+
+                try {
+                    //Письмо тому кто заказывает
+                    if ($this->email) {
+                        $this->email = trim($this->email);
+                        $this->notifyNew();
+                    }
+                } catch (\Exception $e) {
+                    \Yii::error("Email client seinding error '{$this->email}': ".$e->getMessage(), self::class);
+                }
             }
 
-            try {
-                //Письмо тому кто заказывает
-                if ($this->email) {
-                    $this->email = trim($this->email);
-                    $this->notifyNew();
-                }
-            } catch (\Exception $e) {
-                \Yii::error("Email client seinding error '{$this->email}': ".$e->getMessage(), self::class);
-            }
 
         }
 
@@ -249,7 +266,9 @@ class ShopOrder extends \skeeks\cms\models\Core
                 if (!$this->save()) {
                     \Yii::error('Статус заказа после оплаты не обновлен: '.$e->getMessage(), self::class);
                 }
-            } else {
+            }
+
+            if ($this->isNotifyEmailPayed) {
                 //Уведомить клиента об оплате
                 if ($this->email) {
                     try {
@@ -286,6 +305,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                     }
                 }
             }
+
         }
     }
 
@@ -558,7 +578,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_last_name'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
                     return !$this->cms_user_id && in_array('last_name', $requiredFields);
                 },
             ],
@@ -566,7 +586,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_first_name'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
                     return !$this->cms_user_id && in_array('first_name', $requiredFields);
                 },
             ],
@@ -574,7 +594,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_email'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
                     return !$this->cms_user_id && in_array('email', $requiredFields);
                 },
             ],
@@ -582,11 +602,11 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_phone'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array) $this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
                     return !$this->cms_user_id && in_array('phone', $requiredFields);
                 },
             ],
-            
+
             [['contact_phone'], 'string'],
             [['contact_phone'], "filter", 'filter' => 'trim'],
             [
@@ -1200,6 +1220,19 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
         ]);
 
+        $orderItems = [];
+        foreach ($this->shopOrderItems as $orderItem) {
+            $orderItems[] = $orderItem->toArray([], ['itemMoney', 'totalMoney']);
+        }
+
+        $result['items'] = $orderItems;
+
+        $userData = [];
+        if ($this->cmsUser) {
+            $userData = $this->cmsUser->toArray([], (new CmsUser())->extraFields());
+        }
+        $result['cmsUser'] = $userData;
+
         if ($this->shopDelivery && $this->shopDelivery->freeOrderPriceFrom) {
 
             $m = new \skeeks\cms\money\Money((string)$this->shopDelivery->freeOrderPriceFrom, $this->currency_code);
@@ -1214,7 +1247,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             ];
 
         } else {
-            if (\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price && (float) $this->shopDelivery->money->amount > 0) {
+            if (\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price && (float)$this->shopDelivery->money->amount > 0) {
 
                 $m = new \skeeks\cms\money\Money((string)\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price, $this->currency_code);
                 $needMoney = $m->sub($this->moneyItems);
@@ -1241,24 +1274,23 @@ class ShopOrder extends \skeeks\cms\models\Core
         $deliveries = \skeeks\cms\shop\models\ShopDelivery::find()->cmsSite()->active()->sort()->all();
         $deliveriesData = [];
         if ($deliveries) {
-            foreach ($deliveries as $deliveriy)
-            {
+            foreach ($deliveries as $deliveriy) {
 
                 $money = $deliveriy->getMoneyForOrder($this);
                 $baseMoney = $deliveriy->money;
 
                 $deliveriesData[] = [
-                    'is_allow' => true, //todo:сделать проверки доступна или нет
-                    'id' => $deliveriy->id, //todo:сделать проверки доступна или нет
-                    'name' => $deliveriy->name, //todo:сделать проверки доступна или нет
+                    'is_allow'      => true, //todo:сделать проверки доступна или нет
+                    'id'            => $deliveriy->id, //todo:сделать проверки доступна или нет
+                    'name'          => $deliveriy->name, //todo:сделать проверки доступна или нет
                     'sx_need_price' => [
                         'amount'           => (float)$money->amount,
                         'convertAndFormat' => \Yii::$app->money->convertAndFormat($money),
                     ],
-                    'price' => [
+                    'price'         => [
                         'amount'           => (float)$baseMoney->amount,
                         'convertAndFormat' => \Yii::$app->money->convertAndFormat($baseMoney),
-                    ]
+                    ],
                 ];
             }
         }
@@ -1266,13 +1298,12 @@ class ShopOrder extends \skeeks\cms\models\Core
         $paysystems = ShopPaySystem::find()->cmsSite()->active()->sort()->all();
         $paysystemsData = [];
         if ($deliveries) {
-            foreach ($paysystems as $paysystem)
-            {
+            foreach ($paysystems as $paysystem) {
                 $paysystemsData[] = [
-                    'id' => $paysystem->id, //todo:сделать проверки доступна или нет
+                    'id'   => $paysystem->id, //todo:сделать проверки доступна или нет
                     'name' => $paysystem->name, //todo:сделать проверки доступна или нет
 
-                    'is_allow' => $paysystem->isAllowForOrder($this), //todo:сделать проверки доступна или нет
+                    'is_allow'         => $paysystem->isAllowForOrder($this), //todo:сделать проверки доступна или нет
                     'is_allow_message' => $paysystem->getNotAllowMessage($this), //todo:сделать проверки доступна или нет
                 ];
             }
@@ -1283,8 +1314,6 @@ class ShopOrder extends \skeeks\cms\models\Core
         $result['paysystems'] = $paysystemsData;
 
 
-
-
         return $result;
     }
     /**
@@ -1293,7 +1322,7 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function extraFields()
     {
         return [
-            'shopOrderItems',
+            'shopOrderItems', //это устаревшее
             'quantity',
             'countShopOrderItems',
             'countShopBaskets',

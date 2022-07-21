@@ -61,6 +61,11 @@ class ShopComponent extends Component implements BootstrapInterface
     /**
      * @var array
      */
+    public $cloudkassaHandlers = [];
+
+    /**
+     * @var array
+     */
     public $deliveryHandlers = [];
 
     /**
@@ -1072,6 +1077,27 @@ SQL
 
         if ($this->deliveryHandlers) {
             foreach ($this->deliveryHandlers as $id => $handlerClass) {
+
+                if (is_array($handlerClass)) {
+                    $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
+                }
+
+                $result[$id] = (new $handlerClass())->descriptor->name;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCloudkassaHandlersForSelect()
+    {
+        $result = [];
+
+        if ($this->cloudkassaHandlers) {
+            foreach ($this->cloudkassaHandlers as $id => $handlerClass) {
 
                 if (is_array($handlerClass)) {
                     $handlerClass = ArrayHelper::getValue($handlerClass, 'class');
