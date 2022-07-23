@@ -17,33 +17,37 @@ use skeeks\cms\shop\models\queries\ShopStoreQuery;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property string             $name
- * @property string             $description
- * @property int                $cms_image_id
- * @property bool               $is_active
- * @property string|null        $external_id
- * @property integer|null       $cms_site_id
- * @property string|null        $address Полный адрес
- * @property float|null         $latitude Широта
- * @property float|null         $longitude Долгота
- * @property string|null        $work_time Рабочее время
- * @property int                $priority
- * @property bool               $is_supplier
- * @property string             $source_selling_price
- * @property string             $source_purchase_price
- * @property float              $purchase_extra_charge
- * @property float              $selling_extra_charge
+ * @property string              $name
+ * @property string              $description
+ * @property int                 $cms_image_id
+ * @property bool                $is_active
+ * @property string|null         $external_id
+ * @property integer|null        $cms_site_id
+ * @property string|null         $address Полный адрес
+ * @property float|null          $latitude Широта
+ * @property float|null          $longitude Долгота
+ * @property string|null         $work_time Рабочее время
+ * @property int                 $priority
+ * @property bool                $is_supplier
+ * @property string              $source_selling_price
+ * @property string              $source_purchase_price
+ * @property float               $purchase_extra_charge
+ * @property float               $selling_extra_charge
  *
- * @property string             $coordinates
+ * @property float               $cashier_is_allow_sell_out_of_stock Разрешить продажу товаров не в наличии?
+ * @property float               $cashier_is_show_out_of_stock Показывать товары не в наличии?
+ * @property integer             $cashier_default_cms_user_id Клиент по умолчанию
  *
- * @property CmsStorageFile     $cmsImage
- * @property CmsSite            $cmsSite
- * @property ShopStoreProduct[] $shopStoreProducts
- * @property ShopProduct[]      $shopProducts
+ * @property string              $coordinates
+ *
+ * @property CmsStorageFile      $cmsImage
+ * @property CmsSite             $cmsSite
+ * @property ShopStoreProduct[]  $shopStoreProducts
+ * @property ShopProduct[]       $shopProducts
  * @property ShopStoreProperty[] $shopStoreProperties
  *
- * @property ShopCashebox[]     $shopCasheboxes
- * @property ShopOrder[]        $shopOrders
+ * @property ShopCashebox[]      $shopCasheboxes
+ * @property ShopOrder[]         $shopOrders
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -93,6 +97,9 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['priority'], 'integer'],
 
+            [['cashier_is_allow_sell_out_of_stock'], 'integer'],
+            [['cashier_is_show_out_of_stock'], 'integer'],
+
             [['name'], 'string', 'max' => 255],
             [['name'], 'required'],
 
@@ -108,6 +115,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['external_id'], 'string'],
 
 
+            [['cashier_default_cms_user_id'], 'integer'],
             [['cms_site_id'], 'integer'],
             [['is_supplier'], 'integer'],
             [['is_supplier'], 'default', 'value' => 0],
@@ -181,22 +189,34 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
 
-            'name'                  => "Название",
-            'description'           => "Описание",
-            'cms_image_id'          => "Изображение",
-            'is_active'             => "Активность",
-            'external_id'           => "ID из внешней системы",
-            'priority'              => "Сортировка",
-            'work_time'             => 'Время работы',
-            'latitude'              => 'Широта',
-            'longitude'             => 'Долгота',
-            'address'               => 'Адрес',
-            'coordinates'           => '',
-            'is_supplier'           => 'Поставщик?',
-            'source_selling_price'  => 'Цена поставщика',
-            'source_purchase_price' => 'Цена поставщика',
-            'purchase_extra_charge' => 'Наценка',
-            'selling_extra_charge'  => 'Наценка',
+            'name'                               => "Название",
+            'description'                        => "Описание",
+            'cms_image_id'                       => "Изображение",
+            'is_active'                          => "Активность",
+            'external_id'                        => "ID из внешней системы",
+            'priority'                           => "Сортировка",
+            'work_time'                          => 'Время работы',
+            'latitude'                           => 'Широта',
+            'longitude'                          => 'Долгота',
+            'address'                            => 'Адрес',
+            'coordinates'                        => '',
+            'is_supplier'                        => 'Поставщик?',
+            'source_selling_price'               => 'Цена поставщика',
+            'source_purchase_price'              => 'Цена поставщика',
+            'purchase_extra_charge'              => 'Наценка',
+            'selling_extra_charge'               => 'Наценка',
+            'cashier_is_allow_sell_out_of_stock' => 'Разрешить продажу товаров не в наличии?',
+            'cashier_is_show_out_of_stock'       => 'Показывать товары не в наличии?',
+            'cashier_default_cms_user_id'        => 'Клиент выбранный по умолчанию',
+        ]);
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeHints(), [
+            'cashier_default_cms_user_id'                               => "Обязательно укажите этому клиенту email!",
         ]);
     }
 
@@ -285,7 +305,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     }
 
 
-     /**
+    /**
      * Gets query for [[ShopCasheboxes]].
      *
      * @return \yii\db\ActiveQuery

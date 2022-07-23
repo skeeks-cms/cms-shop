@@ -72,10 +72,13 @@ use yii\validators\EmailValidator;
  * @property string|null                $receiver_last_name
  * @property integer|null               $receiver_cms_user_id
  * @property integer|null               $cms_user_address_id
+ * @property string                     $order_type
  *
  * @property string                     $comment
  *
  * ***
+ *
+ * @property string                     $orderTypeAsText
  *
  * @property ShopPaySystem              $shopPaySystem
  * @property ShopPersonType             $shopPersonType
@@ -137,6 +140,8 @@ class ShopOrder extends \skeeks\cms\models\Core
 
     protected $_email = null;
 
+    const TYPE_SALE = "sale";
+    const TYPE_RETURN = "return";
 
     /**
      * Уведомить по email о смене статуса?
@@ -170,6 +175,22 @@ class ShopOrder extends \skeeks\cms\models\Core
     }
 
 
+    public function orderTypes()
+    {
+        return [
+            static::TYPE_SALE   => 'Продажа',
+            static::TYPE_RETURN => 'Возврат',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderTypeAsText()
+    {
+        return (string)ArrayHelper::getValue(static::orderTypes(), $this->order_type);
+    }
+
     public function notifyNew()
     {
         if ($this->email) {
@@ -192,10 +213,10 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        $this->on(self::EVENT_AFTER_FIND,    function() {
-            $this->amount = (float) $this->amount;
-            $this->discount_amount = (float) $this->discount_amount;
-            $this->delivery_amount = (float) $this->delivery_amount;
+        $this->on(self::EVENT_AFTER_FIND, function () {
+            $this->amount = (float)$this->amount;
+            $this->discount_amount = (float)$this->discount_amount;
+            $this->delivery_amount = (float)$this->delivery_amount;
         });
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "_afterUpdateCallback"]);
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeUpdateCallback"]);
@@ -489,6 +510,8 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['cms_site_id'], 'integer'],
 
             [['currency_code'], 'string', 'max' => 3],
+            [['order_type'], 'string', 'max' => 50],
+            [['order_type'], 'in',  'range' => array_keys(static::orderTypes())],
             [['shop_delivery_id'], 'integer'],
 
             [['status_at'], 'default', 'value' => \Yii::$app->formatter->asTimestamp(time())],

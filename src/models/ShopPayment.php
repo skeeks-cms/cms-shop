@@ -58,7 +58,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
 {
 
     const STORE_PAYMENT_TYPE_CASH = 'cash';
-    const STORE_PAYMENT_TYPE_BANK_CARD = 'bank_card';
+    const STORE_PAYMENT_TYPE_CARD = 'card';
 
     /**
      * {@inheritdoc}

@@ -14,10 +14,12 @@ use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\store\StoreUrlRule;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\GridView;
 use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
 use skeeks\cms\ya\map\widgets\YaMapInput;
@@ -102,36 +104,36 @@ HTML
 
                         'countProducts',
                         'countReadyProducts',
-                        
+
                         'panel',
                     ],
                     'columns'        => [
-                        
+
                         'panel' => [
-                            'label' => '',
-                            'format' => 'raw',
+                            'label'         => '',
+                            'format'        => 'raw',
                             'headerOptions' => [
                                 'style' => 'width: 320px;',
                             ],
-                            'value' => function(ShopStore $shopStore) {
+                            'value'         => function (ShopStore $shopStore) {
                                 return Html::a('Панель <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/store-product', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
-                                    'class' => 'btn btn-secondary',
-                                    'data-pjax' => 0,
-                                    'target' => '_blank',
-                                    'title' => 'Открыть интерфейс управления в новой вкладке',
-                                    'data-toggle' => 'tooltip'
-                                ]) . Html::a('Интерфейс кассира <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/cashier', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
-                                    'class' => 'btn btn-secondary',
-                                    'data-pjax' => 0,
-                                    'target' => '_blank',
-                                    'style' => 'margin-left: 20px; ',
-                                    'title' => 'Открыть интерфейс кассира',
-                                    'data-toggle' => 'tooltip'
-                                ]);
-                            }
+                                        'class'       => 'btn btn-secondary',
+                                        'data-pjax'   => 0,
+                                        'target'      => '_blank',
+                                        'title'       => 'Открыть интерфейс управления в новой вкладке',
+                                        'data-toggle' => 'tooltip',
+                                    ]).Html::a('Интерфейс кассира <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/cashier', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
+                                        'class'       => 'btn btn-secondary',
+                                        'data-pjax'   => 0,
+                                        'target'      => '_blank',
+                                        'style'       => 'margin-left: 20px; ',
+                                        'title'       => 'Открыть интерфейс кассира',
+                                        'data-toggle' => 'tooltip',
+                                    ]);
+                            },
                         ],
 
-                        
+
                         'priority'  => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
@@ -269,11 +271,10 @@ HTML
                     ArrayHelper::removeValue($visibleColumns, 'shop_store_id');
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
-                 },
+                },
             ],
         ]);
     }
-
 
 
     public function updateFields($action)
@@ -404,12 +405,12 @@ CSS
                 ],
                 'fields'         => [
                     'address' => [
-                        'class' => WidgetField::class,
-                        'widgetClass' => YaMapDecodeInput::class,
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => YaMapDecodeInput::class,
                         'widgetConfig' => [
-                            'modelLatitudeAttr' => 'latitude',
+                            'modelLatitudeAttr'  => 'latitude',
                             'modelLongitudeAttr' => 'longitude',
-                        ]
+                        ],
                     ],
 
                     [
@@ -430,113 +431,41 @@ CSS
                     ],
                 ],
             ],
+            'cashier'     => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Работа на кассе'),
+                'elementOptions' => [
+                    'isOpen' => false,
+                ],
+                'fields'         => [
+                    'cashier_is_allow_sell_out_of_stock' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'cashier_is_show_out_of_stock'       => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'cashier_default_cms_user_id'       => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => CmsUser::class,
+                            'searchQuery' => function($word = '') {
+                                $query = CmsUser::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+                    ],
+                ],
+            ],
 
 
         ];
     }
 
-    public function updateFields1($action)
-    {
-        $action->model->load(\Yii::$app->request->get());
-        $action->model->is_supplier = 0;
-        \Yii::$app->view->registerCss(<<<CSS
-.field-shopstore-is_supplier {
-    display: none;
-}
-CSS
-        );
-
-        return [
-            'cms_image_id' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => AjaxFileUploadWidget::class,
-                'widgetConfig' => [
-                    'accept'   => 'image/*',
-                    'multiple' => false,
-                ],
-            ],
-            'is_active'    => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
-            ],
-            'is_supplier'  => [
-                'class'     => BoolField::class,
-                'allowNull' => false,
-            ],
-            'name',
-
-            'description' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => CKEditorWidget::class,
-                'widgetConfig' => [
-                    'preset'        => false,
-                    'clientOptions' => [
-                        'enterMode'      => 2,
-                        'height'         => 300,
-                        'allowedContent' => true,
-                        'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
-                        'toolbar'        => [
-                            ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
-                        ],
-                    ],
-
-                ],
-            ],
-
-            'external_id',
-            'priority'    => [
-                'class' => NumberField::class,
-            ],
-
-
-            'coordinates' => [
-                'class'        => WidgetField::class,
-                'widgetClass'  => YaMapInput::class,
-                'widgetConfig' => [
-                    'YaMapWidgetOptions' => [
-                        'options' => [
-                            'style' => 'height: 400px;',
-                        ],
-                    ],
-
-                    'clientOptions' => [
-                        'select' => new \yii\web\JsExpression(<<<JS
-        function(e, data)
-        {
-            var lat = data.coords[0];
-            var long = data.coords[1];
-            var address = data.address;
-            var phone = data.phone;
-            var email = data.email;
-
-            $('#shopstore-address').val(address);
-            $('#shopstore-latitude').val(lat);
-            $('#shopstore-longitude').val(long);
-        }
-JS
-                        ),
-                    ],
-                ],
-            ],
-
-            [
-                'class'   => HtmlBlock::class,
-                'content' => '<div style="display: block;">',
-            ],
-            'address',
-            'latitude',
-            'longitude',
-
-            [
-                'class'   => HtmlBlock::class,
-                'content' => '</div>',
-            ],
-
-            'work_time' => [
-                'class'       => WidgetField::class,
-                'widgetClass' => \skeeks\yii2\scheduleInputWidget\ScheduleInputWidget::class,
-            ],
-        ];
-    }
 
 }

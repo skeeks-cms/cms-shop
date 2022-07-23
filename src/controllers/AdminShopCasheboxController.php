@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
@@ -17,6 +18,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopCachebox;
 use skeeks\cms\shop\models\ShopCashebox;
+use skeeks\cms\shop\models\ShopCloudkassa;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\store\StoreUrlRule;
@@ -120,6 +122,7 @@ HTML
                 ],
             ],
 
+
             "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
@@ -168,6 +171,22 @@ HTML
                         'class'     => NumberField::class,
                     ],
 
+
+                    'shop_cloudkassa_id' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => ShopCloudkassa::class,
+                            'searchQuery' => function($word = '') {
+                                $query = ShopCloudkassa::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+
+                    ],
 
                 ],
             ],

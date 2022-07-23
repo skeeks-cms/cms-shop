@@ -20,6 +20,7 @@
                 self.renderProductLabels();
                 self.renderOrderResults();
                 self.renderUserSelected();
+                self.renderOrderType();
             });
         },
 
@@ -135,25 +136,50 @@
                 return false;
             });
 
+            //Закрытие стандартного модального окна
+            $("body").on("click", ".sx-close-standart-modal", function () {
+                $(this).closest(".modal").modal("hide");
+                return true;
+            });
+
             //Открыть заказ
             $("body").on("click", ".sx-create-order", function () {
+                $(".sx-create-order-errors-block").hide().empty();
+
                 var jBlocker = sx.block("#sx-final-modal");
                 jBlocker.block();
 
                 var data = {
                     'comment': $("#sx-order-comment").val(),
                     'payment_type': $("#sx-payment-type .active").data("type"),
+                    'is_print': $("#sx-is-print .active").data("value"),
                 }
 
                 var ajaxQuery = self.createAjaxOrderCreate(data);
-                var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
-                Handler.on("error", function() {
-                    jBlocker.unblock();
+                var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                    'allowResponseErrorMessage' : false,
+                    'allowResponseSuccessMessage' : false,
                 });
-                Handler.on("success", function() {
+
+                Handler.on("error", function(e,data) {
                     jBlocker.unblock();
-                    $("#sx-order-comment").empty();
-                    $(".sx-close-modal").click();
+                    $(".sx-create-order-errors-block").empty().append(data.message).show();
+                });
+                Handler.on("success", function(e, data) {
+                    //Если включена фискализация то нужно проверять чек
+                    //Ожидание чека
+                    if (data.data.check.status == 'wait') {
+                        jBlocker.unblock();
+                        $("#sx-final-modal").removeClass("open");
+                        $("#sx-check-wait-modal").addClass("open");
+                        self.setCheck(data.data.check);
+                        self.runCheckStatusUpdate();
+                    } else {
+                        jBlocker.unblock();
+                        $("#sx-order-comment").empty();
+                        $("#sx-final-modal").removeClass("open");
+                        $("#sx-create-order-success-modal").addClass("open");
+                    }
                 });
 
                 ajaxQuery.execute();
@@ -180,7 +206,29 @@
             //Закрыть смену
             $("body").on('click', '.sx-close-shift-btn', function (e) {
                 $(".sx-menu-content").removeClass("sx-opened").addClass("sx-closed");
-                $("#sx-shift-close").modal("show");
+
+
+                return false;
+            });
+
+            //Сделать возврат
+            $("body").on('click', '#sx-repeat-btn', function (e) {
+                $(".sx-menu-content").removeClass("sx-opened").addClass("sx-closed");
+
+                var data = {};
+                if (self.getOrder().order_type == $(this).data("return-val")) {
+                    data = {
+                        'order_type': $(this).data("sale-val")
+                    }
+                } else {
+                    data = {
+                        'order_type': $(this).data("return-val")
+                    }
+                }
+                var ajaxQuery = self.createAjaxUpdateOrderData(data);
+
+                ajaxQuery.execute();
+
                 return false;
             });
 
@@ -279,9 +327,39 @@
             this.renderOrderItems();
             this.renderProductLabels();
             this.renderOrderResults();
+            this.renderOrderType();
 
         },
 
+
+        /**
+         * Прорисовка элементов необходимого типа товара
+         * @returns {sx.classes.CashierApp}
+         */
+        renderOrderType: function () {
+            var self = this;
+            var order_type = self.getOrder().order_type;
+            var text = $("#sx-repeat-btn").data(order_type);
+            $("#sx-repeat-btn span").empty().append(text);
+
+            $('.sx-order-type-text').each(function () {
+                var text = $(this).data(order_type);
+                $(this).empty().append(text);
+            });
+
+            if (order_type == 'return') {
+                $(".sx-checkout-btn-wrapper").addClass("sx-order-type-return");
+                $(".sx-create-order").addClass("yellow").removeClass("primary");
+            } else {
+                $(".sx-checkout-btn-wrapper").removeClass("sx-order-type-return");
+                $(".sx-create-order").removeClass("yellow").addClass("primary");
+            }
+            /*
+            $('.sx-checkout-btn-wrapper').each(function () {
+                var text = $(this).data(order_type);
+                $(this).empty().append(text);
+            });*/
+        },
         /**
          * Перерисовка кнопок поискового блока
          * @returns {sx.classes.CashierApp}
@@ -377,6 +455,62 @@
         },
 
         /**
+         * Циклично проверяет на сервере статус чека
+         * @returns {sx.classes.CashierApp}
+         */
+        runCheckStatusUpdate: function() {
+            var self = this;
+
+            var ajaxQuery = self.createAjaxCheckStatus();
+            var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                'allowResponseErrorMessage' : false,
+                'allowResponseSuccessMessage' : false,
+            });
+
+            var i = 0;
+            self.checkStatusInterval = setInterval(function() {
+                ajaxQuery.execute();
+            }, 3000);
+
+
+            Handler.on("error", function(e, data) {
+                clearInterval(self.checkStatusInterval);
+
+                $("#sx-check-wait-modal").removeClass("open");
+                $("#sx-check-error-status").addClass("open");
+                if (data.message) {
+                    $("#sx-check-error-status .error-summary").empty().append(data.message);
+                }
+
+            });
+
+            Handler.on("success", function(e, data) {
+//                data.response
+                if (self.getCheck().status == 'approved') {
+
+                    $("#sx-check-wait-modal").removeClass("open");
+                    $("#sx-create-order-success-modal").addClass("open");
+
+                    $("#sx-create-order-success-modal .sx-check-content").empty().append(data.data.check_html);
+
+                    clearInterval(self.checkStatusInterval);
+                } else if (self.getCheck().status == 'error') {
+                    clearInterval(self.checkStatusInterval);
+
+                    $("#sx-check-wait-modal").removeClass("open");
+                    $("#sx-check-error-status").addClass("open");
+                    if (data.message) {
+                        $("#sx-check-error-status .error-summary").empty().append(self.getCheck().error_message);
+                    }
+                }
+            });
+
+            ajaxQuery.execute();
+
+            return this;
+        },
+
+        /**
          * @returns {sx.classes.CashierApp}
          */
         blockProducts: function () {
@@ -436,6 +570,8 @@
             $(".sx-user-search").val("");
             if (this.getOrder().cms_user_id) {
                 $(".sx-user").empty().append(this.getOrder().cmsUser.shortDisplayName).removeClass("sx-user-not-selected");
+            } else {
+                $(".sx-user").empty().append("Выбрать покупателя").addClass("sx-user-not-selected");
             }
             return this;
         },
@@ -484,9 +620,9 @@
 
             } else {
                 $(".calculation").hide();
-                var jEmptyItems = $(".sx-no-order-items").clone();
+                var jEmptyItems = $(".sx-no-order-items-tmpl").clone();
+                jEmptyItems.removeClass("sx-no-order-items-tmpl").addClass("sx-no-order-items");
                 $(".sx-order-items-wrapper").empty().append(jEmptyItems);
-
             }
 
         },
@@ -576,8 +712,24 @@
             return this;
         },
 
+        /**
+         * @param order
+         * @returns {sx.classes.CashierApp}
+         */
+        setCheck: function (check) {
+            this.set("check", check);
+            this.trigger("checkUpdate");
+            //Это чтобы закрыть лишние окна
+            $("body").click();
+            return this;
+        },
+
         getOrder: function () {
             return this.get("order");
+        },
+
+        getCheck: function () {
+            return this.get("check");
         },
 
 
@@ -725,6 +877,28 @@
 
             return ajax;
         },
+
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxUpdateOrderData: function (data) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-update-order-data'));
+
+            ajax.setData(data);
+
+
+            ajax.onSuccess(function (e, data) {
+                self.setOrder(data.response.data.order);
+
+                self.trigger('updateOrderData', data);
+            });
+
+            return ajax;
+        },
         /**
          * Updating the positions of the basket, such as changing the number of
          *
@@ -741,6 +915,28 @@
                 self.setOrder(data.response.data.order);
 
                 self.trigger('orderCreate');
+            });
+
+            return ajax;
+        },
+
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxCheckStatus: function (data) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-check-status'));
+
+            ajax.setData({
+                'check_id' : self.getCheck().id
+            });
+
+            ajax.onSuccess(function (e, data) {
+                console.log(data);
+                self.setCheck(data.response.data.check);
             });
 
             return ajax;

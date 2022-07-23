@@ -330,6 +330,11 @@ return \yii\helpers\ArrayHelper::merge([
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
                         ],
                         [
+                            "label" => \Yii::t('skeeks/shop/app', 'Чеки'),
+                            "url"   => ["shop/admin-shop-check"],
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+                        ],
+                        [
                             "label" => \Yii::t('skeeks/shop/app', 'Смены'),
                             "url"   => ["shop/admin-shop-cashebox-shift"],
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],

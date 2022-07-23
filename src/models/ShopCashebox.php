@@ -18,11 +18,13 @@ use yii\helpers\ArrayHelper;
  * @property int                 $cms_site_id
  * @property string              $name
  * @property int|null            $shop_store_id
- * @property int            $is_active
+ * @property int                 $is_active
+ * @property int|null            $shop_cloudkassa_id
  *
  * @property CmsSite             $cmsSite
  * @property ShopCasheboxShift[] $shopCasheboxShifts
  * @property ShopStore           $shopStore
+ * @property ShopCloudkassa      $shopCloudkassa
  */
 class ShopCashebox extends \skeeks\cms\base\ActiveRecord
 {
@@ -43,6 +45,7 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::rules(), [
 
             [['is_active'], 'integer'],
+            [['shop_cloudkassa_id'], 'integer'],
             [['name'], 'required'],
             [['cms_site_id', 'shop_store_id'], 'integer'],
             [['is_active'], 'integer'],
@@ -52,6 +55,7 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
             [['name'], 'string', 'max' => 255],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
             [['shop_store_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopStore::className(), 'targetAttribute' => ['shop_store_id' => 'id']],
+            [['shop_cloudkassa_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopCloudkassa::class, 'targetAttribute' => ['shop_store_id' => 'id']],
 
             [
                 'cms_site_id',
@@ -71,12 +75,22 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id'            => 'ID',
-            'cms_site_id'   => 'Сайт',
-            'name'          => 'Название',
-            'shop_store_id' => 'Магазин',
-            'is_active'     => 'Активность',
-            'priority'     => 'Сортировка',
+            'id'                 => 'ID',
+            'cms_site_id'        => 'Сайт',
+            'name'               => 'Название',
+            'shop_store_id'      => 'Магазин',
+            'is_active'          => 'Активность',
+            'shop_cloudkassa_id' => 'Облачная касса',
+            'priority'           => 'Сортировка',
+        ]);
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeHints()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'shop_cloudkassa_id' => 'Если выбрана облачная касса, то фискализация будет происходить через нее.',
         ]);
     }
 
@@ -110,5 +124,15 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
     public function getShopStore()
     {
         return $this->hasOne(ShopStore::className(), ['id' => 'shop_store_id']);
+    }
+
+    /**
+     * Gets query for [[ShopStore]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCloudkassa()
+    {
+        return $this->hasOne(ShopCloudkassa::className(), ['id' => 'shop_cloudkassa_id']);
     }
 }

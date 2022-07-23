@@ -62,14 +62,16 @@ protected $_handler = null;
         if ($this->component) {
             try {
 
-                $componentConfig = ArrayHelper::getValue(\Yii::$app->shop->cloudCashboxHandlers, $this->component);
+                $componentConfig = ArrayHelper::getValue(\Yii::$app->shop->cloudkassaHandlers, $this->component);
 
                 $component = \Yii::createObject($componentConfig);
+
                 $component->load($this->component_config, "");
 
                 $this->_handler = $component;
                 return $this->_handler;
             } catch (\Exception $e) {
+                throw $e;
                 \Yii::error("Related property handler not found '{$this->component}'", self::class);
                 return null;
             }
@@ -85,7 +87,7 @@ protected $_handler = null;
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_site_id', 'priority', 'is_main'], 'integer'],
+            [['created_at', 'updated_at', 'cms_site_id', 'priority', 'is_main'], 'integer'],
             [['name', 'component'], 'required'],
             [['name', 'component'], 'string', 'max' => 255],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],

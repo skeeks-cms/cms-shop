@@ -11,15 +11,16 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopCasheboxShift;
+use skeeks\cms\shop\models\ShopCheck;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrderItem;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPayment;
-use skeeks\cms\shop\models\ShopPaySystem;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Exception;
 
@@ -85,6 +86,7 @@ class CashierController extends BackendController
                     //Обновить сессию если заказ уже создан или
                     $order = new ShopOrder();
                     $order->is_created = false;
+                    $order->cms_user_id = \Yii::$app->shop->backendShopStore->cashier_default_cms_user_id;
                     $order->shop_store_id = \Yii::$app->shop->backendShopStore->id;
                     $order->validate();
                     if (!$order->save(false)) {
@@ -98,6 +100,7 @@ class CashierController extends BackendController
             } else {
                 $order = new ShopOrder();
                 $order->is_created = false;
+                $order->cms_user_id = \Yii::$app->shop->backendShopStore->cashier_default_cms_user_id;
                 $order->shop_store_id = \Yii::$app->shop->backendShopStore->id;
                 $order->validate();
                 if (!$order->save(false)) {
@@ -601,6 +604,94 @@ class CashierController extends BackendController
         }
     }
 
+
+    /**
+     * @return array|\yii\web\Response
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionUpdateOrderData()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            $orderData = \Yii::$app->request->post();
+
+            /**
+             * @var $shopBasket ShopBasket
+             */
+
+            $this->order->load($orderData, "");
+            $this->order->save(true, array_keys($orderData));
+            $this->order->refresh();
+
+            $rr->data = [
+                'order' => $this->order->jsonSerialize(),
+            ];
+            $rr->success = true;
+            $rr->message = "";
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+    /**
+     * @return array|\yii\web\Response
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionCheckStatus()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            $t = \Yii::$app->db->beginTransaction();
+            try {
+                $check_id = (int)\Yii::$app->request->post('check_id');
+                if (!$check_id) {
+                    throw new Exception("Не корректный аргумент check_id");
+                }
+
+                /**
+                 * @var $shopCheck ShopCheck
+                 */
+                $shopCheck = ShopCheck::find()->cmsSite()->andWhere(['id' => $check_id])->one();
+                if (!$shopCheck) {
+                    \Yii::error(__METHOD__ . "Чек не найден в базе сайта!", static::class);
+                    throw new Exception("Чек не найден в базе сайта!");
+                }
+
+                if ($shopCheck->shopCashebox && $shopCheck->shopCashebox->shopCloudkassa) {
+                    //Обновить статус продажи
+                    $shopCheck->shopCashebox->shopCloudkassa->handler->updateStatus($shopCheck);
+                }
+
+                $checkHtml = '';
+                if ($shopCheck->isApproved) {
+                    $checkHtml = $this->renderPartial('_check', [
+                        'model' => $shopCheck,
+                    ]);
+                }
+
+                $rr->data = [
+                    'check' => $shopCheck->toArray(),
+                    'check_html' => $checkHtml,
+                ];
+                $rr->success = true;
+                $rr->message = "";
+
+            } catch (\Exception $exception) {
+                throw $exception;
+                $rr->success = false;
+                $rr->message = "Ошибка: ".$exception->getMessage();
+            }
+        }
+
+        return $rr;
+
+    }
     /**
      * @return array|\yii\web\Response
      * @throws \Throwable
@@ -610,11 +701,13 @@ class CashierController extends BackendController
     {
         $rr = new RequestResponse();
 
+
         if ($rr->isRequestAjaxPost()) {
             $t = \Yii::$app->db->beginTransaction();
             try {
                 $comment = (string)\Yii::$app->request->post('comment');
-                $payment_type = (string)\Yii::$app->request->post('payment_type');
+                $payment_type = (string)trim(\Yii::$app->request->post('payment_type'));
+                $is_print = (int)trim(\Yii::$app->request->post('is_print'));
 
                 $order = $this->order;
 
@@ -626,7 +719,7 @@ class CashierController extends BackendController
                 $order->isNotifyEmailPayed = false;
                 $order->paid_at = time();
                 if (!$order->save()) {
-                    throw new Exception("Не сохранился заказ: " . print_r($order->errors, true));
+                    throw new Exception("Не сохранился заказ: ".print_r($order->errors, true));
                 }
 
                 $order->refresh();
@@ -634,7 +727,73 @@ class CashierController extends BackendController
                 $lastStatus = ShopOrderStatus::find()->orderBy(['priority' => SORT_DESC])->limit(1)->one();
                 $order->shop_order_status_id = $lastStatus->id;
                 if (!$order->save()) {
-                    throw new Exception("Не сохранился заказ: " . print_r($order->errors, true));
+                    throw new Exception("Не сохранился заказ: ".print_r($order->errors, true));
+                }
+
+
+                //Формирование чека
+
+                $check = new ShopCheck();
+                $check->shop_store_id = $order->shop_store_id;
+                $check->shop_cashebox_id = $this->shift->shop_cashebox_id;
+                $check->shop_cashebox_shift_id = $this->shift->id;
+                $check->shop_order_id = $order->id;
+                $check->cms_user_id = $order->cms_user_id;
+                $check->is_print = $is_print;
+                $check->cashier_cms_user_id = \Yii::$app->user->id;
+
+                if ($order->order_type == ShopOrder::TYPE_SALE) {
+                    $check->doc_type = ShopOrder::TYPE_SALE;
+                } else {
+                    $check->doc_type = ShopOrder::TYPE_RETURN;
+                }
+                /**
+                 * Телефон или электронный адрес почты покупателя
+                    Допустимы символы для адреса электронной почты.
+                    Номер телефона в формате +7<10 цифр>
+                    или 8<10 цифр>
+
+                 */
+                if ($order->contact_email) {
+                    $check->email = $order->contact_email;
+                } elseif($order->contact_phone) {
+                    $phone = trim($order->contact_phone);
+                    $phone = str_replace(" ", "", $phone);
+                    $phone = str_replace("-", "", $phone);
+
+                    $check->email = $phone;
+                }
+
+
+                $check->cashier_name = \Yii::$app->user->identity->shortDisplayName;
+                //$check->cashier_position = "Кассир"; //Взятьи из настроек кассы
+                $check->cashier_cms_user_id = \Yii::$app->user->id;
+                $check->amount = $order->amount;
+
+
+                $items = [];
+                //Это формирование по правилам modulkassa
+                foreach ($order->shopOrderItems as $item) {
+                    $itemData = [
+                        'name'     => $item->name,
+                        'price'    => round($item->amount, 2),
+                        'quantity' => (float)$item->quantity,
+                        'measure'  => $item->measure_code == 796 ? "pcs" : "other",
+                        'vatTag'   => 1105,
+                    ];
+
+                    $items[] = $itemData;
+                }
+                $check->inventPositions = $items;
+                $check->moneyPositions = [
+                    [
+                        'paymentType' => StringHelper::strtoupper($payment_type),
+                        'sum'         => round($order->amount, 2),
+                    ],
+                ];
+
+                if (!$check->save()) {
+                    throw new Exception("Не сохранился чек: ".print_r($check->errors, true));
                 }
 
                 $payment = new ShopPayment();
@@ -648,23 +807,32 @@ class CashierController extends BackendController
                 $payment->comment = "Продажа №{$order->id} от в магазине {$shopName}";
 
                 if (!$payment->save()) {
-                    throw new Exception("Не сохранился платеж: " . print_r($payment->errors, true));
+                    throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
                 }
+
+                //Работа с облачной кассой, нужно сделать чек
+                if ($shopCloudkassa = $this->shift->shopCashebox->shopCloudkassa) {
+                    $shopCloudkassa->handler->createFiscalCheck($check);
+                }
+
 
                 $newOrder = new ShopOrder();
                 $newOrder->is_created = false;
+                $newOrder->cms_user_id = \Yii::$app->shop->backendShopStore->cashier_default_cms_user_id;
                 $newOrder->shop_store_id = \Yii::$app->shop->backendShopStore->id;
                 $newOrder->validate();
                 if (!$newOrder->save(false)) {
                     throw new Exception(print_r($newOrder->errors, true));
                 }
+
                 \Yii::$app->getSession()->set($this->orderSessionName, $newOrder->id);
 
                 $rr->data = [
                     'order' => $newOrder->jsonSerialize(),
+                    'check' => $check->toArray(),
                 ];
                 $rr->success = true;
-                $rr->message = "Продажа прошла успешно";
+                $rr->message = "";
 
                 $t->commit();
 

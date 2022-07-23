@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
@@ -19,6 +20,7 @@ use skeeks\cms\models\CmsSiteSocial;
 use skeeks\cms\models\CmsSmsProvider;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\cloudkassa\CloudkassaHandler;
 use skeeks\cms\shop\models\ShopCloudkassa;
 use skeeks\yii2\form\Builder;
 use skeeks\yii2\form\fields\BoolField;
@@ -56,6 +58,11 @@ class AdminShopCloudkassaController extends BackendModelStandartController
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
+
+            "view" => [
+                'class' => BackendModelAction::class,
+                'name' => 'Просмотр'
+            ],
 
             'index'  => [
                 'on beforeRender' => function (Event $e) {
@@ -171,10 +178,11 @@ HTML
     {
         $handlerFields = [];
         /**
-         * @var $handler DeliveryHandlerComponent
+         * @var $handler CloudkassaHandler
          */
         if ($action->model && $action->model->handler) {
             $handler = $action->model->handler;
+            
             $handlerFields = $handler->getConfigFormFields();
             $handlerFields = Builder::setModelToFields($handlerFields, $handler);
 
@@ -209,7 +217,7 @@ CSS
 
                     'component' => [
                         'class'   => SelectField::class,
-                        'items'   => \Yii::$app->shop->getCloudCashboxHandlersForSelect(),
+                        'items'   => \Yii::$app->shop->getCloudkassaHandlersForSelect(),
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
                         ],

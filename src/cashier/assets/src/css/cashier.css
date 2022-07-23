@@ -442,12 +442,20 @@ button:focus, button:active {
 .sx-menu-item:hover {
     background-color: rgba(242,242,247,1.0);
 }
+.sx-menu-item.sx-red {
+    color: rgba(255,59,48,1.0);
+}
+
+.sx-menu-item > .icon {
+    margin-right: 10px;
+}
+
 .sx-menu-item {
     padding: 15px 35px;
     font-size: 18px;
     display: block;
     white-space: nowrap;
-    color: rgba(255,59,48,1.0);
+
     line-height: 1;
     cursor: pointer;
     border-radius: 4px;
@@ -1184,6 +1192,13 @@ body i.icon {
     pointer-events: none;
 }
 
+.sx-order-type-return .sx-checkout-menu-trigger {
+    background: #FFD300;
+}
+.sx-order-type-return .sx-checkout-btn > div {
+    background: #FFD300;
+}
+
 .sx-checkout-menu-trigger {
     width: 60px;
     display: -webkit-box;
@@ -1594,4 +1609,20 @@ body i.icon {
     padding: 10px;
     width: 100%;
     border-color: rgba(0,0,0,0.1);
+}
+
+#sx-check-wait-modal .sx-content {
+    font-size: 20px;
+}
+
+.sx-pre-order .buttons {
+    margin-bottom: 15px;
+}
+
+
+.ui.yellow.button, .ui.yellow.buttons .button {
+    background-color: #fbbd08;
+    color: #fff;
+    text-shadow: none;
+    background-image: none;
 }

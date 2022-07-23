@@ -22,7 +22,10 @@ $jsData = \yii\helpers\Json::encode([
     'backend-clear-order-items' => \yii\helpers\Url::to(['clear-order-items']),
     'backend-update-order-item' => \yii\helpers\Url::to(['update-order-item']),
     'backend-update-order-user' => \yii\helpers\Url::to(['update-order-user']),
-    'backend-order-create' => \yii\helpers\Url::to(['order-create']),
+    'backend-update-order-data' => \yii\helpers\Url::to(['update-order-data']),
+    'backend-order-create'      => \yii\helpers\Url::to(['order-create']),
+
+    'backend-check-status'      => \yii\helpers\Url::to(['check-status']),
 
     'order' => $controller->order->jsonSerialize(),
 ]);
@@ -79,7 +82,15 @@ JS
 
 
                             <?php if ($controller->shift) : ?>
-                                <div color="systemRed" class="sx-menu-item sx-close-shift-btn"><i class="fa icon fa-times fa-fw"></i>Закрыть смену</div>
+                                <div class="sx-menu-item sx-close-shift-btn sx-red"><i class="fa icon fa-times fa-fw"></i>Закрыть смену</div>
+                                <div class="sx-menu-item"
+                                     id="sx-repeat-btn"
+                                     data-sale="Создать возврат" data-return="Вернуться к продаже"
+                                     data-return-val="<?php echo \skeeks\cms\shop\models\ShopOrder::TYPE_RETURN; ?>"
+                                     data-sale-val="<?php echo \skeeks\cms\shop\models\ShopOrder::TYPE_SALE; ?>"
+                                >
+                                    <i class="fas icon fa-redo fa-fw"></i><span>Создать возврат</span>
+                                </div>
                             <?php endif; ?>
 
 
@@ -182,18 +193,23 @@ JS
                         <div color="#0EA432" class="sx-checkout-menu-trigger">
                             <i class="fas icon fa-ellipsis-v fa-fw" style="color: white; font-size: 23px;"></i>
                         </div>
+
                         <div class="sx-checkout-menu sx-closed">
                             <!--<div class="sc-dxgOiQ hEwctr"><i class="fa icon fa-history fa-fw"></i>Отложить чек</div>-->
                             <div color="systemRed" class="item sx-clear-order-items"><i class="fa icon fa-times fa-fw" style="margin-right: 5px;"></i>Отменить чек</div>
                         </div>
+
                         <a tabindex="999" id="create-sale" color="#0EA432" class="sx-checkout-btn">
                             <div>
                                 <div class="pull-left">
-                                    <div>Продажа</div>
+                                    <div class="sx-create-sale-text sx-order-type-text" data-sale="Продажа" data-return="Возврат">
+                                        Продажа
+                                    </div>
                                 </div>
                                 <div class="pull-right"><b class="sx-money" data-value="<?= (float)$controller->order->money->amount; ?>"><?php echo $controller->order->money; ?></b></div>
                             </div>
                         </a>
+
                     </div>
                 </div>
 
@@ -293,7 +309,7 @@ JS
 
 <div style="display: none;">
 
-    <div class="sx-no-order-items">
+    <div class="sx-no-order-items-tmpl">
         <div>
             <div>Выберите товары</div>
             <img src="<?php echo \skeeks\cms\shop\cashier\assets\CashierAsset::getAssetUrl("img/arrow.svg"); ?>" alt=""></div>
@@ -329,6 +345,54 @@ JS
 
 </div>
 
+
+<div class="portal">
+    <div id="sx-create-order-success-modal" class="sx-modal-overlay">
+        <div class="sx-modal fullscreen custom-modal">
+            <button class="ui huge basic button sx-close-modal">Закрыть</button>
+            <div class="content">
+                <div class="sx-inner-content">
+                    <div>
+                        <h1>Продажа прошла успешно!</h1>
+                        <div class="sx-check-content">
+                            Тут данные по чеку!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="portal">
+    <div id="sx-check-wait-modal" class="sx-modal-overlay">
+        <div class="sx-modal fullscreen custom-modal">
+            <div class="content">
+                <div class="sx-inner-content">
+                    <div>
+                        <h1>Идет получение чека....</h1>
+                        <div class="sx-content">Ожидайте в данный момент идет обращение к кассе для получения чека.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="portal">
+    <div id="sx-check-error-status" class="sx-modal-overlay">
+        <div class="sx-modal fullscreen custom-modal">
+            <button class="ui huge basic button sx-close-modal">Закрыть</button>
+            <div class="content">
+                <div class="sx-inner-content">
+                    <div>
+                        <h1>Ошибка получения чека....</h1>
+                        <div class="error-summary">Обратите к разработчикам.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="portal">
     <div id="sx-final-modal" class="sx-modal-overlay">
         <div class="sx-modal fullscreen custom-modal">
@@ -355,21 +419,39 @@ JS
                             <textarea placeholder="Комментарий к продаже" class="sx-order-comment" id="sx-order-comment" style="height: 8em;"></textarea></div>
                     </div>
                     <div>
-                        <div><h1>Принять оплату</h1>
-                            <div class="ui huge basic fluid buttons" id="sx-payment-type" style="margin-bottom: 30px; margin-top: 12px;">
+                        <div class="sx-pre-order">
+                            <h1 class="sx-order-type-text" data-return="Вернуть деньги" data-sale="Принять оплату">Принять оплату</h1>
+                            <div class="ui huge basic fluid buttons" id="sx-payment-type" style="margin-top: 12px;">
                                 <button class="ui active button" data-type="<?php echo \skeeks\cms\shop\models\ShopPayment::STORE_PAYMENT_TYPE_CASH; ?>">Наличными</button>
-                                <button class="ui button" data-type="<?php echo \skeeks\cms\shop\models\ShopPayment::STORE_PAYMENT_TYPE_BANK_CARD; ?>">Банковской картой</button>
+                                <button class="ui button" data-type="<?php echo \skeeks\cms\shop\models\ShopPayment::STORE_PAYMENT_TYPE_CARD; ?>">Банковской картой</button>
                             </div>
+
+                            <?php if($controller->shift->shopCashebox->shopCloudkassa) : ?>
+                                <div class="ui huge basic fluid buttons" id="sx-is-print">
+                                    <button class="ui active button" data-value="1">Печатать чек</button>
+                                    <button class="ui button" data-value="0">Нет</button>
+                                </div>
+                            <?php else : ?>
+                                <div style="display: none;">
+                                    <div class="ui huge basic fluid buttons" id="sx-is-print">
+                                        <button class="ui button active" data-value="0">Нет</button>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+
                             <!--<div class="sc-dfVpRl bMKUXX">
                                 <input id="sum-input" type="number" placeholder="0.00 ₽" class="sc-gzOgki cSSjPU" value="0">
                                 <span>Сумма</span>
                             </div>-->
-                            <div>
+                            <div style="margin-top: 15px;">
                                 <div class="ui huge fluid primary button sx-create-order sx-btn-hover" role="button" tabindex="0">
-                                    Принять
+                                    <span class="sx-order-type-text" data-return="Вернуть" data-sale="Принять">Принять</span>
                                     <span class="sx-money" data-value="<?= (float)$controller->order->money->amount; ?>"><?= $controller->order->money; ?></span>
                                 </div>
                             </div>
+
+                            <div class="sx-create-order-errors-block error-summary sx-hidden"></div>
                         </div>
                     </div>
                 </div>
@@ -396,5 +478,41 @@ JS
 
 
     <?php \yii\bootstrap\Modal::end(); ?>
+
+
+    <?php /*\yii\bootstrap\Modal::begin([
+        'id'           => 'sx-create-order-success',
+        'header'       => 'Успешная продажа',
+        'toggleButton' => false,
+    ]); */?><!--
+
+
+    <p>Продажа прошла успешно!</p>
+    <div class="d-flex">
+        <div class="d-flex">
+            <button class="ui large primary button sx-close-standart-modal">Закрыть</button>
+        </div>
+    </div>
+    <?php /*\yii\bootstrap\Modal::end(); */?>
+
+
+    <?php /*\yii\bootstrap\Modal::begin([
+        'id'           => 'sx-wait-check',
+        'header'       => 'Ожидание чека',
+        'toggleButton' => false,
+        'closeButton'  => false,
+    ]); */?>
+
+
+    <div class="sx-check-wait">
+        <div class="">Идет обращение к кассе.</div>
+        <div class="">Не закрывайте это окно.</div>
+        <div class=""></div>
+    </div>
+
+    --><?php /*\yii\bootstrap\Modal::end(); */?>
+
+
 <?php endif; ?>
+
 
