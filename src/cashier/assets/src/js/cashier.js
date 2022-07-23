@@ -206,7 +206,7 @@
             //Закрыть смену
             $("body").on('click', '.sx-close-shift-btn', function (e) {
                 $(".sx-menu-content").removeClass("sx-opened").addClass("sx-closed");
-
+                $("#sx-shift-close").modal("show");
 
                 return false;
             });

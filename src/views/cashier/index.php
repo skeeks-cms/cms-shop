@@ -426,7 +426,7 @@ JS
                                 <button class="ui button" data-type="<?php echo \skeeks\cms\shop\models\ShopPayment::STORE_PAYMENT_TYPE_CARD; ?>">Банковской картой</button>
                             </div>
 
-                            <?php if($controller->shift->shopCashebox->shopCloudkassa) : ?>
+                            <?php if($controller->shift && $controller->shift->shopCashebox->shopCloudkassa) : ?>
                                 <div class="ui huge basic fluid buttons" id="sx-is-print">
                                     <button class="ui active button" data-value="1">Печатать чек</button>
                                     <button class="ui button" data-value="0">Нет</button>
