@@ -780,6 +780,8 @@ class CashierController extends BackendController
                         'quantity' => (float)$item->quantity,
                         'measure'  => $item->measure_code == 796 ? "pcs" : "other",
                         'vatTag'   => 1105,
+                        'paymentObject'   => "commodity",
+                        'paymentMethod'   => "full_payment",
                     ];
 
                     $items[] = $itemData;
@@ -804,7 +806,14 @@ class CashierController extends BackendController
                 $payment->amount = $order->amount;
                 $payment->currency_code = $order->currency_code;
                 $shopName = \Yii::$app->shop->backendShopStore->name;
-                $payment->comment = "Продажа №{$order->id} от в магазине {$shopName}";
+                $payment->comment = $order->asText() . " в магазине {$shopName}";
+
+                if ($order->order_type == ShopOrder::TYPE_SALE) {
+                    $payment->is_debit = 1;
+                } else {
+                    $payment->is_debit = 0;
+                }
+
 
                 if (!$payment->save()) {
                     throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));

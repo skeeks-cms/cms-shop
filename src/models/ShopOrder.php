@@ -190,6 +190,12 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return (string)ArrayHelper::getValue(static::orderTypes(), $this->order_type);
     }
+    
+
+    public function asText()
+    {
+        return $this->orderTypeAsText . " #{$this->id}";
+    }
 
     public function notifyNew()
     {

@@ -8,7 +8,10 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use Cassandra\DefaultColumn;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\rbac\CmsManager;
@@ -43,6 +46,11 @@ class AdminShopCheckController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
+            "view" => [
+                'class' => BackendModelAction::class,
+                'name' => 'Просмотр'
+            ],
+
             'index' => [
                 'on beforeRender' => function (Event $e) {
                     $e->content = Alert::widget([
@@ -78,13 +86,14 @@ HTML
                         'checkbox',
                         'actions',
 
-                        //'id',
-                        'shop_store_id',
+                        'id',
                         'shop_cashebox_id',
                         'shop_cashebox_shift_id',
                         'shop_order_id',
                         'doc_type',
                         'amount',
+
+                        'cms_user_id',
 
                         'status',
                         'created_at',
@@ -93,6 +102,13 @@ HTML
 
                         'created_at'             => [
                             'class' => DateTimeColumnData::class,
+                        ],
+                        'id'             => [
+                            'value' => function(ShopCheck $model) {
+                                return \yii\helpers\Html::a("Чек #{$model->id}", "#", [
+                                    'class' => "sx-trigger-action",
+                                ]);
+                            }
                         ],
                         'shop_cashebox_id'       => [
                             'format' => 'raw',
@@ -104,6 +120,9 @@ HTML
                                     $result[] = $shopCheck->shopCashebox->name;
                                     if ($shopCheck->shopCashebox->shopCloudkassa) {
                                         $result[] = "<span style='color:gray;'>Работает через: ".$shopCheck->shopCashebox->shopCloudkassa->name."</span>";
+                                    }
+                                    if ($shopCheck->shopCashebox->shopStore) {
+                                        $result[] = "<span style='color:gray;'>".$shopCheck->shopCashebox->shopStore->name."</span>";
                                     }
                                 }
 
@@ -131,7 +150,7 @@ HTML
                             'value'  => function (ShopCheck $shopCheck) {
                                 $result = [];
 
-                                $result[] = "Продажа #".$shopCheck->shop_order_id;
+                                $result[] = $shopCheck->shopOrder->asText;
 
                                 return implode("<br>", $result);
                             },
