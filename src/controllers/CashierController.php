@@ -23,6 +23,7 @@ use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Exception;
+use yii\data\Pagination;
 
 /**
  * @property ShopCasheboxShift $shift текущая смена;
@@ -163,28 +164,62 @@ class CashierController extends BackendController
             \Yii::$app->shop->backendShopStore;
             \Yii::$app->skeeks->site;
             $q = \Yii::$app->request->post("q");
+            $page = \Yii::$app->request->post("page", 0);
 
             $query = ShopCmsContentElement::find()
                 ->from(['cce' => ShopCmsContentElement::tableName()])
-                ->innerJoinWith("shopProduct")
-                ->limit(40);
+                ->innerJoinWith("shopProduct as shopProduct")
+                ->groupBy(["cce.id"]);
 
             if ($q) {
+                $q = trim($q);
+                $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
                 $query->andWhere([
                     'or',
                     ['like', 'cce.name', $q],
                     ['=', 'cce.id', $q],
+                    ['=', 'barcodes.value', $q],
                 ]);
             }
 
-            if ($query->count()) {
+            $countQuery = clone $query;
+            $totalCount = $countQuery->count();
+
+
+            if ($totalCount) {
+
+                $pagination = new Pagination(['totalCount' => $totalCount, 'defaultPageSize' => 40]);
+                $pagination->setPage($page);
+                $models = $query->offset($pagination->offset)->limit($pagination->limit);
+
+
                 $content = '';
                 foreach ($query->each(10) as $element) {
                     $content .= $this->renderPartial('_product', [
                         'model' => $element,
                     ]);
                 }
+                $hasNextPage = (bool) ($pagination->page < ($pagination->pageCount-1));
+                $nexPage = $pagination->page;
+                if ($hasNextPage) {
+                    $nexPage = $pagination->page + 1;
+                }
+
+
+                if ($hasNextPage) {
+                    $content .= "<div class='sx-more'><button class='ui button btn-lg btn-block sx-btn-next-page' data-next-page='{$nexPage}' data-load-text='Ожидайте! Идет загрузка...'>Показать еще</button></div>";
+                }
+
                 $data['content'] = $content;
+                $data['pagination'] = [
+                    'offset'      => $pagination->offset,
+                    'totalCount'  => (int)$pagination->totalCount,
+                    'page'        => $pagination->page,
+                    'pageSize'    => $pagination->pageSize,
+                    'pageCount'   => $pagination->pageCount,
+                    'hasNextPage' => $hasNextPage,
+                    'nextPage' => $nexPage,
+                ];
             } else {
                 $content = "<div class='sx-not-found-products'><h1>Товар не найден</h1></div>";
                 $data['content'] = $content;
@@ -659,7 +694,7 @@ class CashierController extends BackendController
                  */
                 $shopCheck = ShopCheck::find()->cmsSite()->andWhere(['id' => $check_id])->one();
                 if (!$shopCheck) {
-                    \Yii::error(__METHOD__ . "Чек не найден в базе сайта!", static::class);
+                    \Yii::error(__METHOD__."Чек не найден в базе сайта!", static::class);
                     throw new Exception("Чек не найден в базе сайта!");
                 }
 
@@ -676,7 +711,7 @@ class CashierController extends BackendController
                 }
 
                 $rr->data = [
-                    'check' => $shopCheck->toArray(),
+                    'check'      => $shopCheck->toArray(),
                     'check_html' => $checkHtml,
                 ];
                 $rr->success = true;
@@ -749,14 +784,13 @@ class CashierController extends BackendController
                 }
                 /**
                  * Телефон или электронный адрес почты покупателя
-                    Допустимы символы для адреса электронной почты.
-                    Номер телефона в формате +7<10 цифр>
-                    или 8<10 цифр>
-
+                 * Допустимы символы для адреса электронной почты.
+                 * Номер телефона в формате +7<10 цифр>
+                 * или 8<10 цифр>
                  */
                 if ($order->contact_email) {
                     $check->email = $order->contact_email;
-                } elseif($order->contact_phone) {
+                } elseif ($order->contact_phone) {
                     $phone = trim($order->contact_phone);
                     $phone = str_replace(" ", "", $phone);
                     $phone = str_replace("-", "", $phone);
@@ -775,13 +809,13 @@ class CashierController extends BackendController
                 //Это формирование по правилам modulkassa
                 foreach ($order->shopOrderItems as $item) {
                     $itemData = [
-                        'name'     => $item->name,
-                        'price'    => round($item->amount, 2),
-                        'quantity' => (float)$item->quantity,
-                        'measure'  => $item->measure_code == 796 ? "pcs" : "other",
-                        'vatTag'   => 1105,
-                        'paymentObject'   => "commodity",
-                        'paymentMethod'   => "full_payment",
+                        'name'          => $item->name,
+                        'price'         => round($item->amount, 2),
+                        'quantity'      => (float)$item->quantity,
+                        'measure'       => $item->measure_code == 796 ? "pcs" : "other",
+                        'vatTag'        => 1105,
+                        'paymentObject' => "commodity",
+                        'paymentMethod' => "full_payment",
                     ];
 
                     $items[] = $itemData;
@@ -806,7 +840,7 @@ class CashierController extends BackendController
                 $payment->amount = $order->amount;
                 $payment->currency_code = $order->currency_code;
                 $shopName = \Yii::$app->shop->backendShopStore->name;
-                $payment->comment = $order->asText() . " в магазине {$shopName}";
+                $payment->comment = $order->asText()." в магазине {$shopName}";
 
                 if ($order->order_type == ShopOrder::TYPE_SALE) {
                     $payment->is_debit = 1;

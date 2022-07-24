@@ -11,7 +11,10 @@ namespace skeeks\cms\shop\console\controllers;
 use skeeks\cms\base\DynamicModel;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\CmsUserAddress;
+use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopOrder;
+use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\validators\PhoneValidator;
 use yii\base\Exception;
 use yii\console\Controller;
@@ -264,6 +267,77 @@ class UtilsController extends Controller
 
     }
 
+    /**
+     * Обновляет штрихкоды у инфокарточек
+     */
+    public function actionModelUpdateBarcodes()
+    {
+        $q = ShopCmsContentElement::find()
+            ->cmsSite()
+            ->joinWith("shopProduct as shopProduct", true, "INNER JOIN")
+            ->joinWith("cmsSite as cmsSite")
+        ;
+            //->andWhere(['cmsSite.is_default' => 1]);
+
+        $this->stdout("Инфокарточек: " . $q->count() . "\n");
+
+
+
+        /**
+         * @var $productElement ShopCmsContentElement
+         * @var $supplierElement ShopStoreProduct
+         */
+        foreach ($q->each(10) as $productElement)
+        {
+            $this->stdout("Товар: " . $productElement->id . "\n");
+
+            $productBarcodes = [];
+
+            if ($supplierElements = $productElement->shopProduct->getShopStoreProducts()->all()) {
+
+                foreach ($supplierElements as $supplierElement)
+                {
+                    $tmpBarcodes = [];
+
+                    $shopStoreProperty = $supplierElement->shopStore
+                        ->getShopStoreProperties()
+                        ->andWhere(['property_nature' => ShopStoreProperty::PROPERTY_NATURE_BARCODE])
+                        ->one();
+
+                    /**
+                     * @var $shopStoreProperty ShopStoreProperty
+                     */
+                    if ($shopStoreProperty) {
+                        $barcodeString = ArrayHelper::getValue($supplierElement->external_data, $shopStoreProperty->external_code);
+                        $barcodeString = trim($barcodeString);
+                        if ($shopStoreProperty->import_delimetr) {
+                            $tmpBarcodes = explode($shopStoreProperty->import_delimetr, $barcodeString);
+                        } else {
+                            $tmpBarcodes[] = $barcodeString;
+                        }
+
+                    }
+
+                    if ($tmpBarcodes) {
+                        $productBarcodes = ArrayHelper::merge($productBarcodes, $tmpBarcodes);
+                    }
+                }
+            }
+
+            if ($productBarcodes) {
+                $productBarcodes = array_unique($productBarcodes);
+                $sp = $productElement->shopProduct;
+                $sp->setBarcodes($productBarcodes);
+                if ($sp->save()) {
+                    $barcodeStrings = print_r($productBarcodes, true);
+                    $this->stdout("Штрихкоды обновлены {$barcodeStrings}\n", Console::FG_GREEN);
+                } else {
+                    $this->stdout("Штрихкоды НЕ обновлены: " . print_r($sp->errors, true) . "\n", Console::FG_RED);
+                }
+
+            }
+        }
+    }
 
     
 }

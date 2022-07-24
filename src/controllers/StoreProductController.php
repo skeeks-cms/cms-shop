@@ -504,6 +504,9 @@ HTML;
         ]);
     }
 
+    /**
+     * @return RequestResponse
+     */
     public function actionSaveMain()
     {
         $rr = new RequestResponse();
@@ -511,6 +514,7 @@ HTML;
             $model = $this->model;
 
             $model->load(\Yii::$app->request->post());
+
             if (!$model->save()) {
                 $rr->success = false;
                 $rr->message = print_r($model->errors, true);

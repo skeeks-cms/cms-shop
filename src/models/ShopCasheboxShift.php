@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\shop\models\queries\ShopCasheboxShiftQuery;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -38,6 +39,7 @@ class ShopCasheboxShift extends \skeeks\cms\base\ActiveRecord
     public function init()
     {
         $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeUpdate"]);
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, "_beforeInsert"]);
 
         return parent::init();
     }
@@ -46,6 +48,14 @@ class ShopCasheboxShift extends \skeeks\cms\base\ActiveRecord
     {
         if ($this->isAttributeChanged("closed_at")) {
             $this->closed_by = \Yii::$app->user->id;
+        }
+    }
+
+    public function _beforeInsert($e)
+    {
+        //Если смена уже открыта этим пользователем
+        if (static::find()->cachebox($this->shopCashebox->id)->notClosed()->exists()) {
+            throw new Exception("Смена на кассе уже открыта! Возможно в ней работает другой кассир!");
         }
     }
 

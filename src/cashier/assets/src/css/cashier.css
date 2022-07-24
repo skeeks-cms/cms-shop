@@ -18,6 +18,17 @@ a:hover {
     text-decoration: none;
 }
 
+
+.btn:visited,
+.btn:active,
+.btn:focus {
+    outline: none;
+    box-shadow: none;
+    border: 1px;
+}
+
+
+
 button, h1, h2, h3, h4, h5 {
     font-family: Fira Sans Extra Condensed,sans-serif;
     font-weight: 400;
@@ -584,6 +595,16 @@ button:focus, button:active {
         flex-basis: 33.333%;
         max-width: 33.333%;
     }
+}
+
+.catalogList .sx-more {
+    display: flex;
+    /* flex-basis: 20%; */
+    /* max-width: 20%; */
+    padding: 3px;
+    position: relative;
+    transition: 0.3s;
+    width: 100%;
 }
 
 .main-tabs, .main-tabs-item {

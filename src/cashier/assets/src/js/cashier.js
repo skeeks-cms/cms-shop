@@ -36,7 +36,7 @@
             self.getJSearch().on("keyup", function () {
                 //Не нужно сразу применять нужно чуть подождать
                 self.lastKeyTime = new Date().getTime();
-                self.blockProducts();
+
                 self.updateSearchButtons();
                 setTimeout(function () {
                     var newTime = new Date().getTime();
@@ -324,6 +324,22 @@
                 return false;
             });
 
+            //Подгрузка следующих данных
+            $("body").on('click', ".catalogList .sx-btn-next-page", function() {
+                if ($(this).hasClass("sx-loaded")) {
+                    return false;
+                }
+                var text = $(this).data("load-text");
+                var nextPage = $(this).data("next-page");
+                $(this).empty().append(text);
+                $(this).closest(".sx-more").addClass("sx-loaded");
+                self.loadProducts(nextPage);
+            });
+            /*$("body").on('scroll', ".sx-block-products", function() {
+                console.log($(".catalogList .catalog-card:last").offset());
+                console.log($(window).height());
+            });*/
+
             this.renderOrderItems();
             this.renderProductLabels();
             this.renderOrderResults();
@@ -434,6 +450,7 @@
                     $(".label", addLabel).empty().text(value.quantity);
                 }
             });
+            //$(".catalog-card-not-ready").removeClass("catalog-card-not-ready");
 
             return this;
         },
@@ -630,13 +647,18 @@
         /**
          * @returns {sx.classes.CashierApp}
          */
-        loadProducts: function () {
+        loadProducts: function (page = 0) {
             var self = this;
 
-            self.getJProducts().empty();
+            if (page == 0) {
+                self.blockProducts();
+                self.getJProducts().empty();
+            }
+
 
             var ajaxQuery = sx.ajax.preparePostQuery(this.get("backend_products"), {
                 'q': self.getJSearch().val(),
+                'page': page,
             });
 
             var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
@@ -648,8 +670,17 @@
             });
 
             handler.on("success", function (e, response) {
-                self.getJProducts().empty().append(response.data.content);
+                self.getJProducts().append(response.data.content);
                 self.renderProductLabels();
+
+                $(".catalogList .sx-more.sx-loaded").hide().remove();
+                
+                /*$(".sx-block-products").on("scroll", function() {
+                    var delta = $(window).height() - $(".catalogList .catalog-card:last").offset().top;
+                    if (delta > -200) {
+                        console.log("Грузить еще");
+                    }
+                });*/
             });
 
             ajaxQuery.execute();
