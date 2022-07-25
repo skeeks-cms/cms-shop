@@ -1435,9 +1435,12 @@ body i.icon {
     opacity: 1;
     pointer-events: auto;
 }
+.sx-modal-overlay.sx-modal-overlay-fullscreen {
+    background-color: rgba(255,255,255,1.0);
+}
 .sx-modal-overlay {
     position: fixed;
-    background-color: rgba(255,255,255,1.0);
+    background-color: rgba(0,0,0,0.4);;
     top: 0;
     left: 0;
     right: 0;
@@ -1461,6 +1464,13 @@ body i.icon {
     pointer-events: none;
 }
 
+.sx-modal-overlay .tiny{
+    width: 500px;
+}
+
+#sx-order-item-edit .sx-modal {
+    min-height: 300px;
+}
 .sx-modal-overlay.open > .sx-modal {
     -webkit-transform: scale(1);
     -ms-transform: scale(1);

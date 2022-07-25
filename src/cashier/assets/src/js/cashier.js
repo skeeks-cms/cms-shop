@@ -335,6 +335,20 @@
                 $(this).closest(".sx-more").addClass("sx-loaded");
                 self.loadProducts(nextPage);
             });
+
+            //Редактирование одной позиции корзины
+            $("body").on('click', ".sx-order-items-wrapper tr .sx-name, .sx-order-items-wrapper tr .sx-discount, .sx-order-items-wrapper tr .sx-total, .sx-order-items-wrapper tr .sx-price", function() {
+                var jTr = $(this).closest("tr");
+                var order_item_id = jTr.data("order_item_id");
+                $("#sx-order-item-edit").addClass("open");
+
+                var ajaxQuery = self.createAjaxGetOrderItem(order_item_id);
+                var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
+                Handler.on("success", function(e, response) {
+                    $("#sx-order-item-edit .sx-modal").empty().append(response.data.content);
+                });
+                ajaxQuery.execute();
+            });
             /*$("body").on('scroll', ".sx-block-products", function() {
                 console.log($(".catalogList .catalog-card:last").offset());
                 console.log($(window).height());
@@ -966,10 +980,24 @@
             });
 
             ajax.onSuccess(function (e, data) {
-                console.log(data);
                 self.setCheck(data.response.data.check);
             });
 
+            return ajax;
+        },
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxGetOrderItem: function (order_item_id) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-get-order-item-edit'));
+
+            ajax.setData({
+                'order_item_id' : order_item_id
+            });
             return ajax;
         },
 

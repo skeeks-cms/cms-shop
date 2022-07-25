@@ -26,6 +26,7 @@ $jsData = \yii\helpers\Json::encode([
     'backend-order-create'      => \yii\helpers\Url::to(['order-create']),
 
     'backend-check-status'      => \yii\helpers\Url::to(['check-status']),
+    'backend-get-order-item-edit'      => \yii\helpers\Url::to(['get-order-item-edit']),
 
     'order' => $controller->order->jsonSerialize(),
 ]);
@@ -347,7 +348,7 @@ JS
 
 
 <div class="portal">
-    <div id="sx-create-order-success-modal" class="sx-modal-overlay">
+    <div id="sx-create-order-success-modal" class="sx-modal-overlay sx-modal-overlay-fullscreen">
         <div class="sx-modal fullscreen custom-modal">
             <button class="ui huge basic button sx-close-modal">Закрыть</button>
             <div class="content">
@@ -364,7 +365,7 @@ JS
     </div>
 </div>
 <div class="portal">
-    <div id="sx-check-wait-modal" class="sx-modal-overlay">
+    <div id="sx-check-wait-modal" class="sx-modal-overlay sx-modal-overlay-fullscreen">
         <div class="sx-modal fullscreen custom-modal">
             <div class="content">
                 <div class="sx-inner-content">
@@ -379,7 +380,7 @@ JS
 </div>
 
 <div class="portal">
-    <div id="sx-check-error-status" class="sx-modal-overlay">
+    <div id="sx-check-error-status" class="sx-modal-overlay sx-modal-overlay-fullscreen">
         <div class="sx-modal fullscreen custom-modal">
             <button class="ui huge basic button sx-close-modal">Закрыть</button>
             <div class="content">
@@ -393,8 +394,24 @@ JS
         </div>
     </div>
 </div>
+
 <div class="portal">
-    <div id="sx-final-modal" class="sx-modal-overlay">
+    <div id="sx-order-item-edit" class="sx-modal-overlay">
+        <div class="sx-modal tiny">
+            <div class="content">
+                <div class="sx-inner-content">
+                    <div>
+                        Загрузка...
+                    </div>
+                    <button class="ui huge basic button sx-close-modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="portal">
+    <div id="sx-final-modal" class="sx-modal-overlay sx-modal-overlay-fullscreen">
         <div class="sx-modal fullscreen custom-modal">
             <button class="ui huge basic button sx-close-modal">Закрыть</button>
             <div class="content">

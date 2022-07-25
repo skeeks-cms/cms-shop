@@ -280,6 +280,44 @@ class CashierController extends BackendController
 
 
     /**
+     * Это бэкенд для поиска товаров
+     *
+     * @return RequestResponse
+     */
+    public function actionGetOrderItemEdit()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            \Yii::$app->shop->backendShopStore;
+            \Yii::$app->skeeks->site;
+            try {
+                $order_item_id = \Yii::$app->request->post("order_item_id");
+
+                $orderItem = ShopOrderItem::find()->where(['id' => $order_item_id])->one();
+                if (!$orderItem) {
+                    throw new Exception("Не найден");
+                }
+
+                $data['content'] = $this->renderPartial("_order-item-edit", [
+                    'model' => $orderItem
+                ]);
+
+                $rr->success = true;
+                $rr->data = $data;
+
+            } catch (\Exception $exception) {
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+
+        }
+
+        return $rr;
+    }
+
+
+    /**
      * Создание смены
      * @return RequestResponse
      */
