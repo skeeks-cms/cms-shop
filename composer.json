@@ -27,7 +27,8 @@
     "require": {
         "skeeks/cms": "^5.0 || dev-master",
         "skeeks/cms-money": "^1.0 || dev-master",
-        "chillerlan/php-qrcode": "^4.3"
+        "chillerlan/php-qrcode": "^4.3",
+        "picqer/php-barcode-generator": "^2.2"
     },
     "autoload": {
         "psr-4": {
