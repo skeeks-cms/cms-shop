@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -445,5 +446,140 @@ class ShopCheck extends \skeeks\cms\base\ActiveRecord
             return true;
         }
         return false;
+    }
+
+    /**
+     * Предмет расчета. Список доступных значений:
+        ● commodity – товар
+        ● excise – подакцизный товар
+        ● job – работа
+        ● service – услуга
+        ● gambling_bet – ставка азартной игры
+        ● gambling_prize – выигрыш азартной игры
+        ● lottery – лотерейный билет
+        ● lottery_prize – выигрыш лотереи
+        ● intellectual_activity – предоставление
+        результатов интеллектуальной деятельности
+        ● payment – платеж
+        ● agent_commission – агентское вознаграждение
+        ● composite – составной предмет расчета
+        ● another – иной предмет расчета
+        ● property_right – имущественное право
+        ● sales_tax – торговый сбор
+        ● resort_fee – курортный сбор
+        Если не указано, то касса проводит продажу с
+        предметом расчета ТОВАР
+
+             *
+     * @return string[]
+     */
+    static public function paymentObjects()
+    {
+         return [
+             'commodity' => 'товар',
+             'excise' => 'подакцизный товар',
+             'job' => 'работа',
+             'service' => 'услуга',
+             'gambling_bet' => 'ставка азартной игры',
+             'gambling_prize' => 'выигрыш азартной игры',
+             'lottery' => 'лотерейный билет',
+             'lottery_prize' => 'выигрыш лотереи',
+             'intellectual_activity' => 'предоставление результатов интеллектуальной деятельности',
+             'payment' => 'платеж',
+             'agent_commission' => 'агентское вознаграждение',
+             'composite' => 'составной предмет расчета',
+             'another' => 'иной предмет расчета',
+             'property_right' => 'имущественное право',
+             'sales_tax' => 'торговый сбор',
+             'resort_fee' => 'курортный сбор',
+         ];
+    }
+
+    /**
+     * Признак расчета. Список доступных значений:
+        ● full_prepayment – предоплата 100%. Полная
+        предварительная оплата до момента передачи
+        предмета расчета
+        ● prepayment – предоплата. Частичная
+        предварительная оплата до момента передачи
+        предмета расчета
+        ● advance – аванс
+        ● full_payment – полный расчет. Полная оплата, в
+        том числе с учетом аванса (предварительной
+        оплаты) в момент передачи предмета расчета
+        ● partial_payment – частичный расчет и кредит.
+        Частичная оплата предмета расчета в момент
+        его передачи с последующей оплатой в кредит
+        ● credit – передача в кредит. Передача предмета
+        расчета без его оплаты в момент его передачи с
+        последующей оплатой в кредит
+        ● credit_payment – оплата кредита. Оплата
+        предмета расчета после его передачи с оплатой
+        в кредит (оплата кредита)
+        Если не указано, то касса проводит продажу с
+        признаком расчета ПОЛНЫЙ РАСЧЕТ
+             *
+     * @return string[]
+     */
+    static public function paymentMethods()
+    {
+         return [
+             'full_prepayment' => 'предоплата 100%',
+             'prepayment' => 'предоплата',
+             'advance' => 'аванс',
+             'full_payment' => 'полный расчет',
+             'partial_payment' => '– частичный расчет и кредит',
+             'credit' => 'передача в кредит',
+             'credit_payment' => 'оплата кредита',
+         ];
+    }
+
+    /**
+     * Тип оплаты
+        ● CARD - безналичная оплата
+        ● CASH - оплата наличными
+        ● PREPAID - предварительная оплата (зачет
+        аванса и (или) предыдущих платежей)
+        ● POSTPAY - постоплата (кредит)
+        ● OTHER - иная форма оплаты
+
+             *
+     * @return string[]
+     */
+    static public function paymentTypes()
+    {
+         return [
+             'card' => 'безналичная оплата',
+             'cash' => 'оплата наличными',
+             'prepaid' => 'предварительная оплата',
+             'postpay' => 'постоплата (кредит)',
+             'other' => 'иная форма оплаты',
+         ];
+    }
+
+    /**
+     * @param string $code
+     * @return string
+     */
+    static public function getPaymentObjectAsText(string $code = "")
+    {
+        return (string) ArrayHelper::getValue(static::paymentObjects(), $code, 'товар');
+    }
+
+    /**
+     * @param string $code
+     * @return string
+     */
+    static public function getPaymentMethodAsText(string $code = "")
+    {
+        return (string) ArrayHelper::getValue(static::paymentMethods(), $code, 'полный расчет');
+    }
+    /**
+     * @param string $code
+     * @return string
+     */
+    static public function getPaymentTypeAsText(string $code = "")
+    {
+        return (string) ArrayHelper::getValue(static::paymentTypes(), StringHelper::strtolower($code));
     }
 }

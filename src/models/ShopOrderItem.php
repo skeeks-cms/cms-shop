@@ -20,46 +20,55 @@ use yii\helpers\Url;
 /**
  * This is the model class for table "{{%shop_basket}}".
  *
- * @property integer           $id
- * @property integer           $created_by
- * @property integer           $updated_by
- * @property integer           $created_at
- * @property integer           $updated_at
- * @property integer           $shop_order_id
- * @property integer           $shop_product_id
- * @property integer           $shop_product_price_id
- * @property string            $amount
- * @property string            $currency_code
- * @property string            $weight
- * @property string            $quantity
- * @property string            $name
- * @property string            $notes
- * @property string            $discount_amount
- * @property string            $discount_name
- * @property string            $discount_value
- * @property string            $vat_rate
- * @property double            $reserve_quantity
- * @property string            $dimensions
- * @property string            $measure_name
- * @property integer           $measure_code
+ * @property integer                 $id
+ * @property integer                 $created_by
+ * @property integer                 $updated_by
+ * @property integer                 $created_at
+ * @property integer                 $updated_at
+ * @property integer                 $shop_order_id
+ * @property integer                 $shop_product_id
+ * @property integer                 $shop_product_price_id
+ * @property string                  $amount
+ * @property string                  $currency_code
+ * @property string                  $weight
+ * @property string                  $quantity
+ * @property string                  $name
+ * @property string                  $notes
+ * @property string                  $discount_amount
+ * @property string                  $discount_name
+ * @property string                  $discount_value
+ * @property string                  $vat_rate
+ * @property double                  $reserve_quantity
+ * @property string                  $dimensions
+ * @property string                  $measure_name
+ * @property integer                 $measure_code
  *
  * ***
  *
- * @property StorageFile       $image
- * @property string            $url
- * @property string            $absoluteUrl
+ * @property float                   $discount_percent
+ * @property float                   $discount_percent_round
  *
- * @property ShopOrder         $shopOrder
- * @property shopProduct       $shopProduct
- * @property shopProductPrice  $shopProductPrice
+ * @property StorageFile             $image
+ * @property string                  $url
+ * @property string                  $absoluteUrl
  *
- * @property MoneyCurrency     $currency
+ * @property ShopOrder               $shopOrder
+ * @property shopProduct             $shopProduct
+ * @property shopProductPrice        $shopProductPrice
+ *
+ * @property MoneyCurrency           $currency
  * @property ShopOrderItemProperty[] $shopOrderItemProperties
  *
- * @property Money             $money
- * @property Money             $moneyOriginal
- * @property Money             $moneyDiscount
- * @property Money             $moneyVat
+ * @property Money                   $money  базовая цена
+ * @property Money                   $moneyWithDiscount цена позиции с учетом скидки
+
+ * @property Money                   $moneyDiscount цена скидки
+ * @property Money                   $totalMoneyDiscount суммарная скидка
+ *
+ * @property Money                   $totalMoney итоговая цена
+ * @property Money                   $totalMoneyWithDiscount итоговая цена с учетом скидки
+
+ * @property Money                   $moneyVat
  */
 class ShopOrderItem extends ActiveRecord
 {
@@ -87,10 +96,10 @@ class ShopOrderItem extends ActiveRecord
     {
         parent::init();
 
-        $this->on(self::EVENT_AFTER_FIND,    function () {
-            $this->quantity = (float) $this->quantity;
-            $this->discount_amount = (float) $this->discount_amount;
-            $this->amount = (float) $this->amount;
+        $this->on(self::EVENT_AFTER_FIND, function () {
+            $this->quantity = (float)$this->quantity;
+            $this->discount_amount = (float)$this->discount_amount;
+            $this->amount = (float)$this->amount;
         });
 
         $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveCallback"]);
@@ -237,6 +246,22 @@ class ShopOrderItem extends ActiveRecord
     {
         return new Money((string)$this->discount_amount, $this->currency_code);
     }
+    /**
+     * Итоговая стоимость скидки
+     * @return Money
+     */
+    public function getTotalMoneyWithDiscount()
+    {
+        return $this->totalMoney->sub($this->moneyDiscount);
+    }
+    /**
+     * Итоговая стоимость скидки
+     * @return Money
+     */
+    public function getTotalMoneyDiscount()
+    {
+        return $this->moneyDiscount->mul($this->quantity);
+    }
 
     /**
      *
@@ -258,12 +283,11 @@ class ShopOrderItem extends ActiveRecord
         ]);*/
 
         $product = $this->shopProduct;
-        
+
         $parentElement = null;
         if ($product->shopProductWhithOffers) {
             $parentElement = $product->shopProductWhithOffers->cmsContentElement;
         }
-        
 
 
         $productPrice = $product->minProductPrice ? $product->minProductPrice : $product->baseProductPrice;
@@ -311,14 +335,14 @@ class ShopOrderItem extends ActiveRecord
 
             if ($properties) {
                 foreach ($properties as $code => $value) {
-                    
-                    if (in_array($code, (array) ArrayHelper::map(\Yii::$app->shop->offerCmsContentProperties, "code", 'code'))) {
+
+                    if (in_array($code, (array)ArrayHelper::map(\Yii::$app->shop->offerCmsContentProperties, "code", 'code'))) {
                         if (!$this->getShopOrderItemProperties()->andWhere(['code' => $code])->count() && $value) {
                             $property = $element->relatedPropertiesModel->getRelatedProperty($code);
 
                             $val = $element->relatedPropertiesModel->getAttributeAsText($code);
                             if ($property->cmsMeasure) {
-                                $val = $val . $property->cmsMeasure->symbol;
+                                $val = $val.$property->cmsMeasure->symbol;
                             }
 
                             $basketProperty = new ShopOrderItemProperty();
@@ -326,7 +350,7 @@ class ShopOrderItem extends ActiveRecord
                             $basketProperty->code = $code;
                             $basketProperty->value = $val;
                             $basketProperty->name = $property->name;
-    
+
                             $basketProperty->save();
                         }
                     }
@@ -436,7 +460,16 @@ class ShopOrderItem extends ActiveRecord
     {
         return [
             'itemMoney',
-            'totalMoney',
+            'itemMoneyWithDiscount',
+
+            'itemDiscountMoney',
+            'itemTotalDiscountMoney',
+
+            'itemTotalMoney',
+            'itemTotalMoneyWithDiscount',
+
+            'discount_percent',
+            'discount_percent_round',
         ];
     }
 
@@ -451,9 +484,77 @@ class ShopOrderItem extends ActiveRecord
     /**
      * @return array
      */
+    public function getItemMoneyWithDiscount()
+    {
+        return $this->moneyWithDiscount->jsonSerialize();
+    }
+
+    /**
+     * @return array
+     */
+    public function getItemTotalMoneyWithDiscount()
+    {
+        return $this->totalMoneyWithDiscount->jsonSerialize();
+    }
+
+    /**
+     * Цена с учетом скидки
+     * @return Money
+     */
+    public function getMoneyWithDiscount()
+    {
+        return $this->money->sub($this->moneyDiscount);
+    }
+    /**
+     * @return array
+     */
+    public function getItemTotalMoney()
+    {
+        return $this->totalMoney->jsonSerialize();
+    }
+
+    /**
+     * @return array
+     */
     public function getTotalMoney()
     {
-        return $this->money->mul($this->quantity)->jsonSerialize();
+        return $this->money->mul($this->quantity);
+    }
+    /**
+     * @return array
+     */
+    public function getItemDiscountMoney()
+    {
+        return $this->moneyDiscount->jsonSerialize();
+    }
+    /**
+     * @return array
+     */
+    public function getItemTotalDiscountMoney()
+    {
+        return $this->totalMoneyDiscount->jsonSerialize();
+    }
+
+    /**
+     * @return array
+     */
+    public function getDiscount_percent()
+    {
+        $percent = 0;
+
+        if ($this->discount_amount) {
+            $percent = $this->discount_amount * 100 / $this->amount;
+        }
+
+        return $percent;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDiscount_percent_round()
+    {
+        return round($this->discount_percent, 2);
     }
 
 }

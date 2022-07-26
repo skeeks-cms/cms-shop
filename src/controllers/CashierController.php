@@ -579,47 +579,84 @@ class CashierController extends BackendController
 
         if ($rr->isRequestAjaxPost()) {
             $basket_id = (int)\Yii::$app->request->post('order_item_id');
-            $quantity = (float)\Yii::$app->request->post('quantity');
+            $post = \Yii::$app->request->post();
+
+            $quantity = (float)\Yii::$app->request->post("quantity");
+            $amount = (float)\Yii::$app->request->post("amount");
+            $discount_amount = (float)\Yii::$app->request->post("discount_amount");
+            $discount_percent = (float)\Yii::$app->request->post("discount_percent");
 
             $eventData = [];
             /**
-             * @var $shopBasket ShopBasket
+             * @var $orderItem ShopOrderItem
              */
-            $shopBasket = ShopOrderItem::find()->where(['id' => $basket_id])->one();
-            if ($shopBasket) {
-                if ($quantity > 0) {
-                    //Обновление корзины, это может быть как добавление позиции так и удаление
-                    $product = $shopBasket->product;
+            $orderItem = ShopOrderItem::find()->where(['id' => $basket_id])->one();
+            if ($orderItem) {
 
-                    if ($product->measure_ratio > 1) {
-                        if ($quantity % $product->measure_ratio != 0) {
-                            $quantity = $product->measure_ratio;
+                if (isset($post['quantity'])) {
+                    if ($quantity > 0) {
+                        //Обновление корзины, это может быть как добавление позиции так и удаление
+                        $product = $orderItem->product;
+
+                        if ($product->measure_ratio > 1) {
+                            if ($quantity % $product->measure_ratio != 0) {
+                                $quantity = $product->measure_ratio;
+                            }
                         }
-                    }
 
-                    $shopBasket->quantity = $quantity;
-                    if ($product->measure_ratio_min > $shopBasket->quantity) {
-                        $shopBasket->quantity = $product->measure_ratio_min;
-                    }
+                        $orderItem->quantity = $quantity;
+                        if ($product->measure_ratio_min > $orderItem->quantity) {
+                            $orderItem->quantity = $product->measure_ratio_min;
+                        }
 
-                    if ($shopBasket->recalculate()->save()) {
+                        if ($orderItem->save()) {
+                            $rr->success = true;
+                            $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
+                        }
+
+                    }
+                }
+
+                if (isset($post['amount'])) {
+                    //Обновление корзины, это может быть как добавление позиции так и удаление
+
+                    $orderItem->amount = $amount;
+
+                    if ($orderItem->save()) {
                         $rr->success = true;
                         $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
                     }
+                }
 
-                } else {
+                if (isset($post['discount_amount'])) {
+                    //Обновление корзины, это может быть как добавление позиции так и удаление
 
-                    if ($shopBasket->delete()) {
+                    $orderItem->discount_amount = $discount_amount;
+
+                    if ($orderItem->save()) {
                         $rr->success = true;
-                        $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
                     }
                 }
+
+                if (isset($post['discount_percent'])) {
+                    //Обновление корзины, это может быть как добавление позиции так и удаление
+
+                    $orderItem->discount_amount = $orderItem->amount*$discount_percent / 100;
+
+                    if ($orderItem->save()) {
+                        $rr->success = true;
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
+                    }
+                }
+
             }
 
             $this->order->refresh();
 
             $rr->data = [
                 'order' => $this->order->jsonSerialize(),
+                'item' => $orderItem->toArray([], $orderItem->extraFields()),
             ];
             $rr->success = true;
             $rr->message = "";
@@ -849,6 +886,7 @@ class CashierController extends BackendController
                     $itemData = [
                         'name'          => $item->name,
                         'price'         => round($item->amount, 2),
+                        'discSum'         => round($item->discount_amount, 2),
                         'quantity'      => (float)$item->quantity,
                         'measure'       => $item->measure_code == 796 ? "pcs" : "other",
                         'vatTag'        => 1105,

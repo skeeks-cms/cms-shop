@@ -66,16 +66,18 @@
             foreach ($positions as $one) : ?>
                 <? $counter++; ?>
                 <?
-                $sum = \yii\helpers\ArrayHelper::getValue($one, "price") * \yii\helpers\ArrayHelper::getValue($one, "quantity");
+                $itemPrice = (float) \yii\helpers\ArrayHelper::getValue($one, "price") - (float) \yii\helpers\ArrayHelper::getValue($one, "discSum");
+                $sum = $itemPrice * \yii\helpers\ArrayHelper::getValue($one, "quantity");
                 $sum = round($sum, 2);
                 ?>
                 <tr>
                     <td><?php echo $counter; ?></td>
                     <td>
                         <div><?php echo \yii\helpers\ArrayHelper::getValue($one, "name"); ?></div>
-                        <div><?php echo \yii\helpers\ArrayHelper::getValue($one, "paymentObject", "Товар"); ?> / <?php echo \yii\helpers\ArrayHelper::getValue($one, "paymentMethod", "Полный расчет"); ?></div>
+                        <div><?php echo \skeeks\cms\shop\models\ShopCheck::getPaymentObjectAsText(\yii\helpers\ArrayHelper::getValue($one, "paymentObject")); ?> /
+                            <?php echo \skeeks\cms\shop\models\ShopCheck::getPaymentMethodAsText(\yii\helpers\ArrayHelper::getValue($one, "paymentMethod")); ?></div>
                     </td>
-                    <td><?php echo \yii\helpers\ArrayHelper::getValue($one, "price"); ?> x <?php echo \yii\helpers\ArrayHelper::getValue($one, "quantity"); ?> = <?php echo $sum; ?></td>
+                    <td><?php echo $itemPrice; ?> x <?php echo \yii\helpers\ArrayHelper::getValue($one, "quantity"); ?> = <?php echo $sum; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -97,7 +99,7 @@
             <?php foreach ($model->moneyPositions as $moneyData) : ?>
                 <div class="sx-row">
                     <div class="sx-first-column">
-                        <?php echo \yii\helpers\ArrayHelper::getValue($moneyData, "paymentType"); ?>
+                        <?php echo \skeeks\cms\shop\models\ShopCheck::getPaymentTypeAsText(\yii\helpers\ArrayHelper::getValue($moneyData, "paymentType")); ?>
                     </div>
                     <div><?php echo \yii\helpers\ArrayHelper::getValue($moneyData, "sum"); ?></div>
                 </div>

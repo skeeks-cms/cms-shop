@@ -175,9 +175,10 @@ JS
                                 </div>
                                 <div class="pull-left">Налог</div>
                             </div>
-                            <div class="col-12 sx-order-result-block <?php echo \Yii::$app->shop->shopUser->moneyDiscount->amount > 0 ? "" : "sx-hidden"; ?>">
-                                <div class="float-right sx-money-discount" data-value="<?= (float)$controller->order->moneyDiscount->amount; ?>">
-                                    <?= $controller->order->moneyDiscount; ?>
+                            <div class="col-12 sx-order-result-block-visible">
+                                <div class="float-right sx-order-result-total-percent">
+                                    (<span class="sx-money-discount-percent" data-value="<?= (float)$controller->order->discount_percent_round; ?>"><?= (float)$controller->order->discount_percent_round; ?></span>%)
+                                    <span class="sx-money-discount" data-value="<?= (float)$controller->order->moneyDiscount->amount; ?>"><?= $controller->order->moneyDiscount; ?></span>
                                 </div>
                                 <div class="pull-left">Скидка</div>
                             </div>

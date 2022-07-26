@@ -107,6 +107,9 @@ use yii\validators\EmailValidator;
  * @property ShopTypePrice[]            $buyTypePrices
  *
  *
+ * @property float                      $discount_percent
+ * @property float                      $discount_percent_round
+ *
  * @property Money                      $money Итоговая цена к оплате
  * @property Money                      $moneyDelivery Цена доставки
  * @property Money                      $moneyVat Цена налога
@@ -190,11 +193,11 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         return (string)ArrayHelper::getValue(static::orderTypes(), $this->order_type);
     }
-    
+
 
     public function asText()
     {
-        return $this->orderTypeAsText . " #{$this->id}";
+        return $this->orderTypeAsText." #{$this->id}";
     }
 
     public function notifyNew()
@@ -290,7 +293,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             //Если в базе есть статус, который должен быть установлен после оплаты заказа, то нужно его установить.
             if ($shopOrderStatus = ShopOrderStatus::find()->where(['is_install_after_pay' => 1])->one()) {
                 $this->shop_order_status_id = $shopOrderStatus->id;
-                if (!$this->save()) {
+                if (!$this->update(false, ['shop_order_status_id'])) {
                     \Yii::error('Статус заказа после оплаты не обновлен: '.$e->getMessage(), self::class);
                 }
             }
@@ -394,19 +397,22 @@ class ShopOrder extends \skeeks\cms\models\Core
             }
 
             try {
-                //Notify admins
-                if ($emails = $this->cmsSite->shopSite->notifyEmails) {
+                if ($this->isNotifyChangeStatus) {
+                    //Notify admins
+                    if ($emails = $this->cmsSite->shopSite->notifyEmails) {
 
-                    \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
+                        \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-                    \Yii::$app->mailer->compose('order-status-change', [
-                        'order' => $this,
-                    ])
-                        ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
-                        ->setTo($emails)
-                        ->setSubject("Заказ №".$this->id." — ".$this->shopOrderStatus->name)
-                        ->send();
+                        \Yii::$app->mailer->compose('order-status-change', [
+                            'order' => $this,
+                        ])
+                            ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->name.''])
+                            ->setTo($emails)
+                            ->setSubject("Заказ №".$this->id." — ".$this->shopOrderStatus->name)
+                            ->send();
+                    }
                 }
+
             } catch (\Exception $e) {
                 \Yii::error("Email seinding error: ".$e->getMessage(), self::class);
             }
@@ -517,7 +523,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
             [['currency_code'], 'string', 'max' => 3],
             [['order_type'], 'string', 'max' => 50],
-            [['order_type'], 'in',  'range' => array_keys(static::orderTypes())],
+            [['order_type'], 'in', 'range' => array_keys(static::orderTypes())],
             [['shop_delivery_id'], 'integer'],
 
             [['status_at'], 'default', 'value' => \Yii::$app->formatter->asTimestamp(time())],
@@ -952,7 +958,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         $money = new Money("", $this->currency_code);
 
         foreach ($this->shopOrderItems as $shopOrderItem) {
-            $money = $money->add($shopOrderItem->moneyOriginal->multiply($shopOrderItem->quantity));
+            $money = $money->add($shopOrderItem->money->multiply($shopOrderItem->quantity));
         }
 
         return $money;
@@ -1187,6 +1193,8 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         return $this;
     }
+
+
     /**
      * @param array $options
      * @param bool  $scheme
@@ -1251,7 +1259,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         $orderItems = [];
         foreach ($this->shopOrderItems as $orderItem) {
-            $orderItems[] = $orderItem->toArray([], ['itemMoney', 'totalMoney']);
+            $orderItems[] = $orderItem->toArray([], (new ShopOrderItem())->extraFields());
         }
 
         $result['items'] = $orderItems;
@@ -1355,6 +1363,10 @@ class ShopOrder extends \skeeks\cms\models\Core
             'quantity',
             'countShopOrderItems',
             'countShopBaskets',
+
+            'discount_percent',
+            'discount_percent_round',
+
         ];
     }
     /**
@@ -1679,5 +1691,28 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         return $receiverAttributes;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDiscount_percent()
+    {
+        $percent = 0;
+
+        if ($this->discount_amount) {
+            $percent = $this->discount_amount * 100 / (float)$this->moneyItems->amount;
+        }
+
+        return $percent;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDiscount_percent_round()
+    {
+        return round($this->discount_percent, 2);
     }
 }

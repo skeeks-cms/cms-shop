@@ -112,7 +112,7 @@
                 }
                 return false;
             });
-            
+
             //Принять деньги финальное окно
             $("body").on("click", ".sx-checkout-btn", function () {
                 if ($(this).closest(".sx-checkout-btn-wrapper").hasClass("sx-lock")) {
@@ -157,15 +157,15 @@
 
                 var ajaxQuery = self.createAjaxOrderCreate(data);
                 var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
-                    'allowResponseErrorMessage' : false,
-                    'allowResponseSuccessMessage' : false,
+                    'allowResponseErrorMessage': false,
+                    'allowResponseSuccessMessage': false,
                 });
 
-                Handler.on("error", function(e,data) {
+                Handler.on("error", function (e, data) {
                     jBlocker.unblock();
                     $(".sx-create-order-errors-block").empty().append(data.message).show();
                 });
-                Handler.on("success", function(e, data) {
+                Handler.on("success", function (e, data) {
                     //Если включена фискализация то нужно проверять чек
                     //Ожидание чека
                     if (data.data.check.status == 'wait') {
@@ -236,12 +236,12 @@
             $("body").on('click', '.catalog-card', function (e) {
                 var jCard = $(this);
                 jCard.css("transform", "scale(0.95)");
-                setTimeout(function() {
+                setTimeout(function () {
                     jCard.css("transform", "");
                 }, 300);
                 var ajaxQuery = self.createAjaxAddProduct($(this).data("id"), 1);
                 var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
-                    'allowResponseSuccessMessage' : false
+                    'allowResponseSuccessMessage': false
                 });
                 ajaxQuery.execute();
 
@@ -262,7 +262,9 @@
              * Обновление позиции корзины
              */
             $("body").on('change', '.sx-quantity input', function (e) {
-                self.createAjaxUpdateOrderItem($(this).closest("tr").data("order_item_id"), $(this).val()).execute();
+                self.createAjaxUpdateOrderItem($(this).closest("tr").data("order_item_id"), {
+                    "quantity": Number($(this).val())
+                }).execute();
                 return false;
             });
 
@@ -325,7 +327,7 @@
             });
 
             //Подгрузка следующих данных
-            $("body").on('click', ".catalogList .sx-btn-next-page", function() {
+            $("body").on('click', ".catalogList .sx-btn-next-page", function () {
                 if ($(this).hasClass("sx-loaded")) {
                     return false;
                 }
@@ -337,14 +339,14 @@
             });
 
             //Редактирование одной позиции корзины
-            $("body").on('click', ".sx-order-items-wrapper tr .sx-name, .sx-order-items-wrapper tr .sx-discount, .sx-order-items-wrapper tr .sx-total, .sx-order-items-wrapper tr .sx-price", function() {
+            $("body").on('click', ".sx-order-items-wrapper tr .sx-name, .sx-order-items-wrapper tr .sx-discount, .sx-order-items-wrapper tr .sx-total, .sx-order-items-wrapper tr .sx-price", function () {
                 var jTr = $(this).closest("tr");
                 var order_item_id = jTr.data("order_item_id");
                 $("#sx-order-item-edit").addClass("open");
 
                 var ajaxQuery = self.createAjaxGetOrderItem(order_item_id);
                 var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
-                Handler.on("success", function(e, response) {
+                Handler.on("success", function (e, response) {
                     $("#sx-order-item-edit .sx-modal").empty().append(response.data.content);
                 });
                 ajaxQuery.execute();
@@ -354,6 +356,10 @@
                 console.log($(window).height());
             });*/
 
+            this._onDomReadyOrderEdit();
+            this._onDomReadyInitPlusMinus();
+
+
             this.renderOrderItems();
             this.renderProductLabels();
             this.renderOrderResults();
@@ -362,6 +368,47 @@
         },
 
 
+        /**
+         * Редактирование одной позиции корзины
+         */
+        _onDomReadyOrderEdit: function () {
+
+            var self = this;
+
+            $("body").on('change', ".sx-order-item-edit input[name=amount], .sx-order-item-edit input[name=discount_amount], .sx-order-item-edit input[name=quantity], .sx-order-item-edit input[name=discount_percent]", function () {
+                var jElement = $(this);
+                var jEdit = jElement.closest(".sx-order-item-edit");
+
+                var name = $(this).attr("name");
+                var val = $(this).val();
+                var data = {};
+                data[name] = val;
+                var ajaxQuery = self.createAjaxUpdateOrderItem(jEdit.data("id"), data);
+                var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery);
+                Handler.on("success", function (e, response) {
+                    var newData = response.data.item;
+                    console.log(newData);
+                    console.log(newData.discount_percent);
+                    $(".sx-order-item-edit input[name=amount]").val(newData.amount);
+                    $(".sx-order-item-edit input[name=discount_amount]").val(newData.discount_amount);
+                    $(".sx-order-item-edit input[name=discount_percent]").val(newData.discount_percent_round);
+                    $(".sx-order-item-edit input[name=quantity]").val(newData.quantity);
+
+                    if (newData.discount_percent) {
+                        $(".sx-order-item-total-money-amount").show();
+                    } else {
+                        $(".sx-order-item-total-money-amount").hide();
+                    }
+
+                    $(".sx-order-item-total-money-amount-with-discount .sx-amount").empty().append(newData.itemTotalMoneyWithDiscount.amountFormat);
+                    $(".sx-order-item-total-money-amount .sx-amount").empty().append(newData.itemTotalMoney.amountFormat);
+                });
+
+                ajaxQuery.execute();
+
+            });
+
+        },
         /**
          * Прорисовка элементов необходимого типа товара
          * @returns {sx.classes.CashierApp}
@@ -401,6 +448,7 @@
             this._updateOrderResultBlock("sx-money-delivery", cart.moneyDelivery.amount, cart.moneyDelivery.convertAndFormat);
             this._updateOrderResultBlock("sx-money-vat", cart.moneyVat.amount, cart.moneyVat.convertAndFormat);
             this._updateOrderResultBlock("sx-money-discount", cart.moneyDiscount.amount, cart.moneyDiscount.convertAndFormat);
+            this._updateOrderResultBlock("sx-money-discount-percent", cart.discount_percent_round, cart.discount_percent_round);
             this._updateOrderResultBlock("sx-money", cart.money.amount, cart.money.convertAndFormat);
             this._updateOrderResultBlock("sx-weight", cart.weight.value, cart.weight.convertAndFormat);
         },
@@ -489,22 +537,22 @@
          * Циклично проверяет на сервере статус чека
          * @returns {sx.classes.CashierApp}
          */
-        runCheckStatusUpdate: function() {
+        runCheckStatusUpdate: function () {
             var self = this;
 
             var ajaxQuery = self.createAjaxCheckStatus();
             var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
-                'allowResponseErrorMessage' : false,
-                'allowResponseSuccessMessage' : false,
+                'allowResponseErrorMessage': false,
+                'allowResponseSuccessMessage': false,
             });
 
             var i = 0;
-            self.checkStatusInterval = setInterval(function() {
+            self.checkStatusInterval = setInterval(function () {
                 ajaxQuery.execute();
             }, 3000);
 
 
-            Handler.on("error", function(e, data) {
+            Handler.on("error", function (e, data) {
                 clearInterval(self.checkStatusInterval);
 
                 $("#sx-check-wait-modal").removeClass("open");
@@ -515,7 +563,7 @@
 
             });
 
-            Handler.on("success", function(e, data) {
+            Handler.on("success", function (e, data) {
 //                data.response
                 if (self.getCheck().status == 'approved') {
 
@@ -644,7 +692,8 @@
                     $(".sx-name", jItemTemplate).append(value.name);
                     $(".sx-price", jItemTemplate).append(value.itemMoney.convertAndFormat);
                     $(".sx-quantity input", jItemTemplate).val(value.quantity);
-                    $(".sx-total", jItemTemplate).append(value.totalMoney.convertAndFormat);
+                    $(".sx-total", jItemTemplate).append(value.itemTotalMoneyWithDiscount.convertAndFormat);
+                    $(".sx-discount", jItemTemplate).empty().append(value.discount_percent_round + "%");
 
                     jTableBody.append(jItemTemplate);
                 });
@@ -688,7 +737,7 @@
                 self.renderProductLabels();
 
                 $(".catalogList .sx-more.sx-loaded").hide().remove();
-                
+
                 /*$(".sx-block-products").on("scroll", function() {
                     var delta = $(window).height() - $(".catalogList .catalog-card:last").offset().top;
                     if (delta > -200) {
@@ -871,27 +920,23 @@
          * @param basket_id
          * @returns {*|sx.classes.AjaxQuery}
          */
-        createAjaxUpdateOrderItem: function (order_item_id, quantity, additional) {
+        createAjaxUpdateOrderItem: function (order_item_id, data) {
             var self = this;
             var ajax = sx.ajax.preparePostQuery(this.get('backend-update-order-item'));
 
-            additional = additional || {};
+            data = data || {};
 
-            ajax.setData({
+            var requestData = Object.assign(data, {
                 'order_item_id': Number(order_item_id),
-                'quantity': Number(quantity),
-                'additional': additional,
             });
+
+            ajax.setData(requestData);
 
 
             ajax.onSuccess(function (e, data) {
                 self.setOrder(data.response.data.order);
 
-                self.trigger('updateOrderItem', {
-                    'order_item_id': order_item_id,
-                    'quantity': quantity,
-                    'response': data.response,
-                });
+                self.trigger('updateOrderItem', data.response.data.item);
             });
 
             return ajax;
@@ -976,7 +1021,7 @@
             var ajax = sx.ajax.preparePostQuery(this.get('backend-check-status'));
 
             ajax.setData({
-                'check_id' : self.getCheck().id
+                'check_id': self.getCheck().id
             });
 
             ajax.onSuccess(function (e, data) {
@@ -996,10 +1041,146 @@
             var ajax = sx.ajax.preparePostQuery(this.get('backend-get-order-item-edit'));
 
             ajax.setData({
-                'order_item_id' : order_item_id
+                'order_item_id': order_item_id
             });
             return ajax;
         },
+
+        /**
+         *
+         */
+        _onDomReadyInitPlusMinus: function () {
+            $("body").on("click", ".sx-quantity-group .sx-plus", function () {
+
+                /*var jWrapper = $(this).closest(".sx-quantity-wrapper");
+                $(".sx-plus", jWrapper).trigger("up");*/
+                $(this).trigger("up");
+                return false;
+            });
+
+            $("body").on("click", ".sx-quantity-group .sx-minus", function () {
+                /*var jWrapper = $(this).closest(".sx-quantity-wrapper");
+                $(".sx-minus", jWrapper).trigger("down");*/
+
+                $(this).trigger("down");
+                return false;
+            });
+
+            $("body").on("up", ".sx-quantity-group .sx-plus", function () {
+
+                var jGroup = $(this).closest(".sx-quantity-group");
+                var jInput = $(".sx-quantity-input", jGroup);
+                var measure_ratio = Number(jInput.data("measure_ratio")) || 1;
+                var measure_ratio_min = parseFloat(jInput.data("measure_ratio_min")) || 1;
+                var newVal = Number(jInput.val()) + measure_ratio;
+
+                var count = newVal / measure_ratio;
+                count = Math.round(count);
+
+                newVal = count * measure_ratio;
+                newVal = Math.floor(newVal * 100) / 100;
+
+                if (newVal < measure_ratio_min) {
+                    newVal = measure_ratio_min
+                }
+
+                jInput.val(newVal);
+                jInput.focus();
+
+                jInput.trigger("change", {
+                    'result': 'up'
+                });
+
+                return false;
+            });
+
+            $("body").on("down", ".sx-quantity-group .sx-minus", function () {
+                var jGroup = $(this).closest(".sx-quantity-group");
+                var jInput = $(".sx-quantity-input", jGroup);
+                var measure_ratio = parseFloat(jInput.data("measure_ratio")) || 1;
+                var measure_ratio_min = parseFloat(jInput.data("measure_ratio_min")) || 1;
+                var newVal = parseFloat(jInput.val()) - measure_ratio;
+                if (newVal < measure_ratio_min) {
+                    newVal = measure_ratio_min
+                }
+                jInput.val(newVal);
+                jInput.focus();
+                jInput.trigger("change", {
+                    'result': 'down'
+                });
+                return false;
+            });
+
+            $("body").on("updatewidth", ".sx-quantity-group .sx-quantity-input", function () {
+                var measure_ratio = Number($(this).data("measure_ratio")) || 1;
+                var newVal = $(this).val();
+
+
+                var length = (String(newVal).length - 1) || 1;
+                $(this).attr("size", length);
+            });
+
+            $("body").on("updateOther", ".sx-quantity-input", function () {
+                var measure_ratio = Number($(this).data("measure_ratio")) || 1;
+                var coefficient = $(this).val() / measure_ratio;
+                coefficient = Math.round(coefficient);
+
+                var jWrapper = $(this).closest(".sx-quantity-wrapper")
+
+                $(".sx-quantity-input", jWrapper).each(function () {
+                    if ($(this).hasClass("sx-current-changed")) {
+                        $(this).removeClass("sx-current-changed")
+                    } else {
+                        var measure_ratio = Number($(this).data("measure_ratio")) || 1;
+                        var newVal = coefficient * measure_ratio;
+                        console.log(newVal);
+
+                        newVal = Math.floor(newVal * 100) / 100;
+
+                        $(this).val(newVal);
+                        $(this).trigger("updatewidth");
+                    }
+                });
+
+            });
+
+            $("body").on("change", ".sx-quantity-input", function (e, data) {
+
+                var measure_ratio = Number($(this).data("measure_ratio")) || 1;
+                var newVal = $(this).val();
+
+                if (isNaN(newVal) === false) {
+
+                } else {
+                    newVal = 0;
+                }
+
+                if (Number(newVal) < measure_ratio) {
+
+                    $(this).val(measure_ratio);
+                    $(this).trigger("updatewidth");
+
+                    $(this).focus();
+                    $(this).addClass("sx-current-changed").trigger("updateOther");
+
+                    return false;
+                }
+
+                var count = newVal / measure_ratio;
+                count = Math.round(count);
+
+                newVal = count * measure_ratio;
+                newVal = Math.floor(newVal * 100) / 100;
+
+                $(this).val(newVal);
+                $(this).trigger("updatewidth");
+
+                $(this).focus();
+                $(this).addClass("sx-current-changed").trigger("updateOther");
+
+                return false;
+            });
+        }
 
     });
 })(sx, sx.$, sx._);
