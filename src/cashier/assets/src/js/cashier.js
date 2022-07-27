@@ -176,6 +176,8 @@
                         self.runCheckStatusUpdate();
                     } else {
                         jBlocker.unblock();
+                        $("#sx-create-order-success-modal .sx-check-content").empty().append(data.data.check_html);
+
                         $("#sx-order-comment").empty();
                         $("#sx-final-modal").removeClass("open");
                         $("#sx-create-order-success-modal").addClass("open");

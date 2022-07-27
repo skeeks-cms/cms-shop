@@ -451,6 +451,21 @@ HTML
                     },
                 ],
 
+                "price-tags" => [
+                    'class'        => BackendModelMultiDialogEditAction::class,
+                    "name"         => "Ценники",
+                    "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/_price-tags",
+                    'on init'      => function ($e) {
+                        $action = $e->sender;
+                        /**
+                         * @var BackendGridModelAction $action
+                         */
+                        if ($this->content) {
+                            $action->url = ["/".$action->uniqueId, 'content_id' => $this->content->id];
+                        }
+                    },
+                ],
+
 
                 "viewed-products" => [
                     'class'           => BackendGridModelRelatedAction::class,

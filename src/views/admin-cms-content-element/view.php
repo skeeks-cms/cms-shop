@@ -408,6 +408,10 @@ $noValue = "<span style='color: silver;'>—</span>";
                 </div>
             <? endif; ?>
 
+
+
+
+
         </div>
     </div>
 
@@ -513,7 +517,15 @@ JS
                                   data-form="#barcodes-form"
                                   data-title="Штрихкод"
                             >
-                                <?php echo $model->shopProduct->shopProductBarcodes ? implode("<br>", \yii\helpers\ArrayHelper::map($model->shopProduct->shopProductBarcodes, 'value', 'value')) : "&nbsp;&nbsp;&nbsp;" ?>
+                                <?php if($model->shopProduct->shopProductBarcodes) : ?>
+                                    <? foreach ($model->shopProduct->shopProductBarcodes as $data) : ?>
+                                        <?php echo $data->value; ?>
+                                    <? endforeach; ?>
+                                <?php else : ?>
+                                    &nbsp;&nbsp;&nbsp;
+                                <?php endif; ?>
+
+                                <?php /*echo $model->shopProduct->shopProductBarcodes ? implode("<br>", \yii\helpers\ArrayHelper::map($model->shopProduct->shopProductBarcodes, 'value', 'value')) : "&nbsp;&nbsp;&nbsp;" */?>
                             </span>
 
                             <div class="sx-fast-edit-form-wrapper">
@@ -639,7 +651,43 @@ JS
                         <?php echo $model->created_at ? \Yii::$app->formatter->asDate($model->created_at) : ""; ?>
                 </span>
                     </li>
+
+
                 </ul>
+
+
+                <?php if($model->shopProduct->shopProductBarcodes) : ?>
+                <div class="text-center" style="margin-top: 10px; height: 50px;">
+                    <? foreach ($model->shopProduct->shopProductBarcodes as $data) : ?>
+
+                        <?
+                        $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
+                        ?>
+                        <img src="data:image/png;base64,<?php echo base64_encode($generator->getBarcode($data->value, $generator::TYPE_CODE_128, 1, 40)); ?>" />
+
+                    <div class="block" style='
+                        z-index: 1;
+                        border-left-width: 0px;
+                        border-right-width: 0px;
+                        border-bottom-width: 0px;
+                        border-top-width: 0px;
+                        font-size: 10px;
+                        text-align: center;
+                        margin-top: 3px;
+                        '>
+
+
+                                <?php echo $data->value; ?>
+
+
+                            </div>
+                        <?
+                        break;
+                        ?>
+                    <? endforeach; ?>
+                </div>
+                <?php endif; ?>
+
             </div>
         </div>
     </div>

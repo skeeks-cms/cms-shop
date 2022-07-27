@@ -64,6 +64,7 @@ use yii\helpers\ArrayHelper;
  * @property string            $statusAsText
  * @property string            $docTypeAsText
  * @property boolean           $isApproved Проведен/фискализирован?
+ * @property boolean           $isNew Просто новый без фискализации
  *
  * @property CmsUser           $cashierCmsUser
  * @property CmsSite           $cmsSite
@@ -443,6 +444,17 @@ class ShopCheck extends \skeeks\cms\base\ActiveRecord
     public function getIsApproved()
     {
         if ($this->status == static::STATUS_APPROVED) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsNew()
+    {
+        if ($this->status == static::STATUS_NEW) {
             return true;
         }
         return false;

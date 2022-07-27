@@ -946,9 +946,17 @@ class CashierController extends BackendController
 
                 \Yii::$app->getSession()->set($this->orderSessionName, $newOrder->id);
 
+                $checkHtml = '';
+                if ($check->isNew) {
+                    $checkHtml = $this->renderPartial('_check', [
+                        'model' => $check,
+                    ]);
+                }
+
                 $rr->data = [
                     'order' => $newOrder->jsonSerialize(),
                     'check' => $check->toArray(),
+                    'check_html' => $checkHtml,
                 ];
                 $rr->success = true;
                 $rr->message = "";

@@ -73,7 +73,7 @@ JS
             <?
 
             $items = [
-                'quantity' => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), 'quantity'),
+                //'quantity' => \yii\helpers\ArrayHelper::getValue($element->attributeLabels(), 'quantity'),
             ];
 
             if (\Yii::$app->skeeks->site->shopTypePrices) {
