@@ -45,19 +45,29 @@
 
 
     @media print {
-        .perpage {
+        /*.perpage {
             page-break-after: always;
             float: none !important;
-        }
+        }*/
 
         #settings, hr {
             display: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
         }
     }
 
     <?php if($isPrintSpec) : ?>
     #settings, hr {
         display: none;
+    }
+    
+    .perpage {
+        page-break-after: always;
+        float: none !important;
     }
 
     <?php endif; ?>

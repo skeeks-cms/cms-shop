@@ -27,11 +27,14 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\bootstrap\Alert;
@@ -530,16 +533,57 @@ JS
 
     public function updateFields($action)
     {
+
         /**
          * @var $model ShopStoreProperty
          */
         $model = $action->model;
 
-        if ($model->property_nature == ShopStoreProperty::PROPERTY_NATURE_EAV) {
+        \Yii::$app->view->registerJs(<<<JS
+$("#shopstoreproperty-property_nature").on("change", function() {
+   if ($(this).val() == 'eav') {
+       $(".sx-property").show();
+   }  else {
+       $(".sx-property").hide();
+       $(".sx-property select").val("");
+   }
+});
+
+if ($("#shopstoreproperty-property_nature").val() == "eav") {
+    $(".sx-property").show();
+} else {
+    $(".sx-property").hide();
+   $(".sx-property select").val("");
+}
+
+$(document).on('pjax:complete', function (e) {
+    if ($("#shopstoreproperty-property_nature").val() == "eav") {
+    $(".sx-property").show();
+} else {
+    $(".sx-property").hide();
+   $(".sx-property select").val("");
+}
+    
+});
+
+JS
+        );
+        //if ($model->property_nature == ShopStoreProperty::PROPERTY_NATURE_EAV) {
 
             $cms_content_property_id = [
-                'class' => SelectField::class,
+                //'class' => SelectField::class,
+                'class' => WidgetField::class,
+                'widgetClass' => AjaxSelectModel::class,
                 'widgetConfig' => [
+                    'modelClass' => CmsContentProperty::class,
+                    'searchQuery' => function($word = '') {
+                        $query = CmsContentProperty::find()->cmsSite();
+                        if ($word) {
+                            $query->search($word);
+                        }
+                        return $query;
+                    },
+
                     'pluginOptions' => [
                         'templateResult' => new JsExpression(<<<JS
 function formatState (state) {
@@ -566,7 +610,7 @@ JS)
 
                     ]
                 ],
-                'items' => ArrayHelper::map(
+                /*'items' => ArrayHelper::map(
                     CmsContentProperty::find()->cmsSite()->all(),
                     'id',
                     function(CmsContentProperty $model) {
@@ -578,11 +622,11 @@ JS)
 
                         return $model->asText . $treeSting;
                     }
-                ),
+                ),*/
             ];
-        } else {
-            $cms_content_property_id = new UnsetArrayValue();
-        }
+        //} else {
+           // $cms_content_property_id = new UnsetArrayValue();
+        //}
 
 
         return [
@@ -609,13 +653,23 @@ JS)
                     'property_nature' => [
                         'class'          => SelectField::class,
                         'items'          => ShopStoreProperty::getPropertyNatureOptions(),
-                        'elementOptions' => [
+                        /*'elementOptions' => [
                             'data-form-reload' => 'true',
-                        ],
+                        ],*/
 
                     ],
 
+                    [
+                        'class' => HtmlBlock::class,
+                        'content' => '<div class="sx-property" style="display: none;">'
+                    ],
+
                     'cms_content_property_id' => $cms_content_property_id,
+
+                    [
+                        'class' => HtmlBlock::class,
+                        'content' => '</div>'
+                    ],
                 ],
             ],
 

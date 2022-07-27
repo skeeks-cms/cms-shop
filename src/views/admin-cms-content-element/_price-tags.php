@@ -83,6 +83,7 @@ JS
                             <option value="70x50">70x50 см (16 на странице А4, альбомного расположения)</option>
                             <option value="58x30">58x30 см</option>
                             <option value="50x30">50x30 см</option>
+                            <option value="40x30">40x30 см</option>
                         </select>
 
                     </div>

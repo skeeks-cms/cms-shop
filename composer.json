@@ -28,6 +28,7 @@
         "skeeks/cms": "^5.0 || dev-master",
         "skeeks/cms-money": "^1.0 || dev-master",
         "chillerlan/php-qrcode": "^4.3",
+        "kartik-v/yii2-mpdf": "1.0.6",
         "picqer/php-barcode-generator": "^2.2"
     },
     "autoload": {
