@@ -73,20 +73,26 @@ class ShopCmsContentElement extends CmsContentElement
     {
         //Если есть родительский элемент
         if ($this->parent_content_element_id) {
-            if ($offers = $this->parentContentElement->getTradeOffers()->all()) {
-                /**
-                 * Если есть оферы, берем одного из них и обновляем цены, это повлечет за собой обновление цены у продукта
-                 * @var $offer ShopCmsContentElement
-                 */
-                $offer = array_shift($offers);
-
-                if ($offer->shopProduct && $offer->shopProduct->shopProductPrices) {
-                    foreach ($offer->shopProduct->shopProductPrices as $shopPrice) {
-                        $shopPrice->save();
+            if ($this->parentContentElement) {
+                $offers = $this->parentContentElement->getTradeOffers()->all();
+                if ($offers) {
+                    /**
+                     * Если есть оферы, берем одного из них и обновляем цены, это повлечет за собой обновление цены у продукта
+                     * @var $offer ShopCmsContentElement
+                     */
+                    $offer = array_shift($offers);
+    
+                    if ($offer->shopProduct && $offer->shopProduct->shopProductPrices) {
+                        foreach ($offer->shopProduct->shopProductPrices as $shopPrice) {
+                            $shopPrice->save();
+                        }
                     }
+    
+                    $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_OFFERS;
+                } else {
+                    $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_SIMPLE;
                 }
-
-                $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_OFFERS;
+                
             } else {
                 $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_SIMPLE;
             }
@@ -147,7 +153,10 @@ class ShopCmsContentElement extends CmsContentElement
      */
     public function getTradeOffers()
     {
-        return $this->shopProduct->getTradeOffers();
+        if ($this->shopProduct) {
+            return $this->shopProduct->getTradeOffers();
+        }
+        return [];
     }
     /**
      * @return \yii\db\ActiveQuery
