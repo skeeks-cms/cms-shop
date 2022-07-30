@@ -18,6 +18,7 @@ $jsData = \yii\helpers\Json::encode([
     'backend-find-users'  => \yii\helpers\Url::to(['users']),
 
     'backend-add-product'       => \yii\helpers\Url::to(['add-product']),
+    'backend-add-product-barcode'       => \yii\helpers\Url::to(['add-product-barcode']),
     'backend-remove-order-item' => \yii\helpers\Url::to(['remove-order-item']),
     'backend-clear-order-items' => \yii\helpers\Url::to(['clear-order-items']),
     'backend-update-order-item' => \yii\helpers\Url::to(['update-order-item']),

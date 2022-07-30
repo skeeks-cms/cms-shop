@@ -180,6 +180,7 @@ class CashierController extends BackendController
                     ['=', 'cce.id', $q],
                     ['=', 'barcodes.value', $q],
                 ]);
+                $query->groupBy("shopProduct.id");
             }
 
             $countQuery = clone $query;
@@ -489,6 +490,55 @@ class CashierController extends BackendController
             $rr->data = [
                 'order' => $this->order->jsonSerialize(),
             ];
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+    /**
+     * Добавить товар
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionAddProductBarcode()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $barcode = \Yii::$app->request->post('barcode');
+            if (!$barcode) {
+                return $rr;
+            }
+
+            $query = ShopCmsContentElement::find()
+                ->from(['cce' => ShopCmsContentElement::tableName()])
+                ->innerJoinWith("shopProduct as shopProduct")
+                ->groupBy(["cce.id"]);
+
+            if ($barcode) {
+                $barcode = trim($barcode);
+                $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
+                $query->andWhere(
+                    ['=', 'barcodes.value', $barcode],
+                );
+                $query->groupBy("shopProduct.id");
+            }
+
+            $countQuery = clone $query;
+            $totalCount = $countQuery->count();
+
+            $product = [];
+            if ($totalCount == 1) {
+                $product = $query->one()->toArray();
+            }
+            $data["total"] = (int) $totalCount;
+            $data["product"] = $product;
+
+            $rr->data = $data;
+            $rr->success = true;
 
             return (array)$rr;
         } else {

@@ -22,6 +22,69 @@
                 self.renderUserSelected();
                 self.renderOrderType();
             });
+
+            this._initScanner();
+        },
+
+        _initScanner: function () {
+            var self = this;
+            var code = "";
+            var reading = false;
+
+            document.addEventListener('keypress', e => {
+                //usually scanners throw an 'Enter' key at the end of read
+                if (e.keyCode === 13) {
+                    if (code.length > 10) {
+
+                        var ajaxQuery = self.createAjaxAddProductBarcode(code);
+
+                        ajaxQuery.onError(function (e, data) {
+                            code = "";
+                        });
+
+                        ajaxQuery.onSuccess(function (e, data) {
+
+                            if (self.getJSearch().val() != code) {
+                                self.getJSearch().val(code);
+                                self.updateSearchButtons();
+                                self.loadProducts();
+                            }
+
+                            //self.loadProducts();
+
+                            if (data.response.data.total == 1) {
+
+                                var q = self.createAjaxAddProduct(data.response.data.product.id, 1);
+                                var Handler = new sx.classes.AjaxHandlerStandartRespose(q, {
+                                    'allowResponseSuccessMessage': false
+                                });
+                                q.execute();
+
+                            } else if (data.response.data.total > 1) {
+
+                            } else {
+
+                            }
+
+                            code = "";
+                        });
+
+                        /// code ready to use
+                        ajaxQuery.execute();
+                    }
+                } else {
+                    code += e.key; //while this is not an 'enter' it stores the every key
+                }
+
+                //run a timeout of 200ms at the first read and clear everything
+                if (!reading) {
+                    reading = true;
+                    setTimeout(() => {
+                        code = "";
+                        reading = false;
+                    }, 200);  //200 works fine for me but you can adjust it
+                }
+            });
         },
 
         _onDomReady: function () {
@@ -1028,6 +1091,22 @@
 
             ajax.onSuccess(function (e, data) {
                 self.setCheck(data.response.data.check);
+            });
+
+            return ajax;
+        },
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxAddProductBarcode: function (barcode) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-add-product-barcode'));
+
+            ajax.setData({
+                'barcode': barcode
             });
 
             return ajax;
