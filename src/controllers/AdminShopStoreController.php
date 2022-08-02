@@ -305,6 +305,10 @@ CSS
                     'name',
 
 
+                    'is_sync_external' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ]
                 ],
             ],
             'selling_price'  => [

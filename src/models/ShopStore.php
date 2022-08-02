@@ -38,6 +38,8 @@ use yii\helpers\ArrayHelper;
  * @property float               $cashier_is_show_out_of_stock Показывать товары не в наличии?
  * @property integer             $cashier_default_cms_user_id Клиент по умолчанию
  *
+ * @property integer             $is_sync_external Синхронизирован с внешней системой?
+ *
  * @property string              $coordinates
  *
  * @property CmsStorageFile      $cmsImage
@@ -45,6 +47,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopStoreProduct[]  $shopStoreProducts
  * @property ShopProduct[]       $shopProducts
  * @property ShopStoreProperty[] $shopStoreProperties
+ * @property ShopStoreDocMove[]  $shopStoreDocMoves
  *
  * @property ShopCashebox[]      $shopCasheboxes
  * @property ShopOrder[]         $shopOrders
@@ -97,6 +100,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['priority'], 'integer'],
 
+            [['is_sync_external'], 'integer'],
             [['cashier_is_allow_sell_out_of_stock'], 'integer'],
             [['cashier_is_show_out_of_stock'], 'integer'],
 
@@ -119,6 +123,8 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['cms_site_id'], 'integer'],
             [['is_supplier'], 'integer'],
             [['is_supplier'], 'default', 'value' => 0],
+
+            [['is_sync_external'], 'default', 'value' => 1],
 
             [
                 'cms_site_id',
@@ -208,6 +214,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'cashier_is_allow_sell_out_of_stock' => 'Разрешить продажу товаров не в наличии?',
             'cashier_is_show_out_of_stock'       => 'Показывать товары не в наличии?',
             'cashier_default_cms_user_id'        => 'Клиент выбранный по умолчанию',
+            'is_sync_external'                   => 'Синхронизирован с внешней системой?',
         ]);
     }
     /**
@@ -216,7 +223,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'cashier_default_cms_user_id'                               => "Обязательно укажите этому клиенту email!",
+            'cashier_default_cms_user_id' => "Обязательно укажите этому клиенту email!",
         ]);
     }
 
@@ -323,5 +330,15 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function getShopOrders()
     {
         return $this->hasMany(ShopOrder::className(), ['shop_store_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopStoreDocMoves]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopStoreDocMoves()
+    {
+        return $this->hasMany(ShopStoreDocMove::className(), ['shop_store_id' => 'id']);
     }
 }

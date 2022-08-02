@@ -10,26 +10,31 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\relatedProperties\PropertyType;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property integer      $shop_store_id
- * @property integer|nukk $shop_product_id
- * @property float        $quantity
- * @property string|null  $external_id
- * @property string|null  $name
- * @property array        $external_data
- * @property float        $purchase_price
- * @property float        $selling_price
- * @property integer      $is_active
+ * @property integer                $shop_store_id
+ * @property integer|nukk           $shop_product_id
+ * @property float                  $quantity
+ * @property string|null            $external_id
+ * @property string|null            $name
+ * @property array                  $external_data
+ * @property float                  $purchase_price
+ * @property float                  $selling_price
+ * @property integer                $is_active
  *
- * @property ShopProduct  $shopProduct
- * @property ShopStore    $shopStore
+ * @property string                 $productName
+ *
+ * @property ShopProduct            $shopProduct
+ * @property ShopStore              $shopStore
+ * @property ShopStoreProductMove[] $shopStoreProductMoves
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 {
+    public $isAllowCorrection = true;
     /**
      * {@inheritdoc}
      */
@@ -41,12 +46,52 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
     public function init()
     {
         $this->on(self::EVENT_AFTER_FIND, [$this, "_afterFind"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeSave"]);
+
         return parent::init();
+    }
+
+    public function _beforeSave($e)
+    {
+        if (!$this->shopStore->is_supplier) {
+
+            $oldAttribute = (float)$this->getOldAttribute("quantity");
+
+            if ($this->isAllowCorrection && $this->quantity != $oldAttribute) {
+
+                $doc = new ShopStoreDocMove();
+                $doc->doc_type = ShopStoreDocMove::DOCTYPE_CORRECTION;
+                $doc->shop_store_id = $this->shop_store_id;
+                $doc->is_active = 1;
+                if (!$doc->save()) {
+                    throw new Exception("Ошибка: ".print_r($doc->errors, true));
+                }
+
+                $oldAttribute = (float)$this->getOldAttribute("quantity");
+                if ($this->quantity > $oldAttribute) {
+                    $newValue = $this->quantity - $oldAttribute;
+                } else {
+                    $newValue = $this->quantity - $oldAttribute;
+                }
+
+                $move = new ShopStoreProductMove();
+                $move->is_active = 1;
+                $move->quantity = $newValue;
+                $move->shop_store_doc_move_id = $doc->id;
+                $move->price = (float)($this->shopProduct && $this->shopProduct->baseProductPrice ? $this->shopProduct->baseProductPrice->price : 0);
+                $move->product_name = $this->productName;
+                $move->shop_store_product_id = (int)$this->id;
+                if (!$move->save()) {
+                    throw new Exception("Ошибка: ".print_r($move->errors, true));
+                }
+            }
+        }
     }
 
     public function _afterFind($event)
     {
         $this->quantity = (float)$this->quantity;
+
         $this->purchase_price = (float)$this->purchase_price;
         $this->selling_price = (float)$this->selling_price;
     }
@@ -144,7 +189,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
             'external_id'     => "Код",
             'purchase_price'  => "Закупочная цена",
             'selling_price'   => "Цена продажи",
-            'is_active'   => "Активность",
+            'is_active'       => "Активность",
         ]);
     }
 
@@ -393,5 +438,30 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
             //print_r($model->relatedPropertiesModel->toArray());die;
         }
+    }
+
+    /**
+     * Gets query for [[ShopStoreProductMoves]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopStoreProductMoves()
+    {
+        return $this->hasMany(ShopStoreProductMove::className(), ['shop_store_product_id' => 'id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getProductName()
+    {
+        if ($this->shopProduct && $this->shopProduct->cmsContentElement) {
+            return (string)$this->shopProduct->cmsContentElement->productName;
+        } elseif ($this->name) {
+            return (string)$this->name;
+        } else {
+            return (string)"Нет названия";
+        }
+
     }
 }

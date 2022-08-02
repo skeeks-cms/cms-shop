@@ -282,7 +282,7 @@ HTML;
                             'format' => "raw",
                             'label' => "Номер заказа",
                             'value' => function (ShopOrder $shopOrder) {
-                                $name = "Заказ №" . $shopOrder->id;
+                                $name = $shopOrder->asText;
                                 if (!$shopOrder->shopOrderStatus) {
                                     return $name;
                                 }

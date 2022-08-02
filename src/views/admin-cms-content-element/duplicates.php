@@ -47,23 +47,23 @@ $qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()
 //print_r($qProducts->createCommand()->rawSql);die;
 
 ?>
-<?php $form = \yii\widgets\ActiveForm::begin([
+<?php /*$form = \yii\widgets\ActiveForm::begin([
     'method' => 'get',
-]); ?>
+]); */?><!--
 <div class="sx-bg-secondary">
 <div class="row" style="padding: 15px; padding-bottom: 0px;">
     <div class="col">
-        <?php echo $form->field($dm, 'from')->textInput(['type' => 'date'])->label("Начало периода"); ?>
+        <?php /*echo $form->field($dm, 'from')->textInput(['type' => 'date'])->label("Начало периода"); */?>
     </div>
     <div class="col">
-        <?php echo $form->field($dm, 'to')->textInput(['type' => 'date'])->label("Конец периода"); ?>
+        <?php /*echo $form->field($dm, 'to')->textInput(['type' => 'date'])->label("Конец периода"); */?>
     </div>
     <div class="col my-auto">
         <button type="submit" class="btn btn-primary">Отправить</button>
     </div>
 </div>
 </div>
-<?php $form::end(); ?>
+--><?php /*$form::end(); */?>
 
 
 

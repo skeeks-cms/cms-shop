@@ -244,6 +244,8 @@
                         $("#sx-order-comment").empty();
                         $("#sx-final-modal").removeClass("open");
                         $("#sx-create-order-success-modal").addClass("open");
+
+                        self.loadProducts();
                     }
                 });
 
@@ -636,7 +638,7 @@
                     $("#sx-create-order-success-modal").addClass("open");
 
                     $("#sx-create-order-success-modal .sx-check-content").empty().append(data.data.check_html);
-
+                    self.loadProducts();
                     clearInterval(self.checkStatusInterval);
                 } else if (self.getCheck().status == 'error') {
                     clearInterval(self.checkStatusInterval);

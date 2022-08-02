@@ -177,7 +177,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                 "relations" => [
                     'class'    => BackendModelAction::class,
-                    'name'     => "Связанные товары",
+                    'name'     => "Связанные",
                     'icon'     => 'fa fa-list',
                     'priority' => 190,
 
@@ -469,7 +469,7 @@ HTML
 
                 "viewed-products" => [
                     'class'           => BackendGridModelRelatedAction::class,
-                    'name'            => ['skeeks/shop/app', 'Looked'],
+                    'name'            => ['skeeks/shop/app', 'Кто посмотрел?'],
                     'icon'            => 'far fa-eye',
                     'controllerRoute' => "/shop/admin-viewed-product",
                     'relation'        => ['shop_product_id' => 'id'],
@@ -526,7 +526,7 @@ HTML
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
 
-                    'name'            => ['skeeks/shop/app', 'Waiting for receipt'],
+                    'name'            => ['skeeks/shop/app', 'Кто ждет?'],
                     'icon'            => 'far fa-envelope',
                     'controllerRoute' => "/shop/admin-quantity-notice-email",
                     'relation'        => ['shop_product_id' => 'id'],

@@ -43,140 +43,17 @@ return \yii\helpers\ArrayHelper::merge([
 
     'orders' => [
         'priority' => 200,
-        "label"    => \Yii::t('skeeks/shop/app', 'Orders'),
+        "label"    => \Yii::t('skeeks/shop/app', 'Продажи и заказы'),
         "url"      => ["shop/admin-order"],
         "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
     ],
 
-    'shop' => [
-        'label'    => \Yii::t('skeeks/shop/app', 'Shop'),
-        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
-        'priority' => 250,
-
-        'items' => [
-            [
-
-
-                /*'priority' => 10,
-                'label'    => \Yii::t('skeeks/shop/app', 'Orders'),
-                "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
-
-                'items' =>
-                    [
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Orders'),
-                            "url"   => ["shop/admin-order"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'История изменения'),
-                            "url"   => ["shop/admin-order-change"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Счета'),
-                            "url"   => ["shop/admin-bill"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
-                        ],
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Платежи'),
-                            "url"   => ["shop/admin-payment"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/orders.png'],
-                        ],
-                    ],*/
-
-            ],
-
-
-            /*[
-                'priority' => 30,
-                'label'    => \Yii::t('skeeks/shop/app', 'Buyers'),
-                "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
-
-                'items' =>
-                    [
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Regular customers'),
-                            "url"   => ["shop/admin-buyer-user"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Buyers'),
-                            //"url"       => ["shop/admin-buyer"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/buyers.png'],
-
-                            'items' => shopPersonTypes(),
-                        ],
-
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Baskets'),
-                            "url"   => ["shop/admin-cart"],
-                            'icon'  => 'fas fa-cart-arrow-down',
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Notify on receipt (Email)'),
-                            "url"   => ["shop/admin-quantity-notice-email"],
-                            'icon'  => 'far fa-envelope',
-
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Viewed products'),
-                            "url"   => ["shop/admin-viewed-product"],
-                            'icon'  => 'far fa-eye',
-                        ],
-                    ],
-
-            ],*/
-
-
-            /*[
-                'priority' => 50,
-                'label'    => \Yii::t('skeeks/shop/app', 'Reports'),
-                "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/reports.png'],
-
-                'items' =>
-                    [
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Reports on orders'),
-                            "url"   => ["shop/admin-report-order"],
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Reports on products'),
-                            "url"   => ["shop/admin-report-product"],
-                        ],
-
-                    ],
-
-            ],*/
-
-            /*[
-                "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
-                "url"   => ["shop/admin-shop-import-cms-site"],
-                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
-            ],*/
-            /*[
-                "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
-                "url"   => ["shop/admin-shop-supplier"],
-                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
-            ],*/
-
-
-        ],
-    ],
 
     "settings" => [
         "items" => [
             [
                 'priority' => 600,
-                "label"    => \Yii::t('skeeks/shop/app', 'Настройки магазина'),
+                "label"    => \Yii::t('skeeks/shop/app', 'Магазин'),
                 "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
 
                 'items' =>
@@ -308,18 +185,6 @@ return \yii\helpers\ArrayHelper::merge([
 
 
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
-                            "url"   => ["shop/admin-shop-store-supplier"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
-                        ],
-
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Склады/Магазины'),
-                            "url"   => ["shop/admin-shop-store"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-                        ],
-
-                        [
                             "label" => \Yii::t('skeeks/shop/app', 'Облачные кассы'),
                             "url"   => ["shop/admin-shop-cloudkassa"],
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
@@ -364,4 +229,28 @@ return \yii\helpers\ArrayHelper::merge([
 
         ],
     ],
+
+    "shop-doc-move" => [
+        "label" => \Yii::t('skeeks/shop/app', 'Движение товара'),
+        "url"   => ["shop/admin-shop-store-doc-move"],
+        "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/icons8.png'],
+        'priority' => 270,
+    ],
+
+    "shop-store" => [
+        "label" => \Yii::t('skeeks/shop/app', 'Склады/Магазины'),
+        "url"   => ["shop/admin-shop-store"],
+        "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+        'priority' => 272,
+    ],
+
+    "shop-supplier" => [
+        "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
+        "url"   => ["shop/admin-shop-store-supplier"],
+        "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
+        'priority' => 273,
+    ],
+
+
+
 ], \skeeks\cms\shop\components\ShopComponent::getAdminShopProductsMenu());

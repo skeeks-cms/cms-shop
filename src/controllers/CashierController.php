@@ -22,6 +22,9 @@ use skeeks\cms\shop\models\ShopOrderItem;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopStoreDocMove;
+use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\models\ShopStoreProductMove;
 use yii\base\Exception;
 use yii\data\Pagination;
 
@@ -930,6 +933,16 @@ class CashierController extends BackendController
                 $check->amount = $order->amount;
 
 
+                //Создать движение товара
+                $doc = new ShopStoreDocMove();
+                $doc->doc_type = $order->order_type == ShopOrder::TYPE_SALE ? ShopStoreDocMove::DOCTYPE_SALE : ShopStoreDocMove::DOCTYPE_RETURN;
+                $doc->shop_store_id = \Yii::$app->shop->backendShopStore->id;
+                $doc->is_active = 1;
+                if (!$doc->save()) {
+                    throw new Exception("Ошибка: ".print_r($doc->errors, true));
+                }
+
+
                 $items = [];
                 //Это формирование по правилам modulkassa
                 foreach ($order->shopOrderItems as $item) {
@@ -945,6 +958,35 @@ class CashierController extends BackendController
                     ];
 
                     $items[] = $itemData;
+
+
+                    /**
+                     * @var $shopStoreProduct ShopStoreProduct
+                     */
+                    $shopStoreProduct = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => $item->shop_product_id])->one();
+                    if ($shopStoreProduct) {
+                        $shopStoreProduct->isAllowCorrection = false;
+                        if ($order->order_type == ShopOrder::TYPE_SALE) {
+                            $shopStoreProduct->quantity = $shopStoreProduct->quantity - $item->quantity;
+                        } else {
+                            $shopStoreProduct->quantity = $shopStoreProduct->quantity + $item->quantity;
+                        }
+                        if (!$shopStoreProduct->update(false, ['quantity'])) {
+                            throw new Exception("Ошибка: ".print_r($shopStoreProduct->errors, true));
+                        }
+                    }
+                    $move = new ShopStoreProductMove();
+                    $move->is_active = 1;
+                    $move->quantity = $order->order_type == ShopOrder::TYPE_SALE ? (-1 * (float)$item->quantity) : ((float)$item->quantity);
+                    $move->shop_store_doc_move_id = $doc->id;
+                    $move->price = round($item->amount, 2);
+                    $move->product_name = $item->name;
+                    $move->shop_store_product_id = $shopStoreProduct ? $shopStoreProduct->id : null;
+
+                    if (!$move->save()) {
+                        throw new Exception("Ошибка: ".print_r($move->errors, true));
+                    }
+
                 }
                 $check->inventPositions = $items;
                 $check->moneyPositions = [
@@ -979,10 +1021,19 @@ class CashierController extends BackendController
                     throw new Exception("Не сохранился платеж: ".print_r($payment->errors, true));
                 }
 
+
+
+
+
+
+
                 //Работа с облачной кассой, нужно сделать чек
                 if ($shopCloudkassa = $this->shift->shopCashebox->shopCloudkassa) {
                     $shopCloudkassa->handler->createFiscalCheck($check);
                 }
+
+
+
 
 
                 $newOrder = new ShopOrder();
