@@ -1232,7 +1232,7 @@ SQL
         $data = [
             'id'    => $cmsContentElement->id,
             "name"  => $cmsContentElement->seoName,
-            "price" => (float)$cmsContentElement->shopProduct->minProductPrice->money->amount,
+            "price" => (float) ($cmsContentElement->shopProduct->minProductPrice ? $cmsContentElement->shopProduct->minProductPrice->money->amount : $cmsContentElement->shopProduct->baseProductPrice->money->amount)
         ];
 
         if ($cmsContentElement->cmsTree) {

@@ -36,8 +36,8 @@ class m220722_130601__create_table__shop_check extends Migration
 
             'cms_site_id' => $this->integer()->notNull(),
 
-            'status'   => $this->string(255)->notNull()->defaulValue("new")->comment("Статус чека (new, wait, approved, error)"),
-            'doc_type' => $this->string(255)->notNull()->defaulValue("sale")->comment("Тип документа (sale, return, buy, bure_return)"),
+            'status'   => $this->string(255)->notNull()->defaultValue("new")->comment("Статус чека (new, wait, approved, error)"),
+            'doc_type' => $this->string(255)->notNull()->defaultValue("sale")->comment("Тип документа (sale, return, buy, bure_return)"),
 
             'shop_store_id'          => $this->integer()->comment('Магазин'),
             'shop_cashebox_id'       => $this->integer()->comment('Касса'),
