@@ -133,8 +133,12 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
             [['is_active'], 'integer'],
             [['is_active'], 'default', 'value' => 1],
 
+            [['external_id'], "filter", 'filter' => 'trim'],
+            [['name'], "filter", 'filter' => 'trim'],
+            
             [['external_id'], 'default', 'value' => null],
             [['external_data'], 'default', 'value' => null],
+            
             [['name'], 'default', 'value' => null],
             [['shop_product_id'], 'default', 'value' => null],
 

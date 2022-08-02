@@ -95,7 +95,7 @@ UPDATE
             INNER JOIN (
                 SELECT
                     /*if(ssp.selling_price is null, 0, ssp.selling_price) as selling_price*/
-                    (if(store.source_selling_price = 'purchase_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as price,
+                    (if(store.source_purchase_price = 'purchase_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as price,
                     (
                         IF(
                             ssp.quantity > 0,
@@ -159,7 +159,7 @@ FROM (
     INNER JOIN (
 
         SELECT
-            (if(store.source_purchase_price = 'selling_price', ssp.purchase_price, ssp.selling_price) * store.purchase_extra_charge / 100) as price,
+            (if(store.source_purchase_price = 'selling_price', ssp.selling_price, ssp.purchase_price) * store.selling_extra_charge / 100) as price,
             (
                 IF(
                     ssp.quantity > 0,
