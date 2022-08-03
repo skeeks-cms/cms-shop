@@ -14,9 +14,10 @@ class m200820_142301__alter_table__shop_discount extends Migration
     {
         $tableName = "shop_discount";
 
-        $this->dropIndex("site_id", $tableName);
+        $this->dropForeignKey("shop_discount__site_id", $tableName);
+        $this->dropIndex("shop_discount__site_id", $tableName);
         $this->renameColumn($tableName, "site_id", 'cms_site_id');
-        $this->createIndex("cms_site_id", $tableName, ["cms_site_id"]);
+        $this->createIndex("shop_discount__cms_site_id", $tableName, ["cms_site_id"]);
         $this->addForeignKey(
             "{$tableName}__cms_site_id", $tableName,
             'cms_site_id', '{{%cms_site}}', 'id', 'CASCADE', 'CASCADE'
