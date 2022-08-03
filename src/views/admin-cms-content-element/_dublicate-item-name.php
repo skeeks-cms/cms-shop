@@ -11,10 +11,9 @@
  */
 $elementsByBarcode = \skeeks\cms\shop\models\ShopCmsContentElement::find()
     ->joinWith("shopProduct as shopProduct", true, "INNER JOIN")
-    ->joinWith("shopProduct.shopProductBarcodes as shopProductBarcodes", true, "INNER JOIN")
     ->joinWith("cmsSite as cmsSite")
-    ->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id])
-    ->andWhere(['shopProductBarcodes.value' => $model->raw_row['barcode']])
+    ->cmsSite()
+    ->andWhere([\skeeks\cms\shop\models\ShopCmsContentElement::tableName() . '.name' => $model->name])
 ;
 /*print_r($elementsByBarcode->createCommand()->rawSql);die;*/
 

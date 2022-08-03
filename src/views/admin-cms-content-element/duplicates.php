@@ -8,12 +8,7 @@
 $controller = $this->context;
 $action = $controller->action;
 $content = $controller->content;
-$dm = new \skeeks\cms\base\DynamicModel([
-    'from',
-    'to',
-]);
-$dm->addRule(['from', 'to'], 'string');
-$dm->load(\Yii::$app->request->get());
+
 
 $q = \skeeks\cms\models\CmsContentElement::find()->from([
     'c' => \skeeks\cms\models\CmsContentElement::tableName(),
@@ -41,94 +36,144 @@ $qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()
     ->joinWith("shopProduct.shopProductBarcodes as shopProductBarcodes", true, "INNER JOIN")
     ->groupBy('shopProductBarcodes.value')
     ->orderBy(['count' => SORT_DESC])
-    ->having(['>', 'count', 1])
-;
+    ->having(['>', 'count', 1]);
 
-//print_r($qProducts->createCommand()->rawSql);die;
+$qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()
+    ->from([
+        'c' => \skeeks\cms\models\CmsContentElement::tableName(),
+    ])
+    ->addSelect(['c.*'])
+    ->addSelect(['barcode' => 'shopProductBarcodes.value'])
+    ->addSelect(['count' => new \yii\db\Expression("count(*)")])
+    ->cmsSite()
+    ->andWhere(['c.content_id' => $content->id])
+    ->joinWith("shopProduct as shopProduct", true, "INNER JOIN")
+    ->joinWith("shopProduct.shopProductBarcodes as shopProductBarcodes", true, "INNER JOIN")
+    ->groupBy('shopProductBarcodes.value')
+    ->orderBy(['count' => SORT_DESC])
+    ->having(['>', 'count', 1]);
+
+
+$qProductsName = \skeeks\cms\shop\models\ShopCmsContentElement::find()
+    ->from([
+        'c' => \skeeks\cms\models\CmsContentElement::tableName(),
+    ])
+    ->addSelect(['c.*'])
+    ->addSelect(['count' => new \yii\db\Expression("count(*)")])
+    ->cmsSite()
+    ->andWhere(['c.content_id' => $content->id])
+    ->joinWith("shopProduct as shopProduct", true, "INNER JOIN")
+    ->groupBy('c.name')
+    ->orderBy(['count' => SORT_DESC])
+    ->having(['>', 'count', 1]);
+
 
 ?>
-<?php /*$form = \yii\widgets\ActiveForm::begin([
-    'method' => 'get',
-]); */?><!--
-<div class="sx-bg-secondary">
-<div class="row" style="padding: 15px; padding-bottom: 0px;">
-    <div class="col">
-        <?php /*echo $form->field($dm, 'from')->textInput(['type' => 'date'])->label("Начало периода"); */?>
-    </div>
-    <div class="col">
-        <?php /*echo $form->field($dm, 'to')->textInput(['type' => 'date'])->label("Конец периода"); */?>
-    </div>
-    <div class="col my-auto">
-        <button type="submit" class="btn btn-primary">Отправить</button>
-    </div>
+<div class="sx-box sx-bg-secondary" style="padding: 10px; margin-bottom: 20px;">
+    <h3>Дубли по штрихкоду</h3>
+    <?php if ($qProducts->count() > 0) : ?>
+        <?
+        echo \skeeks\cms\backend\widgets\GridViewWidget::widget([
+            'dataProvider'   => new \yii\data\ActiveDataProvider([
+                'query' => $qProducts,
+            ]),
+            'visibleColumns' => [
+                'barcode',
+                'count',
+                'products',
+            ],
+            'columns'        => [
+                'barcode'  => [
+                    'label'         => 'Штрихкод',
+                    'value'         => function ($model) {
+                        return $model->raw_row['barcode'];
+                    },
+                    'headerOptions' => [
+                        'style' => 'width: 200px; ',
+                    ],
+                ],
+                'count'    => [
+                    'label'         => 'Количество товаров',
+                    'value'         => function ($model) {
+                        return $model->raw_row['count'];
+                    },
+                    'headerOptions' => [
+                        'style' => 'width: 50px;',
+                    ],
+                ],
+                'products' => [
+                    'label'  => 'Дубли',
+                    'format' => 'raw',
+                    'value'  => function ($model) {
+                        return \Yii::$app->view->render("_dublicate-item", [
+                            'model' => $model,
+                        ]);
+                    },
+                ],
+            ],
+        ]);
+        ?>
+    <?php else: ?>
+        <p style="color: green;">Нет дублей! Отлично!</p>
+    <?php endif; ?>
 </div>
+<div class="sx-box sx-bg-secondary" style="padding: 10px;">
+    <h3>Дубли по названию</h3>
+    <?php $widget = \yii\bootstrap\Alert::begin([
+        'closeButton' => false,
+    ]); ?>
+    <p style="color: red; font-weight: bold; margin-bottom: 5px;">Избавляйтесь от одинаковых названий!</p>
+    <ul>
+        <li>Во первых одинаковые названия приводят к ошибкам в работе, кассиров и менеджеров магазина!</li>
+        <li>Во вторых одинаковые названия это очень плохо для продвижения вашего сайта!</li>
+    </ul>
+    <?php $widget::end(); ?>
+    <?php if ($qProductsName->count() > 0) : ?>
+        <?
+        echo \skeeks\cms\backend\widgets\GridViewWidget::widget([
+            'dataProvider'   => new \yii\data\ActiveDataProvider([
+                'query'      => $qProductsName,
+
+            ]),
+            'visibleColumns' => [
+                'name',
+                'count',
+                'products',
+            ],
+
+            'columns'        => [
+                'name'     => [
+                    'label'         => 'Название - дубль',
+                    'value'         => function ($model) {
+                        return $model->name;
+                    },
+                    'headerOptions' => [
+                        'style' => 'width: 200px; ',
+                    ],
+                ],
+                'count'    => [
+                    'label'         => 'Количество',
+                    'value'         => function ($model) {
+                        return $model->raw_row['count'];
+                    },
+                    'headerOptions' => [
+                        'style' => 'width: 50px;',
+                    ],
+                ],
+                'products' => [
+                    'label'  => 'Товары',
+                    'format' => 'raw',
+                    'value'  => function ($model) {
+                        return \Yii::$app->view->render("_dublicate-item-name", [
+                            'model' => $model,
+                        ]);
+                    },
+                ],
+            ],
+
+        ]);
+        ?>
+    <?php else: ?>
+        <p>Нет дублей! Отлично!</p>
+    <?php endif; ?>
 </div>
---><?php /*$form::end(); */?>
-
-
-
-<?
-echo \skeeks\cms\widgets\GridView::widget([
-    'dataProvider' => new \yii\data\ActiveDataProvider([
-        'query' => $qProducts
-    ]),
-    'visibleColumns' => [
-        'barcode',
-        'count',
-        'products',
-    ],
-    'columns' => [
-        'barcode' => [
-            'label' => 'Штрихкод',
-            'value' => function($model) {
-                return $model->raw_row['barcode'];
-            },
-            'headerOptions' => [
-                'style' => 'width: 200px; '
-            ]
-        ],
-        'count' => [
-            'label' => 'Количество товаров',
-            'value' => function($model) {
-                return $model->raw_row['count'];
-            },
-            'headerOptions' => [
-                'style' => 'width: 50px;'
-            ]
-        ],
-        'products' => [
-            'label' => 'Дубли',
-            'format' => 'raw',
-            'value' => function($model) {
-                return \Yii::$app->view->render("_dublicate-item", [
-                    'model' => $model
-                ]);
-            }
-        ]
-    ]
-]);
-/*
-echo \yii\widgets\ListView::widget([
-    'dataProvider' => new \yii\data\ActiveDataProvider([
-        'query' => $qProducts
-    ]),
-    'itemView'     => '_dublicate-item.php',
-    'emptyText'    => '',
-    'options'      => [
-        'class' => '',
-        'tag'   => 'div',
-    ],
-    'itemOptions'  => [
-        'tag'   => 'div',
-        'class' => 'col-12 product-item',
-    ],
-    'pager'        => [
-        'container' => '.list-view-products',
-        'item'      => '.product-item',
-        'class'     => \skeeks\cms\themes\unify\widgets\ScrollAndSpPager::class,
-    ],
-    //"\n{items}<div class=\"box-paging\">{pager}</div>{summary}<div class='sx-js-pagination'></div>",
-    'layout'       => '<div class="row"><div class="col-md-12">{summary}</div></div>
-<div class="no-gutters row list-view-products">{items}</div>
-<div class="row"><div class="col-md-12">{pager}</div></div>',
-])*/ ?>

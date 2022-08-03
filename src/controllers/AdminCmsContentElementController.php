@@ -725,7 +725,7 @@ HTML
                     'generateAccess' => true,
                     'class'          => ViewBackendAction::class,
                     'name'           => 'Дубли',
-                    'icon'           => 'fas fa-arrows-alt-h',
+                    'icon'           => 'fas fa-copy',
                     'priority'       => 500,
                 ],
 
