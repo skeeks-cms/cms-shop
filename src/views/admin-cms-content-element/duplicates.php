@@ -119,6 +119,8 @@ $qProductsName = \skeeks\cms\shop\models\ShopCmsContentElement::find()
 </div>
 <div class="sx-box sx-bg-secondary" style="padding: 10px;">
     <h3>Дубли по названию</h3>
+    
+    <?php if ($qProductsName->count() > 0) : ?>
     <?php $widget = \yii\bootstrap\Alert::begin([
         'closeButton' => false,
     ]); ?>
@@ -128,7 +130,7 @@ $qProductsName = \skeeks\cms\shop\models\ShopCmsContentElement::find()
         <li>Во вторых одинаковые названия это очень плохо для продвижения вашего сайта!</li>
     </ul>
     <?php $widget::end(); ?>
-    <?php if ($qProductsName->count() > 0) : ?>
+    
         <?
         echo \skeeks\cms\backend\widgets\GridViewWidget::widget([
             'dataProvider'   => new \yii\data\ActiveDataProvider([
@@ -174,6 +176,6 @@ $qProductsName = \skeeks\cms\shop\models\ShopCmsContentElement::find()
         ]);
         ?>
     <?php else: ?>
-        <p>Нет дублей! Отлично!</p>
+        <p style="color: green;">Нет дублей! Отлично!</p>
     <?php endif; ?>
 </div>
