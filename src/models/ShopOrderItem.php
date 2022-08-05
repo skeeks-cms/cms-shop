@@ -252,7 +252,7 @@ class ShopOrderItem extends ActiveRecord
      */
     public function getTotalMoneyWithDiscount()
     {
-        return $this->totalMoney->sub($this->moneyDiscount);
+        return $this->totalMoney->sub($this->totalMoneyDiscount);
     }
     /**
      * Итоговая стоимость скидки

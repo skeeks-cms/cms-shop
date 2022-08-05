@@ -131,15 +131,15 @@ $url = $order->getPublicUrl();
     Оплачено: <?= Html::tag('b', (string)$order->money); ?>
 <?= Html::endTag('p'); ?>
 
-<?= Html::beginTag('h2'); ?>
+<?/*= Html::beginTag('h2'); */?><!--
     Покупатель:
-<?= Html::endTag('h2'); ?>
-<?=
+<?/*= Html::endTag('h2'); */?>
+--><?/*=
 \yii\widgets\DetailView::widget([
     'model'      => $order->buyer->relatedPropertiesModel,
     'attributes' => $order->buyer->relatedPropertiesModel->attributes(),
 ]);
-?>
+*/?>
 
 <?= Html::beginTag('p'); ?>
 <?= \Yii::t('skeeks/shop/app', 'The details of the order, you can track on the page'); ?>: <?= Html::a($url, $url); ?>

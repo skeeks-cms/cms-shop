@@ -949,7 +949,7 @@ class CashierController extends BackendController
                     $itemData = [
                         'name'          => $item->name,
                         'price'         => round($item->amount, 2),
-                        'discSum'         => round($item->discount_amount, 2),
+                        'discSum'         => round($item->totalMoneyDiscount->amount, 2),
                         'quantity'      => (float)$item->quantity,
                         'measure'       => $item->measure_code == 796 ? "pcs" : "other",
                         'vatTag'        => 1105,
