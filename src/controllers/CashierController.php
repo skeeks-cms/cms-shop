@@ -170,6 +170,12 @@ class CashierController extends BackendController
             $page = \Yii::$app->request->post("page", 0);
 
             $query = ShopCmsContentElement::find()
+                ->andWhere([
+                    'shopProduct.product_type' => [
+                        ShopProduct::TYPE_SIMPLE,
+                        ShopProduct::TYPE_OFFER
+                    ]
+                ])
                 ->from(['cce' => ShopCmsContentElement::tableName()])
                 ->innerJoinWith("shopProduct as shopProduct")
                 ->groupBy(["cce.id"]);

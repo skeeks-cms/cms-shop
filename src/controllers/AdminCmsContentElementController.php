@@ -24,6 +24,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\money\Money;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -40,11 +41,12 @@ use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
+use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
+use yii\bootstrap\Alert;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Expression;
@@ -74,12 +76,34 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     }
 
     /**
+     * @return bool
+     */
+    public function isProductGroup()
+    {
+        //var_dump(\Yii::$app->session->get("isProductGroup", 1));die;
+        return (bool)\Yii::$app->session->get("isProductGroup", 1);
+    }
+    /**
      * @inheritdoc
      */
     public function actions()
     {
         $actions = ArrayHelper::merge(parent::actions(), [
-                
+
+                "index" => [
+                    'on beforeRender' => function (Event $e) {
+                    $isGroup = $this->isProductGroup();
+                    
+                    if ($postValue = \Yii::$app->request->post()) {
+                        $isGroup = \Yii::$app->request->post("is_group");
+                        \Yii::$app->session->set("isProductGroup", (int)$isGroup);
+                    }
+                    $e->content = $e->content = $this->renderPartial("_index_btns", [
+                        'isGroup' => $isGroup
+                    ]);
+                },
+                ],
+
                 "view" => [
                     'class'    => BackendModelAction::class,
                     'priority' => 80,
@@ -125,6 +149,17 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                             $query->joinWith("shopProduct as sp");
                             $query->andWhere(['sp.offers_pid' => $this->model->id]);
                             $query->andWhere(['in', 'sp.id', ArrayHelper::map($helper->availableOffers, 'id', 'id')]);
+
+                            $query->joinWith('shopProduct as sp');
+
+                            if (\Yii::$app->skeeks->site->shopTypePrices) {
+                                foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
+                                    $query->leftJoin(["p{$shopTypePrice->id}" => ShopProductPrice::tableName()], [
+                                        "p{$shopTypePrice->id}.product_id"    => new Expression("sp.id"),
+                                        "p{$shopTypePrice->id}.type_price_id" => $shopTypePrice->id,
+                                    ]);
+                                }
+                            }
 
                             $this->initGridColumns($e->sender, $this->content);
                         };
@@ -393,7 +428,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                       
+
                         return \Yii::$app->user->can($this->permissionName."/copy", ['model' => $model]);
                     },
                 ],
@@ -452,10 +487,10 @@ HTML
                 ],
 
                 "price-tags" => [
-                    'class'        => BackendModelMultiDialogEditAction::class,
-                    "name"         => "Ценники",
-                    "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/_price-tags",
-                    'on init'      => function ($e) {
+                    'class'      => BackendModelMultiDialogEditAction::class,
+                    "name"       => "Ценники",
+                    "viewDialog" => "@skeeks/cms/shop/views/admin-cms-content-element/_price-tags",
+                    'on init'    => function ($e) {
                         $action = $e->sender;
                         /**
                          * @var BackendGridModelAction $action
@@ -522,7 +557,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        
+
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
 
@@ -561,7 +596,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                       
+
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                     'name'            => ['skeeks/shop/app', 'In baskets'],
@@ -639,7 +674,7 @@ HTML
                          * @var $site \skeeks\cms\shop\models\CmsSite
                          */
                         $site = $model->cmsSite;
-                        
+
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                 ],
@@ -866,7 +901,7 @@ HTML
             },
         ];
 
-        $shopColumns["shop.product_type"] = [
+        /*$shopColumns["shop.product_type"] = [
             'attribute' => "shop.product_type",
             'label'     => 'Тип товара',
             'format'    => 'raw',
@@ -876,19 +911,16 @@ HTML
                         $shopCmsContentElement->shopProduct->product_type);
                 }
             },
-        ];
-
-
-
+        ];*/
 
 
         $shopColumns["custom"] = [
-            'attribute' => 'id',
-            'label' => 'Товар/Услуга',
+            'attribute'     => 'id',
+            'label'         => 'Товар/Услуга',
             'headerOptions' => [
-                'style' => 'min-width: 300px;'
+                'style' => 'min-width: 300px;',
             ],
-            'class'     => ShopProductColumn::class,
+            'class'         => ShopProductColumn::class,
         ];
 
 
@@ -902,7 +934,7 @@ HTML
                     'format'    => 'raw',
                     'value'     => function (ShopCmsContentElement $model) use ($shopTypePrice) {
                         $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
-                        if ($shopProduct) {
+                        if ($shopProduct && !$shopProduct->isOffersProduct) {
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
                                 ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
                             ) {
@@ -910,9 +942,8 @@ HTML
                             }
                         }
 
-                        return null;
+                        return "";
                     },
-
 
 
                 ];
@@ -929,14 +960,117 @@ HTML
             }
         }
 
+        $purchaseTypePrice = \Yii::$app->skeeks->site->getShopTypePrices()->andWhere(['is_purchase' => 1])->one();
+        $defaultTypePrice = \Yii::$app->skeeks->site->getShopTypePrices()->andWhere(['is_default' => 1])->one();
+
+        if ($purchaseTypePrice && $defaultTypePrice) {
+            $baseMoney = new Money("0", \Yii::$app->money->currencyCode);
+            $shopColumns["shop.marginality_per"] = [
+                'attribute' => "shop.marginality_per",
+                'label'     => "Маржинальность, %",
+                'format'    => 'raw',
+
+                'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $grid->dataProvider->query;
+
+
+                    $query->addSelect([
+                        'marginality_purchase' => "p{$purchaseTypePrice->id}.price",
+                    ]);
+
+
+                    $query->addSelect([
+                        'marginality_selling' => "p{$defaultTypePrice->id}.price",
+                    ]);
+
+                    $query->addSelect([
+                        'marginality_per' => new Expression("if (p{$defaultTypePrice->id}.price > 0 AND p{$purchaseTypePrice->id}.price > 0, ((p{$defaultTypePrice->id}.price - p{$purchaseTypePrice->id}.price) / p{$defaultTypePrice->id}.price * 100), 0)"),
+                    ]);
+
+                    $grid->sortAttributes["shop.marginality_per"] = [
+                        'asc'  => ['marginality_per' => SORT_ASC],
+                        'desc' => ['marginality_per' => SORT_DESC],
+                    ];
+                },
+
+                'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+                    if ($shopCmsContentElement->shopProduct && !$shopCmsContentElement->shopProduct->isOffersProduct) {
+
+                        $result = $shopCmsContentElement->raw_row['marginality_per'] ? \Yii::$app->formatter->asDecimal($shopCmsContentElement->raw_row['marginality_per'])." %" : "";
+                        $color = "red";
+                        if ($result < 0) {
+                            $color = "red";
+                        }
+                        if ($result > 0) {
+                            $color = "green";
+                        }
+
+                        return Html::tag("div", $result, [
+                            'style' => "color: {$color}",
+                        ]);
+                    }
+                    return "";
+                },
+            ];
+
+
+            $shopColumns["shop.marginality_abs"] = [
+                'attribute' => "shop.marginality_abs",
+                'label'     => "Маржинальность, ".$baseMoney->currency->symbol,
+                'format'    => 'raw',
+
+                'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $grid->dataProvider->query;
+
+
+                    $query->addSelect([
+                        'marginality_abs' => new Expression("if (p{$defaultTypePrice->id}.price > 0 AND p{$purchaseTypePrice->id}.price > 0, ((p{$defaultTypePrice->id}.price - p{$purchaseTypePrice->id}.price)), 0)"),
+                    ]);
+
+                    $grid->sortAttributes["shop.marginality_abs"] = [
+                        'asc'  => ['marginality_abs' => SORT_ASC],
+                        'desc' => ['marginality_abs' => SORT_DESC],
+                    ];
+                },
+
+                'value' => function (ShopCmsContentElement $shopCmsContentElement) use ($baseMoney) {
+                    if ($shopCmsContentElement->shopProduct && !$shopCmsContentElement->shopProduct->isOffersProduct) {
+
+                        $result = $shopCmsContentElement->raw_row['marginality_abs'] ? \Yii::$app->formatter->asDecimal($shopCmsContentElement->raw_row['marginality_abs'])." ".$baseMoney->currency->symbol : "";
+
+                        $color = "red";
+                        if ($result < 0) {
+                            $color = "red";
+                        }
+                        if ($result > 0) {
+                            $color = "green";
+                        }
+
+                        return Html::tag("div", $result, [
+                            'style' => "color: {$color}",
+                        ]);
+                    }
+                    return "";
+                },
+            ];
+            $visibleColumns[] = "shop.marginality_per";
+            $visibleColumns[] = "shop.marginality_abs";
+        }
+
+
         /**
          * @var ShopStore[] $stores
          */
         if ($stores = ShopStore::find()->cmsSite()->all()) {
-            foreach ($stores as $store)
-            {
-                $shopColumns["shop.quantity_" . $store->id] = [
-                    'attribute' => "shop.quantity_" . $store->id,
+            foreach ($stores as $store) {
+                $shopColumns["shop.quantity_".$store->id] = [
+                    'attribute' => "shop.quantity_".$store->id,
                     'label'     => $store->name,
                     'format'    => 'raw',
 
@@ -951,56 +1085,110 @@ HTML
                         )->andWhere(['shop_store_id' => $store->id]);
 
                         $query->addSelect([
-                            'quantity_' . $store->id => $subQuery,
+                            'quantity_'.$store->id => $subQuery,
                         ]);
 
 
-                        $grid->sortAttributes["shop.quantity_" . $store->id] = [
-                            'asc'  => ['quantity_' . $store->id => SORT_ASC],
-                            'desc' => ['quantity_' . $store->id => SORT_DESC],
+                        $grid->sortAttributes["shop.quantity_".$store->id] = [
+                            'asc'  => ['quantity_'.$store->id => SORT_ASC],
+                            'desc' => ['quantity_'.$store->id => SORT_DESC],
                         ];
                     },
 
-                    'value'     => function (ShopCmsContentElement $shopCmsContentElement) use ($store) {
+                    'value' => function (ShopCmsContentElement $shopCmsContentElement) use ($store) {
                         if ($shopCmsContentElement->shopProduct) {
-                            return (float) $shopCmsContentElement->raw_row['quantity_' . $store->id] . " " . $shopCmsContentElement->shopProduct->measure->symbol;
+                            return (float)$shopCmsContentElement->raw_row['quantity_'.$store->id]." ".$shopCmsContentElement->shopProduct->measure->symbol;
                         }
-                        return "—";
+                        return "";
                     },
 
                 ];
 
                 if (!$store->is_supplier) {
-                    $visibleColumns[] = "shop.quantity_" . $store->id;
+                    //$visibleColumns[] = "shop.quantity_" . $store->id;
                 }
-
-
             }
         }
 
-        /*$shopColumns["shop.quantity"] = [
-            'attribute' => "shop.quantity",
-            'label'     => 'Количество под заказ',
-            'format'    => 'raw',
-            'value'     => function (ShopCmsContentElement $shopCmsContentElement) {
-                if ($shopCmsContentElement->shopProduct) {
-                    return $shopCmsContentElement->shopProduct->quantity." ".$shopCmsContentElement->shopProduct->measure->symbol;
-                }
-                return "—";
-            },
-        ];*/
+        if (ShopStore::find()->isSupplier(false)->cmsSite()->exists()) {
+            $shopColumns["shop.quantity_our"] = [
+                'attribute' => "shop.quantity_our",
+                'label'     => "В наличии",
+                'format'    => 'raw',
 
-        //$visibleColumns[] = "shop.quantity";
+                'beforeCreateCallback' => function (GridView $grid) use ($store) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $grid->dataProvider->query;
+
+                    $subQuery = ShopStoreProduct::find()->select(["quantity" => new Expression("sum(quantity)")])->andWhere(
+                        ['shop_product_id' => new Expression("sp.id")],
+                    )->andWhere(['shop_store_id' => ShopStore::find()->isSupplier(false)->cmsSite()->select(['id'])]);
+
+                    $query->addSelect([
+                        'quantity_our' => $subQuery,
+                    ]);
+
+
+                    $grid->sortAttributes["shop.quantity_our"] = [
+                        'asc'  => ['quantity_our' => SORT_ASC],
+                        'desc' => ['quantity_our' => SORT_DESC],
+                    ];
+                },
+
+                'value' => function (ShopCmsContentElement $shopCmsContentElement) use ($store) {
+                    if ($shopCmsContentElement->shopProduct && !$shopCmsContentElement->shopProduct->isOffersProduct) {
+
+                        return (float)$shopCmsContentElement->raw_row['quantity_our']." ".$shopCmsContentElement->shopProduct->measure->symbol;
+                    }
+                    return "";
+                },
+            ];
+            $visibleColumns[] = "shop.quantity_our";
+        }
+
+
+        if (ShopStore::find()->isSupplier(true)->cmsSite()->exists()) {
+            $shopColumns["shop.quantity_suppliers"] = [
+                'attribute' => "shop.quantity_suppliers",
+                'label'     => "У поставщиков",
+                'format'    => 'raw',
+
+                'beforeCreateCallback' => function (GridView $grid) use ($store) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $grid->dataProvider->query;
+
+                    $subQuery = ShopStoreProduct::find()->select(["quantity" => new Expression("sum(quantity)")])->andWhere(
+                        ['shop_product_id' => new Expression("sp.id")],
+                    )->andWhere(['shop_store_id' => ShopStore::find()->isSupplier(true)->cmsSite()->select(['id'])]);
+
+                    $query->addSelect([
+                        'quantity_suppliers' => $subQuery,
+                    ]);
+
+
+                    $grid->sortAttributes["shop.quantity_suppliers"] = [
+                        'asc'  => ['quantity_suppliers' => SORT_ASC],
+                        'desc' => ['quantity_suppliers' => SORT_DESC],
+                    ];
+                },
+
+                'value' => function (ShopCmsContentElement $shopCmsContentElement) use ($store) {
+                    if ($shopCmsContentElement->shopProduct && !$shopCmsContentElement->shopProduct->isOffersProduct) {
+                        return (float)$shopCmsContentElement->raw_row['quantity_suppliers']." ".$shopCmsContentElement->shopProduct->measure->symbol;
+                    }
+                    return "";
+                },
+            ];
+            $visibleColumns[] = "shop.quantity_suppliers";
+        }
+
+
         $visibleColumns[] = "shop.barcodes";
 
-        /*$sortAttributes["shop.quantity"] = [
-            'asc'  => ['sp.quantity' => SORT_ASC],
-            'desc' => ['sp.quantity' => SORT_DESC],
-        ];*/
-        $sortAttributes["shop.product_type"] = [
-            'asc'  => ['sp.product_type' => SORT_ASC],
-            'desc' => ['sp.product_type' => SORT_DESC],
-        ];
 
         if ($shopColumns) {
             ArrayHelper::remove($grid->columns, 'custom');
@@ -1013,7 +1201,6 @@ HTML
             ], $visibleColumns);
             $visibleColumns = ArrayHelper::merge($visibleColumns, ['active', 'view']);
             $grid->visibleColumns = $visibleColumns;
-
             $grid->sortAttributes = ArrayHelper::merge($grid->sortAttributes, $sortAttributes);
         }
     }
@@ -1023,99 +1210,125 @@ HTML
     {
         parent::initGridData($action, $content);
 
-        $sortAttributes = [];
         $filterFields = [];
         $filterFieldsLabels = [];
         $filterFieldsRules = [];
 
 
-        $sortAttributes["shop.quantity"] = [
-            'asc'  => ['sp.quantity' => SORT_ASC],
-            'desc' => ['sp.quantity' => SORT_DESC],
-        ];
-        $sortAttributes["shop.product_type"] = [
-            'asc'  => ['sp.product_type' => SORT_ASC],
-            'desc' => ['sp.product_type' => SORT_DESC],
-        ];
+        if ($is_quantity_our_filter = ShopStore::find()->isSupplier(false)->cmsSite()->exists()) {
+            $filterFields['quantity_our_filter'] = [
+                'class'                   => NumberFilterField::class,
+                'label'                   => 'В наличии',
+                'isAddAttributeTableName' => false,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == '0') {
+
+                        $field->setIsHaving();
+
+                        $subQuery = ShopStoreProduct::find()->select(["quantity" => new Expression("sum(quantity)")])->andWhere(
+                            ['shop_product_id' => new Expression("sp.id")],
+                        )->andWhere(['shop_store_id' => ShopStore::find()->isSupplier(false)->cmsSite()->select(['id'])]);
+
+                        $query->addSelect([
+                            'quantity_our_filter' => $subQuery,
+                        ]);
+                    }
 
 
-        if (\Yii::$app->shop->shopTypePrices) {
-
-            foreach (\Yii::$app->shop->shopTypePrices as $shopTypePrice) {
-
-                $sortAttributes['shop.price'.$shopTypePrice->id] = [
-                    'asc'     => ["p{$shopTypePrice->id}.price" => SORT_ASC],
-                    'desc'    => ["p{$shopTypePrice->id}.price" => SORT_DESC],
-                    'label'   => $shopTypePrice->name,
-                    'default' => SORT_ASC,
-                ];
-            }
+                    return true;
+                },
+            ];
         }
 
+        if ($is_quantity_supplier_filter = ShopStore::find()->isSupplier(true)->cmsSite()->exists()) {
+            $filterFields['quantity_supplier_filter'] = [
+                'class'                   => NumberFilterField::class,
+                'label'                   => 'Количество у поставщиков',
+                'isAddAttributeTableName' => false,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
 
-        $filterFields['shop_product_type'] = [
-            'class'    => SelectField::class,
-            'items'    => \skeeks\cms\shop\models\ShopProduct::possibleProductTypes(),
-            'label'    => 'Тип товара',
-            'multiple' => true,
-            'on apply' => function (QueryFiltersEvent $e) {
-                /**
-                 * @var $query ActiveQuery
-                 */
-                $query = $e->dataProvider->query;
+                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == '0') {
 
-                if ($e->field->value) {
-                    $query->andWhere(['sp.product_type' => $e->field->value]);
-                }
-            },
-        ];
+                        $field->setIsHaving();
 
-        $filterFields['all_ids'] = [
-            'class'    => TextField::class,
-            'label'    => 'ID + вложенные',
-            'on apply' => function (QueryFiltersEvent $e) {
-                /**
-                 * @var $query ActiveQuery
-                 **/
-                $query = $e->dataProvider->query;
+                        $subQuery = ShopStoreProduct::find()->select(["quantity" => new Expression("sum(quantity)")])->andWhere(
+                            ['shop_product_id' => new Expression("sp.id")],
+                        )->andWhere(['shop_store_id' => ShopStore::find()->isSupplier(true)->cmsSite()->select(['id'])]);
 
-                if ($e->field->value) {
-
-                    $q = ShopProduct::find()
-                        ->select(['parent_id' => 'cmsContentElement.parent_content_element_id'])
-                        ->joinWith('cmsContentElement as cmsContentElement')
-                        ->where([ShopProduct::tableName().'.id' => $e->field->value])//->andWhere(['is not', 'cmsContentElement.parent_content_element_id', null])
-                    ;
-
-                    //print_R($q->createCommand()->rawSql);die;
+                        $query->addSelect([
+                            'quantity_supplier_filter' => $subQuery,
+                        ]);
+                    }
 
 
-                    $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(ShopCmsContentElement::tableName().".id")]);
-
-                    $query->andWhere([
-                        'or',
-                        [ShopCmsContentElement::tableName().'.id' => $e->field->value],
-                        ['is not', 'p.parent_id', null],
-                    ]);
-                }
-            },
-        ];
+                    return true;
+                },
 
 
-        $filterFields['shop_quantity'] = [
-            'class'           => NumberFilterField::class,
-            'label'           => 'Количество',
-            'filterAttribute' => 'sp.quantity',
-            /*'on apply' => function (QueryFiltersEvent $e) {
-                /**
-                 * @var $query ActiveQuery
-                $query = $e->dataProvider->query;
+            ];
+        }
 
-                if ($e->field->value) {
-                    $query->andWhere(['sp.product_type' => $e->field->value]);
-                }
-            },*/
-        ];
+        if ($is_quantity_our_filter || $is_quantity_supplier_filter) {
+            $filterFields['filter_other'] = [
+                'class'                   => SelectField::class,
+                'items' => [
+                    'not_tied' => 'Не связаны с магазинами и поставщиками',
+                    'tied' => 'Связаны с магазинами и поставщиками'
+                ],
+                'label'                   => 'Связка и оформление',
+                'on apply'       => function (QueryFiltersEvent $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if ($e->field->value == 'tied') {
+                        //$query->joinWith("childrenContentElements as child");
+                        //$query->joinWith("childrenContentElements.parentContentElement as parent");
+
+                        $subQuery = ShopStoreProduct::find()->select(["total" => new Expression("count(id)")])->andWhere(
+                            ['shop_product_id' => new Expression("sp.id")],
+                        );
+                        
+                        $query->addSelect([
+                            'total_tied' => $subQuery,
+                        ]);
+
+                        $query->andHaving([
+                            '>', 'total_tied', 0
+                        ]);
+                    } elseif ($e->field->value == 'not_tied') {
+                        $subQuery = ShopStoreProduct::find()->select(["total" => new Expression("count(id)")])->andWhere(
+                            ['shop_product_id' => new Expression("sp.id")],
+                        );
+
+                        $query->addSelect([
+                            'total_tied' => $subQuery,
+                        ]);
+
+                        $query->andHaving([
+                            '<=', 'total_tied', 0
+                        ]);
+                    }
+                },
+            ];
+        }
+
 
         $filterFields['supplier_external_jsondata'] = [
             'class'           => StringFilterField::class,
@@ -1144,7 +1357,7 @@ HTML
                 $query->joinWith("shopProduct as shopProduct");
                 $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
                 $query->groupBy([
-                    ShopCmsContentElement::tableName() . ".id"
+                    ShopCmsContentElement::tableName().".id",
                 ]);
 
                 /*if ($e->field->value) {
@@ -1155,10 +1368,10 @@ HTML
 
 
         $filterFields['stores'] = [
-            'class'           => StringFilterField::class,
-            'label'           => 'Магазин/склад',
+            'class'    => StringFilterField::class,
+            'label'    => 'Магазин/склад',
             //'filterAttribute' => 'shopStoreProducts.shop_store_id',
-            'on apply'        => function (QueryFiltersEvent $e) {
+            'on apply' => function (QueryFiltersEvent $e) {
                 /**
                  * @var $query ActiveQuery
                  */
@@ -1179,13 +1392,160 @@ HTML
 
         ];
 
+        $purchaseTypePrice = \Yii::$app->skeeks->site->getShopTypePrices()->andWhere(['is_purchase' => 1])->one();
+        $defaultTypePrice = \Yii::$app->skeeks->site->getShopTypePrices()->andWhere(['is_default' => 1])->one();
+
+        if ($purchaseTypePrice && $defaultTypePrice) {
+            $baseMoney = new Money("0", \Yii::$app->money->currencyCode);
+
+            $filterFields["marginality_per_filter"] = [
+                'attribute' => "marginality_per_filter",
+                'label'     => "Маржинальность, %",
+                'class'     => NumberFilterField::class,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+
+                'isAddAttributeTableName' => false,
+                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) use ($defaultTypePrice, $purchaseTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
+
+                        $field->setIsHaving();
+
+                        $query->addSelect([
+                            'marginality_per_filter' => new Expression("(p{$defaultTypePrice->id}.price - p{$purchaseTypePrice->id}.price) / p{$defaultTypePrice->id}.price * 100"),
+                        ]);
+                    }
+                    return true;
+                },
+            ];
+
+            $filterFields["marginality_abs_filter"] = [
+                'attribute' => "marginality_abs_filter",
+                'label'     => "Маржинальность, ".$baseMoney->currency->symbol,
+                'class'     => NumberFilterField::class,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+
+                'isAddAttributeTableName' => false,
+                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) use ($defaultTypePrice, $purchaseTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
+
+                        $field->setIsHaving();
+
+                        $query->addSelect([
+                            'marginality_per_filter' => new Expression("(p{$defaultTypePrice->id}.price - p{$purchaseTypePrice->id}.price)"),
+                        ]);
+                    }
+                    return true;
+                },
+            ];
+
+            $filterFields["marginality_abs_filter"] = [
+                'attribute' => "marginality_abs_filter",
+                'label'     => "Маржинальность, ".$baseMoney->currency->symbol,
+                'class'     => NumberFilterField::class,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+
+                'isAddAttributeTableName' => false,
+                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) use ($defaultTypePrice, $purchaseTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
+
+                        $field->setIsHaving();
+
+                        $query->addSelect([
+                            'marginality_per_filter' => new Expression("(p{$defaultTypePrice->id}.price - p{$purchaseTypePrice->id}.price)"),
+                        ]);
+                    }
+                    return true;
+                },
+            ];
+        }
+
+        if ($defaultTypePrice) {
+            $filterFields["retail_price_filter"] = [
+                'attribute' => "retail_price_filter",
+                'label'     => $defaultTypePrice->name,
+                'class'     => NumberFilterField::class,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+
+                'isAddAttributeTableName' => false,
+                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) use ($defaultTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
+
+                        $field->setIsHaving();
+
+                        $query->addSelect([
+                            'retail_price_filter' => new Expression("(p{$defaultTypePrice->id}.price)"),
+                        ]);
+                    }
+                    return true;
+                },
+            ];
+        }
+
+
+        if ($purchaseTypePrice) {
+            $filterFields["purchase_price_filter"] = [
+                'attribute' => "purchase_price_filter",
+                'label'     => $defaultTypePrice->name,
+                'class'     => NumberFilterField::class,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+
+                'isAddAttributeTableName' => false,
+                'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) use ($purchaseTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+
+                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
+
+                        $field->setIsHaving();
+
+                        $query->addSelect([
+                            'purchase_price_filter' => new Expression("(p{$purchaseTypePrice->id}.price)"),
+                        ]);
+                    }
+                    return true;
+                },
+            ];
+        }
+
 
         //Только для сайта поставщика
         if (\Yii::$app->skeeks->site->shopSite->is_receiver) {
             $filterFields['is_ready'] = [
                 'class'    => SelectField::class,
                 'items'    => [
-                    'on'  => 'Готов',
+                    'on'  => 'Привязан',
                     'off' => 'Не привязан',
                 ],
                 'label'    => 'Привязка',
@@ -1207,37 +1567,13 @@ HTML
                     }
                 },
             ];
-            /*$filterFields['is_error'] = [
-                'class'    => SelectField::class,
-                'items'    => [
-                    'yes' => 'Ошибочно привязан',
-                ],
-                'label'    => 'Ошибка привязки',
-                'multiple' => false,
-                'on apply' => function (QueryFiltersEvent $e) {
-                    /**
-                     * @var $query ActiveQuery
-                    $query = $e->dataProvider->query;
-
-                    if ($e->field->value) {
-                        if ($e->field->value == 'yes') {
-                            $query->joinWith('shopProduct.shopMainProduct as shopMainProduct');
-                            $query->andWhere(['shopMainProduct.product_type' => ShopProduct::TYPE_OFFERS]);
-                            $query->groupBy(ShopCmsContentElement::tableName().".id");
-                        }
-
-                    }
-                },
-            ];*/
 
             $filterFieldsLabels['is_ready'] = 'Привязка';
             $filterFieldsRules[] = ['is_ready', 'safe'];
 
-            /*$filterFieldsLabels['is_error'] = 'Ошибочно привязан';
-            $filterFieldsRules[] = ['is_error', 'safe'];*/
         }
 
-        if (\Yii::$app->skeeks->site->is_default) {
+        /*if (\Yii::$app->skeeks->site->is_default) {
             $filterFields['is_suppliers'] = [
                 'class'    => SelectField::class,
                 'items'    => [
@@ -1249,7 +1585,6 @@ HTML
                 'on apply' => function (QueryFiltersEvent $e) {
                     /**
                      * @var $query ActiveQuery
-                     */
                     $query = $e->dataProvider->query;
 
                     if ($e->field->value) {
@@ -1269,24 +1604,60 @@ HTML
 
             $filterFieldsLabels['is_suppliers'] = 'Привязаны поставщики?';
             $filterFieldsRules[] = ['is_suppliers', 'safe'];
+        }*/
+
+        $visibleFilters = [
+            'barcodes',
+        ];
+
+        if ($is_quantity_our_filter) {
+            $visibleFilters[] = 'quantity_our_filter';
+        }
+        if ($is_quantity_supplier_filter) {
+            $visibleFilters[] = 'quantity_supplier_filter';
+        }
+        if ($purchaseTypePrice) {
+            $visibleFilters[] = 'purchase_price_filter';
+        }
+        if ($defaultTypePrice) {
+            $visibleFilters[] = 'retail_price_filter';
         }
 
+        if ($purchaseTypePrice && $defaultTypePrice) {
+            $visibleFilters[] = 'marginality_abs_filter';
+            $visibleFilters[] = 'marginality_per_filter';
+        }
+        
 
         $filterFieldsLabels['shop_product_type'] = 'Тип товара';
         $filterFieldsLabels['barcodes'] = 'Штрихкод';
         $filterFieldsLabels['stores'] = 'Магазин/склад';
-
-        $filterFieldsLabels['shop_quantity'] = 'Количество';
-        $filterFieldsLabels['all_ids'] = 'ID + вложенные';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика';
+        $filterFieldsLabels['quantity_our_filter'] = "В наличии";
+        $filterFieldsLabels['quantity_supplier_filter'] = "Количество у поставщиков";
+        $filterFieldsLabels['marginality_abs_filter'] = "Маржинальность, значение";
+        $filterFieldsLabels['marginality_per_filter'] = "Маржинальность, %";
+        $filterFieldsLabels['retail_price_filter'] = "";
+        $filterFieldsLabels['purchase_price_filter'] = "";
+        $filterFieldsLabels['filter_other'] = "Связка и оформление";
+
 
 
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
-        $filterFieldsRules[] = ['shop_quantity', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
+        $filterFieldsRules[] = ['quantity_our_filter', 'safe'];
+        $filterFieldsRules[] = ['quantity_supplier_filter', 'safe'];
         $filterFieldsRules[] = ['barcodes', 'string'];
         $filterFieldsRules[] = ['stores', 'safe'];
-        $filterFieldsRules[] = ['all_ids', 'safe'];
+        $filterFieldsRules[] = ['marginality_abs_filter', 'safe'];
+        $filterFieldsRules[] = ['marginality_per_filter', 'safe'];
+        $filterFieldsRules[] = ['retail_price_filter', 'safe'];
+        $filterFieldsRules[] = ['purchase_price_filter', 'safe'];
+        $filterFieldsRules[] = ['filter_other', 'safe'];
+
+
+
+
 
         //Мерж колонок и сортировок
         if ($filterFields) {
@@ -1297,8 +1668,9 @@ HTML
             $action->filters['filtersModel']['attributeLabels'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'attributeLabels']), $filterFieldsLabels);
             $action->filters['filtersModel']['rules'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['filtersModel', 'rules']), $filterFieldsRules);
 
-            //$action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), array_keys($filterFieldsLabels));
+            $action->filters['visibleFilters'] = ArrayHelper::merge((array)ArrayHelper::getValue($action->filters, ['visibleFilters']), $visibleFilters);
         }
+
         //Приджоивание магазинных данных
         $action->grid['on init'] = function (Event $event) {
             /**
@@ -1307,7 +1679,7 @@ HTML
             $query = $event->sender->dataProvider->query;
 
             $query->select([
-                ShopCmsContentElement::tableName().".*"
+                ShopCmsContentElement::tableName().".*",
             ]);
 
             $query->with("image");
@@ -1324,11 +1696,7 @@ HTML
             if ($this->content) {
                 $query->andWhere([CmsContentElement::tableName().'.content_id' => $this->content->id]);
             }
-            //$this->initGridColumns($event->sender, $this->content);
-
             $query->joinWith('shopProduct as sp');
-            //$query->joinWith('shopProduct.shopProductOffers as shopProductOffers');
-            //$query->groupBy([ShopCmsContentElement::tableName().".id"]);
 
             if (\Yii::$app->skeeks->site->shopTypePrices) {
                 foreach (\Yii::$app->skeeks->site->shopTypePrices as $shopTypePrice) {
@@ -1361,14 +1729,27 @@ HTML
             } else {
                 $site_id = \Yii::$app->skeeks->site->id;
                 $query->andWhere(['cms_site_id' => $site_id]);
-                $query->andWhere([
-                    'in',
-                    'sp.product_type',
-                    [
-                        ShopProduct::TYPE_SIMPLE,
-                        ShopProduct::TYPE_OFFERS,
-                    ],
-                ]);
+                
+                if ($this->isProductGroup()) {
+                    $query->andWhere([
+                        'in',
+                        'sp.product_type',
+                        [
+                            ShopProduct::TYPE_SIMPLE,
+                            ShopProduct::TYPE_OFFERS,
+                        ],
+                    ]);
+                } else {
+                    $query->andWhere([
+                        'in',
+                        'sp.product_type',
+                        [
+                            ShopProduct::TYPE_SIMPLE,
+                            ShopProduct::TYPE_OFFER,
+                        ],
+                    ]);
+                }
+                
             }
 
 
@@ -1409,15 +1790,15 @@ HTML
 
 
         /**
-        if ($shopStores = ShopStore::find()->where(['cms_site_id' => \Yii::$app->skeeks->site->id])->all()) {
-            foreach ($shopStores as $shopStore) {
-                $ssp = new ShopStoreProduct([
-                    'shop_store_id' => $shopStore->id,
-                ]);
-
-                $shopStoreProducts[] = $ssp;
-            }
-        }*/
+         * if ($shopStores = ShopStore::find()->where(['cms_site_id' => \Yii::$app->skeeks->site->id])->all()) {
+         * foreach ($shopStores as $shopStore) {
+         * $ssp = new ShopStoreProduct([
+         * 'shop_store_id' => $shopStore->id,
+         * ]);
+         *
+         * $shopStoreProducts[] = $ssp;
+         * }
+         * }*/
 
 
         $modelClassName = $this->modelClassName;
@@ -1601,12 +1982,12 @@ CSS
             'shopProduct'       => $shopProduct,
             'productPrices'     => $productPrices,
             'shopStoreProducts' => $shopStoreProducts,
-            'is_create'  => true,
+            'is_create'         => true,
             //'baseProductPrice' => $baseProductPrice,
 
-            'is_saved'                     => $is_saved,
-            'submitBtn'                    => \Yii::$app->request->post('submit-btn'),
-            'redirect'                     => $redirect,
+            'is_saved'         => $is_saved,
+            'submitBtn'        => \Yii::$app->request->post('submit-btn'),
+            'redirect'         => $redirect,
             //'shopSubproductContentElement' => $shopSubproductContentElement,
             'shopStoreProduct' => $shopStoreProduct,
         ]);
@@ -1713,7 +2094,6 @@ CSS
                             }
 
 
-
                             /**
                              * @var $productPrice ShopProductPrice
                              */
@@ -1726,7 +2106,6 @@ CSS
                                 }
 
                             }
-
 
 
                             $is_saved = true;
@@ -1943,7 +2322,7 @@ JS
                 if (\Yii::$app->request->post("act") == "update-price") {
 
                     $productPrice = $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)\Yii::$app->request->post("price_value"));
-                    $productPrice->is_fixed = (int) \Yii::$app->request->post("is_fixed");
+                    $productPrice->is_fixed = (int)\Yii::$app->request->post("is_fixed");
                     $productPrice->save();
 
                 } elseif (\Yii::$app->request->post("act") == "update-store") {

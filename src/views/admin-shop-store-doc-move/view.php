@@ -187,7 +187,7 @@ CSS
                 Создан
             </span>
             <span class="sx-properties--value">
-                <?php echo \Yii::$app->formatter->asDate($model->shopStore->created_at); ?>
+                <?php echo \Yii::$app->formatter->asDate($model->created_at); ?>
             </span>
         </li>
         <?php if($model->created_by) : ?>
@@ -239,7 +239,23 @@ CSS
                 <? foreach ($model->shopStoreProductMoves as $productMove) : ?>
                     <tr>
                         <td>
-                            <?php echo $productMove->product_name; ?>
+                            <?php if($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
+                                <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId' => 'shop/admin-cms-content-element',
+                                    'urlParams' => [
+                                        'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id
+                                    ],
+                                    'tag' => 'span',
+                                    'modelId' => $productMove->shopStoreProduct->shopProduct->id,
+                                    'isRunFirstActionOnClick' => true
+                                ]); ?>
+                                    <?php echo $productMove->product_name; ?>
+                                <? $widget::end(); ?>
+                            <?php else : ?>
+                                <?php echo $productMove->product_name; ?>
+                            <?php endif; ?>
+
+
                         </td>
                         <td>
                             <?php echo $productMove->quantity; ?>

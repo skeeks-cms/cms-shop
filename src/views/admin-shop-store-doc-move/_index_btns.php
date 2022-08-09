@@ -76,7 +76,16 @@ JS
         </p>
     <?php endif; ?>
     <p>
-        <a href="#" class="btn btn-primary">Создать документ</a>
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Создать документ
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['create', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_POSTING]); ?>">Оприходирование</a>
+            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['create', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_WRITEOFF]); ?>">Списание</a>
+            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['create', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_INVENTORY]); ?>">Инвентаризация</a>
+          </div>
+        </div>
     </p>
 <?php else : ?>
     У вас нет магазинов. Для того чтобы использовать вдижение товаров создайте свой магазин в разделе "Настройки"

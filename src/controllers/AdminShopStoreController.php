@@ -253,26 +253,7 @@ HTML
             ],
 
 
-            "products" => [
-                'class'           => BackendGridModelRelatedAction::class,
-                'name'            => ['skeeks/shop/app', 'Товары'],
-                'icon'            => 'fas fa-list',
-                'controllerRoute' => "/shop/admin-shop-store-product",
-                'relation'        => ['shop_store_id' => 'id'],
-                'priority'        => 600,
-                'on gridInit'     => function ($e) {
-                    /**
-                     * @var $action BackendGridModelRelatedAction
-                     */
-                    $action = $e->sender;
-                    $action->relatedIndexAction->backendShowings = false;
-                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
 
-                    ArrayHelper::removeValue($visibleColumns, 'shop_store_id');
-                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
-
-                },
-            ],
         ]);
     }
 

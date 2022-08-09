@@ -14,6 +14,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
@@ -143,6 +144,9 @@ HTML
                         ],
                         'created_at' => [
                             'class'      => DateTimeColumnData::class,
+                        ],
+                        'created_by' => [
+                            'class'      => UserColumnData::class,
                         ],
 
 

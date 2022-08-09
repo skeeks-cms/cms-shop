@@ -224,6 +224,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeHints(), [
             'cashier_default_cms_user_id' => "Обязательно укажите этому клиенту email!",
+            'is_sync_external'            => 'Поставьте галочку если складской учет ведется во внешней системе (например в 1С, клаудшоп, мойсклад и т.д.)<br />Если же складской учет ведется в системе управления сайтом, то галочку не ставьте!',
         ]);
     }
 
