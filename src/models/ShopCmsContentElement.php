@@ -239,9 +239,12 @@ class ShopCmsContentElement extends CmsContentElement
                  * @var $offer ShopCmsContentElement
                  */
                 foreach ($sp->tradeOffers as $offer) {
+                    /**
+                     * @var $newOffer ShopCmsContentElement
+                     */
                     $newOffer = $offer->copy();
-                    $newOffer->parent_content_element_id = $model->id;
-                    $newOffer->save();
+                    $newOffer->shopProduct->offers_pid = $spNew->id;
+                    $newOffer->shopProduct->save();
 
 
                 }

@@ -429,7 +429,7 @@ HTML
                          */
                         $site = $model->cmsSite;
 
-                        return \Yii::$app->user->can($this->permissionName."/copy", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                     },
                 ],
 
