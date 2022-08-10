@@ -46,6 +46,7 @@ class CartController extends Controller
                 'class'   => VerbFilter::class,
                 'actions' => [
                     'add-product'               => ['post'],
+                    'add-products'               => ['post'],
                     'remove-basket'             => ['post'],
                     'clear'                     => ['post'],
                     'update-basket'             => ['post'],
@@ -401,6 +402,110 @@ class CartController extends Controller
             $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
                 'product' => $productData,
             ]);
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+    /**
+     * Adding a product to the cart.
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionAddProducts()
+    {
+        $rr = new RequestResponse();
+
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $products = (array)\Yii::$app->request->post('products');
+
+            $productsData = [];
+            foreach ($products as $data) {
+                $product_id = (int)ArrayHelper::getValue($data, "product_id");
+                $quantity = (float)ArrayHelper::getValue($data, "quantity");
+
+                /**
+                 * @var ShopProduct $product
+                 */
+                $product = ShopProduct::find()->where(['id' => $product_id])->one();
+
+                if (!$product) {
+                    $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
+                    return (array)$rr;
+                }
+
+                if ($product->isOffersProduct) {
+                    $rr->message = \Yii::t('skeeks/shop/app', 'Этот товар является общим, и не может быть добавлен в корзину.');
+                    return (array)$rr;
+                }
+
+                if ($product->measure_ratio > 1) {
+                    if ($quantity % $product->measure_ratio != 0) {
+                        $quantity = $product->measure_ratio;
+                    }
+                }
+
+                if (\Yii::$app->shop->shopUser->isNewRecord) {
+                    \Yii::$app->shop->shopUser->save();
+                    \Yii::$app->getSession()->set(\Yii::$app->shop->sessionFuserName, \Yii::$app->shop->shopUser->id);
+                }
+
+                $shopBasket = ShopOrderItem::find()->where([
+                    'shop_order_id'   => \Yii::$app->shop->shopUser->shopOrder->id,
+                    'shop_product_id' => $product_id,
+                ])->one();
+
+                if (!$shopBasket) {
+                    $shopBasket = new ShopOrderItem([
+                        'shop_order_id'   => \Yii::$app->shop->shopUser->shopOrder->id,
+                        'shop_product_id' => $product->id,
+                        'quantity'        => 0,
+                    ]);
+                }
+
+
+                $shopBasket->quantity = $shopBasket->quantity + $quantity;
+                if ($product->measure_ratio_min > $shopBasket->quantity) {
+                    $shopBasket->quantity = $product->measure_ratio_min;
+                }
+
+                $int = round($shopBasket->quantity / $product->measure_ratio);
+                $shopBasket->quantity = $int * $product->measure_ratio;
+
+                if ($product->measure_ratio_min > $shopBasket->quantity) {
+                    $shopBasket->quantity = $product->measure_ratio_min;
+                }
+
+
+                if (!$shopBasket->recalculate()->save()) {
+                    $rr->success = false;
+                    $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
+                } else {
+                    $shopBasket->recalculate()->save();
+
+                    $rr->success = true;
+                    $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
+                }
+
+
+
+                $productData = ShopComponent::productDataForJsEvent($product->cmsContentElement);
+                $productData['quantity'] = (float)$quantity;
+                $productsData[] = $productData;
+
+            }
+
+            \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            \Yii::$app->shop->shopUser->shopOrder->refresh();
+
+            $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
+                'products' => $productsData,
+            ]);
+
 
             return (array)$rr;
         } else {

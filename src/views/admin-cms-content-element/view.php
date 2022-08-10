@@ -1062,6 +1062,7 @@ $infoModel = $model;
                             </span>
                             <span class="sx-properties--value">
                                 <? if ($value) : ?>
+                                    <?php /*print_r($rp->getAttribute($code)); */?>
                                     <?php echo $rp->getAttributeAsHtml($code); ?>
                                     <? if ($property->cms_measure_code) : ?>
                                         <?= $property->cmsMeasure->asShortText; ?>
