@@ -14,6 +14,9 @@
      *
      * beforeAddProduct
      * addProduct
+     * 
+     * beforeAddProducts
+     * addProducts
      *
      * beforeRemoveBasket
      * removeBasket
@@ -43,7 +46,7 @@
             var self = this;
             this.carts = [];
 
-            this.bind('removeBasket addProduct updateBasket clearCart addDiscountCoupon removeDiscountCoupon updateOrder', function (e, data) {
+            this.bind('removeBasket addProduct addProducts updateBasket clearCart addDiscountCoupon removeDiscountCoupon updateOrder', function (e, data) {
                 self.trigger('change', {
                     'Shop': self
                 });
@@ -285,6 +288,55 @@
 
 
         /**
+         * Adding products to cart
+         *
+         * @param products
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxAddProducts: function (products) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-add-products'));
+
+            /*var products = [
+                {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'additional': additional,
+                },
+                {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'additional': additional,
+                },
+            ];*/
+
+            ajax.setData({
+                'products': products,
+            });
+
+            ajax.onBeforeSend(function (e, data) {
+                self.trigger('beforeAddProducts', {
+                'products': products,
+            });
+            });
+
+            ajax.onSuccess(function (e, data) {
+                self.set('cartData', data.response.data);
+
+                self.trigger('addProducts', products);
+
+                if (data.response.data.products) {
+                    self.trigger('add', {
+                        'products': data.response.data.products,
+                    });
+                }
+            });
+
+            return ajax;
+        },
+
+        
+        /**
          *
          * @param product_id
          * @returns {*|sx.classes.AjaxQuery}
@@ -371,6 +423,16 @@
          */
         addProduct: function (product_id, quantity, additional) {
             this.createAjaxAddProduct(product_id, quantity, additional).execute();
+            return this;
+        },
+        
+        /**
+         * 
+         * @param data
+         * @returns {event:s}
+         */
+        addProducts: function (data) {
+            this.createAjaxAddProducts(data).execute();
             return this;
         },
 
