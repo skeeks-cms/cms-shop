@@ -15,6 +15,7 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\store\StoreUrlRule;
@@ -48,6 +49,7 @@ class AdminShopStoreController extends BackendModelStandartController
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopStore::class;
 
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
         $this->generateAccessActions = false;
 
         parent::init();

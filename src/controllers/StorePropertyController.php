@@ -21,6 +21,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
@@ -58,7 +59,7 @@ class StorePropertyController extends BackendModelStandartController
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopStoreProperty::class;
 
-        $this->permissionName = Cms::UPA_PERMISSION;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

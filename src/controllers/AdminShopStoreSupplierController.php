@@ -16,6 +16,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
@@ -49,6 +50,7 @@ class AdminShopStoreSupplierController extends BackendModelStandartController
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopStore::class;
 
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
         $this->generateAccessActions = false;
 
         parent::init();

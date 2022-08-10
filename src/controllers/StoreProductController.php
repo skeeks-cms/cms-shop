@@ -23,6 +23,7 @@ use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProperty;
@@ -461,26 +462,73 @@ HTML;
                 'priority' => 80,
                 'name'     => 'Связать',
                 'icon'     => 'fas fa-link',
+                
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                   
+                    return false;
+                }
             ],
 
             "create" => [
                 'fields' => [$this, 'createFields'],
+                
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                    
+                    if (\Yii::$app->shop->backendShopStore->is_sync_external) {
+                        return false;
+                    }
+                    
+                    return true;
+                }
             ],
 
             "update" => [
                 'fields' => [$this, 'updateFields'],
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                    
+                    if (\Yii::$app->shop->backendShopStore->is_sync_external) {
+                        return false;
+                    }
+                    
+                    return true;
+                }
             ],
 
             "import" => [
                 'class' => ViewBackendAction::class,
                 'icon'  => 'far fa-file-excel',
                 'name'  => 'Импорт',
+                
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                   
+                    return false;
+                }
             ],
             
             "activate-multi"   => [
                 'class'   => BackendModelMultiActivateAction::class,
                 'value' => '1',
                 'attribute' => 'is_active',
+                
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                   
+                    return false;
+                }
 
                 /*"eachAccessCallback" => function ($model) {
                     return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
@@ -490,10 +538,19 @@ HTML;
                 },*/
             ],
             "deactivate-multi"   => [
+                
                 'class'   => BackendModelMultiDeactivateAction::class,
                 'value' => '0',
                 'attribute' => 'is_active',
 
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                   
+                    return false;
+                }
+                
                 /*"eachAccessCallback" => function ($model) {
                     return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
@@ -501,6 +558,25 @@ HTML;
                     return \Yii::$app->user->can($this->permissionName."/update");
                 },*/
             ],
+            
+            "delete" => [
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                   
+                    return false;
+                }
+            ],
+            "delete-multi" => [
+                'accessCallback' => function() {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+                   
+                    return false;
+                }
+            ]
         ]);
     }
 
