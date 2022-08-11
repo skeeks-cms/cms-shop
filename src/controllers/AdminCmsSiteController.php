@@ -128,7 +128,7 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                         'is_receiver' => [
                             'label' => 'Получает товары?',
                             'value' => function (CmsSite $model) {
-                                return $model->shopSite->is_receiver ? "Да" : "";
+                                return $model->shopSite && $model->shopSite->is_receiver ? "Да" : "";
                             },
                         ],
 
