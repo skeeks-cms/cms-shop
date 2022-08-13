@@ -1262,7 +1262,7 @@ SQL
 
         $r = new \ReflectionClass($model);
         $className = $r->getShortName();
-        $cacheName = "agregateData_v1_".$className."_".$model->id;
+        $cacheName = "agregateData_v2_".$className."_".$model->id;
 
         //Если данные в кэше берем их оттуда
         if ($result = \Yii::$app->cache->get($cacheName)) {
@@ -1284,6 +1284,8 @@ SQL
             $q0->groupBy("shopProduct.id");
             $q0->orderBy(false);
 
+            //print_r($q0->createCommand()->rawSql);die;
+            
             $result['offerCount'] = $q0->count();
 
             //Если товаров нет, то ничего не делаем

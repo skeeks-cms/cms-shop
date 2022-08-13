@@ -465,7 +465,7 @@ HTML
 
                 "shop-properties" => [
                     'class'        => BackendModelMultiDialogEditAction::class,
-                    "name"         => "Свойства товара",
+                    "name"         => "Цены",
                     "viewDialog"   => "@skeeks/cms/shop/views/admin-cms-content-element/_shop-properties",
                     "eachCallback" => [$this, 'eachShopProperties'],
                     'on init'      => function ($e) {
