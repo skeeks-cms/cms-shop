@@ -589,4 +589,28 @@ class ShopCmsContentElement extends CmsContentElement
 
         return $q;
     }
+    
+    
+    
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'is_adult'               => \Yii::t('skeeks/cms', 'Товар для взрослых?'),
+            'is_adult'               => \Yii::t('skeeks/cms', 'Товар для взрослых?'),
+        ]);
+    }
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'is_adult' => \Yii::t('skeeks/cms', 'Если этот товар содержит контент для взрослых, то есть имеет возрастные ограничения 18+, нужно поставить эту галочку!'),
+            'active' => \Yii::t('skeeks/cms', 'Если эта галочка не стоит, то товар не показывается и не индексируется поисковыми системами'),
+        ]);
+    }
+    
 }
