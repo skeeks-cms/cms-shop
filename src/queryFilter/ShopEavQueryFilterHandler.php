@@ -91,7 +91,7 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
         $activeQuery->joinWith("childrenContentElements as childrenContentElements");
         $activeQuery->andWhere([
             'or',
-            ['in', CmsContentElement::tableName() . '.main_cce_id', $unionQuery],
+            //['in', CmsContentElement::tableName() . '.main_cce_id', $unionQuery],
             ['in', CmsContentElement::tableName().'.id', $unionQuery],
             ['in', 'childrenContentElements.id', $unionQuery],
         ]);

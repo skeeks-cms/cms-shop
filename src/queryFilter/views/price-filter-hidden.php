@@ -19,8 +19,8 @@ $max = $handler->getMaxValue();
 $val1 = $handler->from ? $handler->from : $min;
 $val2 = $handler->to ? $handler->to : $max;
 
-$fromId = \yii\helpers\Html::getInputId($handler, 'from');
-$toId = \yii\helpers\Html::getInputId($handler, 'to');
+$fromId = \yii\helpers\Html::getInputId($handler, 'f');
+$toId = \yii\helpers\Html::getInputId($handler, 't');
 
 ?>
 <? if ($min != $max
@@ -33,7 +33,7 @@ $toId = \yii\helpers\Html::getInputId($handler, 'to');
             </div>
 
             <div class="col-md-6">
-                <?= $form->field($handler, 'from')
+                <?= $form->field($handler, 'f')
                     ->textInput([
                         'placeholder' => $min,
                         'data-value'  => 'sx-price-from',
@@ -42,7 +42,7 @@ $toId = \yii\helpers\Html::getInputId($handler, 'to');
                 ?>
             </div>
             <div class="col-md-6">
-                <?= $form->field($handler, 'to')
+                <?= $form->field($handler, 't')
                     ->textInput([
                         'placeholder' => $max,
                         'data-value'  => 'sx-price-to',

@@ -48,9 +48,9 @@ class PriceFiltersHandler extends Model
      */
     public $type_price_id;
     public $cms_content_element_ids = [];
-    public $from;
-    public $to;
-    public $formName = 'price';
+    public $f;
+    public $t;
+    public $formName = 'p';
     /**
      * @var ActiveQuery
      */
@@ -97,15 +97,15 @@ class PriceFiltersHandler extends Model
     public function attributeLabels()
     {
         return [
-            'from' => 'Цена от',
-            'to'   => 'Цена до',
+            'f' => 'Цена от',
+            't'   => 'Цена до',
         ];
     }
     public function rules()
     {
         return [
-            [['from'], 'number'],
-            [['to'], 'number'],
+            [['f'], 'number'],
+            [['t'], 'number'],
         ];
     }
     public function getMinValue()
@@ -218,6 +218,7 @@ class PriceFiltersHandler extends Model
     {
         $query = $activeQuery;
 
+        //print_r($this->toArray());die;
         if ($this->type_price_id) {
 
             /**
@@ -261,15 +262,15 @@ class PriceFiltersHandler extends Model
   )",
             ]);
 
-//            print_r($query->createCommand()->rawSql);die;
 
-            if ($this->to) {
-                $query->andHaving(['<=', 'realPrice', $this->to]);
+            if ($this->t) {
+                $query->andHaving(['<=', 'realPrice', (float) $this->t]);
             }
-            if ($this->from) {
-                $query->andHaving(['>=', 'realPrice', $this->from]);
+            if ($this->f) {
+                $query->andHaving(['>=', 'realPrice', (float) $this->f]);
             }
-            
+                        //print_r($query->createCommand()->rawSql);die;
+
             //print_r($query->createCommand()->rawSql);die;
         }
 

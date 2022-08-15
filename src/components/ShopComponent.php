@@ -13,6 +13,7 @@ use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
@@ -1257,17 +1258,32 @@ SQL
      * @param ActiveQuery $q
      * @return array
      */
-    static public function getAgregateCategoryData(ActiveQuery $q, $model)
+    static public function getAgregateCategoryData(ActiveQuery $q, $model, $filtersData = [])
     {
 
         $r = new \ReflectionClass($model);
         $className = $r->getShortName();
-        $cacheName = "agregateData_v2_".$className."_".$model->id;
+        $cacheName = "agregateData_v4_" . $className."_" . $model->id;
 
-        //Если данные в кэше берем их оттуда
-        if ($result = \Yii::$app->cache->get($cacheName)) {
-            return $result;
+        //Если это неиндексируемая страница с несколькими фильтрами, то нет смысла считать трудозатратные вещи и кэшировать это
+        $isUseCache = false;
+        if ($model instanceof CmsSavedFilter) {
+            $isUseCache = true;
+        } elseif(isset($q->select['realPrice'])) { //Применен фильтр по цене
+            $isUseCache = false;
+        } else {
+            if (!$filtersData) {
+                $isUseCache = true;
+            }
         }
+
+        if ($isUseCache) {
+            //Если данные в кэше берем их оттуда
+            if ($result = \Yii::$app->cache->get($cacheName)) {
+                return $result;
+            }
+        }
+
 
 
         try {
@@ -1287,6 +1303,11 @@ SQL
             //print_r($q0->createCommand()->rawSql);die;
             
             $result['offerCount'] = $q0->count();
+
+            if ($isUseCache === false) {
+                //Если кэш отключен, значит это страница неиндексируемая и другие рассчеты не нужны
+                return $result;
+            }
 
             //Если товаров нет, то ничего не делаем
             if (!$result['offerCount']) {
