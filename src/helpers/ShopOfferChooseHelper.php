@@ -102,7 +102,7 @@ class ShopOfferChooseHelper extends Component
     /**
      * @var bool 
      */
-    public $is_filter_by_quantity = true;
+    public $is_filter_by_quantity = false;
 
     public function init()
     {

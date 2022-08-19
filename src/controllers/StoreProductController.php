@@ -561,6 +561,7 @@ HTML;
             
             "delete" => [
                 'accessCallback' => function() {
+            
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
