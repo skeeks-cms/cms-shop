@@ -44,6 +44,7 @@ use yii\helpers\ArrayHelper;
  * @property int         $generate_max_product_rating_count Максимальное количество отзывов
  *
  * @property CmsSite     $cmsSite
+ * @property CmsTree     $catalogMainCmsTree
  * @property CmsTree     $catalogCmsTree
  *
  * @property string[]    $notifyEmails
@@ -277,5 +278,32 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
         return $emailsAll;
     }
 
+    /**
+     * Корневой раздел для добавления товаров
+     *
+     * @return CmsTree|null
+     */
+    public function getCatalogMainCmsTree()
+    {
+        if ($this->catalog_cms_tree_id) {
+            return $this->catalogCmsTree;
+        }
+
+        /**
+         * @var $shopContent ShopContent
+         */
+        $shopContent = ShopContent::find()->one();
+        //На сайте настроены товары
+        if ($shopContent) {
+            $cmsContent = $shopContent->cmsContent;
+            //У контента задан тип разделов к которым нужно привязываться
+            if ($cmsContent->cms_tree_type_id) {
+                $firstMaxLevelTree = CmsTree::find()->cmsSite()->andWhere(['tree_type_id' => $cmsContent->cms_tree_type_id])->orderBy(['level' => SORT_ASC])->limit(1)->one();
+                return $firstMaxLevelTree;
+            }
+        }
+
+        return null;
+    }
 
 }
