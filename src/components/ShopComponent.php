@@ -1263,14 +1263,12 @@ SQL
 
         $r = new \ReflectionClass($model);
         $className = $r->getShortName();
-        $cacheName = "agregateData_v4_" . $className."_" . $model->id;
+        $cacheName = "agregateData_v6_" . $className."_" . $model->id;
 
         //Если это неиндексируемая страница с несколькими фильтрами, то нет смысла считать трудозатратные вещи и кэшировать это
         $isUseCache = false;
         if ($model instanceof CmsSavedFilter) {
             $isUseCache = true;
-        } elseif(isset($q->select['realPrice'])) { //Применен фильтр по цене
-            $isUseCache = false;
         } else {
             if (!$filtersData) {
                 $isUseCache = true;
@@ -1291,6 +1289,17 @@ SQL
 
 
             $q0 = clone $q;
+            
+            $realPrice = '';
+            $select = [
+                \skeeks\cms\models\CmsContentElement::tableName().".id"
+            ];
+            if (isset($q0->select['realPrice'])) {
+                $realPrice = $q0->select['realPrice'];
+                $select['realPrice'] = $realPrice;
+            }
+            $q0->select($select);
+
             $q0->andWhere([
                 'shopProduct.product_type' => [
                     ShopProduct::TYPE_SIMPLE,
@@ -1301,7 +1310,7 @@ SQL
             $q0->orderBy(false);
 
             //print_r($q0->createCommand()->rawSql);die;
-            
+
             $result['offerCount'] = $q0->count();
 
             if ($isUseCache === false) {
@@ -1315,7 +1324,13 @@ SQL
             }
 
 
+            $baseTypePrice = \Yii::$app->shop->baseTypePrice;
+            
             $q1 = clone $q;
+            $q1->innerJoin(['prices' => 'shop_product_price'], [
+                'prices.product_id' => new Expression('shopProduct.id'),
+                'prices.type_price_id' => $baseTypePrice->id
+            ]);
             $q1->select(['price' => new Expression("max(prices.price)")]);
             $q1->groupBy(false);
             $q1->orderBy(false);
@@ -1330,6 +1345,10 @@ SQL
 
             $q2 = clone $q;
             $q2->select(['price' => new Expression("min(prices.price)")]);
+            $q2->innerJoin(['prices' => 'shop_product_price'], [
+                'prices.product_id' => new Expression('shopProduct.id'),
+                'prices.type_price_id' => $baseTypePrice->id
+            ]);
             $q2->andWhere(['>', 'prices.price', 0]);
             $q2->orderBy(false);
             $q2->groupBy(false);
@@ -1429,6 +1448,8 @@ SQL
                 ],
             ]));
         } catch (\Exception $exception) {
+            
+            \Yii::error($exception->getMessage());
             return [];
         }
 

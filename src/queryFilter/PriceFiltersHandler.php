@@ -98,7 +98,7 @@ class PriceFiltersHandler extends Model
     {
         return [
             'f' => 'Цена от',
-            't'   => 'Цена до',
+            't' => 'Цена до',
         ];
     }
     public function rules()
@@ -149,7 +149,7 @@ class PriceFiltersHandler extends Model
         $query->joinWith('shopProduct.shopProductPrices.currency as currency');
 
         $query->select([
-                        'min' => "IF(shopProduct.product_type != 'offers', 
+            'min' => "IF(shopProduct.product_type != 'offers', 
                            (currency.course * prices.price), 
                           (
                                 SELECT MIN(p.price) FROM shop_product_price as p 
@@ -160,7 +160,7 @@ class PriceFiltersHandler extends Model
                                 AND spo.offers_pid = cms_content_element.id 
                             )
                           )",
-                        'max' => "IF(shopProduct.product_type != 'offers', 
+            'max' => "IF(shopProduct.product_type != 'offers', 
                            (currency.course * prices.price), 
                           (
                                 SELECT MIN(p.price) FROM shop_product_price as p 
@@ -180,7 +180,7 @@ class PriceFiltersHandler extends Model
 
         $outerQuery = (new Query())->from(['inner' => $query])->select([
             'min' => 'min(min)',
-            'max' => 'max(max)'
+            'max' => 'max(max)',
         ]);
         //echo $outerQuery->createCommand()->rawSql;die;
         //echo $query->createCommand()->rawSql;die;
@@ -210,6 +210,53 @@ class PriceFiltersHandler extends Model
     {
         return $this->applyToQuery($dataProvider->query);
     }
+
+    static public function addSelectRealPrice($query, $type_price_id = null)
+    {
+        if (!$type_price_id) {
+            $type_price_id = \Yii::$app->shop->baseTypePrice->id;
+        }
+
+        if (!isset($query->select['realPrice'])) {
+            
+            $quantitySql = '';
+            if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
+                $quantitySql = "AND (`shopStoreProductsInner`.`quantity` > 0)";
+            }
+            
+            /**
+             * @var $query ActiveQuery
+             */
+            $query->innerJoinWith('shopProduct as shopProduct');
+            $query->innerJoin(['prices' => 'shop_product_price'], [
+                'prices.product_id'    => new Expression('shopProduct.id'),
+                'prices.type_price_id' => $type_price_id,
+            ]);
+            $query->innerJoin(['currency' => 'money_currency'], ['currency.code' => new Expression('prices.currency_code')]);
+
+            $query->addSelect([
+                'realPrice' => "IF(shopProduct.product_type != 'offers', 
+               (
+                    currency.course * prices.price
+                ), 
+              (
+                    SELECT MIN(p.price) FROM shop_product_price as p 
+                    INNER JOIN `shop_product` spo ON spo.`id` = p.product_id
+                    INNER JOIN `shop_store_product` `shopStoreProductsInner` ON
+                    (
+                        `shopStoreProductsInner`.`shop_product_id` = p.product_id
+                    )
+                    WHERE  
+                    p.`type_price_id` = {$type_price_id} 
+                    AND spo.offers_pid = cms_content_element.id 
+                    {$quantitySql}
+                )
+              )",
+            ]);
+        }
+
+        return $query;
+    }
     /**
      * @param QueryInterface $activeQuery
      * @return $this
@@ -218,60 +265,22 @@ class PriceFiltersHandler extends Model
     {
         $query = $activeQuery;
 
-        //print_r($this->toArray());die;
         if ($this->type_price_id) {
 
-            /**
-             * @var $query ActiveQuery
-             */
-            $query->joinWith('shopProduct as shopProduct');
-            $query->leftJoin(['prices' => 'shop_product_price'], [
-                'prices.product_id' => new Expression('shopProduct.id'),
-                'prices.type_price_id' => $this->type_price_id
-            ]);
-            $query->leftJoin(['currency' => 'money_currency'], ['currency.code' => new Expression('prices.currency_code')]);
-            /*$query->joinWith('shopProduct.shopProductPrices as prices');*/
-            /*$query->joinWith('shopProduct.shopProductPrices.currency as currency');*/
-
-            //$query->andWhere(['prices.type_price_id' => $this->type_price_id]);
-
-            $quantitySql = '';
-            if (\Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
-                $quantitySql = "AND (`shopStoreProductsInner`.`quantity` > 0)";
-            }
             
-            $query->select([
-                'cms_content_element.*',
-                //'realPrice' => "( currency.course * prices.price )',
-                'realPrice' => "IF(shopProduct.product_type != 'offers', 
-   (
-        currency.course * prices.price
-    ), 
-  (
-        SELECT MIN(p.price) FROM shop_product_price as p 
-        LEFT JOIN `shop_product` spo ON spo.`id` = p.product_id
-        LEFT JOIN `shop_store_product` `shopStoreProductsInner` ON
-        (
-            `shopStoreProductsInner`.`shop_product_id` = p.product_id
-        )
-        WHERE  
-        p.`type_price_id` = {$this->type_price_id} 
-        AND spo.offers_pid = cms_content_element.id 
-        {$quantitySql}
-    )
-  )",
-            ]);
 
+            if ($this->t || $this->f) {
+
+                self::addSelectRealPrice($activeQuery, $this->type_price_id);
+
+            }
 
             if ($this->t) {
-                $query->andHaving(['<=', 'realPrice', (float) $this->t]);
+                $query->andHaving(['<=', 'realPrice', (float)$this->t]);
             }
             if ($this->f) {
-                $query->andHaving(['>=', 'realPrice', (float) $this->f]);
+                $query->andHaving(['>=', 'realPrice', (float)$this->f]);
             }
-                        //print_r($query->createCommand()->rawSql);die;
-
-            //print_r($query->createCommand()->rawSql);die;
         }
 
         return $this;

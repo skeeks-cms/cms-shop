@@ -151,25 +151,10 @@ class SortFiltersHandler extends Model
                     break;
 
                 case ('price'):
-                    /*$query->joinWith('shopProduct.baseProductPrice as basePrice');
-                    $query->orderBy(['baseProductPrice.price' => SORT_ASC]);*/
-
                     if ($this->type_price_id) {
-                        //$query->joinWith('shopProduct as p');
-                        //$query->joinWith('shopProduct.shopProductPrices as prices');
-                        //$query->joinWith('shopProduct.shopProductPrices.currency as currency');
-                        //$query->andWhere(['prices.type_price_id' => $this->type_price_id]);
-
-                        $query->select([
-                            'cms_content_element.*',
-                            //'realPrice' => '( currency.course * prices.price )',
-                        ]);
-                        /*$query->andHaving([
-                            '>', 'realPrice', 0,
-                        ]);*/
-
+                        PriceFiltersHandler::addSelectRealPrice($query, $this->type_price_id);
                         $query->orderBy(['realPrice' => SORT_ASC]);
-
+                        
                     }
 
                     break;
@@ -177,19 +162,8 @@ class SortFiltersHandler extends Model
                 case ('-price'):
 
                     if ($this->type_price_id) {
-                        /*$query->joinWith('shopProduct as p');
-                        $query->joinWith('shopProduct.shopProductPrices as prices');
-                        $query->joinWith('shopProduct.shopProductPrices.currency as currency');
-                        $query->andWhere(['prices.type_price_id' => $this->type_price_id]);*/
 
-                        $query->select([
-                            'cms_content_element.*',
-                            //'realPrice' => '( currency.course * prices.price )',
-                        ]);
-                        /*$query->andHaving([
-                            '>', 'realPrice', 0,
-                        ]);*/
-
+                        PriceFiltersHandler::addSelectRealPrice($query, $this->type_price_id);
                         $query->orderBy(['realPrice' => SORT_DESC]);
                     }
 
