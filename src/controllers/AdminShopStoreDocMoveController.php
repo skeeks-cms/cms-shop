@@ -82,6 +82,12 @@ class AdminShopStoreDocMoveController extends BackendModelStandartController
                 'icon'     => 'fas fa-info-circle',
             ],
 
+            /*"add" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 80,
+                'name'     => 'Создать документ',
+            ],*/
+
             'create' => new UnsetArrayValue(),
             "update" => [
                 'fields' => [$this, 'updateFields'],
@@ -204,6 +210,61 @@ HTML
                 ],
             ],
 
+        ]);
+    }
+
+    public function actionAdd()
+    {
+        $model = new ShopStoreDocMove();
+        $model->is_active = 0;
+        $model->doc_type = \Yii::$app->request->get("doc_type");
+
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+
+
+                if (!$model->load(\Yii::$app->request->post()) || !$model->validate()) {
+                    $message = "Проверьте корректность данных";
+
+                    $errors = $model->getFirstErrors();
+                    if ($errors) {
+                        $error = array_shift($errors);
+                        $message = $error;
+                    }
+
+                    throw new \yii\base\Exception($message);
+                }
+                
+                if (!$model->save()) {
+                    if ($model->getFirstErrors()) {
+                        $errors = $model->getFirstErrors();
+                        $error = array_shift($errors);
+                        throw new \yii\base\Exception($error);
+                    }
+                }
+
+                $t->commit();
+
+                $rr->message = "Документ добавлен";
+                $rr->success = true;
+
+            } catch (\Exception $exception) {
+                $t->rollBack();
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+
+
+            return $rr;
+        }
+
+        return $this->render("add", [
+            'model' => $model,
         ]);
     }
 

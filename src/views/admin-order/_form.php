@@ -423,9 +423,7 @@ echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
             <a class="btn btn-default btn-sm sx-btn-create-dialog" href="#"><i class="fa fa-plus"></i>
                 {$addItemText}
             </a>
-            <a class="btn btn-default btn-sm" onclick='{$onclick}'><i class="fa fa-plus"></i>
-                {$addPosition}
-            </a>
+          
 HTML
         ,
 

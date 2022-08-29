@@ -67,7 +67,9 @@ JS
 ]); ?>
 <?php $count = $qStores->count() ?>
 <?php if ($count) : ?>
-    <p style="margin-bottom: 5px;">У вас магазинов: <b><?php echo $count; ?></b></p>
+
+    <!--<p style="margin-bottom: 5px;">У вас магазинов: <b><?php /*echo $count; */?></b></p>-->
+
     <?php if ($productsQuery->count()) : ?>
         <p style="margin-bottom: 5px;">
             Есть расхождения по количеству и документам у товаров: <b><?php echo $productsQuery->count(); ?></b>
@@ -81,9 +83,9 @@ JS
             Создать документ
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['create', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_POSTING]); ?>">Оприходирование</a>
-            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['create', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_WRITEOFF]); ?>">Списание</a>
-            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['create', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_INVENTORY]); ?>">Инвентаризация</a>
+            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_POSTING]); ?>">Оприходирование</a>
+            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_WRITEOFF]); ?>">Списание</a>
+            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_INVENTORY]); ?>">Инвентаризация</a>
           </div>
         </div>
     </p>

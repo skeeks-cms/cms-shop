@@ -46,7 +46,6 @@ use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
-use yii\bootstrap\Alert;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Expression;
@@ -92,16 +91,23 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                 "index" => [
                     'on beforeRender' => function (Event $e) {
-                    $isGroup = $this->isProductGroup();
-                    
-                    if ($postValue = \Yii::$app->request->post()) {
-                        $isGroup = \Yii::$app->request->post("is_group");
-                        \Yii::$app->session->set("isProductGroup", (int)$isGroup);
-                    }
-                    $e->content = $e->content = $this->renderPartial("_index_btns", [
-                        'isGroup' => $isGroup
-                    ]);
-                },
+                        $urlHelper = new BackendUrlHelper();
+                        $urlHelper->setBackendParamsByCurrentRequest();
+                        if ($urlHelper->getBackenParam("sx-to-main") || $urlHelper->getBackenParam("all-items")) {
+
+                        } else {
+                            $isGroup = $this->isProductGroup();
+
+                            if ($postValue = \Yii::$app->request->post()) {
+                                $isGroup = \Yii::$app->request->post("is_group");
+                                \Yii::$app->session->set("isProductGroup", (int)$isGroup);
+                            }
+                            $e->content = $e->content = $this->renderPartial("_index_btns", [
+                                'isGroup' => $isGroup,
+                            ]);
+                        }
+
+                    },
                 ],
 
                 "view" => [
@@ -1220,7 +1226,7 @@ HTML
                 'class'                   => NumberFilterField::class,
                 'label'                   => 'В наличии',
                 'isAddAttributeTableName' => false,
-                'field'     => [
+                'field'                   => [
                     'class' => NumberField::class,
                 ],
                 'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) {
@@ -1253,7 +1259,7 @@ HTML
                 'class'                   => NumberFilterField::class,
                 'label'                   => 'Количество у поставщиков',
                 'isAddAttributeTableName' => false,
-                'field'     => [
+                'field'                   => [
                     'class' => NumberField::class,
                 ],
                 'beforeModeApplyCallback' => function (QueryFiltersEvent $e, NumberFilterField $field) {
@@ -1285,13 +1291,13 @@ HTML
 
         if ($is_quantity_our_filter || $is_quantity_supplier_filter) {
             $filterFields['filter_other'] = [
-                'class'                   => SelectField::class,
-                'items' => [
+                'class'    => SelectField::class,
+                'items'    => [
                     'not_tied' => 'Не связаны с магазинами и поставщиками',
-                    'tied' => 'Связаны с магазинами и поставщиками'
+                    'tied'     => 'Связаны с магазинами и поставщиками',
                 ],
-                'label'                   => 'Связка и оформление',
-                'on apply'       => function (QueryFiltersEvent $e) {
+                'label'    => 'Связка и оформление',
+                'on apply' => function (QueryFiltersEvent $e) {
                     /**
                      * @var $query ActiveQuery
                      */
@@ -1304,13 +1310,15 @@ HTML
                         $subQuery = ShopStoreProduct::find()->select(["total" => new Expression("count(id)")])->andWhere(
                             ['shop_product_id' => new Expression("sp.id")],
                         );
-                        
+
                         $query->addSelect([
                             'total_tied' => $subQuery,
                         ]);
 
                         $query->andHaving([
-                            '>', 'total_tied', 0
+                            '>',
+                            'total_tied',
+                            0,
                         ]);
                     } elseif ($e->field->value == 'not_tied') {
                         $subQuery = ShopStoreProduct::find()->select(["total" => new Expression("count(id)")])->andWhere(
@@ -1322,7 +1330,9 @@ HTML
                         ]);
 
                         $query->andHaving([
-                            '<=', 'total_tied', 0
+                            '<=',
+                            'total_tied',
+                            0,
                         ]);
                     }
                 },
@@ -1627,7 +1637,7 @@ HTML
             $visibleFilters[] = 'marginality_abs_filter';
             $visibleFilters[] = 'marginality_per_filter';
         }
-        
+
 
         $filterFieldsLabels['shop_product_type'] = 'Тип товара';
         $filterFieldsLabels['barcodes'] = 'Штрихкод';
@@ -1642,7 +1652,6 @@ HTML
         $filterFieldsLabels['filter_other'] = "Связка и оформление";
 
 
-
         $filterFieldsRules[] = ['shop_product_type', 'safe'];
         $filterFieldsRules[] = ['supplier_external_jsondata', 'safe'];
         $filterFieldsRules[] = ['quantity_our_filter', 'safe'];
@@ -1654,9 +1663,6 @@ HTML
         $filterFieldsRules[] = ['retail_price_filter', 'safe'];
         $filterFieldsRules[] = ['purchase_price_filter', 'safe'];
         $filterFieldsRules[] = ['filter_other', 'safe'];
-
-
-
 
 
         //Мерж колонок и сортировок
@@ -1729,7 +1735,7 @@ HTML
             } else {
                 $site_id = \Yii::$app->skeeks->site->id;
                 $query->andWhere(['cms_site_id' => $site_id]);
-                
+
                 if ($this->isProductGroup()) {
                     $query->andWhere([
                         'in',
@@ -1749,7 +1755,7 @@ HTML
                         ],
                     ]);
                 }
-                
+
             }
 
 

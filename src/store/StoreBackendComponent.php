@@ -41,7 +41,7 @@ class StoreBackendComponent extends BackendComponent
         $theme = new \skeeks\cms\themes\unify\admin\UnifyThemeAdmin();
         $theme->pathMap = [
             '@app/views' => [
-                '@skeeks/cms/shop/store/views',
+                //'@skeeks/cms/shop/store/views',
                 '@skeeks/cms/admin/views',
                 '@skeeks/cms/themes/unify/admin/views',
             ],
