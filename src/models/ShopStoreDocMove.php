@@ -92,6 +92,13 @@ class ShopStoreDocMove extends \skeeks\cms\base\ActiveRecord
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => CmsUser::className(), 'targetAttribute' => ['updated_by' => 'id']],
 
             [['doc_type'], 'default', 'value' => static::DOCTYPE_CORRECTION],
+            
+            [['is_active'], function($attribute) {
+                if (!$this->shopStoreProductMoves && $this->is_active) {
+                    $this->addError($attribute, "Нельзя провести этот документ, потому что в нем нет товаров!");
+                    return false;
+                }
+            }],
         ]);
     }
 

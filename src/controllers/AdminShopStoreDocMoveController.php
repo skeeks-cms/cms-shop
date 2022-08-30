@@ -22,6 +22,8 @@ use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopCachebox;
 use skeeks\cms\shop\models\ShopCashebox;
 use skeeks\cms\shop\models\ShopCloudkassa;
+use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreDocMove;
 use skeeks\cms\shop\models\ShopStoreProduct;
@@ -44,6 +46,7 @@ use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\base\Exception;
 use yii\bootstrap\Alert;
+use yii\data\Pagination;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -250,6 +253,7 @@ HTML
 
                 $t->commit();
 
+                $rr->data['view_url'] = Url::to(['view', 'pk' => $model->id]);
                 $rr->message = "Документ добавлен";
                 $rr->success = true;
 
@@ -357,4 +361,98 @@ HTML
         return $rr;
     }
 
+
+
+
+
+
+    /**
+     * Это бэкенд для поиска товаров
+     *
+     * @return RequestResponse
+     */
+    public function actionProducts()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            \Yii::$app->shop->backendShopStore;
+            \Yii::$app->skeeks->site;
+            $q = \Yii::$app->request->post("q");
+            $page = \Yii::$app->request->post("page", 0);
+
+            $query = ShopCmsContentElement::find()
+                ->andWhere([
+                    'shopProduct.product_type' => [
+                        ShopProduct::TYPE_SIMPLE,
+                        ShopProduct::TYPE_OFFER
+                    ]
+                ])
+                ->from(['cce' => ShopCmsContentElement::tableName()])
+                ->innerJoinWith("shopProduct as shopProduct")
+                ->groupBy(["cce.id"]);
+
+            if ($q) {
+                $q = trim($q);
+                $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
+                $query->andWhere([
+                    'or',
+                    ['like', 'cce.name', $q],
+                    ['=', 'cce.id', $q],
+                    ['=', 'barcodes.value', $q],
+                ]);
+                $query->groupBy("shopProduct.id");
+            }
+
+            $countQuery = clone $query;
+            $totalCount = $countQuery->count();
+
+
+            if ($totalCount) {
+
+                $pagination = new Pagination(['totalCount' => $totalCount, 'defaultPageSize' => 20]);
+                $pagination->setPage($page);
+                $models = $query->offset($pagination->offset)->limit($pagination->limit);
+
+
+                $content = '';
+                foreach ($query->each(10) as $element) {
+                    $content .= $this->renderPartial('_product', [
+                        'model' => $element,
+                    ]);
+                }
+                $hasNextPage = (bool) ($pagination->page < ($pagination->pageCount-1));
+                $nexPage = $pagination->page;
+                if ($hasNextPage) {
+                    $nexPage = $pagination->page + 1;
+                }
+
+
+                if ($hasNextPage) {
+                    $content .= "<div class='sx-more'><button class='btn btn-default btn-block sx-btn-next-page' data-next-page='{$nexPage}' data-load-text='Ожидайте! Идет загрузка...'>Показать еще</button></div>";
+                }
+
+                $data['content'] = $content;
+                $data['pagination'] = [
+                    'offset'      => $pagination->offset,
+                    'totalCount'  => (int)$pagination->totalCount,
+                    'page'        => $pagination->page,
+                    'pageSize'    => $pagination->pageSize,
+                    'pageCount'   => $pagination->pageCount,
+                    'hasNextPage' => $hasNextPage,
+                    'nextPage' => $nexPage,
+                ];
+            } else {
+                $content = "<div class='sx-not-found-products'><h1>Товар не найден</h1></div>";
+                $data['content'] = $content;
+            }
+
+
+            $rr->success = true;
+            $rr->data = $data;
+
+        }
+
+        return $rr;
+    }
 }

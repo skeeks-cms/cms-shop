@@ -7,7 +7,6 @@ $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
 
-
 $this->registerCSS(<<<CSS
 .sx-fast-edit-value {
     padding: 5px;
@@ -182,24 +181,7 @@ CSS
                 <?php echo \Yii::$app->formatter->asBoolean($model->is_active); ?>
             </span>
         </li>
-        <li>
-            <span class="sx-properties--name">
-                Создан
-            </span>
-            <span class="sx-properties--value">
-                <?php echo \Yii::$app->formatter->asDate($model->created_at); ?>
-            </span>
-        </li>
-        <?php if($model->created_by) : ?>
-            <li>
-                <span class="sx-properties--name">
-                    Создал
-                </span>
-                <span class="sx-properties--value">
-                    <?php echo $model->createdBy->shortDisplayName; ?>
-                </span>
-            </li>
-        <?php endif; ?>
+
 
         <li>
             <span class="sx-properties--name">
@@ -224,9 +206,29 @@ CSS
     </ul>
 </div>
 
-<div class="row no-gutters" style="margin-top: 10px;">
-    <div class="col-12">
-        <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Товары</b></div>
+<div class="row" style="margin-top: 10px;">
+
+    <?php if(!$model->is_active) : ?>
+
+
+    <div class="col" style="max-width: 350px;">
+        <div style="margin-bottom: 5px;">
+            <b style="text-transform: uppercase;">Добавить товары</b>
+        </div>
+        <div class="sx-block-search">
+            <input class="form-control" placeholder="Поиск товаров">
+        </div>
+        <div class="sx-block-products">
+
+        </div>
+    </div>
+        <?php endif; ?>
+
+    <div class="col">
+
+            <div style="margin-bottom: 5px;">
+                <b style="text-transform: uppercase;">Выбранные товары</b>
+            </div>
 
         <div class="sx-table-wrapper table-responsive">
             <table class="table sx-table">
@@ -268,3 +270,250 @@ CSS
         </div>
     </div>
 </div>
+
+<?php
+
+$this->registerCss(<<<CSS
+.sx-block-products {
+max-height: 500px;
+overflow: auto;
+}
+.catalog-card {
+    font-size: 14px;
+    cursor: pointer;
+    padding: 10px 0;
+}
+.catalog-card:hover {
+    background: #f9f9f9;
+}
+.catalog-card .title {
+    line-height: 1.1;
+    color: black;
+}
+.catalog-card .sku {
+    font-size: 12px;
+    color: gray;
+}
+.catalog-card .stock {
+    font-size: 12px;
+    color: gray;
+}
+.catalog-card .price {
+    font-size: 12px;
+    color: gray;
+}
+.catalog-card .barcode {
+    font-size: 12px;
+    color: gray;
+}
+CSS
+);
+/*\skeeks\assets\unify\base\UnifyHsScrollbarAsset::register($this);*/
+$jsData = \yii\helpers\Json::encode([
+    'backend_products'    => \yii\helpers\Url::to(['products', 'pk' => $model->id]),
+    'backend-add-product'       => \yii\helpers\Url::to(['add-product', 'pk' => $model->id]),
+    'backend-add-product-barcode'       => \yii\helpers\Url::to(['add-product-barcode', 'pk' => $model->id]),
+    'backend-remove-order-item' => \yii\helpers\Url::to(['remove-item', 'pk' => $model->id]),
+    'backend-update-order-item' => \yii\helpers\Url::to(['update-item', 'pk' => $model->id]),
+    'doc' => $model->toArray(),
+]);
+$this->registerJs(<<<JS
+
+(function (sx, $, _) {
+    sx.classes.DocMove = sx.classes.Component.extend({
+        _init: function () {
+            var self = this;
+    
+            this.productBlocker = null;
+            this.lastKeyTime = new Date().getTime();
+            this._initScanner();
+        },
+        
+        _onDomReady: function () {
+            var self = this;
+
+            self.loadProducts();
+
+            self.getJSearch().on("focus", function () {
+
+            });
+
+            self.getJSearch().on("keyup", function () {
+                //Не нужно сразу применять нужно чуть подождать
+                self.lastKeyTime = new Date().getTime();
+
+                setTimeout(function () {
+                    var newTime = new Date().getTime();
+                    var delta = newTime - self.lastKeyTime;
+                    if (delta >= 1000) {
+                        self.loadProducts();
+                    }
+                }, 1000);
+            });
+            
+            //Подгрузка следующих данных
+            $("body").on('click', ".sx-block-products .sx-btn-next-page", function () {
+                if ($(this).hasClass("sx-loaded")) {
+                    return false;
+                }
+                var text = $(this).data("load-text");
+                var nextPage = $(this).data("next-page");
+                $(this).empty().append(text);
+                $(this).closest(".sx-more").addClass("sx-loaded");
+                self.loadProducts(nextPage);
+            });
+        },
+        
+        _initScanner: function () {
+            var self = this;
+            var code = "";
+            var reading = false;
+
+            document.addEventListener('keypress', e => {
+                //usually scanners throw an 'Enter' key at the end of read
+                if (e.keyCode === 13) {
+                    if (code.length > 10) {
+
+                        var ajaxQuery = self.createAjaxAddProductBarcode(code);
+
+                        ajaxQuery.onError(function (e, data) {
+                            code = "";
+                        });
+
+                        ajaxQuery.onSuccess(function (e, data) {
+
+                            if (self.getJSearch().val() != code) {
+                                self.getJSearch().val(code);
+                                self.loadProducts();
+                            }
+
+                            //self.loadProducts();
+
+                            if (data.response.data.total == 1) {
+
+                                var q = self.createAjaxAddProduct(data.response.data.product.id, 1);
+                                var Handler = new sx.classes.AjaxHandlerStandartRespose(q, {
+                                    'allowResponseSuccessMessage': false
+                                });
+                                q.execute();
+
+                            } else if (data.response.data.total > 1) {
+
+                            } else {
+
+                            }
+
+                            code = "";
+                        });
+
+                        /// code ready to use
+                        ajaxQuery.execute();
+                    }
+                } else {
+                    code += e.key; //while this is not an 'enter' it stores the every key
+                }
+
+                //run a timeout of 200ms at the first read and clear everything
+                if (!reading) {
+                    reading = true;
+                    setTimeout(() => {
+                        code = "";
+                        reading = false;
+                    }, 200);  //200 works fine for me but you can adjust it
+                }
+            });
+        },
+        
+        /**
+         * @returns {sx.classes.CashierApp}
+         */
+        loadProducts: function (page = 0) {
+            var self = this;
+
+            if (page == 0) {
+                self.blockProducts();
+                self.getJProducts().empty();
+            }
+
+
+            var ajaxQuery = sx.ajax.preparePostQuery(this.get("backend_products"), {
+                'q': self.getJSearch().val(),
+                'page': page,
+            });
+
+            var handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                'enableBlocker': false
+            });
+
+            handler.on("stop", function () {
+                self.unblockProducts();
+            });
+
+            handler.on("success", function (e, response) {
+                self.getJProducts().append(response.data.content);
+
+                $(".sx-block-products .sx-more.sx-loaded").hide().remove();
+
+                /*$(".sx-block-products").on("scroll", function() {
+                    var delta = $(window).height() - $(".catalogList .catalog-card:last").offset().top;
+                    if (delta > -200) {
+                        console.log("Грузить еще");
+                    }
+                });*/
+            });
+
+            ajaxQuery.execute();
+
+            return this;
+        },
+        
+        /**
+         * @returns {sx.classes.CashierApp}
+         */
+        blockProducts: function () {
+            if (this.productBlocker === null) {
+                this.productBlocker = new sx.classes.Blocker(".sx-block-products");
+            }
+            this.productBlocker.block();
+            return this;
+        },
+
+        /**
+         * @returns {sx.classes.CashierApp}
+         */
+        unblockProducts: function () {
+            this.productBlocker.unblock();
+            return this;
+        },
+        
+        getJSearch: function () {
+            return $(".sx-block-search input");
+        },
+        
+        getJProducts: function () {
+            return $(".sx-block-products");
+        },
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxAddProductBarcode: function (barcode) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-add-product-barcode'));
+
+            ajax.setData({
+                'barcode': barcode
+            });
+
+            return ajax;
+        },
+        
+    });
+})(sx, sx.$, sx._);
+
+sx.DocMove = new sx.classes.DocMove({$jsData});
+JS
+);
+?>
