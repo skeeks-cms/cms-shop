@@ -150,21 +150,21 @@ $order->refresh();
             ],
     ])
     ?>
-    
+
     <h4 style="margin-top: 15px;">
         Контактные данные:
     </h4>
     <?
-        $contactAttributes = $order->getContactAttributes();
-        $receiverAttributes = $order->getReceiverAttributes();
+    $contactAttributes = $order->getContactAttributes();
+    $receiverAttributes = $order->getReceiverAttributes();
 
-        echo \yii\widgets\DetailView::widget([
-            'model'      => $order,
-            'attributes' => $contactAttributes,
-        ]);
+    echo \yii\widgets\DetailView::widget([
+        'model'      => $order,
+        'attributes' => $contactAttributes,
+    ]);
     ?>
-    
-    <?php if($receiverAttributes) : ?>
+
+    <?php if ($receiverAttributes) : ?>
         <h4 style="margin-top: 15px;">
             Данные получателя:
         </h4>
@@ -173,7 +173,7 @@ $order->refresh();
             'attributes' => $receiverAttributes,
         ]);; ?>
     <?php endif; ?>
-    
+
 
 
     <? if ($order->shop_pay_system_id) : ?>
@@ -229,6 +229,21 @@ $order->refresh();
                         <td><?php echo \yii\helpers\ArrayHelper::getValue($data, 'value'); ?></td>
                     </tr>
                 <? endforeach; ?>
+            </table>
+        <?php endif; ?>
+
+        <?php if ($order->comment) : ?>
+        <h5 style="margin-top: 15px;">
+                Примечание к заказу:
+            </h5>
+        
+            <table>
+
+                <tr>
+                    <th>Комментарий</th>
+                    <td><?php echo $order->comment; ?></td>
+                </tr>
+
             </table>
         <?php endif; ?>
 
