@@ -144,6 +144,10 @@ ul.sx-properties .sx-properties--name:after {
     background: #f9f9f9;
 }
 
+.sx-table td {
+    vertical-align: baseline;
+}
+
 .sx-table-wrapper {
     border-radius: 5px;
     border-left: 1px solid #dee2e68f;
@@ -191,7 +195,7 @@ CSS
                 <?php echo $model->shopStore->name; ?>
             </span>
         </li>
-        <?php if($model->comment) : ?>
+        <?php if ($model->comment) : ?>
             <li>
                 <span class="sx-properties--name">
                     Комментарий
@@ -208,28 +212,109 @@ CSS
 
 <div class="row" style="margin-top: 10px;">
 
-    <?php if(!$model->is_active) : ?>
+    <?php if (!$model->is_active) : ?>
 
 
-    <div class="col" style="max-width: 350px;">
-        <div style="margin-bottom: 5px;">
-            <b style="text-transform: uppercase;">Добавить товары</b>
-        </div>
-        <div class="sx-block-search">
-            <input class="form-control" placeholder="Поиск товаров">
-        </div>
-        <div class="sx-block-products">
+        <div class="col" style="max-width: 350px;">
+            <div style="margin-bottom: 5px;">
+                <b style="text-transform: uppercase;">Добавить товары</b>
+            </div>
+            <div class="sx-block-search">
+                <input class="form-control" placeholder="Поиск товаров">
+            </div>
+            <div class="sx-block-products">
 
+            </div>
         </div>
-    </div>
-        <?php endif; ?>
+
 
     <div class="col">
 
-            <div style="margin-bottom: 5px;">
-                <b style="text-transform: uppercase;">Выбранные товары</b>
-            </div>
+        <? $pjax = \skeeks\cms\widgets\Pjax::begin([
+            'id' => 'sx-selected-proocuts',
+        ]); ?>
+        <div style="margin-bottom: 5px;">
+            <b style="text-transform: uppercase;">Выбранные товары</b>
+        </div>
 
+        <div class="sx-table-wrapper table-responsive">
+            <table class="table sx-table">
+                <tr>
+                    <th>Наименование</th>
+                    <th>Количество</th>
+                    <th>Цена</th>
+                    <th>Итог</th>
+                    <th></th>
+                </tr>
+                <? foreach ($model->shopStoreProductMoves as $productMove) : ?>
+                    <tr>
+                        <td>
+                            <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
+                                <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                    'controllerId'            => 'shop/admin-cms-content-element',
+                                    'urlParams'               => [
+                                        'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
+                                    ],
+                                    'tag'                     => 'span',
+                                    'defaultOptions'          => [
+                                        'class' => 'd-flex',
+                                        'style' => 'line-height: 1.1; cursor: pointer;',
+                                    ],
+                                    'modelId'                 => $productMove->shopStoreProduct->shopProduct->id,
+                                    'isRunFirstActionOnClick' => true,
+                                ]); ?>
+
+                                <?
+                                $image = null;
+                                if ($product = $productMove->shopStoreProduct) {
+                                    if ($product->shopProduct) {
+                                        if ($product->shopProduct->cmsContentElement) {
+                                            if ($product->shopProduct->cmsContentElement->mainProductImage) {
+                                                $image = $product->shopProduct->cmsContentElement->mainProductImage;
+                                            }
+                                        }
+                                    }
+                                }
+                                ?>
+
+                                <?php if ($image) : ?>
+                                    <span class="my-auto">
+                                        <img class="my-auto" src="<?php echo \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"
+                                             style="max-width: 30px; height: 100%;
+                        width: 100%; margin-right: 5px;"/>
+                                    </span>
+                                <?php endif; ?>
+
+                                <span class="my-auto">
+                                    <?php echo $productMove->product_name; ?>
+                            </span>
+                                <? $widget::end(); ?>
+                            <?php else : ?>
+                                <?php echo $productMove->product_name; ?>
+                            <?php endif; ?>
+
+
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" value="<?php echo $productMove->quantity; ?>" />
+                        </td>
+                        <td><input type="number" class="form-control" value="<?php echo $productMove->price; ?>" /></td>
+                        <td><?php echo $productMove->price * $productMove->quantity; ?></td>
+                        <td>
+                            <div class="btn sx-remove-row-btn">
+                                ×
+                            </div>
+                        </td>
+                    </tr>
+                <? endforeach; ?>
+            </table>
+            
+        </div>
+
+        <? $pjax::end(); ?>
+    </div>
+
+    <?php else : ?>
         <div class="sx-table-wrapper table-responsive">
             <table class="table sx-table">
                 <tr>
@@ -241,17 +326,45 @@ CSS
                 <? foreach ($model->shopStoreProductMoves as $productMove) : ?>
                     <tr>
                         <td>
-                            <?php if($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
+                            <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
                                 <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                    'controllerId' => 'shop/admin-cms-content-element',
-                                    'urlParams' => [
-                                        'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id
+                                    'controllerId'            => 'shop/admin-cms-content-element',
+                                    'urlParams'               => [
+                                        'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
                                     ],
-                                    'tag' => 'span',
-                                    'modelId' => $productMove->shopStoreProduct->shopProduct->id,
-                                    'isRunFirstActionOnClick' => true
+                                    'tag'                     => 'span',
+                                    'defaultOptions'          => [
+                                        'class' => 'd-flex',
+                                        'style' => 'line-height: 1.1; cursor: pointer;',
+                                    ],
+                                    'modelId'                 => $productMove->shopStoreProduct->shopProduct->id,
+                                    'isRunFirstActionOnClick' => true,
                                 ]); ?>
+
+                                <?
+                                $image = null;
+                                if ($product = $productMove->shopStoreProduct) {
+                                    if ($product->shopProduct) {
+                                        if ($product->shopProduct->cmsContentElement) {
+                                            if ($product->shopProduct->cmsContentElement->mainProductImage) {
+                                                $image = $product->shopProduct->cmsContentElement->mainProductImage;
+                                            }
+                                        }
+                                    }
+                                }
+                                ?>
+
+                                <?php if ($image) : ?>
+                                    <span class="my-auto">
+                                        <img class="my-auto" src="<?php echo \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"
+                                             style="max-width: 30px; height: 100%;
+                        width: 100%; margin-right: 5px;"/>
+                                    </span>
+                                <?php endif; ?>
+
+                                <span class="my-auto">
                                     <?php echo $productMove->product_name; ?>
+                            </span>
                                 <? $widget::end(); ?>
                             <?php else : ?>
                                 <?php echo $productMove->product_name; ?>
@@ -268,7 +381,7 @@ CSS
                 <? endforeach; ?>
             </table>
         </div>
-    </div>
+    <?php endif; ?>
 </div>
 
 <?php
@@ -279,9 +392,10 @@ max-height: 500px;
 overflow: auto;
 }
 .catalog-card {
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
     padding: 10px 0;
+    border-bottom: 1px solid #f1f1f1;
 }
 .catalog-card:hover {
     background: #f9f9f9;
@@ -306,16 +420,19 @@ overflow: auto;
     font-size: 12px;
     color: gray;
 }
+.sx-more {
+    margin-bottom: 20px;
+}
 CSS
 );
 /*\skeeks\assets\unify\base\UnifyHsScrollbarAsset::register($this);*/
 $jsData = \yii\helpers\Json::encode([
-    'backend_products'    => \yii\helpers\Url::to(['products', 'pk' => $model->id]),
-    'backend-add-product'       => \yii\helpers\Url::to(['add-product', 'pk' => $model->id]),
-    'backend-add-product-barcode'       => \yii\helpers\Url::to(['add-product-barcode', 'pk' => $model->id]),
-    'backend-remove-order-item' => \yii\helpers\Url::to(['remove-item', 'pk' => $model->id]),
-    'backend-update-order-item' => \yii\helpers\Url::to(['update-item', 'pk' => $model->id]),
-    'doc' => $model->toArray(),
+    'backend_products'            => \yii\helpers\Url::to(['products', 'pk' => $model->id]),
+    'backend-add-product'         => \yii\helpers\Url::to(['add-product', 'pk' => $model->id]),
+    'backend-add-product-barcode' => \yii\helpers\Url::to(['add-product-barcode', 'pk' => $model->id]),
+    'backend-remove-order-item'   => \yii\helpers\Url::to(['remove-item', 'pk' => $model->id]),
+    'backend-update-order-item'   => \yii\helpers\Url::to(['update-item', 'pk' => $model->id]),
+    'doc'                         => $model->toArray(),
 ]);
 $this->registerJs(<<<JS
 
@@ -361,6 +478,22 @@ $this->registerJs(<<<JS
                 $(this).empty().append(text);
                 $(this).closest(".sx-more").addClass("sx-loaded");
                 self.loadProducts(nextPage);
+            });
+            
+            //Добавить товар в корзину
+            $("body").on('click', '.catalog-card', function (e) {
+                var jCard = $(this);
+                jCard.css("transform", "scale(0.95)");
+                setTimeout(function () {
+                    jCard.css("transform", "");
+                }, 300);
+                var ajaxQuery = self.createAjaxAddProduct($(this).data("id"), 1);
+                var Handler = new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+                    'allowResponseSuccessMessage': false
+                });
+                ajaxQuery.execute();
+
+                return false;
             });
         },
         
@@ -454,12 +587,8 @@ $this->registerJs(<<<JS
 
                 $(".sx-block-products .sx-more.sx-loaded").hide().remove();
 
-                /*$(".sx-block-products").on("scroll", function() {
-                    var delta = $(window).height() - $(".catalogList .catalog-card:last").offset().top;
-                    if (delta > -200) {
-                        console.log("Грузить еще");
-                    }
-                });*/
+                var maxHeight = $(window).height() - $(".sx-block-products").offset().top;
+                $(".sx-block-products").css("max-height", maxHeight);
             });
 
             ajaxQuery.execute();
@@ -510,6 +639,46 @@ $this->registerJs(<<<JS
             return ajax;
         },
         
+        /**
+         * Adding product to cart
+         *
+         * @param product_id
+         * @param quantity
+         * @param additional
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxAddProduct: function (product_id, quantity, additional) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-add-product'));
+
+            additional = additional || {};
+            quantity = quantity || 0;
+
+            product_id = Number(product_id);
+            quantity = Number(quantity);
+
+            if (quantity <= 0) {
+                quantity = 1;
+            }
+
+            ajax.setData({
+                'product_id': product_id,
+                'quantity': quantity,
+                'additional': additional,
+            });
+
+            ajax.onSuccess(function (e, data) {
+                self.trigger('addProduct', {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'response': data.response,
+                });
+                
+                $.pjax.reload("#sx-selected-proocuts");
+            });
+
+            return ajax;
+        },
     });
 })(sx, sx.$, sx._);
 

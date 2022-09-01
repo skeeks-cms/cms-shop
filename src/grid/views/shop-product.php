@@ -91,7 +91,7 @@ $shopSellerProducts = [];
             }
             ?>
             <div class="my-auto mx-auto text-center">
-                <img src='<?= $image ? $image->src : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 40px; max-height: 40px; border-radius: 5px;'/>
+                <img src='<?= $image ? \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail(), $model->code) : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 40px; max-height: 40px; border-radius: 5px;'/>
             </div>
         </div>
         <div class="my-auto d-flex flex-row" style="height: 50px;">

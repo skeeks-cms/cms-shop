@@ -57,7 +57,7 @@ $models = [$model];
             $(".sx-success-result").empty().append("<div class='sx-message'>✓ " + response.message + "</div>");
             
             setTimeout(function() {
-                window.location.href = $(".sx-back a").attr("href");
+                window.location.href = response.data.view_url;
             }, 1000);
         });
         

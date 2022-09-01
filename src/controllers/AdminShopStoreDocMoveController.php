@@ -365,6 +365,94 @@ HTML
 
 
 
+    /**
+     * Добавить товар
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionAddProduct()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $product_id = \Yii::$app->request->post('product_id');
+            $quantity = \Yii::$app->request->post('quantity');
+
+            /**
+             * @var $shopStoreDocMove ShopStoreDocMove
+             */
+            $shopStoreDocMove = $this->model;
+
+            /**
+             * @var ShopProduct $product
+             */
+            $product = ShopProduct::find()->where(['id' => $product_id])->one();
+
+            if (!$product) {
+                $rr->message = \Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.');
+                return (array)$rr;
+            }
+
+            if ($product->isOffersProduct) {
+                $rr->message = \Yii::t('skeeks/shop/app', 'Этот товар является общим, и не может быть добавлен в корзину.');
+                return (array)$rr;
+            }
+
+            if ($product->measure_ratio > 1) {
+                if ($quantity % $product->measure_ratio != 0) {
+                    $quantity = $product->measure_ratio;
+                }
+            }
+
+            $shopStoreProduct = $product->getStoreProduct($shopStoreDocMove->shopStore);
+            if (!$shopStoreProduct) {
+                $shopStoreProduct = new ShopStoreProduct();
+                $shopStoreProduct->shop_store_id = $shopStoreDocMove->shop_store_id;
+                $shopStoreProduct->shop_product_id = $product->id;
+                if (!$shopStoreProduct->save()) {
+                    $rr->message = "Не удалось добавить товар";
+                    return (array)$rr;
+                }
+            }
+
+            $productMove = $shopStoreDocMove->getShopStoreProductMoves()->andWhere(['shop_store_product_id' => $shopStoreProduct->id])->one();
+            if (!$productMove) {
+                $productMove = new ShopStoreProductMove();
+                $productMove->shop_store_product_id = $shopStoreProduct->id;
+                $productMove->shop_store_doc_move_id = $shopStoreDocMove->id;
+                $productMove->product_name = $product->cmsContentElement->productName;
+                $productMove->is_active = 0;
+                if (!$productMove->save()) {
+                    $rr->message = "Не удалось обновить товар";
+                    return (array)$rr;
+                }
+            }
+
+
+            $productMove->quantity = $productMove->quantity + $quantity;
+            if ($product->measure_ratio_min > $productMove->quantity) {
+                $productMove->quantity = $product->measure_ratio_min;
+            }
+
+            $int = round($productMove->quantity / $product->measure_ratio);
+            $productMove->quantity = $int * $product->measure_ratio;
+
+            if ($product->measure_ratio_min > $productMove->quantity) {
+                $productMove->quantity = $product->measure_ratio_min;
+            }
+
+            if (!$productMove->save()) {
+                $rr->message = "Не удалось обновить товар";
+            }
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+
 
     /**
      * Это бэкенд для поиска товаров
@@ -380,6 +468,7 @@ HTML
             \Yii::$app->skeeks->site;
             $q = \Yii::$app->request->post("q");
             $page = \Yii::$app->request->post("page", 0);
+            $shopStoreDocMove = $this->model;
 
             $query = ShopCmsContentElement::find()
                 ->andWhere([
@@ -419,6 +508,7 @@ HTML
                 foreach ($query->each(10) as $element) {
                     $content .= $this->renderPartial('_product', [
                         'model' => $element,
+                        'shopStoreDocMove' => $shopStoreDocMove,
                     ]);
                 }
                 $hasNextPage = (bool) ($pagination->page < ($pagination->pageCount-1));

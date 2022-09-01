@@ -94,7 +94,7 @@ class AgentsController extends Controller
         $shopSitesQ = ShopSite::find()->andWhere(['is_receiver' => 1])->orderBy(['id' => SORT_DESC]);
         //$shopSites->andWhere(['>=', 'id', 103]);
         if ($cms_site_id) {
-            $shopSites->andWhere(['id' => $cms_site_id]);
+            $shopSitesQ->andWhere(['id' => $cms_site_id]);
         }
 
         $defaultCmsSite = CmsSite::find()->default()->one();
@@ -285,7 +285,7 @@ class AgentsController extends Controller
     {
         $shopSitesQ = ShopSite::find()->where(['is_receiver' => 1])->orderBy(['id' => SORT_DESC]);
         if ($cms_site_id) {
-            $shopSites->andWhere(['id' => $cms_site_id]);
+            $shopSitesQ->andWhere(['id' => $cms_site_id]);
         }
         
         //Сначала нужно создать характеристики

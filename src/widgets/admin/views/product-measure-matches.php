@@ -78,7 +78,7 @@ CSS
         </div>
     </div>
 
-    <button class="btn btn-secondary btn-xs sx-btn-add-row">
+    <button class="btn btn-secondary sx-btn-add-row">
         <i class="fas fa-plus"></i> <?= \Yii::t('skeeks/cms', 'Add') ?>
     </button>
 

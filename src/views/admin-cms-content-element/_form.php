@@ -216,6 +216,44 @@ JS
             ]); ?>
 
 
+<? $fieldSet = $form->fieldSet(\Yii::t('skeeks/shop/app', 'Рейтинг товара'), ['isOpen' => false]); ?>
+
+<div class="col-12" style="margin-top: 20px;">
+    <? $widget = \yii\bootstrap\Alert::begin([
+        'closeButton' => false,
+        'options'     => [
+            'class' => 'alert-default',
+        ],
+    ]); ?>
+    Рейтинг товара рассчитывается автоматически исходя из отзывов по товару.
+    <? $widget = \yii\bootstrap\Alert::end(); ?>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <?= $form->field($shopProduct, 'rating_value')
+            ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                'options' => [
+                    'step'     => 0.0001,
+                    'disabled' => 'disabled',
+                ],
+            ]); ?>
+    </div>
+    <div class="col-md-4">
+        <?= $form->field($shopProduct, 'rating_count')
+            ->widget(\skeeks\cms\backend\widgets\forms\NumberInputWidget::class, [
+                //'dynamicReload' => true,
+                'append'  => "шт",
+                'options' => [
+                    'step'     => 1,
+                    'disabled' => 'disabled',
+                ],
+            ]); ?>
+    </div>
+</div>
+
+<? $fieldSet::end(); ?>
+
+
         
 <?php $successMessage = ''; ?>
 <?php if(@$is_create) : ?>
