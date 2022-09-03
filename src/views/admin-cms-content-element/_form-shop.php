@@ -338,4 +338,42 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
 
 
 
+<? $fieldSet = $form->fieldSet('Срок годности и службы, гарантия.'); ?>
+    <div class="row no-gutters">
+        <div class="col-lg-3 col-md-12 col-12">
+            <?= $form->field($shopProduct, 'expiration_time')->widget(
+                \skeeks\cms\shop\widgets\admin\SmartExpirationTimeInputWidget::class
+            ); ?>
+        </div>
+        <div class="col-12">
+            <?= $form->field($shopProduct, 'expiration_time_comment')->textarea([
+                'rows' => 5
+            ]); ?>
+        </div>
+
+        <div class="col-lg-3 col-md-12 col-12">
+            <?= $form->field($shopProduct, 'service_life_time')->widget(
+                \skeeks\cms\shop\widgets\admin\SmartExpirationTimeInputWidget::class
+            ); ?>
+        </div>
+        <div class="col-12">
+            <?= $form->field($shopProduct, 'service_life_time_comment')->textarea([
+                'rows' => 5
+            ]); ?>
+        </div>
+
+        <div class="col-lg-3 col-md-12 col-12">
+            <?= $form->field($shopProduct, 'warranty_time')->widget(
+                \skeeks\cms\shop\widgets\admin\SmartExpirationTimeInputWidget::class
+            ); ?>
+        </div>
+        <div class="col-12">
+            <?= $form->field($shopProduct, 'warranty_time_comment')->textarea([
+                'rows' => 5
+            ]); ?>
+        </div>
+    </div>
+<? $fieldSet::end(); ?>
+
+
 

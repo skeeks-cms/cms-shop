@@ -39,7 +39,16 @@ use yii\helpers\Json;
  * @property double                    $length
  * @property double                    $height
  * @property double                    $rating_value
- * @property integer                    $rating_count
+ * @property integer                   $rating_count
+ *
+ * @property integer                   $expiration_time
+ * @property string                    $expiration_time_comment
+ *
+ * @property integer                   $service_life_time
+ * @property string                    $service_life_time_comment
+ *
+ * @property integer                   $warranty_time
+ * @property string                    $warranty_time_comment
  *
  * @property integer|null              $offers_pid
  *
@@ -325,7 +334,7 @@ class ShopProduct extends \skeeks\cms\models\Core
          */
         if ($this->_barcodes !== null) {
 
-            $values = ArrayHelper::map((array) $this->_barcodes, 'value', 'value');
+            $values = ArrayHelper::map((array)$this->_barcodes, 'value', 'value');
 
             if ($values) {
                 ShopProductBarcode::deleteAll([
@@ -335,13 +344,12 @@ class ShopProduct extends \skeeks\cms\models\Core
                 ]);
             } else {
                 ShopProductBarcode::deleteAll([
-                    'shop_product_id' => $this->id
+                    'shop_product_id' => $this->id,
                 ]);
             }
 
 
-            foreach ((array) $this->_barcodes as $barcodeData)
-            {
+            foreach ((array)$this->_barcodes as $barcodeData) {
                 $value = ArrayHelper::getValue($barcodeData, "value");
                 if (!$value) {
                     continue;
@@ -349,7 +357,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                 $type = ArrayHelper::getValue($barcodeData, "barcode_type");
 
                 if (!$shopProductBarcode = $this->getShopProductBarcodes()->andWhere([
-                    'value' => $value
+                    'value' => $value,
                 ])->one()) {
                     $shopProductBarcode = new ShopProductBarcode();
                     $shopProductBarcode->shop_product_id = $this->id;
@@ -434,6 +442,10 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'created_at',
                     'updated_at',
                     'vat_id',
+
+                    'expiration_time',
+                    'service_life_time',
+                    'warranty_time',
                 ],
                 'integer',
             ],
@@ -459,55 +471,72 @@ class ShopProduct extends \skeeks\cms\models\Core
             [['weight', 'width', 'length', 'height'], 'default', 'value' => 0],
             [['measure_ratio'], 'default', 'value' => 1],
             [['measure_ratio'], 'number', 'min' => 0.0001, 'max' => 9999999],
-            
+
             [['rating_value'], 'number', 'min' => 0, 'max' => 5],
             [['rating_count'], 'integer', 'min' => 0],
-            
-            [['rating_count'], 'required', 'when' => function() {
-                return $this->rating_value;
-            }],
 
-            [['rating_count'], function($attribute) {
-                if ($this->rating_value > 0 && $this->rating_count == 0) {
-                    $this->addError($attribute, "Необходимо указать количество отзывов. Потому что указан рейтинг товара.");
-                    return false;
-                }
-                
-                return true;
-            }],
+            [
+                ['rating_count'],
+                'required',
+                'when' => function () {
+                    return $this->rating_value;
+                },
+            ],
 
-            [['measure_ratio_min'], 'default', 'value' => function() {
-                return $this->measure_ratio;
-            }],
-            [['measure_ratio_min'], 'number', 'min' => 0.0001, 'max' => 9999999],
-            [['measure_ratio_min'], function() {
-                if ($this->measure_ratio > $this->measure_ratio_min) {
-                    $this->measure_ratio_min = $this->measure_ratio;
-                    //$this->addError("measure_ratio_min", "Минимальное количество продажи должно быть больше чем шаг продажи");
-                    //return false;
-                }
-                /*print_r($this->measure_ratio_min);
-                            die;*/
-
-            }],
-            [['measure_ratio_min'], function() {
-                if ((float) $this->measure_ratio != 0 && (float) $this->measure_ratio_min != 0) {
-                    try {
-                        $one = (float) $this->measure_ratio_min;
-                        $two = (float) $this->measure_ratio;
-                        if ($one < 1 || $two < 1) {
-                            $one = $one * 10000;
-                            $two = $two * 10000;
-                        }
-                        if ($one % $two != 0) {
-                            $this->addError("measure_ratio_min", "Минимальное количество продажи должно быть кратно шагу продажи.");
-                            return false;
-                        }
-                    } catch (\Exception $e){
+            [
+                ['rating_count'],
+                function ($attribute) {
+                    if ($this->rating_value > 0 && $this->rating_count == 0) {
+                        $this->addError($attribute, "Необходимо указать количество отзывов. Потому что указан рейтинг товара.");
+                        return false;
                     }
 
-                }
-            }],
+                    return true;
+                },
+            ],
+
+            [
+                ['measure_ratio_min'],
+                'default',
+                'value' => function () {
+                    return $this->measure_ratio;
+                },
+            ],
+            [['measure_ratio_min'], 'number', 'min' => 0.0001, 'max' => 9999999],
+            [
+                ['measure_ratio_min'],
+                function () {
+                    if ($this->measure_ratio > $this->measure_ratio_min) {
+                        $this->measure_ratio_min = $this->measure_ratio;
+                        //$this->addError("measure_ratio_min", "Минимальное количество продажи должно быть больше чем шаг продажи");
+                        //return false;
+                    }
+                    /*print_r($this->measure_ratio_min);
+                                die;*/
+
+                },
+            ],
+            [
+                ['measure_ratio_min'],
+                function () {
+                    if ((float)$this->measure_ratio != 0 && (float)$this->measure_ratio_min != 0) {
+                        try {
+                            $one = (float)$this->measure_ratio_min;
+                            $two = (float)$this->measure_ratio;
+                            if ($one < 1 || $two < 1) {
+                                $one = $one * 10000;
+                                $two = $two * 10000;
+                            }
+                            if ($one % $two != 0) {
+                                $this->addError("measure_ratio_min", "Минимальное количество продажи должно быть кратно шагу продажи.");
+                                return false;
+                            }
+                        } catch (\Exception $e) {
+                        }
+
+                    }
+                },
+            ],
 
             [['baseProductPriceValue'], 'number'],
             [['baseProductPriceValue'], 'default', 'value' => 0.00],
@@ -620,39 +649,62 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['barcodes'], 'safe'],
 
-            [['barcodes'], function($attribute) {
-                if ($this->barcodes !== null) {
-                    foreach ((array) $this->barcodes as $barcodeData) {
 
-                        if (!ArrayHelper::getValue($barcodeData, 'value')) {
-                            continue;
-                        }
+            [
+                [
+                    'expiration_time_comment',
+                    'service_life_time_comment',
+                    'warranty_time_comment',
+                ],
+                'string'
+            ],
 
-                        if (!$this->isNewRecord) {
-                            if (!$shopProductBarcode = $this->getShopProductBarcodes()->andWhere([
-                                'value' => ArrayHelper::getValue($barcodeData, 'value')
-                            ])->one()) {
+            [
+                [
+                    'expiration_time_comment',
+                    'service_life_time_comment',
+                    'warranty_time_comment',
+                ],
+                'default',
+                'value' => null
+            ],
+
+            [
+                ['barcodes'],
+                function ($attribute) {
+                    if ($this->barcodes !== null) {
+                        foreach ((array)$this->barcodes as $barcodeData) {
+
+                            if (!ArrayHelper::getValue($barcodeData, 'value')) {
+                                continue;
+                            }
+
+                            if (!$this->isNewRecord) {
+                                if (!$shopProductBarcode = $this->getShopProductBarcodes()->andWhere([
+                                    'value' => ArrayHelper::getValue($barcodeData, 'value'),
+                                ])->one()) {
+                                    $shopProductBarcode = new ShopProductBarcode();
+                                    $shopProductBarcode->shop_product_id = $this->id;
+                                }
+                                $validateAttributes = [];
+                            } else {
                                 $shopProductBarcode = new ShopProductBarcode();
                                 $shopProductBarcode->shop_product_id = $this->id;
+                                $validateAttributes = ['value', 'barcode_type'];
                             }
-                            $validateAttributes = [];
-                        } else {
-                            $shopProductBarcode = new ShopProductBarcode();
-                            $shopProductBarcode->shop_product_id = $this->id;
-                            $validateAttributes = ['value', 'barcode_type'];
-                        }
 
-                        $shopProductBarcode->value = ArrayHelper::getValue($barcodeData, 'value');
-                        $shopProductBarcode->barcode_type = ArrayHelper::getValue($barcodeData, 'barcode_type');
+                            $shopProductBarcode->value = ArrayHelper::getValue($barcodeData, 'value');
+                            $shopProductBarcode->barcode_type = ArrayHelper::getValue($barcodeData, 'barcode_type');
 
-                        if (!$shopProductBarcode->validate($validateAttributes)) {
-                            $this->addError($attribute, ArrayHelper::getValue($barcodeData, 'value') . " — некорректный штрихкод: " . Json::encode($shopProductBarcode->errors));
-                            return false;
+                            if (!$shopProductBarcode->validate($validateAttributes)) {
+                                $this->addError($attribute, ArrayHelper::getValue($barcodeData, 'value')." — некорректный штрихкод: ".Json::encode($shopProductBarcode->errors));
+                                return false;
+                            }
                         }
                     }
-                }
 
-            }],
+                },
+            ],
         ];
     }
     /**
@@ -661,26 +713,34 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function attributeLabels()
     {
         return [
-            'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
-            'quantity'      => \Yii::t('skeeks/shop/app', 'Количество под заказ'),
-            'weight'        => \Yii::t('skeeks/shop/app', 'Вес'),
-            'vat_id'        => \Yii::t('skeeks/shop/app', 'VAT rate'),
-            'vat_included'  => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
-            'measure_code'  => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
-            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Шаг количества продажи'),
+            'id'                => \Yii::t('skeeks/shop/app', 'ID'),
+            'created_by'        => \Yii::t('skeeks/shop/app', 'Created By'),
+            'updated_by'        => \Yii::t('skeeks/shop/app', 'Updated By'),
+            'created_at'        => \Yii::t('skeeks/shop/app', 'Created At'),
+            'updated_at'        => \Yii::t('skeeks/shop/app', 'Updated At'),
+            'quantity'          => \Yii::t('skeeks/shop/app', 'Количество под заказ'),
+            'weight'            => \Yii::t('skeeks/shop/app', 'Вес'),
+            'vat_id'            => \Yii::t('skeeks/shop/app', 'VAT rate'),
+            'vat_included'      => \Yii::t('skeeks/shop/app', 'VAT included in the price'),
+            'measure_code'      => \Yii::t('skeeks/shop/app', 'Unit of measurement'),
+            'measure_ratio'     => \Yii::t('skeeks/shop/app', 'Шаг количества продажи'),
             'measure_ratio_min' => \Yii::t('skeeks/shop/app', 'Минимальное количество продажи'),
-            'width'         => \Yii::t('skeeks/shop/app', 'Width'),
-            'length'        => \Yii::t('skeeks/shop/app', 'Length'),
-            'height'        => \Yii::t('skeeks/shop/app', 'Height'),
-            'barcodes'      => "Штрихкоды",
+            'width'             => \Yii::t('skeeks/shop/app', 'Width'),
+            'length'            => \Yii::t('skeeks/shop/app', 'Length'),
+            'height'            => \Yii::t('skeeks/shop/app', 'Height'),
+            'barcodes'          => "Штрихкоды",
             'rating_value'      => "Рейтинг товара",
             'rating_count'      => "Количество отзывов",
-            'product_type'  => \Yii::t('skeeks/shop/app', 'Product type'),
-            /*'mainя_pid'          => \Yii::t('skeeks/shop/app', 'Инфо карточка'),*/
+            'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
+
+            'expiration_time'      => 'Срок годности',
+            'expiration_time_comment'      => 'Комментарий к сроку годности',
+
+            'service_life_time'      => 'Срок службы',
+            'service_life_time_comment'      => 'Комментарий к сроку службы',
+
+            'warranty_time'      => 'Срок гарантии',
+            'warranty_time_comment'      => 'Комментарий к сроку гарантии',
 
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
             'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
@@ -691,9 +751,18 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function attributeHints()
     {
         return [
-            'measure_code'  => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
-            'measure_ratio' => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
+            'measure_code'      => \Yii::t('skeeks/shop/app', 'Единица в которой ведется учет товара. Цена указывается за еденицу товара в этой величине.'),
+            'measure_ratio'     => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
             'measure_ratio_min' => \Yii::t('skeeks/shop/app', 'Нажимая кнопку плюс и минус для добавления в корзину будет добавлятся именно это количество'),
+
+            'expiration_time' => 'Через какое время товар станет непригоден для использования. Например, срок годности есть у таких категорий, как продукты питания и медицинские препараты.',
+            'expiration_time_comment' => 'Можно указать условия хранения.',
+
+            'service_life_time' => 'В течение этого периода изготовитель готов нести ответственность за существенные недостатки товара, обеспечивать наличие запчастей и возможность обслуживания и ремонта. Например, срок службы устанавливается для детских игрушек и климатической техники.',
+            'service_life_time_comment' => 'Можно указать условия использования.',
+
+            'warranty_time' => 'В течение этого периода возможны обслуживание и ремонт товара, возврат денег.',
+            'warranty_time_comment' => 'Можно дать инструкцию для наступления гарантийного случая.'
         ];
     }
     /**
@@ -1186,22 +1255,22 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         if (is_string($barcodes)) {
 
-            $value = trim((string) $barcodes);
+            $value = trim((string)$barcodes);
             if (StringHelper::strlen($value) == 13) {
                 $barcodes = [
                     [
-                        'value' => $value,
-                        'barcode_type' => ShopProductBarcode::TYPE_EAN13
-                    ]
+                        'value'        => $value,
+                        'barcode_type' => ShopProductBarcode::TYPE_EAN13,
+                    ],
                 ];
 
             } elseif (StringHelper::strlen($value) == 12) {
 
                 $barcodes = [
                     [
-                        'value' => $value,
-                        'barcode_type' => ShopProductBarcode::TYPE_UPC
-                    ]
+                        'value'        => $value,
+                        'barcode_type' => ShopProductBarcode::TYPE_UPC,
+                    ],
                 ];
             }
 
@@ -1211,16 +1280,16 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             foreach ($barcodes as $key => $barcodeData) {
                 if (is_string($barcodeData) || is_int($barcodeData)) {
-                    $value = trim((string) $barcodeData);
+                    $value = trim((string)$barcodeData);
                     if (StringHelper::strlen($value) == 13) {
                         $barcodes[$key] = [
-                            'value' => $value,
-                            'barcode_type' => ShopProductBarcode::TYPE_EAN13
+                            'value'        => $value,
+                            'barcode_type' => ShopProductBarcode::TYPE_EAN13,
                         ];
                     } elseif (StringHelper::strlen($value) == 12) {
                         $barcodes[$key] = [
-                            'value' => $value,
-                            'barcode_type' => ShopProductBarcode::TYPE_UPC
+                            'value'        => $value,
+                            'barcode_type' => ShopProductBarcode::TYPE_UPC,
                         ];
                     }
                 }
@@ -1247,8 +1316,8 @@ class ShopProduct extends \skeeks\cms\models\Core
                      * @var ShopProductBarcode $model
                      */
                     return [
-                        'barcode_type'  => $model->barcode_type,
-                        'value' => $model->value,
+                        'barcode_type' => $model->barcode_type,
+                        'value'        => $model->value,
                     ];
                 });
             } else {
