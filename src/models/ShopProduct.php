@@ -85,6 +85,10 @@ use yii\helpers\Json;
  *
  *
  * @property boolean                   $isSubProduct
+ * @property string                    $weightFormatted
+ * @property string                    $lengthFormatted
+ * @property string                    $widthFormatted
+ * @property string                    $heightFormatted
  *
  * @property boolean                   $isSimpleProduct
  * @property boolean                   $isOfferProduct
@@ -656,7 +660,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'service_life_time_comment',
                     'warranty_time_comment',
                 ],
-                'string'
+                'string',
             ],
 
             [
@@ -666,7 +670,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'warranty_time_comment',
                 ],
                 'default',
-                'value' => null
+                'value' => null,
             ],
 
             [
@@ -733,14 +737,14 @@ class ShopProduct extends \skeeks\cms\models\Core
             'rating_count'      => "Количество отзывов",
             'product_type'      => \Yii::t('skeeks/shop/app', 'Product type'),
 
-            'expiration_time'      => 'Срок годности',
-            'expiration_time_comment'      => 'Комментарий к сроку годности',
+            'expiration_time'         => 'Срок годности',
+            'expiration_time_comment' => 'Комментарий к сроку годности',
 
-            'service_life_time'      => 'Срок службы',
-            'service_life_time_comment'      => 'Комментарий к сроку службы',
+            'service_life_time'         => 'Срок службы',
+            'service_life_time_comment' => 'Комментарий к сроку службы',
 
-            'warranty_time'      => 'Срок гарантии',
-            'warranty_time_comment'      => 'Комментарий к сроку гарантии',
+            'warranty_time'         => 'Срок гарантии',
+            'warranty_time_comment' => 'Комментарий к сроку гарантии',
 
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
             'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
@@ -755,14 +759,14 @@ class ShopProduct extends \skeeks\cms\models\Core
             'measure_ratio'     => \Yii::t('skeeks/shop/app', 'Задайте минимальное количество, которое разрешено класть в корзину'),
             'measure_ratio_min' => \Yii::t('skeeks/shop/app', 'Нажимая кнопку плюс и минус для добавления в корзину будет добавлятся именно это количество'),
 
-            'expiration_time' => 'Через какое время товар станет непригоден для использования. Например, срок годности есть у таких категорий, как продукты питания и медицинские препараты.',
+            'expiration_time'         => 'Через какое время товар станет непригоден для использования. Например, срок годности есть у таких категорий, как продукты питания и медицинские препараты.',
             'expiration_time_comment' => 'Можно указать условия хранения.',
 
-            'service_life_time' => 'В течение этого периода изготовитель готов нести ответственность за существенные недостатки товара, обеспечивать наличие запчастей и возможность обслуживания и ремонта. Например, срок службы устанавливается для детских игрушек и климатической техники.',
+            'service_life_time'         => 'В течение этого периода изготовитель готов нести ответственность за существенные недостатки товара, обеспечивать наличие запчастей и возможность обслуживания и ремонта. Например, срок службы устанавливается для детских игрушек и климатической техники.',
             'service_life_time_comment' => 'Можно указать условия использования.',
 
-            'warranty_time' => 'В течение этого периода возможны обслуживание и ремонт товара, возврат денег.',
-            'warranty_time_comment' => 'Можно дать инструкцию для наступления гарантийного случая.'
+            'warranty_time'         => 'В течение этого периода возможны обслуживание и ремонт товара, возврат денег.',
+            'warranty_time_comment' => 'Можно дать инструкцию для наступления гарантийного случая.',
         ];
     }
     /**
@@ -1328,4 +1332,71 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->_barcodes;
     }
 
+    /**
+     * @return string
+     */
+    public function getWeightFormatted()
+    {
+        if ($this->weight >= 1000 && $this->weight <= 1000000) {
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000))." кг.";
+        } elseif ($this->weight >= 1000000) {
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000000))." т.";
+        } else {
+            return \Yii::$app->formatter->asDecimal(($this->weight))." г.";
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getLengthFormatted()
+    {
+        if ($this->length >= 10 && $this->length <= 1000) {
+            return \Yii::$app->formatter->asDecimal(($this->length / 10))." см.";
+        } elseif ($this->length >= 1000) {
+            return \Yii::$app->formatter->asDecimal(($this->length / 1000))." м.";
+        } else {
+            return \Yii::$app->formatter->asDecimal(($this->length))." мм.";
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getWidthFormatted()
+    {
+        if ($this->width >= 10 && $this->width <= 1000) {
+            return \Yii::$app->formatter->asDecimal(($this->width / 10))." см.";
+        } elseif ($this->width >= 1000) {
+            return \Yii::$app->formatter->asDecimal(($this->width / 1000))." м.";
+        } else {
+            return \Yii::$app->formatter->asDecimal(($this->width))." мм.";
+        }
+    }
+    /**
+     * @return string
+     */
+    public function getHeightFormatted()
+    {
+        if ($this->height >= 10 && $this->height <= 1000) {
+            return \Yii::$app->formatter->asDecimal(($this->height / 10))." см.";
+        } elseif ($this->width >= 1000) {
+            return \Yii::$app->formatter->asDecimal(($this->height / 1000))." м.";
+        } else {
+            return \Yii::$app->formatter->asDecimal(($this->height))." мм.";
+        }
+    }
+
+    static public function formatExperationTime(int $value)
+    {
+        if ($value >= 24 && $value < 720) {
+            return \Yii::$app->formatter->asDecimal(($value / 24))." дней";
+        } elseif ($value >= 720  && $value < 8640) {
+            return \Yii::$app->formatter->asDecimal(($value / 720))." месяцев";
+        } elseif ($value >= 8640) {
+            return \Yii::$app->formatter->asDecimal(($value / 8640))." год";
+        } else {
+            return \Yii::$app->formatter->asDecimal($value)." часов";
+        }
+    }
 }

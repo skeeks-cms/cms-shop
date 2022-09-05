@@ -265,7 +265,7 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
 <? $fieldSet::end(); ?>
 
 <?php if ($isShowDimensions) : ?>
-<? $fieldSet = $form->fieldSet('Габариты и вес товара за '.$shopProduct->measure_ratio." ".($shopProduct->measure ? $shopProduct->measure->symbol : "")); ?>
+<? $fieldSet = $form->fieldSet('Габариты и вес товара с упаковкой за '.$shopProduct->measure_ratio." ".($shopProduct->measure ? $shopProduct->measure->symbol : "")); ?>
     <div class="row no-gutters">
         <div class="col-lg-3 col-md-12 col-12">
             <?= $form->field($shopProduct, 'weight')->widget(

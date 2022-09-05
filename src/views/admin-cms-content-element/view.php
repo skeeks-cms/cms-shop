@@ -409,9 +409,6 @@ $noValue = "<span style='color: silver;'>—</span>";
             <? endif; ?>
 
 
-
-
-
         </div>
     </div>
 
@@ -419,7 +416,7 @@ $noValue = "<span style='color: silver;'>—</span>";
         <div style="padding: 10px;">
             <h4 style="line-height: 1.1;">
                 <?php if (
-                $model->cmsSite->shopSite->is_receiver //Если это товар собирает данные от поставщиков
+                    $model->cmsSite->shopSite->is_receiver //Если это товар собирает данные от поставщиков
                 ) : ?>
                     <?php if ($model->main_cce_id) : ?>
                         <?
@@ -517,7 +514,7 @@ JS
                                   data-form="#barcodes-form"
                                   data-title="Штрихкод"
                             >
-                                <?php if($model->shopProduct->shopProductBarcodes) : ?>
+                                <?php if ($model->shopProduct->shopProductBarcodes) : ?>
                                     <? foreach ($model->shopProduct->shopProductBarcodes as $data) : ?>
                                         <?php echo $data->value; ?>
                                     <? endforeach; ?>
@@ -525,7 +522,7 @@ JS
                                     &nbsp;&nbsp;&nbsp;
                                 <?php endif; ?>
 
-                                <?php /*echo $model->shopProduct->shopProductBarcodes ? implode("<br>", \yii\helpers\ArrayHelper::map($model->shopProduct->shopProductBarcodes, 'value', 'value')) : "&nbsp;&nbsp;&nbsp;" */?>
+                                <?php /*echo $model->shopProduct->shopProductBarcodes ? implode("<br>", \yii\helpers\ArrayHelper::map($model->shopProduct->shopProductBarcodes, 'value', 'value')) : "&nbsp;&nbsp;&nbsp;" */ ?>
                             </span>
 
                             <div class="sx-fast-edit-form-wrapper">
@@ -656,16 +653,16 @@ JS
                 </ul>
 
 
-                <?php if($model->shopProduct->shopProductBarcodes) : ?>
-                <div class="text-center" style="margin-top: 10px; height: 50px;">
-                    <? foreach ($model->shopProduct->shopProductBarcodes as $data) : ?>
+                <?php if ($model->shopProduct->shopProductBarcodes) : ?>
+                    <div class="text-center" style="margin-top: 10px; height: 50px;">
+                        <? foreach ($model->shopProduct->shopProductBarcodes as $data) : ?>
 
-                        <?
-                        $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
-                        ?>
-                        <img src="data:image/png;base64,<?php echo base64_encode($generator->getBarcode($data->value, $generator::TYPE_CODE_128, 1, 40)); ?>" />
+                            <?
+                            $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
+                            ?>
+                            <img src="data:image/png;base64,<?php echo base64_encode($generator->getBarcode($data->value, $generator::TYPE_CODE_128, 1, 40)); ?>"/>
 
-                    <div class="block" style='
+                            <div class="block" style='
                         z-index: 1;
                         border-left-width: 0px;
                         border-right-width: 0px;
@@ -681,11 +678,11 @@ JS
 
 
                             </div>
-                        <?
-                        break;
-                        ?>
-                    <? endforeach; ?>
-                </div>
+                            <?
+                            break;
+                            ?>
+                        <? endforeach; ?>
+                    </div>
                 <?php endif; ?>
 
             </div>
@@ -693,10 +690,10 @@ JS
     </div>
 
 
-
     <div class="col-lg-4 col-sm-6 col-12">
         <div style="padding: 10px;">
             <div class="sx-properties-wrapper sx-columns-1" style="max-width: 350px; margin-top: 15px;">
+                <div style="color: gray; margin-bottom: 8px;">Габариты товара с упаковкой</div>
                 <ul class="sx-properties">
                     <li>
                         <span class="sx-properties--name">
@@ -704,15 +701,15 @@ JS
                         </span>
                         <span class="sx-properties--value">
                             <span class="sx-fast-edit sx-fast-edit-popover"
-                                  data-form="#is_active-form"
-                                  data-title="Активность"
+                                  data-form="#weight-form"
+                                  data-title="Вес"
                             >
-                                <?php echo $model->is_active ? '<span data-toggle="tooltip" title="Товар показывается на сайте"  style="color: green;">✓</span>' : '<span data-toggle="tooltip" title="Товар не активен" style="color: red;">x</span>' ?>
+                                <?php echo $model->shopProduct->weightFormatted; ?>
                             </span>
 
                             <div class="sx-fast-edit-form-wrapper">
                                 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-                                    'id'             => "is_active-form",
+                                    'id'             => "weight-form",
                                     'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
                                     'options'        => [
                                         'class' => 'sx-fast-edit-form',
@@ -727,7 +724,131 @@ JS
 JS
                                     ),
                                 ]); ?>
-                                <?php echo $form->field($model, 'active')->radioList(\Yii::$app->cms->booleanFormat())->label(false); ?>
+                                <?php echo $form->field($model->shopProduct, 'weight')->widget(
+                                    \skeeks\cms\shop\widgets\admin\SmartWeightShortInputWidget::class
+                                )->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <span class="sx-properties--name">
+                            Длина
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#length-form"
+                                  data-title="Длина"
+                            >
+                                <?php echo $model->shopProduct->lengthFormatted; ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "length-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model->shopProduct, 'length')->widget(
+                                    \skeeks\cms\shop\widgets\admin\SmartDimensionsShortInputWidget::class
+                                )->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <span class="sx-properties--name">
+                            Ширина
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#width-form"
+                                  data-title="Ширина"
+                            >
+                                <?php echo $model->shopProduct->widthFormatted; ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "width-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model->shopProduct, 'width')->widget(
+                                    \skeeks\cms\shop\widgets\admin\SmartDimensionsShortInputWidget::class
+                                )->label(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+                    <li>
+                        <span class="sx-properties--name">
+                            Высота
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#height-form"
+                                  data-title="Высота"
+                            >
+                                <?php echo $model->shopProduct->heightFormatted; ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "height-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model->shopProduct, 'height')->widget(
+                                    \skeeks\cms\shop\widgets\admin\SmartDimensionsShortInputWidget::class
+                                )->label(false); ?>
                                     <div class="input-group-append">
                                         <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
                                     </div>
@@ -739,12 +860,189 @@ JS
 
                 </ul>
             </div>
+
+
+            <div class="sx-properties-wrapper sx-columns-1" style="max-width: 350px; margin-top: 15px;">
+
+                <div style="color: gray; margin-bottom: 8px;">Гарантия и срок службы</div>
+                <ul class="sx-properties">
+                    <li>
+                        <span class="sx-properties--name">
+                            <?php echo $model->shopProduct->getAttributeLabel("expiration_time"); ?>
+                            <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
+                                           title="<?php echo $model->shopProduct->getAttributeHint("expiration_time"); ?>"></i>
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#expiration_time-form"
+                                  data-title="<?php echo $model->shopProduct->getAttributeLabel("expiration_time"); ?>"
+                            >
+                                <?php echo $model->shopProduct->expiration_time ? \skeeks\cms\shop\models\ShopProduct::formatExperationTime($model->shopProduct->expiration_time) : "&nbsp;&nbsp;&nbsp;"; ?>
+                                <?php if($model->shopProduct->expiration_time_comment) : ?>
+                                    <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" data-html="true"
+                                           title="<?php echo $model->shopProduct->expiration_time_comment; ?>"></i>
+                                <?php endif; ?>
+
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "expiration_time-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                        'style' => 'max-width: 400px;',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+
+                                <?php echo $form->field($model->shopProduct, 'expiration_time')->widget(
+                                    \skeeks\cms\shop\widgets\admin\SmartExpirationTimeInputWidget::class
+                                )->label(false); ?>
+
+                                <?= $form->field($model->shopProduct, 'expiration_time_comment')->textarea([
+                                    'rows' => 5,
+                                    'placeholder' => $model->shopProduct->getAttributeLabel("expiration_time_comment")
+                                ])->label(false); ?>
+
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+
+
+                    <li>
+                        <span class="sx-properties--name">
+                            <?php echo $model->shopProduct->getAttributeLabel("service_life_time"); ?>
+                            <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
+                                           title="<?php echo $model->shopProduct->getAttributeHint("service_life_time"); ?>"></i>
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#service_life_time-form"
+                                  data-title="<?php echo $model->shopProduct->getAttributeLabel("service_life_time"); ?>"
+                            >
+                                <?php echo $model->shopProduct->service_life_time ? \skeeks\cms\shop\models\ShopProduct::formatExperationTime($model->shopProduct->service_life_time) : "&nbsp;&nbsp;&nbsp;"; ?>
+                                <?php if($model->shopProduct->service_life_time_comment) : ?>
+                                    <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" data-html="true"
+                                           title="<?php echo $model->shopProduct->service_life_time_comment; ?>"></i>
+                                <?php endif; ?>
+
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "service_life_time-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                        'style' => 'max-width: 400px;',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+
+                                <?php echo $form->field($model->shopProduct, 'service_life_time')->widget(
+                                    \skeeks\cms\shop\widgets\admin\SmartExpirationTimeInputWidget::class
+                                )->label(false); ?>
+
+                                <?= $form->field($model->shopProduct, 'service_life_time_comment')->textarea([
+                                    'rows' => 5,
+                                    'placeholder' => $model->shopProduct->getAttributeLabel("service_life_time_comment")
+                                ])->label(false); ?>
+
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+
+                    <li>
+                        <span class="sx-properties--name">
+                            <?php echo $model->shopProduct->getAttributeLabel("warranty_time"); ?>
+                            <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
+                                           title="<?php echo $model->shopProduct->getAttributeHint("warranty_time"); ?>"></i>
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#warranty_time-form"
+                                  data-title="<?php echo $model->shopProduct->getAttributeLabel("warranty_time"); ?>"
+                            >
+                                <?php echo $model->shopProduct->warranty_time ? \skeeks\cms\shop\models\ShopProduct::formatExperationTime($model->shopProduct->warranty_time) : "&nbsp;&nbsp;&nbsp;"; ?>
+                                <?php if($model->shopProduct->warranty_time_comment) : ?>
+                                    <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" data-html="true"
+                                           title="<?php echo $model->shopProduct->warranty_time_comment; ?>"></i>
+                                <?php endif; ?>
+
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "warranty_time-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                        'style' => 'max-width: 400px;',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+
+                                <?php echo $form->field($model->shopProduct, 'warranty_time')->widget(
+                                    \skeeks\cms\shop\widgets\admin\SmartExpirationTimeInputWidget::class
+                                )->label(false); ?>
+
+                                <?= $form->field($model->shopProduct, 'warranty_time_comment')->textarea([
+                                    'rows' => 5,
+                                    'placeholder' => $model->shopProduct->getAttributeLabel("warranty_time_comment")
+                                ])->label(false); ?>
+
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
+</div>
 
 <?php if (
-!$model->shopProduct->isOffersProduct //И если это товар без предложений
+    !$model->shopProduct->isOffersProduct //И если это товар без предложений
 ) : ?>
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
@@ -1112,7 +1410,7 @@ $infoModel = $model;
                             </span>
                             <span class="sx-properties--value">
                                 <? if ($value) : ?>
-                                    <?php /*print_r($rp->getAttribute($code)); */?>
+                                    <?php /*print_r($rp->getAttribute($code)); */ ?>
                                     <?php echo $rp->getAttributeAsHtml($code); ?>
                                     <? if ($property->cms_measure_code) : ?>
                                         <?= $property->cmsMeasure->asShortText; ?>
