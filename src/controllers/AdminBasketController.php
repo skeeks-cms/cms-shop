@@ -152,6 +152,7 @@ CSS
             'measure_name',
             'amount'        => [
                 'class' => NumberField::class,
+                'step' => 0.01
             ],
             'currency_code' => [
                 'class' => SelectField::class,
