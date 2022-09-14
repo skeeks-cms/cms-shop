@@ -357,7 +357,7 @@ class ShopOrder extends \skeeks\cms\models\Core
         }
 
         if ($this->isAttributeChanged('delivery_amount')) {
-            $this->recalculate();
+            //$this->recalculate();
         }
 
         if ($this->isAttributeChanged('shop_pay_system_id')) {

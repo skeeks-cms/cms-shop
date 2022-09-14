@@ -180,7 +180,7 @@ class ShopComponent extends Component implements BootstrapInterface
         $result = [];
 
         if (!$user) {
-            $user = \Yii::$app->user->identity;
+            $user = isset(\Yii::$app->user) ? \Yii::$app->user->identity : null;
         }
 
         foreach ($this->shopTypePrices as $typePrice) {
@@ -189,18 +189,25 @@ class ShopComponent extends Component implements BootstrapInterface
                 $result[$typePrice->id] = $typePrice;
                 continue;
             }
-
-            if (!$typePrice->cmsUserRoles) {
+            if ($typePrice->is_purchase) {
                 //$result[$typePrice->id] = $typePrice;
                 continue;
             }
 
-            foreach ($typePrice->cmsUserRoles as $role) {
-                if (\Yii::$app->authManager->checkAccess($user ? $user->id : null, $role->name)) {
-                    $result[$typePrice->id] = $typePrice;
-                    continue;
+            if (!$typePrice->cmsUserRoles) {
+                $result[$typePrice->id] = $typePrice;
+                continue;
+            }
+
+            if ($user) {
+                foreach ($typePrice->cmsUserRoles as $role) {
+                    if (\Yii::$app->authManager->checkAccess($user ? $user->id : null, $role->name)) {
+                        $result[$typePrice->id] = $typePrice;
+                        continue;
+                    }
                 }
             }
+
         }
 
         return $result;
@@ -229,6 +236,11 @@ class ShopComponent extends Component implements BootstrapInterface
 
             if ($typePrice->isDefault) {
                 $result[$typePrice->id] = $typePrice;
+                continue;
+            }
+
+            if ($typePrice->is_purchase) {
+                //$result[$typePrice->id] = $typePrice;
                 continue;
             }
 

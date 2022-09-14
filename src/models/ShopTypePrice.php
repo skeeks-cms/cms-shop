@@ -2,6 +2,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\rbac\models\CmsAuthItem;
 use yii\base\Event;
@@ -37,7 +38,7 @@ use yii\helpers\ArrayHelper;
  * @property string       $buyPermissionName
  * @property string       $viewPermissionName
  */
-class ShopTypePrice extends \skeeks\cms\models\Core
+class ShopTypePrice extends ActiveRecord
 {
     /**
      * @inheritdoc

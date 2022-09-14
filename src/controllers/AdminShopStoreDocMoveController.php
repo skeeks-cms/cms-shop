@@ -24,10 +24,12 @@ use skeeks\cms\shop\models\ShopCashebox;
 use skeeks\cms\shop\models\ShopCloudkassa;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreDocMove;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProductMove;
+use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\shop\store\StoreUrlRule;
 use skeeks\cms\Skeeks;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
@@ -422,6 +424,29 @@ HTML
                 $productMove->shop_store_product_id = $shopStoreProduct->id;
                 $productMove->shop_store_doc_move_id = $shopStoreDocMove->id;
                 $productMove->product_name = $product->cmsContentElement->productName;
+
+
+                $typePurchasePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_purchase' => 1])->one();
+
+
+
+                $price = null;
+                if ($typePurchasePrice) {
+                    $price = $product->getPrice($typePurchasePrice);
+                }
+
+                if (!$price) {
+                    $typePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_default' => 1])->one();
+                    if ($typePrice) {
+                        $price = $product->getPrice($typePrice);
+                    }
+                }
+                /**
+                 * @var $price ShopProductPrice
+                 */
+                if ($price) {
+                    $productMove->price = $price->price;
+                }
                 $productMove->is_active = 0;
                 if (!$productMove->save()) {
                     $rr->message = "Не удалось обновить товар";
@@ -445,6 +470,41 @@ HTML
             if (!$productMove->save()) {
                 $rr->message = "Не удалось обновить товар";
             }
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+
+
+    /**
+     * Добавить товар
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionRemoveItem()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $itemId = \Yii::$app->request->post('id');
+
+            /**
+             * @var $shopStoreDocMove ShopStoreDocMove
+             */
+            $shopStoreDocMove = $this->model;
+
+            $docMove = $shopStoreDocMove->getShopStoreProductMoves()->andWhere(['id' => $itemId])->one();
+
+            if (!$docMove->delete()) {
+                $rr->message = "Не удалось удалить позицию: " . print_r($docMove->errors, true);
+            } else {
+                $rr->success = true;
+            }
+
 
             return (array)$rr;
         } else {

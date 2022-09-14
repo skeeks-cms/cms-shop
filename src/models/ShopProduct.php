@@ -906,11 +906,19 @@ class ShopProduct extends \skeeks\cms\models\Core
         }
 
 
-        if (!$shopUser) {
+        /*if (!$shopUser) {
             $basPriceTypes = [\Yii::$app->shop->baseTypePrice];
         } else {
             $basPriceTypes = $shopUser->buyTypePrices;
+        }*/
+
+
+        if ($shopUser && $shopUser->cmsUser) {
+            $basPriceTypes = \Yii::$app->shop->getCanBuyTypePrices($shopUser->cmsUser);
+        } else {
+            $basPriceTypes = \Yii::$app->shop->canBuyTypePrices;
         }
+
 
         return $this->hasOne(ShopProductPrice::class, [
             'product_id' => 'id',
