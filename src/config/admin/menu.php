@@ -88,10 +88,10 @@ return \yii\helpers\ArrayHelper::merge([
                             "url"   => ["shop/admin-content"],
                         ],
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Свойства контента'),
                             "url"   => ["shop/admin-shop-cms-content-property"],
-                        ],
+                        ],*/
 
                         [
                             "label" => \Yii::t('skeeks/shop/app', 'Order statuses'),

@@ -60,26 +60,23 @@ $(".sx-join-by-model-barcode-trigger").on("click", function() {
 JS
 );
 
-$shopCmsContentPropertyVendor = \skeeks\cms\shop\models\ShopCmsContentProperty::find()
-    ->innerJoinWith('cmsContentProperty as cmsContentProperty')
-    ->andWhere(['cmsContentProperty.cms_site_id' => \Yii::$app->skeeks->site->id])
+
+$cmsContentPropertyVendor = CmsContentProperty::find()->cmsSite()
     ->andWhere(['is_vendor' => 1])
     ->one();
 
-$shopCmsContentPropertyVendorCode = \skeeks\cms\shop\models\ShopCmsContentProperty::find()
-    ->innerJoinWith('cmsContentProperty as cmsContentProperty')
-    ->andWhere(['cmsContentProperty.cms_site_id' => \Yii::$app->skeeks->site->id])
+$cmsContentPropertyVendorCode = CmsContentProperty::find()->cmsSite()
     ->andWhere(['is_vendor_code' => 1])
     ->one();
 
 $isBrand = false;
 $isBarcode = false;
-if ($shopCmsContentPropertyVendor && $shopCmsContentPropertyVendorCode) {
+if ($cmsContentPropertyVendor && $cmsContentPropertyVendorCode) {
     $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
-    $shopStorePropertyVendor = $qShopStoreProperties->andWhere(['cms_content_property_id' => $shopCmsContentPropertyVendor->cms_content_property_id])->one();
+    $shopStorePropertyVendor = $qShopStoreProperties->andWhere(['cms_content_property_id' => $cmsContentPropertyVendor->id])->one();
 
     $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
-    $shopStorePropertyVendorCode = $qShopStoreProperties->andWhere(['cms_content_property_id' => $shopCmsContentPropertyVendorCode->cms_content_property_id])->one();
+    $shopStorePropertyVendorCode = $qShopStoreProperties->andWhere(['cms_content_property_id' => $cmsContentPropertyVendorCode->id])->one();
 
     if ($shopStorePropertyVendor && $shopStorePropertyVendorCode) {
         $isBrand = true;

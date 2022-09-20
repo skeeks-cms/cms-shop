@@ -21,6 +21,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentElementProperty;
+use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
@@ -931,28 +932,25 @@ HTML;
 
             $added = 0;
 
-            $shopCmsContentPropertyVendor = \skeeks\cms\shop\models\ShopCmsContentProperty::find()
-                ->innerJoinWith('cmsContentProperty as cmsContentProperty')
-                ->andWhere(['cmsContentProperty.cms_site_id' => \Yii::$app->skeeks->site->id])
+            $cmsContentPropertyVendor = CmsContentProperty::find()->cmsSite()
                 ->andWhere(['is_vendor' => 1])
                 ->one();
-
-            $shopCmsContentPropertyVendorCode = \skeeks\cms\shop\models\ShopCmsContentProperty::find()
-                ->innerJoinWith('cmsContentProperty as cmsContentProperty')
-                ->andWhere(['cmsContentProperty.cms_site_id' => \Yii::$app->skeeks->site->id])
+            
+            $cmsContentPropertyVendorCode = CmsContentProperty::find()->cmsSite()
                 ->andWhere(['is_vendor_code' => 1])
                 ->one();
 
+
             $isBrand = false;
-            if ($shopCmsContentPropertyVendor && $shopCmsContentPropertyVendorCode) {
+            if ($cmsContentPropertyVendor && $cmsContentPropertyVendorCode) {
                 /**
                  * @var $shopStorePropertyVendor ShopStoreProperty
                  */
                 $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
-                $shopStorePropertyVendor = $qShopStoreProperties->andWhere(['cms_content_property_id' => $shopCmsContentPropertyVendor->cms_content_property_id])->one();
+                $shopStorePropertyVendor = $qShopStoreProperties->andWhere(['cms_content_property_id' => $cmsContentPropertyVendor->id])->one();
 
                 $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
-                $shopStorePropertyVendorCode = $qShopStoreProperties->andWhere(['cms_content_property_id' => $shopCmsContentPropertyVendorCode->cms_content_property_id])->one();
+                $shopStorePropertyVendorCode = $qShopStoreProperties->andWhere(['cms_content_property_id' => $cmsContentPropertyVendorCode->id])->one();
 
                 if ($shopStorePropertyVendor && $shopStorePropertyVendorCode) {
                     $rr->success = true;
@@ -997,12 +995,12 @@ HTML;
                                 $find1 = CmsContentElementProperty::find()->select(['element_id as id'])
                                     ->where([
                                         "value_element_id" => $vendorOption->cms_content_element_id,
-                                        "property_id"      => $shopCmsContentPropertyVendor->cms_content_property_id,
+                                        "property_id"      => $cmsContentPropertyVendor->id,
                                     ]);
                                 $find2 = CmsContentElementProperty::find()->select(['element_id as id'])
                                     ->where([
                                         "value"       => $vendorCodeValue,
-                                        "property_id" => $shopCmsContentPropertyVendorCode->cms_content_property_id,
+                                        "property_id" => $cmsContentPropertyVendorCode->id,
                                     ]);
 
 

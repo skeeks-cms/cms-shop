@@ -14,7 +14,6 @@ use skeeks\cms\base\DynamicModel;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\shop\models\ShopCmsContentElement;
-use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Exception;
 
@@ -50,7 +49,7 @@ class ShopCreateOffersModel extends DynamicModel
         $rpm->initAllProperties();
 
         foreach ($rpm->toArray() as $code => $value) {
-            if ($property = ShopCmsContentProperty::findCmsContentProperties()->andWhere(['code' => $code])->one()) {
+            if ($property = CmsContentProperty::find()->cmsSite()->andWhere(["is_offer_property" => 1])->andWhere(['code' => $code])->one()) {
                 $this->defineAttribute($code);
                 $this->addRule($code, 'safe');
                 $this->availableProperties[$code] = $property;

@@ -18,7 +18,6 @@ use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCmsContentElement;
-use skeeks\cms\shop\models\ShopCmsContentProperty;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
@@ -986,7 +985,11 @@ SQL
      */
     public function getOfferCmsContentProperties()
     {
-        return ShopCmsContentProperty::findCmsContentProperties()->all();
+        $q = CmsContentProperty::find()
+                ->cmsSite()
+                ->andWhere(["is_offer_property" => 1]);
+
+        return $q->all();
     }
 
 
@@ -1252,7 +1255,13 @@ SQL
             $data['category'] = $cmsContentElement->cmsTree->name;
         }
 
-        if ($shopCmsContentProperty = \skeeks\cms\shop\models\ShopCmsContentProperty::find()->where(['is_vendor' => 1])->one()) {
+        if ($cmsContentProperty = CmsContentProperty::find()->cmsSite()->andWhere(['is_vendor' => 1])->one()) {
+            if ($brandName = $cmsContentElement->relatedPropertiesModel->getAttributeAsText($cmsContentProperty->code)) {
+                $data['brand'] = $brandName;
+            }
+        }
+        
+        /*if ($shopCmsContentProperty = \skeeks\cms\shop\models\ShopCmsContentProperty::find()->where(['is_vendor' => 1])->one()) {
             $brandId = $cmsContentElement->relatedPropertiesModel->getAttribute($shopCmsContentProperty->cmsContentProperty->code);
             if ($brandId) {
                 if ($brand = \skeeks\cms\models\CmsContentElement::findOne((int)$brandId)) {
@@ -1260,7 +1269,7 @@ SQL
                 }
             }
 
-        }
+        }*/
 
         return $data;
 
