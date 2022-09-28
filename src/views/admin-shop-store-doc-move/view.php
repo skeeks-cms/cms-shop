@@ -8,20 +8,11 @@ $action = $controller->action;
 $model = $action->model;
 
 $this->render("view-css");
+\skeeks\cms\backend\widgets\AjaxControllerActionsWidget::registerAssets();
 ?>
 
 <div class="sx-properties-wrapper sx-columns-1" style="max-width: 600px; margin-top: 15px;">
     <ul class="sx-properties">
-        <li>
-            <span class="sx-properties--name">
-                Документ проведен
-            </span>
-            <span class="sx-properties--value">
-                <?php echo \Yii::$app->formatter->asBoolean($model->is_active); ?>
-            </span>
-        </li>
-
-
         <li>
             <span class="sx-properties--name">
                 Магазин
@@ -30,6 +21,21 @@ $this->render("view-css");
                 <?php echo $model->shopStore->name; ?>
             </span>
         </li>
+
+        <li>
+            <span class="sx-properties--name">
+                Проведение документа <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="" data-original-title="После проведение документа количество товаров будет зачтено"></i>
+            </span>
+            <span class="sx-properties--value">
+                <?php if (!$model->is_active) : ?>
+                    <button class="btn btn-primary sx-approve-doc">Провести документ</button>
+                <?php else : ?>
+                    <button class="btn btn-secondary sx-not-approve-doc">Отменить документ</button>
+                <?php endif; ?>
+            </span>
+        </li>
+
+
         <?php if ($model->comment) : ?>
             <li>
                 <span class="sx-properties--name">
@@ -40,9 +46,8 @@ $this->render("view-css");
                 </span>
             </li>
         <?php endif; ?>
-
-
     </ul>
+
 </div>
 
 <div class="row" style="margin-top: 10px;">
@@ -63,91 +68,91 @@ $this->render("view-css");
         </div>
 
 
-    <div class="col">
+        <div class="col">
 
-        <? $pjax = \skeeks\cms\widgets\Pjax::begin([
-            'id' => 'sx-selected-proocuts',
-        ]); ?>
-        <div style="margin-bottom: 5px;">
-            <b style="text-transform: uppercase;">Выбранные товары</b>
-        </div>
+            <? $pjax = \skeeks\cms\widgets\Pjax::begin([
+                'id' => 'sx-selected-proocuts',
+            ]); ?>
+            <div style="margin-bottom: 5px;">
+                <b style="text-transform: uppercase;">Выбранные товары</b>
+            </div>
 
-        <div class="sx-table-wrapper table-responsive">
-            <table class="table sx-table">
-                <tr>
-                    <th>Наименование</th>
-                    <th>Количество</th>
-                    <th>Цена</th>
-                    <th>Итог</th>
-                    <th></th>
-                </tr>
-                <? foreach ($model->shopStoreProductMoves as $productMove) : ?>
-                    <tr data-id="<?php echo $productMove->id; ?>">
-                        <td>
-                            <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
-                                <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                    'controllerId'            => 'shop/admin-cms-content-element',
-                                    'urlParams'               => [
-                                        'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
-                                    ],
-                                    'tag'                     => 'span',
-                                    'defaultOptions'          => [
-                                        'class' => 'd-flex',
-                                        'style' => 'line-height: 1.1; cursor: pointer;',
-                                    ],
-                                    'modelId'                 => $productMove->shopStoreProduct->shopProduct->id,
-                                    'isRunFirstActionOnClick' => true,
-                                ]); ?>
+            <div class="sx-table-wrapper table-responsive">
+                <table class="table sx-table">
+                    <tr>
+                        <th>Наименование</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th>Итог</th>
+                        <th></th>
+                    </tr>
+                    <? foreach ($model->shopStoreProductMoves as $productMove) : ?>
+                        <tr data-id="<?php echo $productMove->id; ?>">
+                            <td>
+                                <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
+                                    <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                                        'controllerId'            => 'shop/admin-cms-content-element',
+                                        'urlParams'               => [
+                                            'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
+                                        ],
+                                        'tag'                     => 'span',
+                                        'defaultOptions'          => [
+                                            'class' => 'd-flex',
+                                            'style' => 'line-height: 1.1; cursor: pointer;',
+                                        ],
+                                        'modelId'                 => $productMove->shopStoreProduct->shopProduct->id,
+                                        'isRunFirstActionOnClick' => true,
+                                    ]); ?>
 
-                                <?
-                                $image = null;
-                                if ($product = $productMove->shopStoreProduct) {
-                                    if ($product->shopProduct) {
-                                        if ($product->shopProduct->cmsContentElement) {
-                                            if ($product->shopProduct->cmsContentElement->mainProductImage) {
-                                                $image = $product->shopProduct->cmsContentElement->mainProductImage;
+                                    <?
+                                    $image = null;
+                                    if ($product = $productMove->shopStoreProduct) {
+                                        if ($product->shopProduct) {
+                                            if ($product->shopProduct->cmsContentElement) {
+                                                if ($product->shopProduct->cmsContentElement->mainProductImage) {
+                                                    $image = $product->shopProduct->cmsContentElement->mainProductImage;
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                ?>
+                                    ?>
 
-                                <?php if ($image) : ?>
-                                    <span class="my-auto">
+                                    <?php if ($image) : ?>
+                                        <span class="my-auto">
                                         <img class="my-auto" src="<?php echo \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"
                                              style="max-width: 30px; height: 100%;
                         width: 100%; margin-right: 5px;"/>
                                     </span>
-                                <?php endif; ?>
+                                    <?php endif; ?>
 
-                                <span class="my-auto">
+                                    <span class="my-auto">
                                     <?php echo $productMove->product_name; ?>
                             </span>
-                                <? $widget::end(); ?>
-                            <?php else : ?>
-                                <?php echo $productMove->product_name; ?>
-                            <?php endif; ?>
+                                    <? $widget::end(); ?>
+                                <?php else : ?>
+                                    <?php echo $productMove->product_name; ?>
+                                <?php endif; ?>
 
 
-                        </td>
-                        <td>
-                            <input type="number" class="form-control sx-quantity" value="<?php echo $productMove->quantity; ?>" />
-                        </td>
-                        <td><input type="number" class="form-control sx-price" value="<?php echo $productMove->price; ?>" /></td>
-                        <td><?php echo $productMove->price * $productMove->quantity; ?></td>
-                        <td>
-                            <div class="btn sx-remove-row-btn">
-                                ×
-                            </div>
-                        </td>
-                    </tr>
-                <? endforeach; ?>
-            </table>
-            
+                            </td>
+                            <td>
+                                <input type="number" class="form-control sx-quantity" value="<?php echo $productMove->quantity; ?>"/>
+                            </td>
+                            <td><input type="number" class="form-control sx-price" value="<?php echo $productMove->price; ?>"/></td>
+                            <td><?php echo $productMove->price * $productMove->quantity; ?></td>
+                            <td>
+                                <div class="btn sx-remove-row-btn">
+                                    ×
+                                </div>
+                            </td>
+                        </tr>
+                    <? endforeach; ?>
+                </table>
+
+            </div>
+
+            <? $pjax::end(); ?>
         </div>
-
-        <? $pjax::end(); ?>
-    </div>
 
     <?php else : ?>
         <div class="sx-table-wrapper table-responsive">
@@ -267,8 +272,10 @@ $jsData = \yii\helpers\Json::encode([
     'backend-add-product'         => \yii\helpers\Url::to(['add-product', 'pk' => $model->id]),
     'backend-add-product-barcode' => \yii\helpers\Url::to(['add-product-barcode', 'pk' => $model->id]),
     'backend-remove-order-item'   => \yii\helpers\Url::to(['remove-item', 'pk' => $model->id]),
-    'backend-update-order-item'   => \yii\helpers\Url::to(['update-item', 'pk' => $model->id]),
-    'backend-remove-item'   => \yii\helpers\Url::to(['remove-item', 'pk' => $model->id]),
+    'backend-update-item'         => \yii\helpers\Url::to(['update-item', 'pk' => $model->id]),
+    'backend-remove-item'         => \yii\helpers\Url::to(['remove-item', 'pk' => $model->id]),
+    'backend-approve-doc'         => \yii\helpers\Url::to(['approve-doc', 'pk' => $model->id]),
+    'backend-no-approve-doc'         => \yii\helpers\Url::to(['no-approve-doc', 'pk' => $model->id]),
     'doc'                         => $model->toArray(),
 ]);
 $this->registerJs(<<<JS

@@ -61,11 +61,11 @@ JS
 );
 
 
-$cmsContentPropertyVendor = CmsContentProperty::find()->cmsSite()
+$cmsContentPropertyVendor = \skeeks\cms\models\CmsContentProperty::find()->cmsSite()
     ->andWhere(['is_vendor' => 1])
     ->one();
 
-$cmsContentPropertyVendorCode = CmsContentProperty::find()->cmsSite()
+$cmsContentPropertyVendorCode = \skeeks\cms\models\CmsContentProperty::find()->cmsSite()
     ->andWhere(['is_vendor_code' => 1])
     ->one();
 

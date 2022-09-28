@@ -94,9 +94,11 @@ class AdminShopStoreDocMoveController extends BackendModelStandartController
             ],*/
 
             'create' => new UnsetArrayValue(),
-            "update" => [
+            'update' => new UnsetArrayValue(),
+            /*"update" => [
                 'fields' => [$this, 'updateFields'],
-            ],
+
+            ],*/
             'delete-multi' => new UnsetArrayValue(),
             'index' => [
                 'on beforeRender' => function (Event $e) {
@@ -326,7 +328,7 @@ HTML
                     $doc->doc_type = ShopStoreDocMove::DOCTYPE_CORRECTION;
                     $doc->shop_store_id = $store->id;
                     $doc->comment = "Начальная корректировка";
-                    $doc->is_active = 1;
+                    $doc->is_active = 0;
                     if (!$doc->save()) {
                         throw new Exception("Ошибка: " . print_r($doc->errors, true));
                     }
@@ -346,6 +348,11 @@ HTML
                         if (!$move->save()) {
                             throw new Exception("Ошибка: " . print_r($move->errors, true));
                         }
+                    }
+                    
+                    $doc->is_active = 1;
+                    if (!$doc->save()) {
+                        throw new Exception("Ошибка: " . print_r($doc->errors, true));
                     }
                 }
             }
@@ -505,6 +512,175 @@ HTML
                 $rr->success = true;
             }
 
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+    /**
+     * Добавить товар
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionApproveDoc()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $itemId = \Yii::$app->request->post('id');
+
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+
+                /**
+                 * @var $shopStoreDocMove ShopStoreDocMove
+                 */
+                $shopStoreDocMove = $this->model;
+                $shopStoreDocMove->is_active = 1;
+
+                foreach ($shopStoreDocMove->shopStoreProductMoves as $shopStoreProductMove)
+                {
+                    //Активировать количество в текущей позиции
+                    $shopStoreProductMove->is_active = 1;
+                    if (!$shopStoreProductMove->save()) {
+                        throw new Exception("Ошибка: " . print_r($shopStoreProductMove->errors, true));
+                    }
+
+                    //Если есть товар ему нужно обновить количество
+                    if ($shopStoreProduct = $shopStoreProductMove->shopStoreProduct) {
+                        $data = $shopStoreProduct->getShopStoreProductMoves()->andWhere(['is_active' => 1])->select(['quantity' => new Expression("sum(quantity)")])->asArray()->one();
+                        $shopStoreProduct->quantity = (float) $data['quantity'];
+                        $shopStoreProduct->isAllowCorrection = false;
+
+                        if (!$shopStoreProduct->save()) {
+                            $rr->message = "Не удалось сохранить количество в товаре: " . print_r($shopStoreProduct->errors, true);
+                        }
+                    }
+                }
+
+                if (!$shopStoreDocMove->save()) {
+                    $rr->message = "Не удалось мохранить документ: " . print_r($shopStoreDocMove->errors, true);
+                } else {
+                    $rr->success = true;
+                }
+
+
+                $t->commit();
+
+            } catch (\Exception $exception) {
+                $t->rollBack();
+                throw $exception;
+            }
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+
+    /**
+     * Добавить товар
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionNoApproveDoc()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $itemId = \Yii::$app->request->post('id');
+
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+
+                /**
+                 * @var $shopStoreDocMove ShopStoreDocMove
+                 */
+                $shopStoreDocMove = $this->model;
+                $shopStoreDocMove->is_active = 0;
+
+                foreach ($shopStoreDocMove->shopStoreProductMoves as $shopStoreProductMove)
+                {
+                    //Активировать количество в текущей позиции
+                    $shopStoreProductMove->is_active = 0;
+                    if (!$shopStoreProductMove->save()) {
+                        throw new Exception("Ошибка: " . print_r($shopStoreProductMove->errors, true));
+                    }
+
+                    //Если есть товар ему нужно обновить количество
+                    if ($shopStoreProduct = $shopStoreProductMove->shopStoreProduct) {
+                        $data = $shopStoreProduct->getShopStoreProductMoves()->andWhere(['is_active' => 1])->select(['quantity' => new Expression("sum(quantity)")])->asArray()->one();
+                        $shopStoreProduct->quantity = (float) $data['quantity'];
+                        $shopStoreProduct->isAllowCorrection = false;
+
+                        if (!$shopStoreProduct->save()) {
+                            $rr->message = "Не удалось сохранить количество в товаре: " . print_r($shopStoreProduct->errors, true);
+                        }
+                    }
+                }
+
+                if (!$shopStoreDocMove->save()) {
+                    $rr->message = "Не удалось сохранить документ: " . print_r($shopStoreDocMove->errors, true);
+                } else {
+                    $rr->success = true;
+                }
+
+
+                $t->commit();
+
+            } catch (\Exception $exception) {
+                $t->rollBack();
+                throw $exception;
+            }
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+
+    /**
+     * Добавить товар
+     *
+     * @return array|\yii\web\Response
+     */
+    public function actionUpdateItem()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $itemId = \Yii::$app->request->post('id');
+
+            /**
+             * @var $shopStoreDocMove ShopStoreDocMove
+             * @var $shopStoreProductMove ShopStoreProductMove
+             */
+            $shopStoreDocMove = $this->model;
+
+            $shopStoreProductMove = $shopStoreDocMove->getShopStoreProductMoves()->andWhere(['id' => $itemId])->one();
+
+            if (\Yii::$app->request->post('quantity')) {
+                $shopStoreProductMove->quantity = (float) \Yii::$app->request->post('quantity');
+            }
+            if (\Yii::$app->request->post('price')) {
+                $shopStoreProductMove->price = (float) \Yii::$app->request->post('price');
+            }
+
+
+            if (!$shopStoreProductMove->save()) {
+                $rr->message = "Не удалось обновить позицию: " . print_r($docMove->errors, true);
+            } else {
+                $rr->success = true;
+            }
 
             return (array)$rr;
         } else {

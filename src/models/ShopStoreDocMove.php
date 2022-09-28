@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsUser;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -50,6 +51,15 @@ class ShopStoreDocMove extends \skeeks\cms\base\ActiveRecord
         return 'shop_store_doc_move';
     }
 
+    public function init()
+    {
+        $this->on(self::EVENT_BEFORE_DELETE, function() {
+            if ($this->is_active) {
+                throw new Exception("Нельзя удалить проведенный документ! Для начала отмените его!");
+            }
+        });
+        return parent::init();
+    }
 
 
     /**

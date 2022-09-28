@@ -57,33 +57,50 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
             $oldAttribute = (float)$this->getOldAttribute("quantity");
 
-            if ($this->isAllowCorrection && $this->quantity != $oldAttribute) {
 
-                $doc = new ShopStoreDocMove();
-                $doc->doc_type = ShopStoreDocMove::DOCTYPE_CORRECTION;
-                $doc->shop_store_id = $this->shop_store_id;
-                $doc->is_active = 1;
-                if (!$doc->save()) {
-                    throw new Exception("Ошибка: ".print_r($doc->errors, true));
+            if ($this->isAllowCorrection && $this->quantity != $oldAttribute && !$this->shopStore->is_sync_external) {
+
+                $t = \Yii::$app->db->beginTransaction();
+
+                try {
+
+                    $doc = new ShopStoreDocMove();
+                    $doc->doc_type = ShopStoreDocMove::DOCTYPE_CORRECTION;
+                    $doc->shop_store_id = $this->shop_store_id;
+                    $doc->is_active = 0;
+                    if (!$doc->save()) {
+                        throw new Exception("Ошибка: ".print_r($doc->errors, true));
+                    }
+
+                    $oldAttribute = (float)$this->getOldAttribute("quantity");
+                    if ($this->quantity > $oldAttribute) {
+                        $newValue = $this->quantity - $oldAttribute;
+                    } else {
+                        $newValue = $this->quantity - $oldAttribute;
+                    }
+
+                    $move = new ShopStoreProductMove();
+                    $move->is_active = 1;
+                    $move->quantity = $newValue;
+                    $move->shop_store_doc_move_id = $doc->id;
+                    $move->price = (float)($this->shopProduct && $this->shopProduct->baseProductPrice ? $this->shopProduct->baseProductPrice->price : 0);
+                    $move->product_name = $this->productName;
+                    $move->shop_store_product_id = (int)$this->id;
+                    if (!$move->save()) {
+                        throw new Exception("Ошибка: ".print_r($move->errors, true));
+                    }
+                    
+                    $doc->is_active = 1;
+                    if (!$doc->save()) {
+                        throw new Exception("Ошибка: ".print_r($doc->errors, true));
+                    }
+
+                    $t->commit();
+                } catch (\Exception $exception) {
+                     $t->rollBack();
+                     throw $exception;
                 }
 
-                $oldAttribute = (float)$this->getOldAttribute("quantity");
-                if ($this->quantity > $oldAttribute) {
-                    $newValue = $this->quantity - $oldAttribute;
-                } else {
-                    $newValue = $this->quantity - $oldAttribute;
-                }
-
-                $move = new ShopStoreProductMove();
-                $move->is_active = 1;
-                $move->quantity = $newValue;
-                $move->shop_store_doc_move_id = $doc->id;
-                $move->price = (float)($this->shopProduct && $this->shopProduct->baseProductPrice ? $this->shopProduct->baseProductPrice->price : 0);
-                $move->product_name = $this->productName;
-                $move->shop_store_product_id = (int)$this->id;
-                if (!$move->save()) {
-                    throw new Exception("Ошибка: ".print_r($move->errors, true));
-                }
             }
         }
     }

@@ -57,6 +57,32 @@ $this->registerJs(<<<JS
                 return false;
             });
             
+            $("body").on('change', '.sx-quantity', function (e) {
+                var data = {};
+                data['quantity'] = $(this).val();
+                self.createAjaxUpdateItem($(this).closest("tr").data("id"), data).execute();
+                return false;
+            });
+            
+            
+            $("body").on('click', '.sx-approve-doc', function (e) {
+                self.createAjaxApproveDoc().execute();
+                return false;
+            });
+            
+            $("body").on('click', '.sx-not-approve-doc', function (e) {
+                self.createAjaxNoApproveDoc().execute();
+                return false;
+            });
+            
+            
+            $("body").on('change', '.sx-price', function (e) {
+                var data = {};
+                data['price'] = $(this).val();
+                self.createAjaxUpdateItem($(this).closest("tr").data("id"), data).execute();
+                return false;
+            });
+            
             //Добавить товар в корзину
             $("body").on('click', '.catalog-card', function (e) {
                 var jCard = $(this);
@@ -256,6 +282,81 @@ $this->registerJs(<<<JS
 
             return ajax;
         },
+        
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxUpdateItem: function (order_item_id, data) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-update-item'));
+
+            data = data || {};
+
+            var requestData = Object.assign(data, {
+                'id': Number(order_item_id),
+            });
+
+            ajax.setData(requestData);
+
+
+            ajax.onSuccess(function (e, data) {
+                $.pjax.reload("#sx-selected-proocuts");
+            });
+
+            return ajax;
+        },
+
+
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @param basket_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxApproveDoc: function () {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-approve-doc'));
+
+            var Handler = new sx.classes.AjaxHandlerStandartRespose(ajax);
+            
+            Handler.on("success", function() {
+                window.location.reload();
+            });
+            
+            Handler.on("error", function() {
+            });
+            
+           
+            return ajax;
+        },
+
+
+        /**
+         * Updating the positions of the basket, such as changing the number of
+         *
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxNoApproveDoc: function () {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-no-approve-doc'));
+
+            
+            var Handler = new sx.classes.AjaxHandlerStandartRespose(ajax);
+            
+            Handler.on("success", function() {
+                window.location.reload();
+            });
+            
+            Handler.on("error", function() {
+            });
+
+            return ajax;
+        },
+
+
         /**
          * Removing the basket position
          *
