@@ -14,12 +14,18 @@ $qStores = \skeeks\cms\shop\models\ShopStore::find()->isSupplier(false)->cmsSite
 $productsQuery = \skeeks\cms\shop\models\ShopStoreProduct::find()
     ->select([\skeeks\cms\shop\models\ShopStoreProduct::tableName().".*", 'total_quantity' => new \yii\db\Expression("if(sum(shopStoreProductMoves.quantity), sum(shopStoreProductMoves.quantity), 0)")])
     ->andWhere(['shop_store_id' => $qStores])
-    ->andWhere(["!=", \skeeks\cms\shop\models\ShopStoreProduct::tableName().'.quantity', 0])
+    //->andWhere(["!=", \skeeks\cms\shop\models\ShopStoreProduct::tableName().'.quantity', 0])
     ->andHaving([
         "!=", \skeeks\cms\shop\models\ShopStoreProduct::tableName().'.quantity', new \yii\db\Expression("total_quantity")
     ])
-    ->joinWith("shopStoreProductMoves as shopStoreProductMoves")
+    //->joinWith("shopStoreProductMoves as shopStoreProductMoves")
+    ->leftJoin(["shopStoreProductMoves" => \skeeks\cms\shop\models\ShopStoreProductMove::tableName()], [
+        "shopStoreProductMoves.shop_store_product_id" => new \yii\db\Expression(\skeeks\cms\shop\models\ShopStoreProduct::tableName() . ".id"),
+        "shopStoreProductMoves.is_active" => "1",
+    ])
     ->groupBy([\skeeks\cms\shop\models\ShopStoreProduct::tableName().".id"]);
+//print_r($productsQuery->createCommand()->rawSql);die;
+
 
 $backendCorrectionUrl = \yii\helpers\Url::to(['create-correction']);
 $this->registerJs(<<<JS
@@ -85,7 +91,7 @@ JS
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_POSTING]); ?>">Оприходирование</a>
             <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_WRITEOFF]); ?>">Списание</a>
-            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_INVENTORY]); ?>">Инвентаризация</a>
+            <!--<a class="dropdown-item" href="<?php /*echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_INVENTORY]); */?>">Инвентаризация</a>-->
           </div>
         </div>
     </p>
