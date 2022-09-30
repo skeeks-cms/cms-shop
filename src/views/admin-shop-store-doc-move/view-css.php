@@ -171,5 +171,10 @@ ul.sx-properties .sx-properties--name:after {
 .sx-quantity {
     max-width: 95px;
 }
+
+.popover {
+    max-width: none;
+}
+
 CSS
 );

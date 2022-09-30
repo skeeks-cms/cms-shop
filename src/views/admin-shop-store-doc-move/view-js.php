@@ -22,6 +22,30 @@ $this->registerJs(<<<JS
 
             self.loadProducts();
 
+            
+            $('body').on('click', function (e) {
+                //did not click a popover toggle or popover
+                if ($(e.target).data('toggle') !== 'popover'
+                    && $(e.target).closest('.popover').length === 0
+                    && !$(e.target).hasClass("sx-fast-edit-popover")
+                    && !$(e.target).closest(".sx-fast-edit-popover").length
+                    ) { 
+                    $('.sx-fast-edit-popover').popover('hide');
+                }
+            });
+            
+            $("body").on("click", ".sx-fast-edit-popover", function() {
+                var jWrapper = $(this);
+                $(".sx-fast-edit-popover").popover("hide");
+                self._createPopover(jWrapper);
+            });
+            
+            
+            
+            
+            
+            
+            
             self.getJSearch().on("focus", function () {
 
             });
@@ -98,6 +122,28 @@ $this->registerJs(<<<JS
 
                 return false;
             });
+        },
+        
+        
+        _createPopover(jWrapper) {
+            
+            if (!jWrapper.hasClass('is-rendered')) {
+                jWrapper.popover({
+                    "html": true,
+                    //'container': "body",
+                    'trigger': "click",
+                    'boundary': 'window',
+                    'title': jWrapper.data('title').length ? jWrapper.data('title') : "",
+                    'content': $(jWrapper.data('form'))
+                });
+    
+                jWrapper.on('show.bs.popover', function (e, data) {
+                    jWrapper.addClass('is-rendered');
+                });
+            }
+            
+
+            jWrapper.popover('show');
         },
         
         _initScanner: function () {

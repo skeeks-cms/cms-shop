@@ -870,7 +870,7 @@ JS
                         <span class="sx-properties--name">
                             <?php echo $model->shopProduct->getAttributeLabel("expiration_time"); ?>
                             <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
-                                           title="<?php echo $model->shopProduct->getAttributeHint("expiration_time"); ?>"></i>
+                               title="<?php echo $model->shopProduct->getAttributeHint("expiration_time"); ?>"></i>
                         </span>
                         <span class="sx-properties--value">
                             <span class="sx-fast-edit sx-fast-edit-popover"
@@ -878,9 +878,9 @@ JS
                                   data-title="<?php echo $model->shopProduct->getAttributeLabel("expiration_time"); ?>"
                             >
                                 <?php echo $model->shopProduct->expiration_time ? \skeeks\cms\shop\models\ShopProduct::formatExperationTime($model->shopProduct->expiration_time) : "&nbsp;&nbsp;&nbsp;"; ?>
-                                <?php if($model->shopProduct->expiration_time_comment) : ?>
+                                <?php if ($model->shopProduct->expiration_time_comment) : ?>
                                     <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" data-html="true"
-                                           title="<?php echo $model->shopProduct->expiration_time_comment; ?>"></i>
+                                       title="<?php echo $model->shopProduct->expiration_time_comment; ?>"></i>
                                 <?php endif; ?>
 
                             </span>
@@ -909,8 +909,8 @@ JS
                                 )->label(false); ?>
 
                                 <?= $form->field($model->shopProduct, 'expiration_time_comment')->textarea([
-                                    'rows' => 5,
-                                    'placeholder' => $model->shopProduct->getAttributeLabel("expiration_time_comment")
+                                    'rows'        => 5,
+                                    'placeholder' => $model->shopProduct->getAttributeLabel("expiration_time_comment"),
                                 ])->label(false); ?>
 
                                     <div class="input-group-append">
@@ -927,7 +927,7 @@ JS
                         <span class="sx-properties--name">
                             <?php echo $model->shopProduct->getAttributeLabel("service_life_time"); ?>
                             <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
-                                           title="<?php echo $model->shopProduct->getAttributeHint("service_life_time"); ?>"></i>
+                               title="<?php echo $model->shopProduct->getAttributeHint("service_life_time"); ?>"></i>
                         </span>
                         <span class="sx-properties--value">
                             <span class="sx-fast-edit sx-fast-edit-popover"
@@ -935,9 +935,9 @@ JS
                                   data-title="<?php echo $model->shopProduct->getAttributeLabel("service_life_time"); ?>"
                             >
                                 <?php echo $model->shopProduct->service_life_time ? \skeeks\cms\shop\models\ShopProduct::formatExperationTime($model->shopProduct->service_life_time) : "&nbsp;&nbsp;&nbsp;"; ?>
-                                <?php if($model->shopProduct->service_life_time_comment) : ?>
+                                <?php if ($model->shopProduct->service_life_time_comment) : ?>
                                     <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" data-html="true"
-                                           title="<?php echo $model->shopProduct->service_life_time_comment; ?>"></i>
+                                       title="<?php echo $model->shopProduct->service_life_time_comment; ?>"></i>
                                 <?php endif; ?>
 
                             </span>
@@ -966,8 +966,8 @@ JS
                                 )->label(false); ?>
 
                                 <?= $form->field($model->shopProduct, 'service_life_time_comment')->textarea([
-                                    'rows' => 5,
-                                    'placeholder' => $model->shopProduct->getAttributeLabel("service_life_time_comment")
+                                    'rows'        => 5,
+                                    'placeholder' => $model->shopProduct->getAttributeLabel("service_life_time_comment"),
                                 ])->label(false); ?>
 
                                     <div class="input-group-append">
@@ -983,7 +983,7 @@ JS
                         <span class="sx-properties--name">
                             <?php echo $model->shopProduct->getAttributeLabel("warranty_time"); ?>
                             <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
-                                           title="<?php echo $model->shopProduct->getAttributeHint("warranty_time"); ?>"></i>
+                               title="<?php echo $model->shopProduct->getAttributeHint("warranty_time"); ?>"></i>
                         </span>
                         <span class="sx-properties--value">
                             <span class="sx-fast-edit sx-fast-edit-popover"
@@ -991,9 +991,9 @@ JS
                                   data-title="<?php echo $model->shopProduct->getAttributeLabel("warranty_time"); ?>"
                             >
                                 <?php echo $model->shopProduct->warranty_time ? \skeeks\cms\shop\models\ShopProduct::formatExperationTime($model->shopProduct->warranty_time) : "&nbsp;&nbsp;&nbsp;"; ?>
-                                <?php if($model->shopProduct->warranty_time_comment) : ?>
+                                <?php if ($model->shopProduct->warranty_time_comment) : ?>
                                     <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" data-html="true"
-                                           title="<?php echo $model->shopProduct->warranty_time_comment; ?>"></i>
+                                       title="<?php echo $model->shopProduct->warranty_time_comment; ?>"></i>
                                 <?php endif; ?>
 
                             </span>
@@ -1022,8 +1022,8 @@ JS
                                 )->label(false); ?>
 
                                 <?= $form->field($model->shopProduct, 'warranty_time_comment')->textarea([
-                                    'rows' => 5,
-                                    'placeholder' => $model->shopProduct->getAttributeLabel("warranty_time_comment")
+                                    'rows'        => 5,
+                                    'placeholder' => $model->shopProduct->getAttributeLabel("warranty_time_comment"),
                                 ])->label(false); ?>
 
                                     <div class="input-group-append">
@@ -1185,12 +1185,15 @@ JS
                                 </td>
                                 <td><?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?></td>
                                 <td>
-                                    <span class="sx-fast-edit sx-fast-edit-popover"
-                                          data-form="#store-<?php echo $shopStore->id; ?>-form"
-                                          data-title="<?php echo \yii\helpers\Html::encode($shopStore->name); ?>"
-                                    >
+                                    <a href="<?php echo \yii\helpers\Url::to(['store-moves', 'pk' => $model->id]); ?>"  class="sx-fast-edit" style="color: black;">
                                         <?php echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
-                                    </span>
+                                    <!--<span class="sx-fast-edit sx-fast-edit-popover"
+                                          data-form="#store-<?php /*echo $shopStore->id; */?>-form"
+                                          data-title="<?php /*echo \yii\helpers\Html::encode($shopStore->name); */?>"
+                                    >
+                                        <?php /*echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; */?>
+                                    </span>-->
+                                    </a>
 
                                     <div class="sx-fast-edit-form-wrapper">
                                         <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([

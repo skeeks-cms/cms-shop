@@ -37,7 +37,9 @@ use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\cms\shop\models\ShopStore;
+use skeeks\cms\shop\models\ShopStoreDocMove;
 use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\shop\models\ShopStoreProductMove;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -684,6 +686,58 @@ HTML
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
                     },
                 ],
+
+                "store-moves" => [
+                    'generateAccess'  => true,
+                    'class'           => BackendGridModelRelatedAction::class,
+                    'name'            => 'Движение товара',
+                    'icon'            => 'fas fa-truck',
+                    'controllerRoute' => "/shop/admin-shop-store-product-move",
+                    'relation'        => ['shop_store_product_id' => 'id'],
+                    'priority'        => 600,
+                    'on gridInit'     => function ($e) {
+                        /**
+                         * @var $action BackendGridModelRelatedAction
+                         */
+                        $action = $e->sender;
+                        $action->relatedIndexAction->backendShowings = false;
+                        $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                        $action->relatedIndexAction->grid['on init'] = function (Event $e) {
+                            /**
+                             * @var $querAdminCmsContentElementControllery ActiveQuery
+                             */
+                            $query = $e->sender->dataProvider->query;
+                            $query->joinWith("shopStoreProduct as shopStoreProduct");
+                            $query->joinWith("shopStoreProduct.shopProduct as shopProduct");
+                            $query->andWhere([ShopStoreProductMove::tableName() . ".is_active" => 1]);
+
+                            $query->andWhere(['shopProduct.id' => $this->model->id]);
+                        };
+
+                        /*ArrayHelper::removeValue($visibleColumns, 'goods');
+                        $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;*/
+
+                    },
+                    'accessCallback'  => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+
+                        return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
+                    },
+                ],
+
 
                 "update-data" => [
                     'class'          => ViewBackendAction::class,

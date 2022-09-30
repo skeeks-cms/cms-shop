@@ -11,8 +11,8 @@ $this->render("view-css");
 \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::registerAssets();
 ?>
 
-<div class="sx-properties-wrapper sx-columns-1" style="max-width: 600px; margin-top: 15px;">
-    <ul class="sx-properties">
+<div class="sx-properties-wrapper sx-columns-1" style="max-width: 700px; margin-top: 15px;">
+    <ul class="sx-properties sx-bg-secondary" style="padding: 10px;">
         <li>
             <span class="sx-properties--name">
                 Магазин
@@ -36,16 +36,52 @@ $this->render("view-css");
         </li>
 
 
-        <?php if ($model->comment) : ?>
-            <li>
-                <span class="sx-properties--name">
-                    Комментарий
-                </span>
+        <li>
+            <span class="sx-properties--name">
+                Комментарий
+            </span>
+            <span class="sx-properties--value">
+
+
+
                 <span class="sx-properties--value">
-                    <?php echo $model->comment; ?>
-                </span>
-            </li>
-        <?php endif; ?>
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#comment-form"
+                                  data-title="Комментарий"
+                            >
+                                <?php echo $model->comment ? $model->comment : "&nbsp;&nbsp;&nbsp;"; ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "comment-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                window.location.reload();
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <div style="min-width: 500px;">
+                                    <?php echo $form->field($model, 'comment')->textarea(['rows' => 3])->label(false); ?>
+                                </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+
+            </span>
+        </li>
     </ul>
 
 </div>
@@ -86,7 +122,15 @@ $this->render("view-css");
                         <th>Итог</th>
                         <th></th>
                     </tr>
-                    <? foreach ($model->shopStoreProductMoves as $productMove) : ?>
+                    <?
+                    $totalQuantity = 0;
+                    $totalPrice = 0;
+                    foreach ($model->shopStoreProductMoves as $productMove) : ?>
+
+                        <?
+                        $totalQuantity = $totalQuantity + $productMove->quantity;
+                        $totalPrice = $totalPrice + $productMove->price * $productMove->quantity;
+                        ?>
                         <tr data-id="<?php echo $productMove->id; ?>">
                             <td>
                                 <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
@@ -147,6 +191,15 @@ $this->render("view-css");
                             </td>
                         </tr>
                     <? endforeach; ?>
+
+                    <tr>
+                        <td style="text-align: right;">Итого:</td>
+                        <td><b><?php echo $totalQuantity; ?></b></td>
+                        <td></td>
+                        <td><b><?php echo $totalPrice; ?></b></td>
+                        <td></td>
+                    </tr>
+
                 </table>
 
             </div>
@@ -163,7 +216,17 @@ $this->render("view-css");
                     <th>Цена</th>
                     <th>Итог</th>
                 </tr>
-                <? foreach ($model->shopStoreProductMoves as $productMove) : ?>
+
+                <?
+                $totalQuantity = 0;
+                $totalPrice = 0;
+                foreach ($model->shopStoreProductMoves as $productMove) : ?>
+
+                    <?
+                    $totalQuantity = $totalQuantity + $productMove->quantity;
+                    $totalPrice = $totalPrice + $productMove->price * $productMove->quantity;
+                    ?>
+
                     <tr data-id="<?php echo $productMove->id; ?>">
                         <td>
                             <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
@@ -219,6 +282,14 @@ $this->render("view-css");
                         <td><?php echo $productMove->price * $productMove->quantity; ?></td>
                     </tr>
                 <? endforeach; ?>
+
+                <tr>
+                    <td style="text-align: right;">Итого:</td>
+                    <td><b><?php echo $totalQuantity; ?></b></td>
+                    <td></td>
+                    <td><b><?php echo $totalPrice; ?></b></td>
+                </tr>
+
             </table>
         </div>
     <?php endif; ?>
@@ -275,7 +346,7 @@ $jsData = \yii\helpers\Json::encode([
     'backend-update-item'         => \yii\helpers\Url::to(['update-item', 'pk' => $model->id]),
     'backend-remove-item'         => \yii\helpers\Url::to(['remove-item', 'pk' => $model->id]),
     'backend-approve-doc'         => \yii\helpers\Url::to(['approve-doc', 'pk' => $model->id]),
-    'backend-no-approve-doc'         => \yii\helpers\Url::to(['no-approve-doc', 'pk' => $model->id]),
+    'backend-no-approve-doc'      => \yii\helpers\Url::to(['no-approve-doc', 'pk' => $model->id]),
     'doc'                         => $model->toArray(),
 ]);
 $this->registerJs(<<<JS

@@ -10,12 +10,14 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\models\CmsSiteDomain;
+use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\cms\widgets\formInputs\ckeditor\Ckeditor;
+use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\WidgetField;
@@ -171,6 +173,44 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                             'attribute' => 'countShopTypePrices',
                             'label'     => 'Количество типов цен',
                         ],
+
+
+
+                        'files_size' => [
+                            'label' => 'Занимаемое место',
+                            'attribute' => 'files_size',
+                            'format' => 'raw',
+                            'value' => function (CmsSite $model) {
+                                $result = "";
+                                if ($model->raw_row['files_size'] > 0) {
+                                    $result = \Yii::$app->formatter->asShortSize($model->raw_row['files_size']);
+                                }
+                                return $result;
+                            },
+                            'beforeCreateCallback' => function (GridView $gridView) {
+                                $query = $gridView->dataProvider->query;
+
+
+                                $size = CmsStorageFile::find()
+                                    ->select(["size" => new \yii\db\Expression("sum(size)"),])
+                                    ->andWhere([
+                                        'cms_site_id' => new Expression(CmsSite::tableName().".id"),
+                                    ]);
+
+
+                                $query->addSelect([
+                                    'files_size' => $size,
+                                ]);
+
+                                $gridView->sortAttributes['files_size'] = [
+                                    'asc'     => ['files_size' => SORT_ASC],
+                                    'desc'    => ['files_size' => SORT_DESC],
+                                    'label'   => '',
+                                    'default' => SORT_ASC,
+                                ];
+                            },
+                        ],
+
                     ],
                 ],
             ],

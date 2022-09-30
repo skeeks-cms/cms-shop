@@ -87,6 +87,14 @@ class AdminShopStoreDocMoveController extends BackendModelStandartController
                 'icon'     => 'fas fa-info-circle',
             ],
 
+
+            "update-attribute" => [
+
+                'class'     => BackendModelAction::class,
+                'isVisible' => false,
+                'callback'  => [$this, 'actionUpdateAttribute'],
+            ],
+
             /*"add" => [
                 'class'    => BackendModelAction::class,
                 'priority' => 80,
@@ -157,6 +165,7 @@ HTML
                         ],
                         'created_at' => [
                             'class'      => DateTimeColumnData::class,
+                            'view_type'      => DateTimeColumnData::VIEW_DATE,
                         ],
                         'created_by' => [
                             'class'      => UserColumnData::class,
@@ -170,7 +179,31 @@ HTML
 
 
                         'doc_type' => [
-                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
+                            'value'         => function(ShopStoreDocMove $shopStoreDocMove, $key, $index) {
+
+                if (!$shopStoreDocMove->is_active) {
+                    \Yii::$app->view->registerJs(<<<JS
+$('tr[data-key={$key}]').addClass('sx-tr-no-active');
+JS
+                                        );
+                }
+
+
+                                        \Yii::$app->view->registerCss(<<<CSS
+tr.sx-tr-no-active td
+{
+opacity: 0.2;
+}
+tr.sx-tr-no-active:hover td
+{
+opacity: 1;
+}
+CSS
+                                        );
+
+
+
+
                                 $result = [];
                                 $result[] = \yii\helpers\Html::a($shopStoreDocMove->asText, "#", [
                                     'class' => "sx-trigger-action",
@@ -313,12 +346,17 @@ HTML
                 $productsQuery = \skeeks\cms\shop\models\ShopStoreProduct::find()
                     ->select([\skeeks\cms\shop\models\ShopStoreProduct::tableName().".*", 'total_quantity' => new \yii\db\Expression("if(sum(shopStoreProductMoves.quantity), sum(shopStoreProductMoves.quantity), 0)")])
                     ->andWhere(['shop_store_id' => $store->id])
-                    ->andWhere(["!=", \skeeks\cms\shop\models\ShopStoreProduct::tableName().'.quantity', 0])
+                    //->andWhere(["!=", \skeeks\cms\shop\models\ShopStoreProduct::tableName().'.quantity', 0])
                     ->andHaving([
                         "!=", \skeeks\cms\shop\models\ShopStoreProduct::tableName().'.quantity', new \yii\db\Expression("total_quantity")
                     ])
-                    ->joinWith("shopStoreProductMoves as shopStoreProductMoves")
+                    //->joinWith("shopStoreProductMoves as shopStoreProductMoves")
+                    ->leftJoin(["shopStoreProductMoves" => \skeeks\cms\shop\models\ShopStoreProductMove::tableName()], [
+                        "shopStoreProductMoves.shop_store_product_id" => new \yii\db\Expression(\skeeks\cms\shop\models\ShopStoreProduct::tableName() . ".id"),
+                        "shopStoreProductMoves.is_active" => "1",
+                    ])
                     ->groupBy([\skeeks\cms\shop\models\ShopStoreProduct::tableName().".id"]);
+                
 
 
                 //Только если есть товары с расхождением
@@ -433,9 +471,12 @@ HTML
                 $productMove->product_name = $product->cmsContentElement->productName;
 
 
-                $typePurchasePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_purchase' => 1])->one();
-
-
+                $typePurchasePrice = null;
+                if ($shopStoreDocMove->doc_type == ShopStoreDocMove::DOCTYPE_POSTING) {
+                    $typePurchasePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_default' => 1])->one();
+                } elseif ($shopStoreDocMove->doc_type == ShopStoreDocMove::DOCTYPE_WRITEOFF) {
+                    $typePurchasePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_purchase' => 1])->one();
+                }
 
                 $price = null;
                 if ($typePurchasePrice) {
@@ -753,7 +794,6 @@ HTML
                     $nexPage = $pagination->page + 1;
                 }
 
-
                 if ($hasNextPage) {
                     $content .= "<div class='sx-more'><button class='btn btn-default btn-block sx-btn-next-page' data-next-page='{$nexPage}' data-load-text='Ожидайте! Идет загрузка...'>Показать еще</button></div>";
                 }
@@ -781,4 +821,45 @@ HTML
 
         return $rr;
     }
+
+
+
+
+
+    /**
+     *
+     */
+    public function actionUpdateAttribute()
+    {
+        $rr = new RequestResponse();
+        /**
+         * @var $model ShopStoreDocMove
+         */
+        $model = $this->model;
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $attribute = \Yii::$app->request->post("attribute");
+            $value = \Yii::$app->request->post("value");
+
+            try {
+
+                if ($model->load(\Yii::$app->request->post())) {
+                    if (!$model->save()) {
+                        throw new \yii\base\Exception("Ошибка сохранения данных: ".print_r($model->errors, true));
+                    }
+                }
+
+                $rr->message = "Обновлено";
+                $rr->success = true;
+
+            } catch (\Exception $exception) {
+                $rr->message = $exception->getMessage();
+                $rr->success = false;
+            }
+        }
+
+        return $rr;
+    }
+
 }
