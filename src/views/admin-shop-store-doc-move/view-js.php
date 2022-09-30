@@ -156,20 +156,33 @@ $this->registerJs(<<<JS
                 if (e.keyCode === 13) {
                     if (code.length > 10) {
 
-                        var ajaxQuery = self.createAjaxAddProductBarcode(code);
+                        var tmp_code = code;
+                        
+                        var ajaxQuery = self.createAjaxAddProductBarcode(tmp_code);
 
                         ajaxQuery.onError(function (e, data) {
+                            console.log("onError");
+                            
+                            if (self.getJSearch().val() != tmp_code) {
+                                self.getJSearch().val(tmp_code);
+                                self.loadProducts();
+                            }
+                            
                             code = "";
                         });
 
                         ajaxQuery.onSuccess(function (e, data) {
 
-                            if (self.getJSearch().val() != code) {
-                                self.getJSearch().val(code);
+                            console.log(data);
+                            console.log("onSuccess");
+                            console.log(tmp_code);
+                            console.log("------");
+                            
+                            console.log(self.getJSearch().val());
+                            if (self.getJSearch().val() != tmp_code) {
+                                self.getJSearch().val(tmp_code);
                                 self.loadProducts();
                             }
-
-                            //self.loadProducts();
 
                             if (data.response.data.total == 1) {
 

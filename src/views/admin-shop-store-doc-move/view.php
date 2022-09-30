@@ -92,8 +92,65 @@ JS
 
 
         <div class="col" style="max-width: 350px;">
-            <div style="margin-bottom: 5px;">
-                <b style="text-transform: uppercase;">Каталог товаров</b>
+            <div style="margin-bottom: 5px;" class="d-flex">
+                <b style="text-transform: uppercase; width: 100%;">Каталог товаров</b>
+
+
+                <?
+                if ($controllerProperty = \Yii::$app->createController('shop/admin-cms-content-element')[0]) {
+
+                    /**
+                     * @var $shopContent \skeeks\cms\shop\models\ShopContent
+                     */
+                    $shopContent = \skeeks\cms\shop\models\ShopContent::find()->one();
+                    $controllerProperty->content = $shopContent->cmsContent;
+                    /**
+                     * @var \skeeks\cms\backend\BackendAction $actionIndex
+                     * @var \skeeks\cms\backend\BackendAction $actionCreate
+                     */
+                    $createAction = \yii\helpers\ArrayHelper::getValue($controllerProperty->actions, 'create');
+                    if ($createAction) {
+
+                        $r = new \ReflectionClass(\skeeks\cms\models\CmsContentProperty::class);
+
+                        /*$createAction->url = \yii\helpers\ArrayHelper::merge($createAction->urlData, [
+                            $r->getShortName() => [
+                                'cmsContents' => [$model->content_id],
+                                'cmsTrees'    => [$model->tree_id],
+                            ],
+                        ]);*/
+
+                        $createAction->name = "Добавить&nbsp;товар";
+                        $createAction->icon = '';
+
+                        /*echo \skeeks\cms\backend\widgets\DropdownControllerActionsWidget::widget([
+                            'actions' => ['create' => $actionCreate],
+                            'isOpenNewWindow' => true
+                        ]);*/
+
+                        $createProperty = \skeeks\cms\backend\widgets\ControllerActionsWidget::widget([
+                            'actions'         => ['create' => $createAction],
+                            'clientOptions'   => [
+                                'updateSuccessCallback' => new \yii\web\JsExpression(<<<JS
+            function() {
+            $("[data-form-reload]:first").trigger("change");
+            }
+        JS
+                                ),
+                            ],
+                            'isOpenNewWindow' => true,
+                            'tag'             => 'span',
+                            'minViewCount'    => 1,
+                            'itemWrapperTag'  => 'span',
+                            'itemTag'         => 'button',
+                            'itemOptions'     => ['class' => 'btn btn-secondary btn-xs'],
+                            'options'         => ['class' => 'sx-controll-actions'],
+                        ]);
+
+                    }
+                }
+                ?>
+                <?php echo $createProperty; ?>
             </div>
             <div class="sx-block-search">
                 <input class="form-control" placeholder="Поиск товаров">

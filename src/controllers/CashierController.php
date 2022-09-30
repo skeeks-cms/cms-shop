@@ -943,7 +943,7 @@ class CashierController extends BackendController
                 $doc = new ShopStoreDocMove();
                 $doc->doc_type = $order->order_type == ShopOrder::TYPE_SALE ? ShopStoreDocMove::DOCTYPE_SALE : ShopStoreDocMove::DOCTYPE_RETURN;
                 $doc->shop_store_id = \Yii::$app->shop->backendShopStore->id;
-                $doc->is_active = 1;
+                $doc->is_active = 0;
                 if (!$doc->save()) {
                     throw new Exception("Ошибка: ".print_r($doc->errors, true));
                 }
@@ -994,6 +994,12 @@ class CashierController extends BackendController
                     }
 
                 }
+
+                $doc->is_active = 1;
+                if (!$doc->save()) {
+                    throw new Exception("Ошибка: ".print_r($doc->errors, true));
+                }
+
                 $check->inventPositions = $items;
                 $check->moneyPositions = [
                     [
