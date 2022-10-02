@@ -237,10 +237,10 @@ JS
 
                             </td>
                             <td>
-                                <input type="number" class="form-control sx-quantity" value="<?php echo $productMove->quantity; ?>"/>
+                                <input type="number" class="form-control sx-quantity" value="<?php echo abs($productMove->quantity); ?>"/>
                             </td>
                             <td><input type="number" class="form-control sx-price" value="<?php echo $productMove->price; ?>"/></td>
-                            <td><?php echo $productMove->price * $productMove->quantity; ?></td>
+                            <td><?php echo abs($productMove->price * $productMove->quantity); ?></td>
                             <td>
                                 <div class="btn sx-remove-row-btn">
                                     ×

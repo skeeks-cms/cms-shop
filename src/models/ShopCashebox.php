@@ -55,7 +55,7 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
             [['name'], 'string', 'max' => 255],
             [['cms_site_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsSite::className(), 'targetAttribute' => ['cms_site_id' => 'id']],
             [['shop_store_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopStore::className(), 'targetAttribute' => ['shop_store_id' => 'id']],
-            [['shop_cloudkassa_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopCloudkassa::class, 'targetAttribute' => ['shop_store_id' => 'id']],
+            //[['shop_cloudkassa_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopCloudkassa::class, 'targetAttribute' => ['shop_store_id' => 'id']],
 
             [
                 'cms_site_id',

@@ -483,7 +483,7 @@ CSS
                     $price = $product->getPrice($typePurchasePrice);
                 }
 
-                if (!$price) {
+                if (!$price || !(float)$price->price) {
                     $typePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_default' => 1])->one();
                     if ($typePrice) {
                         $price = $product->getPrice($typePrice);
@@ -503,7 +503,7 @@ CSS
             }
 
 
-            $productMove->quantity = $productMove->quantity + $quantity;
+            $productMove->quantity = abs($productMove->quantity) + abs($quantity);
             if ($product->measure_ratio_min > $productMove->quantity) {
                 $productMove->quantity = $product->measure_ratio_min;
             }
@@ -513,6 +513,10 @@ CSS
 
             if ($product->measure_ratio_min > $productMove->quantity) {
                 $productMove->quantity = $product->measure_ratio_min;
+            }
+            
+            if ($shopStoreDocMove->doc_type == ShopStoreDocMove::DOCTYPE_WRITEOFF) {
+                $productMove->quantity = $productMove->quantity * -1;
             }
 
             if (!$productMove->save()) {
@@ -711,6 +715,11 @@ CSS
 
             if (\Yii::$app->request->post('quantity')) {
                 $shopStoreProductMove->quantity = (float) \Yii::$app->request->post('quantity');
+                
+                if ($shopStoreDocMove->doc_type == ShopStoreDocMove::DOCTYPE_WRITEOFF) {
+                    $shopStoreProductMove->quantity = $shopStoreProductMove->quantity * -1;
+                }
+                
             }
             if (\Yii::$app->request->post('price')) {
                 $shopStoreProductMove->price = (float) \Yii::$app->request->post('price');
