@@ -72,7 +72,7 @@ class ShopStoreDocMove extends \skeeks\cms\base\ActiveRecord
             static::DOCTYPE_RETURN     => "Возврат",
             static::DOCTYPE_CORRECTION => "Корректировка",
             static::DOCTYPE_INVENTORY  => "Инвентаризация",
-            static::DOCTYPE_POSTING    => "Оприходирование",
+            static::DOCTYPE_POSTING    => "Оприходование",
             static::DOCTYPE_WRITEOFF   => "Списание",
         ];
     }

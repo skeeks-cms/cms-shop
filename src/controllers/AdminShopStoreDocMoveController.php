@@ -757,6 +757,7 @@ CSS
             $shopStoreDocMove = $this->model;
 
             $query = ShopCmsContentElement::find()
+                ->andWhere(['cce.cms_site_id' => \Yii::$app->skeeks->site->id])
                 ->andWhere([
                     'shopProduct.product_type' => [
                         ShopProduct::TYPE_SIMPLE,

@@ -89,7 +89,7 @@ JS
             Создать документ
           </button>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_POSTING]); ?>">Оприходирование</a>
+            <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_POSTING]); ?>">Оприходование</a>
             <a class="dropdown-item" href="<?php echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_WRITEOFF]); ?>">Списание</a>
             <!--<a class="dropdown-item" href="<?php /*echo \yii\helpers\Url::to(['add', 'doc_type' => \skeeks\cms\shop\models\ShopStoreDocMove::DOCTYPE_INVENTORY]); */?>">Инвентаризация</a>-->
           </div>
