@@ -39,6 +39,7 @@ use yii\widgets\ActiveForm;
  * @author Semenov Alexander <semenov@skeeks.com>
  *
  * @property ShopTypePrice        $baseTypePrice
+ * @property ShopTypePrice        $purchaseTypePrice
  * @property ShopPersonType[]     $shopPersonTypes
  * @property ShopTypePrice[]      $shopTypePrices
  * @property ShopTypePrice[]      $canBuyTypePrices
@@ -87,6 +88,10 @@ class ShopComponent extends Component implements BootstrapInterface
      * @var ShopTypePrice
      */
     protected $_baseTypePrice;
+    /**
+     * @var ShopTypePrice
+     */
+    protected $_purchaseTypePrice;
     /**
      * @var array
      */
@@ -145,6 +150,19 @@ class ShopComponent extends Component implements BootstrapInterface
         }
 
         return $this->_baseTypePrice;
+    }
+
+    /**
+     * Тип закупочной цены
+     * @return ShopTypePrice
+     */
+    public function getPurchaseTypePrice()
+    {
+        if (!$this->_purchaseTypePrice) {
+            $this->_purchaseTypePrice = \Yii::$app->skeeks->site->getShopTypePrices()->isPurchase()->one();
+        }
+
+        return $this->_purchaseTypePrice;
     }
 
 

@@ -5,6 +5,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\rbac\models\CmsAuthItem;
+use skeeks\cms\shop\models\queries\ShopTypePriceQuery;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
@@ -242,5 +243,14 @@ class ShopTypePrice extends ActiveRecord
 
             $this->is_default = 1; //сайт по умолчанию всегда активный
         }
+    }
+
+
+    /**
+     * @return \skeeks\cms\query\CmsActiveQuery|ShopStoreQuery
+     */
+    public static function find()
+    {
+        return new ShopTypePriceQuery(get_called_class());
     }
 }

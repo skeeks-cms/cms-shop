@@ -1046,7 +1046,8 @@ JS
 ) : ?>
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
-            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Цены</b></div>
+            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Цена на сайте</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
+                                           title="Эта цена используется на сайте, именно ее видит клиент на сайте."></i></div>
 
             <div class="sx-table-wrapper table-responsive">
                 <table class="table sx-table">
@@ -1133,14 +1134,17 @@ JS
 
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
-            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Склады</b></div>
+            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Склады и магазины</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
+                                           title="В каждом магазине может быть своя цена, она может отличатся от цены сайта, это зависит от настроек системы."></i></div>
             <div class="sx-table-wrapper table-responsive">
                 <table class="table sx-table">
                     <tr>
                         <th style="text-align: left;">Магазин - склад</th>
-                        <th><?php echo \Yii::$app->shop->baseTypePrice->name; ?></th>
+
+                        <th>Закупочная цена</th>
+                        <th>Розничная цена</th>
                         <th>Остаток, <?php echo $model->shopProduct->measure->symbol; ?></th>
-                        <th><?php echo \Yii::$app->shop->baseTypePrice->name; ?> (сумма)</th>
+                       <!-- <th><?php /*echo \Yii::$app->shop->baseTypePrice->name; */?> (сумма)</th>-->
                     </tr>
 
                     <?php
@@ -1183,6 +1187,15 @@ JS
                                         <?php echo $shopStore->name; ?>
                                     <?php endif; ?>
                                 </td>
+
+                                <td>
+                                    <?php if(\Yii::$app->shop->purchaseTypePrice) : ?>
+                                        <?php
+                                            $purchasePrice = $model->shopProduct->getPrice(\Yii::$app->shop->purchaseTypePrice);
+                                            echo $purchasePrice ? $purchasePrice->money : ""; ?>
+                                    <?php endif; ?>
+                                </td>
+
                                 <td><?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?></td>
                                 <td>
                                     <a href="<?php echo \yii\helpers\Url::to(['store-moves', 'pk' => $model->id]); ?>"  class="sx-fast-edit" style="color: black;">
@@ -1225,7 +1238,7 @@ JS
                                     </div>
 
                                 </td>
-                                <td><?php echo $totalPrice; ?></td>
+                                <!--<td><?php /*echo $totalPrice; */?></td>-->
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
@@ -1234,14 +1247,15 @@ JS
                             <td><?php echo $noValue; ?></td>
                             <td><?php echo $noValue; ?></td>
                             <td><?php echo $noValue; ?></td>
+                            <!--<td><?php /*echo $noValue; */?></td>-->
                         </tr>
                     <?php endif; ?>
 
 
                     <tr>
-                        <td colspan="2" style="text-align: right;"><b>Итого</b></td>
+                        <td colspan="3" style="text-align: right;"><b>Итого</b></td>
                         <td><?php echo $totalSummQuantity ? $totalSummQuantity : $noValue; ?></td>
-                        <td><?php echo $noValue; ?></td>
+                        <!--<td><?php /*echo $noValue; */?></td>-->
                     </tr>
                 </table>
             </div>
@@ -1251,14 +1265,16 @@ JS
 
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
-            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b></div>
+            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
+                                           title="Если ваш проект интегрирован с поставщиками, то в этом разделе можно смотреть количество оставшегося товара у поставщика + цены."></i></div>
             <div class="sx-table-wrapper table-responsive">
                 <table class="table sx-table">
                     <tr>
                         <th style="text-align: left;">Поставщик</th>
                         <th>Код</th>
-                        <th>Остаток, <?php echo $model->shopProduct->measure->symbol; ?></th>
                         <th>Закупочная цена</th>
+                        <th>Розничная цена</th>
+                        <th>Остаток, <?php echo $model->shopProduct->measure->symbol; ?></th>
                     </tr>
 
                     <?php
@@ -1320,6 +1336,8 @@ JS
                                             &nbsp;&nbsp;&nbsp;
                                         <?php endif; ?>
                                     </td>
+                                    <td><?php echo $storeProduct ? $storeProduct->purchase_price : "&nbsp;&nbsp;&nbsp;"; ?></td>
+                                    <td><?php echo $storeProduct ? $storeProduct->selling_price : "&nbsp;&nbsp;&nbsp;"; ?></td>
                                     <td>
                                     <span class=""
                                     >
@@ -1356,7 +1374,6 @@ JS
                                         </div>
 
                                     </td>
-                                    <td><?php echo $storeProduct ? $storeProduct->purchase_price : "&nbsp;&nbsp;&nbsp;"; ?></td>
                                 </tr>
                             <? endif; ?>
 
@@ -1367,14 +1384,15 @@ JS
                             <td><?php echo $noValue; ?></td>
                             <td><?php echo $noValue; ?></td>
                             <td><?php echo $noValue; ?></td>
+                            <td><?php echo $noValue; ?></td>
                         </tr>
                     <?php endif; ?>
 
 
                     <tr>
-                        <td colspan="2" style="text-align: right;"><b>Итого</b></td>
+                        <td colspan="4" style="text-align: right;"><b>Итого</b></td>
                         <td><?php echo $totalSummQuantity ? $totalSummQuantity : $noValue; ?></td>
-                        <td><?php echo $noValue; ?></td>
+                       <!-- <td><?php /*echo $noValue; */?></td>-->
                     </tr>
                 </table>
             </div>

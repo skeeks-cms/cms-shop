@@ -53,7 +53,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
     public function _beforeSave($e)
     {
-        if (!$this->shopStore->is_supplier) {
+        /*if (!$this->shopStore->is_supplier) {
 
             $oldAttribute = (float)$this->getOldAttribute("quantity");
 
@@ -102,7 +102,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                 }
 
             }
-        }
+        }*/
     }
 
     public function _afterFind($event)
