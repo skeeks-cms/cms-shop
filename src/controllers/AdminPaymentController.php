@@ -120,7 +120,7 @@ class AdminPaymentController extends BackendModelStandartController
                                     return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
                                         'controllerId'            => '/shop/admin-shop-check',
                                         'modelId'                 => $shopPayment->shopCheck->id,
-                                        'content'                 => $shopPayment->shopCheck->id,
+                                        'content'                 => $shopPayment->shopCheck->asText,
                                         'isRunFirstActionOnClick' => true,
                                         'options'                 => [
                                             'class' => 'btn btn-xs btn-default',
