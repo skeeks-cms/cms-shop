@@ -326,6 +326,8 @@ class CartController extends Controller
     {
         $rr = new RequestResponse();
 
+        //print_r(\Yii::$app->shop->shopUser->shopOrder->toArray());
+
         if ($rr->isRequestAjaxPost()) {
 
             $product_id = \Yii::$app->request->post('product_id');
@@ -383,19 +385,24 @@ class CartController extends Controller
                 $shopBasket->quantity = $product->measure_ratio_min;
             }
 
+            $shopBasket->recalculate();
 
-            if (!$shopBasket->recalculate()->save()) {
+            if (!$shopBasket->save()) {
                 $rr->success = false;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
             } else {
-                $shopBasket->recalculate()->save();
+                //$shopBasket->recalculate()->save();
 
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
             }
 
+            \Yii::$app->shop->shopUser->shopOrder->recalculate();
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             \Yii::$app->shop->shopUser->shopOrder->refresh();
+
+
+
 
             $productData = ShopComponent::productDataForJsEvent($product->cmsContentElement);
             $productData['quantity'] = (float)$quantity;

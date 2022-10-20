@@ -13,6 +13,7 @@ use skeeks\cms\models\StorageFile;
 use skeeks\cms\money\models\MoneyCurrency;
 use skeeks\cms\money\Money;
 use skeeks\modules\cms\catalog\models\Product;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -111,7 +112,20 @@ class ShopOrderItem extends ActiveRecord
     {
         //Эта позиция привязана к заказу, после ее обновления нужно обновить заказ целиком
         if ($this->shopOrder) {
-            $this->shopOrder->recalculate()->save(false);
+
+            $order = $this->shopOrder;
+            $order->recalculate();
+            try {
+                if (!$order->save()) {
+                    \Yii::error("not saved: " . print_r($this->shopOrder->errors, true));
+                    throw new Exception(print_r($this->shopOrder->errors, true));
+                } else {
+                    \Yii::error("saved: " . print_r($order->toArray(), true));
+                }
+            } catch (\Exception $exception) {
+                print_r($exception->getMessage());die;
+            }
+
         }
     }
 
