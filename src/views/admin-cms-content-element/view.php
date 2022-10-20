@@ -1192,14 +1192,12 @@ JS
                                 <td>
 
 
-
-
-
                                     <span class="sx-fast-edit sx-fast-edit-popover"
                                           data-form="#price-purchase-store-form"
                                           data-title="Закупочная цена"
                                     >
                                         <?php
+                                        $purchasePrice = null;
                                          $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
                                          if ($shopStoreProduct && $shopStoreProduct->purchase_price): ?>
                                             <?php echo new \skeeks\cms\money\Money((string) $shopStoreProduct->purchase_price, \Yii::$app->money->currency_code); ?>
@@ -1216,7 +1214,7 @@ JS
                                     <div class="sx-fast-edit-form-wrapper">
                                         <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                                             'id'             => "price-purchase-store-form",
-                                            'action'         => \yii\helpers\Url::to(['update-price-purchase', 'pk' => $model->id, '' => ]),
+                                            'action'         => \yii\helpers\Url::to(['update-price-purchase', 'pk' => $model->id]),
                                             'options'        => [
                                                 'class' => 'sx-fast-edit-form',
                                             ],
@@ -1231,24 +1229,44 @@ JS
                                             ),
                                         ]); ?>
                                         <input type="hidden" value="update-price" name="act" class="form-control"/>
-                                        <input type="hidden" value="<?php echo $shopTypePrice->id; ?>" name="shop_type_price_id" class="form-control"/>
+                                        <input type="hidden" value="<?php echo $shopStore->id; ?>" name="shop_store_id" class="form-control"/>
 
+                                        <?
+$this->registerJs(<<<JS
+if ($(".sx-check-purchase-price").is(":checked")) {
+    $(".sx-input-purchase-price").show();
+} else {
+    $(".sx-input-purchase-price").hide();
+}
+
+$(".sx-check-purchase-price").on("change", function() {
+    if ($(this).is(":checked")) {
+        $(".sx-input-purchase-price").show();
+    } else {
+        $(".sx-input-purchase-price").hide();
+    }
+});
+
+JS
+                                        );
+                                        ?>
                                         <div class="input-group" style="margin-top: 10px;">
-                                            <? echo \yii\helpers\Html::checkbox("is_personal_price", ($price && $price->is_fixed ? true : false), [
+                                            <? echo \yii\helpers\Html::checkbox("is_personal_price", ($shopStoreProduct && $shopStoreProduct->purchase_price ? true : false), [
                                                 'label' => 'В магазине своя цена',
+                                                'class' => 'sx-check-purchase-price',
                                             ]); ?>
                                         </div>
 
-                                        <div class="input-group">
-                                            <input type="text" value="<?php echo(($price && (float)$price->money->amount > 0) ? (float)$price->money->amount : ""); ?>" name="price_value" class="form-control"/>
-                                            <?php if (count(\Yii::$app->money->activeCurrencies) > 1) : ?>
-                                                <? echo \yii\helpers\Html::listBox("price_currency_code", $price ? $price->money->currency->code : "", \yii\helpers\ArrayHelper::map(
-                                                    \Yii::$app->money->activeCurrencies, 'code', 'code'
-                                                ), ['size' => 1, 'class' => 'form-control']); ?>
+                                        <div class="input-group sx-input-purchase-price">
+                                            <?php if ($shopStoreProduct && $shopStoreProduct->purchase_price) : ?>
+                                                <input type="text" value="<?php echo $shopStoreProduct->purchase_price; ?>" name="price_value" class="form-control"/>
+                                            <?php else : ?>
+                                                <input type="text" value="<?php echo $purchasePrice ? $purchasePrice->price : ""; ?>" name="price_value" class="form-control"/>
                                             <?php endif; ?>
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
-                                            </div>
+                                        </div>
+                                        
+                                        <div class="input-group" style="margin-top: 10px;">
+                                            <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
                                         </div>
 
                                         <?php $form::end(); ?>

@@ -26,9 +26,13 @@ use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
+use skeeks\cms\shop\models\ShopTypePrice;
+use skeeks\cms\Skeeks;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -128,7 +132,7 @@ class StoreProductController extends BackendModelStandartController
                                     }
                                 },
                             ],
-                            'is_active' => [
+                            'is_active'        => [
                                 'class'    => BoolField::class,
                                 'on apply' => function (QueryFiltersEvent $e) {
                                     /**
@@ -268,7 +272,7 @@ class StoreProductController extends BackendModelStandartController
                         'marginality_per',
                     ],
                     'columns'        => [
-                        'is_active' => [
+                        'is_active'  => [
                             'class' => BooleanColumn::class,
                         ],
                         'created_at' => [
@@ -459,35 +463,51 @@ HTML;
                 'icon'     => 'fas fa-info-circle',
             ],
 
+
             "join" => [
                 'class'    => ViewBackendAction::class,
                 'priority' => 80,
                 'name'     => 'Связать',
                 'icon'     => 'fas fa-link',
-                
-                'accessCallback' => function() {
+
+                'accessCallback' => function () {
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                   
+
                     return false;
-                }
+                },
             ],
+
+            "services" => [
+                'class'          => ViewBackendAction::class,
+                'priority'       => 90,
+                'name'           => 'Инструменты',
+                'icon'           => 'fas fa-info-circle',
+                'accessCallback' => function () {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+
+                    return false;
+                },
+            ],
+
 
             "create" => [
                 'fields' => [$this, 'createFields'],
-                
-                'accessCallback' => function() {
+
+                'accessCallback' => function () {
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                    
+
                     if (\Yii::$app->shop->backendShopStore->is_sync_external) {
                         return false;
                     }
-                    
+
                     return true;
-                }
+                },
             ],
 
             "update" => new UnsetArrayValue(),
@@ -510,26 +530,26 @@ HTML;
                 'class' => ViewBackendAction::class,
                 'icon'  => 'far fa-file-excel',
                 'name'  => 'Импорт',
-                
-                'accessCallback' => function() {
+
+                'accessCallback' => function () {
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                   
+
                     return false;
-                }
+                },
             ],
-            
+
             "activate-multi"   => [
-                'class'   => BackendModelMultiActivateAction::class,
-                'value' => '1',
+                'class'     => BackendModelMultiActivateAction::class,
+                'value'     => '1',
                 'attribute' => 'is_active',
-                
-                'accessCallback' => function() {
+
+                'accessCallback' => function () {
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                   
+
                     return false;
                 }
 
@@ -540,20 +560,20 @@ HTML;
                     return \Yii::$app->user->can($this->permissionName."/update");
                 },*/
             ],
-            "deactivate-multi"   => [
-                
-                'class'   => BackendModelMultiDeactivateAction::class,
-                'value' => '0',
+            "deactivate-multi" => [
+
+                'class'     => BackendModelMultiDeactivateAction::class,
+                'value'     => '0',
                 'attribute' => 'is_active',
 
-                'accessCallback' => function() {
+                'accessCallback' => function () {
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                   
+
                     return false;
                 }
-                
+
                 /*"eachAccessCallback" => function ($model) {
                     return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
                 },
@@ -561,29 +581,148 @@ HTML;
                     return \Yii::$app->user->can($this->permissionName."/update");
                 },*/
             ],
-            
-            "delete" => [
-                'accessCallback' => function() {
-            
+
+            "delete"       => [
+                'accessCallback' => function () {
+
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                   
+
                     return false;
-                }
+                },
             ],
             "delete-multi" => [
-                'accessCallback' => function() {
+                'accessCallback' => function () {
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                   
+
                     return false;
-                }
-            ]
+                },
+            ],
         ]);
     }
 
+
+    public function actionAutoCreate()
+    {
+        Skeeks::unlimited();
+
+        $rr = new RequestResponse();
+        if ($rr->isRequestAjaxPost()) {
+
+            $model = new \skeeks\cms\base\DynamicModel();
+            $model->addRule("is_active", "integer");
+            $model->defineAttribute("is_active");
+            $model->setAttrubuteLebel("is_active", "Показывать товары на сайте сразу?");
+
+            $model->defineAttribute("cms_tree_id");
+            $model->setAttrubuteLebel("cms_tree_id", "Раздел");
+            $model->addRule("cms_tree_id", "integer");
+
+            $model->load(\Yii::$app->request->post());
+
+            $q = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => null]);
+
+            $result = [];
+
+            $retailTypePrice = ShopTypePrice::find()->cmsSite()->isRetail()->one();
+            $purchaseTypePrice = ShopTypePrice::find()->isPurchase()->cmsSite()->one();
+
+            $cmsContent = \Yii::$app->shop->cmsContent;
+
+            /**
+             * @var $shopStoreProduct ShopStoreProduct
+             */
+            foreach ($q->each(10) as $shopStoreProduct) {
+                $shopStoreProduct->name;
+
+                $t = \Yii::$app->db->beginTransaction();
+                try {
+                    $element = new ShopCmsContentElement();
+                    //$shopStoreProduct->loadDataToElementProduct($element);
+
+
+                    $element->content_id = $cmsContent->id;
+
+                    $element->name = $shopStoreProduct->name;
+                    $element->tree_id = $model->cms_tree_id;
+
+                    if ($model->is_active) {
+                        $element->active = "Y";
+                    } else {
+                        $element->active = "N";
+                    }
+
+                    if (!$element->save()) {
+                        throw new Exception(print_r($element->errors, true));
+                    }
+
+                    $sp = new ShopProduct();
+                    $sp->id = $element->id;
+                    if (!$sp->save()) {
+                        throw new Exception(print_r($sp->errors, true));
+                    }
+
+
+                    if ($purchaseTypePrice) {
+                        $price2 = $element->shopProduct->getPrice($retailTypePrice->id);
+                        if (!$price2) {
+                            $price2 = new ShopProductPrice();
+                            $price2->type_price_id = $purchaseTypePrice->id;
+                            $price2->product_id = $element->id;
+                        }
+
+                        $price2->price = $shopStoreProduct->purchase_price;
+                        if (!$price2->save()) {
+                            throw new Exception(print_r($price2->errors, true));
+                        }
+                    }
+
+                    //try {
+                    if ($retailTypePrice) {
+                        $price1 = $element->shopProduct->getPrice($retailTypePrice->id);
+                        if (!$price1) {
+                            $price1 = new ShopProductPrice();
+                            $price1->type_price_id = $retailTypePrice->id;
+                            $price1->product_id = $element->id;
+
+
+                        }
+                        $price1->price = $shopStoreProduct->selling_price;
+                        if (!$price1->save()) {
+                            throw new Exception(print_r($price1->errors, true));
+                        }
+                    }
+
+
+                    //} catch (\Exception $exception) {
+
+                    //}
+
+
+                    $shopStoreProduct->shop_product_id = $element->id;
+                    if (!$shopStoreProduct->save()) {
+                        throw new Exception(print_r($shopStoreProduct->errors, true));
+                    }
+
+                    $t->commit();
+
+                } catch (\Exception $e) {
+                    $t->rollBack();
+                    throw $e;
+                    die;
+                    continue;
+                }
+
+
+            }
+
+            $rr->success = true;
+        }
+        return $rr;
+    }
     /**
      * @return RequestResponse
      */
@@ -861,27 +1000,24 @@ HTML;
 
                             $find = ShopCmsContentElement::find()
                                 ->cmsSite()
-
                                 ->innerJoinWith("mainCmsContentElement as mainCCE")
                                 ->innerJoinWith("mainCmsContentElement.shopProduct as mainCCESp")
                                 ->innerJoinWith("mainCmsContentElement.shopProduct.shopProductBarcodes as mainBarcodes")
-
                                 /*->innerJoinWith("shopProduct as sp")
                                 ->innerJoinWith("shopProduct.shopProductBarcodes as barcodes")*/
                                 ->andWhere(["mainBarcodes.value" => $barcodeValue])
-
                                 ->groupBy([ShopCmsContentElement::tableName().".id"]);
 
-                                /*$find = ShopCmsContentElement::find()
-                                ->cmsSite(CmsSite::find()->default()->one())
+                            /*$find = ShopCmsContentElement::find()
+                            ->cmsSite(CmsSite::find()->default()->one())
 
-                                ->innerJoinWith("shopProduct as sp")
-                                ->innerJoinWith("shopProduct.shopProductBarcodes as barcodes")
+                            ->innerJoinWith("shopProduct as sp")
+                            ->innerJoinWith("shopProduct.shopProductBarcodes as barcodes")
 
-                                ->andWhere(["barcodes.value" => $barcodeValue])
+                            ->andWhere(["barcodes.value" => $barcodeValue])
 
-                                ->groupBy([ShopCmsContentElement::tableName().".id"]);
-                                */
+                            ->groupBy([ShopCmsContentElement::tableName().".id"]);
+                            */
 
                             /*print_r($find->createCommand()->rawSql);die;*/
 
@@ -937,7 +1073,7 @@ HTML;
             $cmsContentPropertyVendor = CmsContentProperty::find()->cmsSite()
                 ->andWhere(['is_vendor' => 1])
                 ->one();
-            
+
             $cmsContentPropertyVendorCode = CmsContentProperty::find()->cmsSite()
                 ->andWhere(['is_vendor_code' => 1])
                 ->one();

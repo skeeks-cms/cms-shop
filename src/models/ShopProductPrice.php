@@ -61,7 +61,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     public function _logPrice()
     {
         \Yii::info('Change price'
-            .'produt = '.$this->product->id
+            .'produt = '.$this->product_id
             .'data = '.print_r($this->toArray(), true)
             .'is console = '.(\Yii::$app instanceof Application ? 1 : 0)
             .'$_POST = '.print_r($_POST, true)

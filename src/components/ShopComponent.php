@@ -18,6 +18,7 @@ use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
@@ -52,6 +53,7 @@ use yii\widgets\ActiveForm;
  * @property ShopStore[]          $stores
  * @property ShopStore[]          $supplierStores
  * @property ShopStore[]          $allStores
+ * @property ShopContent          $cmsContent
  *
  * @property ShopStore            $backendShopStore
  */
@@ -392,6 +394,16 @@ class ShopComponent extends Component implements BootstrapInterface
 
         $query->multiple = true;
         return $query->all();
+    }
+
+    /**
+     * @return $this
+     */
+    public function getCmsContent()
+    {
+        return \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
+            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id'),
+        ])->one();
     }
 
     /**
