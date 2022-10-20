@@ -65,6 +65,13 @@ class AdminShopCasheboxController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
+            "view" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 80,
+                'name'     => 'Просмотр',
+                'icon'     => 'fas fa-info-circle',
+            ],
+
             'index' => [
                 'on beforeRender' => function (Event $e) {
                     $e->content = Alert::widget([
@@ -123,6 +130,30 @@ HTML
             ],
 
 
+            'payments' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Платежи',
+                'priority' => 90,
+                'callback' => [$this, 'payments'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
+            'orders' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Продажи',
+                'priority' => 90,
+                'callback' => [$this, 'orders'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
+            'checks' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Чеки',
+                'priority' => 90,
+                'callback' => [$this, 'checks'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
             "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
@@ -136,6 +167,129 @@ HTML
     }
 
 
+
+    public function payments()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-payment')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_cashebox_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
+    public function orders()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-order')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_cashebox_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
+    public function checks()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-shop-check')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_cashebox_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
 
     public function updateFields($action)
     {

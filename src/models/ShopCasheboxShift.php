@@ -10,20 +10,24 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\shop\models\queries\ShopCasheboxShiftQuery;
 use yii\base\Exception;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "shop_cashebox_shift".
  *
- * @property int          $id
- * @property int          $shop_cashebox_id
- * @property int|null     $created_by
- * @property int|null     $created_at
- * @property int|null     $closed_at
- * @property int|null     $closed_by
- * @property int          $shift_number
+ * @property int           $id
+ * @property int           $shop_cashebox_id
+ * @property int|null      $created_by
+ * @property int|null      $created_at
+ * @property int|null      $closed_at
+ * @property int|null      $closed_by
+ * @property int           $shift_number
  *
- * @property ShopCashebox $shopCashebox
+ * @property ShopCashebox  $shopCashebox
+ * @property ShopPayment[] $shopPayments
+ * @property ShopOrder[]   $shopOrders
+ * @property float         $totalCash
  */
 class ShopCasheboxShift extends \skeeks\cms\base\ActiveRecord
 {
@@ -69,9 +73,13 @@ class ShopCasheboxShift extends \skeeks\cms\base\ActiveRecord
 
             [['shop_cashebox_id', 'shift_number', 'created_by', 'created_at', 'closed_at', 'closed_by'], 'integer'],
             [['shop_cashebox_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopCashebox::className(), 'targetAttribute' => ['shop_cashebox_id' => 'id']],
-            [['created_by'], 'default', 'value' => function() {
-                return \Yii::$app->user->id;
-            }],
+            [
+                ['created_by'],
+                'default',
+                'value' => function () {
+                    return \Yii::$app->user->id;
+                },
+            ],
 
             [
                 ['shift_number'],
@@ -95,7 +103,7 @@ class ShopCasheboxShift extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id'               => 'ID',
-            'shift_number'     => 'Номер смены',
+            'shift_number'     => 'Смена',
             'shop_cashebox_id' => 'Касса',
             'created_by'       => 'Кассир',
             'created_at'       => 'Открыта',
@@ -104,6 +112,10 @@ class ShopCasheboxShift extends \skeeks\cms\base\ActiveRecord
         ]);
     }
 
+    public function asText()
+    {
+        return "Смена #".$this->shift_number;
+    }
 
     /**
      * Gets query for [[ShopCachebox]].
@@ -122,4 +134,81 @@ class ShopCasheboxShift extends \skeeks\cms\base\ActiveRecord
     {
         return new ShopCasheboxShiftQuery(get_called_class());
     }
+
+    /**
+     * Gets query for [[ShopCasheboxShifts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopPayments()
+    {
+        return $this->hasMany(ShopPayment::className(), ['shop_cashebox_shift_id' => 'id']);
+    }
+
+
+    /**
+     * Gets query for [[ShopCasheboxShifts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrders()
+    {
+        return $this->hasMany(ShopOrder::className(), ['shop_cashebox_shift_id' => 'id']);
+    }
+
+
+    /**
+     * Всего пришло наличных
+     * @return float
+     */
+    public function getTotalCash()
+    {
+        $debit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CASH])->andWhere(['is_debit' => 1])->asArray()->one();
+        return (float)(ArrayHelper::getValue($debit, "sum"));
+    }
+
+
+    /**
+     * Всего пришло по банку
+     * @return float
+     */
+    public function getTotalCard()
+    {
+        $debit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CARD])->andWhere(['is_debit' => 1])->asArray()->one();
+        return (float)(ArrayHelper::getValue($debit, "sum"));
+    }
+
+
+    /**
+     * Всего вернули по банку
+     * @return float
+     */
+    public function getTotalReturnCard()
+    {
+        $debit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CARD])->andWhere(['is_debit' => 0])->asArray()->one();
+        return (float)(ArrayHelper::getValue($debit, "sum"));
+    }
+
+    /**
+     * Всего вернули наличных
+     * @return float
+     */
+    public function getTotalReturnCash()
+    {
+        $debit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CASH])->andWhere(['is_debit' => 0])->asArray()->one();
+        return (float)(ArrayHelper::getValue($debit, "sum"));
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getTotalBank()
+    {
+        $debit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CASH])->andWhere(['is_debit' => 1])->asArray()->one();
+        $creadit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['is_debit' => 0])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CASH])->asArray()->one();
+
+        return (float)(ArrayHelper::getValue($debit, "sum") - ArrayHelper::getValue($creadit, "sum"));
+    }
+
 }

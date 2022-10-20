@@ -39,6 +39,7 @@ use yii\helpers\ArrayHelper;
  * @property integer             $cashier_default_cms_user_id Клиент по умолчанию
  *
  * @property integer             $is_sync_external Синхронизирован с внешней системой?
+ * @property integer             $is_allow_no_check Разрешить продажу без чека?
  *
  * @property string              $coordinates
  *
@@ -101,6 +102,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['priority'], 'integer'],
 
             [['is_sync_external'], 'integer'],
+            [['is_allow_no_check'], 'integer'],
             [['cashier_is_allow_sell_out_of_stock'], 'integer'],
             [['cashier_is_show_out_of_stock'], 'integer'],
 
@@ -125,6 +127,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['is_supplier'], 'default', 'value' => 0],
 
             [['is_sync_external'], 'default', 'value' => 1],
+            [['is_allow_no_check'], 'default', 'value' => 0],
 
             [
                 'cms_site_id',
@@ -214,6 +217,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'cashier_is_allow_sell_out_of_stock' => 'Разрешить продажу товаров не в наличии?',
             'cashier_is_show_out_of_stock'       => 'Показывать товары не в наличии?',
             'cashier_default_cms_user_id'        => 'Клиент выбранный по умолчанию',
+            'is_allow_no_check'                  => 'Разрешить продажу без чека?',
             'is_sync_external'                   => 'Синхронизирован с внешней системой?',
         ]);
     }
@@ -225,6 +229,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::attributeHints(), [
             'cashier_default_cms_user_id' => "Обязательно укажите этому клиенту email!",
             'is_sync_external'            => 'Поставьте галочку если складской учет ведется во внешней системе (например в 1С, клаудшоп, мойсклад и т.д.)<br />Если же складской учет ведется в системе управления сайтом, то галочку не ставьте!',
+            'is_allow_no_check'           => 'Если опция выбрана, то в момент оформления продажи или воврата на кассе, можно не выбивать чек.',
         ]);
     }
 

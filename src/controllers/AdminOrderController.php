@@ -43,10 +43,9 @@ class AdminOrderController extends BackendModelStandartController
         
         $this->generateAccessActions = false;
 
-        $this->modelHeader = function () {
+        /*$this->modelHeader = function () {
             /**
              * @var $model ShopOrder
-             */
             $model = $this->model;
             $date = \Yii::$app->formatter->asDatetime($model->created_at);
             return Html::tag('h1', "Заказ <span class='g-color-primary'>№{$model->id}</span> на сумму<span class='g-color-primary'> " . $model->money . "</span>" .  Html::a('<i class="fas fa-external-link-alt"></i>', $model->getPublicUrl(), [
@@ -59,7 +58,7 @@ class AdminOrderController extends BackendModelStandartController
                 .
                 "<h6 style='color: gray;'>от " . Html::tag("span", \Yii::$app->formatter->asDatetime($model->created_at)) . "</h6>";
                 ;
-        };
+        };*/
 
         parent::init();
     }
@@ -116,19 +115,22 @@ class AdminOrderController extends BackendModelStandartController
 
                     'defaultOrder' => [
                         //'is_created' => SORT_DESC,
-                        'updated_at' => SORT_DESC,
+                        'created_at' => SORT_DESC,
                     ],
 
                     'visibleColumns' => [
-                        'checkbox',
+                        /*'checkbox',*/
                         'actions',
                         //'id',
 
-                        'updated_at',
+                        'created_at',
 
                         'custom',
 
+                        'amount',
                         'paid_at',
+
+                        'shop',
 
                         //'shop_buyer_id',
                         //'buyer',
@@ -137,7 +139,7 @@ class AdminOrderController extends BackendModelStandartController
 
                         //'items',
 
-                        'amount',
+
                         //'is_created',
                         'go',
                     ],
@@ -175,6 +177,25 @@ class AdminOrderController extends BackendModelStandartController
                                 'style' => 'max-width: 40px; width: 40px;',
                             ],
                         ],
+                        'shop'                   => [
+                            'format' => "raw",
+                            'label' => "Магазин",
+                            'value'  => function (ShopOrder $shopOrder) {
+                                $data = [];
+                                if ($shopOrder->shop_store_id) {
+                                    $data[] = $shopOrder->shopStore->name;
+                                }
+                                if ($shopOrder->shop_cashebox_id) {
+                                    $data[] = $shopOrder->shopCashebox->name;
+                                }
+                                if ($shopOrder->shop_cashebox_shift_id) {
+                                    $data[] = $shopOrder->shopCasheboxShift->asText;
+                                }
+
+                                return implode("<br />", $data);
+                            },
+
+                        ],
 
                         'buyer'                   => [
                             'format' => "raw",
@@ -210,7 +231,7 @@ class AdminOrderController extends BackendModelStandartController
                                 'style' => 'width: 80px;'
                             ],
                             'contentOptions' => [
-                                'style' => 'width: 80px;'
+                                'style' => 'width: 80px; text-align: center;'
                             ],
 
                             'value' => function (ShopOrder $shopOrder, $key) {
@@ -231,21 +252,20 @@ CSS
                                     $reuslt = "<div style='color: green;'>";
                                 }
 
-                                $reuslt .= $shopOrder->paid_at ? \Yii::$app->formatter->asDatetime($shopOrder->paid_at) : "-";
+                                $reuslt .= $shopOrder->paid_at ? "<span style='color: green;' title='" . \Yii::$app->formatter->asDatetime($shopOrder->paid_at) . "'>✓</span>" : "";
                                 $reuslt .= "</div>";
                                 return $reuslt;
                             },
                         ],
-                        'updated_at'           => [
+                        'created_at'           => [
                             'headerOptions' => [
                                 'style' => 'width: 120px;'
                             ],
                             'contentOptions' => [
                                 'style' => 'width: 120px;'
                             ],
-                            'value' => function(ShopOrder $shopOrder) {
-                                return \Yii::$app->formatter->asRelativeTime($shopOrder->updated_at);
-                            }
+                            'class' => DateTimeColumnData::class,
+                            'view_type' => DateTimeColumnData::VIEW_DATE
                         ],
                         'items'                => [
                             'label'  => "Товары",
@@ -291,23 +311,27 @@ HTML;
                                 
                                 $data[] = Html::a($name, "#", [
                                          'class' => "sx-trigger-action",
-                                        'style' => "font-size: 18px;",
-                                    ]) . " " . 
-                                    \yii\helpers\Html::tag("span", $shopOrder->shopOrderStatus->name, [
+                                        //'style' => "font-size: 18px;",
+                                    ]);
+
+                                if ($shopOrder->is_order) {
+                                    $data[] =  \yii\helpers\Html::tag("span", $shopOrder->shopOrderStatus->name, [
                                         'style' => "background: {$shopOrder->shopOrderStatus->bg_color}; color: {$shopOrder->shopOrderStatus->color}; padding: 5px; 0px;",
                                         //'class' => "label",
                                     ]);
+                                }
+
                                 
-                                $data[] = "от " . \yii\helpers\Html::tag("small", \Yii::$app->formatter->asDatetime($shopOrder->created_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->created_at).")");
+                                //$data[] = "от " . \yii\helpers\Html::tag("small", \Yii::$app->formatter->asDatetime($shopOrder->created_at)." (".\Yii::$app->formatter->asRelativeTime($shopOrder->created_at).")");
                                 
-                                if ($shopOrder->shopPaySystem) {
+                                /*if ($shopOrder->shopPaySystem) {
                                     $data[] = "" . $shopOrder->shopPaySystem->name;
                                 }
                                 
                                 if ($shopOrder->shopDelivery) {
                                     $data[] = "" . $shopOrder->shopDelivery->name;
-                                }
-                                return implode("<br />", $data);
+                                }*/
+                                return implode(" ", $data);
                             },
                         ],
                         'shop_order_status_id' => [
@@ -331,7 +355,6 @@ HTML;
                             'value' => function (ShopOrder $shopOrder) {
                                 return Html::tag('span', $shopOrder->money, [
                                     'class' => 'g-color-primary',
-                                    'style' => 'font-size: 18px;',
                                 ]);
                                 $result = [];
                                 $result[] = "Товары:&nbsp;".$shopOrder->moneyItems;
@@ -372,6 +395,23 @@ HTML;
                 'callback' => [$this, 'bills'],
                 'icon'     => 'fas fa-credit-card',
             ],
+
+            'checks' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Чеки',
+                'priority' => 400,
+                'callback' => [$this, 'checks'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
+            'docmoves' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Движение товара',
+                'priority' => 400,
+                'callback' => [$this, 'docmoves'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
             'changes'  => [
                 'class'    => BackendModelAction::class,
                 'name'     => 'Изменения по заказу',
@@ -382,6 +422,89 @@ HTML;
 
         ]);
     }
+
+    public function checks()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-shop-check')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_order_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
+    public function docmoves()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-shop-store-doc-move')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_order_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
 
     public function view()
     {

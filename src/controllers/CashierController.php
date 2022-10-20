@@ -89,6 +89,7 @@ class CashierController extends BackendController
                 if (!$order || $order->is_created) {
                     //Обновить сессию если заказ уже создан или
                     $order = new ShopOrder();
+                    $order->is_order = 0;
                     $order->is_created = false;
                     $order->cms_user_id = \Yii::$app->shop->backendShopStore->cashier_default_cms_user_id;
                     $order->shop_store_id = \Yii::$app->shop->backendShopStore->id;
@@ -103,6 +104,7 @@ class CashierController extends BackendController
 
             } else {
                 $order = new ShopOrder();
+                $order->is_order = 0;
                 $order->is_created = false;
                 $order->cms_user_id = \Yii::$app->shop->backendShopStore->cashier_default_cms_user_id;
                 $order->shop_store_id = \Yii::$app->shop->backendShopStore->id;
@@ -485,11 +487,17 @@ class CashierController extends BackendController
             }
 
 
-            if (!$shopBasket->recalculate()->save()) {
+            $shopBasket->recalculate();
+            //todo: доработать
+            $money = $product->getRetailPriceMoney(\Yii::$app->shop->backendShopStore);
+            $shopBasket->amount = $money->amount;
+
+
+            if (!$shopBasket->save()) {
                 $rr->success = false;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Failed to add item to cart');
             } else {
-                $shopBasket->recalculate()->save();
+                //$shopBasket->save();
 
                 $rr->success = true;
                 $rr->message = \Yii::t('skeeks/shop/app', 'Item added to cart');
@@ -882,11 +890,18 @@ class CashierController extends BackendController
 
                 $order->comment = $comment;
                 $order->shop_store_id = \Yii::$app->shop->backendShopStore->id;
+
+                $order->shop_cashebox_shift_id = $this->shift->id;
+                $order->shop_cashebox_id = $this->shift->shop_cashebox_id;
+
                 $order->is_created = 1;
+                $order->is_order = 0;
                 $order->isNotifyChangeStatus = false;
                 $order->isNotifyEmailCreated = false;
                 $order->isNotifyEmailPayed = false;
                 $order->paid_at = time();
+
+
                 if (!$order->save()) {
                     throw new Exception("Не сохранился заказ: ".print_r($order->errors, true));
                 }
@@ -943,6 +958,7 @@ class CashierController extends BackendController
                 $doc = new ShopStoreDocMove();
                 $doc->doc_type = $order->order_type == ShopOrder::TYPE_SALE ? ShopStoreDocMove::DOCTYPE_SALE : ShopStoreDocMove::DOCTYPE_RETURN;
                 $doc->shop_store_id = \Yii::$app->shop->backendShopStore->id;
+                $doc->shop_order_id = $order->id;
                 $doc->is_active = 0;
                 if (!$doc->save()) {
                     throw new Exception("Ошибка: ".print_r($doc->errors, true));
@@ -1016,6 +1032,10 @@ class CashierController extends BackendController
                 $payment->cms_user_id = $order->cms_user_id;
                 $payment->shop_order_id = $order->id;
                 $payment->shop_store_id = $order->shop_store_id;
+                $payment->shop_cashebox_shift_id = $this->shift->id;
+                $payment->shop_cashebox_id = $this->shift->shop_cashebox_id;
+                $payment->shop_check_id = $check->id;
+
                 $payment->shop_store_payment_type = $payment_type;
                 $payment->amount = $order->amount;
                 $payment->currency_code = $order->currency_code;
@@ -1041,7 +1061,10 @@ class CashierController extends BackendController
 
                 //Работа с облачной кассой, нужно сделать чек
                 if ($shopCloudkassa = $this->shift->shopCashebox->shopCloudkassa) {
-                    $shopCloudkassa->handler->createFiscalCheck($check);
+                    //Это продажа без чека
+                    if ($check->is_print != 2) {
+                        $shopCloudkassa->handler->createFiscalCheck($check);
+                    }
                 }
 
 
@@ -1049,6 +1072,7 @@ class CashierController extends BackendController
 
 
                 $newOrder = new ShopOrder();
+                $newOrder->is_order = 0;
                 $newOrder->is_created = false;
                 $newOrder->cms_user_id = \Yii::$app->shop->backendShopStore->cashier_default_cms_user_id;
                 $newOrder->shop_store_id = \Yii::$app->shop->backendShopStore->id;

@@ -18,7 +18,22 @@ $this->render("view-css");
                 Магазин
             </span>
             <span class="sx-properties--value">
-                <?php echo $model->shopStore->name; ?>
+                <?php if ($model->shopStore) : ?>
+                    <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                        'controllerId'            => '/shop/admin-shop-store',
+                        'modelId'                 => $model->shopStore->id,
+                        'isRunFirstActionOnClick' => true,
+                        'options'                 => [
+                            'class' => 'sx-dashed',
+                            'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                        ],
+                    ]); ?>
+                    <?php echo $model->shopStore->name; ?>
+                    <?php $widget::end(); ?>
+                <?php else : ?>
+                    -
+                <?php endif; ?>
+
             </span>
         </li>
 
@@ -35,6 +50,26 @@ $this->render("view-css");
             </span>
         </li>
 
+        <?php if ($model->shopOrder) : ?>
+            <li>
+                <span class="sx-properties--name">
+                    Заказ/возврат
+                </span>
+                <span class="sx-properties--value">
+                        <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            'controllerId'            => '/shop/admin-order',
+                            'modelId'                 => $model->shopOrder->id,
+                            'isRunFirstActionOnClick' => true,
+                            'options'                 => [
+                                'class' => 'sx-dashed',
+                                'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                            ],
+                        ]); ?>
+                        <?php echo $model->shopOrder->asText; ?>
+                        <?php $widget::end(); ?>
+                </span>
+            </li>
+        <? endif; ?>
 
         <li>
             <span class="sx-properties--name">
@@ -87,7 +122,7 @@ JS
 </div>
 
 <div class="row" style="margin-top: 10px;">
-
+    <div class="col-12">
     <?php if (!$model->is_active) : ?>
 
 
@@ -350,6 +385,7 @@ JS
             </table>
         </div>
     <?php endif; ?>
+    </div>
 </div>
 
 <?php

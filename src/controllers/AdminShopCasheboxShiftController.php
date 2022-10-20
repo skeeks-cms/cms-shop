@@ -8,10 +8,14 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendGridModelAction;
+use skeeks\cms\backend\actions\BackendModelAction;
+use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\queries\ShopCasheboxShiftQuery;
@@ -52,9 +56,40 @@ class AdminShopCasheboxShiftController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
+            "view" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 80,
+                'name'     => 'Просмотр',
+                'icon'     => 'fas fa-info-circle',
+            ],
+
+            'payments' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Платежи',
+                'priority' => 90,
+                'callback' => [$this, 'payments'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
+            'orders' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Продажи',
+                'priority' => 90,
+                'callback' => [$this, 'orders'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
+            'checks' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Чеки',
+                'priority' => 90,
+                'callback' => [$this, 'checks'],
+                'icon'     => 'fas fa-credit-card',
+            ],
+
             'index' => [
                 'on beforeRender' => function (Event $e) {
-                    $e->content = Alert::widget([
+                    /*$e->content = Alert::widget([
                         'closeButton' => false,
                         'options'     => [
                             'class' => 'alert-default',
@@ -64,7 +99,7 @@ class AdminShopCasheboxShiftController extends BackendModelStandartController
 Все смены
 HTML
                         ,
-                    ]);
+                    ]);*/
                 },
                 "filters"         => false,
                 "backendShowings" => false,
@@ -87,15 +122,19 @@ HTML
                     ],
                     'visibleColumns' => [
 
-                        'checkbox',
+                        /*'checkbox',*/
                         'actions',
 
                         //'id',
-                        'custom',
                         'shift_number',
-                        'created_by',
+
                         'created_at',
                         'closed_at',
+
+                        'created_by',
+
+                        'shop',
+                        'custom',
                     ],
                     'columns'        => [
                         'created_at' => [
@@ -108,12 +147,27 @@ HTML
                                 return $model->closed_at ? \Yii::$app->formatter->asDatetime($model->closed_at) : "";
                             }
                         ],
+                        'shift_number' => [
+                            'class'         => DefaultActionColumn::class,
+                            'viewAttribute'         => "asText"
+                        ],
+                        'created_by' => [
+                            'class'         => UserColumnData::class
+                        ],
                         'custom' => [
                             'label'         => 'Касса',
                             'attribute'         => 'shop_cashebox_id',
                             'format'         => 'raw',
                             'value' => function(ShopCasheboxShift $casheboxShift) {
-                                return $casheboxShift->shopCashebox->shopStore->name . " <br />" . $casheboxShift->shopCashebox->name;
+                                return $casheboxShift->shopCashebox->name;
+                            },
+                        ],
+                        'shop' => [
+                            'label'         => 'Магазин',
+                            'attribute'         => 'shop_cashebox_id',
+                            'format'         => 'raw',
+                            'value' => function(ShopCasheboxShift $casheboxShift) {
+                                return $casheboxShift->shopCashebox->shopStore->name;
                             },
                         ],
                         /*'is_active' => [
@@ -133,6 +187,132 @@ HTML
 
             "create" => new UnsetArrayValue(),
             "update" => new UnsetArrayValue(),
+            "delete-multi" => new UnsetArrayValue(),
+            "delete" => new UnsetArrayValue(),
         ]);
+    }
+
+    public function checks()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-shop-check')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_cashebox_shift_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
+
+    public function payments()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-payment')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_cashebox_shift_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
+    }
+
+    public function orders()
+    {
+        if ($controller = \Yii::$app->createController('/shop/admin-order')) {
+            /**
+             * @var $controller BackendController
+             * @var $indexAction BackendGridModelAction
+             */
+            $controller = $controller[0];
+            $controller->actionsMap = [
+                'index' => [
+                    'configKey' => $this->action->uniqueId,
+                ],
+            ];
+
+            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
+                $indexAction->url = $this->action->urlData;
+                $indexAction->filters = false;
+                $indexAction->backendShowings = false;
+                $visibleColumns = $indexAction->grid['visibleColumns'];
+                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
+                $indexAction->grid['visibleColumns'] = $visibleColumns;
+                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
+                $indexAction->grid['on init'] = function (Event $e) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->sender->dataProvider->query;
+                    $query->andWhere([
+                        'shop_cashebox_shift_id' => $this->model->id,
+                    ]);
+                };
+
+
+
+                return $indexAction->run();
+            }
+        }
+
+        return '1';
     }
 }

@@ -149,6 +149,9 @@ HTML
                         //'id',
                         'doc_type',
 
+                        'shop_order_id',
+
+
                         'created_at',
                         'created_by',
                         'shop_store_id',
@@ -213,6 +216,44 @@ CSS
                                 }
                                 return implode("<br />", $result);
                             }
+                        ],
+
+                        'shop_order_id' => [
+                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
+                                if ($shopStoreDocMove->shopOrder) {
+                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                        'controllerId'            => '/shop/admin-order',
+                                        'modelId'                 => $shopStoreDocMove->shopOrder->id,
+                                        'content'                 => $shopStoreDocMove->shopOrder->asText,
+                                        'isRunFirstActionOnClick' => true,
+                                        'options'                 => [
+                                            'class' => 'btn btn-xs btn-default',
+                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                        ],
+                                    ]);
+                                } else {
+                                    return '';
+                                }
+                            },
+                        ],
+
+                        'shop_store_id' => [
+                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
+                                if ($shopStoreDocMove->shopOrder) {
+                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                        'controllerId'            => '/shop/admin-shop-store',
+                                        'modelId'                 => $shopStoreDocMove->shopStore->id,
+                                        'content'                 => $shopStoreDocMove->shopStore->asText,
+                                        'isRunFirstActionOnClick' => true,
+                                        'options'                 => [
+                                            'class' => 'btn btn-xs btn-default',
+                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                        ],
+                                    ]);
+                                } else {
+                                    return '';
+                                }
+                            },
                         ],
 
                         'number_products' => [

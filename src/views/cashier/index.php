@@ -446,9 +446,16 @@ JS
                             </div>
 
                             <?php if($controller->shift && $controller->shift->shopCashebox->shopCloudkassa) : ?>
+
+
                                 <div class="ui huge basic fluid buttons" id="sx-is-print">
                                     <button class="ui active button" data-value="1">Печатать чек</button>
-                                    <button class="ui button" data-value="0">Нет</button>
+                                    <button class="ui button" data-value="0">Чек онлайн</button>
+
+                                    <?php if(\Yii::$app->shop->backendShopStore->is_allow_no_check) : ?>
+                                        <button class="ui button" data-value="2">Без чека</button>
+                                    <?php endif; ?>
+
                                 </div>
                             <?php else : ?>
                                 <div style="display: none;">

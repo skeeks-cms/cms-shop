@@ -425,6 +425,10 @@ CSS
                     'isOpen' => false,
                 ],
                 'fields'         => [
+                    'is_allow_no_check' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
                     'cashier_is_allow_sell_out_of_stock' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,

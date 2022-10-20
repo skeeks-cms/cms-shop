@@ -68,8 +68,8 @@ class ShopStoreDocMove extends \skeeks\cms\base\ActiveRecord
     static public function docTypes()
     {
         return [
-            static::DOCTYPE_SALE       => "Продажа",
-            static::DOCTYPE_RETURN     => "Возврат",
+            static::DOCTYPE_SALE       => "Документ продажи",
+            static::DOCTYPE_RETURN     => "Документ возврата",
             static::DOCTYPE_CORRECTION => "Корректировка",
             static::DOCTYPE_INVENTORY  => "Инвентаризация",
             static::DOCTYPE_POSTING    => "Оприходование",
@@ -171,7 +171,7 @@ class ShopStoreDocMove extends \skeeks\cms\base\ActiveRecord
 
     public function asText()
     {
-        return $this->docTypeAsText." №".$this->id;
+        return $this->docTypeAsText." #".$this->id;
     }
 
 }

@@ -138,7 +138,7 @@ class ShopCheck extends \skeeks\cms\base\ActiveRecord
     static public function statuses()
     {
         return [
-            static::STATUS_NEW      => "Новый",
+            static::STATUS_NEW      => "Не проведен",
             static::STATUS_WAIT     => "Ожидает фискализации",
             static::STATUS_APPROVED => "Проведен/Фискализирован",
             static::STATUS_ERROR    => "Ошибка фискализации",
@@ -363,6 +363,11 @@ class ShopCheck extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
         ]);
+    }
+
+    public function asText()
+    {
+        return "Чек #" . $this->id;
     }
 
 

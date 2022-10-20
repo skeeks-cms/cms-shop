@@ -1175,6 +1175,7 @@ JS
                                             'controllerId' => "/shop/store-product",
                                             'modelId'      => $storeProduct->id,
                                             'tag'          => 'span',
+                                            'isRunFirstActionOnClick'          => true,
                                             'options'      => [
                                                 'style' => 'text-align: left;',
                                                 'class' => 'sx-fast-edit',
@@ -1189,14 +1190,85 @@ JS
                                 </td>
 
                                 <td>
-                                    <?php if(\Yii::$app->shop->purchaseTypePrice) : ?>
+
+
+
+
+
+                                    <span class="sx-fast-edit sx-fast-edit-popover"
+                                          data-form="#price-purchase-store-form"
+                                          data-title="Закупочная цена"
+                                    >
                                         <?php
-                                            $purchasePrice = $model->shopProduct->getPrice(\Yii::$app->shop->purchaseTypePrice);
-                                            echo $purchasePrice ? $purchasePrice->money : ""; ?>
-                                    <?php endif; ?>
+                                         $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
+                                         if ($shopStoreProduct && $shopStoreProduct->purchase_price): ?>
+                                            <?php echo new \skeeks\cms\money\Money((string) $shopStoreProduct->purchase_price, \Yii::$app->money->currency_code); ?>
+                                        <?php else : ?>
+                                             <?php if(\Yii::$app->shop->purchaseTypePrice) : ?>
+                                                <?php
+                                                    $purchasePrice = $model->shopProduct->getPrice(\Yii::$app->shop->purchaseTypePrice);
+                                                    echo $purchasePrice ? $purchasePrice->money : "&nbsp;&nbsp;&nbsp;"; ?>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+
+                                    </span>
+
+                                    <div class="sx-fast-edit-form-wrapper">
+                                        <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                            'id'             => "price-purchase-store-form",
+                                            'action'         => \yii\helpers\Url::to(['update-price-purchase', 'pk' => $model->id, '' => ]),
+                                            'options'        => [
+                                                'class' => 'sx-fast-edit-form',
+                                            ],
+                                            'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                                function (ActiveFormAjaxSubmit) {
+                                                    ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                        $.pjax.reload("#{$pjax->id}");
+                                                        $(".sx-fast-edit").popover("hide");
+                                                    });
+                                                }
+JS
+                                            ),
+                                        ]); ?>
+                                        <input type="hidden" value="update-price" name="act" class="form-control"/>
+                                        <input type="hidden" value="<?php echo $shopTypePrice->id; ?>" name="shop_type_price_id" class="form-control"/>
+
+                                        <div class="input-group" style="margin-top: 10px;">
+                                            <? echo \yii\helpers\Html::checkbox("is_personal_price", ($price && $price->is_fixed ? true : false), [
+                                                'label' => 'В магазине своя цена',
+                                            ]); ?>
+                                        </div>
+
+                                        <div class="input-group">
+                                            <input type="text" value="<?php echo(($price && (float)$price->money->amount > 0) ? (float)$price->money->amount : ""); ?>" name="price_value" class="form-control"/>
+                                            <?php if (count(\Yii::$app->money->activeCurrencies) > 1) : ?>
+                                                <? echo \yii\helpers\Html::listBox("price_currency_code", $price ? $price->money->currency->code : "", \yii\helpers\ArrayHelper::map(
+                                                    \Yii::$app->money->activeCurrencies, 'code', 'code'
+                                                ), ['size' => 1, 'class' => 'form-control']); ?>
+                                            <?php endif; ?>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i></button>
+                                            </div>
+                                        </div>
+
+                                        <?php $form::end(); ?>
+                                    </div>
+
+
+
+
                                 </td>
 
-                                <td><?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?></td>
+                                <td>
+                                    <?php
+                                     $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
+                                     if ($shopStoreProduct && $shopStoreProduct->selling_price): ?>
+                                        <?php echo new \skeeks\cms\money\Money((string) $shopStoreProduct->selling_price, \Yii::$app->money->currency_code); ?>
+                                    <?php else : ?>
+                                        <?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?>
+                                    <?php endif; ?>
+
+                                </td>
                                 <td>
                                     <a href="<?php echo \yii\helpers\Url::to(['store-moves', 'pk' => $model->id]); ?>"  class="sx-fast-edit" style="color: black;">
                                         <?php echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>

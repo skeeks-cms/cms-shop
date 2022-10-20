@@ -18,39 +18,46 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "{{%shop_payment}}".
  *
- * @property int           $id
- * @property int           $created_by
- * @property int           $updated_by
- * @property int           $created_at
- * @property int           $updated_at
+ * @property int               $id
+ * @property int               $created_by
+ * @property int               $updated_by
+ * @property int               $created_at
+ * @property int               $updated_at
  *
- * @property int           $cms_user_id Покупатель
+ * @property int               $cms_user_id Покупатель
  *
- * @property int           $shop_order_id Заказ
- * @property int|null      $shop_pay_system_id Платежная система
+ * @property int               $shop_order_id Заказ
+ * @property int               $shop_check_id Чек
+ * @property int|null          $shop_pay_system_id Платежная система
  *
- * @property int           $is_debit Дебет? (иначе кредит)
+ * @property int               $is_debit Дебет? (иначе кредит)
  *
- * @property string        $amount
- * @property string        $currency_code
+ * @property string            $amount
+ * @property string            $currency_code
  *
- * @property string        $comment комментарий к платежу
+ * @property string            $comment комментарий к платежу
  *
- * @property int|null      $shop_store_id оплата в магазине
- * @property string|null   $shop_store_payment_type тип оплаты в магазине
+ * @property int|null          $shop_store_id оплата в магазине
+ * @property int|null          $shop_cashebox_shift_id Смена
+ * @property int|null          $shop_cashebox_id Касса
  *
- * @property string        $external_name
- * @property string        $external_id
- * @property string        $external_data
+ * @property string|null       $shop_store_payment_type тип оплаты в магазине
+ * @property string            $external_name
+ * @property string            $external_id
+ * @property string            $external_data
  *
- * @property CmsUser       $cmsUser
- * @property ShopStore     $shopStore
- * @property ShopBill[]    $shopBills
- * @property MoneyCurrency $currencyCode
- * @property ShopBuyer     $shopBuyer
- * @property ShopOrder     $shopOrder
- * @property ShopPaySystem $shopPaySystem
- * @property Money         $money
+ * @property string            $shopStorePaymentTypeAsText
+ * @property CmsUser           $cmsUser
+ * @property ShopCheck         $shopCheck
+ * @property ShopStore         $shopStore
+ * @property ShopCashebox      $shopCashebox
+ * @property ShopCasheboxShift $shopCasheboxShift
+ * @property ShopBill[]        $shopBills
+ * @property MoneyCurrency     $currencyCode
+ * @property ShopBuyer         $shopBuyer
+ * @property ShopOrder         $shopOrder
+ * @property ShopPaySystem     $shopPaySystem
+ * @property Money             $money
  *
  * @property int           -$shop_buyer_id deprecated
  */
@@ -66,6 +73,19 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     public static function tableName()
     {
         return '{{%shop_payment}}';
+    }
+
+    static public function getShopStorePaymentTypes()
+    {
+        return [
+            self::STORE_PAYMENT_TYPE_CASH => 'Наличные',
+            self::STORE_PAYMENT_TYPE_CARD => 'Банковской картой',
+        ];
+    }
+
+    public function getShopStorePaymentTypeAsText()
+    {
+        return (string)ArrayHelper::getValue(self::getShopStorePaymentTypes(), $this->shop_store_payment_type);
     }
 
     public function behaviors()
@@ -93,9 +113,12 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
                     'cms_user_id',
                     'shop_buyer_id',
                     'shop_order_id',
+                    'shop_check_id',
                     'shop_pay_system_id',
                     'is_debit',
                     'shop_store_id',
+                    'shop_cashebox_shift_id',
+                    'shop_cashebox_id',
                 ],
                 'integer',
             ],
@@ -103,6 +126,8 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             [['shop_order_id'], 'required'],
 
             [['shop_store_id'], 'default', 'value' => null],
+            [['shop_cashebox_shift_id'], 'default', 'value' => null],
+            [['shop_cashebox_id'], 'default', 'value' => null],
             [['shop_store_payment_type'], 'default', 'value' => null],
             [['shop_buyer_id'], 'default', 'value' => null],
             [['cms_user_id'], 'default', 'value' => null],
@@ -128,10 +153,13 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id'                      => Yii::t('skeeks/shop/app', 'ID'),
             'shop_store_id'           => Yii::t('skeeks/shop/app', 'Магазин'),
+            'shop_cashebox_shift_id'  => Yii::t('skeeks/shop/app', 'Смена'),
+            'shop_cashebox_id'        => Yii::t('skeeks/shop/app', 'Касса'),
             'shop_store_payment_type' => Yii::t('skeeks/shop/app', 'Тип оплаты в магазине'),
             'shop_buyer_id'           => Yii::t('skeeks/shop/app', 'Покупатель'),
             'cms_user_id'             => Yii::t('skeeks/shop/app', 'Покупатель'),
             'shop_order_id'           => Yii::t('skeeks/shop/app', 'Заказ'),
+            'shop_check_id'           => Yii::t('skeeks/shop/app', 'Чек'),
             'shop_pay_system_id'      => Yii::t('skeeks/shop/app', 'Способ оплаты'),
             'is_debit'                => Yii::t('skeeks/shop/app', 'Дебет? (иначе кредит)'),
             'amount'                  => Yii::t('skeeks/shop/app', 'Сумма'),
@@ -165,6 +193,28 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     public function getShopStore()
     {
         return $this->hasOne(ShopStore::class, ['id' => 'shop_store_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCheck()
+    {
+        return $this->hasOne(ShopCheck::class, ['id' => 'shop_check_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCasheboxShift()
+    {
+        return $this->hasOne(ShopCasheboxShift::class, ['id' => 'shop_cashebox_shift_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCashebox()
+    {
+        return $this->hasOne(ShopCashebox::class, ['id' => 'shop_cashebox_id']);
     }
     /**
      * @return \yii\db\ActiveQuery

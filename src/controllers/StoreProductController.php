@@ -41,6 +41,7 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\UnsetArrayValue;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -489,20 +490,21 @@ HTML;
                 }
             ],
 
-            "update" => [
+            "update" => new UnsetArrayValue(),
+            /*"update" => [
                 'fields' => [$this, 'updateFields'],
                 'accessCallback' => function() {
                     if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
                         return true;
                     }
-                    
+
                     if (\Yii::$app->shop->backendShopStore->is_sync_external) {
                         return false;
                     }
-                    
+
                     return true;
                 }
-            ],
+            ],*/
 
             "import" => [
                 'class' => ViewBackendAction::class,

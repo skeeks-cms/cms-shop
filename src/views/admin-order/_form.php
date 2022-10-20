@@ -10,6 +10,8 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopOrder */
+
+$this->render("@skeeks/cms/shop/views/admin-shop-store-doc-move/view-css");
 ?>
 
 <?
@@ -91,44 +93,48 @@ JS
 );
 
 $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
+
+$this->render("@skeeks/cms/shop/views/admin-shop-store-doc-move/view-css");
+
 ?>
+<?php if ($model->is_order || !$model->paid_at) : ?>
+
+    <div class="sx-detail-order sx-data">
+        <div class="col-12">
 
 
-<div class="sx-detail-order sx-data">
-    <div class="col-12">
-
-        <div class="row sx-data-row">
-            <div class="col-3">Статус</div>
-            <div class="col-9">
-                <?php echo Html::tag('a', $model->shopOrderStatus->name, [
-                    'style' => "padding: 2px 5px; color: {$model->shopOrderStatus->color}; background: {$model->shopOrderStatus->bg_color};",
-                    'class' => 'btn',
-                    'data'  => [
-                        'toggle' => "modal",
-                        'target' => "#sx-status-change",
-                    ],
-                ]); ?>
-                <?php if ($model->shopOrderStatus->description) : ?>
-                    <i class="far fa-question-circle" title="<?php echo $model->shopOrderStatus->description; ?>"></i>
-                <?php endif; ?>
-                <small style="color: gray;"><?php echo \Yii::$app->formatter->asDatetime($model->status_at); ?></small>
-
-
-            </div>
-        </div>
-        <div class="row sx-data-row">
-            <div class="col-3">Оплата</div>
-            <div class="col-9">
-                <a href="#" data-toggle="modal" data-target="#sx-allow-payment" class="sx-dashed">
-                    <?php if ($model->paySystem) : ?>
-                        <?php echo \skeeks\cms\helpers\StringHelper::ucfirst($model->paySystem->name); ?>
-                    <?php else: ?>
-                        Не выбрана
+            <div class="row sx-data-row">
+                <div class="col-3">Статус</div>
+                <div class="col-9">
+                    <?php echo Html::tag('a', $model->shopOrderStatus->name, [
+                        'style' => "padding: 2px 5px; color: {$model->shopOrderStatus->color}; background: {$model->shopOrderStatus->bg_color};",
+                        'class' => 'btn',
+                        'data'  => [
+                            'toggle' => "modal",
+                            'target' => "#sx-status-change",
+                        ],
+                    ]); ?>
+                    <?php if ($model->shopOrderStatus->description) : ?>
+                        <i class="far fa-question-circle" title="<?php echo $model->shopOrderStatus->description; ?>"></i>
                     <?php endif; ?>
-                </a>
+                    <small style="color: gray;"><?php echo \Yii::$app->formatter->asDatetime($model->status_at); ?></small>
 
 
-                <span style="margin-left: 20px;">
+                </div>
+            </div>
+            <div class="row sx-data-row">
+                <div class="col-3">Оплата</div>
+                <div class="col-9">
+                    <a href="#" data-toggle="modal" data-target="#sx-allow-payment" class="sx-dashed">
+                        <?php if ($model->paySystem) : ?>
+                            <?php echo \skeeks\cms\helpers\StringHelper::ucfirst($model->paySystem->name); ?>
+                        <?php else: ?>
+                            Не выбрана
+                        <?php endif; ?>
+                    </a>
+
+
+                    <span style="margin-left: 20px;">
                     <?php if ($model->paid_at) : ?>
                         <span style='color: green;'>Оплачен</span>
                     <?php else: ?>
@@ -136,89 +142,199 @@ $statusDate = \Yii::$app->formatter->asDatetime($model->status_at);
                     <?php endif; ?>
                 </span>
 
-                <span style="margin-left: 20px;">
-                    <? if ($model->shopOrderStatus->is_payment_allowed) : ?>
-                        <span style='color: gray;'>Оплата разрешена</span>
-                    <? else : ?>
-                        <span style='color: gray;'>Оплата не разрешена</span>
+                    <?php if (!$model->paid_at) : ?>
+                        <span style="margin-left: 20px;">
+                        <? if ($model->shopOrderStatus->is_payment_allowed) : ?>
+                            <span style='color: gray;'>Оплата разрешена</span>
+                        <? else : ?>
+                            <span style='color: gray;'>Оплата не разрешена</span>
+                        <? endif; ?>
+                    </span>
                     <? endif; ?>
-                </span>
-
-
+                </div>
             </div>
-        </div>
 
-        <div class="row sx-data-row">
-            <div class="col-3">Доставка</div>
-            <div class="col-9">
-                <a href="#" data-toggle="modal" data-target="#sx-allow-delivery" class="sx-dashed">
-                    <?php if ($model->shopDelivery) : ?>
-                        <?php echo $model->shopDelivery->name; ?>
-                    <?php else: ?>
-                        Не выбрана
+            <div class="row sx-data-row">
+                <div class="col-3">Доставка</div>
+                <div class="col-9">
+                    <a href="#" data-toggle="modal" data-target="#sx-allow-delivery" class="sx-dashed">
+                        <?php if ($model->shopDelivery) : ?>
+                            <?php echo $model->shopDelivery->name; ?>
+                        <?php else: ?>
+                            Не выбрана
+                        <?php endif; ?>
+
+
+                    </a>
+
+                    <?php if ((float)$model->moneyDelivery->amount > 0) : ?>
+                        <span style="margin-left: 10px;">
+                        <?php echo $model->moneyDelivery; ?>
+                </span>
+                    <? endif; ?>
+
+                </div>
+            </div>
+            <?php if ($model->lastStatusLog && $model->lastStatusLog->comment) : ?>
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-12">
+                        <div style="margin-bottom: 0; color: gray;"><small><b>Комментарий к статусу:</b></small></div>
+                    </div>
+                    <div class="col-12">
+                        <div class="g-brd-primary" style="background: #fafafa; border-left: 5px solid; padding: 20px; 10px;">
+                            <?php echo nl2br($model->lastStatusLog->comment); ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($model->shopOrderStatus->order_page_description) : ?>
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-12">
+                        <div style="margin-bottom: 0; color: gray;"><small><b>Эту информацию видит клиент на странице заказа:</b></small></div>
+                    </div>
+                    <div class="col-12">
+                        <div class="g-brd-primary" style="background: #fafafa; border-left: 5px solid; padding: 20px; 10px;">
+                            <?php echo $model->shopOrderStatus->order_page_description; ?>
+                        </div>
+                    </div>
+
+                </div>
+            <?php endif; ?>
+
+
+        </div>
+    </div>
+
+
+<?php else : ?>
+    <div class="row">
+        <div class="col-12">
+            <h5>Продажа в магазине</h5>
+        </div>
+    </div>
+
+    <div class="sx-properties-wrapper sx-columns-1" style="max-width: 700px;">
+        <ul class="sx-properties sx-bg-secondary" style="padding: 10px;">
+            <li>
+                <span class="sx-properties--name">
+                    Магазин
+                </span>
+                <span class="sx-properties--value">
+                    <?php if ($model->shopStore) : ?>
+                        <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            'controllerId'            => '/shop/admin-shop-store',
+                            'modelId'                 => $model->shopStore->id,
+                            'isRunFirstActionOnClick' => true,
+                            'options'                 => [
+                                'class' => 'sx-dashed',
+                                'style' => 'cursor: pointer;',
+                            ],
+                        ]); ?>
+                        <?php echo $model->shopStore->name; ?>
+                        <?php $widget::end(); ?>
+                    <?php else : ?>
+                        -
+                    <?php endif; ?>
+
+                </span>
+            </li>
+
+
+            <li>
+                <span class="sx-properties--name">
+                    Касса
+                </span>
+                <span class="sx-properties--value">
+                    <?php if ($model->shopCashebox) : ?>
+                        <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            'controllerId'            => '/shop/admin-shop-cashebox',
+                            'modelId'                 => $model->shopCashebox->id,
+                            'isRunFirstActionOnClick' => true,
+                            'options'                 => [
+                                'class' => 'sx-dashed',
+                                'style' => 'cursor: pointer;',
+                            ],
+                        ]); ?>
+                        <?php echo $model->shopCashebox->asText; ?>
+                        <?php $widget::end(); ?>
+                    <?php else : ?>
+                        -
                     <?php endif; ?>
 
 
-                </a>
-
-                <?php if ((float)$model->moneyDelivery->amount > 0) : ?>
-                    <span style="margin-left: 10px;">
-                        <?php echo $model->moneyDelivery; ?>
                 </span>
-                <? endif; ?>
+            </li>
 
-            </div>
-        </div>
+            <li>
+                <span class="sx-properties--name">
+                    Смена
+                </span>
+                <span class="sx-properties--value">
+                    <?php if ($model->shopCasheboxShift) : ?>
+                        <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            'controllerId'            => '/shop/admin-shop-cashebox-shift',
+                            'modelId'                 => $model->shopCasheboxShift->id,
+                            'isRunFirstActionOnClick' => true,
+                            'options'                 => [
+                                'class' => 'sx-dashed',
+                                'style' => 'cursor: pointer;',
+                            ],
+                        ]); ?>
+                        <?php echo $model->shopCasheboxShift->asText; ?>
+                        <?php $widget::end(); ?>
+                    <?php else : ?>
+                        -
+                    <?php endif; ?>
 
-        <?php if ($model->lastStatusLog && $model->lastStatusLog->comment) : ?>
-            <div class="row" style="margin-top: 20px;">
-                <div class="col-12">
-                    <div style="margin-bottom: 0; color: gray;"><small><b>Комментарий к статусу:</b></small></div>
-                </div>
-                <div class="col-12">
-                    <div class="g-brd-primary" style="background: #fafafa; border-left: 5px solid; padding: 20px; 10px;">
-                        <?php echo nl2br($model->lastStatusLog->comment); ?>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
 
-        <?php if ($model->shopOrderStatus->order_page_description) : ?>
-            <div class="row" style="margin-top: 20px;">
-                <div class="col-12">
-                    <div style="margin-bottom: 0; color: gray;"><small><b>Эту информацию видит клиент на странице заказа:</b></small></div>
-                </div>
-                <div class="col-12">
-                    <div class="g-brd-primary" style="background: #fafafa; border-left: 5px solid; padding: 20px; 10px;">
-                        <?php echo $model->shopOrderStatus->order_page_description; ?>
-                    </div>
-                </div>
+                </span>
+            </li>
 
-            </div>
-        <?php endif; ?>
+            <li>
+                <span class="sx-properties--name">
+                    Кассир
+                </span>
+                <span class="sx-properties--value">
+                    <?php if ($model->shopCasheboxShift && $model->shopCasheboxShift->createdBy) : ?>
+                        <?php echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget(["cmsUser" => $model->shopCasheboxShift->createdBy]); ?>
+                    <?php else : ?>
+                        -
+                    <?php endif; ?>
+                </span>
+            </li>
 
+
+        </ul>
     </div>
-</div>
+<?php endif; ?>
+
 
 <?php if ($cmsUser = $model->cmsUser) : ?>
-        <div class="sx-contact-info" style="
+    <div class="sx-contact-info" style="
             margin-top: 20px;
             /*background: #f8f8f8;*/
             /*padding: 20px;*/
         ">
-            <div class="row">
-                <div class="col-12">
-                    <h5>Профиль покупателя в CRM</h5>
-                </div>
+        <div class="row">
+            <div class="col-12">
+                <h5>Покупатель</h5>
             </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <? echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget(['cmsUser' => $cmsUser]); ?>
-                </div>
-            </div>
-
         </div>
+    </div>
+    <div class="sx-contact-info sx-bg-secondary" style="
+            padding: 10px;
+            max-width: 700px;
+            /*background: #f8f8f8;*/
+            /*padding: 20px;*/
+        ">
+        <div class="row">
+            <div class="col-12">
+                <? echo \skeeks\cms\widgets\admin\CmsUserViewWidget::widget(['cmsUser' => $cmsUser]); ?>
+            </div>
+        </div>
+
+    </div>
 <?php endif; ?>
 
 <?
@@ -287,7 +403,7 @@ $receiverAttributes = $model->getReceiverAttributes();
                 ">
         <div class="row">
             <div class="col-12">
-                <h5>Детали доставки</h5>
+                <h5>Доставка</h5>
             </div>
         </div>
         <div class="sx-data">
@@ -314,7 +430,7 @@ $receiverAttributes = $model->getReceiverAttributes();
                 ">
             <div class="row">
                 <div class="col-12">
-                    <h5>Детали доставки</h5>
+                    <h5>Доставка</h5>
                 </div>
             </div>
             <div class="sx-data">
@@ -370,13 +486,19 @@ $receiverAttributes = $model->getReceiverAttributes();
 <?php endif; ?>
 
 
-
-
-
-<div style="height: 20px;"></div>
-<?= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
+<!--<div style="height: 20px;"></div>
+--><? /*= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
     'content' => \Yii::t('skeeks/shop/app', 'The composition of the order'),
-]) ?>
+]) */ ?>
+
+<div class="row" style="
+                    margin-top: 20px;
+                ">
+    <div class="col-12">
+        <h5>Состав заказа</h5>
+    </div>
+</div>
+
 <?
 
 $json = \yii\helpers\Json::encode([
@@ -400,6 +522,86 @@ $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
 /*<a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="fa fa-plus"></i>
                 {$addItemText}
             </a>*/
+
+?>
+
+
+<div class="sx-table-wrapper table-responsive">
+    <table class="table sx-table">
+        <tr>
+            <th>Товар</th>
+            <th>Цена</th>
+            <th>Количество</th>
+            <th>Скидка</th>
+            <th>Итог</th>
+        </tr>
+        <?
+        $totalQuantity = 0;
+        $totalPrice = 0;
+        foreach ($model->shopOrderItems as $shopOrderItem) : ?>
+
+            <tr data-id="<?php echo $shopOrderItem->id; ?>">
+                <td>
+                    <?php if ($shopOrderItem->shopProduct) : ?>
+                        <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            'controllerId'            => 'shop/admin-cms-content-element',
+                            'urlParams'               => [
+                                'content_id' => $shopOrderItem->shopProduct->cmsContentElement->content_id,
+                            ],
+                            'tag'                     => 'span',
+                            'defaultOptions'          => [
+                                'class' => 'd-flex',
+                                'style' => 'line-height: 1.1; cursor: pointer;',
+                            ],
+                            'modelId'                 => $shopOrderItem->shopProduct->id,
+                            'isRunFirstActionOnClick' => true,
+                        ]); ?>
+
+                        <?
+                        $image = null;
+                        if ($product = $shopOrderItem->shopProduct) {
+                            if ($product->cmsContentElement) {
+                                if ($product->cmsContentElement->mainProductImage) {
+                                    $image = $product->cmsContentElement->mainProductImage;
+                                }
+                            }
+                        }
+                        ?>
+
+                        <?php if ($image) : ?>
+                            <span class="my-auto">
+                            <img class="my-auto" src="<?php echo \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"
+                                 style="max-width: 30px; height: 100%;
+            width: 100%; margin-right: 5px;"/>
+                        </span>
+                        <?php endif; ?>
+
+                        <span class="my-auto">
+                        <?php echo $shopOrderItem->name; ?>
+                </span>
+                        <? $widget::end(); ?>
+                    <?php else : ?>
+                        <?php echo $shopOrderItem->name; ?>
+                    <?php endif; ?>
+
+
+                </td>
+                <td><?php echo $shopOrderItem->money; ?></td>
+                <td>
+                    <?php echo $shopOrderItem->quantity; ?>
+                    <?php echo $shopOrderItem->measure_name; ?>
+                </td>
+                <td><?php echo $shopOrderItem->discount_percent; ?>%</td>
+                <td><?php echo $shopOrderItem->totalMoney; ?></td>
+            </tr>
+        <? endforeach; ?>
+
+    </table>
+
+</div>
+
+<?php
+/*
 
 
 echo \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
@@ -452,19 +654,20 @@ HTML
     ],
 ]);
 
-?>
+*/ ?>
 
 
 <div class="row">
     <div class="col-md-8"></div>
     <div class="col-md-4">
-        <div class="sx-result">
+        <div class="sx-result sx-bg-secondary">
             <?
             $this->registerCss(<<<CSS
 .sx-result
 {
-    background-color: #ecf2d3;
+    /*background-color: #ecf2d3;*/
     padding: 10px;
+    margin-top: 10px;
 }
 .sx-result .table tbody tr:last-child
 {

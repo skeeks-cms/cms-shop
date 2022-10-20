@@ -38,6 +38,7 @@ use yii\validators\EmailValidator;
  * @property integer                    $status_at
  * @property string                     $delivery_amount
  * @property string                     $is_allowed_payment
+ * @property integer                    $is_order
  * @property string                     $amount
  * @property string                     $currency_code
  * @property string                     $discount_amount
@@ -60,6 +61,8 @@ use yii\validators\EmailValidator;
  *
  * @property integer|null               $cms_user_id
  * @property integer|null               $shop_store_id
+ * @property int|null                   $shop_cashebox_shift_id Смена
+ * @property int|null                   $shop_cashebox_id Касса
  *
  * @property string|null                $contact_phone
  * @property string|null                $contact_email
@@ -132,10 +135,13 @@ use yii\validators\EmailValidator;
  * @property string                     $payUrl read-only ссылка на оплату
  * @property string                     $url read-only ссылка на заказ
  *
+ * @property ShopPayment[]              $shopPayments
  * @property int                        $countShopOrderItems
  * @property array                      $deliveryHandlerData
  * @property DeliveryCheckoutModel      $deliveryHandlerCheckoutModel
  * @property boolean                    $hasReceiver Получатель заказа указан? Если не указан, получателем является оформитель заказа.
+ * @property ShopCashebox               $shopCashebox
+ * @property ShopCasheboxShift          $shopCasheboxShift
  */
 class ShopOrder extends \skeeks\cms\models\Core
 {
@@ -197,7 +203,17 @@ class ShopOrder extends \skeeks\cms\models\Core
 
     public function asText()
     {
-        return $this->orderTypeAsText." #{$this->id}";
+        if ($this->is_order) {
+            $text = 'Заказ';
+            if ($this->order_type == static::TYPE_SALE) {
+                $text = 'Заказ';
+            } else {
+                $text = 'Возврат заказа';
+            }
+            return $text." №{$this->id}";
+        } else {
+            return $this->orderTypeAsText." №{$this->id}";
+        }
     }
 
     public function notifyNew()
@@ -439,6 +455,9 @@ class ShopOrder extends \skeeks\cms\models\Core
                     'shop_order_status_id',
 
                     'cms_user_id',
+
+                    'shop_cashebox_shift_id',
+                    'shop_cashebox_id',
                 ],
                 'integer',
             ],
@@ -453,6 +472,9 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ],
                 'string',
             ],
+
+            [['shop_cashebox_shift_id'], 'default', 'value' => null],
+            [['shop_cashebox_id'], 'default', 'value' => null],
 
             [['delivery_latitude', 'delivery_longitude'], 'number'],
 
@@ -477,11 +499,17 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
             [
                 [
+                    'is_order',
+                ],
+                'integer',
+            ],
+            [
+                [
                     'shop_pay_system_id',
                 ],
                 'required',
                 'when' => function () {
-                    return $this->is_created && ShopPaySystem::find()->active()->cmsSite()->exists();
+                    return ($this->is_order && $this->is_created && ShopPaySystem::find()->active()->cmsSite()->exists());
                 },
             ],
             /*[
@@ -509,9 +537,11 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['shop_pay_system_id',],
                 'default',
                 'value' => function () {
-                    $shopPaySystem = ShopPaySystem::find()->orderBy(['priority' => SORT_ASC])->active()->cmsSite()->one();
-                    if ($shopPaySystem) {
-                        return $shopPaySystem->id;
+                    if ($this->is_order) {
+                        $shopPaySystem = ShopPaySystem::find()->orderBy(['priority' => SORT_ASC])->active()->cmsSite()->one();
+                        if ($shopPaySystem) {
+                            return $shopPaySystem->id;
+                        }
                     }
                 },
             ],
@@ -555,26 +585,29 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
 
             [['is_created'], 'default', 'value' => 0],
+            [['is_order'], 'default', 'value' => 1],
             [
                 ['shop_order_status_id'],
                 'default',
                 'value' => function () {
-                    $shopOrder = ShopOrderStatus::find()->orderBy(['priority' => SORT_ASC])->one();
-                    if ($shopOrder) {
-                        return $shopOrder->id;
+                    if ($this->is_order) {
+                        $shopOrder = ShopOrderStatus::find()->orderBy(['priority' => SORT_ASC])->one();
+                        if ($shopOrder) {
+                            return $shopOrder->id;
+                        }
                     }
                 },
             ],
 
 
-            [
+            /*[
                 ['shop_person_type_id'],
                 'default',
                 'value' => function () {
                     $shopPersonType = \Yii::$app->shop->shopPersonTypes[0];
                     return $shopPersonType->id;
                 },
-            ],
+            ],*/
 
             [
                 'isNotifyChangeStatus',
@@ -756,10 +789,14 @@ class ShopOrder extends \skeeks\cms\models\Core
             'delivery_apartment_number' => "Номер квартиры",
             'delivery_comment'          => "Комментарий",
 
+            'is_order' => "Это заказ?",
+
             'shop_pay_system_id' => \Yii::t('skeeks/shop/app', 'Оплата'),
 
             'is_created'                   => \Yii::t('skeeks/shop/app', 'Заказ создан?'),
             'delivery_handler_data_jsoned' => "Данные службы доставки",
+            'shop_cashebox_shift_id'  => 'Смена',
+            'shop_cashebox_id'        => 'Касса',
         ];
     }
 
@@ -1526,6 +1563,14 @@ class ShopOrder extends \skeeks\cms\models\Core
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getShopPayments()
+    {
+        return $this->hasMany(ShopPayment::class, ['shop_order_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getShopCart()
     {
         return $this->hasOne(ShopUser::class, ['shop_order_id' => 'id']);
@@ -1714,5 +1759,21 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function getDiscount_percent_round()
     {
         return round($this->discount_percent, 2);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCasheboxShift()
+    {
+        return $this->hasOne(ShopCasheboxShift::class, ['id' => 'shop_cashebox_shift_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCashebox()
+    {
+        return $this->hasOne(ShopCashebox::class, ['id' => 'shop_cashebox_id']);
     }
 }

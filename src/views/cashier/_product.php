@@ -51,7 +51,7 @@ if ($storeProduct) {
             <?php endif; ?>
 
         </div>
-        <div class="price"><?php echo $model->shopProduct->baseProductPrice->money; ?></div>
+        <div class="price"><?php echo $model->shopProduct->getRetailPriceMoney(\Yii::$app->shop->backendShopStore); ?></div>
         <div class="label">0</div>
     </div>
 </div>

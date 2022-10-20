@@ -13,6 +13,7 @@ use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\money\Money;
 use skeeks\modules\cms\money\models\Currency;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
@@ -69,6 +70,7 @@ use yii\helpers\Json;
  * @property string                    $baseProductPriceCurrency
  *
  * @property ShopProductPrice          $baseProductPrice
+ * @property ShopProductPrice          $purchaseProductPrice
  * @property ShopProductPrice          $minProductPrice
  * @property ShopProductPrice[]        $viewProductPrices
  * @property ShopQuantityNoticeEmail[] $shopQuantityNoticeEmails
@@ -403,6 +405,26 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         if (\Yii::$app->shop->baseTypePrice) {
             $result->andWhere(['type_price_id' => \Yii::$app->shop->baseTypePrice->id]);
+        };
+
+        return $result;
+    }
+    /**
+     *
+     * Базовая цена по умолчанию
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPurchaseProductPrice()
+    {
+        $result = $this->hasOne(ShopProductPrice::class, [
+            'product_id' => 'id',
+        ]);
+
+        if (\Yii::$app->shop->purchaseTypePrice) {
+            $result->andWhere(['type_price_id' => \Yii::$app->shop->purchaseTypePrice->id]);
+        } else {
+            return null;
         };
 
         return $result;
@@ -1166,6 +1188,50 @@ class ShopProduct extends \skeeks\cms\models\Core
         }
 
         return $productPrice;
+    }
+
+
+    /**
+     * @param $shopStore
+     * @return Money
+     */
+    public function getRetailPriceMoney($shopStore)
+    {
+        $store = null;
+        if ($shopStore instanceof ShopStore) {
+            $store = $shopStore->id;
+        } else {
+            $store = (int)$shopStore;
+        }
+
+        $storeProduct = $this->getStoreProduct($store);
+        if ($storeProduct && $storeProduct->selling_price) {
+            return new Money($storeProduct->selling_price, \Yii::$app->money->currency_code);
+        } else {
+            return $this->baseProductPrice->money;
+        }
+    }
+
+
+    /**
+     * @param $shopStore
+     * @return Money
+     */
+    public function getPurchasePriceMoney($shopStore)
+    {
+        $store = null;
+        if ($shopStore instanceof ShopStore) {
+            $store = $shopStore->id;
+        } else {
+            $store = (int)$shopStore;
+        }
+
+        $storeProduct = $this->getStoreProduct($store);
+        if ($storeProduct && $storeProduct->purchase_price) {
+            return new Money($storeProduct->purchase_price, \Yii::$app->money->currency_code);
+        } else {
+            return $this->purchaseProductPrice->money;
+        }
     }
 
     /**

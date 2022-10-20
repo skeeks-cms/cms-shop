@@ -6,13 +6,6 @@
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 $this->registerCSS(<<<CSS
-
-h5 {
-    text-transform: uppercase;
-    font-size: 14px;
-    font-weight: bold;
-}
-
 .sx-fast-edit-value {
     padding: 5px;
 }

@@ -9,6 +9,8 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\money\Money;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -21,8 +23,13 @@ use yii\helpers\ArrayHelper;
  * @property int                 $is_active
  * @property int|null            $shop_cloudkassa_id
  *
+ * @property float               $balanceCash
+ * @property Money               $balanceCashMoney
+ *
  * @property CmsSite             $cmsSite
  * @property ShopCasheboxShift[] $shopCasheboxShifts
+ * @property ShopOrder[]         $shopOrders
+ * @property ShopPayment[]       $shopPayments
  * @property ShopStore           $shopStore
  * @property ShopCloudkassa      $shopCloudkassa
  */
@@ -117,6 +124,26 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
     }
 
     /**
+     * Gets query for [[ShopCasheboxShifts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopPayments()
+    {
+        return $this->hasMany(ShopPayment::className(), ['shop_cashebox_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ShopCasheboxShifts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopOrders()
+    {
+        return $this->hasMany(ShopOrder::className(), ['shop_cashebox_id' => 'id']);
+    }
+
+    /**
      * Gets query for [[ShopStore]].
      *
      * @return \yii\db\ActiveQuery
@@ -134,5 +161,24 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
     public function getShopCloudkassa()
     {
         return $this->hasOne(ShopCloudkassa::className(), ['id' => 'shop_cloudkassa_id']);
+    }
+
+    /**
+     * @return float
+     */
+    public function getBalanceCash()
+    {
+        $debit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CASH])->andWhere(['is_debit' => 1])->asArray()->one();
+        $creadit = $this->getShopPayments()->select(['sum' => new Expression("SUM(amount)")])->andWhere(['is_debit' => 0])->andWhere(['shop_store_payment_type' => ShopPayment::STORE_PAYMENT_TYPE_CASH])->asArray()->one();
+
+        return (float)(ArrayHelper::getValue($debit, "sum") - ArrayHelper::getValue($creadit, "sum"));
+    }
+
+    /**
+     * @return Money
+     */
+    public function getBalanceCashMoney()
+    {
+        return new Money((string)$this->balanceCash, \Yii::$app->money->currency_code);
     }
 }

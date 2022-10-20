@@ -143,8 +143,8 @@ return \yii\helpers\ArrayHelper::merge([
 
                         [
                             //'priority' => 40,
-                            'label'    => \Yii::t('skeeks/shop/app', 'Marketing'),
-                            "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
+                            'label' => \Yii::t('skeeks/shop/app', 'Marketing'),
+                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
                             'items' => [
 
@@ -185,28 +185,6 @@ return \yii\helpers\ArrayHelper::merge([
 
 
                         [
-                            "label" => \Yii::t('skeeks/shop/app', 'Облачные кассы'),
-                            "url"   => ["shop/admin-shop-cloudkassa"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
-                        ],
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Кассы'),
-                            "url"   => ["shop/admin-shop-cashebox"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
-                        ],
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Чеки'),
-                            "url"   => ["shop/admin-shop-check"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
-                        ],
-                        [
-                            "label" => \Yii::t('skeeks/shop/app', 'Смены'),
-                            "url"   => ["shop/admin-shop-cashebox-shift"],
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
-                        ],
-
-
-                        [
                             "label" => \Yii::t('skeeks/shop/app', 'Способы оплаты'),
                             "url"   => ["shop/admin-pay-system"],
                             "icon"  => "fab fa-cc-visa",
@@ -231,26 +209,76 @@ return \yii\helpers\ArrayHelper::merge([
     ],
 
     "shop-doc-move" => [
-        "label" => \Yii::t('skeeks/shop/app', 'Движение товара'),
-        "url"   => ["shop/admin-shop-store-doc-move"],
-        "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/icons8.png'],
+        "label"    => \Yii::t('skeeks/shop/app', 'Движение товара'),
+        "url"      => ["shop/admin-shop-store-doc-move"],
+        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/icons8.png'],
         'priority' => 270,
     ],
 
+    "shop-payment" => [
+        "label" => \Yii::t('skeeks/shop/app', 'Движение денег'),
+
+        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/business-color_money-coins_icon.svg'],
+        'priority' => 271,
+        'items'    => [
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Платежи'),
+                "url"   => ["shop/admin-payment"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/business-color_money-coins_icon.svg'],
+            ],
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Чеки'),
+                "url"   => ["shop/admin-shop-check"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+            ],
+
+        ],
+    ],
+
+    "shop-cashebox" => [
+        "label" => \Yii::t('skeeks/shop/app', 'Кассы и смены'),
+
+        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+        'priority' => 271,
+        'items'    => [
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Смены'),
+                "url"   => ["shop/admin-shop-cashebox-shift"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+            ],
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Кассы'),
+                "url"   => ["shop/admin-shop-cashebox"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+            ],
+
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Облачные кассы'),
+                "url"   => ["shop/admin-shop-cloudkassa"],
+                "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
+            ],
+
+        ],
+    ],
+
     "shop-store" => [
-        "label" => \Yii::t('skeeks/shop/app', 'Склады/Магазины'),
-        "url"   => ["shop/admin-shop-store"],
-        "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
-        'priority' => 272,
+        "label"    => \Yii::t('skeeks/shop/app', 'Магазины и склады'),
+        "url"      => ["shop/admin-shop-store"],
+        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
+        'priority' => 279,
     ],
 
     "shop-supplier" => [
-        "label" => \Yii::t('skeeks/shop/app', 'Поставщики'),
-        "url"   => ["shop/admin-shop-store-supplier"],
-        "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
-        'priority' => 273,
+        "label"    => \Yii::t('skeeks/shop/app', 'Поставщики'),
+        "url"      => ["shop/admin-shop-store-supplier"],
+        "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/lorrygreen.png'],
+        'priority' => 280,
     ],
-
 
 
 ], \skeeks\cms\shop\components\ShopComponent::getAdminShopProductsMenu());

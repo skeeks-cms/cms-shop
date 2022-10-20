@@ -1770,7 +1770,7 @@ body i.icon {
     overflow: hidden;
     word-break: break-word;
     font-weight: 500;
-    max-height: 60px;
+    max-height: 75px;
 }
 .edit-order-item-head .sx-title span {
     color: rgba(0,0,0,0.5);

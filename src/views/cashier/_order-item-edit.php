@@ -43,7 +43,7 @@
 
         </div>
         <div>
-            <?php if($model->shopProduct) : ?>
+            <?php if($model->shopProduct && $model->shopProduct->cmsContentElement->is_active) : ?>
                 <a class="btn btn-secondary" title="Открыть карточку на сайте" target="_blank" href="<?php echo $model->shopProduct->cmsContentElement->url; ?>"><i class="fas fa-external-link-alt"></i></a>
             <?php endif; ?>
         </div>
