@@ -44,7 +44,7 @@ if ($storeProduct) {
             </div>
         </div>
         <div class="text">
-            <div class="title"><span><?php echo $model->productName; ?></span></div>
+            <div class="title" title="<?php echo $model->productName; ?>"><span><?php echo $model->productName; ?></span></div>
             <div class="sku"><i class="fa icon fa-asterisk fa-fw"></i><span><?php echo $model->id; ?></span></div>
             <?php if ($barcodes = $model->shopProduct->shopProductBarcodes) : ?>
                 <div class="barcode"><i class="fa icon fa-barcode fa-fw"></i><span><?php echo implode(",", \yii\helpers\ArrayHelper::map($barcodes, 'id', 'value')); ?></span></div>

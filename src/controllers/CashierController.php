@@ -185,12 +185,26 @@ class CashierController extends BackendController
             if ($q) {
                 $q = trim($q);
                 $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
+
+                $qParts = explode(" ", $q);
+                $like = [];
+                $like[] = "AND";
+                foreach ($qParts as $part)
+                {
+                    $part = trim($part);
+                    if ($part) {
+                        $like[] = ['like', 'cce.name', $part];
+                    }
+                }
+                //print_r($like);die;
                 $query->andWhere([
                     'or',
-                    ['like', 'cce.name', $q],
+                    //['like', 'cce.name', $q],
+                    $like,
                     ['=', 'cce.id', $q],
                     ['=', 'barcodes.value', $q],
                 ]);
+
                 $query->groupBy("shopProduct.id");
             }
 
