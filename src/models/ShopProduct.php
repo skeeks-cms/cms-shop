@@ -374,7 +374,7 @@ class ShopProduct extends \skeeks\cms\models\Core
 
                 //print_r($shopProductBarcode->toArray());
                 if (!$shopProductBarcode->save()) {
-                    throw new Exception("Ошибка сохранения кода: {$shopProductBarcode->value}");
+                    throw new Exception("Ошибка сохранения кода: {$shopProductBarcode->value}" . print_r($shopProductBarcode->errors, true));
                 }
             }
         }

@@ -122,7 +122,7 @@ JS
 </div>
 
 <div class="row" style="margin-top: 10px;">
-    <div class="col-12">
+    
     <?php if (!$model->is_active) : ?>
 
 
@@ -300,6 +300,7 @@ JS
         </div>
 
     <?php else : ?>
+    <div class="col-12">
         <div class="sx-table-wrapper table-responsive">
             <table class="table sx-table">
                 <tr>
@@ -384,8 +385,9 @@ JS
 
             </table>
         </div>
-    <?php endif; ?>
     </div>
+
+    <?php endif; ?>
 </div>
 
 <?php
