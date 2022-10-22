@@ -239,7 +239,7 @@ CSS
 
                         'shop_store_id' => [
                             'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
-                                if ($shopStoreDocMove->shopOrder) {
+                                if ($shopStoreDocMove->shopStore) {
                                     return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
                                         'controllerId'            => '/shop/admin-shop-store',
                                         'modelId'                 => $shopStoreDocMove->shopStore->id,
