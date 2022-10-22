@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use violuke\Barcodes\BarcodeValidator;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -48,6 +49,25 @@ class ShopProductBarcode extends \skeeks\cms\base\ActiveRecord
     }
 
     /**
+     * @param $type
+     * @return string
+     */
+    static public function getBarcodeTypeFromValidator($type = '')
+    {
+        if ($type == BarcodeValidator::TYPE_EAN) {
+            return self::TYPE_EAN13;
+        } elseif($type == BarcodeValidator::TYPE_EAN_8) {
+            return self::TYPE_EAN8;
+        } elseif($type == BarcodeValidator::TYPE_UPC) {
+            return self::TYPE_UPC;
+        }elseif($type == BarcodeValidator::TYPE_GTIN) {
+            return self::TYPE_GTIN;
+        }
+        
+        return '';
+    }
+    
+    /**
      * {@inheritdoc}
      */
     public function rules()
@@ -60,17 +80,39 @@ class ShopProductBarcode extends \skeeks\cms\base\ActiveRecord
             [['shop_product_id', 'value'], 'unique', 'targetAttribute' => ['shop_product_id', 'value']],
             //[['shop_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopProduct::class, 'targetAttribute' => ['shop_product_id' => 'id']],
 
-            [['barcode_type'], 'default', 'value' => self::TYPE_EAN13],
 
             [['value'], 'trim'],
             [['barcode_type'], 'trim'],
 
-            [['value'], 'string', 'max' => 12, 'min' => 12, "when" => function() {
-                return $this->barcode_type == self::TYPE_UPC;
+            [['value'], 'string'],
+
+            [['value'], function($attribute) {
+                $bc_validator = new \violuke\Barcodes\BarcodeValidator($this->{$attribute});
+                if (!$bc_validator->isValid()) {
+                    $this->addError($attribute, "Штрихкод: " . $this->{$attribute} . " - не корректный");
+                    return false;
+                }
+
+                return true;
             }],
 
-            [['value'], 'string', 'max' => 13, 'min' => 13, "when" => function() {
-                return $this->barcode_type == self::TYPE_EAN13;
+            [['barcode_type'], 'default', 'value' => function() {
+                $bc_validator = new \violuke\Barcodes\BarcodeValidator($this->value);
+                if ($bc_validator->getType()) {
+                    return self::getBarcodeTypeFromValidator($bc_validator->getType());
+                }
+                
+                return '';
+            }],
+            
+            [['barcode_type'],  function() {
+                $bc_validator = new \violuke\Barcodes\BarcodeValidator($this->value);
+                if ($bc_validator->getType()) {
+                    $type = self::getBarcodeTypeFromValidator($bc_validator->getType());
+                    if ($type && $type != $this->barcode_type) {
+                        $this->barcode_type = $type;
+                    }
+                }
             }],
         ]);
     }

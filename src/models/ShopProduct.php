@@ -370,11 +370,14 @@ class ShopProduct extends \skeeks\cms\models\Core
                 }
 
                 $shopProductBarcode->value = $value;
-                $shopProductBarcode->barcode_type = $type;
+                if ($type) {
+                    $shopProductBarcode->barcode_type = $type;
+                }
 
                 //print_r($shopProductBarcode->toArray());
                 if (!$shopProductBarcode->save()) {
-                    throw new Exception("Ошибка сохранения кода: {$shopProductBarcode->value}" . print_r($shopProductBarcode->errors, true));
+                    throw new Exception("Ошибка сохранения кода: {$shopProductBarcode->value} (несуществующий или некорректный)");
+                    //throw new Exception("Ошибка сохранения кода: {$shopProductBarcode->value}" . print_r($shopProductBarcode->errors, true));
                 }
             }
         }
@@ -1334,7 +1337,15 @@ class ShopProduct extends \skeeks\cms\models\Core
         if (is_string($barcodes)) {
 
             $value = trim((string)$barcodes);
-            if (StringHelper::strlen($value) == 13) {
+            
+            $barcodes = [
+                [
+                    'value'        => $value,
+                    //'barcode_type' => ShopProductBarcode::TYPE_EAN13,
+                ],
+            ];
+        
+            /*if (StringHelper::strlen($value) == 13) {
                 $barcodes = [
                     [
                         'value'        => $value,
@@ -1350,7 +1361,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                         'barcode_type' => ShopProductBarcode::TYPE_UPC,
                     ],
                 ];
-            }
+            }*/
 
 
         } elseif (is_array($barcodes)) {
@@ -1359,7 +1370,13 @@ class ShopProduct extends \skeeks\cms\models\Core
             foreach ($barcodes as $key => $barcodeData) {
                 if (is_string($barcodeData) || is_int($barcodeData)) {
                     $value = trim((string)$barcodeData);
-                    if (StringHelper::strlen($value) == 13) {
+                    
+                    $barcodes[$key] = [
+                        'value'        => $value,
+                        //'barcode_type' => ShopProductBarcode::TYPE_EAN13,
+                    ];
+                    
+                    /*if (StringHelper::strlen($value) == 13) {
                         $barcodes[$key] = [
                             'value'        => $value,
                             'barcode_type' => ShopProductBarcode::TYPE_EAN13,
@@ -1369,7 +1386,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                             'value'        => $value,
                             'barcode_type' => ShopProductBarcode::TYPE_UPC,
                         ];
-                    }
+                    }*/
                 }
             }
         } else {
