@@ -141,47 +141,7 @@ return \yii\helpers\ArrayHelper::merge([
                         ],
 
 
-                        [
-                            //'priority' => 40,
-                            'label' => \Yii::t('skeeks/shop/app', 'Marketing'),
-                            "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
 
-                            'items' => [
-
-                                /*[
-                                    "label"     => \Yii::t('skeeks/shop/app', 'Rules for the basket'),
-                                    'items' =>
-                                    [
-                                        [
-                                            "label"     => \Yii::t('skeeks/shop/app', 'Rules for the basket'),
-                                            "url"       => ["shop/admin-discount1"],
-                                        ],
-            
-                                        [
-                                            "label"     => \Yii::t('skeeks/shop/app', 'Coupons of rules work to basket'),
-                                            "url"       => ["shop/admin-discsav1e"],
-                                        ]
-            
-                                    ]
-                                ],*/
-
-                                [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Discounts'),
-                                    "url"   => ["shop/admin-discount"],
-                                ],
-
-                                [
-                                    "label" => \Yii::t('skeeks/shop/app', 'Купоны'),
-                                    "url"   => ["shop/admin-discount-coupon"],
-                                ],
-
-                                /*[
-                                    "label" => \Yii::t('skeeks/shop/app', 'Cumulative discounts'),
-                                    "url"   => ["shop/admin-discsave"],
-                                ],*/
-
-                            ],
-                        ],
 
 
                         [
@@ -262,6 +222,37 @@ return \yii\helpers\ArrayHelper::merge([
                 "url"   => ["shop/admin-shop-cloudkassa"],
                 "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/cashier.png'],
             ],
+
+        ],
+    ],
+
+    "shop-marketing" => [
+        //'priority' => 40,
+        'label' => \Yii::t('skeeks/shop/app', 'Marketing'),
+        "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/marketing.png'],
+        'priority' => 278,
+
+        'items' => [
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Бонусы'),
+                "url"   => ["shop/admin-bonus-transaction"],
+            ],
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Discounts'),
+                "url"   => ["shop/admin-discount"],
+            ],
+
+            [
+                "label" => \Yii::t('skeeks/shop/app', 'Купоны'),
+                "url"   => ["shop/admin-discount-coupon"],
+            ],
+
+            /*[
+                "label" => \Yii::t('skeeks/shop/app', 'Cumulative discounts'),
+                "url"   => ["shop/admin-discsave"],
+            ],*/
 
         ],
     ],
