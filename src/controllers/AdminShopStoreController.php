@@ -247,6 +247,54 @@ HTML
                 ],
             ],
 
+            'orders' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'name'     => 'Продажи',
+                'priority' => 400,
+                'callback' => [$this, 'shift'],
+                'icon'     => 'fas fa-credit-card',
+
+                'controllerRoute' => "/shop/admin-order",
+                'relation'        => ['shop_store_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_store_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+            'cashebox' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'name'     => 'Кассы',
+                'priority' => 400,
+                'callback' => [$this, 'shift'],
+                'icon'     => 'fas fa-credit-card',
+
+                'controllerRoute' => "/shop/admin-shop-cashebox",
+                'relation'        => ['shop_store_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_store_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
             "create" => [
                 'fields' => [$this, 'updateFields'],
             ],
@@ -434,6 +482,10 @@ CSS
                         'allowNull' => false,
                     ],
                     'cashier_is_show_out_of_stock'       => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
+                    ],
+                    'cashier_is_show_only_inner_products'       => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
                     ],

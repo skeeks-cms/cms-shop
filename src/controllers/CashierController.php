@@ -27,6 +27,7 @@ use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProductMove;
 use yii\base\Exception;
 use yii\data\Pagination;
+use yii\db\Expression;
 
 /**
  * @property ShopCasheboxShift $shift текущая смена;
@@ -178,9 +179,35 @@ class CashierController extends BackendController
                         ShopProduct::TYPE_OFFER
                     ]
                 ])
+
                 ->from(['cce' => ShopCmsContentElement::tableName()])
+                ->addSelect("cce.*")
+                ->addSelect(['counter' => new Expression("count(cce.id)")])
+
                 ->innerJoinWith("shopProduct as shopProduct")
+                ->orderBy(['counter' => SORT_DESC])
                 ->groupBy(["cce.id"]);
+
+            $query->joinWith( "shopProduct.shopOrderItems as countOrders");
+
+            //Показывть только товары связанные со складом
+            if (\Yii::$app->shop->backendShopStore->cashier_is_show_only_inner_products) {
+                $query->innerJoin(['ssp' => ShopStoreProduct::tableName()], [
+                    'shopProduct.id' => new Expression('ssp.shop_product_id'),
+                    'ssp.shop_store_id' => \Yii::$app->shop->backendShopStore->id
+                ]);
+            }
+
+            if (!\Yii::$app->shop->backendShopStore->cashier_is_show_out_of_stock) {
+                $query->innerJoin(['ssp_quantity' => ShopStoreProduct::tableName()], [
+                    "AND",
+                    ['shopProduct.id' => new Expression('ssp_quantity.shop_product_id')],
+                    ['ssp_quantity.shop_store_id' => \Yii::$app->shop->backendShopStore->id],
+                    ['>', 'ssp_quantity.quantity', 0]
+                ]);
+            }
+
+            //print_r($query->createCommand()->rawSql);die;
 
             if ($q) {
                 $q = trim($q);

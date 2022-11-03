@@ -1123,6 +1123,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasMany(ShopProductRelation::className(), ['shop_product2_id' => 'id']);
     }
 
+
     /**
      * Gets query for [[ShopProductRelations]].
      *
@@ -1464,6 +1465,7 @@ class ShopProduct extends \skeeks\cms\models\Core
             return \Yii::$app->formatter->asDecimal(($this->width))." мм.";
         }
     }
+
     /**
      * @return string
      */

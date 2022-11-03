@@ -131,27 +131,102 @@ HTML
 
 
             'payments' => [
-                'class'    => BackendModelAction::class,
+                'class'    => BackendGridModelRelatedAction::class,
                 'name'     => 'Платежи',
                 'priority' => 90,
-                'callback' => [$this, 'payments'],
+                'callback' => [$this, 'shift'],
                 'icon'     => 'fas fa-credit-card',
+
+                'controllerRoute' => "/shop/admin-payment",
+                'relation'        => ['shop_cashebox_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_cashebox_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
             ],
+
 
             'orders' => [
-                'class'    => BackendModelAction::class,
+                'class'    => BackendGridModelRelatedAction::class,
                 'name'     => 'Продажи',
                 'priority' => 90,
-                'callback' => [$this, 'orders'],
+                'callback' => [$this, 'shift'],
                 'icon'     => 'fas fa-credit-card',
+
+                'controllerRoute' => "/shop/admin-order",
+                'relation'        => ['shop_cashebox_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_cashebox_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
             ],
 
+
             'checks' => [
-                'class'    => BackendModelAction::class,
+                'class'    => BackendGridModelRelatedAction::class,
                 'name'     => 'Чеки',
                 'priority' => 90,
-                'callback' => [$this, 'checks'],
+                'callback' => [$this, 'shift'],
                 'icon'     => 'fas fa-credit-card',
+
+                'controllerRoute' => "/shop/admin-shop-check",
+                'relation'        => ['shop_cashebox_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_cashebox_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+
+            'shifts' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'name'     => 'Смены',
+                'priority' => 90,
+                'callback' => [$this, 'shift'],
+                'icon'     => 'fas fa-credit-card',
+
+                'controllerRoute' => "/shop/admin-shop-cashebox-shift",
+                'relation'        => ['shop_cashebox_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_cashebox_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
             ],
 
             "create" => [
@@ -167,129 +242,6 @@ HTML
     }
 
 
-
-    public function payments()
-    {
-        if ($controller = \Yii::$app->createController('/shop/admin-payment')) {
-            /**
-             * @var $controller BackendController
-             * @var $indexAction BackendGridModelAction
-             */
-            $controller = $controller[0];
-            $controller->actionsMap = [
-                'index' => [
-                    'configKey' => $this->action->uniqueId,
-                ],
-            ];
-
-            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
-                $indexAction->url = $this->action->urlData;
-                $indexAction->filters = false;
-                $indexAction->backendShowings = false;
-                $visibleColumns = $indexAction->grid['visibleColumns'];
-                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
-                $indexAction->grid['visibleColumns'] = $visibleColumns;
-                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
-                $indexAction->grid['on init'] = function (Event $e) {
-                    /**
-                     * @var $query ActiveQuery
-                     */
-                    $query = $e->sender->dataProvider->query;
-                    $query->andWhere([
-                        'shop_cashebox_id' => $this->model->id,
-                    ]);
-                };
-
-
-
-                return $indexAction->run();
-            }
-        }
-
-        return '1';
-    }
-
-    public function orders()
-    {
-        if ($controller = \Yii::$app->createController('/shop/admin-order')) {
-            /**
-             * @var $controller BackendController
-             * @var $indexAction BackendGridModelAction
-             */
-            $controller = $controller[0];
-            $controller->actionsMap = [
-                'index' => [
-                    'configKey' => $this->action->uniqueId,
-                ],
-            ];
-
-            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
-                $indexAction->url = $this->action->urlData;
-                $indexAction->filters = false;
-                $indexAction->backendShowings = false;
-                $visibleColumns = $indexAction->grid['visibleColumns'];
-                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
-                $indexAction->grid['visibleColumns'] = $visibleColumns;
-                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
-                $indexAction->grid['on init'] = function (Event $e) {
-                    /**
-                     * @var $query ActiveQuery
-                     */
-                    $query = $e->sender->dataProvider->query;
-                    $query->andWhere([
-                        'shop_cashebox_id' => $this->model->id,
-                    ]);
-                };
-
-
-
-                return $indexAction->run();
-            }
-        }
-
-        return '1';
-    }
-
-    public function checks()
-    {
-        if ($controller = \Yii::$app->createController('/shop/admin-shop-check')) {
-            /**
-             * @var $controller BackendController
-             * @var $indexAction BackendGridModelAction
-             */
-            $controller = $controller[0];
-            $controller->actionsMap = [
-                'index' => [
-                    'configKey' => $this->action->uniqueId,
-                ],
-            ];
-
-            if ($indexAction = ArrayHelper::getValue($controller->actions, 'index')) {
-                $indexAction->url = $this->action->urlData;
-                $indexAction->filters = false;
-                $indexAction->backendShowings = false;
-                $visibleColumns = $indexAction->grid['visibleColumns'];
-                //ArrayHelper::removeValue($visibleColumns, 'shop_order_id');
-                $indexAction->grid['visibleColumns'] = $visibleColumns;
-                $indexAction->grid['columns']['actions']['isOpenNewWindow'] = true;
-                $indexAction->grid['on init'] = function (Event $e) {
-                    /**
-                     * @var $query ActiveQuery
-                     */
-                    $query = $e->sender->dataProvider->query;
-                    $query->andWhere([
-                        'shop_cashebox_id' => $this->model->id,
-                    ]);
-                };
-
-
-
-                return $indexAction->run();
-            }
-        }
-
-        return '1';
-    }
 
     public function updateFields($action)
     {

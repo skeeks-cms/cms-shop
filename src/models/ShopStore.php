@@ -36,6 +36,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property float               $cashier_is_allow_sell_out_of_stock Разрешить продажу товаров не в наличии?
  * @property float               $cashier_is_show_out_of_stock Показывать товары не в наличии?
+ * @property float               $cashier_is_show_only_inner_products Показывать товары только товары магазина?
  * @property integer             $cashier_default_cms_user_id Клиент по умолчанию
  *
  * @property integer             $is_sync_external Синхронизирован с внешней системой?
@@ -104,6 +105,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['is_sync_external'], 'integer'],
             [['is_allow_no_check'], 'integer'],
             [['cashier_is_allow_sell_out_of_stock'], 'integer'],
+            [['cashier_is_show_only_inner_products'], 'integer'],
             [['cashier_is_show_out_of_stock'], 'integer'],
 
             [['name'], 'string', 'max' => 255],
@@ -215,6 +217,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'purchase_extra_charge'              => 'Наценка',
             'selling_extra_charge'               => 'Наценка',
             'cashier_is_allow_sell_out_of_stock' => 'Разрешить продажу товаров не в наличии?',
+            'cashier_is_show_only_inner_products' => 'Показывать только товары магазина?',
             'cashier_is_show_out_of_stock'       => 'Показывать товары не в наличии?',
             'cashier_default_cms_user_id'        => 'Клиент выбранный по умолчанию',
             'is_allow_no_check'                  => 'Разрешить продажу без чека?',
@@ -228,6 +231,8 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeHints(), [
             'cashier_default_cms_user_id' => "Обязательно укажите этому клиенту email!",
+            'cashier_is_show_only_inner_products' => "При включении опции в магазине будут отображатся товары, только связанные с этим магазином.",
+            'cashier_is_allow_sell_out_of_stock' => "При включении опции в магазине возможно будет пробить товара больше чем числится в наличии.",
             'is_sync_external'            => 'Поставьте галочку если складской учет ведется во внешней системе (например в 1С, клаудшоп, мойсклад и т.д.)<br />Если же складской учет ведется в системе управления сайтом, то галочку не ставьте!',
             'is_allow_no_check'           => 'Если опция выбрана, то в момент оформления продажи или воврата на кассе, можно не выбивать чек.',
         ]);
