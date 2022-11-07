@@ -237,7 +237,12 @@ JS
                 ]); ?>
 
                 <?
-                $cacheBoxes = \Yii::$app->shop->backendShopStore->shopCasheboxes;
+                $cacheBoxes = \Yii::$app->shop->backendShopStore->getShopCasheboxes()
+                        ->innerJoinWith("shopCashebox2users as shopCashebox2users")
+                        ->andWhere(['shopCashebox2users.cms_user_id' => \Yii::$app->user->id])
+                        ->active()
+                        ->all()
+                ;
                 ?>
 
                 <?php if ($cacheBoxes) : ?>

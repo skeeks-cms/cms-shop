@@ -48,6 +48,7 @@ class m221103_162301__create_table__shop_cashebox2user extends Migration
         $this->createIndex($tableName.'__created_at', $tableName, 'created_at');
         $this->createIndex($tableName.'__cms_user_id', $tableName, 'cms_user_id');
         $this->createIndex($tableName.'__shop_cashebox_id', $tableName, 'shop_cashebox_id');
+        $this->createIndex($tableName.'__uniq', $tableName, ['shop_cashebox_id', 'cms_user_id'], true);
         $this->createIndex($tableName.'__is_active', $tableName, 'is_active');
 
         $this->addForeignKey(

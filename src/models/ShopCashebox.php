@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\Money;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -32,6 +33,8 @@ use yii\helpers\ArrayHelper;
  * @property ShopPayment[]       $shopPayments
  * @property ShopStore           $shopStore
  * @property ShopCloudkassa      $shopCloudkassa
+ * @property ShopCashebox2user[] $shopCashebox2users
+ * @property CmsUser[]           $workers
  */
 class ShopCashebox extends \skeeks\cms\base\ActiveRecord
 {
@@ -181,4 +184,26 @@ class ShopCashebox extends \skeeks\cms\base\ActiveRecord
     {
         return new Money((string)$this->balanceCash, \Yii::$app->money->currency_code);
     }
+
+    /**
+     * Gets query for [[ShopCashebox2users]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopCashebox2users()
+    {
+        return $this->hasMany(ShopCashebox2user::class, ['shop_cashebox_id' => 'id']);
+    }
+
+
+    /**
+     * Gets query for [[ShopCashebox2users]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWorkers()
+    {
+        return $this->hasMany(\Yii::$app->user->identityClass, ['id' => 'cms_user_id'])->viaTable('shop_cashebox2user', ['shop_cashebox_id' => 'id']);
+    }
+
 }

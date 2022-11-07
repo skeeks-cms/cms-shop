@@ -110,6 +110,9 @@ HTML
                         //'id',
                         'name',
                         'shop_store_id',
+                        'balance',
+                        'workers',
+
                         'is_active',
                     ],
                     'columns'        => [
@@ -123,6 +126,57 @@ HTML
                         'name' => [
                             'class'         => DefaultActionColumn::class,
                             'viewAttribute' => 'asText',
+                        ],
+
+                        'shop_store_id' => [
+                            'label'         => 'Магазин',
+                            'attribute'         => 'shop_store_id',
+                            'format'         => 'raw',
+                            'value' => function(ShopCashebox $model) {
+
+                                return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                    'controllerId'            => '/shop/admin-shop-store',
+                                    'modelId'                 => $model->shopStore->id,
+                                    'content'                 => $model->shopStore->name,
+                                    'isRunFirstActionOnClick' => true,
+                                    'options'                 => [
+                                        'class' => 'btn btn-xs btn-default',
+                                        //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    ],
+                                ]);
+                            },
+                        ],
+
+                        'balance' => [
+                            'label' => 'Наличных в кассе',
+                            'value' => function(ShopCashebox $model) {
+                                return $model->balanceCashMoney;
+                            }
+                        ],
+
+                        'workers' => [
+                            'label' => 'Кассиры',
+                            'format' => 'raw',
+                            'value' => function(ShopCashebox $model) {
+                                $result = [];
+                                if ($model->workers) {
+                                    foreach ($model->workers as $worker)
+                                    {
+                                        $result[] = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                            'controllerId'            => '/cms/admin-user',
+                                            'modelId'                 => $worker->id,
+                                            'content'                 => $worker->shortDisplayName,
+                                            'isRunFirstActionOnClick' => true,
+                                            'options'                 => [
+                                                'class' => 'btn btn-xs btn-default',
+                                                //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                            ],
+                                        ]);
+                                    }
+
+                                }
+                                return implode(" ", $result);
+                            }
                         ],
 
                     ],
@@ -213,6 +267,30 @@ HTML
                 'icon'     => 'fas fa-credit-card',
 
                 'controllerRoute' => "/shop/admin-shop-cashebox-shift",
+                'relation'        => ['shop_cashebox_id' => 'id'],
+                'on gridInit'     => function ($e) {
+                    /**
+                     * @var $action BackendGridModelRelatedAction
+                     */
+                    $action = $e->sender;
+                    $action->relatedIndexAction->backendShowings = false;
+                    $action->relatedIndexAction->filters = false;
+                    $visibleColumns = $action->relatedIndexAction->grid['visibleColumns'];
+
+                    ArrayHelper::removeValue($visibleColumns, 'shop_cashebox_id');
+                    $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
+
+                },
+            ],
+
+
+            'workers' => [
+                'class'    => BackendGridModelRelatedAction::class,
+                'name'     => 'Кассиры',
+                'priority' => 90,
+                'icon'     => 'fas fa-user',
+
+                'controllerRoute' => "/shop/admin-shop-cashebox-2user",
                 'relation'        => ['shop_cashebox_id' => 'id'],
                 'on gridInit'     => function ($e) {
                     /**

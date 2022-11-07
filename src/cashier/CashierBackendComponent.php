@@ -60,6 +60,16 @@ class CashierBackendComponent extends BackendComponent
         \Yii::$app->view->theme = $theme;
 
         $cmsManager = \Yii::$app->authManager;
+
+        $casheBoxes = \Yii::$app->shop->backendShopStore->getShopCasheboxes()
+            ->innerJoinWith("shopCashebox2users as shopCashebox2users")
+            ->andWhere(['shopCashebox2users.cms_user_id' => \Yii::$app->user->id])
+            ->active();
+
+        if (!$casheBoxes->all()) {
+            throw new ForbiddenHttpException("Нет доступных касс");
+        }
+
         //$cmsManager = new CmsManager();
         //$cmsManager->cmsSite = \Yii::$app->shop->backendShopStore->cmsSite;
         /*if (!$cmsManager->checkAccess(\Yii::$app->user->id, "shop/admin-shop-store-supplier")) {

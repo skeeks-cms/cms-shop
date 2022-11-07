@@ -57,7 +57,7 @@ class CashierController extends BackendController
      */
     public function init()
     {
-        $this->name = \Yii::t('skeeks/shop/app', 'Товары');
+        $this->name = "Касса";
 
         $this->permissionName = Cms::UPA_PERMISSION;
 
@@ -66,6 +66,21 @@ class CashierController extends BackendController
             $debug->panels = [];
         }
         parent::init();
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _initMetaData()
+    {
+        $data = [];
+        $data[] = $this->name;
+
+        if ($this->action && $this->action instanceof IHasName) {
+            $data[] = $this->action->name;
+        }
+        $this->view->title = implode(" / ", $data);
+        return $this;
     }
 
     /**

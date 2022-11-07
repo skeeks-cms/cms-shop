@@ -159,7 +159,18 @@ HTML
                             'attribute'         => 'shop_cashebox_id',
                             'format'         => 'raw',
                             'value' => function(ShopCasheboxShift $casheboxShift) {
-                                return $casheboxShift->shopCashebox->name;
+
+                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                        'controllerId'            => '/shop/admin-shop-cashebox',
+                                        'modelId'                 => $casheboxShift->shopCashebox->id,
+                                        'content'                 => $casheboxShift->shopCashebox->name,
+                                        'isRunFirstActionOnClick' => true,
+                                        'options'                 => [
+                                            'class' => 'btn btn-xs btn-default',
+                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                        ],
+                                    ]);
+
                             },
                         ],
                         'shop' => [
@@ -167,7 +178,17 @@ HTML
                             'attribute'         => 'shop_cashebox_id',
                             'format'         => 'raw',
                             'value' => function(ShopCasheboxShift $casheboxShift) {
-                                return $casheboxShift->shopCashebox->shopStore->name;
+
+                                return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                    'controllerId'            => '/shop/admin-shop-store',
+                                    'modelId'                 => $casheboxShift->shopCashebox->shopStore->id,
+                                    'content'                 => $casheboxShift->shopCashebox->shopStore->name,
+                                    'isRunFirstActionOnClick' => true,
+                                    'options'                 => [
+                                        'class' => 'btn btn-xs btn-default',
+                                        //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    ],
+                                ]);
                             },
                         ],
                         /*'is_active' => [
