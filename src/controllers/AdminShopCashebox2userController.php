@@ -124,7 +124,7 @@ HTML
 
                         'cashiers_name' => [
                             'value' => function(ShopCashebox2user $model) {
-                                return $model->cashiers_name ? $model->cashiers_name : $model->cmsUser->shortDisplayName;
+                                return $model->cashiersName;
                             }
                         ]
 

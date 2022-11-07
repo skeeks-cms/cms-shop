@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property int $is_active Активен?
  * @property string|null $cashiers_name Имя кассира на чеке
  * @property string|null $comment Комментарий
+ * @property string $cashiersName 
  *
  * @property CmsUser $cmsUser
  * @property ShopCashebox $shopCashebox
@@ -101,5 +102,13 @@ class ShopCashebox2user extends \skeeks\cms\base\ActiveRecord
     public function getShopCashebox()
     {
         return $this->hasOne(ShopCashebox::class, ['id' => 'shop_cashebox_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCashiersName()
+    {
+        return $this->cashiers_name ? $this->cashiers_name : $this->cmsUser->shortDisplayName;
     }
 }

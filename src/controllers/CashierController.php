@@ -14,6 +14,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\shop\models\ShopCashebox2user;
 use skeeks\cms\shop\models\ShopCasheboxShift;
 use skeeks\cms\shop\models\ShopCheck;
 use skeeks\cms\shop\models\ShopCmsContentElement;
@@ -1004,7 +1005,16 @@ class CashierController extends BackendController
                 }
 
 
-                $check->cashier_name = \Yii::$app->user->identity->shortDisplayName;
+                /**
+                 *
+                 */
+                $casheBox = $this->shift->shopCashebox;
+                /**
+                 * @var $shopCashebox2user ShopCashebox2user
+                 */
+                $shopCashebox2user = $casheBox->getShopCashebox2users()->andWhere(['cms_user_id' => \Yii::$app->user->identity->id])->one();
+
+                $check->cashier_name = $shopCashebox2user->cashiersName;
                 //$check->cashier_position = "Кассир"; //Взятьи из настроек кассы
                 $check->cashier_cms_user_id = \Yii::$app->user->id;
                 $check->amount = $order->amount;
