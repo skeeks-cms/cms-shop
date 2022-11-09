@@ -386,12 +386,16 @@
             //Выбор пользователя
             $("body").on('click', '.sx-user-find-menu .item', function (e) {
                 var ajaxQuery = self.createAjaxUpdateOrderUser($(this).data("id"));
-
-                /*ajaxQuery.on("success", function() {
-                    self.renderUserSelected();
-                });*/
-
                 ajaxQuery.execute();
+
+                return false;
+            });
+
+
+            //Общая скидка на заказ
+            $("body").on('click', '.sx-order-result-total-percent', function (e) {
+
+
 
                 return false;
             });

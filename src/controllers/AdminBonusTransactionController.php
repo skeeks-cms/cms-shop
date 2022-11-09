@@ -62,6 +62,17 @@ class AdminBonusTransactionController extends BackendModelStandartController
                         'created_at' => SORT_DESC,
                     ],
 
+                    'on init' => function (\yii\base\Event $e) {
+                        /**
+                         * @var $dataProvider ActiveDataProvider
+                         * @var $query ActiveQuery
+                         */
+                        $query = $e->sender->dataProvider->query;
+
+                        $query->cmsSite();
+
+                    },
+
                     'visibleColumns' => [
                         //'checkbox',
                         'actions',
