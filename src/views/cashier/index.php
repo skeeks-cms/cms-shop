@@ -17,17 +17,17 @@ $jsData = \yii\helpers\Json::encode([
     'backend_close_shift' => \yii\helpers\Url::to(['close-shift']),
     'backend-find-users'  => \yii\helpers\Url::to(['users']),
 
-    'backend-add-product'       => \yii\helpers\Url::to(['add-product']),
-    'backend-add-product-barcode'       => \yii\helpers\Url::to(['add-product-barcode']),
-    'backend-remove-order-item' => \yii\helpers\Url::to(['remove-order-item']),
-    'backend-clear-order-items' => \yii\helpers\Url::to(['clear-order-items']),
-    'backend-update-order-item' => \yii\helpers\Url::to(['update-order-item']),
-    'backend-update-order-user' => \yii\helpers\Url::to(['update-order-user']),
-    'backend-update-order-data' => \yii\helpers\Url::to(['update-order-data']),
-    'backend-order-create'      => \yii\helpers\Url::to(['order-create']),
+    'backend-add-product'         => \yii\helpers\Url::to(['add-product']),
+    'backend-add-product-barcode' => \yii\helpers\Url::to(['add-product-barcode']),
+    'backend-remove-order-item'   => \yii\helpers\Url::to(['remove-order-item']),
+    'backend-clear-order-items'   => \yii\helpers\Url::to(['clear-order-items']),
+    'backend-update-order-item'   => \yii\helpers\Url::to(['update-order-item']),
+    'backend-update-order-user'   => \yii\helpers\Url::to(['update-order-user']),
+    'backend-update-order-data'   => \yii\helpers\Url::to(['update-order-data']),
+    'backend-order-create'        => \yii\helpers\Url::to(['order-create']),
 
-    'backend-check-status'      => \yii\helpers\Url::to(['check-status']),
-    'backend-get-order-item-edit'      => \yii\helpers\Url::to(['get-order-item-edit']),
+    'backend-check-status'        => \yii\helpers\Url::to(['check-status']),
+    'backend-get-order-item-edit' => \yii\helpers\Url::to(['get-order-item-edit']),
 
     'order' => $controller->order->jsonSerialize(),
 ]);
@@ -139,7 +139,7 @@ JS
 
 
                         </div>
-                        <i class="fa icon fa-user-plus fa-fw sx-btn-hover sx-user-selected-element"></i></div>
+                        <i class="fa icon fa-user-plus fa-fw sx-btn-hover sx-user-create-element"></i></div>
 
                     <a href="" class="sx-user-find-clear sx-user-find-element">
                         <i class="fa icon fa-times fa-fw"></i>
@@ -238,11 +238,10 @@ JS
 
                 <?
                 $cacheBoxes = \Yii::$app->shop->backendShopStore->getShopCasheboxes()
-                        ->innerJoinWith("shopCashebox2users as shopCashebox2users")
-                        ->andWhere(['shopCashebox2users.cms_user_id' => \Yii::$app->user->id])
-                        ->active()
-                        ->all()
-                ;
+                    ->innerJoinWith("shopCashebox2users as shopCashebox2users")
+                    ->andWhere(['shopCashebox2users.cms_user_id' => \Yii::$app->user->id])
+                    ->active()
+                    ->all();
                 ?>
 
                 <?php if ($cacheBoxes) : ?>
@@ -450,14 +449,14 @@ JS
                                 <button class="ui button" data-type="<?php echo \skeeks\cms\shop\models\ShopPayment::STORE_PAYMENT_TYPE_CARD; ?>">Банковской картой</button>
                             </div>
 
-                            <?php if($controller->shift && $controller->shift->shopCashebox->shopCloudkassa) : ?>
+                            <?php if ($controller->shift && $controller->shift->shopCashebox->shopCloudkassa) : ?>
 
 
                                 <div class="ui huge basic fluid buttons" id="sx-is-print">
                                     <button class="ui active button" data-value="1">Печатать чек</button>
                                     <button class="ui button" data-value="0">Чек онлайн</button>
 
-                                    <?php if(\Yii::$app->shop->backendShopStore->is_allow_no_check) : ?>
+                                    <?php if (\Yii::$app->shop->backendShopStore->is_allow_no_check) : ?>
                                         <button class="ui button" data-value="2">Без чека</button>
                                     <?php endif; ?>
 
@@ -515,7 +514,7 @@ JS
         'id'           => 'sx-create-order-success',
         'header'       => 'Успешная продажа',
         'toggleButton' => false,
-    ]); */?><!--
+    ]); */ ?><!--
 
 
     <p>Продажа прошла успешно!</p>
@@ -524,7 +523,7 @@ JS
             <button class="ui large primary button sx-close-standart-modal">Закрыть</button>
         </div>
     </div>
-    <?php /*\yii\bootstrap\Modal::end(); */?>
+    <?php /*\yii\bootstrap\Modal::end(); */ ?>
 
 
     <?php /*\yii\bootstrap\Modal::begin([
@@ -532,7 +531,7 @@ JS
         'header'       => 'Ожидание чека',
         'toggleButton' => false,
         'closeButton'  => false,
-    ]); */?>
+    ]); */ ?>
 
 
     <div class="sx-check-wait">
@@ -541,8 +540,108 @@ JS
         <div class=""></div>
     </div>
 
-    --><?php /*\yii\bootstrap\Modal::end(); */?>
+    --><?php /*\yii\bootstrap\Modal::end(); */ ?>
 
 
 <?php endif; ?>
 
+
+<div class="sx-create-user-wrapper">
+    <div class="sx-create-header">
+        <div class="content">Создание клиента</div>
+        <div class="action"><i class="fa icon fa-times fa-fw"></i></div>
+    </div>
+    <div class="sx-create-body sx-cashier-edit-form">
+
+        <?php
+        $model = new \skeeks\cms\models\CmsUser();
+\skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
+        \Yii::$app->view->registerJs(<<<JS
+    $("#cmsuser-phone").mask("+7 999 999-99-99");
+
+    $(".sx-create-user-btn").on("click", function() {
+        $("#sx-create-user-form").submit();
+        return false;
+    });
+
+JS
+);
+
+        $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+            'enableAjaxValidation' => false,
+            'id' => 'sx-create-user-form',
+            'action' => \yii\helpers\Url::to(['create-user']),
+            //'validationUrl' => \skeeks\cms\helpers\UrlHelper::constructCurrent()->enableAjaxValidateForm()->toString(),
+            'clientCallback'       => new \yii\web\JsExpression(<<<JS
+    function (ActiveFormAjaxSubmit) {
+        
+        ActiveFormAjaxSubmit.on('success', function(e, response) {
+
+            var ajaxQuery = sx.CashierApp.createAjaxUpdateOrderUser(response.data.user.id);
+            ajaxQuery.execute();
+            
+        });
+        
+        ActiveFormAjaxSubmit.on('error', function(e, response) {
+            
+            ActiveFormAjaxSubmit.AjaxQueryHandler.set("allowResponseSuccessMessage", false);
+            ActiveFormAjaxSubmit.AjaxQueryHandler.set("allowResponseErrorMessage", false);
+            
+            $(".error-summary ul", ActiveFormAjaxSubmit.jForm).append("<li>" +  response.message + "</li>");
+            $(".error-summary", ActiveFormAjaxSubmit.jForm).show();
+        });
+    }
+JS
+            ),
+        ]); ?>
+
+
+        <?php echo $form->errorSummary($model); ?>
+
+
+        <?php echo $form->field($model, "phone")->textInput([
+            'autocomplete' => 'no'
+        ]); ?>
+        <?php echo $form->field($model, "first_name")->textInput([
+            'autocomplete' => 'no'
+        ]); ?>
+        <?php echo $form->field($model, "last_name")->textInput([
+            'autocomplete' => 'no'
+        ]); ?>
+        <?php echo $form->field($model, "patronymic")->textInput([
+            'autocomplete' => 'no'
+        ]); ?>
+        <?php echo $form->field($model, "email")->textInput([
+            'autocomplete' => 'no'
+        ]); ?>
+        <div style="display:none;" class="sx-real-gender">
+            <?php echo $form->field($model, "gender") ?>
+        </div>
+
+        <div class="form-group sx-gender-custom">
+            <label>Пол</label>
+            <div class="ui huge basic fluid buttons" data-real-element=".sx-real-gender input" id="gender-v1" style="margin-top: 12px;">
+                <button class="ui button" data-value="men">Мужчина</button>
+                <button class="ui button" data-value="women">Женщина</button>
+            </div>
+        </div>
+
+        <button type="submit" style="display: none;">Отправить</button>
+        <?php $form::end(); ?>
+
+        <!--<form action="<?php /*echo \yii\helpers\Url::to(['user-create']); */ ?>" id="sx-create-user-form">
+            <div class="form-group">
+                <label for="first_name">Имя</label>
+                <input type="text" id="first_name" name="first_name" value="">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Фамилия</label>
+                <input type="text" id="last_name" name="last_name" value="">
+            </div>
+        </form>-->
+
+    </div>
+    <div class="sx-create-footer">
+        <div class="btn btn-primary btn-block sx-create-user-btn">Создать клиента</div>
+    </div>
+</div>

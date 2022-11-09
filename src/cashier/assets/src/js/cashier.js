@@ -21,6 +21,7 @@
                 self.renderOrderResults();
                 self.renderUserSelected();
                 self.renderOrderType();
+                self.createUserFormClose();
             });
 
             this._initScanner();
@@ -176,6 +177,36 @@
                 return false;
             });
 
+            
+            //Все что касается создания клиента
+            //Отркрыть форму создания клиента
+            $("body").on("click", ".sx-create-header .action", function () {
+                self.createUserFormClose();
+                return false;
+            });
+
+            //Отркрыть форму создания клиента
+            $("body").on("click", ".sx-user-create-element", function () {
+
+                self.createUserFormOpen();
+                return false;
+            });
+
+
+            //Принять деньги финальное окно
+            $("body").on("click", ".sx-create-user-wrapper .buttons .button", function () {
+                var jWrapper = $(this).closest(".buttons");
+
+                var elementSelector = jWrapper.data("real-element");
+                $(elementSelector).val($(this).data("value"));
+                
+                $(".button", jWrapper).removeClass("active");
+                $(this).addClass("active");
+
+                return false;
+            });
+
+
             //Принять деньги финальное окно
             $("body").on("click", ".sx-checkout-btn", function () {
                 if ($(this).closest(".sx-checkout-btn-wrapper").hasClass("sx-lock")) {
@@ -190,14 +221,16 @@
 
                 return false;
             });
+
             //Принять деньги финальное окно
-            $("body").on("click", ".buttons .button", function () {
+            $("body").on("click", ".sx-pre-order .buttons .button", function () {
                 var jWrapper = $(this).closest(".buttons");
                 $(".button", jWrapper).removeClass("active");
                 $(this).addClass("active");
 
                 return false;
             });
+
 
             //Закрытие стандартного модального окна
             $("body").on("click", ".sx-close-standart-modal", function () {
@@ -476,6 +509,28 @@
             });
 
         },
+
+        /**
+         * Открыть форму создания клиента
+         * @returns {sx.classes.CashierApp}
+         */
+        createUserFormOpen: function() {
+            $(".sx-create-user-wrapper").css("right", "0");
+            return this;
+        },
+        /**
+         * Закрыть форму создания клиента
+         * @returns {sx.classes.CashierApp}
+         */
+        createUserFormClose: function() {
+            $(".sx-create-user-wrapper").css("right", "-40%");
+            //Чистка полей
+            $(".sx-create-user-wrapper input").val("");
+            $(".sx-create-user-wrapper .buttons .active").removeClass("active");
+            $(".sx-create-user-wrapper .error-summary").hide();
+            return this;
+        },
+
         /**
          * Прорисовка элементов необходимого типа товара
          * @returns {sx.classes.CashierApp}

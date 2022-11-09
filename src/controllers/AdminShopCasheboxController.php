@@ -149,6 +149,7 @@ HTML
 
                         'balance' => [
                             'label' => 'Наличных в кассе',
+                            'format' => 'raw',
                             'value' => function(ShopCashebox $model) {
                                 return $model->balanceCashMoney;
                             }

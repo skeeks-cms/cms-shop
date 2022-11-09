@@ -1181,4 +1181,55 @@ class CashierController extends BackendController
         }
     }
 
+    public function actionCreateUser()
+    {
+        $rr = new RequestResponse();
+        $user = new CmsUser();
+        
+        if ($rr->isRequestAjaxPost()) {
+            try {
+
+                if (!$user->load(\Yii::$app->request->post()) || !$user->validate()) {
+                    $message = "Проверьте корректность данных";
+
+                    $errors = $user->getFirstErrors();
+                    if ($errors) {
+                        $error = array_shift($errors);
+                        $message = $error;
+                    }
+
+                    throw new \yii\base\Exception($message);
+                } else {
+
+                    if (!$user->phone) {
+                        throw new \yii\base\Exception("Укажите телефон клиента!");
+                    }
+
+                    if (!$user->name) {
+                        throw new \yii\base\Exception("Укажите имя клиента!");
+                    }
+
+                    if (!$user->save()) {
+                        $errors = $user->getFirstErrors();
+                        if ($errors) {
+                            $error = array_shift($errors);
+                            $message = $error;
+                        }
+                        throw new \yii\base\Exception($message);
+                    }
+
+                    $rr->message = "Клиент добавлен";
+                    $rr->data = [
+                        'user' => $user->toArray()
+                    ];
+                    $rr->success = true;
+                }
+            } catch (\Exception $exception) {
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+        } 
+        return $rr;
+    }
+
 }
