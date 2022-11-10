@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -40,6 +41,14 @@ class AdminPaymentController extends BackendModelStandartController
     public function actions()
     {
         $result = ArrayHelper::merge(parent::actions(), [
+
+            "view" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 80,
+                'name'     => 'Просмотр',
+                'icon'     => 'fas fa-info-circle',
+            ],
+
             "index" => [
                 "filters" => [
                     "visibleFilters" => [
@@ -56,12 +65,13 @@ class AdminPaymentController extends BackendModelStandartController
                     'visibleColumns' => [
                         //'checkbox',
                         'actions',
-                        'id',
 
                         'created_at',
-                        'shop_order_id',
+
+                        'id',
 
                         'amount',
+                        'shop_order_id',
 
                         'cms_user_id',
 
@@ -72,6 +82,14 @@ class AdminPaymentController extends BackendModelStandartController
 
                     ],
                     'columns'        => [
+
+                        'id'             => [
+                            'value' => function(ShopPayment $model) {
+                                return \yii\helpers\Html::a( ($model->is_debit ? "Поступление " : "Оплата") . " #{$model->id}", "#", [
+                                    'class' => "sx-trigger-action",
+                                ]);
+                            }
+                        ],
 
                         'created_at' => [
                             'class' => DateTimeColumnData::class,
