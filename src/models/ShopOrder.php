@@ -358,27 +358,33 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function _beforeUpdateCallback(ModelEvent $e)
     {
         //После создания заказа делать его пересчет
+        $isRecalculate = false;
         if ($this->isAttributeChanged('is_created') && $this->is_created) {
             $this->created_at = time();
-            $this->recalculate();
+            $isRecalculate = true;
         }
 
         if ($this->isAttributeChanged('shop_delivery_id') && !$this->isAttributeChanged('delivery_amount')) {
 
-            $this->recalculate();
+            $isRecalculate = true;
         }
 
         if ($this->isAttributeChanged('delivery_handler_data_jsoned')) {
-            $this->recalculate();
+            $isRecalculate = true;
         }
 
         if ($this->isAttributeChanged('delivery_amount')) {
-            //$this->recalculate();
+            //$isRecalculate = true;
         }
 
         if ($this->isAttributeChanged('shop_pay_system_id')) {
+            $isRecalculate = true;
+        }
+
+        if ($isRecalculate) {
             $this->recalculate();
         }
+
 
         if ($this->isAttributeChanged('shop_order_status_id')) {
             $this->status_at = time();
@@ -1222,9 +1228,16 @@ class ShopOrder extends \skeeks\cms\models\Core
     public function recalculate()
     {
         $this->tax_amount = $this->calcMoneyVat->amount;
-        $this->amount = $this->calcMoney->amount;
+
         $this->discount_amount = $this->calcMoneyDiscount->amount;
         $this->delivery_amount = $this->calcMoneyDelivery->amount;
+
+        /*var_dump($this->delivery_amount);
+        print_r($this->calcMoneyDelivery);
+        print_r($this->moneyDelivery);
+        print_r($this->calcMoney->amount);
+        die;*/
+        $this->amount = $this->calcMoney->amount;
 
         $this->trigger(self::EVENT_AFTER_RECALCULATE, new Event());
 

@@ -294,6 +294,8 @@ class CartController extends Controller
                     $attributeForUpdate = array_keys($data);
                 }
 
+                $attributeForUpdate = ArrayHelper::merge($attributeForUpdate, ['amount']);
+
                 if (!$order->save(true, $attributeForUpdate)) {
                     $errors = $order->getFirstErrors();
                     if ($errors) {
@@ -304,6 +306,10 @@ class CartController extends Controller
                     throw new Exception(print_r($order->errors, true));
                 }
 
+                //$order->recalculate();
+                $order->refresh();
+
+                //print_r($order->toArray());
 
                 $rr->data = ArrayHelper::merge($order->jsonSerialize(), []);
                 $rr->success = true;

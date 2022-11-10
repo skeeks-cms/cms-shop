@@ -246,6 +246,8 @@ class ShopOrderItem extends ActiveRecord
      * Итоговая стоимость позиции без скидок и наценок
      * Цена товара в момент укладки товара в корзину
      *
+     * TODO: тут ошибка переписать
+     * @deprecated
      * @return Money
      */
     public function getMoneyOriginal()
@@ -333,6 +335,9 @@ class ShopOrderItem extends ActiveRecord
 
         if ($priceHelper->hasDiscount) {
             $this->discount_amount = $priceHelper->discountMoney->convertToCurrency(\Yii::$app->money->currencyCode)->amount;
+            if ($this->discount_amount) {
+                $this->amount = $this->amount + $this->discount_amount;
+            }
             $this->discount_name = implode(" + ", ArrayHelper::map($priceHelper->applyedDiscounts, 'id', 'name'));
             $this->discount_value = \Yii::$app->formatter->asPercent($priceHelper->percent);
         }
