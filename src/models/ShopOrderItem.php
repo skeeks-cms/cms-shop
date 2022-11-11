@@ -120,7 +120,7 @@ class ShopOrderItem extends ActiveRecord
                     \Yii::error("not saved: " . print_r($this->shopOrder->errors, true));
                     throw new Exception(print_r($this->shopOrder->errors, true));
                 } else {
-                    \Yii::error("saved: " . print_r($order->toArray(), true));
+                    //\Yii::error("saved: " . print_r($order->toArray(), true));
                 }
             } catch (\Exception $exception) {
                 print_r($exception->getMessage());die;
