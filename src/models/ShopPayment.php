@@ -24,6 +24,7 @@ use yii\helpers\ArrayHelper;
  * @property int               $created_at
  * @property int               $updated_at
  *
+ * @property integer           $cms_site_id
  * @property int               $cms_user_id Покупатель
  *
  * @property int               $shop_order_id Заказ
@@ -58,6 +59,7 @@ use yii\helpers\ArrayHelper;
  * @property ShopOrder         $shopOrder
  * @property ShopPaySystem     $shopPaySystem
  * @property Money             $money
+ * @property CmsSite           $cmsSite
  *
  * @property int           -$shop_buyer_id deprecated
  */
@@ -124,6 +126,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             ],
             [['shop_store_payment_type'], 'string'],
             [['shop_order_id'], 'required'],
+            [['cms_site_id'], 'integer'],
 
             [['shop_store_id'], 'default', 'value' => null],
             [['shop_cashebox_shift_id'], 'default', 'value' => null],
@@ -131,6 +134,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             [['shop_store_payment_type'], 'default', 'value' => null],
             [['shop_buyer_id'], 'default', 'value' => null],
             [['cms_user_id'], 'default', 'value' => null],
+            [['cms_site_id'], 'default', 'value' => \Yii::$app->skeeks->site->id],
 
             [['amount'], 'number'],
             [['external_data'], 'safe'],
@@ -168,7 +172,17 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             'external_name'           => Yii::t('skeeks/shop/app', 'External Name'),
             'external_id'             => Yii::t('skeeks/shop/app', 'External ID'),
             'external_data'           => Yii::t('skeeks/shop/app', 'External Data'),
+            'cms_site_id'             => \Yii::t('skeeks/shop/app', 'Site'),
         ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsSite()
+    {
+        $class = \Yii::$app->skeeks->siteClass;
+        return $this->hasOne($class, ['id' => 'cms_site_id']);
     }
 
     /**
