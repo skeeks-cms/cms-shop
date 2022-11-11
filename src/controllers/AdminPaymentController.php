@@ -15,6 +15,7 @@ use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopOrderChange;
 use skeeks\cms\shop\models\ShopPayment;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**
