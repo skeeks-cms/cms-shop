@@ -1314,7 +1314,7 @@ SQL
 
         $r = new \ReflectionClass($model);
         $className = $r->getShortName();
-        $cacheName = "agregateData_v6_" . $className."_" . $model->id;
+        $cacheName = "agregateData_" . $className."_" . $model->id . "_" . \Yii::$app->id;
 
         //Если это неиндексируемая страница с несколькими фильтрами, то нет смысла считать трудозатратные вещи и кэшировать это
         $isUseCache = false;

@@ -25,6 +25,8 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\money\Money;
+use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
+use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\filters\StringFilterField;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -1289,7 +1291,7 @@ HTML
                      */
                     $query = $e->dataProvider->query;
 
-                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == '0') {
+                    if (ArrayHelper::getValue($e->field->value, "mode") == FilterModeEmpty::ID || ArrayHelper::getValue($e->field->value, "mode") == FilterModeNotEmpty::ID ||ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == '0') {
 
                         $field->setIsHaving();
 
@@ -1560,7 +1562,7 @@ HTML
                      */
                     $query = $e->dataProvider->query;
 
-                    if (ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
+                    if (ArrayHelper::getValue($e->field->value, "mode") == FilterModeNotEmpty::ID || ArrayHelper::getValue($e->field->value, "mode") == FilterModeEmpty::ID || ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
 
                         $field->setIsHaving();
 

@@ -1035,7 +1035,7 @@ class CashierController extends BackendController
                 //Это формирование по правилам modulkassa
                 foreach ($order->shopOrderItems as $item) {
                     $itemData = [
-                        'name'          => $item->name,
+                        'name'          => StringHelper::substr($item->name, 0, 128),
                         'price'         => round($item->amount, 2),
                         'discSum'         => round($item->totalMoneyDiscount->amount, 2),
                         'quantity'      => (float)$item->quantity,
