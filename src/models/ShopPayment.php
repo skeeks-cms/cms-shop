@@ -77,6 +77,14 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
         return '{{%shop_payment}}';
     }
 
+    public function init()
+    {
+        $this->on(static::EVENT_AFTER_FIND, function () {
+            $this->amount = (float)$this->amount;
+        });
+        return parent::init();
+    }
+
     static public function getShopStorePaymentTypes()
     {
         return [
@@ -125,7 +133,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
                 'integer',
             ],
             [['shop_store_payment_type'], 'string'],
-            [['shop_order_id'], 'required'],
+            //[['shop_order_id'], 'required'],
             [['cms_site_id'], 'integer'],
 
             [['shop_store_id'], 'default', 'value' => null],

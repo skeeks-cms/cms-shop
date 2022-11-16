@@ -32,6 +32,24 @@ $this->render("@skeeks/cms/shop/views/admin-shop-store-doc-move/view-css");
                 Количество платежей
             </span>
             <span class="sx-properties--value">
+                <?php echo $model->getShopPayments()->count(); ?>
+            </span>
+        </li>
+
+        <li>
+            <span class="sx-properties--name">
+                Количество безналичных платежей
+            </span>
+            <span class="sx-properties--value">
+                <?php echo $model->getShopPayments()->andWhere(['shop_store_payment_type' => \skeeks\cms\shop\models\ShopPayment::STORE_PAYMENT_TYPE_CARD])->count(); ?>
+            </span>
+        </li>
+
+        <li>
+            <span class="sx-properties--name">
+                Количество наличных платежей
+            </span>
+            <span class="sx-properties--value">
                 <?php echo $model->getShopPayments()->andWhere(['shop_store_payment_type' => \skeeks\cms\shop\models\ShopPayment::STORE_PAYMENT_TYPE_CASH])->count(); ?>
             </span>
         </li>

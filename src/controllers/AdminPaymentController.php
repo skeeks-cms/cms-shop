@@ -13,8 +13,20 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsUser;
+use skeeks\cms\shop\models\ShopCashebox;
+use skeeks\cms\shop\models\ShopCheck;
+use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrderChange;
 use skeeks\cms\shop\models\ShopPayment;
+use skeeks\cms\shop\models\ShopPaySystem;
+use skeeks\cms\shop\models\ShopStore;
+use skeeks\cms\widgets\AjaxSelectModel;
+use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\NumberField;
+use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
@@ -189,13 +201,170 @@ class AdminPaymentController extends BackendModelStandartController
                     ],
                 ],
             ],
+
+            'create' => [
+                'fields'        => [$this, 'updateFields'],
+                'buttons'         => ["save"],
+            ]
         ]);
 
-        ArrayHelper::remove($result, "create");
+       /// ArrayHelper::remove($result, "create");
         ArrayHelper::remove($result, "update");
         ArrayHelper::remove($result, "delete");
         ArrayHelper::remove($result, "delete-multi");
 
         return $result;
     }
+
+    public function updateFields($action)
+    {
+        $model = $action->model;
+
+        $result = [
+            'main'         => [
+                'class'  => FieldSet::class,
+                'name'   => \Yii::t('skeeks/shop/app', 'Main'),
+                'fields' => [
+
+                    'is_debit' => [
+                        'class'       => SelectField::class,
+                        'label' => 'Тип операции',
+                        'items' => [
+                            '1' => 'Нам поступили деньги/Внесли деньги в кассу',
+                            '0' => 'Мы заплатили/выплатили/выдали из кассы',
+                        ],
+                    ],
+
+                    'cms_user_id' => [
+                        'class'        => WidgetField::class,
+                        'label' => 'Контрагент',
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => CmsUser::class,
+                            'searchQuery' => function($word = '') {
+                                $query = CmsUser::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+                    ],
+
+                    'amount' => [
+                        'class'        => NumberField::class,
+                    ],
+
+                    'comment' => [
+                        'class'        => TextareaField::class,
+                    ],
+                ],
+            ],
+
+            'shop'         => [
+                'class'  => FieldSet::class,
+                'name'   => "Связь с магазном",
+                'fields' => [
+
+
+                    'shop_store_id' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => ShopStore::class,
+                            'searchQuery' => function($word = '') {
+                                $query = ShopStore::find()->isSupplier(false)->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+                    ],
+
+                    'shop_cashebox_id' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => ShopCashebox::class,
+                            'searchQuery' => function($word = '') {
+                                $query = ShopCashebox::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+                    ],
+
+                    'shop_store_payment_type' => [
+                        'class'       => SelectField::class,
+                        'label' => 'Тип оплаты в магазине',
+                        'items' => ShopPayment::getShopStorePaymentTypes(),
+                    ],
+
+                ],
+            ],
+
+            'relations'         => [
+                'class'  => FieldSet::class,
+                'name'   => "Дополнительны связи",
+                'fields' => [
+
+
+                    'shop_order_id' => [
+                        'class'        => WidgetField::class,
+                        'label' => 'Заказ/Продажа/Возврат',
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => ShopOrder::class,
+                            'searchQuery' => function($word = '') {
+                                $query = ShopOrder::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+                    ],
+
+                    'shop_check_id' => [
+                        'class'        => WidgetField::class,
+                        'label' => 'Чек',
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => ShopCheck::class,
+                            'searchQuery' => function($word = '') {
+                                $query = ShopCheck::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+                    ],
+
+                    'shop_pay_system_id' => [
+                        'class'        => WidgetField::class,
+                        'label' => 'Способ олплаты на сайте',
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => ShopPaySystem::class,
+                            'searchQuery' => function($word = '') {
+                                $query = ShopPaySystem::find()->cmsSite();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },
+                        ],
+                    ],
+                ],
+            ],
+
+        ];
+
+        return $result;
+    }
+
 }
