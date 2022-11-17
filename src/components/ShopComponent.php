@@ -1309,12 +1309,12 @@ SQL
      * @param ActiveQuery $q
      * @return array
      */
-    static public function getAgregateCategoryData(ActiveQuery $q, $model, $filtersData = [])
+    static public function getAgregateCategoryData(ActiveQuery $q, $model, $filtersData = [], $availableFilter = 0)
     {
 
         $r = new \ReflectionClass($model);
         $className = $r->getShortName();
-        $cacheName = "agregateData_" . $className."_" . $model->id . "_" . \Yii::$app->id;
+        $cacheName = "agregateData_" . $className."_" . $model->id . "_" . \Yii::$app->id . "_" . $availableFilter;
 
         //Если это неиндексируемая страница с несколькими фильтрами, то нет смысла считать трудозатратные вещи и кэшировать это
         $isUseCache = false;
