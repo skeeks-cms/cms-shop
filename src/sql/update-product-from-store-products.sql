@@ -137,7 +137,7 @@ SELECT
     UNIX_TIMESTAMP(),
     product_id,
     type_price_id,
-    if(price is null, 0, price) as price,
+    if(price is null, 0, ROUND(price)) as price,
     "RUB"
 FROM (
     SELECT
@@ -199,7 +199,7 @@ UPDATE
     INNER JOIN (
         SELECT
             subq.id,
-            if(subq.price is null, 0, subq.price) as price
+            if(subq.price is null, 0, ROUND(subq.price)) as price
         FROM
         (SELECT
                 spp.id,
