@@ -206,7 +206,7 @@ class AvailabilityFiltersHandler extends Model
             return [
                 0 => 'Все',
                 //1 => 'В наличии',
-                2 => 'В наличии',
+                2 => 'В наличии и под заказ',
             ];
         }
 
