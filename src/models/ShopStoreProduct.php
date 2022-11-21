@@ -135,7 +135,7 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::rules(), [
 
-            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            [['created_at', 'updated_at'], 'integer'],
 
 
             [['quantity'], 'number'],

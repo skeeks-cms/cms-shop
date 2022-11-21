@@ -13,10 +13,6 @@ use yii\helpers\ArrayHelper;
  * This is the model class for table "{{%shop_product_price}}".
  *
  * @property integer                  $id
- * @property integer                  $created_by
- * @property integer                  $updated_by
- * @property integer                  $created_at
- * @property integer                  $updated_at
  * @property integer                  $product_id
  * @property integer                  $type_price_id
  * @property float                    $price
@@ -172,10 +168,6 @@ class ShopProductPrice extends \skeeks\cms\models\Core
         return [
             [
                 [
-                    'created_by',
-                    'updated_by',
-                    'created_at',
-                    'updated_at',
                     'product_id',
                     'type_price_id',
                     'is_fixed',
@@ -197,10 +189,6 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     {
         return [
             'id'            => \Yii::t('skeeks/shop/app', 'ID'),
-            'created_by'    => \Yii::t('skeeks/shop/app', 'Created By'),
-            'updated_by'    => \Yii::t('skeeks/shop/app', 'Updated By'),
-            'created_at'    => \Yii::t('skeeks/shop/app', 'Created At'),
-            'updated_at'    => \Yii::t('skeeks/shop/app', 'Updated At'),
             'product_id'    => \Yii::t('skeeks/shop/app', 'Product ID'),
             'type_price_id' => \Yii::t('skeeks/shop/app', 'Type Price ID'),
             'price'         => \Yii::t('skeeks/shop/app', 'Price'),
