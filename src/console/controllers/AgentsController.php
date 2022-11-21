@@ -62,15 +62,23 @@ class AgentsController extends Controller
      */
     public function actionUpdateReceiverSites()
     {
-        $q = ShopSite::find()->where(['is_receiver' => 1])->orderBy(['id' => SORT_DESC]);
+        $q = \skeeks\cms\shop\models\CmsSite::find()
+            ->active()
+            ->innerJoinWith("shopSite as shopSite")
+            ->andWhere(['shopSite.is_receiver' => 1])
+            ->orderBy(['id' => SORT_DESC]);
+            
+        /*$q = ShopSite::find()
+            ->where(['is_receiver' => 1])
+            ->orderBy(['id' => SORT_DESC]);*/
         /**
          * @var $shopSite ShopSite
          */
         if ($q->count()) {
             $this->stdout("Найдено сайтов получателей: " . $q->count() . "\n");
-            foreach ($q->each(10) as $shopSite) {
-                $this->stdout("\tСайт: " . $shopSite->id . "\n");
-                \common\modules\sitika\components\ShopComponent::importNewProductsOnSite($shopSite->cmsSite);
+            foreach ($q->each(10) as $cmsSite) {
+                $this->stdout("\tСайт: " . $cmsSite->id . "\n");
+                \common\modules\sitika\components\ShopComponent::importNewProductsOnSite($cmsSite);
             }
         }
     }

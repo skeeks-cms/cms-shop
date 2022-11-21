@@ -7,10 +7,8 @@ SET @site_id = {site_id};
  * Создание недостающих закупочных цен
  */
 INSERT IGNORE
-    INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
+    INTO shop_product_price (`product_id`, `type_price_id`, `price`, `currency_code`)
 SELECT
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
     product_id,
     type_price_id,
     if(price is null, 0, price) as price,
@@ -131,10 +129,8 @@ SET
  * Создание недостающих розничных цен
  */
 INSERT IGNORE
-    INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
+    INTO shop_product_price (`product_id`, `type_price_id`, `price`, `currency_code`)
 SELECT
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
     product_id,
     type_price_id,
     if(price is null, 0, ROUND(price)) as price,
