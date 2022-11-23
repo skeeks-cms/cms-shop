@@ -471,7 +471,7 @@ $receiverAttributes = $model->getReceiverAttributes();
                     <?php endif; ?>
                     <?php if ($model->delivery_comment) : ?>
                         <div class="row sx-data-row">
-                            <div class="col-3">Коментарий
+                            <div class="col-3">Комментарий
                             </div>
                             <div class="col-9">
                                 <?php echo $model->delivery_comment; ?>

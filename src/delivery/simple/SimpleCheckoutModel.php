@@ -175,7 +175,7 @@ class SimpleCheckoutModel extends DeliveryCheckoutModel
         if ($this->comment) {
             $result['comment'] = [
                 'value' => $this->comment,
-                'label' => 'Коментарий к адресу',
+                'label' => 'Комментарий к адресу',
             ];
         }
 
