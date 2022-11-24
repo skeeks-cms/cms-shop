@@ -297,22 +297,23 @@ class ShopComponent extends Component implements BootstrapInterface
             return $this->_shopUser;
         }
 
+        $session =  \Yii::$app->session;
         //Если пользователь гость
         if (isset(\Yii::$app->user) && \Yii::$app->user && \Yii::$app->user->isGuest) {
             //Проверка сессии
-            if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
-                $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
-                $shopCart = ShopUser::find()->where(['id' => $fuserId])->one();
-                //Поиск юзера
-                if ($shopCart) {
-                    $this->_shopUser = $shopCart;
+            if ($session->getHasSessionId() || $session->getIsActive()) {
+                if ($session->offsetExists($this->sessionFuserName)) {
+                    $fuserId = $session->get($this->sessionFuserName);
+                    $shopCart = ShopUser::find()->where(['id' => $fuserId])->one();
+                    //Поиск юзера
+                    if ($shopCart) {
+                        $this->_shopUser = $shopCart;
+                    }
                 }
             }
 
             if (!$this->_shopUser) {
                 $shopCart = new ShopUser();
-                //$shopCart->save();
-                //\Yii::$app->getSession()->set($this->sessionFuserName, $shopCart->id);
                 $this->_shopUser = $shopCart;
             }
         } else {
@@ -325,8 +326,8 @@ class ShopComponent extends Component implements BootstrapInterface
             //Если у авторизовнного пользоывателя уже есть пользователь корзины
             if ($this->_shopUser) {
                 //Проверка сессии, а было ли чего то в корзине
-                if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
-                    $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
+                if ($session->offsetExists($this->sessionFuserName)) {
+                    $fuserId = $session->get($this->sessionFuserName);
                     $shopCart = ShopUser::find()->where(['id' => $fuserId])->one();
 
                     /**
@@ -338,12 +339,12 @@ class ShopComponent extends Component implements BootstrapInterface
                     }
 
                     //Эти данные в сессии больше не нужны
-                    \Yii::$app->getSession()->remove($this->sessionFuserName);
+                    $session->remove($this->sessionFuserName);
                 }
             } else {
                 //Проверка сессии, а было ли чего то в корзине
-                if (\Yii::$app->getSession()->offsetExists($this->sessionFuserName)) {
-                    $fuserId = \Yii::$app->getSession()->get($this->sessionFuserName);
+                if ($session->offsetExists($this->sessionFuserName)) {
+                    $fuserId = $session->get($this->sessionFuserName);
                     $shopCart = ShopUser::find()->where(['id' => $fuserId])->one();
                     //Поиск юзера
                     /**
@@ -355,7 +356,7 @@ class ShopComponent extends Component implements BootstrapInterface
                     }
 
                     $this->_shopUser = $shopCart;
-                    \Yii::$app->getSession()->remove($this->sessionFuserName);
+                    $session->remove($this->sessionFuserName);
                 } else {
                     $shopCart = new ShopUser([
                         'cms_user_id' => \Yii::$app->user->identity->id,

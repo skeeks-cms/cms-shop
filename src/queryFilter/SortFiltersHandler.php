@@ -74,11 +74,13 @@ class SortFiltersHandler extends Model
      */
     public function getCurrentValue()
     {
-        if (\Yii::$app->session->offsetExists("sx-sort-value")) {
-            $value = (string) \Yii::$app->session->get("sx-sort-value");
-            $options = $this->getSortOptions();
-            if (isset($options[$value])) {
-                return $value;
+        if (\Yii::$app->session->getHasSessionId() || \Yii::$app->session->getIsActive()) {
+            if (\Yii::$app->session->offsetExists("sx-sort-value")) {
+                $value = (string) \Yii::$app->session->get("sx-sort-value");
+                $options = $this->getSortOptions();
+                if (isset($options[$value])) {
+                    return $value;
+                }
             }
         }
 
