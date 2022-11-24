@@ -57,13 +57,16 @@ class AvailabilityFiltersHandler extends Model
      */
     public function getCurrentValue()
     {
-        if (\Yii::$app->session->offsetExists("sx-available-value")) {
-            $value = (int) \Yii::$app->session->get("sx-available-value");
-            $options = $this->getOptions();
-            if (isset($options[$value])) {
-                return $value;
+        if (\Yii::$app->session->getHasSessionId() || \Yii::$app->session->getIsActive()) {
+            if (\Yii::$app->session->offsetExists("sx-available-value")) {
+                $value = (int) \Yii::$app->session->get("sx-available-value");
+                $options = $this->getOptions();
+                if (isset($options[$value])) {
+                    return $value;
+                }
             }
         }
+
 
         return (int) \Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity;
     }

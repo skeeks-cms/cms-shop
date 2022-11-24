@@ -794,15 +794,13 @@ SQL
         \Yii::$app->db->createCommand(<<<SQL
 /*Создание недостающих цен у товаров с пердложениями*/
 INSERT IGNORE
-    INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
+    INTO shop_product_price (`product_id`, `type_price_id`, `price`, `currency_code`)
 select
 	/*sp.offers_pid,
     sp_price.type_price_id,
     min(sp_price.price) as min_price,
     sp_price.**/
 
-    UNIX_TIMESTAMP(),
-    UNIX_TIMESTAMP(),
     sp.offers_pid,
     sp_price.type_price_id,
     min(sp_price.price) as min_price,
