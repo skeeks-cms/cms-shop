@@ -60,6 +60,10 @@ class CashierController extends BackendController
     {
         $this->name = "Касса";
 
+        if (\Yii::$app->shop->backendShopStore) {
+            $this->name = "Касса / " . \Yii::$app->shop->backendShopStore->name;
+        }
+
         $this->permissionName = Cms::UPA_PERMISSION;
 
         //Эта панелька мешается
