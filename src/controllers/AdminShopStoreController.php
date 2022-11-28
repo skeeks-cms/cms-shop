@@ -339,6 +339,11 @@ CSS
                     'is_sync_external' => [
                         'class'     => BoolField::class,
                         'allowNull' => false,
+                    ],
+
+                    'is_personal_price' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ]
                 ],
             ],

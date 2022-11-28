@@ -1205,7 +1205,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         }
 
         $storeProduct = $this->getStoreProduct($store);
-        if ($storeProduct && $storeProduct->selling_price) {
+        if ($storeProduct && $storeProduct->shopStore->is_personal_price && $storeProduct->selling_price) {
             return new Money($storeProduct->selling_price, \Yii::$app->money->currency_code);
         } else {
             return $this->baseProductPrice->money;
@@ -1227,7 +1227,7 @@ class ShopProduct extends \skeeks\cms\models\Core
         }
 
         $storeProduct = $this->getStoreProduct($store);
-        if ($storeProduct && $storeProduct->purchase_price) {
+        if ($storeProduct && $storeProduct->shopStore->is_personal_price && $storeProduct->purchase_price) {
             return new Money($storeProduct->purchase_price, \Yii::$app->money->currency_code);
         } else {
             return $this->purchaseProductPrice->money;

@@ -33,6 +33,7 @@ use yii\helpers\ArrayHelper;
  * @property string              $source_purchase_price
  * @property float               $purchase_extra_charge
  * @property float               $selling_extra_charge
+ * @property bool               $is_personal_price
  *
  * @property float               $cashier_is_allow_sell_out_of_stock Разрешить продажу товаров не в наличии?
  * @property float               $cashier_is_show_out_of_stock Показывать товары не в наличии?
@@ -128,6 +129,9 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['is_supplier'], 'integer'],
             [['is_supplier'], 'default', 'value' => 0],
 
+            [['is_personal_price'], 'integer'],
+            [['is_personal_price'], 'default', 'value' => 0],
+
             [['is_sync_external'], 'default', 'value' => 1],
             [['is_allow_no_check'], 'default', 'value' => 0],
 
@@ -212,6 +216,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'address'                            => 'Адрес',
             'coordinates'                        => '',
             'is_supplier'                        => 'Поставщик?',
+            'is_personal_price'                        => 'У товаров этого магазина своя цена?',
             'source_selling_price'               => 'Цена поставщика',
             'source_purchase_price'              => 'Цена поставщика',
             'purchase_extra_charge'              => 'Наценка',
@@ -235,6 +240,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'cashier_is_allow_sell_out_of_stock' => "При включении опции в магазине возможно будет пробить товара больше чем числится в наличии.",
             'is_sync_external'            => 'Поставьте галочку если складской учет ведется во внешней системе (например в 1С, клаудшоп, мойсклад и т.д.)<br />Если же складской учет ведется в системе управления сайтом, то галочку не ставьте!',
             'is_allow_no_check'           => 'Если опция выбрана, то в момент оформления продажи или воврата на кассе, можно не выбивать чек.',
+            'is_personal_price'           => 'Если включена эта опция, значит у товаров в этом магазине может быть своя цена, отличающаяся от интернет магазина.',
         ]);
     }
 

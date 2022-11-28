@@ -1153,7 +1153,11 @@ JS
                     ?>
 
                     <?php if ($shopStores = \Yii::$app->skeeks->site->getShopStores()->andWhere(['is_supplier' => 0])->all()) : ?>
-                        <?php foreach ($shopStores as $shopStore) : ?>
+                        <?php
+                        /**
+                         * @var $shopStore \skeeks\cms\shop\models\ShopStore
+                         */
+                        foreach ($shopStores as $shopStore) : ?>
                             <?php
                             $storeProduct = $model->shopProduct->getStoreProduct($shopStore);
                             $totalPrice = $noValue;
@@ -1199,7 +1203,7 @@ JS
                                         <?php
                                         $purchasePrice = null;
                                          $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
-                                         if ($shopStoreProduct && $shopStoreProduct->purchase_price): ?>
+                                         if ($shopStore->is_personal_price && $shopStoreProduct && $shopStoreProduct->purchase_price): ?>
                                             <?php echo new \skeeks\cms\money\Money((string) $shopStoreProduct->purchase_price, \Yii::$app->money->currency_code); ?>
                                         <?php else : ?>
                                              <?php if(\Yii::$app->shop->purchaseTypePrice) : ?>
@@ -1280,7 +1284,7 @@ JS
                                 <td>
                                     <?php
                                      $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
-                                     if ($shopStoreProduct && $shopStoreProduct->selling_price): ?>
+                                     if ($shopStore->is_personal_price && $shopStoreProduct && $shopStoreProduct->selling_price): ?>
                                         <?php echo new \skeeks\cms\money\Money((string) $shopStoreProduct->selling_price, \Yii::$app->money->currency_code); ?>
                                     <?php else : ?>
                                         <?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?>
