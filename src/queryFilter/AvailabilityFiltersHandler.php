@@ -198,17 +198,21 @@ class AvailabilityFiltersHandler extends Model
 
     public function getOptions()
     {
-        if (\Yii::$app->shop->stores) {
+        if (\Yii::$app->shop->stores && \Yii::$app->shop->supplierStores) {
             return [
                 0 => 'Все',
                 1 => 'В наличии',
                 2 => 'В наличии и под заказ',
             ];
 
+        } elseif (\Yii::$app->shop->stores) {
+            return [
+                0 => 'Все товары',
+                1 => 'Только в наличии',
+            ];
         } else {
             return [
                 0 => 'Все',
-                //1 => 'В наличии',
                 2 => 'В наличии и под заказ',
             ];
         }

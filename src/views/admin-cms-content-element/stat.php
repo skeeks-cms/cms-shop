@@ -34,12 +34,12 @@ $qProducts = \skeeks\cms\shop\models\ShopStoreProduct::find()
     ])
     ->joinWith('shopProduct as shopProduct')
     ->joinWith('shopProduct.cmsContentElement as cce')
-    ->andWhere(['!=', 'shopProduct.created_by', new \yii\db\Expression("ssp.updated_by")])
+    //->andWhere(['!=', 'shopProduct.created_by', new \yii\db\Expression("ssp.updated_by")])
     //->andWhere(['=', 'cce.cms_site_id', \Yii::$app->skeeks->site->id])
-    ->groupBy(['ssp.updated_by'])
+    //->groupBy(['ssp.updated_by'])
     ->select([
         'count'      => new \yii\db\Expression("count(1)"),
-        "main_cce_by" => 'ssp.updated_by',
+        //"main_cce_by" => 'ssp.updated_by',
         "shop_product_id" => 'ssp.shop_product_id',
         "id" => 'ssp.id',
         //"delta" => new \yii\db\Expression("abs(ssp.updated_at - shopProduct.updated_at)"),
@@ -49,29 +49,6 @@ $qProducts = \skeeks\cms\shop\models\ShopStoreProduct::find()
     ])*/
 ;
 
-/*$qProducts = \skeeks\cms\shop\models\ShopCmsContentElement::find()->from([
-                'c' => \skeeks\cms\models\CmsContentElement::tableName(),
-            ])
-            //->cmsSite()
-            ->joinWith('mainCmsContentElement as mainCmsContentElement')
-            //->joinWith('shopProduct.shopMainProduct as shopMainProduct')
-    
-            ->andWhere(['c.content_id' => $content->id])
-            ->andWhere(['is not', 'c.main_cce_by', null])
-            ->andWhere(['!=', 'mainCmsContentElement.created_by', new \yii\db\Expression("c.main_cce_by")])
-    
-            ->groupBy(['c.main_cce_by'])
-            ->select([
-                'count'      => new \yii\db\Expression("count(1)"),
-                "main_cce_by" => 'c.main_cce_by',
-                "main_cce_id" => 'c.main_cce_id',
-                "id" => 'c.id',
-                //"delta" => new \yii\db\Expression("abs(mainCmsContentElement.created_at - c.main_cce_at)"),
-            ])
-            /*->andHaving([
-                '>=', 'delta', 60
-            ])
-;*/
 
 if ($dm->from) {
     $start = strtotime($dm->from." 00:00:00");
@@ -89,10 +66,10 @@ $all = $q
     ->asArray()
     ->all();
 
-$allProducts = $qProducts
+/*$allProducts = $qProducts
     ->asArray()
     ->indexBy('main_cce_by')
-    ->all();
+    ->all();*/
 
 
 
@@ -151,38 +128,38 @@ $allProducts = $qProducts
             <?php endif; ?>
         </table>
     </div>
-    <?php if ($allProducts && \Yii::$app->skeeks->site->is_default) : ?>
+    <?php /*if ($allProducts && \Yii::$app->skeeks->site->is_default) : */?><!--
     <div class="col-12" style="max-width: 500px;">
         <h4>Статистика привязки:</h4>
         <table class="table table-bordered">
             
-                <?php foreach ($allProducts as $data) : ?>
+                <?php /*foreach ($allProducts as $data) : */?>
                     <tr>
                         <td style="width: 400px;">
-                            <?php $user = \skeeks\cms\models\CmsUser::findOne($data['main_cce_by']); ?>
-                            <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                            <?php /*$user = \skeeks\cms\models\CmsUser::findOne($data['main_cce_by']); */?>
+                            <?/* $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                                 'controllerId' => 'cms/admin-user',
                                 'modelId' => $user->id
-                            ]); ?>
+                            ]); */?>
                             <div class="d-flex flex-row">
                                 <div class="my-auto" style="margin-right: 5px;">
-                                    <img src='<?= $user->avatarSrc ? $user->avatarSrc : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 25px; max-height: 25px; border-radius: 50%;'/>
+                                    <img src='<?/*= $user->avatarSrc ? $user->avatarSrc : \skeeks\cms\helpers\Image::getCapSrc(); */?>' style='max-width: 25px; max-height: 25px; border-radius: 50%;'/>
                                 </div>
                                 <div class="my-auto">
                                     <div style="overflow: hidden; max-height: 40px; text-align: left;">
-                                        <?= $user->shortDisplayName; ?>
+                                        <?/*= $user->shortDisplayName; */?>
                                     </div>
                                 </div>
                             </div>
-                            <? $widget::end(); ?>
+                            <?/* $widget::end(); */?>
                         </td>
                         <td>
-                            <b><?php echo $data['count']; ?></b>
+                            <b><?php /*echo $data['count']; */?></b>
                         </td>
                     </tr>
-                <?php endforeach; ?>
+                <?php /*endforeach; */?>
             
         </table>
     </div>
-    <?php endif; ?>
+    --><?php /*endif; */?>
 </div>
