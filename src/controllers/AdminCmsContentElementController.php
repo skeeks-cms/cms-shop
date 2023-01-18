@@ -1546,6 +1546,19 @@ HTML
             ];
         }
 
+
+
+        $filterFields["product_weight"] = [
+                'filterAttribute' => 'sp.weight',
+                'attribute' => "product_weight",
+                'label'     => "Вес товара с упаковкой",
+                'class'     => NumberFilterField::class,
+                'field'     => [
+                    'class' => NumberField::class,
+                ],
+
+            ];
+
         if ($defaultTypePrice) {
             $filterFields["retail_price_filter"] = [
                 'attribute' => "retail_price_filter",
@@ -1689,6 +1702,8 @@ HTML
             $visibleFilters[] = 'retail_price_filter';
         }
 
+        $visibleFilters[] = 'product_weight';
+
         if ($purchaseTypePrice && $defaultTypePrice) {
             $visibleFilters[] = 'marginality_abs_filter';
             $visibleFilters[] = 'marginality_per_filter';
@@ -1704,6 +1719,7 @@ HTML
         $filterFieldsLabels['marginality_abs_filter'] = "Маржинальность, значение";
         $filterFieldsLabels['marginality_per_filter'] = "Маржинальность, %";
         $filterFieldsLabels['retail_price_filter'] = "";
+        $filterFieldsLabels['product_weight'] = "Вес товара с упаковкой";
         $filterFieldsLabels['purchase_price_filter'] = "";
         $filterFieldsLabels['filter_other'] = "Связка и оформление";
 
@@ -1717,6 +1733,7 @@ HTML
         $filterFieldsRules[] = ['marginality_abs_filter', 'safe'];
         $filterFieldsRules[] = ['marginality_per_filter', 'safe'];
         $filterFieldsRules[] = ['retail_price_filter', 'safe'];
+        $filterFieldsRules[] = ['product_weight', 'safe'];
         $filterFieldsRules[] = ['purchase_price_filter', 'safe'];
         $filterFieldsRules[] = ['filter_other', 'safe'];
 
