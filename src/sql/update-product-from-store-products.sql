@@ -48,7 +48,7 @@ FROM (
                 INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
             WHERE
                 store.cms_site_id = @site_id
-                AND store.is_supplier = 1
+                AND (store.is_supplier = 1 || store.is_sync_external = 1)
                 /*AND ssp.purchase_price > 0*/
             ORDER BY
                 is_quantity,
@@ -107,7 +107,7 @@ UPDATE
                     INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
                 WHERE
                     store.cms_site_id = @site_id
-                    AND store.is_supplier = 1
+                    AND (store.is_supplier = 1 || store.is_sync_external = 1)
                 ORDER BY
                     is_quantity,
                     store.priority
@@ -169,7 +169,7 @@ FROM (
             INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
         WHERE
             store.cms_site_id = @site_id
-            AND store.is_supplier = 1
+            AND (store.is_supplier = 1 || store.is_sync_external = 1)
             /*AND ssp.purchase_price > 0*/
         ORDER BY
             is_quantity,
@@ -228,7 +228,7 @@ UPDATE
                     INNER JOIN shop_store as store ON ssp.shop_store_id = store.id
                 WHERE
                     store.cms_site_id = @site_id
-                    AND store.is_supplier = 1
+                    AND (store.is_supplier = 1 || store.is_sync_external = 1)
                 ORDER BY
                     is_quantity,
                     store.priority
