@@ -9,8 +9,10 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
@@ -293,6 +295,13 @@ HTML
                     $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;
 
                 },
+            ],
+
+            'stat' => [
+                'class'    => BackendModelAction::class,
+                'name'     => 'Статистика',
+                'priority' => 500,
+                'icon'     => 'fas fa-credit-card',
             ],
 
             "create" => [
