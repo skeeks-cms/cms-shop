@@ -29,6 +29,14 @@ class ShopViewedProduct extends ActiveRecord
     {
         return '{{%shop_viewed_product}}';
     }
+    
+    public function behaviors()
+    {
+        $result = parent::behaviors();
+        ArrayHelper::remove($result, HasUserLog::class);
+
+        return $result;
+    }
 
     /**
      * @inheritdoc

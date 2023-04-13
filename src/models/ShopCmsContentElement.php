@@ -11,6 +11,8 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsStorageFile;
+use yii\base\ModelEvent;
+use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -47,8 +49,30 @@ class ShopCmsContentElement extends CmsContentElement
     {
         parent::init();
 
+        //$this->on(self::EVENT_BEFORE_UPDATE, [$this, "_beforeUpdateProductName"]);
+
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "_deleteShops"]);
         $this->on(self::EVENT_AFTER_DELETE, [$this, "_updateParentAfterDelete"]);
+    }
+
+
+    /**
+     * TODO:доделать
+     * @param ModelEvent $event
+     * @return void
+     */
+    public function _beforeUpdateProductName(ModelEvent $event)
+    {
+        //Если изменилось название
+        if ($this->isAttributeChanged("name")) {
+            //Это общий товар
+            if ($this->shopProduct->isOffersProduct) {
+                foreach ($this->tradeOffers as $tradeOffer)
+                {
+                    $tradeOffer->name = $tradeOffer->productName;
+                }
+            }
+        }
     }
 
     //Удалить все что связано с элементом

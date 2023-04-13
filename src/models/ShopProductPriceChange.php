@@ -2,8 +2,10 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\models\behaviors\HasUserLog;
 use skeeks\cms\money\Money;
 use skeeks\modules\cms\money\models\Currency;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%shop_product_price_change}}".
@@ -31,6 +33,14 @@ class ShopProductPriceChange extends \skeeks\cms\models\Core
         return '{{%shop_product_price_change}}';
     }
 
+
+    public function behaviors()
+    {
+        $result = parent::behaviors();
+        ArrayHelper::remove($result, HasUserLog::class);
+
+        return $result;
+    }
 
     /**
      * @inheritdoc

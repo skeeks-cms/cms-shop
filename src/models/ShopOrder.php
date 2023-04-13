@@ -652,7 +652,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_last_name'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
                     return !$this->cms_user_id && in_array('last_name', $requiredFields);
                 },
             ],
@@ -660,7 +660,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_first_name'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
                     return !$this->cms_user_id && in_array('first_name', $requiredFields);
                 },
             ],
@@ -668,7 +668,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_email'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
                     return !$this->cms_user_id && in_array('email', $requiredFields);
                 },
             ],
@@ -676,7 +676,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ['contact_phone'],
                 'required',
                 'when' => function () {
-                    $requiredFields = (array)$this->cmsSite->shopSite->order_required_fields;
+                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
                     return !$this->cms_user_id && in_array('phone', $requiredFields);
                 },
             ],
@@ -1334,7 +1334,8 @@ class ShopOrder extends \skeeks\cms\models\Core
             ];
 
         } else {
-            if (\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price && (float)$this->shopDelivery->money->amount > 0) {
+            
+            if (\Yii::$app->skeeks->site->shopSite && \Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price && (float)$this->shopDelivery->money->amount > 0) {
 
                 $m = new \skeeks\cms\money\Money((string)\Yii::$app->skeeks->site->shopSite->order_free_shipping_from_price, $this->currency_code);
                 $needMoney = $m->sub($this->moneyItems);

@@ -231,24 +231,6 @@ class ShopProduct extends \skeeks\cms\models\Core
                 }
             }
         }
-
-        /*if ($this->isAttributeChanged('main_pid')) {
-            if ($this->main_pid) {
-                $this->main_pid_at = time();
-
-                if (isset(\Yii::$app->user) && !\Yii::$app->user->isGuest) {
-                    $this->main_pid_by = \Yii::$app->user->id;
-                } else {
-                    $this->main_pid_by = null;
-                }
-
-            } else {
-                $this->main_pid_at = null;
-                $this->main_pid_by = null;
-            }
-        }*/
-
-
     }
     /**
      * @return array|\skeeks\cms\query\CmsActiveQuery|\skeeks\cms\query\CmsContentElementActiveQuery

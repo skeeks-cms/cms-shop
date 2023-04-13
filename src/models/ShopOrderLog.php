@@ -4,6 +4,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
+use skeeks\cms\models\behaviors\HasUserLog;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -40,6 +41,8 @@ class ShopOrderLog extends ActiveRecord
     {
         return '{{%shop_order_log}}';
     }
+
+
     /**
      * @return string
      */
@@ -59,7 +62,7 @@ class ShopOrderLog extends ActiveRecord
     }
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
+        $result = ArrayHelper::merge(parent::behaviors(), [
             HasJsonFieldsBehavior::class => [
                 'class'  => HasJsonFieldsBehavior::class,
                 "fields" => [
@@ -67,6 +70,10 @@ class ShopOrderLog extends ActiveRecord
                 ],
             ],
         ]);
+
+        ArrayHelper::remove($result, HasUserLog::class);
+
+        return $result;
     }
     /**
      * @inheritdoc
