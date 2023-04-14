@@ -149,7 +149,7 @@ class SortFiltersHandler extends Model
                     break;
 
                 case ('-new'):
-                    $query->orderBy([CmsContentElement::tableName().'.created_at' => SORT_DESC]);
+                    $query->orderBy([CmsContentElement::tableName().'.published_at' => SORT_DESC]);
                     break;
 
                 case ('price'):
