@@ -514,7 +514,7 @@ CSS
 
                 $typePurchasePrice = null;
                 if ($shopStoreDocMove->doc_type == ShopStoreDocMove::DOCTYPE_POSTING) {
-                    $typePurchasePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_default' => 1])->one();
+                    $typePurchasePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_purchase' => 1])->one();
                 } elseif ($shopStoreDocMove->doc_type == ShopStoreDocMove::DOCTYPE_WRITEOFF) {
                     $typePurchasePrice = ShopTypePrice::find()->cmsSite()->andWhere(['is_purchase' => 1])->one();
                 }
