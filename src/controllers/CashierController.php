@@ -14,6 +14,7 @@ use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopCashebox2user;
 use skeeks\cms\shop\models\ShopCasheboxShift;
 use skeeks\cms\shop\models\ShopCheck;
