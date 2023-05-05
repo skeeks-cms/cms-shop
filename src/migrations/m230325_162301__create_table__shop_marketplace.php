@@ -50,7 +50,6 @@ class m230325_162301__create_table__shop_marketplace extends Migration
         $this->addCommentOnTable($tableName, "Маркетплейс");
 
         $this->createIndex($tableName.'__name', $tableName, 'name');
-        $this->createIndex($tableName.'__component', $tableName, 'component');
         $this->createIndex($tableName.'__is_active', $tableName, 'is_active');
         $this->createIndex($tableName.'__priority', $tableName, 'priority');
 
