@@ -153,6 +153,24 @@ class AgentsController extends Controller
 
                     //Модель
                     $mainCmsContentElement = $shopCmsContentElement->mainCmsContentElement;
+
+                    $q = CmsTree::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cms_tree_id' => $mainCmsContentElement->tree_id]);
+                    $needCmsTree = $q->one();
+                    
+                    if ($needCmsTree && $shopCmsContentElement->tree_id != $needCmsTree->id) {
+                        /*var_dump($shopCmsContentElement->tree_id);
+                        var_dump($needCmsTree->id);                    
+                        var_dump($shopCmsContentElement->id);
+                        die;*/
+                        $shopCmsContentElement->tree_id = $needCmsTree->id;
+                        if ($shopCmsContentElement->update(false, 'tree_id')) {
+                            print_r($shopCmsContentElement->errors, true);die;
+                        }
+                        $shopCmsContentElement->refresh();
+                    }
+
+
+
                     $mainCmsContentElement->relatedPropertiesModel->initAllProperties();
                     $mainData = $mainCmsContentElement->relatedPropertiesModel->toArray();
                     if (!$mainData) {
