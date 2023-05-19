@@ -39,31 +39,11 @@ if ($model->isNewRecord) {
 ?>
 <div class="">
     <div class="sx-main-product-wrapper">
+
+
+        <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
         <?php $form = $action->beginActiveForm(); ?>
 
-        <? if (@$is_saved && @$is_create) : ?>
-            <?php $this->registerJs(<<<JS
-    sx.Window.openerWidgetTriggerEvent('model-create', {
-        'submitBtn' : '{$submitBtn}'
-    });
-JS
-            ); ?>
-
-        <? elseif (@$is_saved) : ?>
-            <?php $this->registerJs(<<<JS
-sx.Window.openerWidgetTriggerEvent('model-update', {
-        'submitBtn' : '{$submitBtn}'
-    });
-JS
-            ); ?>
-        <? endif; ?>
-
-        <? if (@$redirect) : ?>
-            <?php $this->registerJs(<<<JS
-window.location.href = '{$redirect}';
-JS
-            ); ?>
-        <? endif; ?>
 
 
         <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
@@ -253,20 +233,11 @@ JS
 
 <? $fieldSet::end(); ?>
 
-
         
-<?php $successMessage = ''; ?>
-<?php if(@$is_create) : ?>
-
-<?php else : ?>
-<? if ($successMessageFlash = \Yii::$app->getSession()->getFlash('success')) : ?>
-    <?php $successMessage = $successMessageFlash; ?>
-<? endif; ?>
-<?php endif; ?>
-        
-        <?= $form->buttonsStandart($model, $action->buttons, $successMessage); ?>
+        <?= $form->buttonsStandart($model, $action->buttons); ?>
         <?php echo $form->errorSummary([$model, $relatedModel, $shopProduct]); ?>
         <?php $form::end(); ?>
+        <?php $pjax::end(); ?>
     </div>
 
 

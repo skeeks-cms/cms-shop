@@ -2052,6 +2052,82 @@ CSS
 
             }
 
+        } elseif ($rr->isRequestAjaxPost()) {
+
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+
+                $site = \Yii::$app->skeeks->site;
+                $siteClass = \Yii::$app->skeeks->siteClass;
+                \Yii::$app->skeeks->site = $siteClass::find()->where(['is_default' => 1])->one();
+
+                $model->load(\Yii::$app->request->post());
+                $relatedModel->load(\Yii::$app->request->post());
+
+
+                if (!$model->errors && !$relatedModel->errors)
+                {
+                    if (!$model->save()) {
+                        throw new Exception("Ошибка сохранения данных");
+                    }
+
+                    if (!$relatedModel->save()) {
+                        throw new Exception("Ошибка сохранения дополнительных данных");
+                    }
+
+                    \Yii::$app->skeeks->site = $site;
+                    
+                    $shopProduct->id = $model->id;
+                        if (!$shopProduct->save()) {
+                            throw new \yii\base\Exception("Товар не сохранен: ".print_r($shopProduct->errors, true));
+                        }
+
+                        $savedPrice = $shopProduct->getBaseProductPrice()->one();
+                        foreach ($productPrices as $productPrice) {
+                            if ($savedPrice->type_price_id == $productPrice->type_price_id) {
+                                $productPrice = $savedPrice;
+                                $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                                $productPrice->load($data, "");
+                                $productPrice->save();
+                            } else {
+                                $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                                $productPrice->load($data, "");
+                                $productPrice->product_id = $shopProduct->id;
+                                $productPrice->save();
+                            }
+
+                        }
+
+                        if ($shopStoreProduct) {
+                            $shopStoreProduct->shop_product_id = $shopProduct->id;
+                            $shopStoreProduct->save();
+                        }
+
+                        $t->commit();
+                        
+                    $rr->message = '✓ Сохранено';
+                    $rr->data = [
+                        'type' => 'create'
+                    ];
+                    $rr->success = true;
+                } else {
+                    $rr->success = false;
+                    $rr->data = [
+                        'validation' => ArrayHelper::merge(
+                            ActiveForm::validate($model),
+                            ActiveForm::validate($relatedModel),
+                        )
+                    ];
+                }
+            } catch (\Exception $exception) {
+                $t->rollBack();
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
+            }
+
+
+            return $rr;
         }
 
 
@@ -2210,6 +2286,74 @@ CSS
                 }
 
 
+            } elseif ($rr->isRequestAjaxPost()) {
+
+                try {
+                    $model->load(\Yii::$app->request->post());
+                    $model->load(\Yii::$app->request->post());
+                    $shopProduct->load(\Yii::$app->request->post());
+    
+                    if (!$model->errors && !$relatedModel->errors && !$shopProduct->errors)
+                    {
+                        if (!$model->save()) {
+                            throw new Exception("Ошибка сохранения данных");
+                        }
+    
+                        if (!$relatedModel->save()) {
+                            throw new Exception("Ошибка сохранения дополнительных данных");
+                        }
+    
+                        if (!$shopProduct->save()) {
+                            throw new Exception("Ошибка сохранения товарных данных");
+                        }
+                        
+                        /**
+                             * @var $productPrice ShopProductPrice
+                             */
+                            foreach ($productPrices as $productPrice) {
+                                if ($productPrice->save()) {
+
+                                } else {
+                                    throw new Exception("Ошибка сохранения цены");
+                                }
+
+                            }
+
+
+                            /**
+                             * @var $productPrice ShopProductPrice
+                             */
+                            foreach ($shopStoreProducts as $shopStoreProduct) {
+                                if ($shopStoreProduct->save()) {
+
+                                } else {
+                                    throw new Exception('Check the correctness of the stores: '.print_r($shopStoreProduct->errors, true));
+                                }
+
+                            }
+                            
+    
+                        $rr->message = '✓ Сохранено';
+                        $rr->success = true;
+                        $rr->data = [
+                            'type' => 'update'
+                        ];
+                    } else {
+                        $rr->success = false;
+                        $rr->data = [
+                            'validation' => ArrayHelper::merge(
+                                ActiveForm::validate($model),
+                                ActiveForm::validate($relatedModel),
+                                ActiveForm::validate($shopProduct),
+                            )
+                        ];
+                    }
+                } catch (\Exception $exception) {
+                    $rr->success = false;
+                    $rr->message = $exception->getMessage();
+                }
+    
+                return $rr;
             }
 
 
