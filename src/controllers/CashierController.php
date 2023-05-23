@@ -527,12 +527,14 @@ class CashierController extends BackendController
                 'shop_product_id' => $product_id,
             ])->one();
 
+            $isRecalc = false;
             if (!$shopBasket) {
                 $shopBasket = new ShopOrderItem([
                     'shop_order_id'   => $this->order->id,
                     'shop_product_id' => $product->id,
                     'quantity'        => 0,
                 ]);
+                $isRecalc = true;
             }
 
 
@@ -549,7 +551,10 @@ class CashierController extends BackendController
             }
 
 
-            $shopBasket->recalculate();
+            if ($isRecalc) {
+                $shopBasket->recalculate();
+            }
+
             //todo: доработать
             $money = $product->getRetailPriceMoney(\Yii::$app->shop->backendShopStore);
             $shopBasket->amount = $money->amount;
@@ -786,6 +791,50 @@ class CashierController extends BackendController
             $rr->data = [
                 'order' => $this->order->jsonSerialize(),
                 'item' => $orderItem->toArray([], $orderItem->extraFields()),
+            ];
+            $rr->success = true;
+            $rr->message = "";
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
+
+
+
+    /**
+     * @return array|\yii\web\Response
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionApplyDiscount()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            $discount = (float)\Yii::$app->request->post("discount");
+
+            $eventData = [];
+            /**
+             * @var $orderItem ShopOrderItem
+             */
+            if ($this->order->shopOrderItems) {
+                foreach ($this->order->shopOrderItems as $orderItem)
+                {
+                    $orderItem->discount_amount = $orderItem->amount * $discount / 100;
+
+                    if ($orderItem->save()) {
+                        $rr->success = true;
+                        $rr->message = \Yii::t('skeeks/shop/app', 'Postion successfully updated');
+                    }
+                }
+            }
+
+            $this->order->refresh();
+
+            $rr->data = [
+                'order' => $this->order->jsonSerialize(),
             ];
             $rr->success = true;
             $rr->message = "";

@@ -88,10 +88,158 @@
             });
         },
 
+        _initFastEdit: function () {
+            var self = this;
+            $('body').on('click', function (e) {
+                //did not click a popover toggle or popover
+                if ($(e.target).data('toggle') !== 'popover'
+                    && $(e.target).closest('.popover').length === 0
+                    && !$(e.target).hasClass("sx-fast-edit-popover")
+                    && !$(e.target).closest(".sx-fast-edit-popover").length
+                ) {
+                    $('.sx-fast-edit-popover').popover('hide');
+                }
+            });
+
+            $("body").on("click", ".sx-fast-edit-popover", function () {
+                var jWrapper = $(this);
+                $(".sx-fast-edit-popover").popover("hide");
+                self._createPopover(jWrapper);
+            });
+
+
+        },
+
+        _createPopover(jWrapper) {
+
+
+            if (!jWrapper.hasClass('is-rendered')) {
+                jWrapper.popover({
+                    "html": true,
+                    //'container': "body",
+                    'trigger': "click",
+                    'boundary': 'window',
+                    'title': jWrapper.data('title').length ? jWrapper.data('title') : "",
+                    'content': $(jWrapper.data('element'))
+                });
+
+                jWrapper.on('show.bs.popover', function (e, data) {
+                    jWrapper.addClass('is-rendered');
+                    $(jWrapper.data('element')).trigger("show");
+                });
+            }
+
+
+            jWrapper.popover('show');
+        },
+
+        /**
+         * Блок со скидкой
+         * @returns {sx.classes.CashierApp}
+         * @private
+         */
+        _initDiscount: function () {
+            var self = this;
+
+            var jDiscountWrapper = $("#sx-discount-wrapper");
+            var jInput = $("input", jDiscountWrapper);
+            var jText = $(".sx-text-value", jDiscountWrapper);
+            var jMeasure = $(".sx-text-measure", jDiscountWrapper);
+            var jSubmit = $(".sx-apply-discount", jDiscountWrapper);
+            this._discountType = 'amount';
+
+
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-apply-discount'));
+
+
+            ajax.onSuccess(function (e, data) {
+                self.setOrder(data.response.data.order);
+                $('.sx-fast-edit-popover').popover('hide');
+            });
+            ajax.onError(function (e, data) {
+                console.log(data);
+            });
+
+            jSubmit.on("click", function () {
+                if (self._discountType == 'percent') {
+                    var discount = jInput.val();
+                } else {
+                    var discount = jText.text();
+                }
+                ajax.setData({
+                    'discount': Number(discount),
+                });
+                ajax.execute();
+            });
+
+
+            jInput.on("keyup change", function () {
+                var value = $(this).val();
+                if (self._discountType == 'percent') {
+                    if (value > 100) {
+                        value = 100;
+                        $(this).val(value);
+                    }
+                    var amount = self.getOrder().moneyItems.amount * value / 100;
+                    amount = Math.floor(amount * 100) / 100;
+                    jText.empty().append(amount);
+                } else {
+                    if (value > self.getOrder().moneyItems.amount) {
+                        value = self.getOrder().moneyItems.amount;
+                        $(this).val(value);
+                    }
+
+                    var amount = 100 * value / self.getOrder().moneyItems.amount;
+                    amount = Math.floor(amount * 100) / 100;
+                    jText.empty().append(amount);
+                }
+            });
+
+            $("body").on("click", ".sx-discount-type .btn-default", function () {
+                var jWrapper = $(this).closest("div");
+                var currentMeasure = $(".btn-primary", jWrapper).text();
+
+                $(".btn-primary", jWrapper).removeClass("btn-primary").addClass("btn-default");
+                $(this).removeClass("btn-default").addClass("btn-primary");
+
+                self._discountType = $(this).data("type");
+
+                var currentInput = jInput.val();
+                var currentText = jText.text();
+
+                jInput.val(currentText);
+                jText.empty().append(currentInput);
+                jMeasure.empty().append(currentMeasure);
+
+                /*if (self._discountType == 'percent') {
+                    jInput.attr("max", 100);
+                } else {
+                    jInput.attr("max", self.getOrder().moneyItems.amount);
+                }*/
+
+            });
+
+            jDiscountWrapper.on("show", function () {
+                var jMeasureSymbol = $(".sx-discount-type-percent", $(this)).text();
+                $(".sx-discount-type-amount", $(this)).click();
+                jInput.val(self.getOrder().discount_amount);
+                jText.empty().append(self.getOrder().discount_percent_round);
+                jMeasure.empty().append(jMeasureSymbol);
+
+                this._discountType = 'percent';
+
+            });
+
+
+            return this;
+        },
+
         _onDomReady: function () {
             var self = this;
 
             self.loadProducts();
+            self._initFastEdit();
+            self._initDiscount();
 
             self.getJSearch().on("focus", function () {
 
@@ -177,7 +325,19 @@
                 return false;
             });
 
-            
+
+            //Общая скидка на заказ
+            /*$("body").on("click", ".sx-order-result-total-percent", function () {
+                var jMenuContent = $(".sx-discount-popup");
+                if (jMenuContent.hasClass("sx-opened")) {
+                    jMenuContent.removeClass("sx-opened").addClass("sx-closed");
+                } else {
+                    jMenuContent.removeClass("sx-closed").addClass("sx-opened");
+                }
+                return false;
+            });*/
+
+
             //Все что касается создания клиента
             //Отркрыть форму создания клиента
             $("body").on("click", ".sx-create-header .action", function () {
@@ -199,7 +359,7 @@
 
                 var elementSelector = jWrapper.data("real-element");
                 $(elementSelector).val($(this).data("value"));
-                
+
                 $(".button", jWrapper).removeClass("active");
                 $(this).addClass("active");
 
@@ -396,7 +556,6 @@
             $("body").on('click', '.sx-order-result-total-percent', function (e) {
 
 
-
                 return false;
             });
 
@@ -518,7 +677,7 @@
          * Открыть форму создания клиента
          * @returns {sx.classes.CashierApp}
          */
-        createUserFormOpen: function() {
+        createUserFormOpen: function () {
             $(".sx-create-user-wrapper").css("right", "0");
             return this;
         },
@@ -526,7 +685,7 @@
          * Закрыть форму создания клиента
          * @returns {sx.classes.CashierApp}
          */
-        createUserFormClose: function() {
+        createUserFormClose: function () {
             $(".sx-create-user-wrapper").css("right", "-40%");
             //Чистка полей
             $(".sx-create-user-wrapper input").val("");

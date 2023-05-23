@@ -28,6 +28,7 @@ $jsData = \yii\helpers\Json::encode([
 
     'backend-check-status'        => \yii\helpers\Url::to(['check-status']),
     'backend-get-order-item-edit' => \yii\helpers\Url::to(['get-order-item-edit']),
+    'backend-apply-discount' => \yii\helpers\Url::to(['apply-discount']),
 
     'order' => $controller->order->jsonSerialize(),
 ]);
@@ -176,13 +177,17 @@ JS
                                 </div>
                                 <div class="pull-left">Налог</div>
                             </div>
+
                             <div class="col-12 sx-order-result-block-visible">
-                                <div class="float-right sx-order-result-total-percent">
+                                <div class="float-right sx-order-result-total-percent sx-fast-edit sx-fast-edit-popover" data-title="Размер скидки" data-element="#sx-discount-wrapper">
                                     (<span class="sx-money-discount-percent" data-value="<?= (float)$controller->order->discount_percent_round; ?>"><?= (float)$controller->order->discount_percent_round; ?></span>%)
                                     <span class="sx-money-discount" data-value="<?= (float)$controller->order->moneyDiscount->amount; ?>"><?= $controller->order->moneyDiscount; ?></span>
                                 </div>
                                 <div class="pull-left">Скидка</div>
                             </div>
+
+
+
                             <div class="col-12 sx-order-result-block <?php echo $controller->order->weight > 0 ? "" : "sx-hidden"; ?>">
                                 <div class="float-right sx-weight" data-value="<?= (float)$controller->order->weight; ?>">
                                     <?= $controller->order->weightFormatted; ?>
@@ -190,8 +195,43 @@ JS
                                 <div class="pull-left">Вес</div>
                             </div>
                         </div>
-
                     </div>
+
+
+                    <div class="sx-popover-content-wrapper">
+                        <div id="sx-discount-wrapper" class="sx-popover-content">
+                            <div class="field">
+                                <div class="btn-group btn-block sx-discount-type">
+                                    <button class="btn btn-primary sx-discount-type-amount" data-type="amount">₽</button>
+                                    <button class="btn btn-default sx-discount-type-percent" data-type="percent">%</button>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <input min="0" step="0.01" class="change-discount form-control" type="number">
+                                <div class="sx-text">
+                                    <div class="sx-text-value"></div>
+                                    <div class="sx-text-measure"></div>
+                                </div>
+                            </div>
+
+                            <div class="field sx-fast-discaunt-values" style="display: none;">
+                                <div class="btn-group btn-block">
+                                    <div class="btn btn-default" role="button" tabindex="0">3</div>
+                                    <div class="btn btn-default" role="button" tabindex="0">5</div>
+                                    <div class="btn btn-default" role="button" tabindex="0">7</div>
+                                </div>
+                            </div>
+                            <div class="field" style="text-align: right;">
+                                <div class="btn btn-primary btn-block sx-apply-discount" role="button" tabindex="0">Готово</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
                     <div class="sx-checkout-btn-wrapper sx-lock">
                         <div color="#0EA432" class="sx-checkout-menu-trigger">
                             <i class="fas icon fa-ellipsis-v fa-fw" style="color: white; font-size: 23px;"></i>
@@ -555,7 +595,7 @@ JS
 
         <?php
         $model = new \skeeks\cms\models\CmsUser();
-\skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
+        \skeeks\cms\admin\assets\JqueryMaskInputAsset::register($this);
         \Yii::$app->view->registerJs(<<<JS
     $("#cmsuser-phone").mask("+7 999 999-99-99");
 
@@ -565,12 +605,12 @@ JS
     });
 
 JS
-);
+        );
 
         $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
             'enableAjaxValidation' => false,
-            'id' => 'sx-create-user-form',
-            'action' => \yii\helpers\Url::to(['create-user']),
+            'id'                   => 'sx-create-user-form',
+            'action'               => \yii\helpers\Url::to(['create-user']),
             //'validationUrl' => \skeeks\cms\helpers\UrlHelper::constructCurrent()->enableAjaxValidateForm()->toString(),
             'clientCallback'       => new \yii\web\JsExpression(<<<JS
     function (ActiveFormAjaxSubmit) {
@@ -600,19 +640,19 @@ JS
 
 
         <?php echo $form->field($model, "phone")->textInput([
-            'autocomplete' => 'no'
+            'autocomplete' => 'no',
         ]); ?>
         <?php echo $form->field($model, "first_name")->textInput([
-            'autocomplete' => 'no'
+            'autocomplete' => 'no',
         ]); ?>
         <?php echo $form->field($model, "last_name")->textInput([
-            'autocomplete' => 'no'
+            'autocomplete' => 'no',
         ]); ?>
         <?php echo $form->field($model, "patronymic")->textInput([
-            'autocomplete' => 'no'
+            'autocomplete' => 'no',
         ]); ?>
         <?php echo $form->field($model, "email")->textInput([
-            'autocomplete' => 'no'
+            'autocomplete' => 'no',
         ]); ?>
         <div style="display:none;" class="sx-real-gender">
             <?php echo $form->field($model, "gender") ?>
