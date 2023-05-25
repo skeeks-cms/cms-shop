@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\backend\ViewBackendAction;
+use skeeks\cms\components\Cms;
 use skeeks\cms\shop\models\ShopBuyer;
 use skeeks\cms\shop\models\ShopOrder;
 use yii\base\Event;
@@ -28,6 +29,9 @@ class UpaFavoriteController extends BackendModelController
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopOrder::class;
         $this->generateAccessActions = false;
+        $this->permissionNames = [
+            Cms::UPA_PERMISSION => 'Доступ к персональной части',
+        ];
         parent::init();
     }
 
