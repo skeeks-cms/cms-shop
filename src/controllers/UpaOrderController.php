@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\components\Cms;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\shop\models\ShopBuyer;
@@ -29,9 +30,9 @@ class UpaOrderController extends BackendController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Orders');
         $this->generateAccessActions = false;
-        /*$this->permissionNames = [
-            "shop/upa-order" => 'Доступ к персональной части',
-        ];*/
+        $this->permissionNames = [
+            Cms::UPA_PERMISSION => 'Доступ к персональной части',
+        ];
         parent::init();
     }
 
