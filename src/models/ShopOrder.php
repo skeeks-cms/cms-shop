@@ -494,6 +494,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 ],
                 "filter",
                 'filter' => 'trim',
+                'skipOnEmpty' => true
             ],
 
 
@@ -682,7 +683,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             ],
 
             [['contact_phone'], 'string'],
-            [['contact_phone'], "filter", 'filter' => 'trim'],
+            [['contact_phone'], "filter", 'filter' => 'trim', 'skipOnEmpty' => true],
             [
                 ['contact_phone'],
                 "filter",
@@ -700,7 +701,7 @@ class ShopOrder extends \skeeks\cms\models\Core
                 },
             ],
             [['receiver_phone'], 'string'],
-            [['receiver_phone'], "filter", 'filter' => 'trim'],
+            [['receiver_phone'], "filter", 'filter' => 'trim', 'skipOnEmpty' => true],
             [
                 ['receiver_phone'],
                 "filter",
@@ -722,7 +723,7 @@ class ShopOrder extends \skeeks\cms\models\Core
             [['shop_store_id'], 'integer'],
 
             [['contact_email'], 'string'],
-            [['contact_email'], "filter", 'filter' => 'trim'],
+            [['contact_email'], "filter", 'filter' => 'trim', 'skipOnEmpty' => true],
             [
                 ['contact_email'],
                 "filter",
@@ -735,7 +736,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
             [['receiver_email'], EmailValidator::class],
             [['receiver_email'], 'string'],
-            [['receiver_email'], "filter", 'filter' => 'trim'],
+            [['receiver_email'], "filter", 'filter' => 'trim', 'skipOnEmpty' => true],
             [
                 ['receiver_email'],
                 "filter",
