@@ -2290,9 +2290,13 @@ CSS
 
                 try {
                     $model->load(\Yii::$app->request->post());
-                    $model->load(\Yii::$app->request->post());
                     $shopProduct->load(\Yii::$app->request->post());
-    
+                    $relatedModel->load(\Yii::$app->request->post());
+
+                    $shopProduct->validate();
+                    $model->validate();
+                    $relatedModel->validate();
+
                     if (!$model->errors && !$relatedModel->errors && !$shopProduct->errors)
                     {
                         if (!$model->save()) {

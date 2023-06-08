@@ -481,6 +481,9 @@ class ShopOrder extends \skeeks\cms\models\Core
 
             [['shop_cashebox_shift_id'], 'default', 'value' => null],
             [['shop_cashebox_id'], 'default', 'value' => null],
+            [['delivery_floor'], 'default', 'value' => ''],
+            [['delivery_apartment_number'], 'default', 'value' => ''],
+            [['delivery_comment'], 'default', 'value' => ''],
 
             [['delivery_latitude', 'delivery_longitude'], 'number'],
 
