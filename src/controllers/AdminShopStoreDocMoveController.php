@@ -810,7 +810,7 @@ CSS
                 ->groupBy(["cce.id"]);
 
             if ($q) {
-                $q = trim($q);
+                $q = trim((string) $q);
                 $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
                 $query->andWhere([
                     'or',
@@ -938,7 +938,7 @@ CSS
                 ->groupBy(["cce.id"]);
 
             if ($barcode) {
-                $barcode = trim($barcode);
+                $barcode = trim((string) $barcode);
                 $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
                 $query->andWhere(
                     ['=', 'barcodes.value', $barcode],
