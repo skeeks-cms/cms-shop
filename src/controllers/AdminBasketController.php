@@ -160,6 +160,8 @@ CSS
                     'code', 'code'),
             ],
             'notes',
+            'discount_value',
+            'discount_amount',
         ];
     }
 
