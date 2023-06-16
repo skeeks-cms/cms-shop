@@ -519,12 +519,15 @@ JS
 <?
 $addItemText = \Yii::t('skeeks/shop/app', 'Add this item');
 $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
-/*<a class="btn btn-default btn-sm" onclick="new sx.classes.SelectProduct().open(); return true;"><i class="fa fa-plus"></i>
-                {$addItemText}
-            </a>*/
+
 
 ?>
 
+<div style="margin-bottom: 1rem;">
+<a class="btn btn-default btn-sm" onclick='<?php echo $onclick; ?>'><i class="fa fa-plus"></i>
+    <?php echo $addPosition; ?>
+</a>
+</div>
 
 <div class="sx-table-wrapper table-responsive">
     <table class="table sx-table">
@@ -542,6 +545,8 @@ $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
 
             <tr data-id="<?php echo $shopOrderItem->id; ?>">
                 <td>
+                    
+
                     <?php if ($shopOrderItem->shopProduct) : ?>
                         <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
                             'controllerId'            => 'shop/admin-cms-content-element',
@@ -556,6 +561,7 @@ $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
                             'modelId'                 => $shopOrderItem->shopProduct->id,
                             'isRunFirstActionOnClick' => true,
                         ]); ?>
+
 
                         <?
                         $image = null;
@@ -578,21 +584,73 @@ $addPosition = \Yii::t('skeeks/shop/app', 'Add position');
 
                         <span class="my-auto">
                         <?php echo $shopOrderItem->name; ?>
+                            
                 </span>
-                        <? $widget::end(); ?>
+                    <? $widget::end(); ?>
                     <?php else : ?>
                         <?php echo $shopOrderItem->name; ?>
                     <?php endif; ?>
+                    
 
 
                 </td>
-                <td><?php echo $shopOrderItem->money; ?></td>
                 <td>
+                    <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                        'controllerId'            => 'shop/admin-basket',
+                        'tag'                     => 'span',
+                        'defaultOptions'          => [
+                            'class' => 'd-flex',
+                            'style' => 'line-height: 1.1; cursor: pointer;',
+                        ],
+                        'modelId'                 => $shopOrderItem->id,
+                        'isRunFirstActionOnClick' => true,
+                    ]); ?>
+                    <?php echo $shopOrderItem->moneyWithDiscount; ?>
+                    <? $widget::end(); ?>
+                </td>
+                <td>
+                    <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                        'controllerId'            => 'shop/admin-basket',
+                        'tag'                     => 'span',
+                        'defaultOptions'          => [
+                            'class' => 'd-flex',
+                            'style' => 'line-height: 1.1; cursor: pointer;',
+                        ],
+                        'modelId'                 => $shopOrderItem->id,
+                        'isRunFirstActionOnClick' => true,
+                    ]); ?>
                     <?php echo $shopOrderItem->quantity; ?>
                     <?php echo $shopOrderItem->measure_name; ?>
+                    <? $widget::end(); ?>
                 </td>
-                <td><?php echo $shopOrderItem->discount_percent; ?>%</td>
-                <td><?php echo $shopOrderItem->totalMoney; ?></td>
+                <td>
+                    <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                        'controllerId'            => 'shop/admin-basket',
+                        'tag'                     => 'span',
+                        'defaultOptions'          => [
+                            'class' => 'd-flex',
+                            'style' => 'line-height: 1.1; cursor: pointer;',
+                        ],
+                        'modelId'                 => $shopOrderItem->id,
+                        'isRunFirstActionOnClick' => true,
+                    ]); ?>
+                    <?php echo $shopOrderItem->discount_percent_round; ?>%
+                    <? $widget::end(); ?>
+                </td>
+                <td>
+                    <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
+                        'controllerId'            => 'shop/admin-basket',
+                        'tag'                     => 'span',
+                        'defaultOptions'          => [
+                            'class' => 'd-flex',
+                            'style' => 'line-height: 1.1; cursor: pointer;',
+                        ],
+                        'modelId'                 => $shopOrderItem->id,
+                        'isRunFirstActionOnClick' => true,
+                    ]); ?>
+                    <?php echo $shopOrderItem->totalMoney; ?>
+                    <? $widget::end(); ?>
+                </td>
             </tr>
         <? endforeach; ?>
 
