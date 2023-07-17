@@ -308,6 +308,7 @@ class StoreProductController extends BackendModelStandartController
                                 'style' => 'width: 100px;',
                             ],
                             'value'         => function (ShopStoreProduct $shopStoreProduct) {
+            //return print_r($shopStoreProduct->toArray(),true );
                                 return $shopStoreProduct->selling_price ? \Yii::$app->formatter->asDecimal($shopStoreProduct->selling_price) : "";
                             },
                         ],
@@ -1114,8 +1115,8 @@ HTML;
                             print_r($shopStorePropertyVendor->external_code);
                             print_r($shopStorePropertyVendorCode->external_code);
                             die;*/
-                            if ($vendorValue && $vendorCodeValue) {
-                                $vendorOption = $shopStorePropertyVendor->getShopStorePropertyOptions()->andWhere(['name' => trim($vendorValue)])->one();
+                            if ($vendorValue && $vendorCodeValue && is_string($vendorValue)) {
+                                $vendorOption = $shopStorePropertyVendor->getShopStorePropertyOptions()->andWhere(['name' => trim((string) $vendorValue)])->one();
 
                                 /*print_r($storeProduct->id);
                                 print_r($vendorOption->name);
