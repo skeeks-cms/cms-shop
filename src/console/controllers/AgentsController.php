@@ -163,7 +163,7 @@ class AgentsController extends Controller
                         var_dump($shopCmsContentElement->id);
                         die;*/
                         $shopCmsContentElement->tree_id = $needCmsTree->id;
-                        if ($shopCmsContentElement->update(false, 'tree_id')) {
+                        if ($shopCmsContentElement->update(false, ['tree_id'])) {
                             print_r($shopCmsContentElement->errors, true);die;
                         }
                         $shopCmsContentElement->refresh();
