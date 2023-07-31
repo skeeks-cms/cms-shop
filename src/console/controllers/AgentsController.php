@@ -182,6 +182,7 @@ class AgentsController extends Controller
                     $newElementProperties->initAllProperties();
                     $newData = $newElementProperties->toArray();
 
+                    
                     foreach ($newData as $code => $valueNull)
                     {
                         $value = ArrayHelper::getValue($mainData, $code);
@@ -190,6 +191,11 @@ class AgentsController extends Controller
                          */
                         $property = $mainCmsContentElement->relatedPropertiesModel->getRelatedProperty($code);
                         $propertyNew = $newElementProperties->getRelatedProperty($code);
+                        
+                        if (!$property) {
+                            continue;
+                        }
+
                         if ($property->property_type == PropertyType::CODE_ELEMENT) {
 
 
@@ -257,24 +263,33 @@ class AgentsController extends Controller
                                 }
                             } else {
                                 $newValue = null;
-                                $mainEnum = $property->getEnums()->andWhere(['id' => $valueId])->one();
-                                $enum = $propertyNew->getEnums()->andWhere(['code' => $mainEnum->code])->one();
-                                if (!$enum) {
-                                    $mainEnum = CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->andWhere(['code' => $valueId])->one();
-
-                                    $enum = new CmsContentPropertyEnum();
-                                    $enum->property_id = $propertyNew->id;
-                                    $enum->code = $mainEnum->code;
-                                    $enum->value = $mainEnum->value;
-                                    if (!$enum->save()) {
-                                        print_r($enum->errors, true);
+                                $mainEnum = $property->getEnums()->andWhere(['id' => $value])->one();
+                                /*if (!$mainEnum) {
+                                    print_r($property->name);
+                                    var_dump($value);
+                                    die;
+                                }*/
+                                if ($mainEnum) {
+                                    $enum = $propertyNew->getEnums()->andWhere(['code' => $mainEnum->code])->one();
+                                    if (!$enum) {
+                                        //$mainEnum = CmsContentPropertyEnum::find()->where(['property_id' => $property->id])->andWhere(['code' => $valueId])->one();
+    
+                                        $enum = new CmsContentPropertyEnum();
+                                        $enum->property_id = $propertyNew->id;
+                                        $enum->code = $mainEnum->code;
+                                        $enum->value = $mainEnum->value;
+                                        if (!$enum->save()) {
+                                            print_r($enum->errors, true);
+                                        }
                                     }
+    
+                                    $newValue = $enum->id;
+                                    
+                                    $newElementProperties->setAttribute($code, $newValue);
                                 }
-
-                                $newValue = $enum->id;
+                                
                             }
 
-                            $newElementProperties->setAttribute($code, $newValue);
                         } else {
                             $newElementProperties->setAttribute($code, $value);
                         }
