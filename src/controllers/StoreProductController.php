@@ -616,10 +616,10 @@ HTML;
             $model = new \skeeks\cms\base\DynamicModel();
             $model->addRule("is_active", "integer");
             $model->defineAttribute("is_active");
-            $model->setAttrubuteLebel("is_active", "Показывать товары на сайте сразу?");
+            $model->setAttributeLebel("is_active", "Показывать товары на сайте сразу?");
 
             $model->defineAttribute("cms_tree_id");
-            $model->setAttrubuteLebel("cms_tree_id", "Раздел");
+            $model->setAttributeLebel("cms_tree_id", "Раздел");
             $model->addRule("cms_tree_id", "integer");
 
             $model->load(\Yii::$app->request->post());

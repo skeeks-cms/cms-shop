@@ -195,7 +195,11 @@ class ShopOfferChooseHelper extends Component
                             }
                         } else {
 
-                            $this->_chooseFields[$code]['options'][$value] = $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
+                            //$this->_chooseFields[$code]['options'][$value] = $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
+                            $this->_chooseFields[$code]['options'][$value] = [
+                                'asText' => $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code),
+                                'value' => $value
+                            ];
                         }
 
                     }
@@ -333,7 +337,19 @@ class ShopOfferChooseHelper extends Component
 
                 if ($property && $options && $property->property_type == PropertyType::CODE_LIST) {
                     $options = $property->getEnums()->andWhere(['id' => array_keys($options)])->orderBy(['priority' => SORT_ASC])->all();
-                    $this->_chooseFields[$code]['options'] = ArrayHelper::map($options, 'id', 'value');
+                    /*$this->_chooseFields[$code]['options'] = ArrayHelper::map($options, 'id', 'value');*/
+                    
+                    $resultOptions = [];
+                    foreach ($options as $key => $enumModel)
+                    {
+                        $resultOptions[$enumModel->id] = [
+                            'value' => $enumModel->id,
+                            'asText' => $enumModel->value,
+                        ];
+                    }
+                    
+                    $this->_chooseFields[$code]['options'] = $resultOptions;
+                    
                 } elseif ($property && $property->property_type == PropertyType::CODE_NUMBER) {
                     $options = $this->_chooseFields[$code]['options'];
                     ksort($options);
@@ -341,7 +357,6 @@ class ShopOfferChooseHelper extends Component
                 }
             }
         }
-
     }
 
     public function render()

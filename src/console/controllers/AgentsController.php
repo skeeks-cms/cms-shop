@@ -203,39 +203,51 @@ class AgentsController extends Controller
                                 $newValue = [];
                                 foreach ($value as $valueId)
                                 {
-                                    $element = CmsContentElement::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cce_id' => (int) $valueId])->one();
-                                    if (!$element) {
-                                        $mainValueElement = CmsContentElement::find()->cmsSite($defaultCmsSite)->andWhere(['id' => (int) $valueId])->one();
+                                    if ($valueId) {
+                                        $element = CmsContentElement::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cce_id' => (int) $valueId])->one();
+                                        if (!$element) {
+                                            $mainValueElement = CmsContentElement::find()->cmsSite($defaultCmsSite)->andWhere(['id' => (int) $valueId])->one();
 
+                                            if ($mainValueElement) {
+                                                $element = new CmsContentElement();
+                                                $element->content_id = $mainValueElement->content_id;
+                                                $element->cms_site_id = $shopSite->cmsSite->id;
+                                                $element->main_cce_id = (int) $valueId;
+                                                $element->name = $mainValueElement->name;
+                                                if (!$element->save()) {
+                                                    print_r($element->errors, true);
+                                                }
+                                            }
+
+                                        }
+
+                                        if ($element) {
+                                            $newValue[] = $element->id;
+                                        }
+
+                                    }
+
+                                }
+                            } else {
+                                $newValue = null;
+                                if ($value) {
+                                    $element = CmsContentElement::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cce_id' => (int) $value])->one();
+                                    if (!$element) {
+                                        $mainValueElement = CmsContentElement::find()->cmsSite($defaultCmsSite)->andWhere(['id' => (int) $value])->one();
+    
                                         $element = new CmsContentElement();
                                         $element->content_id = $mainValueElement->content_id;
                                         $element->cms_site_id = $shopSite->cmsSite->id;
-                                        $element->main_cce_id = (int) $valueId;
+                                        $element->main_cce_id = (int) $value;
                                         $element->name = $mainValueElement->name;
                                         if (!$element->save()) {
                                             print_r($element->errors, true);
                                         }
                                     }
-
-                                    $newValue[] = $element->id;
+    
+                                    $newValue = $element->id;
                                 }
-                            } else {
-                                $newValue = null;
-                                $element = CmsContentElement::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cce_id' => (int) $value])->one();
-                                if (!$element) {
-                                    $mainValueElement = CmsContentElement::find()->cmsSite($defaultCmsSite)->andWhere(['id' => (int) $value])->one();
-
-                                    $element = new CmsContentElement();
-                                    $element->content_id = $mainValueElement->content_id;
-                                    $element->cms_site_id = $shopSite->cmsSite->id;
-                                    $element->main_cce_id = (int) $value;
-                                    $element->name = $mainValueElement->name;
-                                    if (!$element->save()) {
-                                        print_r($element->errors, true);
-                                    }
-                                }
-
-                                $newValue = $element->id;
+                                
                             }
 
                             $newElementProperties->setAttribute($code, $newValue);
@@ -247,19 +259,22 @@ class AgentsController extends Controller
                                 {
 
                                     $mainEnum = $property->getEnums()->andWhere(['id' => $valueId])->one();
-                                    $enum = $propertyNew->getEnums()->andWhere(['code' => $mainEnum->code])->one();
-                                    if (!$enum) {
+                                    if ($mainEnum) {
+                                        $enum = $propertyNew->getEnums()->andWhere(['code' => $mainEnum->code])->one();
+                                        if (!$enum) {
 
-                                        $enum = new CmsContentPropertyEnum();
-                                        $enum->property_id = $propertyNew->id;
-                                        $enum->code = $mainEnum->code;
-                                        $enum->value = $mainEnum->value;
-                                        if (!$enum->save()) {
-                                            print_r($enum->errors, true);
+                                            $enum = new CmsContentPropertyEnum();
+                                            $enum->property_id = $propertyNew->id;
+                                            $enum->code = $mainEnum->code;
+                                            $enum->value = $mainEnum->value;
+                                            if (!$enum->save()) {
+                                                print_r($enum->errors, true);
+                                            }
                                         }
+
+                                        $newValue[] = $enum->id;
                                     }
 
-                                    $newValue[] = $enum->id;
                                 }
                             } else {
                                 $newValue = null;

@@ -71,6 +71,10 @@ JS
     <? if ($helper->chooseFields) : ?>
         <? foreach ($helper->chooseFields as $code => $data) : ?>
             <?
+            /**
+             * @var $property \skeeks\cms\models\CmsContentProperty
+             */
+            $property = \yii\helpers\ArrayHelper::getValue($data, 'property'); 
             $disabled = \yii\helpers\ArrayHelper::getValue($data, 'disabledOptions'); ?>
             <? if ((array)\yii\helpers\ArrayHelper::getValue($data, 'options')) : ?>
 
@@ -87,30 +91,68 @@ JS
                         );
                     ?>
 
-                    <? foreach ((array)\yii\helpers\ArrayHelper::getValue($data, 'options') as $key => $value): ?>
+                    <? foreach ((array)\yii\helpers\ArrayHelper::getValue($data, 'options') as $key => $optionValue): ?>
                         <?
+                    
+                        $id = \yii\helpers\ArrayHelper::getValue($optionValue, "value");
+                        $value = \yii\helpers\ArrayHelper::getValue($optionValue, "asText");
+
+                        $image = null;
+                        if ($property->is_img_offer_property && $property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_LIST) {
+                            $enum = \skeeks\cms\models\CmsContentPropertyEnum::findOne($id);
+                            if ($enum) {
+                                $image = $enum->cmsImage;
+                            }
+                        } elseif ($property->is_img_offer_property && $property->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_ELEMENT) {
+                            $element = \skeeks\cms\models\CmsContentElement::findOne($id);
+                            if ($element) {
+                                $image = $element->image;
+                            }
+                        }
+                        
                         $isChecked = false;
                         $isDisabled = false;
                         $cssClass = 'u-btn-outline-darkgray';
                         if ($helper->chooseModel->{$code} == $key) {
                             $isChecked = true;
-                            $cssClass = 'u-btn-primary';
+                            $cssClass = 'btn-primary';
                         }
                         if (in_array($key, $disabled)) {
                             $isDisabled = true;
                             $cssClass = "sx-disabled-btn-option";
                         }
-
                         ?>
-                        <button class="btn <?= $cssClass; ?> btn-select-option" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
-                            <? if ($isChecked) : ?>
-                                <!--<i class="fas fa-check"></i>-->
-                                &#10003;
-                            <? else: ?>
-                                <span class="sx-no-check">&#10003;</span>
-                            <? endif; ?>
-                            <?= $value; ?>
-                        </button>
+                        <?php if($property->is_img_offer_property) : ?>
+                            <button class="<?= $cssClass; ?> btn-select-option sx-image-select" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
+                                
+                                <img
+                                    class="img-fluid lazy"
+                                    style="aspect-ratio: 1/1;"
+                                    src="<?php echo \Yii::$app->cms->image1px; ?>"
+                                    title="<?= $value; ?>"
+        
+                                    data-src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($image ? $image->src : \skeeks\cms\helpers\Image::getCapSrc(),
+                                    new \skeeks\cms\components\imaging\filters\Thumbnail([
+                                        'w' => 50,
+                                        'h' => 50,
+                                        'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
+                                    ])
+                                ); ?>">
+                                    
+                            </button>
+                        <?php else : ?>
+                            <button class="btn <?= $cssClass; ?> btn-select-option" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
+                                <? if ($isChecked) : ?>
+                                    <!--<i class="fas fa-check"></i>-->
+                                    <!--&#10003;-->
+                                <? else: ?>
+                                    <!--<span class="sx-no-check">&#10003;</span>-->
+                                <? endif; ?>
+                                <?= $value; ?>
+                            </button>
+                        <?php endif; ?>
+
+
                     <? endforeach; ?>
                 </div>
             <? endif; ?>

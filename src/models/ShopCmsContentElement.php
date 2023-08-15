@@ -206,12 +206,12 @@ class ShopCmsContentElement extends CmsContentElement
     /**
      * @return CmsContentElement|static
      */
-    public function copy()
+    public function copy($add_copy_name = true)
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
 
-            $model = parent::copy();
+            $model = parent::copy($add_copy_name);
             $sp = $this->shopProduct;
 
             ArrayHelper::remove($sp, 'id');
