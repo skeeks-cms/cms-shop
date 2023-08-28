@@ -147,11 +147,16 @@ class CartController extends Controller
                     //Нужно создать пользователя
                     $cmsUser = null;
                     if ($order->contact_phone) {
+                        //Если пользователь найден по телефону, то привязычваем заказа к нему
                         $cmsUser = CmsUser::find()->cmsSite()->phone($order->contact_phone)->one();
                     }
-                    if ($order->contact_email) {
+
+                    //Если пользователь не найден по телефону пробуем найти по еmail
+                    if ($cmsUser === null && $order->contact_email) {
                         $cmsUser = CmsUser::find()->cmsSite()->email($order->contact_email)->one();
                     }
+
+
                     
                     if (!$cmsUser) {
                         $cmsUser = new CmsUser();

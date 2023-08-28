@@ -20,9 +20,9 @@ $infoModel = $model;
         <? if ($infoModel->image) : ?>
             <img class="to-cart-fly-img" src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($infoModel->image ? $infoModel->image->src : null,
                 new \skeeks\cms\components\imaging\filters\Thumbnail([
-                    'w' => \Yii::$app->unifyShopTheme->catalog_img_preview_width,
-                    'h' => \Yii::$app->unifyShopTheme->catalog_img_preview_height,
-                    'm' => \Yii::$app->unifyShopTheme->catalog_img_preview_crop,
+                    'w' => 300,
+                    'h' => 300,
+                    'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
                 ]), $model->code
             ); ?>" title="<?= \yii\helpers\Html::encode($infoModel->name); ?>" alt="<?= \yii\helpers\Html::encode($infoModel->name); ?>"/>
         <? else : ?>
