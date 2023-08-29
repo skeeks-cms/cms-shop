@@ -1404,6 +1404,7 @@ class ShopOrder extends \skeeks\cms\models\Core
 
         $result['deliveries'] = $deliveriesData;
         $result['paysystems'] = $paysystemsData;
+        $result['html_order_items'] = \Yii::$app->view->render("@app/views/modules/shop/cart/_cart-order-items-v2");
 
 
         return $result;
