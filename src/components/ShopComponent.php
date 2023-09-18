@@ -1274,10 +1274,17 @@ SQL
      */
     static public function productDataForJsEvent(ShopCmsContentElement $cmsContentElement)
     {
+
+        $price = 0;
+        if ($cmsContentElement->shopProduct->minProductPrice) {
+            $price = $cmsContentElement->shopProduct->minProductPrice->money->amount;
+        } elseif($cmsContentElement->shopProduct->baseProductPrice) {
+            $price = $cmsContentElement->shopProduct->baseProductPrice->money->amount;
+        }
         $data = [
             'id'    => $cmsContentElement->id,
             "name"  => $cmsContentElement->seoName,
-            "price" => (float) ($cmsContentElement->shopProduct->minProductPrice ? $cmsContentElement->shopProduct->minProductPrice->money->amount : $cmsContentElement->shopProduct->baseProductPrice->money->amount)
+            "price" => (float) $price
         ];
 
         if ($cmsContentElement->cmsTree) {
