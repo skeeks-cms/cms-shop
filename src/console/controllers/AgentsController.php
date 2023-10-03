@@ -254,12 +254,18 @@ class AgentsController extends Controller
 
                         } elseif ($property->property_type == PropertyType::CODE_LIST) {
                             if (is_array($value)) {
+
+                                /*print_r($value);
+                                echo "\n";*/
+
                                 $newValue = [];
                                 foreach ($value as $valueId)
                                 {
 
                                     $mainEnum = $property->getEnums()->andWhere(['id' => $valueId])->one();
                                     if ($mainEnum) {
+
+
                                         $enum = $propertyNew->getEnums()->andWhere(['code' => $mainEnum->code])->one();
                                         if (!$enum) {
 
@@ -273,9 +279,14 @@ class AgentsController extends Controller
                                         }
 
                                         $newValue[] = $enum->id;
+                                                                                //print_r($newValue);
+
                                     }
 
                                 }
+
+                                $newElementProperties->setAttribute($code, $newValue);
+
                             } else {
                                 $newValue = null;
                                 $mainEnum = $property->getEnums()->andWhere(['id' => $value])->one();
@@ -309,9 +320,6 @@ class AgentsController extends Controller
                             $newElementProperties->setAttribute($code, $value);
                         }
                     }
-
-
-
 
                     if (!$newElementProperties->save())
                     {
