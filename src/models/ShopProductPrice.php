@@ -42,8 +42,8 @@ class ShopProductPrice extends \skeeks\cms\models\Core
     {
         parent::init();
 
-        $this->on(self::EVENT_AFTER_INSERT, [$this, "afterInstertCallback"]);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "afterUpdateCallback"]);
+        /*$this->on(self::EVENT_AFTER_INSERT, [$this, "afterInstertCallback"]);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, "afterUpdateCallback"]);*/
 
         $this->on(self::EVENT_AFTER_INSERT, [$this, "afterSaveEvent"]);
         $this->on(self::EVENT_AFTER_UPDATE, [$this, "afterSaveEvent"]);
