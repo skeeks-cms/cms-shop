@@ -36,10 +36,10 @@ use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopProductBarcode;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\cms\shop\models\ShopStore;
-use skeeks\cms\shop\models\ShopStoreDocMove;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProductMove;
 use skeeks\cms\widgets\GridView;
@@ -712,7 +712,7 @@ HTML
                             $query = $e->sender->dataProvider->query;
                             $query->joinWith("shopStoreProduct as shopStoreProduct");
                             $query->joinWith("shopStoreProduct.shopProduct as shopProduct");
-                            $query->andWhere([ShopStoreProductMove::tableName() . ".is_active" => 1]);
+                            $query->andWhere([ShopStoreProductMove::tableName().".is_active" => 1]);
 
                             $query->andWhere(['shopProduct.id' => $this->model->id]);
                         };
@@ -1249,6 +1249,35 @@ HTML
         }
 
 
+        $shopColumns["shop.measure_code"] = [
+            'attribute' => "shop.measure_code",
+            'label'     => "Единица продаж",
+            'format'    => 'raw',
+
+            'beforeCreateCallback' => function (GridView $grid) use ($store) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $grid->dataProvider->query;
+
+                $query->addSelect([
+                    'sp_measure_code' => 'sp.measure_code',
+                ]);
+
+
+                $grid->sortAttributes["shop.measure_code"] = [
+                    'asc'  => ['sp.measure_code' => SORT_ASC],
+                    'desc' => ['sp.measure_code' => SORT_DESC],
+                ];
+            },
+
+            'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+                return (string)$shopCmsContentElement->shopProduct->measure->asShortText;
+            },
+        ];
+        $visibleColumns[] = "shop.measure_code";
+
+
         $visibleColumns[] = "shop.barcodes";
 
 
@@ -1291,7 +1320,8 @@ HTML
                      */
                     $query = $e->dataProvider->query;
 
-                    if (ArrayHelper::getValue($e->field->value, "mode") == FilterModeEmpty::ID || ArrayHelper::getValue($e->field->value, "mode") == FilterModeNotEmpty::ID ||ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == '0') {
+                    if (ArrayHelper::getValue($e->field->value, "mode") == FilterModeEmpty::ID || ArrayHelper::getValue($e->field->value, "mode") == FilterModeNotEmpty::ID || ArrayHelper::getValue($e->field->value,
+                            "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == '0') {
 
                         $field->setIsHaving();
 
@@ -1547,17 +1577,16 @@ HTML
         }
 
 
-
         $filterFields["product_weight"] = [
-                'filterAttribute' => 'sp.weight',
-                'attribute' => "product_weight",
-                'label'     => "Вес товара с упаковкой",
-                'class'     => NumberFilterField::class,
-                'field'     => [
-                    'class' => NumberField::class,
-                ],
+            'filterAttribute' => 'sp.weight',
+            'attribute'       => "product_weight",
+            'label'           => "Вес товара с упаковкой",
+            'class'           => NumberFilterField::class,
+            'field'           => [
+                'class' => NumberField::class,
+            ],
 
-            ];
+        ];
 
         if ($defaultTypePrice) {
             $filterFields["retail_price_filter"] = [
@@ -1575,7 +1604,8 @@ HTML
                      */
                     $query = $e->dataProvider->query;
 
-                    if (ArrayHelper::getValue($e->field->value, "mode") == FilterModeNotEmpty::ID || ArrayHelper::getValue($e->field->value, "mode") == FilterModeEmpty::ID || ArrayHelper::getValue($e->field->value, "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
+                    if (ArrayHelper::getValue($e->field->value, "mode") == FilterModeNotEmpty::ID || ArrayHelper::getValue($e->field->value, "mode") == FilterModeEmpty::ID || ArrayHelper::getValue($e->field->value,
+                            "value.0") || ArrayHelper::getValue($e->field->value, "value.1") || (string)ArrayHelper::getValue($e->field->value, "value.0") == "0") {
 
                         $field->setIsHaving();
 
@@ -2066,8 +2096,7 @@ CSS
                 $relatedModel->load(\Yii::$app->request->post());
 
 
-                if (!$model->errors && !$relatedModel->errors)
-                {
+                if (!$model->errors && !$relatedModel->errors) {
                     if (!$model->save()) {
                         throw new Exception("Ошибка сохранения данных");
                     }
@@ -2077,38 +2106,38 @@ CSS
                     }
 
                     \Yii::$app->skeeks->site = $site;
-                    
+
                     $shopProduct->id = $model->id;
-                        if (!$shopProduct->save()) {
-                            throw new \yii\base\Exception("Товар не сохранен: ".print_r($shopProduct->errors, true));
+                    if (!$shopProduct->save()) {
+                        throw new \yii\base\Exception("Товар не сохранен: ".print_r($shopProduct->errors, true));
+                    }
+
+                    $savedPrice = $shopProduct->getBaseProductPrice()->one();
+                    foreach ($productPrices as $productPrice) {
+                        if ($savedPrice->type_price_id == $productPrice->type_price_id) {
+                            $productPrice = $savedPrice;
+                            $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                            $productPrice->load($data, "");
+                            $productPrice->save();
+                        } else {
+                            $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
+                            $productPrice->load($data, "");
+                            $productPrice->product_id = $shopProduct->id;
+                            $productPrice->save();
                         }
 
-                        $savedPrice = $shopProduct->getBaseProductPrice()->one();
-                        foreach ($productPrices as $productPrice) {
-                            if ($savedPrice->type_price_id == $productPrice->type_price_id) {
-                                $productPrice = $savedPrice;
-                                $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
-                                $productPrice->load($data, "");
-                                $productPrice->save();
-                            } else {
-                                $data = ArrayHelper::getValue($post, 'prices.'.$productPrice->type_price_id);
-                                $productPrice->load($data, "");
-                                $productPrice->product_id = $shopProduct->id;
-                                $productPrice->save();
-                            }
+                    }
 
-                        }
+                    if ($shopStoreProduct) {
+                        $shopStoreProduct->shop_product_id = $shopProduct->id;
+                        $shopStoreProduct->save();
+                    }
 
-                        if ($shopStoreProduct) {
-                            $shopStoreProduct->shop_product_id = $shopProduct->id;
-                            $shopStoreProduct->save();
-                        }
+                    $t->commit();
 
-                        $t->commit();
-                        
                     $rr->message = '✓ Сохранено';
                     $rr->data = [
-                        'type' => 'create'
+                        'type' => 'create',
                     ];
                     $rr->success = true;
                 } else {
@@ -2117,7 +2146,7 @@ CSS
                         'validation' => ArrayHelper::merge(
                             ActiveForm::validate($model),
                             ActiveForm::validate($relatedModel),
-                        )
+                        ),
                     ];
                 }
             } catch (\Exception $exception) {
@@ -2297,50 +2326,49 @@ CSS
                     $model->validate();
                     $relatedModel->validate();
 
-                    if (!$model->errors && !$relatedModel->errors && !$shopProduct->errors)
-                    {
+                    if (!$model->errors && !$relatedModel->errors && !$shopProduct->errors) {
                         if (!$model->save()) {
                             throw new Exception("Ошибка сохранения данных");
                         }
-    
+
                         if (!$relatedModel->save()) {
                             throw new Exception("Ошибка сохранения дополнительных данных");
                         }
-    
+
                         if (!$shopProduct->save()) {
                             throw new Exception("Ошибка сохранения товарных данных");
                         }
-                        
+
                         /**
-                             * @var $productPrice ShopProductPrice
-                             */
-                            foreach ($productPrices as $productPrice) {
-                                if ($productPrice->save()) {
+                         * @var $productPrice ShopProductPrice
+                         */
+                        foreach ($productPrices as $productPrice) {
+                            if ($productPrice->save()) {
 
-                                } else {
-                                    throw new Exception("Ошибка сохранения цены");
-                                }
-
+                            } else {
+                                throw new Exception("Ошибка сохранения цены");
                             }
 
+                        }
 
-                            /**
-                             * @var $productPrice ShopProductPrice
-                             */
-                            foreach ($shopStoreProducts as $shopStoreProduct) {
-                                if ($shopStoreProduct->save()) {
 
-                                } else {
-                                    throw new Exception('Check the correctness of the stores: '.print_r($shopStoreProduct->errors, true));
-                                }
+                        /**
+                         * @var $productPrice ShopProductPrice
+                         */
+                        foreach ($shopStoreProducts as $shopStoreProduct) {
+                            if ($shopStoreProduct->save()) {
 
+                            } else {
+                                throw new Exception('Check the correctness of the stores: '.print_r($shopStoreProduct->errors, true));
                             }
-                            
-    
+
+                        }
+
+
                         $rr->message = '✓ Сохранено';
                         $rr->success = true;
                         $rr->data = [
-                            'type' => 'update'
+                            'type' => 'update',
                         ];
                     } else {
                         $rr->success = false;
@@ -2349,14 +2377,14 @@ CSS
                                 ActiveForm::validate($model),
                                 ActiveForm::validate($relatedModel),
                                 ActiveForm::validate($shopProduct),
-                            )
+                            ),
                         ];
                     }
                 } catch (\Exception $exception) {
                     $rr->success = false;
                     $rr->message = $exception->getMessage();
                 }
-    
+
                 return $rr;
             }
 
@@ -2580,6 +2608,63 @@ JS
         }
 
         return $rr;
+    }
+
+
+    public function actionGenerateBarcode()
+    {
+        $rr = new RequestResponse();
+
+        /**
+         * @var $model ShopCmsContentElement
+         */
+        $model = $this->model;
+
+        if ($model) {
+
+            //Если у товара нет штрихкда, сгенерировать его
+            if (!$model->shopProduct->shopProductBarcodes) {
+                $lastBarcode = ShopProductBarcode::find()->orderBy(['id' => SORT_DESC])->limit(1)->one();
+                $lastId = 1;
+                if ($lastBarcode) {
+                    $lastId = $lastBarcode->id + 1;
+                }
+
+                $new_barcode = $this->_genBarcode($lastId);
+
+                $barcode = new ShopProductBarcode();
+                $barcode->shop_product_id = $model->id;
+                $barcode->value = $new_barcode;
+                if (!$barcode->save()) {
+                    $rr->success = false;
+                    $rr->message = print_r($barcode->errors, true);
+                } else {
+                    $rr->success = true;
+                }
+            }
+        }
+
+        return $rr;
+    }
+
+    private function _genBarcode($num)
+    {
+        $num = (string)$num;
+
+        $result = 0;
+        $s = "2".str_pad($num, 11, '0', STR_PAD_LEFT);
+        $s = trim($s);
+        $sArr = str_split($s);
+        $len_num = strlen($s);
+        /*print_r($sArr);
+        print_r($len_num);
+        die;*/
+        for ($i = $len_num - 1; $i >= 0; $i--) {
+            $result = $result + (int)($sArr[$i]) * (1 + (2 * ($i % 2)));
+        }
+        $last_num = (10 - ($result % 10)) % 10;
+
+        return $s.$last_num;
     }
 }
 

@@ -683,6 +683,32 @@ JS
                             ?>
                         <? endforeach; ?>
                     </div>
+                <?php else : ?>
+
+                    <?php
+                    $backendUrl = \yii\helpers\Url::to(['generate-barcode', 'pk' => $model->id]);
+
+                    $this->registerJs(<<<JS
+$(".sx-generate-barcode").on("click", function() {
+    var ajaxQuery = sx.ajax.preparePostQuery("{$backendUrl}");
+    
+    new sx.classes.AjaxHandlerStandartRespose(ajaxQuery, {
+        'blockerSelector' : 'body',
+        'enableBlocker' : true,
+    }).on("success", function(e, response) {
+        window.location.reload();
+    });
+    
+    ajaxQuery.execute();
+});
+JS
+                    );
+                    ?>
+
+                    <div class="text-center">
+                        <button class="btn btn-default sx-generate-barcode">Сгенерировать штрихкод</button>
+                    </div>
+
                 <?php endif; ?>
 
             </div>
