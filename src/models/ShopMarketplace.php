@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\models\CmsSite;
+use skeeks\cms\shop\components\WbComponent;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -28,6 +29,10 @@ use yii\helpers\ArrayHelper;
  * @property string                                  $oz_api_key API Key
  *
  * @property int                                     $ym_company_id Кампания №
+ *
+ * ***
+ *
+ * @property WbComponent|null                        $wbProvider
  *
  * @property CmsSite|\skeeks\cms\shop\models\CmsSite $cmsSite
  */
@@ -116,14 +121,14 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id'              => 'ID',
             'cms_site_id'     => 'Сайт',
-            'name'            => 'Название',
+            'name'            => 'Название магазина',
             'is_active'       => 'Активность',
             'priority'        => 'Сортировка',
             'marketplace'     => 'Маркетплейс',
             'wb_key_stat'     => 'Ключ «Статистика»',
             'wb_key_standart' => 'Ключ «Стандартный»',
-            'oz_client_id'    => 'Client ID',
-            'oz_api_key'      => 'API Key',
+            'oz_client_id'    => 'Ozon Client ID',
+            'oz_api_key'      => 'Ozon API Key',
             'ym_company_id'   => 'Кампания №',
         ]);
     }
@@ -134,6 +139,12 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
+            'name'            => '',
+            'wb_key_stat'     => '149 символов.',
+            'wb_key_standart' => '149 символов.',
+
+            'oz_client_id' => 'Пример Client Id: 124764',
+            'oz_api_key'   => 'Пример ключа: e6978772-ce82-4d2a-b49a-60d19e53fa5c',
         ]);
     }
 
@@ -147,5 +158,22 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
     {
         $siteClass = \Yii::$app->skeeks->siteClass;
         return $this->hasOne($siteClass, ['id' => 'cms_site_id']);
+    }
+
+    /**
+     * @return WbComponent|null
+     */
+    public function getWbProvider()
+    {
+        if (!$this->wb_key_standart || !$this->wb_key_stat) {
+            return null;
+        }
+
+        $wb = new WbComponent();
+
+        $wb->api_key = $this->wb_key_standart;
+        $wb->api_stat_key = $this->wb_key_stat;
+
+        return $wb;
     }
 }

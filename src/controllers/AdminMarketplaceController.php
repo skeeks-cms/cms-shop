@@ -10,15 +10,18 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
+use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\components\DeliveryHandlerComponent;
 use skeeks\cms\shop\deliveries\BoxberryDeliveryHandler;
 use skeeks\cms\shop\models\ShopDelivery;
+use skeeks\cms\shop\models\ShopMarketplace;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
 use skeeks\yii2\form\Builder;
@@ -32,7 +35,10 @@ use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\UnsetArrayValue;
+use yii\helpers\Url;
 
 /**
  * Class AdminTaxController
@@ -44,7 +50,7 @@ class AdminMarketplaceController extends BackendModelStandartController
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Marketplace');
         $this->modelShowAttribute = "name";
-        $this->modelClassName = ShopDelivery::class;
+        $this->modelClassName = ShopMarketplace::class;
 
         $this->generateAccessActions = false;
 
@@ -58,269 +64,295 @@ class AdminMarketplaceController extends BackendModelStandartController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
-            'index'  => [
-                "backendShowings" => false,
-                "filters"         => false,
 
-                'grid' => [
+            "view" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 80,
+                'name'     => 'Просмотр',
+                'icon'     => 'fas fa-info-circle',
+                'isOpenNewWindow' => false
+            ],
+
+            "products" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 90,
+                'name'     => 'Товары',
+                'icon'     => 'fas fa-info-circle',
+                'isOpenNewWindow' => false
+            ],
+
+
+            /*"add" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 80,
+                'name'     => 'Создать документ',
+            ],*/
+
+            'create' => new UnsetArrayValue(),
+            'update' => new UnsetArrayValue(),
+            /*"update" => [
+                'fields' => [$this, 'updateFields'],
+
+            ],*/
+            'delete-multi' => new UnsetArrayValue(),
+            'index' => [
+                'on beforeRender' => function (Event $e) {
+
+                    $e->content = $this->renderPartial("_index_btns");
+                    /*$e->content = Alert::widget([
+                        'closeButton' => false,
+                        'options'     => [
+                            'class' => 'alert-default',
+                        ],
+
+                        'body' => <<<HTML
+<a href="#" class="btn btn-primary">Создать движение</a>
+HTML
+                        ,
+                    ]);*/
+
+                },
+                "filters"         => false,
+                "backendShowings" => false,
+                'grid'            => [
                     'on init'        => function (Event $e) {
                         /**
                          * @var $dataProvider ActiveDataProvider
                          * @var $query ActiveQuery
                          */
                         $query = $e->sender->dataProvider->query;
-
-                        $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                        //$query->andWhere(['is_supplier' => 0]);
                     },
                     'defaultOrder'   => [
-                        'is_active' => SORT_DESC,
-                        'priority'  => SORT_ASC,
+                        'created_at' => SORT_DESC,
                     ],
                     'visibleColumns' => [
-                        'checkbox',
+
+                        //'checkbox',
                         'actions',
                         'name',
-                        'price',
+
+                        //'id',
+                        //'id',
                         'is_active',
-                        'priority',
-                        'shopPaySystems',
                     ],
                     'columns'        => [
-                        'name'           => [
+
+                        'is_active' => [
+                            'class'      => BooleanColumn::class,
+                            'trueValue'  => 1,
+                            'falseValue' => 1,
+                        ],
+                        'created_at' => [
+                            'class'      => DateTimeColumnData::class,
+                            'view_type'      => DateTimeColumnData::VIEW_DATE,
+                        ],
+                        'created_by' => [
+                            'class'      => UserColumnData::class,
+                        ],
+
+
+                        'name' => [
                             'class'         => DefaultActionColumn::class,
                             'viewAttribute' => 'asText',
                         ],
-                        'is_active'      => [
-                            'class' => BooleanColumn::class,
+
+
+                        'doc_type' => [
+                            'value'         => function(ShopStoreDocMove $shopStoreDocMove, $key, $index) {
+
+                if (!$shopStoreDocMove->is_active) {
+                    \Yii::$app->view->registerJs(<<<JS
+$('tr[data-key={$key}]').addClass('sx-tr-no-active');
+JS
+                                        );
+                }
+
+
+                                        \Yii::$app->view->registerCss(<<<CSS
+tr.sx-tr-no-active td
+{
+opacity: 0.2;
+}
+tr.sx-tr-no-active:hover td
+{
+opacity: 1;
+}
+CSS
+                                        );
+
+
+
+
+                                $result = [];
+                                $result[] = \yii\helpers\Html::a($shopStoreDocMove->asText, "#", [
+                                    'class' => "sx-trigger-action",
+                                ]);
+                                if ($shopStoreDocMove->comment) {
+                                    $result[] = "<small style='color: gray;'>{$shopStoreDocMove->comment}</small>";
+                                }
+                                return implode("<br />", $result);
+                            }
                         ],
-                        'logo_id'        => [
-                            'relationName' => 'logo',
-                            'class'        => ImageColumn::class,
-                        ],
-                        'shopPaySystems' => [
-                            'label' => 'Платежные системы',
-                            'value' => function (\skeeks\cms\shop\models\ShopDelivery $model) {
-                                if ($model->shopPaySystems) {
-                                    return implode(", ", \yii\helpers\ArrayHelper::map($model->shopPaySystems, 'id', 'name'));
+
+                        'shop_order_id' => [
+                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
+                                if ($shopStoreDocMove->shopOrder) {
+                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                        'controllerId'            => '/shop/admin-order',
+                                        'modelId'                 => $shopStoreDocMove->shopOrder->id,
+                                        'content'                 => $shopStoreDocMove->shopOrder->asText,
+                                        'isRunFirstActionOnClick' => true,
+                                        'options'                 => [
+                                            'class' => 'btn btn-xs btn-default',
+                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                        ],
+                                    ]);
                                 } else {
-                                    return 'Все';
+                                    return '';
                                 }
                             },
                         ],
+
+                        'shop_store_id' => [
+                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
+                                if ($shopStoreDocMove->shopStore) {
+                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+                                        'controllerId'            => '/shop/admin-shop-store',
+                                        'modelId'                 => $shopStoreDocMove->shopStore->id,
+                                        'content'                 => $shopStoreDocMove->shopStore->asText,
+                                        'isRunFirstActionOnClick' => true,
+                                        'options'                 => [
+                                            'class' => 'btn btn-xs btn-default',
+                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                        ],
+                                    ]);
+                                } else {
+                                    return '';
+                                }
+                            },
+                        ],
+
+                        'number_products' => [
+
+                            'label' => 'Позиций',
+                            'attribute' => 'number_products',
+
+                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
+                                return $shopStoreDocMove->raw_row['number_products'];
+                            },
+
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery = ShopStoreProductMove::find()->select([new Expression("count(1)")])->where(
+                                    ['shop_store_doc_move_id' => new Expression(ShopStoreDocMove::tableName() . ".id")],
+                                );
+
+                                $query->addSelect([
+                                    'number_products' => $subQuery,
+                                ]);
+
+
+                                $grid->sortAttributes["number_products"] = [
+                                    'asc'  => ['number_products' => SORT_ASC],
+                                    'desc' => ['number_products' => SORT_DESC],
+                                ];
+                            },
+                        ],
+
                     ],
                 ],
             ],
-            "create" => [
-                'fields'        => [$this, 'updateFields'],
-                'on beforeSave' => function (Event $e) {
-                    /**
-                     * @var $action BackendModelUpdateAction;
-                     * @var $model CmsUser;
-                     */
-                    $action = $e->sender;
-                    $model = $action->model;
-                    $action->isSaveFormModels = false;
 
-                    if (isset($action->formModels['handler'])) {
-                        $handler = $action->formModels['handler'];
-                        $model->component_config = $handler->toArray();
-                    }
-
-                    if ($model->save()) {
-                        //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
-                    } else {
-                        throw new Exception(print_r($model->errors, true));
-                    }
-
-                },
-            ],
-            "update" => [
-                'fields'        => [$this, 'updateFields'],
-                'on beforeSave' => function (Event $e) {
-                    /**
-                     * @var $action BackendModelUpdateAction;
-                     * @var $model CmsUser;
-                     */
-                    $action = $e->sender;
-                    $model = $action->model;
-                    $action->isSaveFormModels = false;
-
-                    if (isset($action->formModels['handler'])) {
-                        $handler = $action->formModels['handler'];
-                        $model->component_config = $handler->toArray();
-                    }
-
-
-                    if ($model->save()) {
-                        //$action->afterSaveUrl = Url::to(['update', 'pk' => $newModel->id, 'content_id' => $newModel->content_id]);
-                    } else {
-                        throw new Exception(print_r($model->errors, true));
-                    }
-
-                },
-
-            ],
-
-            "activate-multi" => [
-                'class' => BackendModelMultiActivateAction::class,
-            ],
-
-            "deactivate-multi" => [
-                'class' => BackendModelMultiDeactivateAction::class,
-            ],
         ]);
     }
 
-    public function updateFields($action)
-    {
-        $handlerFields = [];
-        /**
-         * @var $handler DeliveryHandlerComponent
-         */
-        if ($action->model && $action->model->handler) {
-            $handler = $action->model->handler;
-            $handlerFields = $handler->getConfigFormFields();
-            $handlerFields = Builder::setModelToFields($handlerFields, $handler);
+    public function actionView() {
 
-            $action->formModels['handler'] = $handler;
-            if ($post = \Yii::$app->request->post()) {
-                $handler->load($post);
+        return $this->render("view", [
+            'model' => $this->model,
+        ]);
+    }
+
+    public function actionAdd()
+    {
+        $model = new ShopMarketplace();
+        $model->is_active = 1;
+        $marketplace = \Yii::$app->request->get("marketplace");
+        if (!$marketplace) {
+            return $this->redirect("index");
+        }
+        $model->marketplace = \Yii::$app->request->get("marketplace");
+
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+
+
+                if (!$model->load(\Yii::$app->request->post()) || !$model->validate()) {
+                    $message = "Проверьте корректность данных";
+
+                    $errors = $model->getFirstErrors();
+                    if ($errors) {
+                        $error = array_shift($errors);
+                        $message = $error;
+                    }
+
+                    throw new \yii\base\Exception($message);
+                }
+                
+                if ($model->wbProvider) {
+                    $apiResponse = $model->wbProvider->methodContentAll();
+                    if (!$apiResponse->isOk) {
+                        throw new Exception("Стандартный ключ — некорректный! Ответ от API: $apiResponse->error_message");
+                    }
+
+
+                    $apiResponse = $model->wbProvider->methodStatSupplierSales([
+                        'dateFrom' => '2019-06-20'
+                    ]);
+                    if (!$apiResponse->isOk) {
+                        throw new Exception("Ключ статистики — некорректный! Ответ от API: $apiResponse->error_message");
+                    }
+                }
+
+
+                if (!$model->save()) {
+                    if ($model->getFirstErrors()) {
+                        $errors = $model->getFirstErrors();
+                        $error = array_shift($errors);
+                        throw new \yii\base\Exception($error);
+                    }
+                }
+
+                $t->commit();
+
+                $rr->data['view_url'] = Url::to(['view', 'pk' => $model->id]);
+                $rr->message = "Маркетплейс подключен";
+                $rr->success = true;
+
+
+            } catch (\Exception $exception) {
+                $t->rollBack();
+                $rr->success = false;
+                $rr->message = $exception->getMessage();
             }
 
+
+            return $rr;
         }
 
-        $result = [
-
-
-            'main' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Main'),
-                'fields' => [
-
-                    'is_active' => [
-                        'class'     => BoolField::class,
-                        'allowNull' => false,
-                    ],
-
-                    'logo_id'  => [
-                        'class'        => WidgetField::class,
-                        'widgetClass'  => AjaxFileUploadWidget::class,
-                        'widgetConfig' => [
-                            'accept'   => 'image/*',
-                            'multiple' => false,
-                        ],
-                    ],
-
-
-                    'name',
-                    'priority' => NumberField::class,
-
-
-                    'description' => [
-                        'class'       => WidgetField::class,
-                        'widgetClass' => ComboTextInputWidget::class,
-                    ],
-
-
-                    ['class' => HtmlRowBegin::class],
-
-                    [
-                        'class'    => HtmlColBegin::class,
-                        'colClass' => 'col-3',
-                    ],
-
-                    'price' => NumberField::class,
-
-                    ['class' => HtmlColEnd::class],
-
-                    [
-                        'class'    => HtmlColBegin::class,
-                        'colClass' => 'col-3',
-                    ],
-
-                    'currency_code' => [
-                        'class' => SelectField::class,
-                        'items' => \yii\helpers\ArrayHelper::map(\skeeks\cms\money\models\MoneyCurrency::find()->where(['is_active' => 1])->all(), 'code', 'code'),
-                    ],
-
-                    ['class' => HtmlColEnd::class],
-
-                    ['class' => HtmlRowEnd::class],
-
-                    'free_price_from' => [
-                        'class' => NumberField::class
-                    ]
-
-                ],
-            ],
-
-            /*'filter' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Условия показа'),
-                'fields' => [
-                    ['class' => HtmlRowBegin::class],
-
-                    [
-                        'class'    => HtmlColBegin::class,
-                        'colClass' => 'col-3',
-                    ],
-
-                    'order_price_from' => NumberField::class,
-                    ['class' => HtmlColEnd::class],
-
-                    [
-                        'class'    => HtmlColBegin::class,
-                        'colClass' => 'col-3',
-                    ],
-
-
-                    'order_price_to'   => NumberField::class,
-
-                    ['class' => HtmlColEnd::class],
-
-                    ['class' => HtmlRowEnd::class],
-
-
-                ],
-            ],*/
-
-            'additionally' => [
-                'class'  => FieldSet::class,
-                'name'   => \Yii::t('skeeks/shop/app', 'Additionally'),
-                'fields' => [
-
-                    'shopPaySystems' => [
-                        'class'    => SelectField::class,
-                        'multiple' => true,
-                        'items'    => \yii\helpers\ArrayHelper::map(
-                            \skeeks\cms\shop\models\ShopPaySystem::find()->cmsSite()->active()->all(), 'id', 'name'
-                        ),
-                    ],
-
-                    'component' => [
-                        'class'          => SelectField::class,
-                        'items'          => \Yii::$app->shop->getDeliveryHandlersForSelect(),
-                        'elementOptions' => [
-                            RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
-                        ],
-                    ],
-
-                ],
-            ],
-        ];
-
-        if ($handlerFields) {
-            $result = ArrayHelper::merge($result, [
-                'handler' => [
-                    'class'  => FieldSet::class,
-                    'name'   => "Настройки обработчика",
-                    'fields' => $handlerFields,
-                ],
-            ]);
-        }
-
-
-        return $result;
+        return $this->render("add", [
+            'model' => $model,
+        ]);
     }
 
 }
