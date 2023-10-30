@@ -267,6 +267,16 @@ class ShopCheck extends \skeeks\cms\base\ActiveRecord
                 'default',
                 'value' => self::DOCTYPE_SALE,
             ],
+            [
+                [
+                    'seller_address',
+                    'seller_name',
+                    'seller_inn',
+                    'kkm_payments_address',
+                ],
+                'default',
+                'value' => "",
+            ],
 
             [
                 [

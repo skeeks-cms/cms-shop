@@ -57,6 +57,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\widgets\ActiveForm;
 
 /**
  * @property CmsContent $content
@@ -1178,7 +1179,7 @@ HTML
                 'label'     => "В наличии",
                 'format'    => 'raw',
 
-                'beforeCreateCallback' => function (GridView $grid) use ($store) {
+                'beforeCreateCallback' => function (GridView $grid) {
                     /**
                      * @var $query ActiveQuery
                      */
@@ -1199,7 +1200,7 @@ HTML
                     ];
                 },
 
-                'value' => function (ShopCmsContentElement $shopCmsContentElement) use ($store) {
+                'value' => function (ShopCmsContentElement $shopCmsContentElement) {
                     if ($shopCmsContentElement->shopProduct && !$shopCmsContentElement->shopProduct->isOffersProduct) {
 
                         return (float)$shopCmsContentElement->raw_row['quantity_our']." ".$shopCmsContentElement->shopProduct->measure->symbol;
@@ -1217,7 +1218,7 @@ HTML
                 'label'     => "У поставщиков",
                 'format'    => 'raw',
 
-                'beforeCreateCallback' => function (GridView $grid) use ($store) {
+                'beforeCreateCallback' => function (GridView $grid) {
                     /**
                      * @var $query ActiveQuery
                      */
@@ -1238,7 +1239,7 @@ HTML
                     ];
                 },
 
-                'value' => function (ShopCmsContentElement $shopCmsContentElement) use ($store) {
+                'value' => function (ShopCmsContentElement $shopCmsContentElement) {
                     if ($shopCmsContentElement->shopProduct && !$shopCmsContentElement->shopProduct->isOffersProduct) {
                         return (float)$shopCmsContentElement->raw_row['quantity_suppliers']." ".$shopCmsContentElement->shopProduct->measure->symbol;
                     }
@@ -1254,7 +1255,7 @@ HTML
             'label'     => "Единица продаж",
             'format'    => 'raw',
 
-            'beforeCreateCallback' => function (GridView $grid) use ($store) {
+            'beforeCreateCallback' => function (GridView $grid) {
                 /**
                  * @var $query ActiveQuery
                  */
@@ -2098,7 +2099,7 @@ CSS
 
                 if (!$model->errors && !$relatedModel->errors) {
                     if (!$model->save()) {
-                        throw new Exception("Ошибка сохранения данных");
+                        throw new Exception("Ошибка сохранения данных: " . print_r($model->errors, true));
                     }
 
                     if (!$relatedModel->save()) {
@@ -2153,6 +2154,13 @@ CSS
                 $t->rollBack();
                 $rr->success = false;
                 $rr->message = $exception->getMessage();
+
+                $rr->data = [
+                    'validation' => ArrayHelper::merge(
+                        ActiveForm::validate($model),
+                        ActiveForm::validate($relatedModel),
+                    ),
+                ];
             }
 
 
