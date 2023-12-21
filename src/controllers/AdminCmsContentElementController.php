@@ -40,6 +40,7 @@ use skeeks\cms\shop\models\ShopProductBarcode;
 use skeeks\cms\shop\models\ShopProductPrice;
 use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\cms\shop\models\ShopStore;
+use skeeks\cms\shop\models\ShopStoreDocMove;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProductMove;
 use skeeks\cms\widgets\GridView;
@@ -1124,6 +1125,56 @@ HTML
             ];
             $visibleColumns[] = "shop.marginality_per";
             $visibleColumns[] = "shop.marginality_abs";
+
+
+
+
+
+            $shopColumns["shop.cost_price"] = [
+                'attribute' => "shop.cost_price",
+                'label'     => "Себестоимость",
+                'format'    => 'raw',
+
+                'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $grid->dataProvider->query;
+
+                    $q = ShopStoreProductMove::find()
+                        ->from([
+                            'sspm' => ShopStoreProductMove::tableName()
+                        ])
+                        ->joinWith("shopStoreDocMove as shopStoreDocMove")
+                        ->joinWith("shopStoreProduct as shopStoreProduct")
+                        ->andWhere(['shopStoreProduct.shop_product_id' => new Expression("sp.id")])
+                        ->andWhere(['shopStoreDocMove.doc_type' => ShopStoreDocMove::DOCTYPE_POSTING])
+                        ->addSelect([
+                            "cost_price" => new Expression("sum(sspm.price * sspm.quantity) / sum(sspm.quantity)")
+                        ]);
+                    ;
+
+
+                    $query->addSelect([
+                        'cost_price' => $q,
+                    ]);
+
+                    $grid->sortAttributes["shop.cost_price"] = [
+                        'asc'  => ['cost_price' => SORT_ASC],
+                        'desc' => ['cost_price' => SORT_DESC],
+                    ];
+                },
+
+                'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+
+                    $result = $shopCmsContentElement->raw_row['cost_price'] ? (float) $shopCmsContentElement->raw_row['cost_price'] : "";
+
+                    return Html::tag("div", $result, [
+                    ]);
+
+                    return "";
+                },
+            ];
         }
 
 
@@ -2103,7 +2154,7 @@ CSS
                     }
 
                     if (!$relatedModel->save()) {
-                        throw new Exception("Ошибка сохранения дополнительных данных");
+                        throw new Exception("Ошибка сохранения дополнительных данных: " . print_r($relatedModel->errors, true));
                     }
 
                     \Yii::$app->skeeks->site = $site;
@@ -2340,7 +2391,7 @@ CSS
                         }
 
                         if (!$relatedModel->save()) {
-                            throw new Exception("Ошибка сохранения дополнительных данных");
+                            throw new Exception("Ошибка сохранения дополнительных данных: " . print_r($relatedModel->errors, true));
                         }
 
                         if (!$shopProduct->save()) {

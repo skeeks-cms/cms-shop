@@ -1233,8 +1233,8 @@ class ShopOrder extends \skeeks\cms\models\Core
     {
         $this->tax_amount = $this->calcMoneyVat->amount;
 
-        $this->discount_amount = $this->calcMoneyDiscount->amount;
-        $this->delivery_amount = $this->calcMoneyDelivery->amount;
+        $this->discount_amount = (float) $this->calcMoneyDiscount->amount;
+        $this->delivery_amount = (float) $this->calcMoneyDelivery->amount;
 
         /*var_dump($this->delivery_amount);
         print_r($this->calcMoneyDelivery);

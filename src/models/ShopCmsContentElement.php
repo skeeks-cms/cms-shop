@@ -540,7 +540,13 @@ class ShopCmsContentElement extends CmsContentElement
                 return $this->mainCmsContentElement->productName;
             }
 
-            $name = $this->shopProduct->shopProductWhithOffers->cmsContentElement->name;
+            if ($this->shopProduct) {
+                $shopProductWhithOffers = $this->shopProduct->shopProductWhithOffers;
+                if ($shopProductWhithOffers && $shopProductWhithOffers->cmsContentElement) {
+                    $name = $shopProductWhithOffers->cmsContentElement->name;
+                }
+            }
+
             if (\Yii::$app->shop->offerCmsContentProperties) {
                 foreach (\Yii::$app->shop->offerCmsContentProperties as $cmsContentProperty) {
                     if ($value = $this->relatedPropertiesModel->getAttribute($cmsContentProperty->code)) {

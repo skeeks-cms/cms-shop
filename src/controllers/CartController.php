@@ -360,7 +360,11 @@ class CartController extends Controller
             }
 
             if ($product->measure_ratio > 1) {
-                if ($quantity % $product->measure_ratio != 0) {
+
+                $quantity = (float) $quantity;
+                $product->measure_ratio = $product->measure_ratio;
+                $va = ($quantity * 1000) % ($product->measure_ratio * 1000);
+                if ($va != 0) {
                     $quantity = $product->measure_ratio;
                 }
             }
@@ -626,7 +630,8 @@ class CartController extends Controller
                     $product = $shopBasket->product;
 
                     if ($product->measure_ratio > 1) {
-                        if ($quantity % $product->measure_ratio != 0) {
+
+                        if ($va = ($quantity * 1000) % ($product->measure_ratio * 1000) != 0) {
                             $quantity = $product->measure_ratio;
                         }
                     }

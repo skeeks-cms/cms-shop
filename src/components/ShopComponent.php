@@ -1341,6 +1341,7 @@ SQL
 
 
 
+
         try {
             $result = [];
 
@@ -1365,8 +1366,6 @@ SQL
             ]);
             $q0->groupBy("shopProduct.id");
             $q0->orderBy(false);
-
-            //print_r($q0->createCommand()->rawSql);die;
 
             $result['offerCount'] = $q0->count();
 
