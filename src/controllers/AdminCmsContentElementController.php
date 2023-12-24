@@ -1970,7 +1970,7 @@ HTML
         $model->loadDefaultValues();
         $model->content_id = $this->content->id;
 
-        $relatedModel = $model->relatedPropertiesModel;
+
         $shopProduct = new ShopProduct();
         $shopProduct->loadDefaultValues();
         $shopProduct->validate();
@@ -2047,6 +2047,8 @@ CSS
 
         if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
+
+            $relatedModel = $model->relatedPropertiesModel;
             $relatedModel->load(\Yii::$app->request->post());
             $shopProduct->load(\Yii::$app->request->post());
 
@@ -2055,6 +2057,8 @@ CSS
                 $productPrice->load($data, "");
             }
 
+        } else {
+            $relatedModel = $model->relatedPropertiesModel;
         }
 
 
