@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $notify_emails Email адреса для уведомлений о заказах
  * @property int         $is_show_cart Показывать корзину?
  * @property int         $is_show_prices Показывать цены?
+ * @property int         $is_show_prices_only_quantity Показывать цены только для товаров в наличии?
  *
  * @property int         $is_show_product_no_price Показывать товары с нулевыми ценами?
  * @property int         $is_show_button_no_price Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?
@@ -138,6 +139,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     'is_show_quantity_product',
                     'is_show_cart',
                     'is_show_prices',
+                    'is_show_prices_only_quantity',
                 ],
                 'boolean',
             ],
@@ -193,6 +195,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
             'is_show_cart'                  => "Показывать корзину на сайте?",
             'is_show_prices'                => "Показывать цены на сайте?",
+            'is_show_prices_only_quantity'                => "Показывать цены на сайте только если товар в наличиии?",
             'order_required_fields'         => "Поля обязательные при оформлении заказа заказа",
 
             'max_product_rating_value'          => "Максимальное значение рейтинга товаров",
@@ -224,6 +227,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 Если выбрано «нет», то фактически на сайте будет отключена корзина
 ",
             'is_show_prices'                 => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены",
+            'is_show_prices_only_quantity'                 => "Если выбрано «нет», то на сайте цена будет отображаться у всех товаров.",
             'order_free_shipping_from_price' => "Бесплатная доставка при оформлении заказа от указанной суммы в валюте заказа",
             'is_generate_product_rating'     => "Если рейтинг товара не заполнен, то он будет сгенерирован автоматически. Это полезно для продвижения сайта.",
             'is_generate_product_rating'     => "Если рейтинг товара не заполнен, то он будет сгенерирован автоматически. Это полезно для продвижения сайта.",
