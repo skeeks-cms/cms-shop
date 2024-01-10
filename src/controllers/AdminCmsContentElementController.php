@@ -1978,33 +1978,9 @@ HTML
         $rr = new RequestResponse();
 
 
-        $shopStoreProduct = null;
-        if ($store_product_id = \Yii::$app->request->get("store_product_id")) {
-            /**
-             * @var $shopStoreProduct ShopStoreProduct
-             */
-            $shopStoreProduct = ShopStoreProduct::find()->where(['id' => $store_product_id])->one();
 
-            if ($shopStoreProduct) {
 
-                $shopStoreProduct->loadDataToElementProduct($model, $shopProduct);
-                /*$subShopProduct = $shopSubproductContentElement->shopProduct;
-                $shopSubproductContentElement->loadDataToMainModel($model);
-                $siteClass = \Yii::$app->skeeks->siteClass;
-                if (!$defaultSite = $siteClass::find()->andWhere(['is_default' => 1])->one()) {
-                    throw new Exception("Нет сайта по умолчанию");
-                }
-                $model->cms_site_id = $defaultSite->id;
 
-                $shopProduct->measure_code = $subShopProduct->measure_code;
-                $shopProduct->measure_ratio = $subShopProduct->measure_ratio;
-                $shopProduct->measure_ratio_min = $subShopProduct->measure_ratio_min;
-                $shopProduct->height = $subShopProduct->height;
-                $shopProduct->width = $subShopProduct->width;
-                $shopProduct->length = $subShopProduct->length;
-                $shopProduct->width = $subShopProduct->width;*/
-            }
-        }
 
         //Если создаем товар предложение
         if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
@@ -2045,11 +2021,39 @@ CSS
             }
         }
 
+
+
+        //Сначала правильно подгружаем данные выбранные в форме
         if ($post = \Yii::$app->request->post()) {
             $model->load(\Yii::$app->request->post());
-
             $relatedModel = $model->relatedPropertiesModel;
             $relatedModel->load(\Yii::$app->request->post());
+        }
+
+        //Затем пытаем автоматически заполнить данные из товара поставщика
+        $shopStoreProduct = null;
+        if ($store_product_id = \Yii::$app->request->get("store_product_id")) {
+            /**
+             * @var $shopStoreProduct ShopStoreProduct
+             */
+            $shopStoreProduct = ShopStoreProduct::find()->where(['id' => $store_product_id])->one();
+
+            if ($shopStoreProduct) {
+                $shopStoreProduct->loadDataToElementProduct($model, $shopProduct);
+            }
+        }
+
+        //Перезатераем тем что выбранно в форме
+        if ($post = \Yii::$app->request->post()) {
+            $model->load(\Yii::$app->request->post());
+            $relatedModel = $model->relatedPropertiesModel;
+            //print_r($relatedModel->toArray());die;
+            $relatedModel->load(\Yii::$app->request->post());
+
+            /*print_r($model->tree_id);
+            print_r($relatedModel->toArray());
+            die;*/
+
             $shopProduct->load(\Yii::$app->request->post());
 
             foreach ($productPrices as $productPrice) {
@@ -2060,6 +2064,9 @@ CSS
         } else {
             $relatedModel = $model->relatedPropertiesModel;
         }
+
+
+
 
 
         if ($rr->isRequestPjaxPost()) {
@@ -2249,7 +2256,7 @@ CSS
          * @var $model ShopCmsContentElement
          */
         $model = $this->model;
-        $relatedModel = $model->relatedPropertiesModel;
+
         $shopProduct = $model->shopProduct;
 
 
@@ -2284,8 +2291,12 @@ CSS
             if ($post = \Yii::$app->request->post()) {
 
                 $model->load(\Yii::$app->request->post());
+                $relatedModel = $model->relatedPropertiesModel;
+
                 $relatedModel->load(\Yii::$app->request->post());
                 $shopProduct->load(\Yii::$app->request->post());
+            } else {
+                $relatedModel = $model->relatedPropertiesModel;
             }
 
 

@@ -51,6 +51,30 @@
             <?php echo $element->productName; ?>
         </div>
     </div>
+    
+    <?php if ($isPrintQrcode) : ?>
+        <? $qrCodeBase64 = (new \chillerlan\QRCode\QRCode())->render($element->absoluteUrl); ?>
+        <div class="text-center" style="height: 25px; padding: 0 5px; padding-top:0mm;">
+            <div class="block" style='
+				height: 25px;
+				border-left-width: 0px;
+				border-right-width: 0px;
+				border-bottom-width: 0px;
+				border-top-width: 0px;
+				text-align: center;
+				'>
+
+
+                    <?
+                    $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
+                    ?>
+                    <img style="width: 25px;" src="<?php echo $qrCodeBase64; ?>"/>
+
+
+                </div>
+        </div>
+    <? endif; ?>
+    
     <?php if ($isPrintBarcode && $element->shopProduct->shopProductBarcodes) : ?>
         <div class="text-center" style="height: 9mm;padding: 0 5px; padding-top: 1mm">
             <? foreach ($element->shopProduct->shopProductBarcodes as $data) : ?>

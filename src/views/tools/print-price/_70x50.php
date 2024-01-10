@@ -15,19 +15,18 @@
 ?>
 
 
-<div class="label" style="width: 70mm; height: 50mm;">
+<div class="label" style="width: 70mm; height: 50mm; max-width: 70mm; max-height: 50mm; overflow: hidden;">
 
 
     <?php if ($isPrintPrice) : ?>
     <div class="block" style='
-				height: 9mm;
 				padding-top: 2mm;
+				padding-bootom: 1mm;
 				border-left-width: 0px;
 				border-right-width: 0px;
 				border-bottom-width: 0px;
 				border-top-width: 0px;
 				'>
-
         <div class="text" style='
 							font-size: 20px;
 							font-weight: bold;
@@ -36,18 +35,18 @@
 							text-align: center'>
             <?php echo $element->shopProduct->baseProductPrice->money; ?>
         </div>
-
-
     </div>
     <?php endif; ?>
 
     <div class="block" style='
-				height: 18mm;
+				height: 13mm;
+				max-height: 13mm;
+				overflow: hidden;
 				border-left-width: 0px;
 				border-right-width: 0px;
 				border-bottom-width: 0px;
 				border-top-width: 0px;
-				padding: 0 5px;
+				padding: 1mm;
 				'>
 
         <div class="text" style='
@@ -63,6 +62,29 @@
     </div>
 
 
+    <?php if ($isPrintQrcode) : ?>
+        <? $qrCodeBase64 = (new \chillerlan\QRCode\QRCode())->render($element->absoluteUrl); ?>
+        <div class="text-center" style="height: 20mm; padding: 0 5px; padding-top:1mm;">
+            <div class="block" style='
+				height: 20mm;
+				border-left-width: 0px;
+				border-right-width: 0px;
+				border-bottom-width: 0px;
+				border-top-width: 0px;
+				text-align: center;
+				'>
+
+
+                    <?
+                    $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
+                    ?>
+                    <img style="width: 20mm;" src="<?php echo $qrCodeBase64; ?>"/>
+
+
+                </div>
+        </div>
+    <? endif; ?>
+    
     <?php if ($isPrintBarcode && $element->shopProduct->shopProductBarcodes) : ?>
         <div class="text-center" style="height: 18mm; padding: 0 5px; padding-top:1mm;">
             <? foreach ($element->shopProduct->shopProductBarcodes as $data) : ?>
