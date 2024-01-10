@@ -90,9 +90,19 @@ JS
                     <div style="display: none;">
                         <textarea name="ids"></textarea>
                     </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" name="is-print-price" id="is-print-price" checked/>
+                        <label for="is-print-price">Печатать цену на ценнике</label>
+                    </div>
                     <div class="form-group">
                         <input type="checkbox" name="is-print-barcode" id="is-print-barcode" checked/>
                         <label for="is-print-barcode">Печатать штрихкод на ценнике</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" name="is-print-qrcode" id="is-print-qrcode"/>
+                        <label for="is-print-qrcode">Печатать qrcode со ссылкой на товар</label>
                     </div>
                     <div class="form-group">
                         <input type="checkbox" name="is-print-spec" id="is-print-spec"/>

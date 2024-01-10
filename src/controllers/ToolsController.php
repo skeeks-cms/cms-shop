@@ -41,6 +41,8 @@ class ToolsController extends Controller
     {
         $isSpec = \Yii::$app->request->post("is-print-spec");
         $barcode = \Yii::$app->request->post("is-print-barcode");
+        $qrcode = \Yii::$app->request->post("is-print-qrcode");
+        $price = \Yii::$app->request->post("is-print-price");
         $ids = \Yii::$app->request->post("ids");
         $template = \Yii::$app->request->post("template");
 
@@ -123,6 +125,8 @@ CSS;
 
                 $content = $this->renderPartial("print-price/_" . $template, [
                     'q' => $q,
+                    'isPrintPrice' => (bool) $price,
+                    'isPrintQrcode' => (bool) $qrcode,
                     'isPrintBarcode' => (bool) $barcode,
                     'isPrintSpec' => false,
                     'element' =>  $element,
@@ -144,6 +148,8 @@ CSS;
             {
                 $content .= $this->renderPartial("print-price/_" . $template, [
                     'q' => $q,
+                    'isPrintPrice' => (bool) $price,
+                    'isPrintQrcode' => (bool) $qrcode,
                     'isPrintBarcode' => (bool) $barcode,
                     'isPrintSpec' => (bool) $isSpec,
                     'element' =>  $element,
@@ -154,6 +160,8 @@ CSS;
             //$this->layout = "@skeeks/cms/shop/views/tools/print-price/main";
             return $this->renderPartial("print-price/main", [
                 'content' => $content,
+                'isPrintPrice' => (bool) $price,
+                'isPrintQrcode' => (bool) $qrcode,
                 'isPrintBarcode' => (bool) $barcode,
                 'isPrintSpec' => (bool) $isSpec,
             ]);

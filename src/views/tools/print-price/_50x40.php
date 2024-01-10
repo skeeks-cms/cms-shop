@@ -17,6 +17,7 @@
 <div class="label" style="width: 50mm; height: 40mm;">
 
 
+    <?php if ($isPrintPrice) : ?>
     <div class="block" style='
 				height: 7mm;
 				padding-top: 2mm;
@@ -37,6 +38,7 @@
 
 
     </div>
+    <?php endif; ?>
 
     <div class="block" style='
 				height: 12mm;

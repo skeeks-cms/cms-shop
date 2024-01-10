@@ -15,6 +15,7 @@
 ?>
 
 <div class="label" style="width: 30mm; height: 20mm;">
+    <?php if ($isPrintPrice) : ?>
     <div class="block" style='
 				height: 3mm;
 				padding-top: 1mm;
@@ -32,6 +33,7 @@
             <?php echo $element->shopProduct->baseProductPrice->money; ?>
         </div>
     </div>
+    <?php endif; ?>
     <div class="block" style='
 				height: 6mm;
 				border-left-width: 0px;
