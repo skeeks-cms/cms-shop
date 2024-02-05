@@ -30,7 +30,7 @@ CSS
     <div class="sx-not-real">
         <div class="input-group">
             <input class="form-control" type="number" step="1" style="max-width: 200px;">
-            <?= \yii\helpers\Html::listBox("sx-not-real-select", "mm", [
+            <?= \yii\helpers\Html::listBox("sx-not-real-select", "sm", [
                 'mm'  => 'мм',
                 'sm' => 'см',
                 'm'  => 'м',
@@ -89,19 +89,28 @@ $this->registerJs(<<<JS
             });
             
             var startVal = this.getRealInput().val();
-            if (startVal >= 1000) {
-                var val = startVal/1000;
-                self.getNotRealInput().val(val);
-                self.getNotRealSelect().val("m");
-            } else if (startVal >= 10) {
-                var val = startVal/10;
-                self.getNotRealInput().val(val);
+            if (startVal == 0) {
                 self.getNotRealSelect().val("sm");
+                self.getNotRealInput().attr("step", "0.01");
             } else {
-                var val = startVal;
-                self.getNotRealInput().val(val);
-                self.getNotRealSelect().val("mm");
+                if (startVal >= 1000) {
+                    var val = startVal/1000;
+                    self.getNotRealInput().val(val);
+                    self.getNotRealSelect().val("m");
+                    self.getNotRealInput().attr("step", "0.0001");
+                } else if (startVal >= 10) {
+                    var val = startVal/10;
+                    self.getNotRealInput().val(val);
+                    self.getNotRealSelect().val("sm");
+                    self.getNotRealInput().attr("step", "0.01");
+                } else {
+                    var val = startVal;
+                    self.getNotRealInput().val(val);
+                    self.getNotRealSelect().val("mm");
+                    self.getNotRealInput().attr("step", "1");
+                }
             }
+            
             
         },
         
