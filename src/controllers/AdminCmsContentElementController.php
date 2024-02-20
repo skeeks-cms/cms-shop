@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\controllers;
 
+use PhpOffice\PhpWord\Shared\Text;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
@@ -26,6 +27,7 @@ use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
 use skeeks\cms\money\Money;
 use skeeks\cms\queryfilters\filters\modes\FilterModeEmpty;
+use skeeks\cms\queryfilters\filters\modes\FilterModeEq;
 use skeeks\cms\queryfilters\filters\modes\FilterModeNotEmpty;
 use skeeks\cms\queryfilters\filters\NumberFilterField;
 use skeeks\cms\queryfilters\filters\StringFilterField;
@@ -48,6 +50,7 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
+use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\DynamicModel;
 use yii\base\Event;
@@ -96,6 +99,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         $actions = ArrayHelper::merge(parent::actions(), [
 
                 "index" => [
+                    'backendShowings' => false,
                     'on beforeRender' => function (Event $e) {
                         $urlHelper = new BackendUrlHelper();
                         $urlHelper->setBackendParamsByCurrentRequest();
@@ -1495,22 +1499,32 @@ HTML
 
         $filterFields['barcodes'] = [
             'class'           => StringFilterField::class,
+            'field'             => [
+                'class' => TextField::class,
+            ],
+            "isAllowChangeMode" => false,
+            "defaultMode"       => FilterModeEq::ID,
+            /*'elementOptions' => [
+                'placeholder' => 'Штрихкод',
+            ],*/
             'label'           => 'Штрихкод',
             'filterAttribute' => 'barcodes.value',
             'on apply'        => function (QueryFiltersEvent $e) {
-                /**
-                 * @var $query ActiveQuery
-                 */
-                $query = $e->dataProvider->query;
-                $query->joinWith("shopProduct as shopProduct");
-                $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
-                $query->groupBy([
-                    ShopCmsContentElement::tableName().".id",
-                ]);
 
-                /*if ($e->field->value) {
-                    $query->andWhere(['barcodes.value' => $e->field->value]);
-                }*/
+
+                if (ArrayHelper::getValue($e->field->value, "value.0")) {
+                    /**
+                     * @var $query ActiveQuery
+                     */
+                    $query = $e->dataProvider->query;
+                    $query->joinWith("shopProduct as shopProduct");
+                    $query->joinWith("shopProduct.shopProductBarcodes as barcodes");
+                    $query->groupBy([
+                        ShopCmsContentElement::tableName().".id",
+                    ]);
+
+                    //$query->andWhere(['barcodes.value' => ArrayHelper::getValue($e->field->value, "value.0")]);
+                }
             },
         ];
 
@@ -1943,6 +1957,7 @@ HTML
 
     public function create($adminAction)
     {
+        //echo "Технические работы";die;
         $is_saved = false;
         $redirect = "";
 
@@ -2159,7 +2174,7 @@ CSS
                 $relatedModel->load(\Yii::$app->request->post());
 
 
-                if (!$model->errors && !$relatedModel->errors) {
+                if (!$model->errors && !$relatedModel->errors && !$shopProduct->errors) {
                     if (!$model->save()) {
                         throw new Exception("Ошибка сохранения данных: " . print_r($model->errors, true));
                     }
@@ -2208,6 +2223,7 @@ CSS
                     $rr->data = [
                         'validation' => ArrayHelper::merge(
                             ActiveForm::validate($model),
+                            ActiveForm::validate($shopProduct),
                             ActiveForm::validate($relatedModel),
                         ),
                     ];
@@ -2215,11 +2231,17 @@ CSS
             } catch (\Exception $exception) {
                 $t->rollBack();
                 $rr->success = false;
-                $rr->message = $exception->getMessage();
+                if ($shopProduct->errors) {
+
+                } else {
+                    $rr->message = $exception->getMessage();
+                }
+
 
                 $rr->data = [
                     'validation' => ArrayHelper::merge(
                         ActiveForm::validate($model),
+                        ActiveForm::validate($shopProduct),
                         ActiveForm::validate($relatedModel),
                     ),
                 ];
@@ -2249,6 +2271,8 @@ CSS
 
     public function update($adminAction)
     {
+        //echo "Технические работы";die;
+        
         $is_saved = false;
         $redirect = "";
 

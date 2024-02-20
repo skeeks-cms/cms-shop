@@ -18,7 +18,6 @@ use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCmsContentElement;
-use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
@@ -49,11 +48,13 @@ use yii\widgets\ActiveForm;
  *
  * @property ShopUser             $shopUser
  *
- * @property CmsContent           $shopContents
+ * @depricated CmsContent           $shopContents
  * @property ShopStore[]          $stores
  * @property ShopStore[]          $supplierStores
  * @property ShopStore[]          $allStores
- * @property ShopContent          $cmsContent
+ * @depricated ShopContent          $cmsContent
+ *
+ * @property CmsContent           $contentProducts
  *
  * @property ShopStore            $backendShopStore
  */
@@ -297,7 +298,7 @@ class ShopComponent extends Component implements BootstrapInterface
             return $this->_shopUser;
         }
 
-        $session =  \Yii::$app->session;
+        $session = \Yii::$app->session;
         //Если пользователь гость
         if (isset(\Yii::$app->user) && \Yii::$app->user && \Yii::$app->user->isGuest) {
             //Проверка сессии
@@ -386,26 +387,36 @@ class ShopComponent extends Component implements BootstrapInterface
 
     /**
      * @return $this
+     * @deprecated
      */
     public function getShopContents()
     {
-        $query = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
-            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id'),
-        ]);
+        $result = [];
+        if ($this->contentProducts) {
+            $result[] = $this->contentProducts;
+        }
 
-        $query->multiple = true;
-        return $query->all();
+        return $result;
     }
 
     /**
      * @return $this
+     * @deprecated
      */
     public function getCmsContent()
     {
-        return \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
-            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id', 'content_id'),
-        ])->one();
+        return $this->getContentProducts()->one();
     }
+
+
+    /**
+     * @return CmsContent|null
+     */
+    public function getContentProducts()
+    {
+        return CmsContent::find()->isProducts()->one();
+    }
+
 
     /**
      * TODO: is @return array
@@ -418,7 +429,7 @@ class ShopComponent extends Component implements BootstrapInterface
             return [];
         }
 
-        $ids = ArrayHelper::map($this->shopContents, 'id', 'id');
+        $ids = [\Yii::$app->shop->contentProducts->id];
 
         $result = [];
         foreach ($data as $typeKey => $type) {
@@ -622,11 +633,11 @@ SQL
     {
 
         //Удаляет товары с сайтов получателей, которые не связаны с главным
-        if (!\Yii::$app->shop->shopContents) {
+        if (!\Yii::$app->shop->contentProducts) {
             return false;
         }
 
-        $content_ids = ArrayHelper::map($this->shopContents, 'id', 'id');
+        $content_ids = [\Yii::$app->shop->contentProducts->id];
         $content_ids_row = implode(",", $content_ids);
 
         /*$result = \Yii::$app->db->createCommand(<<<SQL
@@ -1015,8 +1026,8 @@ SQL
     public function getOfferCmsContentProperties()
     {
         $q = CmsContentProperty::find()
-                ->cmsSite()
-                ->andWhere(["is_offer_property" => 1]);
+            ->cmsSite()
+            ->andWhere(["is_offer_property" => 1]);
 
         return $q->all();
     }
@@ -1051,44 +1062,38 @@ SQL
 
         try {
             $table = \skeeks\cms\models\CmsContent::getTableSchema();
-            $table = \skeeks\cms\shop\models\ShopContent::getTableSchema();
         } catch (\Exception $e) {
             return $result;
         }
 
-        if ($contents = \skeeks\cms\models\CmsContent::find()->orderBy("priority ASC")->andWhere([
-            'id' => \yii\helpers\ArrayHelper::map(\skeeks\cms\shop\models\ShopContent::find()->all(), 'content_id',
-                'content_id'),
-        ])->all()
-        ) {
+        if (\Yii::$app->shop->contentProducts) {
             /**
              * @var $content \skeeks\cms\models\CmsContent
              */
-            foreach ($contents as $content) {
-                $itemData = [
-                    'label'          => $content->name,
-                    "img"            => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
-                    'url'            => ["shop/admin-cms-content-element", "content_id" => $content->id],
-                    "activeCallback" => function ($adminMenuItem) use ($content) {
-                        return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element');
-                    },
+            $content = \Yii::$app->shop->contentProducts;
+            $itemData = [
+                'label'          => $content->name,
+                "img"            => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+                'url'            => ["shop/admin-cms-content-element", "content_id" => $content->id],
+                "activeCallback" => function ($adminMenuItem) use ($content) {
+                    return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element');
+                },
 
-                    "accessCallback" => function ($adminMenuItem) use ($content) {
-                        $permissionNames = "shop/admin-cms-content-element__".$content->id;
-                        foreach ([$permissionNames] as $permissionName) {
-                            if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
-                                if (!\Yii::$app->user->can($permission->name)) {
-                                    return false;
-                                }
+                "accessCallback" => function ($adminMenuItem) use ($content) {
+                    $permissionNames = "shop/admin-cms-content-element__".$content->id;
+                    foreach ([$permissionNames] as $permissionName) {
+                        if ($permission = \Yii::$app->authManager->getPermission($permissionName)) {
+                            if (!\Yii::$app->user->can($permission->name)) {
+                                return false;
                             }
                         }
+                    }
 
-                        return true;
-                    },
-                ];
+                    return true;
+                },
+            ];
 
-                $result[] = $itemData;
-            }
+            $result[] = $itemData;
         }
 
         if (count($result) > 1) {
@@ -1278,13 +1283,13 @@ SQL
         $price = 0;
         if ($cmsContentElement->shopProduct->minProductPrice) {
             $price = $cmsContentElement->shopProduct->minProductPrice->money->amount;
-        } elseif($cmsContentElement->shopProduct->baseProductPrice) {
+        } elseif ($cmsContentElement->shopProduct->baseProductPrice) {
             $price = $cmsContentElement->shopProduct->baseProductPrice->money->amount;
         }
         $data = [
             'id'    => $cmsContentElement->id,
             "name"  => $cmsContentElement->seoName,
-            "price" => (float) $price
+            "price" => (float)$price,
         ];
 
         if ($cmsContentElement->cmsTree) {
@@ -1296,7 +1301,7 @@ SQL
                 $data['brand'] = $brandName;
             }
         }
-        
+
         /*if ($shopCmsContentProperty = \skeeks\cms\shop\models\ShopCmsContentProperty::find()->where(['is_vendor' => 1])->one()) {
             $brandId = $cmsContentElement->relatedPropertiesModel->getAttribute($shopCmsContentProperty->cmsContentProperty->code);
             if ($brandId) {
@@ -1320,7 +1325,7 @@ SQL
 
         $r = new \ReflectionClass($model);
         $className = $r->getShortName();
-        $cacheName = "agregateData_" . $className."_" . $model->id . "_" . \Yii::$app->id . "_" . $availableFilter;
+        $cacheName = "agregateData_".$className."_".$model->id."_".\Yii::$app->id."_".$availableFilter;
 
         //Если это неиндексируемая страница с несколькими фильтрами, то нет смысла считать трудозатратные вещи и кэшировать это
         $isUseCache = false;
@@ -1340,17 +1345,15 @@ SQL
         }
 
 
-
-
         try {
             $result = [];
 
 
             $q0 = clone $q;
-            
+
             $realPrice = '';
             $select = [
-                \skeeks\cms\models\CmsContentElement::tableName().".id"
+                \skeeks\cms\models\CmsContentElement::tableName().".id",
             ];
             if (isset($q0->select['realPrice'])) {
                 $realPrice = $q0->select['realPrice'];
@@ -1381,11 +1384,11 @@ SQL
 
 
             $baseTypePrice = \Yii::$app->shop->baseTypePrice;
-            
+
             $q1 = clone $q;
             $q1->innerJoin(['prices' => 'shop_product_price'], [
-                'prices.product_id' => new Expression('shopProduct.id'),
-                'prices.type_price_id' => $baseTypePrice->id
+                'prices.product_id'    => new Expression('shopProduct.id'),
+                'prices.type_price_id' => $baseTypePrice->id,
             ]);
             $q1->select(['price' => new Expression("max(prices.price)")]);
             $q1->groupBy(false);
@@ -1402,8 +1405,8 @@ SQL
             $q2 = clone $q;
             $q2->select(['price' => new Expression("min(prices.price)")]);
             $q2->innerJoin(['prices' => 'shop_product_price'], [
-                'prices.product_id' => new Expression('shopProduct.id'),
-                'prices.type_price_id' => $baseTypePrice->id
+                'prices.product_id'    => new Expression('shopProduct.id'),
+                'prices.type_price_id' => $baseTypePrice->id,
             ]);
             $q2->andWhere(['>', 'prices.price', 0]);
             $q2->orderBy(false);
@@ -1504,7 +1507,7 @@ SQL
                 ],
             ]));
         } catch (\Exception $exception) {
-            
+
             \Yii::error($exception->getMessage());
             return [];
         }

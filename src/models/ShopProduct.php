@@ -9,10 +9,10 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\components\Cms;
-use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsCountry;
 use skeeks\cms\money\Money;
 use skeeks\modules\cms\money\models\Currency;
 use yii\base\Exception;
@@ -41,6 +41,9 @@ use yii\helpers\Json;
  * @property double                    $height
  * @property double                    $rating_value
  * @property integer                   $rating_count
+ * @property integer                   $brand_id
+ * @property string                    $brand_sku
+ * @property integer|null              $country_alpha2
  *
  * @property integer                   $expiration_time
  * @property string                    $expiration_time_comment
@@ -86,6 +89,10 @@ use yii\helpers\Json;
  * @property ShopProduct[]             $shopProductOffers Предложения для текущего товара
  *
  *
+ * @property CmsCountry                $country
+ * @property ShopBrand                 $brand
+ * @property ShopCollection[]          $collections
+ *
  * @property boolean                   $isSubProduct
  * @property string                    $weightFormatted
  * @property string                    $lengthFormatted
@@ -119,6 +126,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function behaviors()
     {
         $behaviors = ArrayHelper::merge(parent::behaviors(), [
+            \skeeks\cms\behaviors\RelationalBehavior::class,
             HasJsonFieldsBehavior::class => [
                 'class'  => HasJsonFieldsBehavior::class,
                 'fields' => [
@@ -194,6 +202,16 @@ class ShopProduct extends \skeeks\cms\models\Core
 
         $this->on(self::EVENT_AFTER_INSERT, [$this, "_updateParentAfterInsert"]);
 
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getCollections()
+    {
+        return $this->hasMany(ShopCollection::class, ['id' => 'shop_collection_id'])
+            ->viaTable('shop_product2collection', ['shop_product_id' => 'id']);
     }
 
 
@@ -481,6 +499,112 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['rating_value'], 'number', 'min' => 0, 'max' => 5],
             [['rating_count'], 'integer', 'min' => 0],
+            [['collections'], 'safe'],
+            /*[['collections'], 'required', "when" => function(self $model) {
+                if ($model->cmsContentElement && $model->cmsContentElement->cmsTree) {
+                    if ($model->cmsContentElement->cmsTree->shop_has_collections) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }],*/
+
+            /*[['weight'], 'required', "when" => function(self $model) {
+                if ($model->cmsContentElement && $model->cmsContentElement->cmsSite->shopSite->required_product_fields) {
+
+                    if (in_array("weight", (array) $model->cmsContentElement->cmsSite->shopSite->required_product_fields)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }],*/
+
+            [
+                [
+                    'brand_id',
+                    'country_alpha2',
+                    'brand_sku',
+                ],
+                "required",
+                "when" => function ($model, $attribute) {
+                    if ($this->cmsContentElement && $this->cmsContentElement->cmsSite->shopSite->required_product_fields) {
+                        if (in_array($attribute, (array)$this->cmsContentElement->cmsSite->shopSite->required_product_fields)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+            ],
+
+            [['brand_id'], 'integer'],
+            [['country_alpha2'], 'string'],
+            [['country_alpha2'], 'default', 'value' => null],
+            [['brand_sku'], 'string'],
+
+            //[['brand_id', 'brand_sku', 'country_id'], 'default', 'value' => null],
+
+            /*[['brand_id'], function($attribute) {
+                print_r($this->cmsContentElement->cmsSite->shopSite->required_product_fields);die;
+                if ($this->cmsContentElement && $this->cmsContentElement->cmsSite->shopSite->required_product_fields) {
+
+
+                    if (in_array($attribute, (array) $this->cmsContentElement->cmsSite->shopSite->required_product_fields) && !$this->{$attribute}) {
+                        $this->addError($attribute, "Необходимо указать «" . $this->getAttributeLabel($attribute) . "»");
+                        return false;
+                    }
+                }
+
+                return true;
+            }],*/
+
+            [
+                ['weight'],
+                function ($attribute) {
+                    if ($this->cmsContentElement && $this->cmsContentElement->cmsSite->shopSite->required_product_fields) {
+
+                        if (in_array($attribute, (array)$this->cmsContentElement->cmsSite->shopSite->required_product_fields)) {
+
+                            if ($this->{$attribute} > 0) {
+
+                            } else {
+                                $this->addError($attribute, "Необходимо указать «".$this->getAttributeLabel($attribute)."»");
+                                return false;
+                            }
+
+                        }
+                    }
+
+                    return true;
+                },
+            ],
+
+            [
+                [
+                    "height",
+                    "width",
+                    "length",
+                ],
+                function ($attribute) {
+                    if ($this->cmsContentElement && $this->cmsContentElement->cmsSite->shopSite->required_product_fields) {
+                        if (in_array("dimensions", (array)$this->cmsContentElement->cmsSite->shopSite->required_product_fields)) {
+
+                            if ($this->{$attribute} > 0) {
+
+                            } else {
+                                $this->addError($attribute, "Необходимо указать «".$this->getAttributeLabel($attribute)."»");
+                                return false;
+                            }
+
+                        }
+                    }
+
+                    return true;
+                },
+            ],
+
 
             [
                 ['rating_count'],
@@ -748,6 +872,10 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             'warranty_time'         => 'Срок гарантии',
             'warranty_time_comment' => 'Комментарий к сроку гарантии',
+            'brand_id'              => 'Бренд',
+            'country_alpha2'        => 'Страна производитель',
+            'brand_sku'             => 'Артикул бренда',
+            'collections'           => 'Коллекции',
 
             'supplier_external_jsondata' => \Yii::t('skeeks/shop/app', 'Данные по товару от поставщика'),
             'measure_matches_jsondata'   => \Yii::t('skeeks/shop/app', 'Упаковка'),
@@ -767,9 +895,13 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             'service_life_time'         => 'В течение этого периода изготовитель готов нести ответственность за существенные недостатки товара, обеспечивать наличие запчастей и возможность обслуживания и ремонта. Например, срок службы устанавливается для детских игрушек и климатической техники.',
             'service_life_time_comment' => 'Можно указать условия использования.',
+            'brand_sku'                 => 'Заполняется если у бренда есть артикул. Он бывает не у всех брендов.',
+            'country_alpha2'            => 'Страна где произведен этот товар',
 
             'warranty_time'         => 'В течение этого периода возможны обслуживание и ремонт товара, возврат денег.',
             'warranty_time_comment' => 'Можно дать инструкцию для наступления гарантийного случая.',
+
+            'collections' => 'Коллекция товаров например плитка, ламинат, обои',
         ];
     }
     /**
@@ -799,6 +931,23 @@ class ShopProduct extends \skeeks\cms\models\Core
         return $this->hasOne(CmsMeasure::class, ['code' => 'measure_code']);
 
     }
+
+    /**
+     * @return ShopBrand
+     */
+    public function getBrand()
+    {
+        return $this->hasOne(ShopBrand::class, ['id' => 'brand_id'])->from(['shopBrand' => ShopBrand::tableName()]);
+
+    }
+    /**
+     * @return CmsCountry|null
+     */
+    public function getCountry()
+    {
+        return $this->hasOne(CmsCountry::class, ['alpha2' => 'country_alpha2']);
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -1316,14 +1465,14 @@ class ShopProduct extends \skeeks\cms\models\Core
         if (is_string($barcodes)) {
 
             $value = trim((string)$barcodes);
-            
+
             $barcodes = [
                 [
-                    'value'        => $value,
+                    'value' => $value,
                     //'barcode_type' => ShopProductBarcode::TYPE_EAN13,
                 ],
             ];
-        
+
             /*if (StringHelper::strlen($value) == 13) {
                 $barcodes = [
                     [
@@ -1349,12 +1498,12 @@ class ShopProduct extends \skeeks\cms\models\Core
             foreach ($barcodes as $key => $barcodeData) {
                 if (is_string($barcodeData) || is_int($barcodeData)) {
                     $value = trim((string)$barcodeData);
-                    
+
                     $barcodes[$key] = [
-                        'value'        => $value,
+                        'value' => $value,
                         //'barcode_type' => ShopProductBarcode::TYPE_EAN13,
                     ];
-                    
+
                     /*if (StringHelper::strlen($value) == 13) {
                         $barcodes[$key] = [
                             'value'        => $value,
@@ -1462,7 +1611,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     {
         if ($value >= 24 && $value < 720) {
             return \Yii::$app->formatter->asDecimal(($value / 24))." дней";
-        } elseif ($value >= 720  && $value < 8640) {
+        } elseif ($value >= 720 && $value < 8640) {
             return \Yii::$app->formatter->asDecimal(($value / 720))." месяцев";
         } elseif ($value >= 8640) {
             return \Yii::$app->formatter->asDecimal(($value / 8640))." год";

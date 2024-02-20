@@ -117,6 +117,51 @@ class PriceFiltersHandler extends Model
 
         return 0;
     }
+
+
+    protected $_applied = [];
+    protected $_appliedResult = null;
+
+    /**
+     * @return array
+     */
+    public function getApplied()
+    {
+        $result = [];
+
+        if ($this->_appliedResult !== null) {
+            return (array) $this->_appliedResult;
+        }
+
+        if ($this->f || $this->t) {
+
+            $priceTitle = "";
+            $priceTitleData = [];
+            if ($this->f) {
+                $f = \Yii::$app->formatter->asDecimal($this->f);
+                $priceTitleData[] = "от <b>{$f}</b>";
+            }
+            if ($this->t) {
+                $t = \Yii::$app->formatter->asDecimal($this->t);
+                $priceTitleData[] = "до <b>{$t}</b>";
+            }
+            $priceTitleData[] = \Yii::$app->money->currency_symbol;
+            $priceTitle = implode(" ", $priceTitleData);
+
+            $rowData = [
+                'name' => "по цене " . $priceTitle,
+                'type' => "",
+                'property_id' => "price",
+                'value' => "",
+            ];
+
+            $result[] = $rowData;
+        }
+
+        $this->_appliedResult = $result;
+        return $result;
+    }
+
     /**
      * @return array
      */

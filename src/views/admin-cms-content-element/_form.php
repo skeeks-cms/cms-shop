@@ -9,7 +9,6 @@ use yii\helpers\Html;
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
 /* @var $shopStoreProducts \skeeks\cms\shop\models\ShopStoreProduct[] */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
-/* @var $shopContent \skeeks\cms\shop\models\ShopContent */
 /* @var $shopSubproductContentElement \skeeks\cms\shop\models\ShopCmsContentElement */
 /* @var $shopStoreProduct \skeeks\cms\shop\models\ShopStoreProduct */
 
@@ -22,7 +21,7 @@ $controller = $this->context;
 $action = $controller->action;
 $contentModel = $controller->content;
 
-$shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
+/*$shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();*/
 
 if ($model->isNewRecord) {
 
@@ -82,7 +81,6 @@ if ($model->isNewRecord) {
                 'shopProduct'                  => $shopProduct,
                 'productPrices'                => $productPrices,
                 'shopStoreProducts'            => $shopStoreProducts,
-                'shopContent'                  => $shopContent,
                 //'shopSubproductContentElement' => $shopSubproductContentElement,
                 'shopStoreProduct' => $shopStoreProduct,
             ]); ?>
@@ -104,18 +102,22 @@ if ($model->isNewRecord) {
                 <? endif; ?>
             <? endif; ?>
 
-            <? if ($shopContent->childrenContent && $model->cmsContent->getChildrenContents()->andWhere([
+            <? if ($model->cmsContent->getChildrenContents()
+                /*->andWhere([
                     '!=',
                     'id',
                     $shopContent->childrenContent->id,
-                ])->all()
+                ])*/
+                ->all()
             ) : ?>
 
-                <? $childContents = $model->cmsContent->getChildrenContents()->andWhere([
-                    '!=',
-                    'id',
-                    $shopContent->childrenContent->id,
-                ])->all(); ?>
+                <? $childContents = $model->cmsContent->getChildrenContents()
+                    /*->andWhere([
+                        '!=',
+                        'id',
+                        $shopContent->childrenContent->id,
+                    ])*/
+                    ->all(); ?>
 
                 <? foreach ($childContents as $childContent) : ?>
                     <? $fieldSet = $form->fieldSet($childContent->name); ?>

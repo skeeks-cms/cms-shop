@@ -196,6 +196,17 @@ class ShopOfferChooseHelper extends Component
                         } else {
 
                             //$this->_chooseFields[$code]['options'][$value] = $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
+                            /*$property = $tradeOfferElement->relatedPropertiesModel->getRelatedProperty($code);
+                            echo $property->name;
+                            //print_r($property->toArray());die;
+                            echo "<br>";
+                            echo $code;
+                            echo "<br>";
+                            echo $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code);
+                            echo "<br>";
+                            echo $tradeOfferElement->relatedPropertiesModel->id;
+                            echo "<br>";
+                            echo "------------------<br>";*/
                             $this->_chooseFields[$code]['options'][$value] = [
                                 'asText' => $tradeOfferElement->relatedPropertiesModel->getAttributeAsText($code),
                                 'value' => $value

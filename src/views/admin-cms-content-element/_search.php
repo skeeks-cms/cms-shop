@@ -110,7 +110,7 @@ if ($cmsContent) {
 <?= $form->relatedFields($searchRelatedPropertiesModel); ?>
 
 
-<?
+<?/*
 if ($shopContent = \skeeks\cms\shop\models\ShopContent::findOne(['content_id' => $content_id])) {
     if ($offerContent = $shopContent->offerContent) {
         $searchOfferRelatedPropertiesModel = new \skeeks\cms\models\searchs\SearchChildrenRelatedPropertiesModel();
@@ -121,6 +121,6 @@ if ($shopContent = \skeeks\cms\shop\models\ShopContent::findOne(['content_id' =>
         echo $form->relatedFields($searchOfferRelatedPropertiesModel);
     }
 };
-?>
+*/?>
 
 <? $form::end(); ?>

@@ -16,6 +16,7 @@ use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\shop\components\ShopComponent;
+use skeeks\cms\shop\models\BrandCmsContentElement;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -149,6 +150,7 @@ class AgentsController extends Controller
                     $counter ++;
                     Console::updateProgress($counter,$total);
                     //$this->stdout("\tТовар: {$shopCmsContentElement->id}\n");
+                    //continue;
                     //die;
 
                     //Модель
@@ -156,19 +158,19 @@ class AgentsController extends Controller
 
                     $q = CmsTree::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cms_tree_id' => $mainCmsContentElement->tree_id]);
                     $needCmsTree = $q->one();
-                    
                     if ($needCmsTree && $shopCmsContentElement->tree_id != $needCmsTree->id) {
+                        //$this->stdout("\t\tаздел не тот\n");
                         /*var_dump($shopCmsContentElement->tree_id);
                         var_dump($needCmsTree->id);                    
                         var_dump($shopCmsContentElement->id);
                         die;*/
                         $shopCmsContentElement->tree_id = $needCmsTree->id;
-                        if ($shopCmsContentElement->update(false, ['tree_id'])) {
-                            print_r($shopCmsContentElement->errors, true);die;
+                        if (!$shopCmsContentElement->update(false, ['tree_id'])) {
+                            print_r($shopCmsContentElement->errors, true);
+                            die;
                         }
                         $shopCmsContentElement->refresh();
                     }
-
 
 
                     $mainCmsContentElement->relatedPropertiesModel->initAllProperties();
@@ -182,7 +184,44 @@ class AgentsController extends Controller
                     $newElementProperties->initAllProperties();
                     $newData = $newElementProperties->toArray();
 
-                    
+                    //Если у товара задан бренда
+                    if ($mainCmsContentElement->shopProduct->brand_id && 1 == 2) {
+
+                        //Если бренд не задан, у получаемого товара
+                        if (!$shopCmsContentElement->shopProduct->brand_id) {
+                            /**
+                             * @var $brandElement BrandCmsContentElement
+                             */
+                            $brandElement = BrandCmsContentElement::find()->cmsSite($shopSite->cmsSite)->andWhere(['main_cce_id' => (int) $mainCmsContentElement->shopProduct->brand_id])->one();
+                            if (!$brandElement) {
+                                $mainBrandElement = BrandCmsContentElement::find()->cmsSite($defaultCmsSite)->andWhere(['id' => (int) $shopCmsContentElement->shopProduct->brand_id])->one();
+                                if ($mainBrandElement) {
+                                    $brandElement = new BrandCmsContentElement();
+                                    $brandElement->content_id = $mainBrandElement->content_id;
+                                    $brandElement->cms_site_id = $shopSite->cmsSite->id;
+                                    $brandElement->main_cce_id = (int) $shopCmsContentElement->shopProduct->brand_id;
+                                    $brandElement->name = $mainBrandElement->name;
+                                    if (!$brandElement->save()) {
+                                        print_r($element->errors, true);
+                                    }
+
+
+                                    /*$shopBrand = $brandElement->shopBrand;
+                                    $shopBrand->country_id = $brandElement->shopBrand->country_id*/
+
+
+                                }
+                            }
+
+                            $mainCmsContentElement->shopProduct->brand_id = $brandElement->id;
+                        }
+
+
+
+                    }
+
+                    //$this->stdout("\t\tтут1\n");
+
                     foreach ($newData as $code => $valueNull)
                     {
                         $value = ArrayHelper::getValue($mainData, $code);
@@ -321,6 +360,7 @@ class AgentsController extends Controller
                         }
                     }
 
+                    //$this->stdout("\t\tтут\n");
                     if (!$newElementProperties->save())
                     {
                         $this->stdout("model: {$mainCmsContentElement->id}\n");
@@ -332,8 +372,10 @@ class AgentsController extends Controller
                         \Yii::error("Ошибка сохранения свойств model: {$mainCmsContentElement->id}, product: {$shopCmsContentElement->id}, error: {$error}", self::class);
                         continue;
                     }
+
                     $shopCmsContentElement->updated_at = time();
                     $shopCmsContentElement->update(['updated_at']);
+
                     //die;
 
 

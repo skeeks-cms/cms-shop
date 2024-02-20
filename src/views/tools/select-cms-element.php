@@ -61,13 +61,12 @@ JS
 
 <?
 
-$contentIds = \yii\helpers\ArrayHelper::map(\Yii::$app->shop->shopContents, 'id', 'id');
 $content_id = \Yii::$app->request->get('content_id');
 
 ?>
 
 <? if (!\Yii::$app->request->get('content_id')) : ?>
-    <? if ($content = \skeeks\cms\models\CmsContent::find()->where(['id' => $contentIds])->orderBy("priority ASC")->one()) : ?>
+    <? if ($content = \skeeks\cms\models\CmsContent::find()->where(['id' => \Yii::$app->shop->contentProducts->id])->orderBy("priority ASC")->one()) : ?>
         <? $content_id = $content->id; ?>
     <? endif; ?>
 <? endif; ?>
@@ -85,7 +84,7 @@ $content_id = \Yii::$app->request->get('content_id');
     $dataProvider = $search->search(\Yii::$app->request->queryParams);
     $searchModel = $search->loadedModel;
 
-    $dataProvider->query->andWhere(['content_id' => $contentIds]);
+    $dataProvider->query->andWhere(['content_id' => \Yii::$app->shop->contentProducts->id]);
 
 
     $dataProvider->setSort(['defaultOrder' => ['published_at' => SORT_DESC]]);

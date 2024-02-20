@@ -13,7 +13,6 @@
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
 /* @var $shopStoreProducts \skeeks\cms\shop\models\ShopStoreProduct[] */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
-/* @var $shopContent \skeeks\cms\shop\models\ShopContent */
 /* @var $shopStoreProduct \skeeks\cms\shop\models\ShopStoreProduct */
 
 //Родительский общий товар, указан если создается предложение к товару
@@ -33,10 +32,6 @@ $isShowQuantity = true;
 $isShowDimensions = true;
 $isAllowChangeSupplier = true;
 $possibleProductTypes = \skeeks\cms\shop\models\ShopProduct::possibleProductTypes();
-/**
- * @var $shopContent \skeeks\cms\shop\models\ShopContent
- */
-$shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();
 /*if ($shopContent->childrenContent) {
     $allowChangeProductType = true;*/
 
@@ -102,6 +97,61 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
     echo "<div style='display: none;'>" . $form->field($model, 'cms_site_id') . "</div>";
 }*/
 ?>
+
+<?php if (YII_ENV_DEV) : ?>
+
+    <?= $form->field($shopProduct, 'brand_id')->widget(
+        \skeeks\cms\widgets\AjaxSelectModel::class,
+        [
+            'options' => [
+                'data-form-reload' => "true",
+            ],
+            'modelClass' => \skeeks\cms\shop\models\ShopBrand::class,
+            "ajaxUrl"    => \yii\helpers\Url::to([
+                '/cms/ajax/autocomplete-brands',
+            ]),
+
+            /*'searchQuery' => function($word = '')  {
+                $query = \skeeks\cms\shop\models\BrandCmsContentElement::find()->cmsSite()->contentId(\Yii::$app->shop->contentBrands->id);
+                if ($word) {
+                    $query->search($word);
+                }
+                return $query;
+            },*/
+        ]
+    ); ?>
+    <?= $form->field($shopProduct, 'brand_sku'); ?>
+
+
+<?= $form->field($shopProduct, 'country_alpha2')->widget(
+    \skeeks\cms\widgets\AjaxSelectModel::class,
+    [
+        'modelClass' => \skeeks\cms\models\CmsCountry::class,
+        'modelPkAttribute' => "alpha2",
+        "ajaxUrl" => \yii\helpers\Url::to([
+            '/cms/ajax/autocomplete-countries',
+        ]),
+    ]
+); ?>
+
+
+<?php if ($model->cmsTree && $model->cmsTree->shop_has_collections) : ?>
+    <?= $form->field($shopProduct, 'collections')->widget(
+        \skeeks\cms\widgets\AjaxSelectModel::class,
+        [
+            'multiple' => true,
+            'modelClass' => \skeeks\cms\shop\models\ShopCollection::class,
+            "ajaxUrl" => \yii\helpers\Url::to([
+                '/cms/ajax/autocomplete-collections',
+                //'property_id' => $this->property->id,
+                'cms_site_id' => \Yii::$app->skeeks->site->id,
+            ]),
+        ]
+    ); ?>
+<?php endif; ?>
+
+
+<?php endif; ?>
 
 <? if ($allowChangeProductType === false) : ?>
     <div style="display: none;">
@@ -232,7 +282,7 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
 
 
 
-<? if ($shopContent->childrenContent && $shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS) : ?>
+<? if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFERS) : ?>
     <div id="row">
         <div id="sx-shop-product-tradeOffers" class="col-md-12">
 

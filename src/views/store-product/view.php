@@ -139,7 +139,7 @@ JS
                 echo $form->field($model, 'shop_product_id')->widget(
                     \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::class,
                     [
-                        'content_id'  => \Yii::$app->shop->shopContents[0]->id,
+                        'content_id'  => \Yii::$app->shop->contentProducts->id,
                         'name'        => "sx-main-product",
                         'dialogRoute' => [
                             '/shop/admin-cms-content-element',
@@ -206,7 +206,7 @@ JS
                     <a href="<?php
                     $url = \yii\helpers\Url::to([
                         '/shop/admin-cms-content-element/create',
-                        'content_id'       => \Yii::$app->shop->shopContents[0]->id,
+                        'content_id'       => \Yii::$app->shop->contentProducts->id,
                         'store_product_id' => $model->id,
                     ], true);
                     echo $url;

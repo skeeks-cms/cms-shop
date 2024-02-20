@@ -41,6 +41,27 @@ function shopPersonTypes()
 
 return \yii\helpers\ArrayHelper::merge([
 
+    'content' =>
+        [
+            'priority' => 180,
+            'label'    => \Yii::t('skeeks/cms', 'Content'),
+            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],
+
+            'items' => [
+
+                [
+                    "label" => "Бренды",
+                    "url"   => ["shop/admin-shop-brand"],
+                    //"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+                ],
+                [
+                    "label" => "Коллекции",
+                    "url"   => ["shop/admin-shop-collection"],
+                    //"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+                ],
+            ],
+        ],
+
     'orders' => [
         'priority' => 200,
         "label"    => \Yii::t('skeeks/shop/app', 'Продажи и заказы'),
@@ -83,10 +104,10 @@ return \yii\helpers\ArrayHelper::merge([
                             "img"   => ['\skeeks\cms\shop\assets\Asset', 'icons/store.png'],
                         ],*/
 
-                        [
+                        /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Content settings'),
                             "url"   => ["shop/admin-content"],
-                        ],
+                        ],*/
 
                         /*[
                             "label" => \Yii::t('skeeks/shop/app', 'Свойства контента'),

@@ -39,6 +39,11 @@ $('[data-fancybox="images"]').fancybox({
             var self = this;
             
             $('body').on('click', function (e) {
+                /*console.log($(e.target));
+                                    return false;
+
+                if ($(e.target).closest(".select2-dropdown").length) {
+                }*/
                 //did not click a popover toggle or popover
                 if ($(e.target).data('toggle') !== 'popover'
                     && $(e.target).closest('.popover').length === 0
@@ -449,7 +454,7 @@ $noValue = "<span style='color: silver;'>—</span>";
 
                     <li>
                         <span class="sx-properties--name">
-                            Показ на сайте
+                            Показ на сайте <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="Если товар активен, значит он показывается на сайте и доступен для всех!"></i>
                         </span>
                         <span class="sx-properties--value">
                             <span class="sx-fast-edit sx-fast-edit-popover"
@@ -488,17 +493,18 @@ JS
 
 
                     <li>
-                <span class="sx-properties--name">
-                    Тип товара <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="От типа товара зависит то как он отображается на сайте"></i>
-                </span>
+                        <span class="sx-properties--name">
+                            Тип товара <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="От типа товара зависит то как он отображается на сайте"></i>
+                        </span>
                         <span class="sx-properties--value">
-                    <?php echo \skeeks\cms\helpers\StringHelper::strtolower($model->shopProduct->productTypeAsText); ?>
-                </span>
+                            <?php echo \skeeks\cms\helpers\StringHelper::strtolower($model->shopProduct->productTypeAsText); ?>
+                        </span>
                     </li>
+
                     <li>
-                <span class="sx-properties--name">
-                    Код товара
-                </span>
+                        <span class="sx-properties--name">
+                            ID товара <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="Уникальный, неизменный идентификатор товара, присваивается при создании в системе"></i>
+                        </span>
                         <span class="sx-properties--value">
                     <?php echo $model->id; ?>
                 </span>
@@ -560,15 +566,15 @@ JS
                         <span class="sx-properties--value" title="<?php echo $model->cmsTree ? $model->cmsTree->fullName : ""; ?>" data-toggle="tooltip">
                             
                         
-                            <span class="sx-fast-edit sx-fast-edit-popover"
+                            <span class=""
                                   data-form="#tree_id-form"
                                   data-title="Категория"
                             >
                                 <?php echo $model->cmsTree ? $model->cmsTree->name : "&nbsp;&nbsp;&nbsp;"; ?>
                             </span>
-                            
-                            <div class="sx-fast-edit-form-wrapper">
-                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+
+                            <!--<div class="sx-fast-edit-form-wrapper">
+                                <?php /*$form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                                     'id'             => "tree_id-form",
                                     'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
                                     'options'        => [
@@ -583,22 +589,261 @@ JS
                                         }
 JS
                                     ),
-                                ]); ?>
-                                <?php echo $form->field($model, 'tree_id')
+                                ]); */ ?>
+                                <?php /*echo $form->field($model, 'tree_id')
                                     ->widget(
                                         \skeeks\cms\backend\widgets\SelectModelDialogTreeWidget::class, [
                                             'visibleInput' => false,
                                         ]
                                     )
-                                    ->label(false); ?>
+                                    ->label(false); */ ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php /*$form::end(); */ ?>
+                            </div>-->
+                        </span>
+
+                    </li>
+
+                    <?
+                    $this->registerCss(<<<CSS
+.select2-container--krajee-bs3 .select2-dropdown {
+    z-index: 9999;
+}
+CSS
+                    );
+                    ?>
+
+                    <?php if (YII_ENV_DEV) : ?>
+
+
+
+                        <li>
+                        <span class="sx-properties--name">
+                            Бренд
+                        </span>
+                            <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#brand-form"
+                                  data-title="Бренд"
+                            >
+                                <?php echo $model->shopProduct->brand_id ? $model->shopProduct->brand->name : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "brand-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                        'style' => 'min-width: 200px;',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]);
+
+                                $this->registerJs(<<<JS
+$("#shopproduct-brand_id").on("change", function() {
+     $("#brand-form").submit();
+});
+JS
+                                );
+                                ?>
+                                <?php echo $form->field($model->shopProduct, 'brand_id')->widget(
+                                    \skeeks\cms\widgets\AjaxSelectModel::class,
+                                    [
+                                        'modelClass' => \skeeks\cms\shop\models\ShopBrand::class,
+                                        "ajaxUrl"    => \yii\helpers\Url::to([
+                                            '/cms/ajax/autocomplete-brands',
+                                        ]),
+                                    ]
+                                )->label(false); ?>
+                                    <div class="input-group-append" style="display: none;">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                        </li>
+
+
+                        <li>
+                        <span class="sx-properties--name">
+                            Артикул бренда
+                        </span>
+                            <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#brandsku-form"
+                                  data-title="Артикул бренда"
+                            >
+                                <?php echo $model->shopProduct->brand_sku ? $model->shopProduct->brand_sku : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "brandsku-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model->shopProduct, 'brand_sku')->label(false); ?>
                                     <div class="input-group-append">
                                         <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
                                     </div>
                                 <?php $form::end(); ?>
                             </div>
-                        </span>
 
+                        </span>
+                        </li>
+
+
+                    <li>
+                        <span class="sx-properties--name">
+                            Страна
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#country-form"
+                                  data-title="Страна"
+                            >
+                                <?php echo $model->shopProduct->country ? $model->shopProduct->country->name : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "country-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                        'style' => 'min-width: 200px;',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]);
+
+                                $this->registerJs(<<<JS
+$("#shopproduct-country_alpha2").on("change", function() {
+     $("#country-form").submit();
+});
+JS
+                                );
+                                ?>
+                                <?php echo $form->field($model->shopProduct, 'country_alpha2')->widget(
+                                    \skeeks\cms\widgets\AjaxSelectModel::class,
+                                    [
+                                        'modelClass'       => \skeeks\cms\models\CmsCountry::class,
+                                        'modelPkAttribute' => "alpha2",
+                                        "ajaxUrl"          => \yii\helpers\Url::to([
+                                            '/cms/ajax/autocomplete-countries',
+                                        ]),
+                                    ]
+                                )->label(false); ?>
+                                    <div class="input-group-append" style="display: none;">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
                     </li>
+
+
+                    <?php if ($model->cmsTree && $model->cmsTree->shop_has_collections) : ?>
+
+                        <li>
+                        <span class="sx-properties--name">
+                            Коллекции
+                        </span>
+                            <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#collections-form"
+                                  data-title="Коллекции"
+                            >
+                                <?php echo $model->shopProduct->collections ? implode(", ", \yii\helpers\ArrayHelper::map(
+                                    $model->shopProduct->collections,
+                                    'id',
+                                    'name'
+                                )) : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "collections-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                        'style' => 'min-width: 200px;',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]);
+
+                                $this->registerJs(<<<JS
+$("#shopproduct-collections").on("change", function() {
+     $("#collections-form").submit();
+});
+JS
+                                );
+                                ?>
+                                <?php echo $form->field($model->shopProduct, 'collections')->widget(
+                                    \skeeks\cms\widgets\AjaxSelectModel::class,
+                                    [
+                                        'multiple'    => true,
+                                        'modelClass'  => \skeeks\cms\shop\models\ShopCollection::class,
+                                        'searchQuery' => function ($word = '') {
+                                            $query = \skeeks\cms\shop\models\ShopCollection::find();
+                                            if ($word) {
+                                                $query->search($word);
+                                            }
+                                            return $query;
+                                        },
+                                    ]
+                                )->label(false); ?>
+                                    <div class="input-group-append" style="display: none;">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                        </li>
+
+                    <?php endif; ?>
+
+                    <?php endif; ?>
 
                     <li>
                         <span class="sx-properties--name">
@@ -640,14 +885,15 @@ JS
                         </span>
                     </li>
 
-                    <li>
-                <span class="sx-properties--name">
-                    Создан
-                </span>
-                        <span class="sx-properties--value" title="<?php echo $model->created_at ? \Yii::$app->formatter->asRelativeTime($model->created_at) : ""; ?>" data-toggle="tooltip">
-                        <?php echo $model->created_at ? \Yii::$app->formatter->asDate($model->created_at) : ""; ?>
-                </span>
-                    </li>
+
+                    <!--<li>
+                        <span class="sx-properties--name">
+                            Создан
+                        </span>
+                                <span class="sx-properties--value" title="<?php /*echo $model->created_at ? \Yii::$app->formatter->asRelativeTime($model->created_at) : ""; */ ?>" data-toggle="tooltip">
+                                <?php /*echo $model->created_at ? \Yii::$app->formatter->asDate($model->created_at) : ""; */ ?>
+                        </span>
+                    </li>-->
 
 
                 </ul>
@@ -1073,7 +1319,7 @@ JS
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
             <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Цена на сайте</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
-                                           title="Эта цена используется на сайте, именно ее видит клиент на сайте."></i></div>
+                                                                                                        title="Эта цена используется на сайте, именно ее видит клиент на сайте."></i></div>
 
             <div class="sx-table-wrapper table-responsive">
                 <table class="table sx-table">
@@ -1158,19 +1404,34 @@ JS
         </div>
     </div>
 
+    <?php
+    $marketplaces = \skeeks\cms\shop\models\ShopMarketplace::find()->active()->all();
+    ?>
+    <?php if ($marketplaces) : ?>
+        <div class="row no-gutters" style="margin-top: 10px;">
+            <div class="col-12">
+                <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Маркетплейсы</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
+                                                                                                           title="Этот товар на маркетплейсах"></i></div>
+                <div class="sx-table-wrapper table-responsive">
+
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
             <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Склады и магазины</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
-                                           title="В каждом магазине может быть своя цена, она может отличатся от цены сайта, это зависит от настроек системы."></i></div>
+                                                                                                            title="В каждом магазине может быть своя цена, она может отличатся от цены сайта, это зависит от настроек системы."></i>
+            </div>
             <div class="sx-table-wrapper table-responsive">
                 <table class="table sx-table">
                     <tr>
-                        <th style="text-align: left;">Магазин - склад</th>
+                        <th style="text-align: left;">Магазин/склад</th>
 
                         <th>Закупочная цена</th>
                         <th>Розничная цена</th>
                         <th>Остаток, <?php echo $model->shopProduct->measure->symbol; ?></th>
-                       <!-- <th><?php /*echo \Yii::$app->shop->baseTypePrice->name; */?> (сумма)</th>-->
+                        <!-- <th><?php /*echo \Yii::$app->shop->baseTypePrice->name; */ ?> (сумма)</th>-->
                     </tr>
 
                     <?php
@@ -1202,11 +1463,11 @@ JS
                                     <?php if ($storeProduct) : ?>
                                         <?
                                         \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                            'controllerId' => "/shop/store-product",
-                                            'modelId'      => $storeProduct->id,
-                                            'tag'          => 'span',
-                                            'isRunFirstActionOnClick'          => true,
-                                            'options'      => [
+                                            'controllerId'            => "/shop/store-product",
+                                            'modelId'                 => $storeProduct->id,
+                                            'tag'                     => 'span',
+                                            'isRunFirstActionOnClick' => true,
+                                            'options'                 => [
                                                 'style' => 'text-align: left;',
                                                 'class' => 'sx-fast-edit',
                                             ],
@@ -1228,14 +1489,14 @@ JS
                                     >
                                         <?php
                                         $purchasePrice = null;
-                                         $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
-                                         if ($shopStore->is_personal_price && $shopStoreProduct && $shopStoreProduct->purchase_price): ?>
-                                            <?php echo new \skeeks\cms\money\Money((string) $shopStoreProduct->purchase_price, \Yii::$app->money->currency_code); ?>
+                                        $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
+                                        if ($shopStore->is_personal_price && $shopStoreProduct && $shopStoreProduct->purchase_price): ?>
+                                            <?php echo new \skeeks\cms\money\Money((string)$shopStoreProduct->purchase_price, \Yii::$app->money->currency_code); ?>
                                         <?php else : ?>
-                                             <?php if(\Yii::$app->shop->purchaseTypePrice) : ?>
+                                            <?php if (\Yii::$app->shop->purchaseTypePrice) : ?>
                                                 <?php
-                                                    $purchasePrice = $model->shopProduct->getPrice(\Yii::$app->shop->purchaseTypePrice);
-                                                    echo $purchasePrice ? $purchasePrice->money : "&nbsp;&nbsp;&nbsp;"; ?>
+                                                $purchasePrice = $model->shopProduct->getPrice(\Yii::$app->shop->purchaseTypePrice);
+                                                echo $purchasePrice ? $purchasePrice->money : "&nbsp;&nbsp;&nbsp;"; ?>
                                             <?php endif; ?>
                                         <?php endif; ?>
 
@@ -1262,7 +1523,7 @@ JS
                                         <input type="hidden" value="<?php echo $shopStore->id; ?>" name="shop_store_id" class="form-control"/>
 
                                         <?
-$this->registerJs(<<<JS
+                                        $this->registerJs(<<<JS
 if ($(".sx-check-purchase-price").is(":checked")) {
     $(".sx-input-purchase-price").show();
 } else {
@@ -1294,7 +1555,7 @@ JS
                                                 <input type="text" value="<?php echo $purchasePrice ? $purchasePrice->price : ""; ?>" name="price_value" class="form-control"/>
                                             <?php endif; ?>
                                         </div>
-                                        
+
                                         <div class="input-group" style="margin-top: 10px;">
                                             <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
                                         </div>
@@ -1303,28 +1564,26 @@ JS
                                     </div>
 
 
-
-
                                 </td>
 
                                 <td>
                                     <?php
-                                     $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
-                                     if ($shopStore->is_personal_price && $shopStoreProduct && $shopStoreProduct->selling_price): ?>
-                                        <?php echo new \skeeks\cms\money\Money((string) $shopStoreProduct->selling_price, \Yii::$app->money->currency_code); ?>
+                                    $shopStoreProduct = $model->shopProduct->getStoreProduct($shopStore);
+                                    if ($shopStore->is_personal_price && $shopStoreProduct && $shopStoreProduct->selling_price): ?>
+                                        <?php echo new \skeeks\cms\money\Money((string)$shopStoreProduct->selling_price, \Yii::$app->money->currency_code); ?>
                                     <?php else : ?>
                                         <?php echo $model->shopProduct->baseProductPrice ? $model->shopProduct->baseProductPrice->money : ""; ?>
                                     <?php endif; ?>
 
                                 </td>
                                 <td>
-                                    <a href="<?php echo \yii\helpers\Url::to(['store-moves', 'pk' => $model->id]); ?>"  class="sx-fast-edit" style="color: black;">
+                                    <a href="<?php echo \yii\helpers\Url::to(['store-moves', 'pk' => $model->id]); ?>" class="sx-fast-edit" style="color: black;">
                                         <?php echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; ?>
-                                    <!--<span class="sx-fast-edit sx-fast-edit-popover"
-                                          data-form="#store-<?php /*echo $shopStore->id; */?>-form"
-                                          data-title="<?php /*echo \yii\helpers\Html::encode($shopStore->name); */?>"
+                                        <!--<span class="sx-fast-edit sx-fast-edit-popover"
+                                          data-form="#store-<?php /*echo $shopStore->id; */ ?>-form"
+                                          data-title="<?php /*echo \yii\helpers\Html::encode($shopStore->name); */ ?>"
                                     >
-                                        <?php /*echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; */?>
+                                        <?php /*echo $storeProduct ? (float)$storeProduct->quantity : "&nbsp;&nbsp;&nbsp;"; */ ?>
                                     </span>-->
                                     </a>
 
@@ -1358,7 +1617,7 @@ JS
                                     </div>
 
                                 </td>
-                                <!--<td><?php /*echo $totalPrice; */?></td>-->
+                                <!--<td><?php /*echo $totalPrice; */ ?></td>-->
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
@@ -1367,7 +1626,7 @@ JS
                             <td><?php echo $noValue; ?></td>
                             <td><?php echo $noValue; ?></td>
                             <td><?php echo $noValue; ?></td>
-                            <!--<td><?php /*echo $noValue; */?></td>-->
+                            <!--<td><?php /*echo $noValue; */ ?></td>-->
                         </tr>
                     <?php endif; ?>
 
@@ -1375,7 +1634,7 @@ JS
                     <tr>
                         <td colspan="3" style="text-align: right;"><b>Итого</b></td>
                         <td><?php echo $totalSummQuantity ? $totalSummQuantity : $noValue; ?></td>
-                        <!--<td><?php /*echo $noValue; */?></td>-->
+                        <!--<td><?php /*echo $noValue; */ ?></td>-->
                     </tr>
                 </table>
             </div>
@@ -1386,7 +1645,8 @@ JS
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
             <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
-                                           title="Если ваш проект интегрирован с поставщиками, то в этом разделе можно смотреть количество оставшегося товара у поставщика + цены."></i></div>
+                                                                                                     title="Если ваш проект интегрирован с поставщиками, то в этом разделе можно смотреть количество оставшегося товара у поставщика + цены."></i>
+            </div>
             <div class="sx-table-wrapper table-responsive">
                 <table class="table sx-table">
                     <tr>
@@ -1512,7 +1772,7 @@ JS
                     <tr>
                         <td colspan="4" style="text-align: right;"><b>Итого</b></td>
                         <td><?php echo $totalSummQuantity ? $totalSummQuantity : $noValue; ?></td>
-                       <!-- <td><?php /*echo $noValue; */?></td>-->
+                        <!-- <td><?php /*echo $noValue; */ ?></td>-->
                     </tr>
                 </table>
             </div>

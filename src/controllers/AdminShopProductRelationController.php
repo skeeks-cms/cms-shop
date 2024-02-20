@@ -12,7 +12,6 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\helpers\BackendUrlHelper;
 use skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget;
 use skeeks\cms\models\CmsAgent;
-use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopProductRelation;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\helpers\ArrayHelper;

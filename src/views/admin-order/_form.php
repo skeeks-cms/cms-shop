@@ -1009,7 +1009,7 @@ $form->field($model, 'delivery_amount')->label("Стоимость достав�
     \skeeks\cms\backend\widgets\SelectModelDialogContentElementWidget::widget([
         'dialogRoute'            => [
             '/shop/admin-cms-content-element/index',
-            'content_id'                                                     => \Yii::$app->shop->shopContents[0]->id,
+            'content_id'                                                     => \Yii::$app->shop->contentProducts->id,
             \skeeks\cms\backend\helpers\BackendUrlHelper::BACKEND_PARAM_NAME => [
                 'all-items' => "true",
             ],

@@ -13,7 +13,6 @@
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
 /* @var $shopStoreProducts \skeeks\cms\shop\models\ShopStoreProduct[] */
 /* @var $relatedModel \skeeks\cms\relatedProperties\models\RelatedPropertiesModel */
-/* @var $shopContent \skeeks\cms\shop\models\ShopContent */
 /* @var $shopSubproductContentElement \skeeks\cms\shop\models\ShopCmsContentElement */
 
 

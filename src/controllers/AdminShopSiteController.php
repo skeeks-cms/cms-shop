@@ -8,20 +8,16 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use chillerlan\QRCode\Data\Number;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelController;
-use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentProperty;
-use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
-use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
@@ -86,9 +82,9 @@ class AdminShopSiteController extends BackendModelController
     {
 
         $propertyQuery = CmsContentProperty::find()
-                            //->cmsSite()
+            //->cmsSite()
 
-                            ->orderBy(['priority' => SORT_ASC]);
+            ->orderBy(['priority' => SORT_ASC]);
 
         $propertyQuery->andWhere([
             'or',
@@ -103,28 +99,57 @@ class AdminShopSiteController extends BackendModelController
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Основное'),
                 'fields' => [
-                    'catalog_cms_tree_id' => [
+                    /*'catalog_cms_tree_id' => [
                         'class'       => WidgetField::class,
                         'widgetClass' => SelectModelDialogTreeWidget::class,
-                    ],
+                    ],*/
 
-                    'notify_emails'         => [
+                    'notify_emails'                => [
                         'class' => TextareaField::class,
                     ],
-                    'is_show_cart'      => [
+                    'is_show_cart'                 => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
-                    'is_show_prices'      => [
+                    'is_show_prices'               => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
-                    'is_show_prices_only_quantity'      => [
+                    'is_show_prices_only_quantity' => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
+                    ],
+
+
+                    'required_product_fields'    => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => [
+                            'weight'      => 'Вес',
+                            'dimensions'  => 'Габариты',
+                            'brand_id'    => 'Бренд',
+                            'brand_sku'   => 'Артикул бренда',
+                            'country_id'  => 'Страна',
+                            'collections' => 'Коллекции',
+                        ],
+                    ],
+                    'required_brand_fields'      => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => [
+                            'country_id' => 'Страна',
+                            'url'        => 'Ссылка на сайт',
+                        ],
+                    ],
+                    'required_collection_fields' => [
+                        'class'    => SelectField::class,
+                        'multiple' => true,
+                        'items'    => [
+                            'brand_id' => 'Бренд',
+                        ],
                     ],
                 ],
             ],
@@ -135,18 +160,18 @@ class AdminShopSiteController extends BackendModelController
 
                 'fields' => [
 
-                    'is_show_product_no_price'      => [
+                    'is_show_product_no_price' => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
-                    'is_show_button_no_price'       => [
+                    'is_show_button_no_price'  => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
                     ],
 
-                    'is_show_product_no_quantity'       => [
+                    'is_show_product_no_quantity' => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
@@ -156,15 +181,15 @@ class AdminShopSiteController extends BackendModelController
                         /*'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,*/
-                        'class'       => SelectField::class,
-                        'items'   => [
+                        'class' => SelectField::class,
+                        'items' => [
                             0 => 'Показывать все товары',
                             1 => 'Показывать только в наличии',
                             2 => 'Показывать В наличии и под заказ',
                         ],
                     ],
 
-                    'is_show_quantity_product'      => [
+                    'is_show_quantity_product' => [
                         'class'       => BoolField::class,
                         'allowNull'   => false,
                         'formElement' => BoolField::ELEMENT_RADIO_LIST,
@@ -207,14 +232,14 @@ class AdminShopSiteController extends BackendModelController
                 'fields' => [
 
                     'order_required_fields' => [
-                        'class' => SelectField::class,
+                        'class'    => SelectField::class,
                         'multiple' => true,
-                        'items' => [
-                            'phone' => 'Телефон',
-                            'email' => 'Email',
+                        'items'    => [
+                            'phone'      => 'Телефон',
+                            'email'      => 'Email',
                             'first_name' => 'Имя',
-                            'last_name' => 'Фамилия',
-                        ]
+                            'last_name'  => 'Фамилия',
+                        ],
                     ]
                     /*'order_free_shipping_from_price' => [
                         'class'    => NumberField::class,
@@ -229,21 +254,21 @@ class AdminShopSiteController extends BackendModelController
 
                 'fields' => [
 
-                    'max_product_rating_value' => [
+                    'max_product_rating_value'   => [
                         'class' => NumberField::class,
                     ],
                     'is_generate_product_rating' => [
-                        'class' => BoolField::class,
+                        'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
-                    
+
                     'generate_min_product_rating_value' => [
                         'class' => NumberField::class,
-                        'step' => 0.0001,
+                        'step'  => 0.0001,
                     ],
                     'generate_max_product_rating_value' => [
                         'class' => NumberField::class,
-                        'step' => 0.0001,
+                        'step'  => 0.0001,
                     ],
                     'generate_min_product_rating_count' => [
                         'class' => NumberField::class,
@@ -251,7 +276,7 @@ class AdminShopSiteController extends BackendModelController
                     'generate_max_product_rating_count' => [
                         'class' => NumberField::class,
                     ],
-                    
+
                     /*'order_free_shipping_from_price' => [
                         'class'    => NumberField::class,
                     ],*/

@@ -12,7 +12,6 @@ use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsStorageFile;
 use yii\base\ModelEvent;
-use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -23,7 +22,6 @@ use yii\helpers\ArrayHelper;
  * @property ShopCmsContentElement[] $childrenContentElements
  *
  * @property ShopCmsContentElement[] $tradeOffers
- * @property ShopContent             $shopContent
  *
  * @property CmsStorageFile          $mainProductImage
  * @property CmsStorageFile[]        $productImages
@@ -67,8 +65,7 @@ class ShopCmsContentElement extends CmsContentElement
         if ($this->isAttributeChanged("name")) {
             //Это общий товар
             if ($this->shopProduct->isOffersProduct) {
-                foreach ($this->tradeOffers as $tradeOffer)
-                {
+                foreach ($this->tradeOffers as $tradeOffer) {
                     $tradeOffer->name = $tradeOffer->productName;
                 }
             }
@@ -105,18 +102,18 @@ class ShopCmsContentElement extends CmsContentElement
                      * @var $offer ShopCmsContentElement
                      */
                     $offer = array_shift($offers);
-    
+
                     if ($offer->shopProduct && $offer->shopProduct->shopProductPrices) {
                         foreach ($offer->shopProduct->shopProductPrices as $shopPrice) {
                             $shopPrice->save();
                         }
                     }
-    
+
                     $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_OFFERS;
                 } else {
                     $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_SIMPLE;
                 }
-                
+
             } else {
                 $this->parentContentElement->shopProduct->product_type = ShopProduct::TYPE_SIMPLE;
             }
@@ -198,11 +195,12 @@ class ShopCmsContentElement extends CmsContentElement
     }
     /**
      * @return \yii\db\ActiveQuery
+     * @deprecated
      */
-    public function getShopContent()
+    /*public function getShopContent()
     {
         return $this->hasOne(ShopContent::class, ['content_id' => 'content_id']);
-    }
+    }*/
     /**
      * @return CmsContentElement|static
      */
@@ -619,17 +617,16 @@ class ShopCmsContentElement extends CmsContentElement
 
         return $q;
     }
-    
-    
-    
+
+
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'is_adult'               => \Yii::t('skeeks/cms', 'Товар для взрослых?'),
-            'is_adult'               => \Yii::t('skeeks/cms', 'Товар для взрослых?'),
+            'is_adult' => \Yii::t('skeeks/cms', 'Товар для взрослых?'),
+            'is_adult' => \Yii::t('skeeks/cms', 'Товар для взрослых?'),
         ]);
     }
     /**
@@ -639,8 +636,8 @@ class ShopCmsContentElement extends CmsContentElement
     {
         return array_merge(parent::attributeHints(), [
             'is_adult' => \Yii::t('skeeks/cms', 'Если этот товар содержит контент для взрослых, то есть имеет возрастные ограничения 18+, нужно поставить эту галочку!'),
-            'active' => \Yii::t('skeeks/cms', 'Если эта галочка не стоит, то товар не показывается и не индексируется поисковыми системами'),
+            'active'   => \Yii::t('skeeks/cms', 'Если эта галочка не стоит, то товар не показывается и не индексируется поисковыми системами'),
         ]);
     }
-    
+
 }

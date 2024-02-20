@@ -63,7 +63,7 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             .'$_POST = '.print_r($_POST, true)
             .'$_GET = '.print_r($_GET, true)
             .'$_REQUEST = '.print_r($_REQUEST, true)
-            .'$_SESSION = '.print_r($_SESSION, true)
+            .'$_SESSION = '. (@$_SESSION ? print_r($_SESSION, true) : "")
             .'$_SERVER = '.print_r($_SERVER, true)
             , static::class);
     }

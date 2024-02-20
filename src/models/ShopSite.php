@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $description
  * @property string|null $description_internal
  * @property int         $is_receiver Сайт получает товары от поставщиков?
- * @property int|null    $catalog_cms_tree_id Главный раздел для товаров
+ * @deprecated  int|null    $catalog_cms_tree_id Главный раздел для товаров
  * @property string|null $notify_emails Email адреса для уведомлений о заказах
  * @property int         $is_show_cart Показывать корзину?
  * @property int         $is_show_prices Показывать цены?
@@ -36,6 +36,10 @@ use yii\helpers\ArrayHelper;
  *
  * @property number      $order_free_shipping_from_price Бесплатная доставка от
  * @property array       $order_required_fields Бесплатная доставка от
+ *
+ * @property array       $required_product_fields
+ * @property array       $required_brand_fields
+ * @property array       $required_collection_fields
  *
  * @property int         $max_product_rating_value Максимальное значение рейтинга товаров
  * @property int         $is_generate_product_rating Генерировать рейтинг товара?
@@ -84,6 +88,10 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     'show_filter_property_ids',
                     'open_filter_property_ids',
                     'order_required_fields',
+
+                    'required_product_fields',
+                    'required_brand_fields',
+                    'required_collection_fields',
                 ],
             ],
         ]);
@@ -129,6 +137,15 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             [['open_filter_property_ids'], 'safe'],
             [['order_required_fields'], 'safe'],
             [['order_required_fields'], 'required'],
+
+            [
+                [
+                    'required_product_fields',
+                    'required_brand_fields',
+                    'required_collection_fields',
+                ],
+                'safe',
+            ],
 
             ['notify_emails', 'string'],
             [
@@ -188,15 +205,19 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'notify_emails'                 => \Yii::t('skeeks/shop/app', 'Email notification address'),
             'is_show_product_no_price'      => "Показывать товары с нулевыми ценами?",
             'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
-            'is_show_product_no_quantity'       => "Показывать кнопку «добавить в корзину» для товаров не в наличии?",
+            'is_show_product_no_quantity'   => "Показывать кнопку «добавить в корзину» для товаров не в наличии?",
             'is_show_product_only_quantity' => "Учет наличия",
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
             'is_show_cart'                  => "Показывать корзину на сайте?",
             'is_show_prices'                => "Показывать цены на сайте?",
-            'is_show_prices_only_quantity'                => "Показывать цены на сайте только если товар в наличиии?",
+            'is_show_prices_only_quantity'  => "Показывать цены на сайте только если товар в наличиии?",
             'order_required_fields'         => "Поля обязательные при оформлении заказа заказа",
+
+            'required_product_fields'    => "Поля обязательные при создании товара",
+            'required_brand_fields'      => "Поля обязательные при создании бренда",
+            'required_collection_fields' => "Поля обязательные при создании коллекции",
 
             'max_product_rating_value'          => "Максимальное значение рейтинга товаров",
             'is_generate_product_rating'        => "Генерировать рейтинг товара?",
@@ -227,7 +248,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 Если выбрано «нет», то фактически на сайте будет отключена корзина
 ",
             'is_show_prices'                 => "Если выбрано «нет», то на сайте у товаров не будут отображаться цены",
-            'is_show_prices_only_quantity'                 => "Если выбрано «нет», то на сайте цена будет отображаться у всех товаров.",
+            'is_show_prices_only_quantity'   => "Если выбрано «нет», то на сайте цена будет отображаться у всех товаров.",
             'order_free_shipping_from_price' => "Бесплатная доставка при оформлении заказа от указанной суммы в валюте заказа",
             'is_generate_product_rating'     => "Если рейтинг товара не заполнен, то он будет сгенерирован автоматически. Это полезно для продвижения сайта.",
             'is_generate_product_rating'     => "Если рейтинг товара не заполнен, то он будет сгенерирован автоматически. Это полезно для продвижения сайта.",
@@ -261,7 +282,8 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
      */
     public function getCatalogCmsTree()
     {
-        return $this->hasOne(CmsTree::className(), ['id' => 'catalog_cms_tree_id']);
+        return $this->getCatalogMainCmsTree();
+        //return $this->hasOne(CmsTree::className(), ['id' => 'catalog_cms_tree_id']);
     }
 
 
@@ -289,17 +311,12 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
      */
     public function getCatalogMainCmsTree()
     {
-        if ($this->catalog_cms_tree_id) {
+        /*if ($this->catalog_cms_tree_id) {
             return $this->catalogCmsTree;
-        }
+        }*/
 
-        /**
-         * @var $shopContent ShopContent
-         */
-        $shopContent = ShopContent::find()->one();
         //На сайте настроены товары
-        if ($shopContent) {
-            $cmsContent = $shopContent->cmsContent;
+        if ($cmsContent = \Yii::$app->shop->contentProducts) {
             //У контента задан тип разделов к которым нужно привязываться
             if ($cmsContent->cms_tree_type_id) {
                 $firstMaxLevelTree = CmsTree::find()->cmsSite()->andWhere(['tree_type_id' => $cmsContent->cms_tree_type_id])->orderBy(['level' => SORT_ASC])->limit(1)->one();

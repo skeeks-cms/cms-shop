@@ -134,11 +134,7 @@ JS
                 <?
                 if ($controllerProperty = \Yii::$app->createController('shop/admin-cms-content-element')[0]) {
 
-                    /**
-                     * @var $shopContent \skeeks\cms\shop\models\ShopContent
-                     */
-                    $shopContent = \skeeks\cms\shop\models\ShopContent::find()->one();
-                    $controllerProperty->content = $shopContent->cmsContent;
+                    $controllerProperty->content = \Yii::$app->shop->contentProducts;
                     /**
                      * @var \skeeks\cms\backend\BackendAction $actionIndex
                      * @var \skeeks\cms\backend\BackendAction $actionCreate

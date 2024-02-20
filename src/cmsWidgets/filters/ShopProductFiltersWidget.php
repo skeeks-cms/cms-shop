@@ -15,7 +15,6 @@ use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\searchs\SearchChildrenRelatedPropertiesModel;
 use skeeks\cms\models\searchs\SearchRelatedPropertiesModel;
-use skeeks\cms\shop\models\ShopContent;
 use skeeks\cms\shop\models\ShopTypePrice;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
@@ -24,7 +23,6 @@ use yii\widgets\ActiveForm;
 /**
  * @property ShopTypePrice $typePrice;
  * @property CmsContent    $cmsContent;
- * @property ShopContent   $shopContent;
  * @property CmsContent    $offerCmsContent;
  * @property []                 $childrenElementIds;
  *
@@ -104,11 +102,11 @@ class ShopProductFiltersWidget extends WidgetRenderable
             $this->searchRelatedPropertiesModel->load(\Yii::$app->request->get());
         }
 
-        if ($this->offerRelatedProperties && $this->cmsContent) {
+        /*if ($this->offerRelatedProperties && $this->cmsContent) {
             $this->searchOfferRelatedPropertiesModel = new SearchChildrenRelatedPropertiesModel();
             $this->searchOfferRelatedPropertiesModel->initCmsContent($this->offerCmsContent);
             $this->searchOfferRelatedPropertiesModel->load(\Yii::$app->request->get());
-        }
+        }*/
     }
 
     public function attributeLabels()
@@ -157,10 +155,10 @@ class ShopProductFiltersWidget extends WidgetRenderable
     /**
      * @return CmsContent
      */
-    public function getOfferCmsContent()
+    /*public function getOfferCmsContent()
     {
         return $this->shopContent->offerContent;
-    }
+    }*/
 
     /**
      * @return CmsContent
@@ -173,10 +171,10 @@ class ShopProductFiltersWidget extends WidgetRenderable
     /**
      * @return ShopContent
      */
-    public function getShopContent()
+    /*public function getShopContent()
     {
         return ShopContent::findOne(['content_id' => $this->content_id]);
-    }
+    }*/
 
     /**
      * @return array
