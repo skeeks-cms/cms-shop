@@ -98,7 +98,7 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
 }*/
 ?>
 
-<?php if (YII_ENV_DEV) : ?>
+<?php /*if (YII_ENV_DEV) : */?>
 
     <?= $form->field($shopProduct, 'brand_id')->widget(
         \skeeks\cms\widgets\AjaxSelectModel::class,
@@ -148,7 +148,7 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
             ]),
         ]
     ); ?>
-<?php endif; ?>
+<?php /*endif; */?>
 
 
 <?php endif; ?>

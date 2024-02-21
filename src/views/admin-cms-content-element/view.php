@@ -615,7 +615,7 @@ CSS
                     );
                     ?>
 
-                    <?php if (YII_ENV_DEV) : ?>
+                    <?php /*if (YII_ENV_DEV) : */?>
 
 
 
@@ -841,7 +841,7 @@ JS
                         </span>
                         </li>
 
-                    <?php endif; ?>
+                    <?php /*endif; */?>
 
                     <?php endif; ?>
 

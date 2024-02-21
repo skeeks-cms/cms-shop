@@ -98,6 +98,7 @@ use yii\helpers\Json;
  * @property string                    $lengthFormatted
  * @property string                    $widthFormatted
  * @property string                    $heightFormatted
+ * @property string                    $dimensionsFormated
  *
  * @property boolean                   $isSimpleProduct
  * @property boolean                   $isOfferProduct
@@ -1605,6 +1606,18 @@ class ShopProduct extends \skeeks\cms\models\Core
         } else {
             return \Yii::$app->formatter->asDecimal(($this->height))." мм.";
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDimensionsFormated()
+    {
+        if ($this->height && $this->width && $this->length) {
+            return \Yii::$app->formatter->asDecimal(($this->length / 10)) . "x" . \Yii::$app->formatter->asDecimal(($this->height / 10)) . "x" . \Yii::$app->formatter->asDecimal(($this->width / 10)) . " см.";
+        }
+
+        return '';
     }
 
     static public function formatExperationTime(int $value)
