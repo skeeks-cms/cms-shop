@@ -883,6 +883,8 @@ SQL
         $sql = file_get_contents($sqlFile);
         $sql = str_replace("{site_id}", $cmsSite->id, $sql);
 
+        /*print_r($sql);die;*/
+
         \Yii::$app->db->createCommand($sql)->execute();
     }
 
