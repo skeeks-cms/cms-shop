@@ -22,6 +22,7 @@ use skeeks\cms\helpers\UrlHelper;
 use skeeks\cms\IHasUrl;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\models\CmsCountry;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\modules\admin\actions\AdminAction;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
@@ -36,6 +37,7 @@ use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\assets\admin\AdminShopProductAsset;
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\grid\ShopProductColumn;
+use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductBarcode;
@@ -45,6 +47,7 @@ use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreDocMove;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProductMove;
+use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -1171,7 +1174,7 @@ HTML
 
                 'value' => function (ShopCmsContentElement $shopCmsContentElement) {
 
-                    $result = $shopCmsContentElement->raw_row['cost_price'] ? (float) $shopCmsContentElement->raw_row['cost_price'] : "";
+                    $result = $shopCmsContentElement->raw_row['cost_price'] ? (float) round($shopCmsContentElement->raw_row['cost_price']) : "";
 
                     return Html::tag("div", $result, [
                     ]);
@@ -1180,6 +1183,114 @@ HTML
                 },
             ];
         }
+
+
+        //$visibleColumns[] = "shop.brand_id";
+        $shopColumns["shop.brand_id"] = [
+            'attribute' => "shop.brand_id",
+            'label'     => "Бренд",
+            'format'    => 'raw',
+
+            'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $grid->dataProvider->query;
+
+
+                $query->addSelect([
+                    'brand_id' => "sp.brand_id",
+                ]);
+
+                $grid->sortAttributes["shop.brand_id"] = [
+                    'asc'  => ['brand_id' => SORT_ASC],
+                    'desc' => ['brand_id' => SORT_DESC],
+                ];
+            },
+
+            'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+
+
+                if ($shopCmsContentElement->shopProduct->brand_id) {
+                    return Html::tag("div", $shopCmsContentElement->shopProduct->brand->name);
+                } else {
+
+                    return "";
+                }
+
+            },
+        ];
+
+        $shopColumns["shop.brand_sku"] = [
+            'attribute' => "shop.brand_sku",
+            'label'     => "Артикул бренда",
+            'format'    => 'raw',
+
+            'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $grid->dataProvider->query;
+
+
+                $query->addSelect([
+                    'brand_sku' => "sp.brand_sku",
+                ]);
+
+                $grid->sortAttributes["shop.brand_sku"] = [
+                    'asc'  => ['brand_sku' => SORT_ASC],
+                    'desc' => ['brand_sku' => SORT_DESC],
+                ];
+            },
+
+            'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+
+
+                if ($shopCmsContentElement->shopProduct->brand_sku) {
+                    return Html::tag("div", $shopCmsContentElement->shopProduct->brand_sku);
+                } else {
+
+                    return "";
+                }
+
+            },
+        ];
+
+
+        $shopColumns["shop.country_alpha2"] = [
+            'attribute' => "shop.country_alpha2",
+            'label'     => "Страна",
+            'format'    => 'raw',
+
+            'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $grid->dataProvider->query;
+
+
+                $query->addSelect([
+                    'country_alpha2' => "sp.country_alpha2",
+                ]);
+
+                $grid->sortAttributes["shop.country_alpha2"] = [
+                    'asc'  => ['country_alpha2' => SORT_ASC],
+                    'desc' => ['country_alpha2' => SORT_DESC],
+                ];
+            },
+
+            'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+
+
+                if ($shopCmsContentElement->shopProduct->country_alpha2) {
+                    return Html::tag("div", $shopCmsContentElement->shopProduct->country->name);
+                } else {
+
+                    return "";
+                }
+
+            },
+        ];
 
 
         /**
@@ -1554,6 +1665,108 @@ HTML
 
         ];
 
+        $filterFields['brand_id'] = [
+            'class'    => StringFilterField::class,
+            'label'    => 'Бренд',
+            //'filterAttribute' => 'shopStoreProducts.shop_store_id',
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                if ($e->field->value) {
+                    $query->andWhere(['sp.brand_id' => $e->field->value]);
+                }
+
+                /*if ($e->field->value) {
+                    $query->andWhere(['barcodes.value' => $e->field->value]);
+                }*/
+            },
+
+            'class'    => WidgetField::class,
+            'widgetClass'    => AjaxSelectModel::class,
+            'widgetConfig'    => [
+                'modelClass' => ShopBrand::class,
+                'multiple' => true,
+            ],
+            //
+
+        ];
+
+        $filterFields['q'] = [
+            'label'          => 'Поиск',
+            'elementOptions' => [
+                'placeholder' => 'Поиск (название, описание)',
+            ],
+            'on apply'       => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+
+                if ($e->field->value) {
+                    //$query->joinWith("childrenContentElements as child");
+                    //$query->joinWith("childrenContentElements.parentContentElement as parent");
+
+                    $query->joinWith("shopProduct.brand as brand");
+
+                    $q = CmsContentElement::find()
+                        ->select(['parent_id' => 'parent_content_element_id'])
+                        ->where([
+                            'or',
+                            ['like', CmsContentElement::tableName().'.id', $e->field->value],
+                            ['like', CmsContentElement::tableName().'.name', $e->field->value],
+                            ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
+                            ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
+                            ['like', CmsContentElement::tableName().'.external_id', $e->field->value],
+                        ]);
+
+                    $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(CmsContentElement::tableName().".id")]);
+
+                    $query->andWhere([
+                        'or',
+                        ['like', CmsContentElement::tableName().'.id', $e->field->value],
+                        ['like', CmsContentElement::tableName().'.name', $e->field->value],
+                        ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
+                        ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
+                        ['like', CmsContentElement::tableName().'.external_id', $e->field->value],
+                        ['like', 'shopProduct.brand_sku', $e->field->value],
+                        ['like', 'brand.name', $e->field->value],
+                        ['is not', 'p.parent_id', null],
+                    ]);
+                }
+            },
+        ];
+
+        $filterFields['country_alpha2'] = [
+            'class'    => StringFilterField::class,
+            'label'    => 'Страна',
+            //'filterAttribute' => 'shopStoreProducts.shop_store_id',
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                if ($e->field->value) {
+                    $query->andWhere(['sp.country_alpha2' => $e->field->value]);
+                }
+
+                /*if ($e->field->value) {
+                    $query->andWhere(['barcodes.value' => $e->field->value]);
+                }*/
+            },
+
+            'class'    => WidgetField::class,
+            'widgetClass'    => AjaxSelectModel::class,
+            'widgetConfig'    => [
+                'modelClass' => CmsCountry::class,
+                'modelPkAttribute' => "alpha2",
+                'multiple' => true,
+            ],
+            //
+
+        ];
+
         $purchaseTypePrice = \Yii::$app->skeeks->site->getShopTypePrices()->andWhere(['is_purchase' => 1])->one();
         $defaultTypePrice = \Yii::$app->skeeks->site->getShopTypePrices()->andWhere(['is_default' => 1])->one();
 
@@ -1809,6 +2022,8 @@ HTML
         $filterFieldsLabels['shop_product_type'] = 'Тип товара';
         $filterFieldsLabels['barcodes'] = 'Штрихкод';
         $filterFieldsLabels['stores'] = 'Магазин/склад';
+        $filterFieldsLabels['brand_id'] = 'Бренд';
+        $filterFieldsLabels['country_alpha2'] = 'Страна';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика';
         $filterFieldsLabels['quantity_our_filter'] = "В наличии";
         $filterFieldsLabels['quantity_supplier_filter'] = "Количество у поставщиков";
@@ -1826,6 +2041,8 @@ HTML
         $filterFieldsRules[] = ['quantity_supplier_filter', 'safe'];
         $filterFieldsRules[] = ['barcodes', 'string'];
         $filterFieldsRules[] = ['stores', 'safe'];
+        $filterFieldsRules[] = ['brand_id', 'safe'];
+        $filterFieldsRules[] = ['country_alpha2', 'safe'];
         $filterFieldsRules[] = ['marginality_abs_filter', 'safe'];
         $filterFieldsRules[] = ['marginality_per_filter', 'safe'];
         $filterFieldsRules[] = ['retail_price_filter', 'safe'];
