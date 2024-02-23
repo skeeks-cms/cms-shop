@@ -55,7 +55,19 @@ $shopSellerProducts = [];
         <div class="my-auto d-flex flex-row" style="height: 50px;">
             <div class="my-auto">
                 <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
-                    <a class="sx-trigger-action" style="border-bottom: 0;" href="#" title="id: <?= $model->id; ?>" data-toggle="tooltip"><?= $model->name; ?></a>
+                    <a class="sx-trigger-action" style="border-bottom: 0;" href="#" title="id: <?= $model->id; ?>" data-toggle="tooltip">
+                        <?= $model->name; ?>
+                    </a>
+                    <? if ($model->is_adult) : ?>
+                        <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
+                            <span data-toggle="tooltip" title="Этот раздел содержит информацию для взрослых. Имеет возрастные ограничения 18+">[18+]</span>
+                        </span>
+                    <? endif; ?>
+                    <? if (!$model->isAllowIndex) : ?>
+                        <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
+                            <span data-toggle="tooltip" title="Этот товар не индексируется поисковыми системами">[no index]</span>
+                        </span>
+                    <? endif; ?>
                 </div>
                 <? if ($model->tree_id) : ?>
                     <div style="">
@@ -98,6 +110,17 @@ $shopSellerProducts = [];
             <div class="my-auto">
                 <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
                     <a class="sx-trigger-action" style="border-bottom: none;" href="#" title="id: <?= $model->id; ?>" data-toggle="tooltip"><?= $model->productName; ?></a>
+                    <? if ($model->is_adult) : ?>
+                        <span style="font-size: 10px; color: red; font-weight: bold; color: #ff0000bd;">
+                            <span data-toggle="tooltip" title="Этот раздел содержит информацию для взрослых. Имеет возрастные ограничения 18+">[18+]</span>
+                        </span>
+                    <? endif; ?>
+                    <? if (!$model->isAllowIndex) : ?>
+                        <span style="font-size: 10px; color: red; font-weight: bold; color: #ff0000bd;">
+                            <span data-toggle="tooltip" title="Этот товар не индексируется поисковыми системами">[noindex]</span>
+                        </span>
+                    <? endif; ?>
+
                 </div>
                 <? if ($model->tree_id) : ?>
                     <div style="">

@@ -158,6 +158,7 @@ class ProductPriceHelper extends Component
 
                     } elseif ($shopDiscount->value_type == ShopDiscount::VALUE_TYPE_F) {
                         $discountMoney = new Money($shopDiscount->value, "RUB");
+                        //print_r($money->amount);die;
 
                         $money->sub($discountMoney);
                         $applyedShopDiscounts[] = $shopDiscount;

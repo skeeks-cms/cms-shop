@@ -8,7 +8,6 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use PhpOffice\PhpWord\Shared\Text;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelMultiDialogEditAction;
@@ -1134,9 +1133,6 @@ HTML
             $visibleColumns[] = "shop.marginality_abs";
 
 
-
-
-
             $shopColumns["shop.cost_price"] = [
                 'attribute' => "shop.cost_price",
                 'label'     => "Себестоимость",
@@ -1150,16 +1146,15 @@ HTML
 
                     $q = ShopStoreProductMove::find()
                         ->from([
-                            'sspm' => ShopStoreProductMove::tableName()
+                            'sspm' => ShopStoreProductMove::tableName(),
                         ])
                         ->joinWith("shopStoreDocMove as shopStoreDocMove")
                         ->joinWith("shopStoreProduct as shopStoreProduct")
                         ->andWhere(['shopStoreProduct.shop_product_id' => new Expression("sp.id")])
                         ->andWhere(['shopStoreDocMove.doc_type' => ShopStoreDocMove::DOCTYPE_POSTING])
                         ->addSelect([
-                            "cost_price" => new Expression("sum(sspm.price * sspm.quantity) / sum(sspm.quantity)")
-                        ]);
-                    ;
+                            "cost_price" => new Expression("sum(sspm.price * sspm.quantity) / sum(sspm.quantity)"),
+                        ]);;
 
 
                     $query->addSelect([
@@ -1174,7 +1169,7 @@ HTML
 
                 'value' => function (ShopCmsContentElement $shopCmsContentElement) {
 
-                    $result = $shopCmsContentElement->raw_row['cost_price'] ? (float) round($shopCmsContentElement->raw_row['cost_price']) : "";
+                    $result = $shopCmsContentElement->raw_row['cost_price'] ? (float)round($shopCmsContentElement->raw_row['cost_price']) : "";
 
                     return Html::tag("div", $result, [
                     ]);
@@ -1213,6 +1208,31 @@ HTML
 
                 if ($shopCmsContentElement->shopProduct->brand_id) {
                     return Html::tag("div", $shopCmsContentElement->shopProduct->brand->name);
+                } else {
+
+                    return "";
+                }
+
+            },
+        ];
+        $shopColumns["shop.dimentions"] = [
+            'attribute' => "shop.dimentions",
+            'label'     => "Габариты",
+            'format'    => 'raw',
+
+            'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $grid->dataProvider->query;
+
+            },
+
+            'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+
+
+                if ($shopCmsContentElement->shopProduct->dimensionsFormated) {
+                    return Html::tag("div", $shopCmsContentElement->shopProduct->dimensionsFormated);
                 } else {
 
                     return "";
@@ -1609,7 +1629,7 @@ HTML
         ];
 
         $filterFields['barcodes'] = [
-            'class'           => StringFilterField::class,
+            'class'             => StringFilterField::class,
             'field'             => [
                 'class' => TextField::class,
             ],
@@ -1618,9 +1638,9 @@ HTML
             /*'elementOptions' => [
                 'placeholder' => 'Штрихкод',
             ],*/
-            'label'           => 'Штрихкод',
-            'filterAttribute' => 'barcodes.value',
-            'on apply'        => function (QueryFiltersEvent $e) {
+            'label'             => 'Штрихкод',
+            'filterAttribute'   => 'barcodes.value',
+            'on apply'          => function (QueryFiltersEvent $e) {
 
 
                 if (ArrayHelper::getValue($e->field->value, "value.0")) {
@@ -1683,11 +1703,11 @@ HTML
                 }*/
             },
 
-            'class'    => WidgetField::class,
-            'widgetClass'    => AjaxSelectModel::class,
-            'widgetConfig'    => [
+            'class'        => WidgetField::class,
+            'widgetClass'  => AjaxSelectModel::class,
+            'widgetConfig' => [
                 'modelClass' => ShopBrand::class,
-                'multiple' => true,
+                'multiple'   => true,
             ],
             //
 
@@ -1756,13 +1776,56 @@ HTML
                 }*/
             },
 
-            'class'    => WidgetField::class,
-            'widgetClass'    => AjaxSelectModel::class,
-            'widgetConfig'    => [
-                'modelClass' => CmsCountry::class,
+            'class'        => WidgetField::class,
+            'widgetClass'  => AjaxSelectModel::class,
+            'widgetConfig' => [
+                'modelClass'       => CmsCountry::class,
                 'modelPkAttribute' => "alpha2",
-                'multiple' => true,
+                'multiple'         => true,
             ],
+            //
+
+        ];
+
+        $filterFields['empty'] = [
+            'class'    => StringFilterField::class,
+            'label'    => 'Не заполнено',
+            //'filterAttribute' => 'shopStoreProducts.shop_store_id',
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                if ($e->field->value == 'dimentions') {
+                    $query->andWhere([
+                        'or',
+                        ['sp.length' => ""],
+                        ['sp.width' => ""],
+                        ['sp.height' => ""],
+                    ]);
+                } elseif ($e->field->value == 'weight') {
+                    $query->andWhere([
+                        'or',
+                        ['sp.weight' => ""],
+                    ]);
+                } elseif ($e->field->value == 'brand') {
+                    $query->andWhere([
+                        'or',
+                        ['sp.brand_id' => null],
+                    ]);
+                }
+
+                /*if ($e->field->value) {
+                    $query->andWhere(['barcodes.value' => $e->field->value]);
+                }*/
+            },
+
+            'class' => SelectField::class,
+            'items' => [
+                'dimentions' => 'Габариты',
+                'weight'     => 'Вес',
+                'brand'     => 'Бренд',
+            ]
             //
 
         ];
@@ -2024,6 +2087,7 @@ HTML
         $filterFieldsLabels['stores'] = 'Магазин/склад';
         $filterFieldsLabels['brand_id'] = 'Бренд';
         $filterFieldsLabels['country_alpha2'] = 'Страна';
+        $filterFieldsLabels['empty'] = 'Не заполнено';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика';
         $filterFieldsLabels['quantity_our_filter'] = "В наличии";
         $filterFieldsLabels['quantity_supplier_filter'] = "Количество у поставщиков";
@@ -2042,6 +2106,7 @@ HTML
         $filterFieldsRules[] = ['barcodes', 'string'];
         $filterFieldsRules[] = ['stores', 'safe'];
         $filterFieldsRules[] = ['brand_id', 'safe'];
+        $filterFieldsRules[] = ['empty', 'safe'];
         $filterFieldsRules[] = ['country_alpha2', 'safe'];
         $filterFieldsRules[] = ['marginality_abs_filter', 'safe'];
         $filterFieldsRules[] = ['marginality_per_filter', 'safe'];
@@ -2210,10 +2275,6 @@ HTML
         $rr = new RequestResponse();
 
 
-
-
-
-
         //Если создаем товар предложение
         if ($parent_content_element_id = \Yii::$app->request->get("parent_content_element_id")) {
             $parent = \skeeks\cms\shop\models\ShopCmsContentElement::findOne($parent_content_element_id);
@@ -2252,7 +2313,6 @@ CSS
                 $productPrices[] = $productPrice;
             }
         }
-
 
 
         //Сначала правильно подгружаем данные выбранные в форме
@@ -2296,9 +2356,6 @@ CSS
         } else {
             $relatedModel = $model->relatedPropertiesModel;
         }
-
-
-
 
 
         if ($rr->isRequestPjaxPost()) {
@@ -2393,11 +2450,11 @@ CSS
 
                 if (!$model->errors && !$relatedModel->errors && !$shopProduct->errors) {
                     if (!$model->save()) {
-                        throw new Exception("Ошибка сохранения данных: " . print_r($model->errors, true));
+                        throw new Exception("Ошибка сохранения данных: ".print_r($model->errors, true));
                     }
 
                     if (!$relatedModel->save()) {
-                        throw new Exception("Ошибка сохранения дополнительных данных: " . print_r($relatedModel->errors, true));
+                        throw new Exception("Ошибка сохранения дополнительных данных: ".print_r($relatedModel->errors, true));
                     }
 
                     \Yii::$app->skeeks->site = $site;
@@ -2489,7 +2546,7 @@ CSS
     public function update($adminAction)
     {
         //echo "Технические работы";die;
-        
+
         $is_saved = false;
         $redirect = "";
 
@@ -2647,7 +2704,7 @@ CSS
                         }
 
                         if (!$relatedModel->save()) {
-                            throw new Exception("Ошибка сохранения дополнительных данных: " . print_r($relatedModel->errors, true));
+                            throw new Exception("Ошибка сохранения дополнительных данных: ".print_r($relatedModel->errors, true));
                         }
 
                         if (!$shopProduct->save()) {
@@ -2901,9 +2958,11 @@ JS
                     $model->load(\Yii::$app->request->post());
 
                     if (\Yii::$app->request->post("ShopProduct")) {
-                        $model->shopProduct->load(\Yii::$app->request->post());
 
-                        if (!$model->shopProduct->save()) {
+                        $model->shopProduct->load(\Yii::$app->request->post());
+                        $dirtyAttrs = $model->shopProduct->getDirtyAttributes();
+
+                        if (!$model->shopProduct->save(true, array_keys($dirtyAttrs))) {
                             throw new \yii\base\Exception("Ошибка сохранения товарных данных: ".print_r($model->shopProduct->errors, true));
                         }
                     }

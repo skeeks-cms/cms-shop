@@ -886,6 +886,47 @@ JS
                     </li>
 
 
+                    <li>
+                        <span class="sx-properties--name">
+                            Количество просмотров <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip"
+                                           title="Количество просмотров, от этого зависит популярность товара. По умолчанию чем популярнее товар, тем он выше в списке, в разделе."></i>
+                        </span>
+                        <span class="sx-properties--value">
+                            <span class="sx-fast-edit sx-fast-edit-popover"
+                                  data-form="#show_counter-form"
+                                  data-title="Количество просмотров"
+                            >
+                                <?php echo $model->show_counter ? $model->show_counter : "&nbsp;&nbsp;&nbsp;" ?>
+                            </span>
+
+                            <div class="sx-fast-edit-form-wrapper">
+                                <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                    'id'             => "show_counter-form",
+                                    'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                    'options'        => [
+                                        'class' => 'sx-fast-edit-form',
+                                    ],
+                                    'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                        function (ActiveFormAjaxSubmit) {
+                                            ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                $.pjax.reload("#{$pjax->id}");
+                                                $(".sx-fast-edit").popover("hide");
+                                            });
+                                        }
+JS
+                                    ),
+                                ]); ?>
+                                <?php echo $form->field($model, 'show_counter')->label(false)->hint(false); ?>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Сохранить</button>
+                                    </div>
+                                <?php $form::end(); ?>
+                            </div>
+
+                        </span>
+                    </li>
+
+
                     <!--<li>
                         <span class="sx-properties--name">
                             Создан
