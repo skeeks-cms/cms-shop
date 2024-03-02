@@ -33,6 +33,7 @@ use yii\helpers\ArrayHelper;
  * ***
  *
  * @property WbComponent|null                        $wbProvider
+ * @property ShopWbProduct[]                        $shopWbProducts
  *
  * @property CmsSite|\skeeks\cms\shop\models\CmsSite $cmsSite
  */
@@ -68,7 +69,6 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
             ],
             [
                 [
-                    'wb_key_stat',
                     'wb_key_standart',
                     'oz_api_key',
                     'marketplace',
@@ -90,7 +90,7 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
                 },
             ],
             [
-                ['wb_key_stat', 'wb_key_standart'],
+                ['wb_key_standart'],
                 'required',
                 'when' => function () {
                     return $this->marketplace == self::MARKETPLACE_WILDBERRIES;
@@ -125,7 +125,6 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
             'is_active'       => 'Активность',
             'priority'        => 'Сортировка',
             'marketplace'     => 'Маркетплейс',
-            'wb_key_stat'     => 'Ключ «Статистика»',
             'wb_key_standart' => 'Ключ «Стандартный»',
             'oz_client_id'    => 'Ozon Client ID',
             'oz_api_key'      => 'Ozon API Key',
@@ -140,7 +139,6 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'name'            => '',
-            'wb_key_stat'     => '149 символов.',
             'wb_key_standart' => '149 символов.',
 
             'oz_client_id' => 'Пример Client Id: 124764',
@@ -159,20 +157,28 @@ class ShopMarketplace extends \skeeks\cms\base\ActiveRecord
         $siteClass = \Yii::$app->skeeks->siteClass;
         return $this->hasOne($siteClass, ['id' => 'cms_site_id']);
     }
+    /**
+     * Gets query for [[CmsSite]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopWbProducts()
+    {
+        return $this->hasMany(ShopWbProduct::class, ['shop_marketplace_id' => 'id']);
+    }
 
     /**
      * @return WbComponent|null
      */
     public function getWbProvider()
     {
-        if (!$this->wb_key_standart || !$this->wb_key_stat) {
+        if (!$this->wb_key_standart) {
             return null;
         }
 
         $wb = new WbComponent();
 
         $wb->api_key = $this->wb_key_standart;
-        $wb->api_stat_key = $this->wb_key_stat;
 
         return $wb;
     }

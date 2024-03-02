@@ -33,7 +33,8 @@ use yii\helpers\ArrayHelper;
  * @property string              $source_purchase_price
  * @property float               $purchase_extra_charge
  * @property float               $selling_extra_charge
- * @property bool               $is_personal_price
+ * @property bool                $is_personal_price
+ * @property integer|null        $sx_id
  *
  * @property float               $cashier_is_allow_sell_out_of_stock Разрешить продажу товаров не в наличии?
  * @property float               $cashier_is_show_out_of_stock Показывать товары не в наличии?
@@ -100,7 +101,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at', 'sx_id'], 'integer'],
             [['priority'], 'integer'],
 
             [['is_sync_external'], 'integer'],
@@ -120,6 +121,10 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
 
             [['cms_image_id'], 'safe'],
 
+            [
+                ['sx_id', ], 'default', 'value' => null
+            ],
+            
             [['external_id'], 'default', 'value' => null],
             [['external_id'], 'string'],
 
@@ -204,29 +209,30 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
 
-            'name'                               => "Название",
-            'description'                        => "Описание",
-            'cms_image_id'                       => "Изображение",
-            'is_active'                          => "Активность",
-            'external_id'                        => "ID из внешней системы",
-            'priority'                           => "Сортировка",
-            'work_time'                          => 'Время работы',
-            'latitude'                           => 'Широта',
-            'longitude'                          => 'Долгота',
-            'address'                            => 'Адрес',
-            'coordinates'                        => '',
-            'is_supplier'                        => 'Поставщик?',
-            'is_personal_price'                        => 'У товаров этого магазина своя цена?',
-            'source_selling_price'               => 'Цена поставщика',
-            'source_purchase_price'              => 'Цена поставщика',
-            'purchase_extra_charge'              => 'Наценка',
-            'selling_extra_charge'               => 'Наценка',
-            'cashier_is_allow_sell_out_of_stock' => 'Разрешить продажу товаров не в наличии?',
+            'name'                                => "Название",
+            'description'                         => "Описание",
+            'cms_image_id'                        => "Изображение",
+            'is_active'                           => "Активность",
+            'external_id'                         => "ID из внешней системы",
+            'priority'                            => "Сортировка",
+            'work_time'                           => 'Время работы',
+            'latitude'                            => 'Широта',
+            'longitude'                           => 'Долгота',
+            'address'                             => 'Адрес',
+            'coordinates'                         => '',
+            'is_supplier'                         => 'Поставщик?',
+            'is_personal_price'                   => 'У товаров этого магазина своя цена?',
+            'source_selling_price'                => 'Цена поставщика',
+            'source_purchase_price'               => 'Цена поставщика',
+            'purchase_extra_charge'               => 'Наценка',
+            'selling_extra_charge'                => 'Наценка',
+            'cashier_is_allow_sell_out_of_stock'  => 'Разрешить продажу товаров не в наличии?',
             'cashier_is_show_only_inner_products' => 'Показывать только товары магазина?',
-            'cashier_is_show_out_of_stock'       => 'Показывать товары не в наличии?',
-            'cashier_default_cms_user_id'        => 'Клиент выбранный по умолчанию',
-            'is_allow_no_check'                  => 'Разрешить продажу без чека?',
-            'is_sync_external'                   => 'Синхронизирован с внешней системой?',
+            'cashier_is_show_out_of_stock'        => 'Показывать товары не в наличии?',
+            'cashier_default_cms_user_id'         => 'Клиент выбранный по умолчанию',
+            'is_allow_no_check'                   => 'Разрешить продажу без чека?',
+            'is_sync_external'                    => 'Синхронизирован с внешней системой?',
+            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
     /**
@@ -235,12 +241,12 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
-            'cashier_default_cms_user_id' => "Обязательно укажите этому клиенту email!",
+            'cashier_default_cms_user_id'         => "Обязательно укажите этому клиенту email!",
             'cashier_is_show_only_inner_products' => "При включении опции в магазине будут отображатся товары, только связанные с этим магазином.",
-            'cashier_is_allow_sell_out_of_stock' => "При включении опции в магазине возможно будет пробить товара больше чем числится в наличии.",
-            'is_sync_external'            => 'Поставьте галочку если складской учет ведется во внешней системе (например в 1С, клаудшоп, мойсклад и т.д.)<br />Если же складской учет ведется в системе управления сайтом, то галочку не ставьте!',
-            'is_allow_no_check'           => 'Если опция выбрана, то в момент оформления продажи или воврата на кассе, можно не выбивать чек.',
-            'is_personal_price'           => 'Если включена эта опция, значит у товаров в этом магазине может быть своя цена, отличающаяся от интернет магазина.',
+            'cashier_is_allow_sell_out_of_stock'  => "При включении опции в магазине возможно будет пробить товара больше чем числится в наличии.",
+            'is_sync_external'                    => 'Поставьте галочку если складской учет ведется во внешней системе (например в 1С, клаудшоп, мойсклад и т.д.)<br />Если же складской учет ведется в системе управления сайтом, то галочку не ставьте!',
+            'is_allow_no_check'                   => 'Если опция выбрана, то в момент оформления продажи или воврата на кассе, можно не выбивать чек.',
+            'is_personal_price'                   => 'Если включена эта опция, значит у товаров в этом магазине может быть своя цена, отличающаяся от интернет магазина.',
         ]);
     }
 

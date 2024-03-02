@@ -35,6 +35,7 @@ use yii\helpers\Url;
  * @property string|null    $website_url
  * @property string         $code
  * @property string         $external_id
+ * @property integer|null   $sx_id
  *
  * @property string|null    $seo_h1
  * @property string|null    $meta_title
@@ -48,7 +49,7 @@ use yii\helpers\Url;
  * @property string         $absoluteUrl
  * @property CmsCountry     $country
  * @property CmsStorageFile $logo
- * @property ShopProduct[] $products
+ * @property ShopProduct[]  $products
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -112,8 +113,12 @@ class ShopBrand extends ActiveRecord
                     'created_by',
                     'is_active',
                     'priority',
+                    'sx_id',
                 ],
                 'integer',
+            ],
+            [
+                ['sx_id', ], 'default', 'value' => null
             ],
             [
                 [
@@ -218,6 +223,7 @@ class ShopBrand extends ActiveRecord
             'meta_description'  => Yii::t('skeeks/cms', 'Meta Description'),
             'priority'          => Yii::t('skeeks/cms', 'Сортировка'),
             'external_id'       => Yii::t('skeeks/cms', 'Внешний код'),
+            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
     /**
