@@ -118,7 +118,9 @@ class ShopBrand extends ActiveRecord
                 'integer',
             ],
             [
-                ['sx_id', ], 'default', 'value' => null
+                ['sx_id',],
+                'default',
+                'value' => null,
             ],
             [
                 [
@@ -223,7 +225,7 @@ class ShopBrand extends ActiveRecord
             'meta_description'  => Yii::t('skeeks/cms', 'Meta Description'),
             'priority'          => Yii::t('skeeks/cms', 'Сортировка'),
             'external_id'       => Yii::t('skeeks/cms', 'Внешний код'),
-            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'             => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
     /**

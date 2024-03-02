@@ -133,7 +133,9 @@ class ShopCollection extends ActiveRecord
             ],
             //Сущьность полей
             [
-                ['sx_id', ], 'default', 'value' => null
+                ['sx_id',],
+                'default',
+                'value' => null,
             ],
             [
                 [
@@ -281,7 +283,7 @@ class ShopCollection extends ActiveRecord
             'external_id'       => Yii::t('skeeks/cms', 'Внешний код'),
             'shop_brand_id'     => Yii::t('skeeks/cms', 'Бренд'),
             'imageIds'          => Yii::t('skeeks/cms', 'Images'),
-            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'             => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
     /**

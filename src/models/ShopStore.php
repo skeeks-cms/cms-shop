@@ -122,9 +122,11 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['cms_image_id'], 'safe'],
 
             [
-                ['sx_id', ], 'default', 'value' => null
+                ['sx_id',],
+                'default',
+                'value' => null,
             ],
-            
+
             [['external_id'], 'default', 'value' => null],
             [['external_id'], 'string'],
 
@@ -232,7 +234,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'cashier_default_cms_user_id'         => 'Клиент выбранный по умолчанию',
             'is_allow_no_check'                   => 'Разрешить продажу без чека?',
             'is_sync_external'                    => 'Синхронизирован с внешней системой?',
-            'sx_id'           => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'                               => \Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
     /**
