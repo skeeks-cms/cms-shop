@@ -22,4 +22,12 @@ class ShopBrandQuery extends CmsActiveQuery
     {
         return $this->andWhere(['external_id' => $external_id]);
     }
+    /**
+     * @param string|int|array $id
+     * @return ShopBrandQuery
+     */
+    public function sxId(mixed $id)
+    {
+        return $this->andWhere(['sx_id' => $id]);
+    }
 }
