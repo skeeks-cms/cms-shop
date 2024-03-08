@@ -14,6 +14,7 @@ use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsCountry;
 use skeeks\cms\money\Money;
+use skeeks\cms\query\CmsActiveQuery;
 use skeeks\modules\cms\money\models\Currency;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
@@ -105,6 +106,7 @@ use yii\helpers\Json;
  * @property boolean                   $isOffersProduct
  * @property array                     $measureMatches
  *
+ * @property ShopFeedback[]            $shopFeedbacks
  * @property ShopFavoriteProduct[]     $shopFavoriteProducts
  * @property ShopProductBarcode[]      $shopProductBarcodes
  */
@@ -1453,6 +1455,16 @@ class ShopProduct extends \skeeks\cms\models\Core
 
 
     /**
+     * @return CmsActiveQuery
+     */
+    public function getShopFeedbacks()
+    {
+        return $this->hasMany(ShopFeedback::className(), ['shop_product_id' => 'id']);
+    }
+
+
+
+    /**
      * @var null
      */
     protected $_barcodes = null;
@@ -1614,7 +1626,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getDimensionsFormated()
     {
         if ($this->height && $this->width && $this->length) {
-            return \Yii::$app->formatter->asDecimal(($this->length / 10)) . "x" . \Yii::$app->formatter->asDecimal(($this->height / 10)) . "x" . \Yii::$app->formatter->asDecimal(($this->width / 10)) . " см.";
+            return \Yii::$app->formatter->asDecimal(($this->length / 10))."x".\Yii::$app->formatter->asDecimal(($this->height / 10))."x".\Yii::$app->formatter->asDecimal(($this->width / 10))." см.";
         }
 
         return '';

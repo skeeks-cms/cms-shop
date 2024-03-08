@@ -59,6 +59,11 @@ return \yii\helpers\ArrayHelper::merge([
                     "url"   => ["shop/admin-shop-collection"],
                     //"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
                 ],
+                [
+                    "label" => "Отзывы к товарам",
+                    "url"   => ["shop/admin-shop-feedback"],
+                    //"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+                ],
             ],
         ],
 
