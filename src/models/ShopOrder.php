@@ -1199,6 +1199,8 @@ class ShopOrder extends \skeeks\cms\models\Core
         $result = 0;
 
         foreach ($this->shopOrderItems as $shopOrderItem) {
+            /*print_r($shopOrderItem->quantity);
+            die;*/
             $result = $result + ($shopOrderItem->weight * $shopOrderItem->quantity);
         }
 

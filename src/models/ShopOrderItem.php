@@ -316,7 +316,7 @@ class ShopOrderItem extends ActiveRecord
 
         $this->name = $product->cmsContentElement->productName;
         //$this->name = $parentElement ? $parentElement->name : $product->cmsContentElement->name;
-        $this->weight = $product->weight;
+        $this->weight = $product->WeightPerOneMeasure;
 
 
         $this->dimensions = Json::encode([

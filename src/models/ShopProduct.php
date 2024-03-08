@@ -96,6 +96,8 @@ use yii\helpers\Json;
  *
  * @property boolean                   $isSubProduct
  * @property string                    $weightFormatted
+ * @property string                    $WeightPerOneMeasure Вес за 1 единицу измерений (например 1 м2)
+ * @property string                    $WeightPerOneMeasureFormatted 
  * @property string                    $lengthFormatted
  * @property string                    $widthFormatted
  * @property string                    $heightFormatted
@@ -1562,6 +1564,35 @@ class ShopProduct extends \skeeks\cms\models\Core
         }
 
         return $this->_barcodes;
+    }
+
+    /**
+     * @return float
+     */
+    public function getWeightPerOneMeasure()
+    {
+        if ($this->measure_ratio == 0) {
+            return 0;
+        }
+        
+        if ($this->measure_ratio == 1) {
+            return $this->weight;
+        }
+
+        return (float) ($this->weight / $this->measure_ratio);
+    }
+    /**
+     * @return float
+     */
+    public function getWeightPerOneMeasureFormatted()
+    {
+        if ($this->WeightPerOneMeasure >= 1000 && $this->WeightPerOneMeasure <= 1000000) {
+            return \Yii::$app->formatter->asDecimal(($this->WeightPerOneMeasure / 1000))." кг.";
+        } elseif ($this->WeightPerOneMeasure >= 1000000) {
+            return \Yii::$app->formatter->asDecimal(($this->WeightPerOneMeasure / 1000000))." т.";
+        } else {
+            return \Yii::$app->formatter->asDecimal(($this->WeightPerOneMeasure))." г.";
+        }
     }
 
     /**
