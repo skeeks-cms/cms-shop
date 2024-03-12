@@ -632,7 +632,8 @@ class CartController extends Controller
                     if ($product->measure_ratio > 1) {
 
                         if ($va = ($quantity * 1000) % ($product->measure_ratio * 1000) != 0) {
-                            $quantity = $product->measure_ratio;
+                            $quantity = $product->measure_ratio * round(($quantity * 1000) / ($product->measure_ratio * 1000));
+
                         }
                     }
 
