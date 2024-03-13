@@ -64,6 +64,7 @@ return [
                 ],
             ],
         ],
+
         'cacheboxBackend' => [
             'id'    => 'cacheboxBackend',
             'class' => \skeeks\cms\shop\cashier\CashierBackendComponent::class

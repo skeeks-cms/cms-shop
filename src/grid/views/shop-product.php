@@ -120,6 +120,9 @@ $shopSellerProducts = [];
                             <span data-toggle="tooltip" title="Этот товар не индексируется поисковыми системами">[noindex]</span>
                         </span>
                     <? endif; ?>
+                    <? if ($model->sx_id) : ?>
+                        <span data-toggle='tooltip' title='SkeekS Suppliers ID: <?php echo $model->sx_id; ?>'><i class='fas fa-link'></i></span>
+                    <? endif; ?>
 
                 </div>
                 <? if ($model->tree_id) : ?>

@@ -420,32 +420,7 @@ $noValue = "<span style='color: silver;'>—</span>";
     <div class="col-lg-4 col-sm-6 col-12">
         <div style="padding: 10px;">
             <h4 style="line-height: 1.1;">
-                <?php if (
-                    $model->cmsSite->shopSite->is_receiver //Если это товар собирает данные от поставщиков
-                ) : ?>
-                    <?php if ($model->main_cce_id) : ?>
-                        <?
-                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                            'controllerId' => "/shop/admin-cms-content-element",
-                            'modelId'      => $model->main_cce_id,
-                            'tag'          => 'span',
-                            'options'      => [
-                                'style' => 'color: green; text-align: left;',
-                                'class' => '',
-                            ],
-                        ]);
-                        ?>
-                        <i class="fas fa-link" title="Товар привязан к инфокарточке. Берет описание, фото и характеристики из нее. <?php echo $model->main_cce_id; ?>" data-toggle="tooltip" style="margin-left: 5px;"></i>
-                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                    <?php else : ?>
-                        <span style="color: red;">
-                            <i class="fas fa-link" title="Товар не привязан к инфокарточке" data-toggle="tooltip" style="margin-left: 5px;"></i>
-                        </span>
-                    <?php endif; ?>
-
-
-                    <?php echo $model->productName; ?>
-                <? endif; ?>
+                <?php echo $model->productName; ?>
             </h4>
 
             <div class="sx-properties-wrapper sx-columns-1" style="max-width: 350px; margin-top: 15px;">
