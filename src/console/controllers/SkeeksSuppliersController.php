@@ -20,6 +20,7 @@ use skeeks\cms\shop\models\BrandCmsContentElement;
 use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopCollection;
+use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use yii\base\Exception;
 use yii\console\Controller;
@@ -675,11 +676,11 @@ class SkeeksSuppliersController extends Controller
 
                         if ($model->is_multiple) {
                             $model->component_settings = [
-                                'fieldElement' => PropertyTypeList::FIELD_ELEMENT_SELECT,
+                                'fieldElement' => PropertyTypeList::FIELD_ELEMENT_SELECT_MULTI,
                             ];
                         } else {
                             $model->component_settings = [
-                                'fieldElement' => PropertyTypeList::FIELD_ELEMENT_SELECT_MULTI,
+                                'fieldElement' => PropertyTypeList::FIELD_ELEMENT_SELECT,
                             ];
                         }
 
@@ -893,7 +894,7 @@ class SkeeksSuppliersController extends Controller
                             $img = $this->_addImage($imgApiData);
                             $imgIds[] = $img->id;
                         }
-
+                        
                         $model->setImageIds($imgIds);
                     }
 
@@ -924,12 +925,6 @@ class SkeeksSuppliersController extends Controller
                     $model->cms_image_id = $image->id;
                 }
 
-                if ($model->save()) {
-
-                } else {
-                    throw new Exception("Ошибка создания бренда: ".print_r($model->errors, true));
-                }
-
                 if ($images = ArrayHelper::getValue($apiData, "images")) {
 
                     /*foreach ($images as $imgApiData) {
@@ -943,8 +938,14 @@ class SkeeksSuppliersController extends Controller
                         $img = $this->_addImage($imgApiData);
                         $imgIds[] = $img->id;
                     }
-
+                    
                     $model->setImageIds($imgIds);
+                }
+                
+                if ($model->save()) {
+
+                } else {
+                    throw new Exception("Ошибка создания коллекции: ".print_r($model->errors, true));
                 }
 
                 $result = true;
@@ -978,6 +979,8 @@ class SkeeksSuppliersController extends Controller
         $updated_at = (int)ArrayHelper::getValue($apiData, "updated_at.timestamp");
         $result = false;
 
+        $content_id = \Yii::$app->shop->contentProducts->id;
+        
         $t = \Yii::$app->db->beginTransaction();
         try {
             if ($model) {
@@ -1094,31 +1097,84 @@ class SkeeksSuppliersController extends Controller
                 $model = new ShopCmsContentElement();
 
                 $model->sx_id = (int)ArrayHelper::getValue($apiData, "id");
+                $model->content_id = $content_id;
 
 
-                $brand_id = (int)ArrayHelper::getValue($apiData, "brand_id");
-                if ($brand_id) {
-                    if ($shopBrand = ShopBrand::find()->sxId($brand_id)->one()) {
-                        $model->shop_brand_id = $shopBrand->id;
+                //TODO:добавить обновление
+                $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
+                $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
+                $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
+                $model->is_adult = (int)ArrayHelper::getValue($apiData, "is_adult");
+
+                $shopProduct = new ShopProduct();
+
+                $category_id = (int)ArrayHelper::getValue($apiData, "category_id");
+                if ($category_id) {
+                    $cmsTree = CmsTree::find()->sxId($category_id)->one();
+                    if (!$cmsTree) {
+                        $this->actionUpdateAll();
+                        $cmsTree = CmsTree::find()->sxId($category_id)->one();
+                    }
+                    if ($cmsTree) {
+                        $model->tree_id = $cmsTree->id;
                     }
                 }
 
-                if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
-                    $model->cms_image_id = $image->id;
+                $brand_id = (int)ArrayHelper::getValue($apiData, "brand_id");
+                if ($brand_id) {
+                    $shopBrand = ShopBrand::find()->sxId($brand_id)->one();
+                    if (!$shopBrand) {
+                        $this->actionUpdateAll();
+                        $shopBrand = ShopBrand::find()->sxId($brand_id)->one();
+                    }
+
+                    if ($shopBrand) {
+                        $shopProduct->brand_id = $shopBrand->id;
+                    }
                 }
 
-                if ($model->save()) {
+                $collection_ids = (array)ArrayHelper::getValue($apiData, "collection_ids");
+                if ($collection_ids) {
+                    $tmpCollectionIds = [];
+                    foreach ($collection_ids as $sx_collection_id) {
+                        $shopCollection = ShopCollection::find()->sxId($sx_collection_id)->one();
+                        if (!$shopCollection) {
+                            $this->actionUpdateAll();
+                            $shopCollection = ShopCollection::find()->sxId($sx_collection_id)->one();
+                        }
 
-                } else {
-                    throw new Exception("Ошибка создания бренда: ".print_r($model->errors, true));
+                        if ($shopCollection) {
+                            $tmpCollectionIds[] = $shopCollection->id;
+                            //$shopProduct->link("collections", $shopCollection);
+                        }
+                    }
+
+                    $shopProduct->collections = $tmpCollectionIds;
+                }
+
+
+                $shopProduct->brand_sku = trim((string)ArrayHelper::getValue($apiData, "brand_sku"));
+                $shopProduct->country_alpha2 = trim((string)ArrayHelper::getValue($apiData, "country_alpha2"));
+                $shopProduct->measure_code = trim((string)ArrayHelper::getValue($apiData, "measure_code"));
+                $shopProduct->weight = (float)ArrayHelper::getValue($apiData, "weight");
+                $shopProduct->width = (float)ArrayHelper::getValue($apiData, "width");
+                $shopProduct->length = (float)ArrayHelper::getValue($apiData, "length");
+                $shopProduct->height = (float)ArrayHelper::getValue($apiData, "height");
+                $shopProduct->measure_ratio = (float)ArrayHelper::getValue($apiData, "measure_ratio");
+                $shopProduct->measure_ratio_min = (float)ArrayHelper::getValue($apiData, "measure_ratio_min");
+                $shopProduct->expiration_time = (int)ArrayHelper::getValue($apiData, "expiration_time");
+                $shopProduct->service_life_time = (int)ArrayHelper::getValue($apiData, "service_life_time");
+                $shopProduct->warranty_time = (int)ArrayHelper::getValue($apiData, "warranty_time");
+                $shopProduct->expiration_time_comment = trim((string)ArrayHelper::getValue($apiData, "expiration_time_comment"));
+                $shopProduct->service_life_time_comment = trim((string)ArrayHelper::getValue($apiData, "service_life_time_comment"));
+                $shopProduct->warranty_time_comment = trim((string)ArrayHelper::getValue($apiData, "warranty_time_comment"));
+
+
+                if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
+                    $model->image_id = $image->id;
                 }
 
                 if ($images = ArrayHelper::getValue($apiData, "images")) {
-
-                    /*foreach ($images as $imgApiData) {
-                        $img = $this->_addImage($imgApiData);
-                        $model->link("images", $img);
-                    }*/
 
                     $imgIds = [];
 
@@ -1128,6 +1184,17 @@ class SkeeksSuppliersController extends Controller
                     }
 
                     $model->setImageIds($imgIds);
+                }
+
+                if (!$model->save()) {
+                    throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true));
+                }
+
+
+                $shopProduct->id = $model->id;
+                
+                if (!$shopProduct->save()) {
+                    throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true));
                 }
 
                 $result = true;
