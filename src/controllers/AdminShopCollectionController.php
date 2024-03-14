@@ -201,7 +201,12 @@ class AdminShopCollectionController extends BackendModelStandartController
                         'value'     => function (ShopCollection $model) {
 
                             $data = [];
-                            $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                            $name = $model->asText;
+                            if ($model->sx_id) {
+                                $data[] = Html::a($name . " <small data-toggle='tooltip' title='SkeekS Suppliers ID: {$model->sx_id}'><i class='fas fa-link'></i></small>", "#", ['class' => 'sx-trigger-action']);
+                            } else {
+                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                            }
 
                             $info = implode("<br />", $data);
 

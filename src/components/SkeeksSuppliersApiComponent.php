@@ -156,48 +156,48 @@ class SkeeksSuppliersApiComponent extends Component
     /**
      * @return ApiResponse
      */
-    public function methodCategories()
+    public function methodCategories($params = [])
     {
-        return $this->request("/categories");
+        return $this->request("/categories", $params);
     }
 
     /**
      * @return ApiResponse
      */
-    public function methodProperties()
+    public function methodProperties($params = [])
     {
-        return $this->request("/properties");
+        return $this->request("/properties", $params);
     }
 
     /**
      * @return ApiResponse
      */
-    public function methodBrands()
+    public function methodBrands($params = [])
     {
-        return $this->request("/brands");
+        return $this->request("/brands", $params);
     }
 
     /**
      * @return ApiResponse
      */
-    public function methodCollections()
+    public function methodCollections($params = [])
     {
-        return $this->request("/collections");
+        return $this->request("/collections", $params);
     }
 
     /**
      * @return ApiResponse
      */
-    public function methodStoreItems()
+    public function methodStoreItems($params = [])
     {
-        return $this->request("/store-items");
+        return $this->request("/store-items", $params);
     }
 
     /**
      * @return ApiResponse
      */
-    public function methodProducts()
+    public function methodProducts($params = [])
     {
-        return $this->request("/products");
+        return $this->request("/products", $params);
     }
 }

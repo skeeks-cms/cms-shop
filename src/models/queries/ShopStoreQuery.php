@@ -16,10 +16,19 @@ class ShopStoreQuery extends CmsActiveQuery
 {
     /**
      * @param bool $value
-     * @return ShopOrderQuery
+     * @return ShopStoreQuery
      */
     public function isSupplier($value = true)
     {
         return $this->andWhere(['is_supplier' => (int)$value]);
+    }
+
+    /**
+     * @param string|int|array $id
+     * @return ShopStoreQuery
+     */
+    public function sxId(mixed $id)
+    {
+        return $this->andWhere(['sx_id' => $id]);
     }
 }
