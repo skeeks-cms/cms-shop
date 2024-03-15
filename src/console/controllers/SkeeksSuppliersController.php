@@ -71,23 +71,19 @@ class SkeeksSuppliersController extends Controller
     public function init()
     {
         if (!isset(\Yii::$app->skeeksSuppliersApi)) {
-            $this->stdout("Компонент skeeksSuppliersApi не подключен");
-            return false;
+            throw new Exception("Компонент skeeksSuppliersApi не подключен");
         }
 
         if (!\Yii::$app->skeeksSuppliersApi->api_key) {
-            $this->stdout("Skeeks Suppliers API не настроено, не указан api_key");
-            return false;
+            throw new Exception("Skeeks Suppliers API не настроено, не указан api_key");
         }
 
         if (!\Yii::$app->shop->contentProducts) {
-            $this->stdout("Магазин не настроен, не настроен товарный контент");
-            return false;
+            throw new Exception("Магазин не настроен, не настроен товарный контент");
         }
 
         if (!\Yii::$app->cms->cmsSite->shopSite->catalogMainCmsTree) {
-            $this->stdout("Магазин не настроен, нет корневого раздела для товаров.");
-            return false;
+            throw new Exception("Магазин не настроен, нет корневого раздела для товаров.");
         }
 
         return parent::init();
@@ -701,6 +697,7 @@ class SkeeksSuppliersController extends Controller
                 $cmsTree = new CmsTree();
 
                 $cmsTree->sx_id = (int)ArrayHelper::getValue($apiData, "id");
+                
                 $cmsTree->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $cmsTree->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                 $cmsTree->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
@@ -916,6 +913,7 @@ class SkeeksSuppliersController extends Controller
                 //Создать
                 $model = new ShopBrand();
 
+                $model->sx_id = (int)ArrayHelper::getValue($apiData, "id");
                 $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $model->website_url = trim((string)ArrayHelper::getValue($apiData, "website_url"));
                 $model->country_alpha2 = trim((string)ArrayHelper::getValue($apiData, "country_alpha2"));
