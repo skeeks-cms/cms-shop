@@ -22,6 +22,7 @@ use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopCollection;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
+use skeeks\cms\shop\models\ShopStoreProduct;
 use yii\base\Exception;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
@@ -244,12 +245,25 @@ class SkeeksSuppliersController extends Controller
      * @return void
      * @throws Exception
      */
-    public function actionUpdateCategories()
+    public function actionUpdateCategories($page = 1)
     {
-        $response = \Yii::$app->skeeksSuppliersApi->methodCategories();
+        $response = \Yii::$app->skeeksSuppliersApi->methodCategories([
+            'page' => $page
+        ]);
 
-        $this->stdout("Обновление категорий [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление категорий, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
         $this->stdout("\n");
+
+        $total = $response->headers->get("x-pagination-total-count");
+        $pageCount = $response->headers->get("x-pagination-page-count");
+
+        if ($page == 1) {
+            $this->stdout("Всего категорий к обновлению: {$total}\n");
+            $this->stdout("Страниц: {$pageCount}\n");
+        }
+
+        $this->stdout("Страница: {$page}\n");
+
 
         $updated = 0;
         $created = 0;
@@ -286,19 +300,35 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
+
+        if ($page < $pageCount) {
+            $this->actionUpdateCategories($page + 1);
+        }
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function actionUpdateProperties()
+    public function actionUpdateProperties($page = 1)
     {
-        $response = \Yii::$app->skeeksSuppliersApi->methodProperties();
+        $response = \Yii::$app->skeeksSuppliersApi->methodProperties([
+            'page' => $page
+        ]);
 
-        $this->stdout("Обновление характеристик [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление характеристик, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
         $this->stdout("\n");
 
+        $total = $response->headers->get("x-pagination-total-count");
+        $pageCount = $response->headers->get("x-pagination-page-count");
+
+        if ($page == 1) {
+            $this->stdout("Всего характеристик к обновлению: {$total}\n");
+            $this->stdout("Страниц: {$pageCount}\n");
+        }
+
+        $this->stdout("Страница: {$page}\n");
+        
         $updated = 0;
         $created = 0;
 
@@ -333,18 +363,34 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
+        
+        if ($page < $pageCount) {
+            $this->actionUpdateProperties($page + 1);
+        }
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function actionUpdateBrands()
+    public function actionUpdateBrands($page = 1)
     {
-        $response = \Yii::$app->skeeksSuppliersApi->methodBrands();
+        $response = \Yii::$app->skeeksSuppliersApi->methodBrands([
+            'page' => $page
+        ]);
 
-        $this->stdout("Обновление брендов [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление брендов, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
         $this->stdout("\n");
+
+        $total = $response->headers->get("x-pagination-total-count");
+        $pageCount = $response->headers->get("x-pagination-page-count");
+
+        if ($page == 1) {
+            $this->stdout("Всего брендов к обновлению: {$total}\n");
+            $this->stdout("Страниц: {$pageCount}\n");
+        }
+
+        $this->stdout("Страница: {$page}\n");
 
         $updated = 0;
         $created = 0;
@@ -380,6 +426,10 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
+        
+        if ($page < $pageCount) {
+            $this->actionUpdateBrands($page + 1);
+        }
     }
 
 
@@ -387,13 +437,25 @@ class SkeeksSuppliersController extends Controller
      * @return void
      * @throws Exception
      */
-    public function actionUpdateCollections()
+    public function actionUpdateCollections($page = 1)
     {
-        $response = \Yii::$app->skeeksSuppliersApi->methodCollections();
+        $response = \Yii::$app->skeeksSuppliersApi->methodCollections([
+            'page' => $page
+        ]);
 
-        $this->stdout("Обновление коллекций [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление коллекций, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
         $this->stdout("\n");
 
+        $total = $response->headers->get("x-pagination-total-count");
+        $pageCount = $response->headers->get("x-pagination-page-count");
+
+        if ($page == 1) {
+            $this->stdout("Всего коллекций к обновлению: {$total}\n");
+            $this->stdout("Страниц: {$pageCount}\n");
+        }
+
+        $this->stdout("Страница: {$page}\n");
+        
         $updated = 0;
         $created = 0;
 
@@ -428,19 +490,36 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
+        
+        if ($page < $pageCount) {
+            $this->actionUpdateCollections($page + 1);
+        }
     }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function actionUpdateStores()
+    public function actionUpdateStores($page = 1)
     {
-        $response = \Yii::$app->skeeksSuppliersApi->methodStores();
+        $response = \Yii::$app->skeeksSuppliersApi->methodStores([
+            'page' => $page
+        ]);
 
-        $this->stdout("Обновление складов [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление складов, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
         $this->stdout("\n");
 
+        $total = $response->headers->get("x-pagination-total-count");
+        $pageCount = $response->headers->get("x-pagination-page-count");
+
+        if ($page == 1) {
+            $this->stdout("Всего складов к обновлению: {$total}\n");
+            $this->stdout("Страниц: {$pageCount}\n");
+        }
+
+        $this->stdout("Страница: {$page}\n");
+        
+        
         $updated = 0;
         $created = 0;
 
@@ -475,12 +554,18 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
+        
+        if ($page < $pageCount) {
+            $this->actionUpdateStores($page + 1);
+        }
     }
 
 
     /**
+     * @param $page
      * @return void
      * @throws Exception
+     * @throws \Throwable
      */
     public function actionUpdateProducts($page = 1)
     {
@@ -894,7 +979,7 @@ class SkeeksSuppliersController extends Controller
                             $img = $this->_addImage($imgApiData);
                             $imgIds[] = $img->id;
                         }
-                        
+
                         $model->setImageIds($imgIds);
                     }
 
@@ -938,10 +1023,10 @@ class SkeeksSuppliersController extends Controller
                         $img = $this->_addImage($imgApiData);
                         $imgIds[] = $img->id;
                     }
-                    
+
                     $model->setImageIds($imgIds);
                 }
-                
+
                 if ($model->save()) {
 
                 } else {
@@ -980,7 +1065,7 @@ class SkeeksSuppliersController extends Controller
         $result = false;
 
         $content_id = \Yii::$app->shop->contentProducts->id;
-        
+
         $t = \Yii::$app->db->beginTransaction();
         try {
             if ($model) {
@@ -1090,6 +1175,9 @@ class SkeeksSuppliersController extends Controller
                         throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true));
                     }
 
+                    $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
+                    $this->_updateStoreItemsForProduct($shopProduct, $store_items);
+
                     $result = true;
                 }
             } else {
@@ -1192,11 +1280,15 @@ class SkeeksSuppliersController extends Controller
 
 
                 $shopProduct->id = $model->id;
-                
+
                 if (!$shopProduct->save()) {
                     throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true));
                 }
 
+                
+                $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
+                $this->_updateStoreItemsForProduct($shopProduct, $store_items);
+                    
                 $result = true;
 
             }
@@ -1217,6 +1309,98 @@ class SkeeksSuppliersController extends Controller
         return $result;
     }
 
+    private $_stores = [];
+
+    /**
+     * @param int $sx_store_id
+     * @return ShopStore|null
+     */
+    private function _getStore(int $sx_store_id)
+    {
+
+        $shopStore = ArrayHelper::getValue($this->_stores, $sx_store_id, null);
+
+        if (!$shopStore) {
+            $shopStore = ShopStore::find()->sxId($sx_store_id)->one();
+            if ($shopStore) {
+                $this->_stores[$sx_store_id] = $shopStore;
+            }
+        }
+
+        return $shopStore;
+    }
+
+    private function _updateStoreItemsForProduct(ShopProduct $shopProduct, array $apiData = [])
+    {
+        if ($apiData) {
+            foreach ($apiData as $store_item_data) {
+                $sx_store_id = (int)ArrayHelper::getValue($store_item_data, "store_id");
+                $supplier_code = trim((string)ArrayHelper::getValue($store_item_data, "supplier_code"));
+                $shopStore = $this->_getStore($sx_store_id);
+
+                if ($shopStore) {
+                    /**
+                     * @var $shopStoreItem ShopStoreProduct
+                     */
+                    $shopStoreItem = $shopStore->getShopStoreProducts()->andWhere(['external_id' => $supplier_code])->one();
+
+                    $api_supplier_name = trim((string)ArrayHelper::getValue($store_item_data, "supplier_name"));
+                    $api_quantity = (float)ArrayHelper::getValue($store_item_data, "quantity");
+                    $api_purchase_price = (float)ArrayHelper::getValue($store_item_data, "purchase_price");
+                    $api_selling_price = (float)ArrayHelper::getValue($store_item_data, "selling_price");
+
+                    if (!$shopStoreItem) {
+                        $shopStoreItem = new ShopStoreProduct();
+                        $shopStoreItem->shop_store_id = $shopStore->id;
+                        $shopStoreItem->shop_product_id = $shopProduct->id;
+                        $shopStoreItem->external_id = $supplier_code;
+                        $shopStoreItem->name = $api_supplier_name;
+                        $shopStoreItem->quantity = $api_quantity;
+                        $shopStoreItem->purchase_price = $api_purchase_price;
+                        $shopStoreItem->selling_price = $api_selling_price;
+                        if (!$shopStoreItem->save()) {
+                            throw new Exception(print_r($shopStoreItem->errors, true));
+                        }
+                    } else {
+                        $changedAttrs = [];
+
+                        if ($shopStoreItem->shop_product_id != $shopProduct->id) {
+                            $shopStoreItem->shop_product_id = $shopProduct->id;
+                            $changedAttrs[] = "shop_product_id";
+                        }
+
+                        if ($shopStoreItem->name != $api_supplier_name) {
+                            $shopStoreItem->name = $api_supplier_name;
+                            $changedAttrs[] = "name";
+                        }
+
+                        if ($shopStoreItem->quantity != $api_quantity) {
+                            $shopStoreItem->quantity = $api_quantity;
+                            $changedAttrs[] = "quantity";
+                        }
+
+                        if ($shopStoreItem->selling_price != $api_selling_price) {
+                            $shopStoreItem->selling_price = $api_selling_price;
+                            $changedAttrs[] = "selling_price";
+                        }
+
+                        if ($shopStoreItem->purchase_price != $api_purchase_price) {
+                            $shopStoreItem->purchase_price = $api_purchase_price;
+                            $changedAttrs[] = "purchase_price";
+                        }
+                        
+                        if ($changedAttrs) {
+                            if (!$shopStoreItem->update(true, $changedAttrs)) {
+                                throw new Exception(print_r($shopStoreItem->errors, true));;
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        }
+    }
 
     /**
      * @param                $apiData
