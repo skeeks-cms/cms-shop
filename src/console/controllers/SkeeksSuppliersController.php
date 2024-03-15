@@ -10,9 +10,11 @@ namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\measure\models\CmsMeasure;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsCountry;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeNumber;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
@@ -567,11 +569,28 @@ class SkeeksSuppliersController extends Controller
      * @throws Exception
      * @throws \Throwable
      */
-    public function actionUpdateProducts($page = 1)
+    public function actionUpdateProducts($is_new = 1, $page = 1)
     {
-        $response = \Yii::$app->skeeksSuppliersApi->methodProducts([
+        $apiQuery = [
             'page' => $page,
-        ]);
+        ];
+        
+        if ($is_new) {
+            /**
+             * @var ShopCmsContentElement $lastProduct
+             */
+            $lastProduct = ShopCmsContentElement::find()
+                ->innerJoinWith("shopProduct as shopProduct")
+                ->andWhere(['is not', 'sx_id', null])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->one()
+            ;
+            if ($lastProduct) {
+                $apiQuery['updated_at'] = $lastProduct->updated_at;
+            }
+        }
+        
+        $response = \Yii::$app->skeeksSuppliersApi->methodProducts($apiQuery);
 
         $this->stdout("Обновление товаров, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
         $this->stdout("\n");
@@ -584,6 +603,9 @@ class SkeeksSuppliersController extends Controller
             $this->stdout("Страниц: {$pageCount}\n");
         }
 
+        if (!$total) {
+            return false;
+        }
 
         $this->stdout("Страница: {$page}\n");
 
@@ -623,7 +645,7 @@ class SkeeksSuppliersController extends Controller
         }
 
         if ($page < $pageCount) {
-            $this->actionUpdateProducts($page + 1);
+            $this->actionUpdateProducts($is_new, $page + 1);
         }
     }
 
@@ -775,8 +797,10 @@ class SkeeksSuppliersController extends Controller
                     } else {
                         $model->component = PropertyTypeText::class;
                     }
-
-
+                    
+                    $model->is_multiple = (int) $model->handler->isMultiple;
+                    
+                    
                     if ($model->save()) {
                         $result = true;
                     } else {
@@ -1067,11 +1091,14 @@ class SkeeksSuppliersController extends Controller
         $content_id = \Yii::$app->shop->contentProducts->id;
 
         $t = \Yii::$app->db->beginTransaction();
+        
         try {
             if ($model) {
                 //Обновить
                 $isNeedUpdate = false;
                 if ($this->is_check_updated_at) {
+                    /*var_dump($model->updated_at);
+                    var_dump($updated_at);*/
                     if ($model->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
@@ -1170,13 +1197,15 @@ class SkeeksSuppliersController extends Controller
                         throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true));
                     }
 
-
                     if (!$shopProduct->save()) {
                         throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true));
                     }
 
                     $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
                     $this->_updateStoreItemsForProduct($shopProduct, $store_items);
+
+                    $properties = (array)ArrayHelper::getValue($apiData, "properties");
+                    $this->_updatePropertiesForProduct($model, $properties);
 
                     $result = true;
                 }
@@ -1288,7 +1317,10 @@ class SkeeksSuppliersController extends Controller
                 
                 $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
                 $this->_updateStoreItemsForProduct($shopProduct, $store_items);
-                    
+
+                $properties = (array)ArrayHelper::getValue($apiData, "properties");
+                $this->_updatePropertiesForProduct($model, $properties);
+
                 $result = true;
 
             }
@@ -1399,6 +1431,85 @@ class SkeeksSuppliersController extends Controller
                 }
 
             }
+        }
+    }
+
+    private function _updatePropertiesForProduct(ShopCmsContentElement $model, array $apiData = []) {
+        if ($apiData) {
+            
+            $rpmModel = $model->relatedPropertiesModel;
+            
+            $apiData = ArrayHelper::map($apiData, "property_id", "value");
+            $properties = CmsContentProperty::find()->sxId(array_keys($apiData))->all();
+            if (count($apiData) != count($properties)) {
+                $this->actionUpdateAll();
+                $properties = CmsContentProperty::find()->sxId(array_keys($apiData))->all();
+            }
+            
+            $properties = ArrayHelper::map($properties, "sx_id", function ($model){
+                return $model;
+            });
+
+            foreach ($apiData as $sx_id => $value) {
+                /**
+                 * @var CmsContentProperty $property
+                 */
+                $property = ArrayHelper::getValue($properties, $sx_id);
+                
+                if ($property->property_type == PropertyType::CODE_LIST) {
+                    
+                    if ($property->is_multiple) {
+                        $enumIds = [];
+                        
+                        foreach ($value as $valueObject)
+                        {
+                            $enumSxId = (int)ArrayHelper::getValue($valueObject, "id");
+                            $enumSxValue = (string)ArrayHelper::getValue($valueObject, "value");
+                            
+                            $enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                            if (!$enum) {
+                                $enum = new CmsContentPropertyEnum();
+                                $enum->property_id =  $property->id;
+                                $enum->value = $enumSxValue;
+                                $enum->sx_id = $enumSxId;
+                                if (!$enum->save()) {
+                                    throw new Exception(print_r($enum->errors, true));
+                                }
+                            }
+                            
+                            $enumIds[] = $enum->id;
+                        }
+                        
+                        $rpmModel->{$property->code} = $enumIds;
+                    } else {
+
+                        if ($value) {
+                            
+                        }
+                        $enumSxId = (int)ArrayHelper::getValue($value, "id");
+                        $enumSxValue = (string)ArrayHelper::getValue($value, "value");
+                        
+                        $enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                        if (!$enum) {
+                            $enum = new CmsContentPropertyEnum();
+                            $enum->property_id =  $property->id;
+                            $enum->value = $enumSxValue;
+                            $enum->sx_id = $enumSxId;
+                            if (!$enum->save()) {
+                                throw new Exception(print_r($enum->errors, true) . print_r($enum->toArray(), true));
+                            }
+                        }
+                        
+                        $rpmModel->{$property->code} = $enum->id;
+                        
+                    }
+                    
+                } else {
+                    $rpmModel->{$property->code} = $value;
+                }
+            }
+            
+            $rpmModel->save();
         }
     }
 
