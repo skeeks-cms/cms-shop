@@ -41,9 +41,11 @@ class AgentsController extends Controller
     public function actionUpdateProductPricesFromStoreProducts($cms_site_id = null)
     {
         $q = ShopSite::find();
+        
         if ($cms_site_id) {
             $q->andWhere(['id' => $cms_site_id]);
         }
+        
         /**
          * @var $shopSite ShopSite
          */

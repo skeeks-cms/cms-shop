@@ -29,6 +29,7 @@ use yii\base\Exception;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
+use yii\helpers\Json;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -586,6 +587,7 @@ class SkeeksSuppliersController extends Controller
             }
         }
         
+        
         $response = \Yii::$app->skeeksSuppliersApi->methodProducts($apiQuery);
 
         $this->stdout("Обновление товаров, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
@@ -1008,7 +1010,7 @@ class SkeeksSuppliersController extends Controller
                     if ($model->save()) {
                         $result = true;
                     } else {
-                        throw new Exception("Ошибка обновления бренда {$model->id}: ".print_r($model->errors, true));
+                        throw new Exception("Ошибка создания коллекции {$model->id}: ".print_r($model->errors, true) . print_r($apiData, true));
                     }
 
                 }
@@ -1167,6 +1169,7 @@ class SkeeksSuppliersController extends Controller
                     $shopProduct->height = (float)ArrayHelper::getValue($apiData, "height");
                     $shopProduct->measure_ratio = (float)ArrayHelper::getValue($apiData, "measure_ratio");
                     $shopProduct->measure_ratio_min = (float)ArrayHelper::getValue($apiData, "measure_ratio_min");
+                    $shopProduct->measure_matches_jsondata = Json::encode((array)ArrayHelper::getValue($apiData, "measure_matches"));
                     $shopProduct->expiration_time = (int)ArrayHelper::getValue($apiData, "expiration_time");
                     $shopProduct->service_life_time = (int)ArrayHelper::getValue($apiData, "service_life_time");
                     $shopProduct->warranty_time = (int)ArrayHelper::getValue($apiData, "warranty_time");
@@ -1192,11 +1195,11 @@ class SkeeksSuppliersController extends Controller
                     }
 
                     if (!$model->save()) {
-                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true));
+                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true) . print_r($apiData, true));
                     }
 
                     if (!$shopProduct->save()) {
-                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true));
+                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true) . print_r($apiData, true));
                     }
 
                     $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
@@ -1216,6 +1219,7 @@ class SkeeksSuppliersController extends Controller
 
 
                 //TODO:добавить обновление
+                print_r($apiData);die;
                 $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                 $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
@@ -1275,6 +1279,7 @@ class SkeeksSuppliersController extends Controller
                 $shopProduct->width = (float)ArrayHelper::getValue($apiData, "width");
                 $shopProduct->length = (float)ArrayHelper::getValue($apiData, "length");
                 $shopProduct->height = (float)ArrayHelper::getValue($apiData, "height");
+                $shopProduct->measure_matches_jsondata = Json::encode((array)ArrayHelper::getValue($apiData, "measure_matches"));
                 $shopProduct->measure_ratio = (float)ArrayHelper::getValue($apiData, "measure_ratio");
                 $shopProduct->measure_ratio_min = (float)ArrayHelper::getValue($apiData, "measure_ratio_min");
                 $shopProduct->expiration_time = (int)ArrayHelper::getValue($apiData, "expiration_time");
@@ -1302,14 +1307,14 @@ class SkeeksSuppliersController extends Controller
                 }
 
                 if (!$model->save()) {
-                    throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true));
+                    throw new Exception("Ошибка создания товара: ".print_r($model->errors, true) .print_r($model->toArray(), true));
                 }
 
 
                 $shopProduct->id = $model->id;
 
                 if (!$shopProduct->save()) {
-                    throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true));
+                    throw new Exception("Ошибка создания товара: ".print_r($shopProduct->errors, true) . print_r($shopProduct->toArray(), true));
                 }
 
                 
@@ -1482,23 +1487,25 @@ class SkeeksSuppliersController extends Controller
                     } else {
 
                         if ($value) {
+                            $enumSxId = (int)ArrayHelper::getValue($value, "id");
+                            $enumSxValue = (string)ArrayHelper::getValue($value, "value");
                             
-                        }
-                        $enumSxId = (int)ArrayHelper::getValue($value, "id");
-                        $enumSxValue = (string)ArrayHelper::getValue($value, "value");
-                        
-                        $enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
-                        if (!$enum) {
-                            $enum = new CmsContentPropertyEnum();
-                            $enum->property_id =  $property->id;
-                            $enum->value = $enumSxValue;
-                            $enum->sx_id = $enumSxId;
-                            if (!$enum->save()) {
-                                throw new Exception(print_r($enum->errors, true) . print_r($enum->toArray(), true));
+                            $enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                            if (!$enum) {
+                                $enum = new CmsContentPropertyEnum();
+                                $enum->property_id =  $property->id;
+                                $enum->value = $enumSxValue;
+                                $enum->sx_id = $enumSxId;
+                                if (!$enum->save()) {
+                                    throw new Exception(print_r($enum->errors, true) . print_r($enum->toArray(), true));
+                                }
                             }
+                            
+                            $rpmModel->{$property->code} = $enum->id;
+                        } else {
+                            $rpmModel->{$property->code} = "";
                         }
                         
-                        $rpmModel->{$property->code} = $enum->id;
                         
                     }
                     
@@ -1618,10 +1625,29 @@ class SkeeksSuppliersController extends Controller
             }
         }
 
+        
+        
         $file = \Yii::$app->storage->upload($image_src);
         $file->sx_id = $image_id;
         $file->update(false, ['sx_id']);
+        
+        if ($file->extension != "webp") {
+            $this->stdout("Updloading ...\n");
+            $this->stdout($image_src . "\n");
+            
+            $this->stdout("{$file->src}\n");
+            $this->stdout("---------------\n");
+            die;
+        }
 
+        
         return $file;
     }
+
+    /*public function actionTest()
+    {
+        $image_src = "https://skeeks-market.ru/uploads/all/1a/d0/e3/1ad0e385ef9ef31a4a05886b2728c94f/sx-filter__skeeks-cms-components-imaging-filters-Thumbnail/150956fd0dcf249e18b4b4a51758abc9/galaxy-330707.webp?w=0&h=1200&q=90&m=2&ext=jpg";
+        $file = \Yii::$app->storage->upload($image_src);
+        print_r($file->toArray());die;
+    }*/
 }
