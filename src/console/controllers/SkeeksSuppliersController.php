@@ -66,11 +66,23 @@ class SkeeksSuppliersController extends Controller
         ]);
     }
 
+    private $_base_memory_usage = 0;
+
+    /**
+     * @return string
+     */
+    private function _memoryUsage()
+    {
+        return \Yii::$app->formatter->asShortSize(memory_get_usage() - $this->_base_memory_usage);
+    }
+    
     /**
      * @return false|void
      */
     public function init()
     {
+        $this->_base_memory_usage = memory_get_usage();
+
         if (!isset(\Yii::$app->skeeksSuppliersApi)) {
             throw new Exception("Компонент skeeksSuppliersApi не подключен");
         }
@@ -118,7 +130,7 @@ class SkeeksSuppliersController extends Controller
     {
         $response = \Yii::$app->skeeksSuppliersApi->methodCountries();
 
-        $this->stdout("Обновление стран [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление стран [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $updated = 0;
@@ -193,7 +205,7 @@ class SkeeksSuppliersController extends Controller
     {
         $response = \Yii::$app->skeeksSuppliersApi->methodMeasures();
 
-        $this->stdout("Обновление едениц измерения [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление едениц измерения [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $updated = 0;
@@ -250,7 +262,7 @@ class SkeeksSuppliersController extends Controller
             'page' => $page
         ]);
 
-        $this->stdout("Обновление категорий, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление категорий, страница {$page} [{$response->time} сек]  [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $total = $response->headers->get("x-pagination-total-count");
@@ -301,6 +313,7 @@ class SkeeksSuppliersController extends Controller
         }
 
         if ($page < $pageCount) {
+            unset($response);
             $this->actionUpdateCategories($page + 1);
         }
     }
@@ -315,7 +328,7 @@ class SkeeksSuppliersController extends Controller
             'page' => $page
         ]);
 
-        $this->stdout("Обновление характеристик, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление характеристик, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $total = $response->headers->get("x-pagination-total-count");
@@ -364,6 +377,7 @@ class SkeeksSuppliersController extends Controller
         }
         
         if ($page < $pageCount) {
+            unset($response);
             $this->actionUpdateProperties($page + 1);
         }
     }
@@ -378,7 +392,7 @@ class SkeeksSuppliersController extends Controller
             'page' => $page
         ]);
 
-        $this->stdout("Обновление брендов, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление брендов, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $total = $response->headers->get("x-pagination-total-count");
@@ -427,6 +441,7 @@ class SkeeksSuppliersController extends Controller
         }
         
         if ($page < $pageCount) {
+            unset($response);
             $this->actionUpdateBrands($page + 1);
         }
     }
@@ -442,7 +457,7 @@ class SkeeksSuppliersController extends Controller
             'page' => $page
         ]);
 
-        $this->stdout("Обновление коллекций, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление коллекций, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $total = $response->headers->get("x-pagination-total-count");
@@ -491,6 +506,7 @@ class SkeeksSuppliersController extends Controller
         }
         
         if ($page < $pageCount) {
+            unset($response);
             $this->actionUpdateCollections($page + 1);
         }
     }
@@ -505,7 +521,7 @@ class SkeeksSuppliersController extends Controller
             'page' => $page
         ]);
 
-        $this->stdout("Обновление складов, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление складов, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $total = $response->headers->get("x-pagination-total-count");
@@ -555,6 +571,7 @@ class SkeeksSuppliersController extends Controller
         }
         
         if ($page < $pageCount) {
+            unset($response);
             $this->actionUpdateStores($page + 1);
         }
     }
@@ -590,7 +607,7 @@ class SkeeksSuppliersController extends Controller
         
         $response = \Yii::$app->skeeksSuppliersApi->methodProducts($apiQuery);
 
-        $this->stdout("Обновление товаров, страница {$page} [{$response->time} сек]", Console::BG_BLUE);
+        $this->stdout("Обновление товаров, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
 
         $total = $response->headers->get("x-pagination-total-count");
@@ -643,6 +660,7 @@ class SkeeksSuppliersController extends Controller
         }
 
         if ($page < $pageCount) {
+            unset($response);
             $this->actionUpdateProducts($is_new, $page + 1);
         }
     }
