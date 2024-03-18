@@ -1237,7 +1237,6 @@ class SkeeksSuppliersController extends Controller
 
 
                 //TODO:добавить обновление
-                print_r($apiData);die;
                 $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                 $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
@@ -1486,8 +1485,12 @@ class SkeeksSuppliersController extends Controller
                         {
                             $enumSxId = (int)ArrayHelper::getValue($valueObject, "id");
                             $enumSxValue = (string)ArrayHelper::getValue($valueObject, "value");
-                            
-                            $enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+
+                            /**
+                             * @var $enum CmsContentPropertyEnum
+                             */
+                            $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
+                            //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
                             if (!$enum) {
                                 $enum = new CmsContentPropertyEnum();
                                 $enum->property_id =  $property->id;
@@ -1495,6 +1498,11 @@ class SkeeksSuppliersController extends Controller
                                 $enum->sx_id = $enumSxId;
                                 if (!$enum->save()) {
                                     throw new Exception(print_r($enum->errors, true));
+                                }
+                            } else {
+                                if ($enum->property_id != $property->id) {
+                                    $enum->property_id = $property->id;
+                                    $enum->update(false, ['property_id']);
                                 }
                             }
                             
@@ -1508,7 +1516,8 @@ class SkeeksSuppliersController extends Controller
                             $enumSxId = (int)ArrayHelper::getValue($value, "id");
                             $enumSxValue = (string)ArrayHelper::getValue($value, "value");
                             
-                            $enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                            //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                            $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
                             if (!$enum) {
                                 $enum = new CmsContentPropertyEnum();
                                 $enum->property_id =  $property->id;
@@ -1516,6 +1525,11 @@ class SkeeksSuppliersController extends Controller
                                 $enum->sx_id = $enumSxId;
                                 if (!$enum->save()) {
                                     throw new Exception(print_r($enum->errors, true) . print_r($enum->toArray(), true));
+                                }
+                            } else {
+                                if ($enum->property_id != $property->id) {
+                                    $enum->property_id = $property->id;
+                                    $enum->update(false, ['property_id']);
                                 }
                             }
                             
@@ -1650,7 +1664,8 @@ class SkeeksSuppliersController extends Controller
         $file->update(false, ['sx_id']);
         
         if ($file->extension != "webp") {
-            $this->stdout("Updloading ...\n");
+            $this->stdout("Uploading ...\n");
+            /*print_r($imageData);die;*/
             $this->stdout($image_src . "\n");
             
             $this->stdout("{$file->src}\n");
