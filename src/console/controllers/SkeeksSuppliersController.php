@@ -44,7 +44,7 @@ class SkeeksSuppliersController extends Controller
     /**
      * @var int
      */
-    public $is_stop_on_error = 1;
+    public $is_stop_on_error = 0;
 
     /**
      * @var int
@@ -98,6 +98,10 @@ class SkeeksSuppliersController extends Controller
         if (!\Yii::$app->cms->cmsSite->shopSite->catalogMainCmsTree) {
             throw new Exception("Магазин не настроен, нет корневого раздела для товаров.");
         }
+        
+        \Yii::$app->skeeks->site->shopSite->required_collection_fields = [];
+        \Yii::$app->skeeks->site->shopSite->required_brand_fields = [];
+        \Yii::$app->skeeks->site->shopSite->required_product_fields = [];
 
         return parent::init();
     }
@@ -1080,7 +1084,7 @@ class SkeeksSuppliersController extends Controller
                     $model->setImageIds($imgIds);
                 }
 
-                if ($model->save()) {
+                if ($model->save(false)) {
 
                 } else {
                     throw new Exception("Ошибка создания коллекции: ".print_r($model->errors, true));
@@ -1227,7 +1231,7 @@ class SkeeksSuppliersController extends Controller
                         throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true) . print_r($apiData, true));
                     }
 
-                    if (!$shopProduct->save()) {
+                    if (!$shopProduct->save(false)) {
                         throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true) . print_r($apiData, true));
                     }
 
@@ -1341,7 +1345,7 @@ class SkeeksSuppliersController extends Controller
 
                 $shopProduct->id = $model->id;
 
-                if (!$shopProduct->save()) {
+                if (!$shopProduct->save(false)) {
                     throw new Exception("Ошибка создания товара: ".print_r($shopProduct->errors, true) . print_r($shopProduct->toArray(), true));
                 }
 
@@ -1593,6 +1597,7 @@ class SkeeksSuppliersController extends Controller
                     $model->address = trim((string)ArrayHelper::getValue($apiData, "address"));
                     $model->latitude = (float)ArrayHelper::getValue($apiData, "latitude");
                     $model->longitude = (float)ArrayHelper::getValue($apiData, "longitude");
+                    $model->is_supplier = 1;
 
                     if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
                         $model->cms_image_id = $image->id;
@@ -1611,6 +1616,7 @@ class SkeeksSuppliersController extends Controller
 
                 $model->sx_id = (int)ArrayHelper::getValue($apiData, "id");
 
+                $model->is_supplier = 1;
                 $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $model->address = trim((string)ArrayHelper::getValue($apiData, "address"));
                 $model->latitude = (float)ArrayHelper::getValue($apiData, "latitude");
