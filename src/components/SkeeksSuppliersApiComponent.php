@@ -34,6 +34,12 @@ class SkeeksSuppliersApiComponent extends Component
      */
     public $timeout = 20;
 
+
+    /**
+     * @var bool скачивать изображения на сервер?
+     */
+    public $is_download_images = false;
+
     /**
      * @param string $api_method метод API полученный
      * @param array  $data

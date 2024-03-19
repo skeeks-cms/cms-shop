@@ -151,6 +151,17 @@ class SkeeksSuppliersController extends Controller
                 if ($cmsCountry = CmsCountry::find()->alpha2($alpha2)->one()) {
                     //TODO:добавить обновление
                     //$updated++;
+                    $image = $this->_addImage(ArrayHelper::getValue($apiData, "image"));
+                    if ($image) {
+                        $cmsCountry->flag_image_id = $image->id;
+                    }
+                    
+                    if ($cmsCountry->save()) {
+                        $created++;
+                    } else {
+                        throw new Exception("Страна не создана".print_r($cmsCountry->errors, true));
+                    }
+                
                 } else {
                     $t = \Yii::$app->db->beginTransaction();
 
@@ -1004,7 +1015,7 @@ class SkeeksSuppliersController extends Controller
                         }
                     }
 
-                    if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
+                    if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"), false)) {
                         $model->cms_image_id = $image->id;
                     }
 
@@ -1018,7 +1029,7 @@ class SkeeksSuppliersController extends Controller
                         $imgIds = [];
 
                         foreach ($images as $imgApiData) {
-                            $img = $this->_addImage($imgApiData);
+                            $img = $this->_addImage($imgApiData, false);
                             $imgIds[] = $img->id;
                         }
 
@@ -1048,7 +1059,7 @@ class SkeeksSuppliersController extends Controller
                     }
                 }
 
-                if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
+                if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"), false)) {
                     $model->cms_image_id = $image->id;
                 }
 
@@ -1062,7 +1073,7 @@ class SkeeksSuppliersController extends Controller
                     $imgIds = [];
 
                     foreach ($images as $imgApiData) {
-                        $img = $this->_addImage($imgApiData);
+                        $img = $this->_addImage($imgApiData, false);
                         $imgIds[] = $img->id;
                     }
 
@@ -1196,7 +1207,7 @@ class SkeeksSuppliersController extends Controller
                     $shopProduct->warranty_time_comment = trim((string)ArrayHelper::getValue($apiData, "warranty_time_comment"));
 
 
-                    if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
+                    if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"), false)) {
                         $model->image_id = $image->id;
                     }
 
@@ -1205,7 +1216,7 @@ class SkeeksSuppliersController extends Controller
                         $imgIds = [];
 
                         foreach ($images as $imgApiData) {
-                            $img = $this->_addImage($imgApiData);
+                            $img = $this->_addImage($imgApiData, false);
                             $imgIds[] = $img->id;
                         }
 
@@ -1307,7 +1318,7 @@ class SkeeksSuppliersController extends Controller
                 $shopProduct->warranty_time_comment = trim((string)ArrayHelper::getValue($apiData, "warranty_time_comment"));
 
 
-                if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
+                if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"), false)) {
                     $model->image_id = $image->id;
                 }
 
@@ -1316,7 +1327,7 @@ class SkeeksSuppliersController extends Controller
                     $imgIds = [];
 
                     foreach ($images as $imgApiData) {
-                        $img = $this->_addImage($imgApiData);
+                        $img = $this->_addImage($imgApiData, false);
                         $imgIds[] = $img->id;
                     }
 
@@ -1634,12 +1645,13 @@ class SkeeksSuppliersController extends Controller
 
     /**
      * @param $imageData
-     * @return \skeeks\cms\models\StorageFile|null
+     * @param $isForceDownload всегда скачивать изображение
+     * @return array|\skeeks\cms\models\StorageFile|void|\yii\db\ActiveRecord|null
      * @throws Exception
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    private function _addImage($imageData = [])
+    private function _addImage($imageData = [], $isForceDownload = true)
     {
         $image_src = (string)ArrayHelper::getValue($imageData, "src");
         $image_id = (int)ArrayHelper::getValue($imageData, "id");
@@ -1658,10 +1670,41 @@ class SkeeksSuppliersController extends Controller
         }
 
         
+        if ($isForceDownload) {
+            $file = \Yii::$app->storage->upload($image_src);
+        } else {
+            if (\Yii::$app->skeeksSuppliersApi->is_download_images) {
+                $file = \Yii::$app->storage->upload($image_src);
+            } else {
+                $imgUrlData = explode("/", $image_src);
+                $urlName = ArrayHelper::getValue($imgUrlData, count($imgUrlData) - 1);
+                if (strpos($urlName, ".") !== false) {
+                    $urlName = substr($urlName, 0, strpos($urlName, "."));
+                }
+                
+                $file = new CmsStorageFile();
+                
+                $file->cluster_id = "sx";
+                $file->cluster_file = (string) ArrayHelper::getValue($imageData, "src");
+                
+                $file->original_name = $urlName;
+                $file->sx_data = $imageData;
+                
+                $file->extension = "webp";
+                $file->mime_type = "image/webp";
+                
+                if (ArrayHelper::getValue($imageData, "width")) {
+                    $file->image_width = (int) ArrayHelper::getValue($imageData, "width");
+                }
+                
+                if (ArrayHelper::getValue($imageData, "height")) {
+                    $file->image_height = (int) ArrayHelper::getValue($imageData, "height");
+                }
+            }
+        }
         
-        $file = \Yii::$app->storage->upload($image_src);
         $file->sx_id = $image_id;
-        $file->update(false, ['sx_id']);
+        $file->save();
         
         if ($file->extension != "webp") {
             $this->stdout("Uploading ...\n");
