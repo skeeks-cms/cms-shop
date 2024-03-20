@@ -56,6 +56,11 @@ class SkeeksSuppliersController extends Controller
      */
     private $_is_updated_all = false;
 
+    /**
+     * @var bool 1 раз за сценарий делаются проверки настроин ли сайт (в дальнейшем можно вынести куда то в другое место). Эти же проверки понадобятся и в web интерфейсе.
+     */
+    private $_isChecked = false;
+
     public function options($actionID)
     {
         // $actionId might be used in subclasses to provide options specific to action id
@@ -67,7 +72,26 @@ class SkeeksSuppliersController extends Controller
     }
 
     private $_base_memory_usage = 0;
+    
+    /**
+     * @return false|void
+     */
+    public function init()
+    {
+        $this->_base_memory_usage = memory_get_usage();
+        return parent::init();
+    }
 
+    /**
+     * @param $action
+     * @return bool
+     */
+    public function beforeAction($action)
+    {
+        $this->_checkBeforeStart();
+        return parent::beforeAction($action);
+    }
+    
     /**
      * @return string
      */
@@ -76,13 +100,13 @@ class SkeeksSuppliersController extends Controller
         return \Yii::$app->formatter->asShortSize(memory_get_usage() - $this->_base_memory_usage);
     }
     
-    /**
-     * @return false|void
-     */
-    public function init()
-    {
-        $this->_base_memory_usage = memory_get_usage();
-
+    
+    private function _checkBeforeStart() {
+        
+        if ($this->_isChecked) {
+            return true;
+        }
+        
         if (!isset(\Yii::$app->skeeksSuppliersApi)) {
             throw new Exception("Компонент skeeksSuppliersApi не подключен");
         }
@@ -99,12 +123,12 @@ class SkeeksSuppliersController extends Controller
             throw new Exception("Магазин не настроен, нет корневого раздела для товаров.");
         }
         
-        \Yii::$app->skeeks->site->shopSite->required_collection_fields = [];
+        /*\Yii::$app->skeeks->site->shopSite->required_collection_fields = [];
         \Yii::$app->skeeks->site->shopSite->required_brand_fields = [];
-        \Yii::$app->skeeks->site->shopSite->required_product_fields = [];
-
-        return parent::init();
+        \Yii::$app->skeeks->site->shopSite->required_product_fields = [];*/
     }
+    
+    
 
     /**
      * Обновление информации по всем справочным данным
@@ -155,16 +179,16 @@ class SkeeksSuppliersController extends Controller
                 if ($cmsCountry = CmsCountry::find()->alpha2($alpha2)->one()) {
                     //TODO:добавить обновление
                     //$updated++;
-                    $image = $this->_addImage(ArrayHelper::getValue($apiData, "image"));
+                    /*$image = $this->_addImage(ArrayHelper::getValue($apiData, "image"));
                     if ($image) {
                         $cmsCountry->flag_image_id = $image->id;
                     }
                     
                     if ($cmsCountry->save()) {
-                        $created++;
+                        $updated++;
                     } else {
                         throw new Exception("Страна не создана".print_r($cmsCountry->errors, true));
-                    }
+                    }*/
                 
                 } else {
                     $t = \Yii::$app->db->beginTransaction();
