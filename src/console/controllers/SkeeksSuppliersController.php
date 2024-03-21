@@ -1524,28 +1524,34 @@ class SkeeksSuppliersController extends Controller
                         {
                             $enumSxId = (int)ArrayHelper::getValue($valueObject, "id");
                             $enumSxValue = (string)ArrayHelper::getValue($valueObject, "value");
+                            //if ($enumSxValue) {
+                                /**
+                                 * @var $enum CmsContentPropertyEnum
+                                 */
+                                $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
+                                //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                                if (!$enum) {
+                                    $enum = new CmsContentPropertyEnum();
+                                    $enum->property_id =  $property->id;
+                                    $enum->value = $enumSxValue;
+                                    $enum->sx_id = $enumSxId;
+                                    if (!$enum->save()) {
+                                        throw new Exception(print_r($enum->errors, true));
+                                    }
+                                } else {
+                                    if ($enum->property_id != $property->id) {
+                                        $enum->property_id = $property->id;
+                                        $enum->update(false, ['property_id']);
+                                    }
+                                }
+                                
+                                $enumIds[] = $enum->id;
+                            //} else {
+                            //    echo '1111';
+                            //    var_dump($valueObject);die;
+                            //}
 
-                            /**
-                             * @var $enum CmsContentPropertyEnum
-                             */
-                            $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
-                            //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
-                            if (!$enum) {
-                                $enum = new CmsContentPropertyEnum();
-                                $enum->property_id =  $property->id;
-                                $enum->value = $enumSxValue;
-                                $enum->sx_id = $enumSxId;
-                                if (!$enum->save()) {
-                                    throw new Exception(print_r($enum->errors, true));
-                                }
-                            } else {
-                                if ($enum->property_id != $property->id) {
-                                    $enum->property_id = $property->id;
-                                    $enum->update(false, ['property_id']);
-                                }
-                            }
                             
-                            $enumIds[] = $enum->id;
                         }
                         
                         $rpmModel->{$property->code} = $enumIds;
@@ -1555,24 +1561,32 @@ class SkeeksSuppliersController extends Controller
                             $enumSxId = (int)ArrayHelper::getValue($value, "id");
                             $enumSxValue = (string)ArrayHelper::getValue($value, "value");
                             
-                            //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
-                            $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
-                            if (!$enum) {
-                                $enum = new CmsContentPropertyEnum();
-                                $enum->property_id =  $property->id;
-                                $enum->value = $enumSxValue;
-                                $enum->sx_id = $enumSxId;
-                                if (!$enum->save()) {
-                                    throw new Exception(print_r($enum->errors, true) . print_r($enum->toArray(), true));
+                            if ($enumSxValue) {
+                                //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                                $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
+                                if (!$enum) {
+                                    $enum = new CmsContentPropertyEnum();
+                                    $enum->property_id =  $property->id;
+                                    $enum->value = $enumSxValue;
+                                    $enum->sx_id = $enumSxId;
+                                    if (!$enum->save()) {
+                                        throw new Exception(print_r($enum->errors, true) . print_r($enum->toArray(), true));
+                                    }
+                                } else {
+                                    if ($enum->property_id != $property->id) {
+                                        $enum->property_id = $property->id;
+                                        $enum->update(false, ['property_id']);
+                                    }
                                 }
+                                
+                                $rpmModel->{$property->code} = $enum->id;
                             } else {
-                                if ($enum->property_id != $property->id) {
-                                    $enum->property_id = $property->id;
-                                    $enum->update(false, ['property_id']);
-                                }
+                                /*print_r($property->toArray());die;
+                                echo '2222';
+                                print_r($value);die;*/
                             }
                             
-                            $rpmModel->{$property->code} = $enum->id;
+                            
                         } else {
                             $rpmModel->{$property->code} = "";
                         }
