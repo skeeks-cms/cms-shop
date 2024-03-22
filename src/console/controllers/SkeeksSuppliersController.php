@@ -26,6 +26,7 @@ use skeeks\cms\shop\models\ShopCollection;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
+use skeeks\cms\Skeeks;
 use yii\base\Exception;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
@@ -115,6 +116,8 @@ class SkeeksSuppliersController extends Controller
         if ($this->_isChecked) {
             return true;
         }
+        
+        Skeeks::unlimited();
 
         if (!isset(\Yii::$app->skeeksSuppliersApi)) {
             throw new Exception("Компонент skeeksSuppliersApi не подключен");
