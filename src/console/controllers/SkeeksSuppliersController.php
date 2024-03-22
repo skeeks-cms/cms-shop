@@ -15,6 +15,7 @@ use skeeks\cms\models\CmsCountry;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\relatedProperties\PropertyType;
+use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeBool;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeNumber;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
@@ -37,19 +38,26 @@ use yii\helpers\Json;
 class SkeeksSuppliersController extends Controller
 {
     /**
-     * @var bool Сравнивать дату последнего обновления? 1 - обновлять только данные свежее; 0 - обновлять все пришедшие данные.
+     * @var bool Сравнивать дату последнего обновления?
+     *      0 - обновлять все пришедшие данные
+     *      1 - обновлять только данные свежее
      */
     public $is_check_updated_at = 1;
 
     /**
-     * @var int
+     * @var bool Если будет ошибка останавливат скриипт?
+     *      0 - продолжать обновление игнорируя ошибки
+     *      1 - остановить скрипт
      */
     public $is_stop_on_error = 0;
 
     /**
-     * @var int
+     * @var bool Перезагружать картинки?
+     *      0 - картинки будут пропускаться
+     *      1 - заново скачивать и обновлять картинки
      */
     public $is_reload_images = 0;
+
 
     /**
      * @var bool
@@ -72,7 +80,7 @@ class SkeeksSuppliersController extends Controller
     }
 
     private $_base_memory_usage = 0;
-    
+
     /**
      * @return false|void
      */
@@ -91,7 +99,7 @@ class SkeeksSuppliersController extends Controller
         $this->_checkBeforeStart();
         return parent::beforeAction($action);
     }
-    
+
     /**
      * @return string
      */
@@ -99,14 +107,15 @@ class SkeeksSuppliersController extends Controller
     {
         return \Yii::$app->formatter->asShortSize(memory_get_usage() - $this->_base_memory_usage);
     }
-    
-    
-    private function _checkBeforeStart() {
-        
+
+
+    private function _checkBeforeStart()
+    {
+
         if ($this->_isChecked) {
             return true;
         }
-        
+
         if (!isset(\Yii::$app->skeeksSuppliersApi)) {
             throw new Exception("Компонент skeeksSuppliersApi не подключен");
         }
@@ -122,16 +131,38 @@ class SkeeksSuppliersController extends Controller
         if (!\Yii::$app->cms->cmsSite->shopSite->catalogMainCmsTree) {
             throw new Exception("Магазин не настроен, нет корневого раздела для товаров.");
         }
-        
+
         /*\Yii::$app->skeeks->site->shopSite->required_collection_fields = [];
         \Yii::$app->skeeks->site->shopSite->required_brand_fields = [];
         \Yii::$app->skeeks->site->shopSite->required_product_fields = [];*/
     }
-    
-    
+
 
     /**
      * Обновление информации по всем справочным данным
+     */
+    public function _updateAllData()
+    {
+        if ($this->_is_updated_all) {
+            return true;
+        }
+        
+        $this->stdout("Обновление недостающих данных [{$this->_memoryUsage()}]", Console::BG_BLUE);
+        $this->stdout("\n");
+        
+        exec("php yii shop/skeeks-suppliers/update-all", $output);
+        print_r($output);
+        
+        $this->stdout("Обновление недостающих данных завершено [{$this->_memoryUsage()}]", Console::BG_BLUE);
+        $this->stdout("\n");
+        
+        $this->_is_updated_all = true;
+    }
+
+    /**
+     * Обновление информации по всем справочным данным
+     * @return bool|void
+     * @throws Exception
      */
     public function actionUpdateAll()
     {
@@ -151,6 +182,7 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
+     * Обновление информации по странам
      * @return void
      * @throws Exception
      */
@@ -189,7 +221,7 @@ class SkeeksSuppliersController extends Controller
                     } else {
                         throw new Exception("Страна не создана".print_r($cmsCountry->errors, true));
                     }*/
-                
+
                 } else {
                     $t = \Yii::$app->db->beginTransaction();
 
@@ -237,6 +269,7 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
+     * Обновление информации по еденицам измерения
      * @return void
      * @throws Exception
      */
@@ -292,13 +325,16 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
+     * Обновление категорий
+     * @param $page
      * @return void
      * @throws Exception
+     * @throws \Throwable
      */
     public function actionUpdateCategories($page = 1)
     {
         $response = \Yii::$app->skeeksSuppliersApi->methodCategories([
-            'page' => $page
+            'page' => $page,
         ]);
 
         $this->stdout("Обновление категорий, страница {$page} [{$response->time} сек]  [{$this->_memoryUsage()}]", Console::BG_BLUE);
@@ -358,13 +394,14 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
+     * Обновление характеристик
      * @return void
      * @throws Exception
      */
     public function actionUpdateProperties($page = 1)
     {
         $response = \Yii::$app->skeeksSuppliersApi->methodProperties([
-            'page' => $page
+            'page' => $page,
         ]);
 
         $this->stdout("Обновление характеристик, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
@@ -379,7 +416,7 @@ class SkeeksSuppliersController extends Controller
         }
 
         $this->stdout("Страница: {$page}\n");
-        
+
         $updated = 0;
         $created = 0;
 
@@ -414,7 +451,7 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
-        
+
         if ($page < $pageCount) {
             unset($response);
             $this->actionUpdateProperties($page + 1);
@@ -422,13 +459,14 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
+     * Обновление брендов
      * @return void
      * @throws Exception
      */
     public function actionUpdateBrands($page = 1)
     {
         $response = \Yii::$app->skeeksSuppliersApi->methodBrands([
-            'page' => $page
+            'page' => $page,
         ]);
 
         $this->stdout("Обновление брендов, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
@@ -478,7 +516,7 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
-        
+
         if ($page < $pageCount) {
             unset($response);
             $this->actionUpdateBrands($page + 1);
@@ -487,13 +525,14 @@ class SkeeksSuppliersController extends Controller
 
 
     /**
+     * Обновление коллекций
      * @return void
      * @throws Exception
      */
     public function actionUpdateCollections($page = 1)
     {
         $response = \Yii::$app->skeeksSuppliersApi->methodCollections([
-            'page' => $page
+            'page' => $page,
         ]);
 
         $this->stdout("Обновление коллекций, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
@@ -508,7 +547,7 @@ class SkeeksSuppliersController extends Controller
         }
 
         $this->stdout("Страница: {$page}\n");
-        
+
         $updated = 0;
         $created = 0;
 
@@ -543,7 +582,7 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
-        
+
         if ($page < $pageCount) {
             unset($response);
             $this->actionUpdateCollections($page + 1);
@@ -551,13 +590,14 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
+     * Обновление складов
      * @return void
      * @throws Exception
      */
     public function actionUpdateStores($page = 1)
     {
         $response = \Yii::$app->skeeksSuppliersApi->methodStores([
-            'page' => $page
+            'page' => $page,
         ]);
 
         $this->stdout("Обновление складов, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
@@ -572,8 +612,8 @@ class SkeeksSuppliersController extends Controller
         }
 
         $this->stdout("Страница: {$page}\n");
-        
-        
+
+
         $updated = 0;
         $created = 0;
 
@@ -608,17 +648,34 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
-        
+
         if ($page < $pageCount) {
             unset($response);
             $this->actionUpdateStores($page + 1);
         }
     }
 
+    /**
+     * Полное обновление, всех товаров
+     * @return void
+     * @throws Exception
+     * @throws \Throwable
+     */
+    public function actionUpdateProductsAll()
+    {
+        $this->actionUpdateProducts(0);
+    }
 
     /**
+     * @var null Вспомогательная переменная
+     */
+    private $_last_product_updated = null;
+
+    /**
+     * Получает информацию по новым товарам, и недавно измененным
+     * @param $is_new
      * @param $page
-     * @return void
+     * @return false|void
      * @throws Exception
      * @throws \Throwable
      */
@@ -627,23 +684,36 @@ class SkeeksSuppliersController extends Controller
         $apiQuery = [
             'page' => $page,
         ];
-        
+
         if ($is_new) {
-            /**
-             * @var ShopCmsContentElement $lastProduct
-             */
-            $lastProduct = ShopCmsContentElement::find()
-                ->innerJoinWith("shopProduct as shopProduct")
-                ->andWhere(['is not', 'sx_id', null])
-                ->orderBy(['updated_at' => SORT_DESC])
-                ->one()
-            ;
-            if ($lastProduct) {
-                $apiQuery['updated_at'] = $lastProduct->updated_at;
+            
+            //Если это уже не первая страница
+            if ($this->_last_product_updated) {
+                $apiQuery['updated_at'] = $this->_last_product_updated;
+            } else {
+                /**
+                 * @var ShopCmsContentElement $lastProduct
+                 */
+                $lastProduct = ShopCmsContentElement::find()
+                    ->innerJoinWith("shopProduct as shopProduct")
+                    ->andWhere(['is not', 'sx_id', null])
+                    ->orderBy(['updated_at' => SORT_DESC])
+                    ->one();
+                
+                if ($lastProduct) {
+                    //Если ранее уже получали SX товары
+                    $this->_last_product_updated = $lastProduct->updated_at;
+                    $apiQuery['updated_at'] = $lastProduct->updated_at;
+                } else {
+                    //Если нет еще товаров то по сути получаем все
+                    $is_new = 0;
+                }
             }
+            
         }
-        
-        
+
+        //$apiQuery['f_id'] = 6830902;
+
         $response = \Yii::$app->skeeksSuppliersApi->methodProducts($apiQuery);
 
         $this->stdout("Обновление товаров, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
@@ -756,7 +826,7 @@ class SkeeksSuppliersController extends Controller
                 $cmsTree = new CmsTree();
 
                 $cmsTree->sx_id = (int)ArrayHelper::getValue($apiData, "id");
-                
+
                 $cmsTree->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $cmsTree->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                 $cmsTree->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
@@ -850,13 +920,18 @@ class SkeeksSuppliersController extends Controller
 
                     } elseif ($type == 'number') {
                         $model->component = PropertyTypeNumber::class;
+                    } elseif ($type == 'bool') {
+                        $model->component = PropertyTypeBool::class;
+                        $model->component_settings = [
+                            'fieldElement' => "checkbox",
+                        ];
                     } else {
                         $model->component = PropertyTypeText::class;
                     }
-                    
-                    $model->is_multiple = (int) $model->handler->isMultiple;
-                    
-                    
+
+                    $model->is_multiple = (int)$model->handler->isMultiple;
+
+
                     if ($model->save()) {
                         $result = true;
                     } else {
@@ -898,6 +973,11 @@ class SkeeksSuppliersController extends Controller
 
                 } elseif ($type == 'number') {
                     $model->component = PropertyTypeNumber::class;
+                } elseif ($type == 'bool') {
+                    $model->component = PropertyTypeBool::class;
+                    $model->component_settings = [
+                        'fieldElement' => "checkbox",
+                    ];
                 } else {
                     $model->component = PropertyTypeText::class;
                 }
@@ -1067,7 +1147,7 @@ class SkeeksSuppliersController extends Controller
                     if ($model->save()) {
                         $result = true;
                     } else {
-                        throw new Exception("Ошибка создания коллекции {$model->id}: ".print_r($model->errors, true) . print_r($apiData, true));
+                        throw new Exception("Ошибка создания коллекции {$model->id}: ".print_r($model->errors, true).print_r($apiData, true));
                     }
 
                 }
@@ -1148,7 +1228,7 @@ class SkeeksSuppliersController extends Controller
         $content_id = \Yii::$app->shop->contentProducts->id;
 
         $t = \Yii::$app->db->beginTransaction();
-        
+
         try {
             if ($model) {
                 //Обновить
@@ -1176,7 +1256,7 @@ class SkeeksSuppliersController extends Controller
                     if ($category_id) {
                         $cmsTree = CmsTree::find()->sxId($category_id)->one();
                         if (!$cmsTree) {
-                            $this->actionUpdateAll();
+                            $this->_updateAllData();
                             $cmsTree = CmsTree::find()->sxId($category_id)->one();
                         }
                         if ($cmsTree) {
@@ -1188,7 +1268,7 @@ class SkeeksSuppliersController extends Controller
                     if ($brand_id) {
                         $shopBrand = ShopBrand::find()->sxId($brand_id)->one();
                         if (!$shopBrand) {
-                            $this->actionUpdateAll();
+                            $this->_updateAllData();
                             $shopBrand = ShopBrand::find()->sxId($brand_id)->one();
                         }
 
@@ -1203,7 +1283,7 @@ class SkeeksSuppliersController extends Controller
                         foreach ($collection_ids as $sx_collection_id) {
                             $shopCollection = ShopCollection::find()->sxId($sx_collection_id)->one();
                             if (!$shopCollection) {
-                                $this->actionUpdateAll();
+                                $this->_updateAllData();
                                 $shopCollection = ShopCollection::find()->sxId($sx_collection_id)->one();
                             }
 
@@ -1252,11 +1332,11 @@ class SkeeksSuppliersController extends Controller
                     }
 
                     if (!$model->save()) {
-                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true) . print_r($apiData, true));
+                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true).print_r($apiData, true));
                     }
 
                     if (!$shopProduct->save(false)) {
-                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true) . print_r($apiData, true));
+                        throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true).print_r($apiData, true));
                     }
 
                     $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
@@ -1264,6 +1344,9 @@ class SkeeksSuppliersController extends Controller
 
                     $properties = (array)ArrayHelper::getValue($apiData, "properties");
                     $this->_updatePropertiesForProduct($model, $properties);
+
+                    $model->updated_at = $updated_at;
+                    $model->update(false, ['updated_at']);
 
                     $result = true;
                 }
@@ -1287,7 +1370,7 @@ class SkeeksSuppliersController extends Controller
                 if ($category_id) {
                     $cmsTree = CmsTree::find()->sxId($category_id)->one();
                     if (!$cmsTree) {
-                        $this->actionUpdateAll();
+                        $this->_updateAllData();
                         $cmsTree = CmsTree::find()->sxId($category_id)->one();
                     }
                     if ($cmsTree) {
@@ -1299,7 +1382,7 @@ class SkeeksSuppliersController extends Controller
                 if ($brand_id) {
                     $shopBrand = ShopBrand::find()->sxId($brand_id)->one();
                     if (!$shopBrand) {
-                        $this->actionUpdateAll();
+                        $this->_updateAllData();
                         $shopBrand = ShopBrand::find()->sxId($brand_id)->one();
                     }
 
@@ -1314,7 +1397,7 @@ class SkeeksSuppliersController extends Controller
                     foreach ($collection_ids as $sx_collection_id) {
                         $shopCollection = ShopCollection::find()->sxId($sx_collection_id)->one();
                         if (!$shopCollection) {
-                            $this->actionUpdateAll();
+                            $this->_updateAllData();
                             $shopCollection = ShopCollection::find()->sxId($sx_collection_id)->one();
                         }
 
@@ -1363,22 +1446,25 @@ class SkeeksSuppliersController extends Controller
                 }
 
                 if (!$model->save()) {
-                    throw new Exception("Ошибка создания товара: ".print_r($model->errors, true) .print_r($model->toArray(), true));
+                    throw new Exception("Ошибка создания товара: ".print_r($model->errors, true).print_r($model->toArray(), true));
                 }
 
 
                 $shopProduct->id = $model->id;
 
                 if (!$shopProduct->save(false)) {
-                    throw new Exception("Ошибка создания товара: ".print_r($shopProduct->errors, true) . print_r($shopProduct->toArray(), true));
+                    throw new Exception("Ошибка создания товара: ".print_r($shopProduct->errors, true).print_r($shopProduct->toArray(), true));
                 }
 
-                
+
                 $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
                 $this->_updateStoreItemsForProduct($shopProduct, $store_items);
 
                 $properties = (array)ArrayHelper::getValue($apiData, "properties");
                 $this->_updatePropertiesForProduct($model, $properties);
+
+                $model->updated_at = $updated_at;
+                $model->update(false, ['updated_at']);
 
                 $result = true;
 
@@ -1479,7 +1565,7 @@ class SkeeksSuppliersController extends Controller
                             $shopStoreItem->purchase_price = $api_purchase_price;
                             $changedAttrs[] = "purchase_price";
                         }
-                        
+
                         if ($changedAttrs) {
                             if (!$shopStoreItem->update(true, $changedAttrs)) {
                                 throw new Exception(print_r($shopStoreItem->errors, true));;
@@ -1493,19 +1579,20 @@ class SkeeksSuppliersController extends Controller
         }
     }
 
-    private function _updatePropertiesForProduct(ShopCmsContentElement $model, array $apiData = []) {
+    private function _updatePropertiesForProduct(ShopCmsContentElement $model, array $apiData = [])
+    {
         if ($apiData) {
-            
+
             $rpmModel = $model->relatedPropertiesModel;
-            
+
             $apiData = ArrayHelper::map($apiData, "property_id", "value");
             $properties = CmsContentProperty::find()->sxId(array_keys($apiData))->all();
             if (count($apiData) != count($properties)) {
-                $this->actionUpdateAll();
+                $this->_updateAllData();
                 $properties = CmsContentProperty::find()->sxId(array_keys($apiData))->all();
             }
-            
-            $properties = ArrayHelper::map($properties, "sx_id", function ($model){
+
+            $properties = ArrayHelper::map($properties, "sx_id", function ($model) {
                 return $model;
             });
 
@@ -1514,63 +1601,62 @@ class SkeeksSuppliersController extends Controller
                  * @var CmsContentProperty $property
                  */
                 $property = ArrayHelper::getValue($properties, $sx_id);
-                
+
                 if ($property->property_type == PropertyType::CODE_LIST) {
-                    
+
                     if ($property->is_multiple) {
                         $enumIds = [];
-                        
-                        foreach ($value as $valueObject)
-                        {
+
+                        foreach ($value as $valueObject) {
                             $enumSxId = (int)ArrayHelper::getValue($valueObject, "id");
                             $enumSxValue = (string)ArrayHelper::getValue($valueObject, "value");
                             //if ($enumSxValue) {
-                                /**
-                                 * @var $enum CmsContentPropertyEnum
-                                 */
-                                $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
-                                //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
-                                if (!$enum) {
-                                    $enum = new CmsContentPropertyEnum();
-                                    $enum->property_id =  $property->id;
-                                    $enum->value = $enumSxValue;
-                                    $enum->sx_id = $enumSxId;
-                                    if (!$enum->save()) {
-                                        throw new Exception(print_r($enum->errors, true));
-                                    }
-                                } else {
-                                    if ($enum->property_id != $property->id) {
-                                        $enum->property_id = $property->id;
-                                        $enum->update(false, ['property_id']);
-                                    }
+                            /**
+                             * @var $enum CmsContentPropertyEnum
+                             */
+                            $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
+                            //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
+                            if (!$enum) {
+                                $enum = new CmsContentPropertyEnum();
+                                $enum->property_id = $property->id;
+                                $enum->value = $enumSxValue;
+                                $enum->sx_id = $enumSxId;
+                                if (!$enum->save()) {
+                                    throw new Exception(print_r($enum->errors, true));
                                 }
-                                
-                                $enumIds[] = $enum->id;
+                            } else {
+                                if ($enum->property_id != $property->id) {
+                                    $enum->property_id = $property->id;
+                                    $enum->update(false, ['property_id']);
+                                }
+                            }
+
+                            $enumIds[] = $enum->id;
                             //} else {
                             //    echo '1111';
                             //    var_dump($valueObject);die;
                             //}
 
-                            
+
                         }
-                        
+
                         $rpmModel->{$property->code} = $enumIds;
                     } else {
 
                         if ($value) {
                             $enumSxId = (int)ArrayHelper::getValue($value, "id");
                             $enumSxValue = (string)ArrayHelper::getValue($value, "value");
-                            
+
                             if ($enumSxValue) {
                                 //$enum = $property->getEnums()->andWhere(['sx_id' => $enumSxId])->one();
                                 $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
                                 if (!$enum) {
                                     $enum = new CmsContentPropertyEnum();
-                                    $enum->property_id =  $property->id;
+                                    $enum->property_id = $property->id;
                                     $enum->value = $enumSxValue;
                                     $enum->sx_id = $enumSxId;
                                     if (!$enum->save()) {
-                                        throw new Exception(print_r($enum->errors, true) . print_r($enum->toArray(), true));
+                                        throw new Exception(print_r($enum->errors, true).print_r($enum->toArray(), true));
                                     }
                                 } else {
                                     if ($enum->property_id != $property->id) {
@@ -1578,28 +1664,30 @@ class SkeeksSuppliersController extends Controller
                                         $enum->update(false, ['property_id']);
                                     }
                                 }
-                                
+
                                 $rpmModel->{$property->code} = $enum->id;
                             } else {
                                 /*print_r($property->toArray());die;
                                 echo '2222';
                                 print_r($value);die;*/
                             }
-                            
-                            
+
+
                         } else {
                             $rpmModel->{$property->code} = "";
                         }
-                        
-                        
+
+
                     }
-                    
+
                 } else {
                     $rpmModel->{$property->code} = $value;
                 }
             }
-            
-            $rpmModel->save();
+
+            if (!$rpmModel->save()) {
+                throw new Exception("Ошибка сохранения характеристик: ".print_r($rpmModel->errors, true));
+            }
         }
     }
 
@@ -1713,7 +1801,7 @@ class SkeeksSuppliersController extends Controller
             }
         }
 
-        
+
         if ($isForceDownload) {
             $file = \Yii::$app->storage->upload($image_src);
         } else {
@@ -1725,42 +1813,42 @@ class SkeeksSuppliersController extends Controller
                 if (strpos($urlName, ".") !== false) {
                     $urlName = substr($urlName, 0, strpos($urlName, "."));
                 }
-                
+
                 $file = new CmsStorageFile();
-                
+
                 $file->cluster_id = "sx";
-                $file->cluster_file = (string) ArrayHelper::getValue($imageData, "src");
-                
+                $file->cluster_file = (string)ArrayHelper::getValue($imageData, "src");
+
                 $file->original_name = $urlName;
                 $file->sx_data = $imageData;
-                
+
                 $file->extension = "webp";
                 $file->mime_type = "image/webp";
-                
+
                 if (ArrayHelper::getValue($imageData, "width")) {
-                    $file->image_width = (int) ArrayHelper::getValue($imageData, "width");
+                    $file->image_width = (int)ArrayHelper::getValue($imageData, "width");
                 }
-                
+
                 if (ArrayHelper::getValue($imageData, "height")) {
-                    $file->image_height = (int) ArrayHelper::getValue($imageData, "height");
+                    $file->image_height = (int)ArrayHelper::getValue($imageData, "height");
                 }
             }
         }
-        
+
         $file->sx_id = $image_id;
         $file->save();
-        
+
         if ($file->extension != "webp") {
             $this->stdout("Uploading ...\n");
             /*print_r($imageData);die;*/
-            $this->stdout($image_src . "\n");
-            
+            $this->stdout($image_src."\n");
+
             $this->stdout("{$file->src}\n");
             $this->stdout("---------------\n");
             die;
         }
 
-        
+
         return $file;
     }
 
