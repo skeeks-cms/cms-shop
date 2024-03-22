@@ -19,6 +19,7 @@ use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeBool;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeNumber;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeText;
+use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\BrandCmsContentElement;
 use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCmsContentElement;
@@ -775,6 +776,12 @@ class SkeeksSuppliersController extends Controller
         if ($page < $pageCount) {
             unset($response);
             $this->actionUpdateProducts($is_new, $page + 1);
+        } else {
+            //Это последняя страница и есть товары, значит обновить цены
+            if ($total) {
+                $this->stdout("Обновление цен\n");
+                ShopComponent::updateProductPrices();
+            }
         }
     }
 
