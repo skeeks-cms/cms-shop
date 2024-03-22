@@ -656,14 +656,15 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
-     * Полное обновление, всех товаров
+     * Полное обновление всех товаров
+     * @param $page
      * @return void
      * @throws Exception
      * @throws \Throwable
      */
-    public function actionUpdateProductsAll()
+    public function actionUpdateProductsAll($page = 1)
     {
-        $this->actionUpdateProducts(0);
+        $this->actionUpdateProducts(0, $page);
     }
 
     /**
