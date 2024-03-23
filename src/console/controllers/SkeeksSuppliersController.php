@@ -360,10 +360,10 @@ class SkeeksSuppliersController extends Controller
         if ($response->isOk) {
 
             $counter = 0;
-            $total = count($response->data);
+            $total = count((array) $response->data);
             Console::startProgress($counter, $total);
 
-            foreach ($response->data as $apiData) {
+            foreach ((array) $response->data as $apiData) {
                 $id = (int)ArrayHelper::getValue($apiData, "id");
                 /**
                  * @var $cmsTree CmsTree
@@ -492,10 +492,10 @@ class SkeeksSuppliersController extends Controller
         if ($response->isOk) {
 
             $counter = 0;
-            $total = count($response->data);
+            $total = count((array)$response->data);
             Console::startProgress($counter, $total);
 
-            foreach ($response->data as $apiData) {
+            foreach ((array)$response->data as $apiData) {
 
                 $id = (int)ArrayHelper::getValue($apiData, "id");
                 if ($model = ShopBrand::find()->sxId($id)->one()) {
@@ -558,10 +558,10 @@ class SkeeksSuppliersController extends Controller
         if ($response->isOk) {
 
             $counter = 0;
-            $total = count($response->data);
+            $total = count((array)$response->data);
             Console::startProgress($counter, $total);
 
-            foreach ($response->data as $apiData) {
+            foreach ((array)$response->data as $apiData) {
 
                 $id = (int)ArrayHelper::getValue($apiData, "id");
                 if ($model = ShopCollection::find()->sxId($id)->one()) {
