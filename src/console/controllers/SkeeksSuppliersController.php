@@ -813,8 +813,8 @@ class SkeeksSuppliersController extends Controller
                 if ($isNeedUpdate) {
                     //TODO:добавить обновление
                     $cmsTree->name = trim((string)ArrayHelper::getValue($apiData, "name"));
-                    $cmsTree->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
-                    $cmsTree->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
+                    /*$cmsTree->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
+                    $cmsTree->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));*/
                     $cmsTree->is_adult = (int)ArrayHelper::getValue($apiData, "is_adult");
                     $cmsTree->shop_has_collections = (int)ArrayHelper::getValue($apiData, "has_collections");
 
@@ -839,8 +839,8 @@ class SkeeksSuppliersController extends Controller
                 $cmsTree->sx_id = (int)ArrayHelper::getValue($apiData, "id");
 
                 $cmsTree->name = trim((string)ArrayHelper::getValue($apiData, "name"));
-                $cmsTree->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
-                $cmsTree->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
+                /*$cmsTree->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
+                $cmsTree->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));*/
                 $cmsTree->is_adult = (int)ArrayHelper::getValue($apiData, "is_adult");
                 $cmsTree->shop_has_collections = (int)ArrayHelper::getValue($apiData, "has_collections");
 
