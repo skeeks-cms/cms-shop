@@ -1536,6 +1536,7 @@ class SkeeksSuppliersController extends Controller
                     $api_quantity = (float)ArrayHelper::getValue($store_item_data, "quantity");
                     $api_purchase_price = (float)ArrayHelper::getValue($store_item_data, "purchase_price");
                     $api_selling_price = (float)ArrayHelper::getValue($store_item_data, "selling_price");
+                    $updated_at = (int)ArrayHelper::getValue($store_item_data, "updated_at.timestamp");
 
                     if (!$shopStoreItem) {
                         $shopStoreItem = new ShopStoreProduct();
@@ -1549,6 +1550,10 @@ class SkeeksSuppliersController extends Controller
                         if (!$shopStoreItem->save()) {
                             throw new Exception(print_r($shopStoreItem->errors, true));
                         }
+
+                        $shopStoreItem->updated_at = $updated_at;
+                        $shopStoreItem->update(false, ['updated_at']);
+
                     } else {
                         $changedAttrs = [];
 
@@ -1581,6 +1586,9 @@ class SkeeksSuppliersController extends Controller
                             if (!$shopStoreItem->update(true, $changedAttrs)) {
                                 throw new Exception(print_r($shopStoreItem->errors, true));;
                             }
+
+                            $shopStoreItem->updated_at = $updated_at;
+                            $shopStoreItem->update(false, ['updated_at']);
                         }
                     }
 
