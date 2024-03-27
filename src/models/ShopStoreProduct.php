@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\models\behaviors\HasJsonFieldsBehavior;
 use skeeks\cms\relatedProperties\PropertyType;
 use yii\base\Exception;
+use yii\console\Application;
 use yii\helpers\ArrayHelper;
 
 /**

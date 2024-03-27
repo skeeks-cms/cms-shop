@@ -103,6 +103,10 @@ $(".sx-import").on("click", function() {
 JS
                     );
 
+
+                    $total_24 = ShopStoreProduct::find()->andWhere(['shop_store_id' => ShopStore::find()->cmsSite()->select("id")])->andWhere(['>=','updated_at', time() - 24*3600])->count();
+                    $total_12 = ShopStoreProduct::find()->andWhere(['shop_store_id' => ShopStore::find()->cmsSite()->select("id")])->andWhere(['>=','updated_at', time() - 12*3600])->count();
+                    $total_1 = ShopStoreProduct::find()->andWhere(['shop_store_id' => ShopStore::find()->cmsSite()->select("id")])->andWhere(['>=','updated_at', time() - 3600])->count();
                     $btn = Html::button("<i class='fas fa-sync'></i> Обновить цены", [
                         'class'       => 'btn btn-primary sx-import',
                         'title'       => 'Эта кнопка запускает обновление цен товаров на сайте',
@@ -116,7 +120,14 @@ JS
                         ],
 
                         'body' => <<<HTML
-<p>{$btn}</p>
+<div class="row">
+<div class="col-6 my-auto">{$btn}</div>
+<div class="col-6 my-auto" style="text-align: right;">
+    <p>Обновлено за последние 24 часа: <b>{$total_24}</b> шт</p>
+    <p>Обновлено за последние 12 часов: <b>{$total_12}</b> шт</p>
+    <p>Обновлено за последний час: <b>{$total_1}</b> шт</p>
+</div>
+</div>
 HTML
                         ,
                     ]);
@@ -243,7 +254,7 @@ HTML
                                 $data = [];
                                 
                                 $name = $model->asText;
-                                if ($model->sx_id) {
+                                if (isset($model->sx_id) && $model->sx_id) {
                                     $data[] = Html::a($name . " <small data-toggle='tooltip' title='SkeekS Suppliers ID: {$model->sx_id}'><i class='fas fa-link'></i></small>", "#", ['class' => 'sx-trigger-action']);
                                 } else {
                                     $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
@@ -328,6 +339,72 @@ HTML
                                 $grid->sortAttributes["countProducts"] = [
                                     'asc'  => ['countProducts' => SORT_ASC],
                                     'desc' => ['countProducts' => SORT_DESC],
+                                ];
+                            },
+                        ],
+                        'countProductsLast1'     => [
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'value'         => function (ShopStore $shopStore) {
+                                return $shopStore->raw_row['countProductsLast1'];
+                            },
+                            'attribute'     => 'countProductsLast1',
+                            'label'         => 'Обновлено за последний час',
+
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery = ShopStoreProduct::find()->select([new Expression("count(1)")])
+                                    ->where([
+                                        'shop_store_id' => new Expression(ShopStore::tableName().".id"),
+                                    ])
+                                    ->andWhere(['>=','updated_at', time() - 3600])
+                                ;
+
+                                $query->addSelect([
+                                    'countProductsLast1' => $subQuery,
+                                ]);
+
+                                $grid->sortAttributes["countProductsLast1"] = [
+                                    'asc'  => ['countProductsLast1' => SORT_ASC],
+                                    'desc' => ['countProductsLast1' => SORT_DESC],
+                                ];
+                            },
+                        ],
+                        'countProductsLast24'     => [
+                            'headerOptions' => [
+                                'style' => 'width: 100px;',
+                            ],
+                            'value'         => function (ShopStore $shopStore) {
+                                return $shopStore->raw_row['countProductsLast24'];
+                            },
+                            'attribute'     => 'countProductsLast24',
+                            'label'         => 'Обновлено за последние 24 часа',
+
+                            'beforeCreateCallback' => function (GridView $grid) {
+                                /**
+                                 * @var $query ActiveQuery
+                                 */
+                                $query = $grid->dataProvider->query;
+
+                                $subQuery = ShopStoreProduct::find()->select([new Expression("count(1)")])
+                                    ->where([
+                                        'shop_store_id' => new Expression(ShopStore::tableName().".id"),
+                                    ])
+                                    ->andWhere(['>=','updated_at', time() - 24*3600])
+                                ;
+
+                                $query->addSelect([
+                                    'countProductsLast24' => $subQuery,
+                                ]);
+
+                                $grid->sortAttributes["countProductsLast24"] = [
+                                    'asc'  => ['countProductsLast24' => SORT_ASC],
+                                    'desc' => ['countProductsLast24' => SORT_DESC],
                                 ];
                             },
                         ],
