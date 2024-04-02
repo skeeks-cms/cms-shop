@@ -351,6 +351,32 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                         }
 
                     } elseif (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_BRAND_SKU,
+                    ])) {
+
+                        if (is_string($value) || is_numeric($value)) {
+                            $value = (string) $value;
+                            $value = trim($value);
+                            $shopProduct->brand_sku = $value;
+                        }
+
+
+                    }  elseif (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_BRAND,
+                    ])) {
+
+                        if (is_string($value) || is_numeric($value)) {
+
+                            if ($option = $property->getShopStorePropertyOptions()->andWhere(['name' => trim((string) $value)])->one()) {
+                                if ($option->shopBrand) {
+                                    $shopProduct->brand_id = $option->shopBrand->id;
+                                }
+                            }
+
+                        }
+
+
+                    } elseif (in_array($property->property_nature, [
                         ShopStoreProperty::PROPERTY_NATURE_BARCODE,
                     ])) {
 

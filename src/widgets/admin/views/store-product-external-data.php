@@ -137,6 +137,10 @@ JS
                         $formCode = "field-shopproduct-measure_ratio_min";
                     } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_MEASURE_RATIO) {
                         $formCode = "field-shopproduct-measure_ratio";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_BRAND) {
+                        $formCode = "field-shopproduct-brand_id";
+                    } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_BRAND_SKU) {
+                        $formCode = "field-shopproduct-brand_sku";
                     }
 
                     $row = \yii\helpers\ArrayHelper::getValue($data, $supplierProperty->external_code);
@@ -151,7 +155,7 @@ JS
                     $isRed = false;
                     $isGreen = false;
                     $cssClasses = [];
-                    if (is_string($row)) {
+                    if (is_string($row) || is_numeric($row)) {
 
                         if ($supplierProperty->cmsContentProperty) {
                             if ($supplierProperty->import_delimetr) {
@@ -197,6 +201,19 @@ JS
                             if ($supplierProperty->cmsContentProperty->property_type == \skeeks\cms\relatedProperties\PropertyType::CODE_NUMBER) {
                                 $isGreen = true;
                             }
+
+                        } elseif ($supplierProperty->property_nature == \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_BRAND) {
+                            /**
+                             * @var $shopSupplierPropertyOption \skeeks\cms\shop\models\ShopStorePropertyOption
+                             */
+                            $shopSupplierPropertyOption = $supplierProperty->getShopStorePropertyOptions()->andWhere(['name' => $row])->one();
+                            if ($shopSupplierPropertyOption) {
+                                if ($shopSupplierPropertyOption->shopBrand) {
+                                    $isGreen = true;
+                                } else {
+                                    $isRed = true;
+                                }
+                            }
                         } elseif ($supplierProperty->property_nature) {
                             $isGreen = true;
                         }
@@ -237,12 +254,14 @@ JS
                                     <? else : ?>
                                         <b><?= $row; ?></b>
                                     <? endif; ?>
+                                <? elseif (is_numeric($row)) : ?>
+                                        <b><?= $row; ?></b>
                                 <? else : ?>
                                     <pre><?= print_r($row, true); ?></pre>
                                 <? endif; ?>
 
                                 <span style="float: right;" title="Правильное название в нашей системе">
-                                <? if (is_string($row)) : ?>
+                                <? if (is_string($row) || is_numeric($row)) : ?>
                                     <? if ($supplierProperty->cmsContentProperty) : ?>
                                         <? if ($shopSupplierPropertyOption && $shopSupplierPropertyOption->cmsContentElement) : ?>
                                             <?= $shopSupplierPropertyOption->cmsContentElement->name; ?>
@@ -258,6 +277,15 @@ JS
                                                 <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->cmsContentPropertyEnum->value; ?>" style="position: absolute; left: -20000px;">
                                             </a>
                                         <? endif; ?>
+
+                                    <? endif; ?>
+
+                                    <? if ($shopSupplierPropertyOption && $shopSupplierPropertyOption->shopBrand) : ?>
+                                        <?= $shopSupplierPropertyOption->shopBrand->name; ?>
+                                        <a href="#" class="btn btn-xs sx-copy btn-default" data-toggle="tooltip" title="" data-original-title="Скопировать">
+                                            <i class="fas fa-copy" style="cursor: pointer; color: gray;"></i>
+                                            <input id="cont" type="text" value="<?= $shopSupplierPropertyOption->shopBrand->name; ?>" style="position: absolute; left: -20000px;">
+                                        </a>
                                     <? endif; ?>
                                 <? endif; ?>
                             </span>
@@ -299,6 +327,8 @@ JS
                                     <b><?= $row; ?></b>
                                 <? endif; ?>
 
+                            <? elseif (is_numeric($row)) : ?>
+                                <b><?= $row; ?></b>
                             <? else : ?>
                                 <pre><?= print_r($row, true); ?></pre>
                             <? endif; ?>

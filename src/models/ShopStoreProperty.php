@@ -52,6 +52,8 @@ class ShopStoreProperty extends ActiveRecord
     const PROPERTY_NATURE_WIDTH = "width";
     const PROPERTY_NATURE_LENGTH = "length";
     const PROPERTY_NATURE_EAV = "eav";
+    const PROPERTY_NATURE_BRAND = "brand";
+    const PROPERTY_NATURE_BRAND_SKU = "brand_sku";
     const PROPERTY_NATURE_TREE = "tree";
     const PROPERTY_NATURE_IMAGE = "image";
     const PROPERTY_NATURE_SECOND_IMAGE = "second_image";
@@ -117,6 +119,8 @@ class ShopStoreProperty extends ActiveRecord
     {
         return [
             self::PROPERTY_NATURE_EAV               => 'Характеристика',
+            self::PROPERTY_NATURE_BRAND             => 'Бренд',
+            self::PROPERTY_NATURE_BRAND_SKU         => 'Артикул бренда',
             self::PROPERTY_NATURE_SECOND_IMAGE      => 'Вторые фото',
             self::PROPERTY_NATURE_IMAGE             => 'Главное фото',
             self::PROPERTY_NATURE_BARCODE           => 'Штрихкод',
@@ -202,10 +206,9 @@ class ShopStoreProperty extends ActiveRecord
 
                         if (in_array($this->cmsContentProperty->property_type, [
                             PropertyTypeList::CODE_ELEMENT,
-                            PropertyTypeList::CODE_LIST
+                            PropertyTypeList::CODE_LIST,
                         ])) {
                             //Значит значение массив
-
 
 
                             if ($this->import_delimetr) {

@@ -74,7 +74,7 @@ JS
                 $(".sx-success-result").empty().append("<div class='sx-message'></div>");
                 
                 setTimeout(function() {
-                    window.location.href = $(".sx-back a").attr("href");
+                    window.location.reload();
                 }, 1000);
             });
             

@@ -833,7 +833,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                             $shopProductBarcode->barcode_type = ArrayHelper::getValue($barcodeData, 'barcode_type');
 
                             if (!$shopProductBarcode->validate($validateAttributes)) {
-                                $this->addError($attribute, ArrayHelper::getValue($barcodeData, 'value')." — некорректный штрихкод: ".Json::encode($shopProductBarcode->errors));
+                                $this->addError($attribute, print_r($barcodeData, true) . " — некорректный штрихкод: ".Json::encode($shopProductBarcode->errors));
                                 return false;
                             }
                         }

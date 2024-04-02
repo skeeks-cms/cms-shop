@@ -141,6 +141,9 @@ HTML
                                 if ($property->cms_tree_id) {
                                     return $property->cmsTree->fullName;
                                 }
+                                if ($property->shop_brand_id) {
+                                    return $property->shopBrand->name;
+                                }
 
                                 return '';
                             },
@@ -202,6 +205,21 @@ HTML
                         'widgetClass' => SelectModelDialogTreeWidget::class,
                     ],
                 ];
+            } elseif ($property->property_nature == ShopStoreProperty::PROPERTY_NATURE_BRAND) {
+                
+                $connect['connect']['fields'] = [
+                    'shop_brand_id' => [
+                        'class'       => WidgetField::class,
+                        'widgetClass' => \skeeks\cms\widgets\AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass' => \skeeks\cms\shop\models\ShopBrand::class,
+                            "ajaxUrl"    => \yii\helpers\Url::to([
+                                '/cms/ajax/autocomplete-brands',
+                            ]),
+                        ]
+                    ],
+                ];
+                
             } elseif ($property->cmsContentProperty) {
 
                 $contentProperty = $property->cmsContentProperty;

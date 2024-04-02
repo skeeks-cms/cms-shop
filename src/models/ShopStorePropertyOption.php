@@ -23,8 +23,10 @@ use yii\helpers\ArrayHelper;
  * @property int|null               $cms_content_property_enum_id
  * @property int|null               $cms_content_element_id
  * @property int|null               $cms_tree_id
+ * @property int|null               $shop_brand_id
  *
  * @property CmsTree                $cmsTree
+ * @property ShopBrand              $shopBrand
  * @property CmsContentElement      $cmsContentElement
  * @property CmsContentPropertyEnum $cmsContentPropertyEnum
  * @property ShopStoreProperty      $shopStoreProperty
@@ -55,6 +57,7 @@ class ShopStorePropertyOption extends ActiveRecord
             [['shop_store_property_id', 'name'], 'unique', 'targetAttribute' => ['shop_store_property_id', 'name']],
             [['cms_content_element_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentElement::className(), 'targetAttribute' => ['cms_content_element_id' => 'id']],
             [['cms_content_property_enum_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentPropertyEnum::className(), 'targetAttribute' => ['cms_content_property_enum_id' => 'id']],
+            //[['shop_brand_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentPropertyEnum::className(), 'targetAttribute' => ['cms_content_property_enum_id' => 'id']],
 
         ]);
     }
@@ -70,6 +73,7 @@ class ShopStorePropertyOption extends ActiveRecord
             'name'                         => 'Название у поставщика',
             'cms_content_property_enum_id' => 'Опция на сайте',
             'cms_content_element_id'       => 'Опция на сайте',
+            'shop_brand_id'                => 'Бренд на сайте',
             'cms_tree_id'                  => 'Раздел на сайте',
         ]);
     }
@@ -91,6 +95,15 @@ class ShopStorePropertyOption extends ActiveRecord
     public function getCmsTree()
     {
         return $this->hasOne(CmsTree::className(), ['id' => 'cms_tree_id']);
+    }
+    /**
+     * Gets query for [[CmsContentElement]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShopBrand()
+    {
+        return $this->hasOne(ShopBrand::className(), ['id' => 'shop_brand_id']);
     }
 
     /**

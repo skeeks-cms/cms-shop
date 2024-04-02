@@ -624,14 +624,14 @@ HTML;
 
             $model->load(\Yii::$app->request->post());
 
-            $q = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => null]);
+            $q = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => null])->orderBy(['id' => SORT_ASC])->limit(1000);
 
             $result = [];
 
             $retailTypePrice = ShopTypePrice::find()->cmsSite()->isRetail()->one();
             $purchaseTypePrice = ShopTypePrice::find()->isPurchase()->cmsSite()->one();
 
-            $cmsContent = \Yii::$app->shop->cmsContent;
+            $cmsContent = \Yii::$app->shop->contentProducts;
 
             /**
              * @var $shopStoreProduct ShopStoreProduct
@@ -642,7 +642,6 @@ HTML;
                 $t = \Yii::$app->db->beginTransaction();
                 try {
                     $element = new ShopCmsContentElement();
-                    //$shopStoreProduct->loadDataToElementProduct($element);
 
 
                     $element->content_id = $cmsContent->id;
@@ -656,19 +655,23 @@ HTML;
                         $element->active = "N";
                     }
 
+
+
+                    $sp = new ShopProduct();
+
+                    $shopStoreProduct->loadDataToElementProduct($element, $sp);
+
                     if (!$element->save()) {
                         throw new Exception(print_r($element->errors, true));
                     }
 
-                    $sp = new ShopProduct();
                     $sp->id = $element->id;
                     if (!$sp->save()) {
                         throw new Exception(print_r($sp->errors, true));
                     }
 
-
                     if ($purchaseTypePrice) {
-                        $price2 = $element->shopProduct->getPrice($retailTypePrice->id);
+                        $price2 = $element->shopProduct->getPrice($purchaseTypePrice->id);
                         if (!$price2) {
                             $price2 = new ShopProductPrice();
                             $price2->type_price_id = $purchaseTypePrice->id;
@@ -708,12 +711,18 @@ HTML;
                         throw new Exception(print_r($shopStoreProduct->errors, true));
                     }
 
+
+                    if (!$element->relatedPropertiesModel->save()) {
+                        throw new Exception(print_r($element->relatedPropertiesModel->errors, true));
+                    }
+
                     $t->commit();
 
                 } catch (\Exception $e) {
                     $t->rollBack();
+                    /*print_r($shopStoreProduct->name);die;
                     throw $e;
-                    die;
+                    die;*/
                     continue;
                 }
 
@@ -722,6 +731,7 @@ HTML;
 
             $rr->success = true;
         }
+
         return $rr;
     }
     /**
@@ -944,6 +954,134 @@ HTML;
 
                             }
                         }
+
+                    }
+                }
+
+                if ($added > 0) {
+                    $rr->message = "Связано товаров: {$added}";
+                    $rr->data = [
+                        'added' => $added,
+                    ];
+                }
+            }
+        }
+
+        return $rr;
+    }
+
+    public function actionJoinByVendorV2()
+    {
+
+        $rr = new RequestResponse();
+
+
+        Skeeks::unlimited();
+
+
+        if ($rr->isRequestAjaxPost()) {
+
+            $added = 0;
+            /**
+             * @var $shopStorePropertyBrand ShopStoreProperty
+             * @var $shopStorePropertyBrandSku ShopStoreProperty
+             */
+
+            $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
+            $shopStorePropertyBrand = $qShopStoreProperties->andWhere(['property_nature' => \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_BRAND])->one();
+
+            $qShopStoreProperties = \Yii::$app->shop->backendShopStore->getShopStoreProperties();
+            $shopStorePropertyBrandSku = $qShopStoreProperties->andWhere(['property_nature' => \skeeks\cms\shop\models\ShopStoreProperty::PROPERTY_NATURE_BRAND_SKU])->one();
+
+
+            if ($shopStorePropertyBrand && $shopStorePropertyBrandSku) {
+                $rr->success = true;
+                $rr->message = "Данные обновлены";
+
+                /**
+                 * @var $option ShopStorePropertyOption
+                 * @var $storeProduct ShopStoreProduct
+                 */
+                $storeProducts = \Yii::$app->shop->backendShopStore->getShopStoreProducts()
+                    ->andWhere(['shop_product_id' => null])
+                ;
+                foreach ($storeProducts->each() as $storeProduct) {
+
+                    if ($storeProduct->external_data) {
+                        $externalData = [];
+                        foreach ($storeProduct->external_data as $key => $val) {
+                            $externalData[trim($key)] = $val;
+                        }
+                        $skuValue = ArrayHelper::getValue($externalData, trim($shopStorePropertyBrandSku->external_code));
+                        $brandValue = ArrayHelper::getValue($externalData, trim($shopStorePropertyBrand->external_code));
+                        $option = $shopStorePropertyBrand->getShopStorePropertyOptions()->andWhere(['name' => $brandValue])->one();
+
+                        if ($option && $skuValue && $option->shopBrand) {
+                            $find = ShopCmsContentElement::find()
+                                ->cmsSite()
+                                ->innerJoinWith("shopProduct as sp")
+                                ->andWhere(["sp.brand_id" => $option->shopBrand->id])
+                                ->andWhere(["sp.brand_sku" => $skuValue])
+                                ->groupBy([ShopCmsContentElement::tableName().".id"]);
+
+                            if ($find->count() == 1) {
+                                $infoModel = $find->one();
+
+                                /*print_r($storeProduct->toArray());
+                                print_r($infoModel->toArray());die;*/
+
+                                if ($infoModel) {
+
+                                    /*print_r($storeProduct->toArray());
+                                    print_r($infoModel->toArray());
+                                    print_r($infoModel->shopProduct->toArray());
+                                    die;*/
+
+                                    $storeProduct->shop_product_id = $infoModel->id;
+                                    try {
+                                        if ($storeProduct->save(false)) {
+                                            $added++;
+                                        }
+                                    } catch (\Exception $exception) {
+
+                                    }
+
+                                }
+
+                            }
+                        }
+
+
+                        /*if ($barcodeValue) {
+
+                            $find = ShopCmsContentElement::find()
+                                ->cmsSite()
+                                ->innerJoinWith("shopProduct as sp")
+                                ->innerJoinWith("shopProduct.shopProductBarcodes as barcodes")
+                                ->andWhere(["barcodes.value" => $barcodeValue])
+                                ->groupBy([ShopCmsContentElement::tableName().".id"]);
+
+
+                            if ($find->count() == 1) {
+                                $infoModel = $find->one();
+
+                                /*print_r($storeProduct->toArray());
+                                print_r($infoModel->toArray());die;
+
+                                if ($infoModel) {
+                                    $storeProduct->shop_product_id = $infoModel->id;
+                                    try {
+                                        if ($storeProduct->save(false)) {
+                                            $added++;
+                                        }
+                                    } catch (\Exception $exception) {
+
+                                    }
+
+                                }
+
+                            }
+                        }*/
 
                     }
                 }

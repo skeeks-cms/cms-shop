@@ -13,7 +13,6 @@ use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
-use skeeks\cms\components\Cms;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
@@ -25,9 +24,11 @@ use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\relatedProperties\PropertyType;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeElement;
 use skeeks\cms\relatedProperties\propertyTypes\PropertyTypeList;
+use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProperty;
 use skeeks\cms\shop\models\ShopStorePropertyOption;
+use skeeks\cms\Skeeks;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -268,6 +269,7 @@ HTML
                             ['cms_content_property_enum_id' => null],
                             ['cms_content_element_id' => null],
                             ['cms_tree_id' => null],
+                            ['shop_brand_id' => null],
                         ]);
 
                         $optionsConnectQuery = ShopStorePropertyOption::find()->select(['count(*) as inner_count1'])->where([
@@ -277,6 +279,7 @@ HTML
                             ['is not', 'cms_content_property_enum_id', null],
                             ['is not', 'cms_content_element_id', null],
                             ['is not', 'cms_tree_id', null],
+                            ['is not', 'shop_brand_id', null],
                         ]);
 
                         $query->groupBy(ShopStoreProperty::tableName().".id");
@@ -407,6 +410,7 @@ CSS
                                         $propertyType .= "<small>Опций: <span title='Всего опций'> {$countOptions}</span> (<span style='color:green;' title='Все привязаны!'>✓</span>)</small>";
                                     } else {
                                         $isRed = true;
+                                        $isGreen = false;
                                         $propertyType .= "<small>Опций: <span title='Всего опций'> {$countOptions}</span> (<span style='color:red;' title='Не привязанных'>{$countNotConnectOptions}</span>)</small>";
                                     }
 
@@ -437,26 +441,38 @@ JS
                                     $result[] = $propertyType;
                                 }
 
-                                if ($property->cmsContentProperty && in_array($property->cmsContentProperty->property_type, [
-                                        PropertyType::CODE_LIST,
-                                        PropertyType::CODE_ELEMENT,
-                                    ]) && $isGreen === false) {
-                                     $result[] = "<br />" . Html::button("Связать", [
-                                         'class' => 'btn btn-xs btn-default sx-join-properties',
-                                         'data' => [
-                                             'id' => $property->id
-                                         ],
-                                         'style' => 'background: #c9c9c9;',
-                                         'title' => 'Только связывает опции по названию'
-                                     ]) . Html::button("Связать и создать", [
-                                         'class' => 'btn btn-xs btn-default sx-join-and-create-properties',
-                                         'style' => 'margin-left: 5px; background: #c9c9c9;',
-                                         'data' => [
-                                             'id' => $property->id
-                                         ],
-                                         'title' => 'Сначала связывает опции по названию далее создает несвязанные'
-                                     ]);
+
+                                if ($isGreen === false) {
+
+
+                                    if (
+                                        (
+                                            $property->cmsContentProperty &&
+                                            in_array($property->cmsContentProperty->property_type, [
+                                                PropertyType::CODE_LIST,
+                                                PropertyType::CODE_ELEMENT,
+                                            ])
+                                        ) ||
+                                        ($property->property_nature == ShopStoreProperty::PROPERTY_NATURE_BRAND)
+                                    ) {
+                                        $result[] = "<br />".Html::button("Связать", [
+                                                'class' => 'btn btn-xs btn-default sx-join-properties',
+                                                'data'  => [
+                                                    'id' => $property->id,
+                                                ],
+                                                'style' => 'background: #c9c9c9;',
+                                                'title' => 'Только связывает опции по названию',
+                                            ]).Html::button("Связать и создать", [
+                                                'class' => 'btn btn-xs btn-default sx-join-and-create-properties',
+                                                'style' => 'margin-left: 5px; background: #c9c9c9;',
+                                                'data'  => [
+                                                    'id' => $property->id,
+                                                ],
+                                                'title' => 'Сначала связывает опции по названию далее создает несвязанные',
+                                            ]);
+                                    }
                                 }
+
 
                                 return implode(" / ", $result);
                             },
@@ -571,22 +587,22 @@ JS
         );
         //if ($model->property_nature == ShopStoreProperty::PROPERTY_NATURE_EAV) {
 
-            $cms_content_property_id = [
-                //'class' => SelectField::class,
-                'class' => WidgetField::class,
-                'widgetClass' => AjaxSelectModel::class,
-                'widgetConfig' => [
-                    'modelClass' => CmsContentProperty::class,
-                    'searchQuery' => function($word = '') {
-                        $query = CmsContentProperty::find()->cmsSite();
-                        if ($word) {
-                            $query->search($word);
-                        }
-                        return $query;
-                    },
+        $cms_content_property_id = [
+            //'class' => SelectField::class,
+            'class'        => WidgetField::class,
+            'widgetClass'  => AjaxSelectModel::class,
+            'widgetConfig' => [
+                'modelClass'  => CmsContentProperty::class,
+                'searchQuery' => function ($word = '') {
+                    $query = CmsContentProperty::find()->cmsSite();
+                    if ($word) {
+                        $query->search($word);
+                    }
+                    return $query;
+                },
 
-                    'pluginOptions' => [
-                        'templateResult' => new JsExpression(<<<JS
+                'pluginOptions' => [
+                    'templateResult'    => new JsExpression(<<<JS
 function formatState (state) {
     console.log(state);
   if (!state.id) {
@@ -595,9 +611,10 @@ function formatState (state) {
   var state = $("<div>", {"style": "line-height: 1;"}).append(state.text);
   return state;
 }
-JS)
-                        ,
-            'templateSelection' => new JsExpression(<<<JS
+JS
+                    )
+                    ,
+                    'templateSelection' => new JsExpression(<<<JS
 function formatState (state) {
     console.log(state);
   if (!state.id) {
@@ -607,26 +624,27 @@ function formatState (state) {
   $("small", state).remove();
   return state;
 }
-JS)
+JS
+                    ),
 
-                    ]
                 ],
-                /*'items' => ArrayHelper::map(
-                    CmsContentProperty::find()->cmsSite()->all(),
-                    'id',
-                    function(CmsContentProperty $model) {
-                        $treeSting = "";
-                        if ($model->cmsTrees) {
-                            $trees = ArrayHelper::map($model->cmsTrees, "id", "name");
-                            $treeSting = "<br /><small>(" . implode(", ", $trees) . ")</small>";
-                        }
-
-                        return $model->asText . $treeSting;
+            ],
+            /*'items' => ArrayHelper::map(
+                CmsContentProperty::find()->cmsSite()->all(),
+                'id',
+                function(CmsContentProperty $model) {
+                    $treeSting = "";
+                    if ($model->cmsTrees) {
+                        $trees = ArrayHelper::map($model->cmsTrees, "id", "name");
+                        $treeSting = "<br /><small>(" . implode(", ", $trees) . ")</small>";
                     }
-                ),*/
-            ];
+
+                    return $model->asText . $treeSting;
+                }
+            ),*/
+        ];
         //} else {
-           // $cms_content_property_id = new UnsetArrayValue();
+        // $cms_content_property_id = new UnsetArrayValue();
         //}
 
 
@@ -652,8 +670,8 @@ JS)
                 'fields' => [
 
                     'property_nature' => [
-                        'class'          => SelectField::class,
-                        'items'          => ShopStoreProperty::getPropertyNatureOptions(),
+                        'class' => SelectField::class,
+                        'items' => ShopStoreProperty::getPropertyNatureOptions(),
                         /*'elementOptions' => [
                             'data-form-reload' => 'true',
                         ],*/
@@ -661,15 +679,15 @@ JS)
                     ],
 
                     [
-                        'class' => HtmlBlock::class,
-                        'content' => '<div class="sx-property" style="display: none;">'
+                        'class'   => HtmlBlock::class,
+                        'content' => '<div class="sx-property" style="display: none;">',
                     ],
 
                     'cms_content_property_id' => $cms_content_property_id,
 
                     [
-                        'class' => HtmlBlock::class,
-                        'content' => '</div>'
+                        'class'   => HtmlBlock::class,
+                        'content' => '</div>',
                     ],
                 ],
             ],
@@ -785,8 +803,7 @@ JS)
      */
     public function actionUpdateOptions()
     {
-        set_time_limit(0);
-        ini_set("memory_limit", "2G");
+        Skeeks::unlimited();
 
         $rr = new RequestResponse();
 
@@ -822,7 +839,8 @@ JS)
                     if ($shopStoreProduct->external_data) {
                         foreach ($properties as $property) {
                             $value = ArrayHelper::getValue($shopStoreProduct->external_data, $property->external_code);
-                            if (is_string($value)) {
+                            if (is_string($value) || is_numeric($value)) {
+                                $value = (string)$value;
                                 if ($property->import_delimetr) {
                                     $value = explode($property->import_delimetr, $value);
                                 } else {
@@ -883,8 +901,7 @@ JS)
      */
     public function actionConnectOptions($is_auto_create = 0)
     {
-        set_time_limit(0);
-        ini_set("memory_limit", "2G");
+        Skeeks::unlimited();
 
         $rr = new RequestResponse();
 
@@ -905,7 +922,7 @@ JS)
 
                 if (!$properties = ShopStoreProperty::find()
                     ->andWhere(['is_options' => 1])
-                    ->andWhere(['is not', 'cms_content_property_id', null])
+                    //->andWhere(['is not', 'cms_content_property_id', null])
                     ->andWhere(['shop_store_id' => \Yii::$app->shop->backendShopStore->id])->all()) {
 
                     throw new Exception('Нет свойств типа список');
@@ -917,6 +934,7 @@ JS)
                         'and',
                         ['cms_content_property_enum_id' => null],
                         ['cms_content_element_id' => null],
+                        ['shop_brand_id' => null],
                     ]);
                     $count = $queryOptions->count();
                     if (!$count) {
@@ -926,17 +944,51 @@ JS)
                     //$this->stdout("\tНе связанных опций: {$count}\n");
 
                     $content_id = null;
-                    $contentProperty = $property->cmsContentProperty;
-                    if ($property->cmsContentProperty->handler instanceof PropertyTypeList) {
-
-                    } elseif ($property->cmsContentProperty->handler instanceof PropertyTypeElement) {
-                        $content_id = $property->cmsContentProperty->handler->content_id;
+                    
+                    if ($property->property_nature == ShopStoreProperty::PROPERTY_NATURE_BRAND) {
+                        
+                    } else {
+                        $contentProperty = $property->cmsContentProperty;
+                        if ($property->cmsContentProperty->handler instanceof PropertyTypeList) {
+    
+                        } elseif ($property->cmsContentProperty->handler instanceof PropertyTypeElement) {
+                            $content_id = $property->cmsContentProperty->handler->content_id;
+                        }
                     }
 
                     foreach ($queryOptions->each(10) as $option) {
                         //$this->stdout("\tОпция: {$option->asText}\n");
 
-                        if ($content_id) {
+                        //Если это бренд
+                        if ($option->shopStoreProperty->property_nature == ShopStoreProperty::PROPERTY_NATURE_BRAND) {
+
+                            $brandName = trim($option->name);
+                            if ($brand = ShopBrand::find()->andWhere(['name' => $brandName])->one()) {
+                                $option->shop_brand_id = $brand->id;
+                                if ($option->save()) {
+                                    //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                } else {
+                                    //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                }
+                            } else {
+                                if ($is_auto_create) {
+                                    $brand = new ShopBrand();
+                                    $brand->name = $brandName;
+
+                                    if (!$brand->save(false)) {
+                                        throw new Exception("Не создался бренд: ".print_r($brand->errors, true));
+                                    }
+                                    
+                                    $option->shop_brand_id = $brand->id;
+                                    if ($option->save()) {
+                                        //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                    } else {
+                                        //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                    }
+                                }
+                            }
+
+                        } elseif ($content_id) {
                             if ($element = CmsContentElement::find()->cmsSite()->andWhere(['content_id' => $content_id])->andWhere(['name' => $option->name])->one()) {
                                 $option->cms_content_element_id = $element->id;
                                 if ($option->save()) {
@@ -1006,8 +1058,7 @@ JS)
     {
         $is_auto_create = 0;
 
-        set_time_limit(0);
-        ini_set("memory_limit", "2G");
+        Skeeks::unlimited();
 
         $rr = new RequestResponse();
 
@@ -1033,7 +1084,7 @@ JS)
                 if (!$properties = ShopStoreProperty::find()
                     ->andWhere(['id' => $id])
                     ->andWhere(['is_options' => 1])
-                    ->andWhere(['is not', 'cms_content_property_id', null])
+                    //->andWhere(['is not', 'cms_content_property_id', null])
                     ->andWhere(['shop_store_id' => \Yii::$app->shop->backendShopStore->id])->all()) {
 
                     throw new Exception('Нет свойств типа список');
@@ -1041,10 +1092,15 @@ JS)
 
                 foreach ($properties as $property) {
 
+                    /**
+                     * @var ShopStorePropertyOption[] $queryOptions
+                     * @var ShopStorePropertyOption   $option
+                     */
                     $queryOptions = $property->getShopStorePropertyOptions()->where([
                         'and',
                         ['cms_content_property_enum_id' => null],
                         ['cms_content_element_id' => null],
+                        ['shop_brand_id' => null],
                     ]);
                     $count = $queryOptions->count();
                     if (!$count) {
@@ -1054,17 +1110,51 @@ JS)
                     //$this->stdout("\tНе связанных опций: {$count}\n");
 
                     $content_id = null;
-                    $contentProperty = $property->cmsContentProperty;
-                    if ($property->cmsContentProperty->handler instanceof PropertyTypeList) {
-
-                    } elseif ($property->cmsContentProperty->handler instanceof PropertyTypeElement) {
-                        $content_id = $property->cmsContentProperty->handler->content_id;
+                    if ($property->property_nature == ShopStoreProperty::PROPERTY_NATURE_BRAND) {
+                        
+                    } else {
+                        $contentProperty = $property->cmsContentProperty;
+                        if ($property->cmsContentProperty->handler instanceof PropertyTypeList) {
+    
+                        } elseif ($property->cmsContentProperty->handler instanceof PropertyTypeElement) {
+                            $content_id = $property->cmsContentProperty->handler->content_id;
+                        }
                     }
+                    
 
                     foreach ($queryOptions->each(10) as $option) {
                         //$this->stdout("\tОпция: {$option->asText}\n");
 
-                        if ($content_id) {
+                        //Если это бренд
+                        if ($option->shopStoreProperty->property_nature == ShopStoreProperty::PROPERTY_NATURE_BRAND) {
+
+                            $brandName = trim($option->name);
+                            if ($brand = ShopBrand::find()->andWhere(['name' => $brandName])->one()) {
+                                $option->shop_brand_id = $brand->id;
+                                if ($option->save()) {
+                                    //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                } else {
+                                    //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                }
+                            } else {
+                                if ($is_auto_create) {
+                                    $brand = new ShopBrand();
+                                    $brand->name = $brandName;
+
+                                    if (!$brand->save(false)) {
+                                        throw new Exception("Не создался бренд: ".print_r($brand->errors, true));
+                                    }
+                                    
+                                    $option->shop_brand_id = $brand->id;
+                                    if ($option->save()) {
+                                        //$this->stdout("\t\tСвязана\n", Console::FG_GREEN);
+                                    } else {
+                                        //$this->stdout("\t\tНе связана ".print_r($option->errors, true)."\n", Console::FG_RED);
+                                    }
+                                }
+                            }
+
+                        } elseif ($content_id) {
                             if ($element = CmsContentElement::find()->cmsSite()->andWhere(['content_id' => $content_id])->andWhere(['name' => $option->name])->one()) {
                                 $option->cms_content_element_id = $element->id;
                                 if ($option->save()) {
