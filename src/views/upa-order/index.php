@@ -30,15 +30,13 @@ $dataProvider = new \yii\data\ActiveDataProvider([
 ?>
 <h1>Мои заказы</h1>
 <div>
-
-    <?php if($statuses > 1) : ?>
+    <?php if($statuses > 1 && $dataProvider->query->count() > 0) : ?>
         <div class="sx-fast-filters" style="margin-bottom: 1rem;">
             <div class="row">
                 <div class="col-12 col-sm"><a class="btn <?php echo $status == 'all' ? "btn-primary" : "btn-default" ?> btn-block" href="<?php echo \yii\helpers\Url::to(['index']); ?>">Все</a></div>
                 <?php foreach($statuses as $orderStatus) : ?>
                     <div class="col-12 col-sm"><a class="btn <?php echo $status == $orderStatus->id ? "btn-primary" : "btn-default" ?>  btn-block" href="<?php echo \yii\helpers\Url::to(['index', 'status' => $orderStatus->id]); ?>"><?php echo $orderStatus->name; ?></a></div>
                 <?php endforeach; ?>
-                
             </div>
         </div>
     <?php endif; ?>

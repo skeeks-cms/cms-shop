@@ -1044,7 +1044,10 @@ class SkeeksSuppliersController extends Controller
                     //TODO:добавить обновление
                     $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                     $model->website_url = trim((string)ArrayHelper::getValue($apiData, "website_url"));
-                    $model->country_alpha2 = trim((string)ArrayHelper::getValue($apiData, "country_alpha2"));
+
+                    $country_alpha2 = ArrayHelper::getValue($apiData, "country_alpha2");
+                    $model->country_alpha2 = $country_alpha2 ? trim((string)$country_alpha2) : null;
+                    
                     $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                     $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
 
@@ -1066,7 +1069,10 @@ class SkeeksSuppliersController extends Controller
                 $model->sx_id = (int)ArrayHelper::getValue($apiData, "id");
                 $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $model->website_url = trim((string)ArrayHelper::getValue($apiData, "website_url"));
-                $model->country_alpha2 = trim((string)ArrayHelper::getValue($apiData, "country_alpha2"));
+
+                $country_alpha2 = ArrayHelper::getValue($apiData, "country_alpha2");
+                $model->country_alpha2 = $country_alpha2 ? trim((string)$country_alpha2) : null;
+
                 $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                 $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
 
@@ -1309,7 +1315,10 @@ class SkeeksSuppliersController extends Controller
 
 
                     $shopProduct->brand_sku = trim((string)ArrayHelper::getValue($apiData, "brand_sku"));
-                    $shopProduct->country_alpha2 = trim((string)ArrayHelper::getValue($apiData, "country_alpha2"));
+
+                    $country_alpha2 = ArrayHelper::getValue($apiData, "country_alpha2");
+                    $shopProduct->country_alpha2 = $country_alpha2 ? trim((string)$country_alpha2) : null;
+
                     $shopProduct->measure_code = trim((string)ArrayHelper::getValue($apiData, "measure_code"));
                     $shopProduct->weight = (float)ArrayHelper::getValue($apiData, "weight");
                     $shopProduct->width = (float)ArrayHelper::getValue($apiData, "width");
@@ -1423,7 +1432,10 @@ class SkeeksSuppliersController extends Controller
 
 
                 $shopProduct->brand_sku = trim((string)ArrayHelper::getValue($apiData, "brand_sku"));
-                $shopProduct->country_alpha2 = trim((string)ArrayHelper::getValue($apiData, "country_alpha2"));
+
+                $country_alpha2 = ArrayHelper::getValue($apiData, "country_alpha2");
+                $shopProduct->country_alpha2 = $country_alpha2 ? trim((string)$country_alpha2) : null;
+
                 $shopProduct->measure_code = trim((string)ArrayHelper::getValue($apiData, "measure_code"));
                 $shopProduct->weight = (float)ArrayHelper::getValue($apiData, "weight");
                 $shopProduct->width = (float)ArrayHelper::getValue($apiData, "width");
