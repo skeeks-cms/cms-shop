@@ -97,7 +97,7 @@ class SkeeksSuppliersController extends Controller
      *      0 - продолжать обновление игнорируя ошибки
      *      1 - остановить скрипт
      */
-    public $is_stop_on_error = 0;
+    public $stop_on_error = 0;
 
 
     /**
@@ -119,7 +119,7 @@ class SkeeksSuppliersController extends Controller
             'product_update_prices',
             'product_new_info',
             'product_api_per_page',
-            'is_stop_on_error',
+            'stop_on_error',
             'is_reload_images',
         ]);
     }
@@ -898,7 +898,7 @@ class SkeeksSuppliersController extends Controller
 
             $t->rollBack();
 
-            if ($this->is_stop_on_error) {
+            if ($this->stop_on_error) {
                 throw $exception;
             }
 
@@ -930,7 +930,7 @@ class SkeeksSuppliersController extends Controller
                 if ($this->info_reload) {
                     $isNeedUpdate = true;
                 } else {
-                    if ($cmsTree->updated_at < $updated_at) {
+                    if ($model->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
                 }
@@ -1041,7 +1041,7 @@ class SkeeksSuppliersController extends Controller
         } catch (\Exception $exception) {
             $t->rollBack();
 
-            if ($this->is_stop_on_error) {
+            if ($this->stop_on_error) {
                 throw $exception;
             }
 
@@ -1071,7 +1071,7 @@ class SkeeksSuppliersController extends Controller
                 if ($this->info_reload) {
                     $isNeedUpdate = true;
                 } else {
-                    if ($cmsTree->updated_at < $updated_at) {
+                    if ($model->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
                 }
@@ -1128,7 +1128,7 @@ class SkeeksSuppliersController extends Controller
         } catch (\Exception $exception) {
             $t->rollBack();
 
-            if ($this->is_stop_on_error) {
+            if ($this->stop_on_error) {
                 throw $exception;
             }
 
@@ -1158,7 +1158,7 @@ class SkeeksSuppliersController extends Controller
                 if ($this->info_reload) {
                     $isNeedUpdate = true;
                 } else {
-                    if ($cmsTree->updated_at < $updated_at) {
+                    if ($model->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
                 }
@@ -1255,7 +1255,7 @@ class SkeeksSuppliersController extends Controller
         } catch (\Exception $exception) {
             $t->rollBack();
 
-            if ($this->is_stop_on_error) {
+            if ($this->stop_on_error) {
                 throw $exception;
             }
 
@@ -1289,7 +1289,7 @@ class SkeeksSuppliersController extends Controller
                 if ($this->product_reload_info) {
                     $isNeedUpdate = true;
                 } else {
-                    if ($cmsTree->updated_at < $updated_at) {
+                    if ($model->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
                 }
@@ -1542,7 +1542,7 @@ class SkeeksSuppliersController extends Controller
         } catch (\Exception $exception) {
             $t->rollBack();
 
-            if ($this->is_stop_on_error) {
+            if ($this->stop_on_error) {
                 throw $exception;
             }
 
@@ -1802,7 +1802,7 @@ class SkeeksSuppliersController extends Controller
                 if ($this->info_reload) {
                     $isNeedUpdate = true;
                 } else {
-                    if ($cmsTree->updated_at < $updated_at) {
+                    if ($model->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
                 }
@@ -1855,7 +1855,7 @@ class SkeeksSuppliersController extends Controller
         } catch (\Exception $exception) {
             $t->rollBack();
 
-            if ($this->is_stop_on_error) {
+            if ($this->stop_on_error) {
                 throw $exception;
             }
 
