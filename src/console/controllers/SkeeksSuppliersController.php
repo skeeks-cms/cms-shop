@@ -35,23 +35,54 @@ use yii\helpers\Console;
 use yii\helpers\Json;
 
 /**
+ *
+ * @exemples
+ * php yii shop/skeeks-suppliers/update-all                                              [часто] (если надо)                         Обновить информацию (коллекцкии, страны, справочники), быстрый скрипт, обновляет информацию если ТОЛЬКО изменилась.
+ * php yii shop/skeeks-suppliers/update-all --info_reload=1                              [редко] (если надо что то поправить)        Обновить информацию (коллекцкии, страны, справочники).
+ *
+ * php yii shop/skeeks-suppliers/update-products --product_new_info=1  *agent (5 мин)    [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
+ * php yii shop/skeeks-suppliers/update-products                                         [редко] (раз в день)                        Обновить все товары, их цены, остатки а информацию если ТОЛЬКО изменилась.
+ * php yii shop/skeeks-suppliers/update-products --product_reload_info=1                 [елси надо] (если надо что то поправить)    Обновить все товары, их цены, остатки и информацию.
+ *
+ *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
 class SkeeksSuppliersController extends Controller
 {
     /**
-     * @var bool Сравнивать дату последнего обновления?
-     *      0 - обновлять все пришедшие данные
-     *      1 - обновлять только данные свежее
+     * @var bool Сравнивать дату последнего обновления информации в справочниках?
+     *      0 - обновлять только данные свежее
+     *      1 - обновлять все пришедшие данные
      */
-    public $is_check_updated_at = 1;
+    public $info_reload = 0;
+
 
     /**
-     * @var bool Если будет ошибка останавливат скриипт?
-     *      0 - продолжать обновление игнорируя ошибки
-     *      1 - остановить скрипт
+     * @var bool Сравнивать дату последнего обновления в товарах?
+     *      0 - обновлять только данные свежее
+     *      1 - обновлять все пришедшие данные
      */
-    public $is_stop_on_error = 0;
+    public $product_reload_info = 0;
+
+    /**
+     * @var bool Обновлять только цены и остатки?
+     *      1 - будет обновляться только цена и количество
+     *      0 - будет обновляться все, информация по товару и цены и наличие
+     *
+     */
+    public $product_update_prices = 1;
+
+    /**
+     * @var int Количество товаров получаемых из API на одну страницу
+     */
+    public $product_api_per_page = 1000;
+
+    /**
+     * @var bool Только товары с новой информацией
+     *      1 - в API будут запрошены товары только недавно обновленные
+     *      0 - в API будут запрошены все товары
+     */
+    public $product_new_info = 0;
 
     /**
      * @var bool Перезагружать картинки?
@@ -59,6 +90,14 @@ class SkeeksSuppliersController extends Controller
      *      1 - заново скачивать и обновлять картинки
      */
     public $is_reload_images = 0;
+
+
+    /**
+     * @var bool Если будет ошибка останавливат скриипт?
+     *      0 - продолжать обновление игнорируя ошибки
+     *      1 - остановить скрипт
+     */
+    public $is_stop_on_error = 0;
 
 
     /**
@@ -75,7 +114,11 @@ class SkeeksSuppliersController extends Controller
     {
         // $actionId might be used in subclasses to provide options specific to action id
         return ArrayHelper::merge(parent::options($actionID), [
-            'is_check_updated_at',
+            'info_reload',
+            'product_reload_info',
+            'product_update_prices',
+            'product_new_info',
+            'product_api_per_page',
             'is_stop_on_error',
             'is_reload_images',
         ]);
@@ -117,7 +160,7 @@ class SkeeksSuppliersController extends Controller
         if ($this->_isChecked) {
             return true;
         }
-        
+
         Skeeks::unlimited();
 
         if (!isset(\Yii::$app->skeeksSuppliersApi)) {
@@ -150,16 +193,16 @@ class SkeeksSuppliersController extends Controller
         if ($this->_is_updated_all) {
             return true;
         }
-        
+
         $this->stdout("Обновление недостающих данных [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
-        
+
         exec("php yii shop/skeeks-suppliers/update-all", $output);
         print_r($output);
-        
+
         $this->stdout("Обновление недостающих данных завершено [{$this->_memoryUsage()}]", Console::BG_BLUE);
         $this->stdout("\n");
-        
+
         $this->_is_updated_all = true;
     }
 
@@ -219,7 +262,7 @@ class SkeeksSuppliersController extends Controller
                     if ($image) {
                         $cmsCountry->flag_image_id = $image->id;
                     }
-                    
+
                     if ($cmsCountry->save()) {
                         $updated++;
                     } else {
@@ -360,10 +403,10 @@ class SkeeksSuppliersController extends Controller
         if ($response->isOk) {
 
             $counter = 0;
-            $total = count((array) $response->data);
+            $total = count((array)$response->data);
             Console::startProgress($counter, $total);
 
-            foreach ((array) $response->data as $apiData) {
+            foreach ((array)$response->data as $apiData) {
                 $id = (int)ArrayHelper::getValue($apiData, "id");
                 /**
                  * @var $cmsTree CmsTree
@@ -660,38 +703,29 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
-     * Полное обновление всех товаров
-     * @param $page
-     * @return void
-     * @throws Exception
-     * @throws \Throwable
-     */
-    public function actionUpdateProductsAll($page = 1)
-    {
-        $this->actionUpdateProducts(0, $page);
-    }
-
-    /**
      * @var null Вспомогательная переменная
      */
     private $_last_product_updated = null;
 
+    private $_total_updated = 0;
+    private $_total_created = 0;
+    
     /**
      * Получает информацию по новым товарам, и недавно измененным
-     * @param $is_new
      * @param $page
      * @return false|void
      * @throws Exception
      * @throws \Throwable
      */
-    public function actionUpdateProducts($is_new = 1, $page = 1)
+    public function actionUpdateProducts($page = 1)
     {
         $apiQuery = [
             'page' => $page,
+            'per-page' => $this->product_api_per_page,
         ];
 
-        if ($is_new) {
-            
+        if ($this->product_new_info) {
+
             //Если это уже не первая страница
             if ($this->_last_product_updated) {
                 $apiQuery['updated_at'] = $this->_last_product_updated;
@@ -704,20 +738,14 @@ class SkeeksSuppliersController extends Controller
                     ->andWhere(['is not', 'sx_id', null])
                     ->orderBy(['updated_at' => SORT_DESC])
                     ->one();
-                
+
                 if ($lastProduct) {
                     //Если ранее уже получали SX товары
                     $this->_last_product_updated = $lastProduct->updated_at;
                     $apiQuery['updated_at'] = $lastProduct->updated_at;
-                } else {
-                    //Если нет еще товаров то по сути получаем все
-                    $is_new = 0;
                 }
             }
-            
         }
-
-        //$apiQuery['f_id'] = 6830902;
 
         $response = \Yii::$app->skeeksSuppliersApi->methodProducts($apiQuery);
 
@@ -768,6 +796,9 @@ class SkeeksSuppliersController extends Controller
 
             $this->stdout("Обновлено: {$updated}\n");
             $this->stdout("Добавлено: {$created}\n");
+            
+            $this->_total_created = $this->_total_created + $created;
+            $this->_total_updated = $this->_total_updated + $updated;
 
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
@@ -775,15 +806,20 @@ class SkeeksSuppliersController extends Controller
 
         if ($page < $pageCount) {
             unset($response);
-            $this->actionUpdateProducts($is_new, $page + 1);
+            $this->actionUpdateProducts($page + 1);
         } else {
+            
+            $this->stdout("Обновлено всего: {$this->_total_updated}\n");
+            $this->stdout("Добавлено всего: {$this->_total_created}\n");
+            
             //Это последняя страница и есть товары, значит обновить цены
-            if ($total) {
-                $this->stdout("Обновление цен\n");
+            if ($this->_total_updated || $this->_total_created) {
+                $this->stdout("Обновление цен ко всем товарам на сайте\n");
                 ShopComponent::updateProductPrices();
             }
         }
     }
+
 
     /**
      * @param              $apiData
@@ -802,12 +838,12 @@ class SkeeksSuppliersController extends Controller
             if ($cmsTree) {
                 //Обновить
                 $isNeedUpdate = false;
-                if ($this->is_check_updated_at) {
+                if ($this->info_reload) {
+                    $isNeedUpdate = true;
+                } else {
                     if ($cmsTree->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
-                } else {
-                    $isNeedUpdate = true;
                 }
 
                 if ($isNeedUpdate) {
@@ -891,12 +927,12 @@ class SkeeksSuppliersController extends Controller
             if ($model) {
                 //Обновить
                 $isNeedUpdate = false;
-                if ($this->is_check_updated_at) {
-                    if ($model->updated_at < $updated_at) {
+                if ($this->info_reload) {
+                    $isNeedUpdate = true;
+                } else {
+                    if ($cmsTree->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
-                } else {
-                    $isNeedUpdate = true;
                 }
 
                 if ($isNeedUpdate) {
@@ -1032,12 +1068,12 @@ class SkeeksSuppliersController extends Controller
             if ($model) {
                 //Обновить
                 $isNeedUpdate = false;
-                if ($this->is_check_updated_at) {
-                    if ($model->updated_at < $updated_at) {
+                if ($this->info_reload) {
+                    $isNeedUpdate = true;
+                } else {
+                    if ($cmsTree->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
-                } else {
-                    $isNeedUpdate = true;
                 }
 
                 if ($isNeedUpdate) {
@@ -1047,7 +1083,7 @@ class SkeeksSuppliersController extends Controller
 
                     $country_alpha2 = ArrayHelper::getValue($apiData, "country_alpha2");
                     $model->country_alpha2 = $country_alpha2 ? trim((string)$country_alpha2) : null;
-                    
+
                     $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                     $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
 
@@ -1119,12 +1155,12 @@ class SkeeksSuppliersController extends Controller
             if ($model) {
                 //Обновить
                 $isNeedUpdate = false;
-                if ($this->is_check_updated_at) {
-                    if ($model->updated_at < $updated_at) {
+                if ($this->info_reload) {
+                    $isNeedUpdate = true;
+                } else {
+                    if ($cmsTree->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
-                } else {
-                    $isNeedUpdate = true;
                 }
 
                 if ($isNeedUpdate) {
@@ -1250,17 +1286,17 @@ class SkeeksSuppliersController extends Controller
             if ($model) {
                 //Обновить
                 $isNeedUpdate = false;
-                if ($this->is_check_updated_at) {
-                    /*var_dump($model->updated_at);
-                    var_dump($updated_at);*/
-                    if ($model->updated_at < $updated_at) {
+                if ($this->product_reload_info) {
+                    $isNeedUpdate = true;
+                } else {
+                    if ($cmsTree->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
-                } else {
-                    $isNeedUpdate = true;
                 }
 
                 if ($isNeedUpdate) {
+
+
                     //TODO:добавить обновление
                     $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                     $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
@@ -1359,9 +1395,6 @@ class SkeeksSuppliersController extends Controller
                         throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($shopProduct->errors, true).print_r($apiData, true));
                     }
 
-                    $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
-                    $this->_updateStoreItemsForProduct($shopProduct, $store_items);
-
                     $properties = (array)ArrayHelper::getValue($apiData, "properties");
                     $this->_updatePropertiesForProduct($model, $properties);
 
@@ -1370,6 +1403,16 @@ class SkeeksSuppliersController extends Controller
 
                     $result = true;
                 }
+
+                if ($this->product_update_prices) {
+
+                    $shopProduct = $model->shopProduct;
+                    $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
+                    if ($this->_updateStoreItemsForProduct($shopProduct, $store_items)) {
+                        $result = true;
+                    }
+                }
+
             } else {
                 //Создать
                 $model = new ShopCmsContentElement();
@@ -1530,8 +1573,18 @@ class SkeeksSuppliersController extends Controller
         return $shopStore;
     }
 
+    /**
+     * @param ShopProduct $shopProduct
+     * @param array       $apiData
+     * @return false
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     private function _updateStoreItemsForProduct(ShopProduct $shopProduct, array $apiData = [])
     {
+        $result = false;
+
         if ($apiData) {
             foreach ($apiData as $store_item_data) {
                 $sx_store_id = (int)ArrayHelper::getValue($store_item_data, "store_id");
@@ -1565,6 +1618,8 @@ class SkeeksSuppliersController extends Controller
 
                         $shopStoreItem->updated_at = $updated_at;
                         $shopStoreItem->update(false, ['updated_at']);
+
+                        $result = true;
 
                     } else {
                         $changedAttrs = [];
@@ -1601,6 +1656,8 @@ class SkeeksSuppliersController extends Controller
 
                             $shopStoreItem->updated_at = $updated_at;
                             $shopStoreItem->update(false, ['updated_at']);
+
+                            $result = true;
                         }
                     }
 
@@ -1608,6 +1665,8 @@ class SkeeksSuppliersController extends Controller
 
             }
         }
+
+        return $result;
     }
 
     private function _updatePropertiesForProduct(ShopCmsContentElement $model, array $apiData = [])
@@ -1740,12 +1799,12 @@ class SkeeksSuppliersController extends Controller
             if ($model) {
                 //Обновить
                 $isNeedUpdate = false;
-                if ($this->is_check_updated_at) {
-                    if ($model->updated_at < $updated_at) {
+                if ($this->info_reload) {
+                    $isNeedUpdate = true;
+                } else {
+                    if ($cmsTree->updated_at < $updated_at) {
                         $isNeedUpdate = true;
                     }
-                } else {
-                    $isNeedUpdate = true;
                 }
 
                 if ($isNeedUpdate) {
