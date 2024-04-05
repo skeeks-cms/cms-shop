@@ -357,16 +357,21 @@ $noValue = "<span style='color: silver;'>—</span>";
                      data-nav-for="#carouselCus2">
 
                     <? foreach ($images as $image) : ?>
+                        <?
+                        $preview = \Yii::$app->imaging->getPreview($image,
+                            new \skeeks\cms\components\imaging\filters\Thumbnail([
+                                'w' => 700,
+                                'h' => 700,
+                                'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_INSET,
+                                'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_BIG,
+                            ]), $model->code
+                        );
+                        ?>
+                            
                         <div class="js-slide">
                             <!--w-100-->
                             <a class="sx-fancybox-gallary" data-fancybox="images" href="<?= $image->src; ?>">
-                                <img class="img-fluid" src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($image->src,
-                                    new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                        'w' => 700,
-                                        'h' => 500,
-                                        'm' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
-                                    ]), $model->code
-                                ); ?>" alt="<?= $model->name; ?>">
+                                <img class="img-fluid" src="<?= $preview->src; ?>" alt="<?= $model->name; ?>">
                             </a>
                         </div>
                     <? endforeach; ?>
@@ -386,14 +391,18 @@ $noValue = "<span style='color: silver;'>—</span>";
                          data-arrow-right-classes="hs-icon hs-icon-arrow-right sx-right"
                     >
                         <? foreach ($images as $image) : ?>
+                            <?
+                            $preview = \Yii::$app->imaging->getPreview($image,
+                                new \skeeks\cms\components\imaging\filters\Thumbnail([
+                                    'w' => 100,
+                                    'h' => 100,
+                                    'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
+                                    'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_MICRO,
+                                ]), $model->code
+                            );
+                            ?>
                             <div class="js-slide">
-                                <img class="img-fluid" src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($image->src,
-                                    new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                        'w' => 75,
-                                        'h' => 75,
-                                        'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
-                                    ]), $model->code
-                                ); ?>" alt="<?= $model->name; ?>">
+                                <img class="img-fluid" src="<?= $preview->src; ?>" alt="<?= $model->name; ?>">
                             </div>
                         <? endforeach; ?>
                     </div>
