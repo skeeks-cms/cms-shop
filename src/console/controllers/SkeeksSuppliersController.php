@@ -37,12 +37,14 @@ use yii\helpers\Json;
 /**
  *
  * @exemples
- * php yii shop/skeeks-suppliers/update-all                                              [часто] (если надо)                         Обновить информацию (коллекцкии, страны, справочники), быстрый скрипт, обновляет информацию если ТОЛЬКО изменилась.
- * php yii shop/skeeks-suppliers/update-all --info_reload=1                              [редко] (если надо что то поправить)        Обновить информацию (коллекцкии, страны, справочники).
+ * php yii shop/skeeks-suppliers/update-all                                                     [часто] (не обязательно)                    Обновить информацию (коллекцкии, страны, справочники), быстрый скрипт, обновляет информацию если ТОЛЬКО изменилась.
+ * php yii shop/skeeks-suppliers/update-all --info_reload=1                                     [редко] (если надо что то поправить)        Обновить информацию (коллекцкии, страны, справочники).
  *
- * php yii shop/skeeks-suppliers/update-products --product_new_info=1  *agent (5 мин)    [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
- * php yii shop/skeeks-suppliers/update-products                                         [редко] (раз в день)                        Обновить все товары, их цены, остатки а информацию если ТОЛЬКО изменилась.
- * php yii shop/skeeks-suppliers/update-products --product_reload_info=1                 [елси надо] (если надо что то поправить)    Обновить все товары, их цены, остатки и информацию.
+ * php yii shop/skeeks-suppliers/update-products --product_new_info=1       *agent (5 мин)      [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
+ * php yii shop/skeeks-suppliers/update-products --product_new_prices=1     *agent (5 мин)      [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
+ * php yii shop/skeeks-suppliers/update-products                            *agent (раз в день) [редко]                                     Обновить все товары, их цены, остатки а информацию если ТОЛЬКО изменилась.
+ *
+ * php yii shop/skeeks-suppliers/update-products --product_reload_info=1                        [елси надо] (если надо что то поправить)    Обновить все товары, их цены, остатки и информацию.
  *
  *
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -85,6 +87,13 @@ class SkeeksSuppliersController extends Controller
     public $product_new_info = 0;
 
     /**
+     * @var bool Только товары с новыми ценами и количеством
+     *      1 - в API будут запрошены товары только недавно обновленные
+     *      0 - в API будут запрошены все товары
+     */
+    public $product_new_prices = 0;
+
+    /**
      * @var bool Перезагружать картинки?
      *      0 - картинки будут пропускаться
      *      1 - заново скачивать и обновлять картинки
@@ -118,6 +127,7 @@ class SkeeksSuppliersController extends Controller
             'product_reload_info',
             'product_update_prices',
             'product_new_info',
+            'product_new_prices',
             'product_api_per_page',
             'stop_on_error',
             'is_reload_images',
@@ -135,14 +145,31 @@ class SkeeksSuppliersController extends Controller
         return parent::init();
     }
 
+    private $_start_time = 0;
+    
     /**
      * @param $action
      * @return bool
      */
     public function beforeAction($action)
     {
+        $this->_start_time = microtime(true);
+        
         $this->_checkBeforeStart();
         return parent::beforeAction($action);
+    }
+    
+    /**
+     * @param $action
+     * @param $result
+     * @return mixed
+     */
+    public function afterAction($action, $result)
+    {
+        $totalTime = round(microtime(true) - $this->_start_time, 3);
+        $this->stdout("Время выполнения: {$totalTime} сек.\n");
+        
+        return parent::afterAction($action, $result);
     }
 
     /**
@@ -706,6 +733,7 @@ class SkeeksSuppliersController extends Controller
      * @var null Вспомогательная переменная
      */
     private $_last_product_updated = null;
+    private $_last_product_store_updated = null;
 
     private $_total_updated = 0;
     private $_total_created = 0;
@@ -737,12 +765,37 @@ class SkeeksSuppliersController extends Controller
                     ->innerJoinWith("shopProduct as shopProduct")
                     ->andWhere(['is not', 'sx_id', null])
                     ->orderBy(['updated_at' => SORT_DESC])
+                    ->limit(1)
                     ->one();
 
                 if ($lastProduct) {
                     //Если ранее уже получали SX товары
                     $this->_last_product_updated = $lastProduct->updated_at;
                     $apiQuery['updated_at'] = $lastProduct->updated_at;
+                }
+            }
+        }
+
+        if ($this->product_new_prices) {
+
+            //Если это уже не первая страница
+            if ($this->_last_product_store_updated) {
+                $apiQuery['store_updated_at'] = $this->_last_product_store_updated;
+            } else {
+                /**
+                 * @var ShopStoreProduct $lastShopStoreProduct
+                 */
+                $lastShopStoreProduct = ShopStoreProduct::find()
+                    ->innerJoinWith("shopStore as shopStore")
+                    ->andWhere(['is not', 'shopStore.sx_id', null])
+                    ->orderBy(['updated_at' => SORT_DESC])
+                    ->limit(1)
+                    ->one();
+
+                if ($lastShopStoreProduct) {
+                    //Если ранее уже получали SX товары
+                    $this->_last_product_store_updated = $lastShopStoreProduct->updated_at;
+                    $apiQuery['store_updated_at'] = $lastShopStoreProduct->updated_at;
                 }
             }
         }
@@ -809,6 +862,7 @@ class SkeeksSuppliersController extends Controller
             $this->actionUpdateProducts($page + 1);
         } else {
             
+            $this->stdout("=======================================================\n");
             $this->stdout("Обновлено всего: {$this->_total_updated}\n");
             $this->stdout("Добавлено всего: {$this->_total_created}\n");
             
