@@ -907,6 +907,7 @@ class SkeeksSuppliersController extends Controller
                     $cmsTree->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));*/
                     $cmsTree->is_adult = (int)ArrayHelper::getValue($apiData, "is_adult");
                     $cmsTree->shop_has_collections = (int)ArrayHelper::getValue($apiData, "has_collections");
+                    $cmsTree->updated_at = $updated_at;
 
                     if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
                         $cmsTree->image_id = $image->id;
@@ -995,6 +996,7 @@ class SkeeksSuppliersController extends Controller
                     $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                     $model->cms_measure_code = trim((string)ArrayHelper::getValue($apiData, "measure_code"));
                     $model->is_multiple = (int)ArrayHelper::getValue($apiData, "is_multiple");
+                    $model->updated_at = $updated_at;
 
                     $category_ids = (array)ArrayHelper::getValue($apiData, "category_ids");
                     if ($category_ids) {
@@ -1083,6 +1085,8 @@ class SkeeksSuppliersController extends Controller
                     $model->component = PropertyTypeText::class;
                 }
 
+                $model->updated_at = $updated_at;
+                
                 if ($model->save()) {
                     $result = true;
                 } else {
@@ -1141,6 +1145,8 @@ class SkeeksSuppliersController extends Controller
                     $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                     $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
 
+                    $model->updated_at = $updated_at;
+                    
                     if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
                         $model->logo_image_id = $image->id;
                     }
@@ -1166,6 +1172,8 @@ class SkeeksSuppliersController extends Controller
                 $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
                 $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
 
+                $model->updated_at = $updated_at;
+                
                 if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
                     $model->logo_image_id = $image->id;
                 }
@@ -1251,6 +1259,8 @@ class SkeeksSuppliersController extends Controller
                         $model->setImageIds($imgIds);
                     }
 
+                    $model->updated_at = $updated_at;
+                    
                     if ($model->save()) {
                         $result = true;
                     } else {
@@ -1295,6 +1305,8 @@ class SkeeksSuppliersController extends Controller
                     $model->setImageIds($imgIds);
                 }
 
+                $model->updated_at = $updated_at;
+                
                 if ($model->save(false)) {
 
                 } else {
@@ -1441,6 +1453,7 @@ class SkeeksSuppliersController extends Controller
                         $model->setImageIds($imgIds);
                     }
 
+                    $model->updated_at = $updated_at;
                     if (!$model->save()) {
                         throw new Exception("Ошибка обновления товара {$model->id}: ".print_r($model->errors, true).print_r($apiData, true));
                     }
@@ -1451,9 +1464,6 @@ class SkeeksSuppliersController extends Controller
 
                     $properties = (array)ArrayHelper::getValue($apiData, "properties");
                     $this->_updatePropertiesForProduct($model, $properties);
-
-                    $model->updated_at = $updated_at;
-                    $model->update(false, ['updated_at']);
 
                     $result = true;
                 }
@@ -1565,6 +1575,7 @@ class SkeeksSuppliersController extends Controller
                     $model->setImageIds($imgIds);
                 }
 
+                $model->updated_at = $updated_at;
                 if (!$model->save()) {
                     throw new Exception("Ошибка создания товара: ".print_r($model->errors, true).print_r($model->toArray(), true));
                 }
@@ -1582,9 +1593,6 @@ class SkeeksSuppliersController extends Controller
 
                 $properties = (array)ArrayHelper::getValue($apiData, "properties");
                 $this->_updatePropertiesForProduct($model, $properties);
-
-                $model->updated_at = $updated_at;
-                $model->update(false, ['updated_at']);
 
                 $result = true;
 
@@ -1666,13 +1674,13 @@ class SkeeksSuppliersController extends Controller
                         $shopStoreItem->quantity = $api_quantity;
                         $shopStoreItem->purchase_price = $api_purchase_price;
                         $shopStoreItem->selling_price = $api_selling_price;
+                        
+                        $shopStoreItem->updated_at = $updated_at;
+                        
                         if (!$shopStoreItem->save()) {
                             throw new Exception(print_r($shopStoreItem->errors, true));
                         }
-
-                        $shopStoreItem->updated_at = $updated_at;
-                        $shopStoreItem->update(false, ['updated_at']);
-
+                        
                         $result = true;
 
                     } else {
@@ -1704,13 +1712,13 @@ class SkeeksSuppliersController extends Controller
                         }
 
                         if ($changedAttrs) {
+                            
+                            $shopStoreItem->updated_at = $updated_at;
+                            
                             if (!$shopStoreItem->update(true, $changedAttrs)) {
                                 throw new Exception(print_r($shopStoreItem->errors, true));;
                             }
-
-                            $shopStoreItem->updated_at = $updated_at;
-                            $shopStoreItem->update(false, ['updated_at']);
-
+                            
                             $result = true;
                         }
                     }
@@ -1867,6 +1875,7 @@ class SkeeksSuppliersController extends Controller
                     $model->address = trim((string)ArrayHelper::getValue($apiData, "address"));
                     $model->latitude = (float)ArrayHelper::getValue($apiData, "latitude");
                     $model->longitude = (float)ArrayHelper::getValue($apiData, "longitude");
+                    $model->updated_at = $updated_at;
                     $model->is_supplier = 1;
 
                     if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
