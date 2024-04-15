@@ -1233,7 +1233,7 @@ class ShopOrder extends \skeeks\cms\models\Core
      */
     public function recalculate()
     {
-        $this->tax_amount = $this->calcMoneyVat->amount;
+        $this->tax_amount = (float)$this->calcMoneyVat->amount;
 
         $this->discount_amount = (float) $this->calcMoneyDiscount->amount;
         $this->delivery_amount = (float) $this->calcMoneyDelivery->amount;

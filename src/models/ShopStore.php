@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
 
 /**
  * @property string              $name
+ * @property string|null         $display_name
  * @property string              $description
  * @property int                 $cms_image_id
  * @property bool                $is_active
@@ -35,6 +36,8 @@ use yii\helpers\ArrayHelper;
  * @property float               $selling_extra_charge
  * @property bool                $is_personal_price
  * @property integer|null        $sx_id
+ * @property string|null         $delivery_info
+ * @property integer|null        $delivery_time
  *
  * @property float               $cashier_is_allow_sell_out_of_stock Разрешить продажу товаров не в наличии?
  * @property float               $cashier_is_show_out_of_stock Показывать товары не в наличии?
@@ -46,6 +49,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property string              $coordinates
  *
+ * @property string              $displayName
  * @property CmsStorageFile      $cmsImage
  * @property CmsSite             $cmsSite
  * @property ShopStoreProduct[]  $shopStoreProducts
@@ -113,6 +117,10 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['name'], 'string', 'max' => 255],
             [['name'], 'required'],
 
+            [['display_name'], 'string', 'max' => 255],
+            [['delivery_info'], 'string'],
+            [['delivery_time'], 'integer'],
+
             [['description'], 'string'],
             [['address'], 'string'],
             [['address'], 'default', 'value' => null],
@@ -122,7 +130,12 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             [['cms_image_id'], 'safe'],
 
             [
-                ['sx_id',],
+                [
+                    'sx_id',
+                    'display_name',
+                    'delivery_info',
+                    'delivery_time',
+                ],
                 'default',
                 'value' => null,
             ],
@@ -234,6 +247,9 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'cashier_default_cms_user_id'         => 'Клиент выбранный по умолчанию',
             'is_allow_no_check'                   => 'Разрешить продажу без чека?',
             'is_sync_external'                    => 'Синхронизирован с внешней системой?',
+            'display_name'                        => 'Отображаемое название',
+            'delivery_time'                       => 'Время доставки с этого склада',
+            'delivery_info'                       => 'Информация о доставке',
             'sx_id'                               => \Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
         ]);
     }
@@ -243,6 +259,9 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'display_name'                        => "Если клиент видит название склада/склада поставщика, то будет показываться это название",
+            'delivery_info'                       => "Информация о доставке с этого склада",
+            'delivery_time'                       => "Через сколько дней после создания заказа, товар будет готов к отправке клиенту. Используется при рассчете времени доставки заказа.",
             'cashier_default_cms_user_id'         => "Обязательно укажите этому клиенту email!",
             'cashier_is_show_only_inner_products' => "При включении опции в магазине будут отображатся товары, только связанные с этим магазином.",
             'cashier_is_allow_sell_out_of_stock'  => "При включении опции в магазине возможно будет пробить товара больше чем числится в наличии.",
@@ -250,6 +269,15 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'is_allow_no_check'                   => 'Если опция выбрана, то в момент оформления продажи или воврата на кассе, можно не выбивать чек.',
             'is_personal_price'                   => 'Если включена эта опция, значит у товаров в этом магазине может быть своя цена, отличающаяся от интернет магазина.',
         ]);
+    }
+
+    public function getDisplayName()
+    {
+        if ($this->display_name) {
+            return $this->display_name;
+        }
+
+        return $this->name;
     }
 
 

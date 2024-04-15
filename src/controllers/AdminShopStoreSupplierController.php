@@ -506,6 +506,7 @@ CSS
                     ],
 
                     'name',
+                    'display_name',
 
 
                 ],
@@ -570,6 +571,21 @@ CSS
                     'external_id',
                     'priority'    => [
                         'class' => NumberField::class,
+                    ],
+                ],
+            ],
+
+            'delivery' => [
+                'class'          => FieldSet::class,
+                'name'           => \Yii::t('skeeks/shop/app', 'Информация о доставке'),
+                'elementOptions' => [
+                    'isOpen' => false,
+                ],
+                'fields'         => [
+                    'delivery_info',
+                    'delivery_time'    => [
+                        'class' => NumberField::class,
+                        'append' => "дней",
                     ],
                 ],
             ],

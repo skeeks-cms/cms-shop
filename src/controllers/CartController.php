@@ -312,6 +312,10 @@ class CartController extends Controller
                 }
 
                 //$order->recalculate();
+                //$order->refresh();
+
+                $order->recalculate();
+                $order->link('cmsSite', \Yii::$app->skeeks->site);
                 $order->refresh();
 
                 //print_r($order->toArray());
@@ -521,6 +525,7 @@ class CartController extends Controller
 
             }
 
+            \Yii::$app->shop->shopUser->shopOrder->recalculate();
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
             \Yii::$app->shop->shopUser->shopOrder->refresh();
 
@@ -568,7 +573,10 @@ class CartController extends Controller
 
             }
 
+            \Yii::$app->shop->shopUser->shopOrder->recalculate();
             \Yii::$app->shop->shopUser->shopOrder->link('cmsSite', \Yii::$app->skeeks->site);
+            \Yii::$app->shop->shopUser->shopOrder->refresh();
+
             $rr->data = ArrayHelper::merge(\Yii::$app->shop->shopUser->shopOrder->jsonSerialize(), [
                 'eventData' => $eventData,
             ]);
