@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\console\controllers;
 
 use skeeks\cms\measure\models\CmsMeasure;
+use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\models\CmsContentPropertyEnum;
 use skeeks\cms\models\CmsCountry;
@@ -41,9 +42,11 @@ use yii\helpers\Json;
  * php yii shop/skeeks-suppliers/update-all --info_reload=1                                     [редко] (если надо что то поправить)        Обновить информацию (коллекцкии, страны, справочники).
  *
  * php yii shop/skeeks-suppliers/update-products --product_new_info=1       *agent (5 мин)      [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
- * php yii shop/skeeks-suppliers/update-products --product_new_prices=1     *agent (5 мин)      [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
  * php yii shop/skeeks-suppliers/update-products                            *agent (раз в день) [редко]                                     Обновить все товары, их цены, остатки а информацию если ТОЛЬКО изменилась.
  *
+ * php yii shop/skeeks-suppliers/update-store-items --store_new_prices=1    *agent (5 мин)      [часто]                                     Обновить недавно измененные цени и наличие. (учет даты последнего изменения)
+ * php yii shop/skeeks-suppliers/update-store-items                         *agent (раз в день) [редко]                                     Обновить недавно измененные цени и наличие.
+
  * php yii shop/skeeks-suppliers/update-products --product_reload_info=1                        [елси надо] (если надо что то поправить)    Обновить все товары, их цены, остатки и информацию.
  *
  *
@@ -80,6 +83,11 @@ class SkeeksSuppliersController extends Controller
     public $product_api_per_page = 1000;
 
     /**
+     * @var int Количество складских позиций получаемых из API на одну страницу
+     */
+    public $store_item_api_per_page = 1000;
+
+    /**
      * @var bool Только товары с новой информацией
      *      1 - в API будут запрошены товары только недавно обновленные
      *      0 - в API будут запрошены все товары
@@ -91,7 +99,7 @@ class SkeeksSuppliersController extends Controller
      *      1 - в API будут запрошены товары только недавно обновленные
      *      0 - в API будут запрошены все товары
      */
-    public $product_new_prices = 0;
+    public $store_new_prices = 0;
 
     /**
      * @var bool Перезагружать картинки?
@@ -127,7 +135,8 @@ class SkeeksSuppliersController extends Controller
             'product_reload_info',
             'product_update_prices',
             'product_new_info',
-            'product_new_prices',
+            'store_new_prices',
+            'store_item_api_per_page',
             'product_api_per_page',
             'stop_on_error',
             'is_reload_images',
@@ -771,12 +780,12 @@ class SkeeksSuppliersController extends Controller
                 if ($lastProduct) {
                     //Если ранее уже получали SX товары
                     $this->_last_product_updated = $lastProduct->updated_at;
-                    $apiQuery['updated_at'] = $lastProduct->updated_at;
+                    $apiQuery['updated_at'] = $lastProduct->updated_at + 1;
                 }
             }
         }
 
-        if ($this->product_new_prices) {
+        if ($this->store_new_prices) {
 
             //Если это уже не первая страница
             if ($this->_last_product_store_updated) {
@@ -866,6 +875,137 @@ class SkeeksSuppliersController extends Controller
             $this->stdout("Обновлено всего: {$this->_total_updated}\n");
             $this->stdout("Добавлено всего: {$this->_total_created}\n");
             
+            //Это последняя страница и есть товары, значит обновить цены
+            if ($this->_total_updated || $this->_total_created) {
+                $this->stdout("Обновление цен ко всем товарам на сайте\n");
+                ShopComponent::updateProductPrices();
+            }
+        }
+    }
+
+
+    /**
+     * Получает информацию по новым товарам, и недавно измененным
+     * @param $page
+     * @return false|void
+     * @throws Exception
+     * @throws \Throwable
+     */
+    public function actionUpdateStoreItems($page = 1)
+    {
+        $apiQuery = [
+            'page' => $page,
+            'per-page' => $this->store_item_api_per_page,
+        ];
+
+        if ($this->store_new_prices) {
+
+            //Если это уже не первая страница
+            if ($this->_last_product_store_updated) {
+                $apiQuery['updated_at'] = $this->_last_product_store_updated;
+            } else {
+                /**
+                 * @var ShopStoreProduct $lastShopStoreProduct
+                 */
+                $lastShopStoreProduct = ShopStoreProduct::find()
+                    ->innerJoinWith("shopStore as shopStore")
+                    ->andWhere(['is not', 'shopStore.sx_id', null])
+                    ->orderBy(['updated_at' => SORT_DESC])
+                    ->limit(1)
+                    ->one();
+
+                if ($lastShopStoreProduct) {
+                    //Если ранее уже получали SX товары
+                    $this->_last_product_store_updated = $lastShopStoreProduct->updated_at;
+                    $apiQuery['updated_at'] = $lastShopStoreProduct->updated_at + 1;
+                }
+            }
+        }
+
+        $response = \Yii::$app->skeeksSuppliersApi->methodStoreItems($apiQuery);
+
+        $this->stdout("Обновление складских позиций, страница {$page} [{$response->time} сек] [{$this->_memoryUsage()}]", Console::BG_BLUE);
+        $this->stdout("\n");
+
+        $total = $response->headers->get("x-pagination-total-count");
+        $pageCount = $response->headers->get("x-pagination-page-count");
+
+        if ($page == 1) {
+            $this->stdout("Всего позиций к обновлению: {$total}\n");
+            $this->stdout("Страниц: {$pageCount}\n");
+        }
+
+        if (!$total) {
+            return false;
+        }
+
+        $this->stdout("Страница: {$page}\n");
+
+        $updated = 0;
+        $created = 0;
+
+        if ($response->isOk) {
+
+            $counter = 0;
+            $total = count($response->data);
+            Console::startProgress($counter, $total);
+
+            foreach ($response->data as $apiData) {
+
+                $id = (int)ArrayHelper::getValue($apiData, "id");
+                
+                $sx_store_id = (int)ArrayHelper::getValue($apiData, "store_id");
+                $supplier_code = trim((string)ArrayHelper::getValue($apiData, "supplier_code"));
+                $api_supplier_name = trim((string)ArrayHelper::getValue($apiData, "supplier_name"));
+                $api_quantity = (float)ArrayHelper::getValue($apiData, "quantity");
+                $api_purchase_price = (float)ArrayHelper::getValue($apiData, "purchase_price");
+                $api_selling_price = (float)ArrayHelper::getValue($apiData, "selling_price");
+                $updated_at = (int)ArrayHelper::getValue($apiData, "updated_at.timestamp");
+                
+                $shopStore = $this->_getStore($sx_store_id);
+    
+                if ($shopStore) {
+                    /**
+                     * @var $shopStoreItem ShopStoreProduct
+                     */
+                    $shopStoreItem = $shopStore->getShopStoreProducts()->andWhere(['external_id' => $supplier_code])->one();
+                    
+                    if ($shopStoreItem) {
+                        if ($this->_updateStoreItem($apiData, $shopStore, $shopStoreItem)) {
+                            $updated++;
+                        }
+                    } else {
+                        if ($this->_updateStoreItem($apiData, $shopStore)) {
+                            $created++;
+                        }
+                    }
+                }
+
+                $counter++;
+                Console::updateProgress($counter, $total);
+            }
+
+            Console::endProgress();
+
+            $this->stdout("Обновлено: {$updated}\n");
+            $this->stdout("Добавлено: {$created}\n");
+
+            $this->_total_created = $this->_total_created + $created;
+            $this->_total_updated = $this->_total_updated + $updated;
+
+        } else {
+            throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
+        }
+
+        if ($page < $pageCount) {
+            unset($response);
+            $this->actionUpdateStoreItems($page + 1);
+        } else {
+
+            $this->stdout("=======================================================\n");
+            $this->stdout("Обновлено всего: {$this->_total_updated}\n");
+            $this->stdout("Добавлено всего: {$this->_total_created}\n");
+
             //Это последняя страница и есть товары, значит обновить цены
             if ($this->_total_updated || $this->_total_created) {
                 $this->stdout("Обновление цен ко всем товарам на сайте\n");
@@ -1185,6 +1325,133 @@ class SkeeksSuppliersController extends Controller
                 }
 
             }
+
+            $t->commit();
+        } catch (\Exception $exception) {
+            $t->rollBack();
+
+            if ($this->stop_on_error) {
+                throw $exception;
+            }
+
+            $this->stdout($exception->getMessage(), Console::FG_RED);
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param array                 $apiData
+     * @param ShopStore             $shopStore
+     * @param ShopStoreProduct|null $model
+     * @return bool
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     * @throws \yii\db\StaleObjectException
+     */
+    private function _updateStoreItem(array $apiData, ShopStore $shopStore, ShopStoreProduct $model = null)
+    {
+        $id = (int)ArrayHelper::getValue($apiData, "id");
+        $updated_at = (int)ArrayHelper::getValue($apiData, "updated_at.timestamp");
+        $result = false;
+
+        $store_item_data = $apiData;
+        $shopStoreItem = $model;
+
+        //Обновить
+        /*$isNeedUpdate = false;
+        if ($this->info_reload) {
+            $isNeedUpdate = true;
+        } else {
+            if ($model->updated_at < $updated_at) {
+                $isNeedUpdate = true;
+            }
+        }*/
+
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+
+            $sx_store_id = (int)ArrayHelper::getValue($store_item_data, "store_id");
+            $supplier_code = trim((string)ArrayHelper::getValue($store_item_data, "supplier_code"));
+            $api_supplier_name = trim((string)ArrayHelper::getValue($store_item_data, "supplier_name"));
+            $api_quantity = (float)ArrayHelper::getValue($store_item_data, "quantity");
+            $api_purchase_price = (float)ArrayHelper::getValue($store_item_data, "purchase_price");
+            $product_id = (float)ArrayHelper::getValue($store_item_data, "product_id");
+            $api_selling_price = (float)ArrayHelper::getValue($store_item_data, "selling_price");
+            $updated_at = (int)ArrayHelper::getValue($store_item_data, "updated_at.timestamp");
+            
+
+            if (!$shopStoreItem) {
+
+                $element = CmsContentElement::find()->sxId($product_id)->one();
+                if ($element) {
+                    $shopStoreItem = new ShopStoreProduct();
+                    $shopStoreItem->shop_store_id = $shopStore->id;
+                    $shopStoreItem->shop_product_id = $element->id;
+                    $shopStoreItem->external_id = $supplier_code;
+                    $shopStoreItem->name = $api_supplier_name;
+                    $shopStoreItem->quantity = $api_quantity;
+                    $shopStoreItem->purchase_price = $api_purchase_price;
+                    $shopStoreItem->selling_price = $api_selling_price;
+                    
+                    $shopStoreItem->updated_at = $updated_at;
+                    
+                    if (!$shopStoreItem->save()) {
+                        throw new Exception(print_r($shopStoreItem->errors, true));
+                    }
+                    
+                    $result = true;
+                }
+                
+
+            } else {
+                $changedAttrs = [];
+
+                /*if ($shopStoreItem->shop_product_id != $shopProduct->id) {
+                    $shopStoreItem->shop_product_id = $shopProduct->id;
+                    $changedAttrs[] = "shop_product_id";
+                }*/
+
+                if ($shopStoreItem->name != $api_supplier_name) {
+                    $shopStoreItem->name = $api_supplier_name;
+                    $changedAttrs[] = "name";
+                }
+
+                if ($shopStoreItem->quantity != $api_quantity) {
+                    $shopStoreItem->quantity = $api_quantity;
+                    $changedAttrs[] = "quantity";
+                }
+
+                if ($shopStoreItem->selling_price != $api_selling_price) {
+                    $shopStoreItem->selling_price = $api_selling_price;
+                    $changedAttrs[] = "selling_price";
+                }
+
+                if ($shopStoreItem->purchase_price != $api_purchase_price) {
+                    $shopStoreItem->purchase_price = $api_purchase_price;
+                    $changedAttrs[] = "purchase_price";
+                }
+
+                if ($shopStoreItem->updated_at != $updated_at) {
+                    $shopStoreItem->updated_at = $updated_at;
+                    $changedAttrs[] = "updated_at";
+                }
+
+                if ($changedAttrs) {
+                    
+                    $shopStoreItem->updated_at = $updated_at;
+                    $changedAttrs[] = "updated_at";
+                    
+                    if (!$shopStoreItem->update(true, $changedAttrs)) {
+                        throw new Exception(print_r($shopStoreItem->errors, true));;
+                    }
+                    
+                    $result = true;
+                }
+            }
+
 
             $t->commit();
         } catch (\Exception $exception) {
@@ -1711,9 +1978,15 @@ class SkeeksSuppliersController extends Controller
                             $changedAttrs[] = "purchase_price";
                         }
 
+                        if ($shopStoreItem->updated_at != $updated_at) {
+                            $shopStoreItem->updated_at = $updated_at;
+                            $changedAttrs[] = "updated_at";
+                        }
+
                         if ($changedAttrs) {
                             
                             $shopStoreItem->updated_at = $updated_at;
+                            $changedAttrs[] = "updated_at";
                             
                             if (!$shopStoreItem->update(true, $changedAttrs)) {
                                 throw new Exception(print_r($shopStoreItem->errors, true));;
