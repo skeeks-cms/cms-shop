@@ -17,10 +17,15 @@ class m221120_162301__alter_table__shop_product_price extends Migration
         $this->dropForeignKey("shop_product_price_created_by", $tableName);
         $this->dropForeignKey("shop_product_price_updated_by", $tableName);
 
-        $this->dropIndex("updated_by", $tableName);
+        /*$this->dropIndex("updated_by", $tableName);
         $this->dropIndex("created_by", $tableName);
         $this->dropIndex("created_at", $tableName);
-        $this->dropIndex("updated_at", $tableName);
+        $this->dropIndex("updated_at", $tableName);*/
+
+        $this->dropIndex($tableName . "__updated_by", $tableName);
+        $this->dropIndex($tableName . "__created_by", $tableName);
+        $this->dropIndex($tableName . "__created_at", $tableName);
+        $this->dropIndex($tableName . "__updated_at", $tableName);
 
         $this->dropColumn($tableName, "created_by");
         $this->dropColumn($tableName, "updated_by");
