@@ -1522,6 +1522,8 @@ class SkeeksSuppliersController extends Controller
                             $img = $this->_addImage($imgApiData, false);
                             $imgIds[] = $img->id;
                         }
+                        
+                        $imgIds = array_unique($imgIds);
 
                         $model->setImageIds($imgIds);
                     }
@@ -1569,6 +1571,8 @@ class SkeeksSuppliersController extends Controller
                         $imgIds[] = $img->id;
                     }
 
+                    $imgIds = array_unique($imgIds);
+                    
                     $model->setImageIds($imgIds);
                 }
 
@@ -1716,6 +1720,8 @@ class SkeeksSuppliersController extends Controller
                             $img = $this->_addImage($imgApiData, false);
                             $imgIds[] = $img->id;
                         }
+                        
+                        $imgIds = array_unique($imgIds);
 
                         $model->setImageIds($imgIds);
                     }
@@ -1838,6 +1844,8 @@ class SkeeksSuppliersController extends Controller
                         $img = $this->_addImage($imgApiData, false);
                         $imgIds[] = $img->id;
                     }
+                    
+                    $imgIds = array_unique($imgIds);
 
                     $model->setImageIds($imgIds);
                 }

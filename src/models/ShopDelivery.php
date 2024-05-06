@@ -98,6 +98,8 @@ class ShopDelivery extends ActiveRecord
                 $component = \Yii::createObject($componentConfig);
                 $component->load($this->component_config, "");
 
+                $component->delivery = $this;
+
                 $this->_handler = $component;
                 return $this->_handler;
             } catch (\Exception $e) {

@@ -102,7 +102,7 @@ class ShopComponent extends Component implements BootstrapInterface
     /**
      * @var ShopUser
      */
-    private $_shopUser = null;
+    protected $_shopUser = null;
 
 
     public function bootstrap($application)

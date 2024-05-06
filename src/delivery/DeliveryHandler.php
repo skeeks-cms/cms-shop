@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\delivery;
 
 use skeeks\cms\IHasConfigForm;
+use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
 use skeeks\cms\traits\TConfigForm;
@@ -40,6 +41,11 @@ abstract class DeliveryHandler extends Model implements IHasConfigForm
     public $shopOrder = null;
 
     /**
+     * @var ShopDelivery
+     */
+    public $delivery = null;
+
+    /**
      * @param ActiveForm $activeForm
      * @return string
      */
@@ -49,7 +55,7 @@ abstract class DeliveryHandler extends Model implements IHasConfigForm
 
         $config = ArrayHelper::merge($this->checkoutWidgetConfig, [
             'deliveryHandler' => $this,
-            'shopOrder' => $shopOrder
+            'shopOrder' => $shopOrder,
         ]);
 
         return $widgetClass::widget($config);
@@ -68,6 +74,7 @@ abstract class DeliveryHandler extends Model implements IHasConfigForm
         if ($this->_checkoutModel === null) {
             $class = $this->checkoutModelClass;
             $this->_checkoutModel = new $class();
+            $this->_checkoutModel->delivery = $this->delivery;
         }
 
         return $this->_checkoutModel;
