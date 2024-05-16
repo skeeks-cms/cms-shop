@@ -116,6 +116,7 @@ class ShopOrderItem extends ActiveRecord
             $order = $this->shopOrder;
             $order->recalculate();
             try {
+                $order->updated_at = time();
                 if (!$order->save(false)) {
                     \Yii::error("not saved: " . print_r($this->shopOrder->errors, true));
                     throw new Exception(print_r($this->shopOrder->errors, true));

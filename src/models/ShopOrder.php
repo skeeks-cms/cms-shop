@@ -2,6 +2,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsUser;
@@ -143,7 +144,7 @@ use yii\validators\EmailValidator;
  * @property ShopCashebox               $shopCashebox
  * @property ShopCasheboxShift          $shopCasheboxShift
  */
-class ShopOrder extends \skeeks\cms\models\Core
+class ShopOrder extends ActiveRecord
 {
     const EVENT_AFTER_RECALCULATE = 'afterRecalculate';
 
