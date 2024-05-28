@@ -52,7 +52,7 @@ class ShopStorePropertyOption extends ActiveRecord
         return ArrayHelper::merge(parent::rules(), [
 
             [['shop_store_property_id', 'name'], 'required'],
-            [['shop_store_property_id', 'cms_content_property_enum_id', 'cms_content_element_id', 'cms_tree_id'], 'integer'],
+            [['shop_store_property_id', 'cms_content_property_enum_id', 'cms_content_element_id', 'cms_tree_id', 'shop_brand_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['shop_store_property_id', 'name'], 'unique', 'targetAttribute' => ['shop_store_property_id', 'name']],
             [['cms_content_element_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsContentElement::className(), 'targetAttribute' => ['cms_content_element_id' => 'id']],

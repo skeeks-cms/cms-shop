@@ -147,6 +147,7 @@ use yii\validators\EmailValidator;
 class ShopOrder extends ActiveRecord
 {
     const EVENT_AFTER_RECALCULATE = 'afterRecalculate';
+    const EVENT_BEFORE_RECALCULATE = 'beforeRecalculate';
 
     protected $_email = null;
 
@@ -1234,6 +1235,8 @@ class ShopOrder extends ActiveRecord
      */
     public function recalculate()
     {
+        $this->trigger(self::EVENT_BEFORE_RECALCULATE, new Event());
+        
         $this->tax_amount = (float)$this->calcMoneyVat->amount;
 
         $this->discount_amount = (float) $this->calcMoneyDiscount->amount;
