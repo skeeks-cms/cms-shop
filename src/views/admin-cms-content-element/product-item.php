@@ -40,7 +40,7 @@ $infoModel = $model;
                 <? endif; ?>
             </div>
             <div class="card-prod--title">
-                <a href="<?= $model->url; ?>" title="<?= $model->name; ?>" data-pjax="0" class="sx-card-prod--title-a sx-main-text-color g-text-underline--none--hover"><?= $infoModel->name; ?></a>
+                <a target="_blank" href="<?= $model->url; ?>" title="<?= $model->name; ?>" data-pjax="0" class="sx-card-prod--title-a sx-main-text-color g-text-underline--none--hover"><?= $infoModel->name; ?></a>
             </div>
         </div>
     </div>

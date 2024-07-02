@@ -15,6 +15,19 @@ $this->registerCss(<<<CSS
     .card-prod--photo img {
         max-width: 100%;
     }
+    .card-prod {
+        margin-right: 1rem;
+        margin-bottom: 2rem;
+    }
+.card-prod--title {
+    line-height: 1.1;
+}
+.card-prod--photo {
+    margin-bottom: 0.5rem;
+}
+.card-prod--photo img {
+    border-radius: 0.5rem;
+}
 CSS
 );
 
@@ -42,12 +55,14 @@ JS
 );
 
 ?>
-    <div class="g-mb-20 g-py-10" style="background: #f9f9f9;">
+    <div style="background: #f9f9f9; margin-bottom: 1rem; margin-top: 1rem;">
         <? $form = \yii\widgets\ActiveForm::begin(); ?>
         <div class="row">
-            <div class="col-auto my-auto g-mx-10 g-my-10">
-            Выберите товары, которые попадут в блок "с этим товаром покупают" и нажмите кнопку "связать"
-        </div>
+        <div class="col-12">
+            <div class="alert alert-default">
+                Выберите товары, которые попадут в блок "с этим товаром покупают" и нажмите кнопку "связать"
+            </div>
+            </div>
         </div>
         <div class="row">
             <div class="col-auto my-auto">
@@ -122,7 +137,7 @@ $dataProvider->query->joinWith("shopProduct.shopProductRelations1 as shopProduct
             ["shopProductRelations2.shop_product1_id" => $model->id],
             ["shopProductRelations2.shop_product2_id" => $model->id],
         ]);
-
+$dataProvider->query->groupBy(['shopProduct.id']);
 
 echo \yii\widgets\ListView::widget([
     'dataProvider' => $dataProvider,

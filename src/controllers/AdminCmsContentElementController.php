@@ -230,7 +230,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                 "relations" => [
                     'class'    => BackendModelAction::class,
-                    'name'     => "Связанные",
+                    'name'     => "Так же покупают",
                     'icon'     => 'fa fa-list',
                     'priority' => 190,
 

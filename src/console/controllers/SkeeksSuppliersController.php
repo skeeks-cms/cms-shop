@@ -2118,6 +2118,9 @@ class SkeeksSuppliersController extends Controller
                 }
             }
 
+            /*print_r($apiData);
+            print_r($rpmModel->toArray());die;*/
+
             if (!$rpmModel->save()) {
                 throw new Exception("Ошибка сохранения характеристик: ".print_r($rpmModel->errors, true));
             }
