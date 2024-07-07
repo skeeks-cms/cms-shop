@@ -43,6 +43,7 @@ use yii\helpers\Json;
  * @property double                    $rating_value
  * @property integer                   $rating_count
  * @property integer                   $brand_id
+ * @property integer|null                   $shop_product_model_id
  * @property string                    $brand_sku
  * @property integer|null              $country_alpha2
  *
@@ -86,6 +87,8 @@ use yii\helpers\Json;
  * @property ShopTypePrice             $shopTypePrices
  *
  *
+ * @property ShopProductModel          $shopProductModel
+ *
  * @property ShopProduct               $shopProductWhithOffers Товар с предложениями для текущего товара
  * @property ShopProduct[]             $shopProductOffers Предложения для текущего товара
  *
@@ -97,7 +100,7 @@ use yii\helpers\Json;
  * @property boolean                   $isSubProduct
  * @property string                    $weightFormatted
  * @property string                    $WeightPerOneMeasure Вес за 1 единицу измерений (например 1 м2)
- * @property string                    $WeightPerOneMeasureFormatted 
+ * @property string                    $WeightPerOneMeasureFormatted
  * @property string                    $lengthFormatted
  * @property string                    $widthFormatted
  * @property string                    $heightFormatted
@@ -476,6 +479,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                     'expiration_time',
                     'service_life_time',
                     'warranty_time',
+                    'shop_product_model_id',
                 ],
                 'integer',
             ],
@@ -743,6 +747,8 @@ class ShopProduct extends \skeeks\cms\models\Core
 
             [['measure_matches_jsondata'], 'string'],
             [['measure_matches_jsondata'], 'default', 'value' => null],
+
+            [['shop_product_model_id'], 'default', 'value' => null],
             [
                 ['measure_matches_jsondata'],
                 function () {
@@ -833,7 +839,7 @@ class ShopProduct extends \skeeks\cms\models\Core
                             $shopProductBarcode->barcode_type = ArrayHelper::getValue($barcodeData, 'barcode_type');
 
                             if (!$shopProductBarcode->validate($validateAttributes)) {
-                                $this->addError($attribute, print_r($barcodeData, true) . " — некорректный штрихкод: ".Json::encode($shopProductBarcode->errors));
+                                $this->addError($attribute, print_r($barcodeData, true)." — некорректный штрихкод: ".Json::encode($shopProductBarcode->errors));
                                 return false;
                             }
                         }
@@ -943,6 +949,14 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getBrand()
     {
         return $this->hasOne(ShopBrand::class, ['id' => 'brand_id'])->from(['shopBrand' => ShopBrand::tableName()]);
+
+    }
+    /**
+     * @return ShopBrand
+     */
+    public function getShopProductModel()
+    {
+        return $this->hasOne(ShopProductModel::class, ['id' => 'shop_product_model_id'])->from(['shopProductModel' => ShopProductModel::tableName()]);
 
     }
     /**
@@ -1465,7 +1479,6 @@ class ShopProduct extends \skeeks\cms\models\Core
     }
 
 
-
     /**
      * @var null
      */
@@ -1574,12 +1587,12 @@ class ShopProduct extends \skeeks\cms\models\Core
         if ($this->measure_ratio == 0) {
             return 0;
         }
-        
+
         if ($this->measure_ratio == 1) {
             return $this->weight;
         }
 
-        return (float) ($this->weight / $this->measure_ratio);
+        return (float)($this->weight / $this->measure_ratio);
     }
     /**
      * @return float
