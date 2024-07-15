@@ -228,6 +228,47 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     },
                 ],
 
+
+                "joins" => [
+                    'class'    => BackendModelAction::class,
+                    'name'     => "Объединение",
+                    'icon'     => 'fa fa-list',
+                    'priority' => 190,
+
+                    'accessCallback' => function (BackendModelAction $action) {
+
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
+                        $model = $action->model;
+
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        if ($model->shopProduct->offers_pid) {
+                            return false;
+                        }
+
+                        if ($model->main_cce_id) {
+                            return false;
+                        }
+
+
+                        /**
+                         * @var $site \skeeks\cms\shop\models\CmsSite
+                         */
+                        $site = $model->cmsSite;
+
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
+
+                    },
+                ],
+
                 "relations" => [
                     'class'    => BackendModelAction::class,
                     'name'     => "Так же покупают",
@@ -267,6 +308,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
 
                     },
                 ],
+
 
                 "connect-to-main" => [
 
@@ -1824,7 +1866,7 @@ HTML
             'items' => [
                 'dimentions' => 'Габариты',
                 'weight'     => 'Вес',
-                'brand'     => 'Бренд',
+                'brand'      => 'Бренд',
             ]
             //
 
@@ -2921,6 +2963,56 @@ JS
                 if ($relation) {
                     $relation->delete();
                 }
+            }
+
+        }
+
+        return $rr;
+    }
+
+    /**
+     * @return RequestResponse
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionJoinsDettach()
+    {
+        $rr = new RequestResponse();
+        if ($rr->isRequestAjaxPost()) {
+            $product_id = (int)\Yii::$app->request->post('product_id');
+
+            if ($product_id) {
+                $sp = ShopProduct::findOne($product_id);
+                $spModel = $sp->shopProductModel;
+                if (!$spModel) {
+                    return $rr;
+                }
+
+                $t = \Yii::$app->db->beginTransaction();
+
+                try {
+
+                    $sp->shop_product_model_id = null;
+                    if (!$sp->save(false, ['shop_product_model_id'])) {
+                        throw new \yii\base\Exception(print_r($sp->errors, true));
+                    }
+
+                    if ($spModel->getShopProducts()->count() <= 1) {
+                        $spModel->delete();
+                    }
+
+
+
+                    $t->commit();
+
+                    $rr->success = true;
+
+                } catch (\Exception $exception) {
+                    $t->rollBack();
+                    throw $exception;
+                }
+
+
             }
 
         }
