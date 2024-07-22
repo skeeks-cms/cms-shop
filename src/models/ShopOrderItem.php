@@ -562,7 +562,7 @@ class ShopOrderItem extends ActiveRecord
     {
         $percent = 0;
 
-        if ($this->discount_amount) {
+        if ($this->discount_amount && $this->amount) {
             $percent = $this->discount_amount * 100 / $this->amount;
         }
 
