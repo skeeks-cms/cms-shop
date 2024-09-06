@@ -231,6 +231,10 @@ class CartController extends Controller
                 
                 $t->commit();
                 
+                if (\Yii::$app->user->isGuest) {
+                    //Автоматически авторизовать пользователя
+                    \Yii::$app->user->login($order->cmsUser, 3600 * 24 * 365 * 5);
+                }
                 
                 /*$order->shopCart->shop_order_id = null;
                 $order->shopCart->save();*/
