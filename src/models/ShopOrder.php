@@ -1183,11 +1183,11 @@ class ShopOrder extends ActiveRecord
     public function getWeightFormatted()
     {
         if ($this->weight >= 1000 && $this->weight <= 1000000) {
-            return \Yii::$app->formatter->asDecimal(($this->weight / 1000))." кг.";
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000))." кг";
         } elseif ($this->weight >= 1000000) {
-            return \Yii::$app->formatter->asDecimal(($this->weight / 1000000))." т.";
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000000))." т";
         } else {
-            return \Yii::$app->formatter->asDecimal(($this->weight))." г.";
+            return \Yii::$app->formatter->asDecimal(($this->weight))." г";
         }
     }
 
