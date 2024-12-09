@@ -10,7 +10,9 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\grid\BooleanColumn;
+use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
+use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsCountry;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
@@ -42,15 +44,15 @@ class AdminShopCollectionController extends BackendModelStandartController
         $this->modelShowAttribute = "name";
         $this->modelClassName = ShopCollection::class;
 
-        $this->generateAccessActions = false;
-        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+        $this->generateAccessActions = true;
+        /*$this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;*/
 
-        $this->accessCallback = function () {
+        /*$this->accessCallback = function () {
             if (!\Yii::$app->skeeks->site->is_default) {
                 return false;
             }
             return \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
-        };
+        };*/
 
 
         parent::init();
@@ -127,7 +129,7 @@ class AdminShopCollectionController extends BackendModelStandartController
                 ],
             'grid'  => [
                 'defaultOrder'   => [
-                    'name' => SORT_ASC,
+                    'created_at' => SORT_DESC,
                 ],
                 /*'sortAttributes' => [
                     'countProducts'   => [
@@ -142,17 +144,28 @@ class AdminShopCollectionController extends BackendModelStandartController
                     'checkbox',
                     'actions',
 
+                    'created_at',
                     'custom',
 
                     'brand',
 
                     'countProducts',
                     'is_active',
-                    'priority',
+                    'created_by',
                     'view',
                 ],
 
                 'columns'        => [
+
+                    'created_at'   => [
+                        'class' => DateTimeColumnData::class
+                    ],
+                    'updated_at'   => [
+                        'class' => DateTimeColumnData::class
+                    ],
+                    'created_by'   => [
+                        'class' => UserColumnData::class
+                    ],
 
                     'countProducts'   => [
                         'format'    => 'raw',
