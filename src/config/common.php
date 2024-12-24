@@ -88,12 +88,12 @@ return [
                 'shop/skeeks-suppliers/update-products' => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['app', 'SkeekS GPD - полное обновление товаров'],
-                    'interval' => 3600*24,
+                    'interval' => 3600*24*7,
                 ],
                 'shop/skeeks-suppliers/update-store-items' => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['app', 'SkeekS GPD - обновить цены и наличие'],
-                    'interval' => 3600*23,
+                    'interval' => 3600*23*6,
                 ],
                 'shop/skeeks-suppliers/update-products --product_new_info=1' => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
