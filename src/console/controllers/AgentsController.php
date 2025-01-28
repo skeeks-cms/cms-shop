@@ -454,10 +454,8 @@ SQL
 
             $result = \Yii::$app->db->createCommand(<<<SQL
 INSERT IGNORE
-    INTO shop_product_price (`created_at`,`updated_at`,`product_id`, `type_price_id`, `price`, `currency_code`)
+    INTO shop_product_price (`product_id`, `type_price_id`, `price`, `currency_code`)
     SELECT 
-        UNIX_TIMESTAMP(),
-        UNIX_TIMESTAMP(),
         spp.product_id,
         {$type_price_id},
         ROUND(spp.price * {$auto_extra_charge} / 100),
