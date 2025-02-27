@@ -123,38 +123,34 @@ if ($model->isNewRecord) {
                     <? $fieldSet = $form->fieldSet($childContent->name); ?>
 
                     <? if ($model->isNewRecord) : ?>
-
-                        <?= \yii\bootstrap\Alert::widget([
-                            'options' =>
-                                [
-                                    'class' => 'alert-warning',
-                                ],
-                            'body'    => \Yii::t('skeeks/shop/app', 'Management will be available after saving'),
-                        ]); ?>
+                        <div class="col-12" style="margin-top: 1rem;">
+                            <p>Управление будет доступно после сохранения</p>
+                        </div>
                     <? else: ?>
 
-                        <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
-                            'label'       => $childContent->name,
-                            'namespace'   => md5($model->className().$childContent->id),
-                            'parentModel' => $model,
-                            'relation'    => [
-                                'content_id'                => $childContent->id,
-                                'parent_content_element_id' => $model->id,
-                            ],
+                        <div class="col-12" style="margin-top: 1rem;">
+                            <?= \skeeks\cms\modules\admin\widgets\RelatedModelsGrid::widget([
+                                'label'       => "", //$childContent->name,
+                                'namespace'   => md5($model->className().$childContent->id),
+                                'parentModel' => $model,
+                                'relation'    => [
+                                    'content_id'                => $childContent->id,
+                                    'parent_content_element_id' => $model->id,
+                                ],
 
-                            'sort' => [
-                                'defaultOrder' =>
-                                    [
-                                        'priority' => 'published_at',
-                                    ],
-                            ],
+                                'sort' => [
+                                    'defaultOrder' =>
+                                        [
+                                            'priority' => 'published_at',
+                                        ],
+                                ],
 
-                            'controllerRoute' => '/shop/admin-cms-content-element',
-                            'gridViewOptions' => [
-                                'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
-                            ],
-                        ]); ?>
-
+                                'controllerRoute' => '/cms/admin-cms-content-element',
+                                'gridViewOptions' => [
+                                    'columns' => (array)\skeeks\cms\controllers\AdminCmsContentElementController::getColumns($childContent),
+                                ],
+                            ]); ?>
+                        </div>
                     <? endif; ?>
 
 
