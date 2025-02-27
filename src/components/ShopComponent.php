@@ -1388,11 +1388,11 @@ SQL
             $baseTypePrice = \Yii::$app->shop->baseTypePrice;
 
             $q1 = clone $q;
-            $q1->innerJoin(['prices' => 'shop_product_price'], [
-                'prices.product_id'    => new Expression('shopProduct.id'),
-                'prices.type_price_id' => $baseTypePrice->id,
+            $q1->innerJoin(['prices_for_calc' => 'shop_product_price'], [
+                'prices_for_calc.product_id'    => new Expression('shopProduct.id'),
+                'prices_for_calc.type_price_id' => $baseTypePrice->id,
             ]);
-            $q1->select(['price' => new Expression("max(prices.price)")]);
+            $q1->select(['price' => new Expression("max(prices_for_calc.price)")]);
             $q1->groupBy(false);
             $q1->orderBy(false);
 
@@ -1405,12 +1405,12 @@ SQL
 
 
             $q2 = clone $q;
-            $q2->select(['price' => new Expression("min(prices.price)")]);
-            $q2->innerJoin(['prices' => 'shop_product_price'], [
-                'prices.product_id'    => new Expression('shopProduct.id'),
-                'prices.type_price_id' => $baseTypePrice->id,
+            $q2->select(['price' => new Expression("min(prices_for_calc.price)")]);
+            $q2->innerJoin(['prices_for_calc' => 'shop_product_price'], [
+                'prices_for_calc.product_id'    => new Expression('shopProduct.id'),
+                'prices_for_calc.type_price_id' => $baseTypePrice->id,
             ]);
-            $q2->andWhere(['>', 'prices.price', 0]);
+            $q2->andWhere(['>', 'prices_for_calc.price', 0]);
             $q2->orderBy(false);
             $q2->groupBy(false);
 
