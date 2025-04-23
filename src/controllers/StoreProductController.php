@@ -483,6 +483,20 @@ HTML;
             "services" => [
                 'class'          => ViewBackendAction::class,
                 'priority'       => 90,
+                'name'           => 'Создание товаров',
+                'icon'           => 'fas fa-info-circle',
+                'accessCallback' => function () {
+                    if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+                        return true;
+                    }
+
+                    return false;
+                },
+            ],
+            
+            "other" => [
+                'class'          => ViewBackendAction::class,
+                'priority'       => 100,
                 'name'           => 'Инструменты',
                 'icon'           => 'fas fa-info-circle',
                 'accessCallback' => function () {
@@ -606,6 +620,32 @@ HTML;
     }
 
 
+    public function actionQuantityZero()
+    {
+        Skeeks::unlimited();
+
+        $rr = new RequestResponse();
+        if ($rr->isRequestAjaxPost()) {
+            $rr->success = true;
+            
+            if (!\Yii::$app->shop->backendShopStore) {
+                $rr->message = "Ошибка";
+                $rr->success = false;
+                return $rr;
+            }
+            
+            $result = ShopStoreProduct::updateAll([
+                'quantity' => 0
+            ], [
+                'shop_store_id' => \Yii::$app->shop->backendShopStore->id
+            ]);
+            
+            $rr->message = "Обнулено: {$result} товаров.";
+        }
+        
+        return $rr;
+    }
+    
     public function actionAutoCreate()
     {
         Skeeks::unlimited();
