@@ -51,6 +51,7 @@ use yii\web\Application;
  * @property ShopBrand        $brand
  * @property CmsStorageFile   $image
  * @property CmsStorageFile[] $images
+ * @property ShopProduct[]    $shopProducts
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -252,6 +253,16 @@ class ShopCollection extends ActiveRecord
         return $this->hasMany(StorageFile::className(), ['id' => 'storage_file_id'])
             ->viaTable('shop_collection2image', ['shop_collection_id' => 'id'])
             ->orderBy(['priority' => SORT_ASC]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getShopProducts()
+    {
+        return $this->hasMany(ShopProduct::class, ['id' => 'shop_product_id'])
+            ->viaTable('shop_product2collection', ['shop_collection_id' => 'id']);
     }
 
     /**
