@@ -12,6 +12,7 @@ use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopVat;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\NumberField;
@@ -29,13 +30,7 @@ class AdminVatController extends BackendModelStandartController
         $this->modelClassName = ShopVat::class;
 
         $this->generateAccessActions = false;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->permissionName);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -99,16 +94,16 @@ class AdminVatController extends BackendModelStandartController
 
         return [
             'name',
-            'rate' => [
+            'rate'     => [
                 'class'  => NumberField::class,
                 'append' => "%",
             ],
             'priority' => [
-                'class'  => NumberField::class,
+                'class' => NumberField::class,
             ],
 
             'is_active' => [
-                'class' => BoolField::class,
+                'class'     => BoolField::class,
                 'allowNull' => false,
             ],
         ];

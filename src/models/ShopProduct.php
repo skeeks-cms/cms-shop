@@ -1614,11 +1614,11 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getWeightFormatted()
     {
         if ($this->weight >= 1000 && $this->weight <= 1000000) {
-            return \Yii::$app->formatter->asDecimal(($this->weight / 1000))." кг.";
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000))." кг";
         } elseif ($this->weight >= 1000000) {
-            return \Yii::$app->formatter->asDecimal(($this->weight / 1000000))." т.";
+            return \Yii::$app->formatter->asDecimal(($this->weight / 1000000))." т";
         } else {
-            return \Yii::$app->formatter->asDecimal(($this->weight))." г.";
+            return \Yii::$app->formatter->asDecimal(($this->weight))." г";
         }
     }
 
@@ -1630,9 +1630,9 @@ class ShopProduct extends \skeeks\cms\models\Core
         if ($this->length >= 10 && $this->length <= 1000) {
             return \Yii::$app->formatter->asDecimal(($this->length / 10))." см.";
         } elseif ($this->length >= 1000) {
-            return \Yii::$app->formatter->asDecimal(($this->length / 1000))." м.";
+            return \Yii::$app->formatter->asDecimal(($this->length / 1000))." м";
         } else {
-            return \Yii::$app->formatter->asDecimal(($this->length))." мм.";
+            return \Yii::$app->formatter->asDecimal(($this->length))." мм";
         }
     }
 
@@ -1642,11 +1642,11 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getWidthFormatted()
     {
         if ($this->width >= 10 && $this->width <= 1000) {
-            return \Yii::$app->formatter->asDecimal(($this->width / 10))." см.";
+            return \Yii::$app->formatter->asDecimal(($this->width / 10))." см";
         } elseif ($this->width >= 1000) {
-            return \Yii::$app->formatter->asDecimal(($this->width / 1000))." м.";
+            return \Yii::$app->formatter->asDecimal(($this->width / 1000))." м";
         } else {
-            return \Yii::$app->formatter->asDecimal(($this->width))." мм.";
+            return \Yii::$app->formatter->asDecimal(($this->width))." мм";
         }
     }
 
@@ -1656,11 +1656,11 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getHeightFormatted()
     {
         if ($this->height >= 10 && $this->height <= 1000) {
-            return \Yii::$app->formatter->asDecimal(($this->height / 10))." см.";
+            return \Yii::$app->formatter->asDecimal(($this->height / 10))." см";
         } elseif ($this->width >= 1000) {
-            return \Yii::$app->formatter->asDecimal(($this->height / 1000))." м.";
+            return \Yii::$app->formatter->asDecimal(($this->height / 1000))." м";
         } else {
-            return \Yii::$app->formatter->asDecimal(($this->height))." мм.";
+            return \Yii::$app->formatter->asDecimal(($this->height))." мм";
         }
     }
 
@@ -1670,7 +1670,7 @@ class ShopProduct extends \skeeks\cms\models\Core
     public function getDimensionsFormated()
     {
         if ($this->height && $this->width && $this->length) {
-            return \Yii::$app->formatter->asDecimal(($this->length / 10))."x".\Yii::$app->formatter->asDecimal(($this->height / 10))."x".\Yii::$app->formatter->asDecimal(($this->width / 10))." см.";
+            return \Yii::$app->formatter->asDecimal(($this->length / 10))."x".\Yii::$app->formatter->asDecimal(($this->height / 10))."x".\Yii::$app->formatter->asDecimal(($this->width / 10))." см";
         }
 
         return '';

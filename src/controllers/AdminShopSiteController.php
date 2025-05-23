@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelController;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopSite;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -34,14 +35,9 @@ class AdminShopSiteController extends BackendModelController
         $this->modelClassName = ShopSite::class;
 
         $this->defaultAction = "update";
-        $this->generateAccessActions = false;
 
-        /*$this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };*/
+        $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }

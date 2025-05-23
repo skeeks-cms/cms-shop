@@ -22,7 +22,7 @@ class SkeeksSuppliersApiComponent extends Component
     /**
      * @var string путь к api включая версию
      */
-    public $api_url = "https://suppliers-api.skeeks.com/v1";
+    public $api_url = "https://gpd-api.skeeks.com/v1";
 
     /**
      * @var string ключ полученный в API сервисе

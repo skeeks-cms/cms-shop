@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopTypePrice;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -34,6 +35,7 @@ class AdminTypePriceController extends BackendModelStandartController
         $this->modelClassName = ShopTypePrice::class;
 
         $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -103,12 +105,12 @@ HTML
                                 if ($model->is_purchase) {
                                     $name = '<span class="fas fa-lock" title="Закупочная цена" style="margin-right: 5px;"></span>';
                                 }
-                                $data[] = $name . Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = $name.Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
                                 if ($model->description) {
                                     $data[] = $model->description;
                                 }
                                 if ($model->is_auto) {
-                                    $data[] = "<small style='color: gray;'>Цена рассчитывается автоматически от цены: " . $model->baseAutoShopTypePrice->asText . "</small>";
+                                    $data[] = "<small style='color: gray;'>Цена рассчитывается автоматически от цены: ".$model->baseAutoShopTypePrice->asText."</small>";
                                 }
 
                                 return implode("<br />", $data);
@@ -168,18 +170,18 @@ CSS
                 'name'   => 'Основное',
                 'fields' => [
                     'is_default'  => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ],
-                    'is_purchase'  => [
-                        'class'       => BoolField::class,
-                        'allowNull'   => false,
+                    'is_purchase' => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ],
                     'name',
                     'description' => [
                         'class' => TextareaField::class,
                     ],
-                    
+
                 ],
             ],
 
@@ -203,25 +205,25 @@ CSS
                     ],
                 ],
             ],
-            
+
             'other' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Прочее',
                 'fields' => [
-                    'priority'    => [
+                    'priority' => [
                         'class' => NumberField::class,
                     ],
                     'external_id',
-                    'is_auto' => [
-                        'class'       => BoolField::class,
-                        'formElement' => BoolField::ELEMENT_CHECKBOX,
-                        'allowNull'   => false,
+                    'is_auto'  => [
+                        'class'          => BoolField::class,
+                        'formElement'    => BoolField::ELEMENT_CHECKBOX,
+                        'allowNull'      => false,
                         'elementOptions' => [
-                            'data-form-reload' => 'true'
-                        ]
+                            'data-form-reload' => 'true',
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         if ($model->is_auto) {
@@ -238,14 +240,12 @@ CSS
                         'asText'
                     ),
                 ],
-                "auto_extra_charge"                => [
+                "auto_extra_charge"            => [
                     'class'  => NumberField::class,
                     'append' => "%",
                 ],
             ]);
         }
-
-        
 
 
         /*if ($model->isNewRecord) {

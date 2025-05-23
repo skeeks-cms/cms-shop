@@ -52,6 +52,7 @@ class ShopStoreProperty extends ActiveRecord
     const PROPERTY_NATURE_WIDTH = "width";
     const PROPERTY_NATURE_LENGTH = "length";
     const PROPERTY_NATURE_EAV = "eav";
+    const PROPERTY_NATURE_COUNTRY = "country";
     const PROPERTY_NATURE_BRAND = "brand";
     const PROPERTY_NATURE_BRAND_SKU = "brand_sku";
     const PROPERTY_NATURE_TREE = "tree";
@@ -119,6 +120,7 @@ class ShopStoreProperty extends ActiveRecord
     {
         return [
             self::PROPERTY_NATURE_EAV               => 'Характеристика',
+            self::PROPERTY_NATURE_COUNTRY           => 'Страна производитель',
             self::PROPERTY_NATURE_BRAND             => 'Бренд',
             self::PROPERTY_NATURE_BRAND_SKU         => 'Артикул бренда',
             self::PROPERTY_NATURE_SECOND_IMAGE      => 'Вторые фото',
@@ -221,42 +223,6 @@ class ShopStoreProperty extends ActiveRecord
                     }
                 },
             ],
-
-            /*[
-                ['property_type'],
-                function() {
-                    $this->property_type = self::PROPERTY_TYPE_STRING;
-                },
-                'when'  => function (self $model) {
-                    if ($model->cmsContentProperty) {
-                        if ($model->cmsContentProperty->property_type == PropertyType::CODE_STRING) {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                },
-            ],*/
-            /*[
-                ['property_type'],
-                function() {
-                    $this->property_type = self::PROPERTY_TYPE_NUMBER;
-                },
-                'when'  => function (self $model) {
-                    if (in_array($model->shop_property_code, [
-                        self::SHOP_PROPETY_WIDTH,
-                        self::SHOP_PROPETY_LENGTH,
-                        self::SHOP_PROPETY_HEIGHT,
-                        self::SHOP_PROPETY_WEIGHT,
-                    ])) {
-                        die;
-                        return true;
-                    }
-
-                    return false;
-                },
-            ],*/
-
         ]);
     }
 

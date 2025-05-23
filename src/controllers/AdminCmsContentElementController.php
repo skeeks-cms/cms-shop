@@ -81,9 +81,29 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
     public function init()
     {
         $this->modelDefaultAction = 'view';
-        $this->name = \Yii::t('skeeks/shop/app', 'Elements');
+        $this->name = "Товары и услуги";
+
+        $this->generateAccessActions = false;
+
+        if ($this->permissionName === null) {
+            $this->permissionName = "shop/admin-product";
+        }
+        
+        if ($this->content) {
+            $this->name = \Yii::t('skeeks/cms', $this->content->name);
+        }
+
         parent::init();
     }
+
+    public function setContent($content)
+    {
+        //$this->permissionName = $this->uniqueId . "__" . $content->id;
+        $this->permissionName = "shop/admin-product";
+        $this->_content = $content;
+        return $this;
+    }
+
 
     /**
      * @return bool
@@ -127,7 +147,36 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                     'priority' => 80,
                     'name'     => 'Карточка',
                     'icon'     => 'fas fa-info-circle',
+                    'accessCallback' => function (BackendModelAction $action) {
+                        return \Yii::$app->user->can($this->permissionName."");
+                    },
                 ],
+
+                "update" => [
+
+                    'accessCallback' => function (BackendModelAction $action) {
+
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
+                        $model = $action->model;
+
+                        if (!$model) {
+                            return false;
+                        }
+
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+
+                        /*if ($model->main_cce_id) {
+                            return false;
+                        }*/
+
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
+                    },
+                ],
+
 
                 "offers" => [
                     'class'                  => BackendGridModelRelatedAction::class,
@@ -226,6 +275,8 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                         return false;
 
                     },
+
+
                 ],
 
 
@@ -264,7 +315,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                          */
                         $site = $model->cmsSite;
 
-                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/join", ['model' => $model]);
 
                     },
                 ],
@@ -304,7 +355,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
                          */
                         $site = $model->cmsSite;
 
-                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/join", ['model' => $model]);
 
                     },
                 ],
@@ -475,21 +526,7 @@ HTML
 
 
                     'accessCallback' => function (BackendModelAction $action) {
-                        $model = $action->model;
-                        if (!$model) {
-                            return false;
-                        }
-
-                        if (!$model->shopProduct) {
-                            return false;
-                        }
-
-                        /**
-                         * @var $site \skeeks\cms\shop\models\CmsSite
-                         */
-                        $site = $model->cmsSite;
-
-                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $model]);
+                        return \Yii::$app->user->can($this->permissionName."/create");
                     },
                 ],
 
@@ -560,6 +597,7 @@ HTML
                         }
                     },
                 ],
+
 
 
                 "viewed-products" => [
@@ -739,8 +777,10 @@ HTML
                     },
                 ],
 
+
+
+
                 "store-moves" => [
-                    'generateAccess'  => true,
                     'class'           => BackendGridModelRelatedAction::class,
                     'name'            => 'Движение товара',
                     'icon'            => 'fas fa-truck',
@@ -771,7 +811,7 @@ HTML
                         $action->relatedIndexAction->grid['visibleColumns'] = $visibleColumns;*/
 
                     },
-                    'accessCallback'  => function (BackendModelAction $action) {
+                    /*'accessCallback'  => function (BackendModelAction $action) {
                         $model = $action->model;
                         if (!$model) {
                             return false;
@@ -783,10 +823,20 @@ HTML
 
                         /**
                          * @var $site \skeeks\cms\shop\models\CmsSite
-                         */
                         $site = $model->cmsSite;
 
+
                         return \Yii::$app->user->can($this->permissionName."/orders", ['model' => $model]);
+                    },*/
+                    'accessCallback' => function (BackendModelAction $action) {
+                        $model = $action->model;
+                        if (!$model) {
+                            return false;
+                        }
+                        if (!$model->shopProduct) {
+                            return false;
+                        }
+                        return \Yii::$app->user->can($this->permissionName."/index");
                     },
                 ],
 
@@ -795,51 +845,15 @@ HTML
                     'class'          => ViewBackendAction::class,
                     'icon'           => 'fas fa-sync',
                     'name'           => 'Обновление данных',
-                    "accessCallback" => function () {
-                        if (!\Yii::$app->skeeks->site->is_default) {
-                            return false;
-                        }
-
-                        return \Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
-                    },
                 ],
 
                 "create" => [
 
                     'accessCallback' => function (BackendAction $action) {
-
-                        if (\Yii::$app->request->get("shop_sub_product_id")) {
-                            return \Yii::$app->user->can($this->permissionName."/create");
-                        }
-
                         return \Yii::$app->user->can($this->permissionName."/create");
                     },
                 ],
 
-                "update" => [
-
-                    'accessCallback' => function (BackendModelAction $action) {
-
-                        /**
-                         * @var $model ShopCmsContentElement
-                         */
-                        $model = $action->model;
-
-                        if (!$model) {
-                            return false;
-                        }
-
-                        if (!$model->shopProduct) {
-                            return false;
-                        }
-
-                        /*if ($model->main_cce_id) {
-                            return false;
-                        }*/
-
-                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
-                    },
-                ],
 
 
                 "update-attribute" => [
@@ -869,7 +883,6 @@ HTML
 
 
                 'duplicates' => [
-                    'generateAccess' => true,
                     'class'          => ViewBackendAction::class,
                     'name'           => 'Дубли',
                     'icon'           => 'fas fa-copy',
@@ -1056,9 +1069,22 @@ HTML
 
                         return "";
                     },
-
-
                 ];
+
+                /*$shopColumns["shop.net_cost"] = [
+                    'label'     => "Себестоимость",
+                    //'attribute' => 'shop.price'.$shopTypePrice->id,
+                    'format'    => 'raw',
+                    'value'     => function (ShopCmsContentElement $model) use ($shopTypePrice) {
+                        $shopProduct = \skeeks\cms\shop\models\ShopProduct::getInstanceByContentElement($model);
+                        if ($shopProduct && $shopProduct->shopStoreProducts) {
+                            $netCostData = $shopProduct->getShopStoreProducts()->select(['net_cost' => new Expression("sum(purchase_price)/count(id)")])->asArray()->one();
+                            return print_r($netCostData, true);
+                        }
+
+                        return "";
+                    },
+                ];*/
 
 
                 $visibleColumns[] = 'shop.price'.$shopTypePrice->id;
@@ -1250,6 +1276,40 @@ HTML
 
                 if ($shopCmsContentElement->shopProduct->brand_id) {
                     return Html::tag("div", $shopCmsContentElement->shopProduct->brand->name);
+                } else {
+
+                    return "";
+                }
+
+            },
+        ];
+        $shopColumns["shop.brand_sku"] = [
+            'attribute' => "shop.brand_sku",
+            'label'     => "Артикул бренда",
+            'format'    => 'raw',
+
+            'beforeCreateCallback' => function (GridView $grid) use ($purchaseTypePrice, $defaultTypePrice) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $grid->dataProvider->query;
+
+
+                $query->addSelect([
+                    'brand_sku' => "sp.brand_sku",
+                ]);
+
+                $grid->sortAttributes["shop.brand_sku"] = [
+                    'asc'  => ['brand_sku' => SORT_ASC],
+                    'desc' => ['brand_sku' => SORT_DESC],
+                ];
+            },
+
+            'value' => function (ShopCmsContentElement $shopCmsContentElement) {
+
+
+                if ($shopCmsContentElement->shopProduct->brand_sku) {
+                    return Html::tag("div", $shopCmsContentElement->shopProduct->brand_sku);
                 } else {
 
                     return "";
@@ -1740,9 +1800,6 @@ HTML
                     $query->andWhere(['sp.brand_id' => $e->field->value]);
                 }
 
-                /*if ($e->field->value) {
-                    $query->andWhere(['barcodes.value' => $e->field->value]);
-                }*/
             },
 
             'class'        => WidgetField::class,
@@ -1753,6 +1810,23 @@ HTML
             ],
             //
 
+        ];
+
+        $filterFields['brand_sku'] = [
+            'class'    => StringFilterField::class,
+            'label'    => 'Артикул бренда',
+            //'filterAttribute' => 'shopStoreProducts.shop_store_id',
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                if ($e->field->value) {
+                    $query->andWhere(['sp.brand_sku' => $e->field->value]);
+                }
+
+            },
+            'class'        => TextField::class,
         ];
 
         $filterFields['q'] = [
@@ -1781,6 +1855,7 @@ HTML
                             ['like', CmsContentElement::tableName().'.description_short', $e->field->value],
                             ['like', CmsContentElement::tableName().'.description_full', $e->field->value],
                             ['like', CmsContentElement::tableName().'.external_id', $e->field->value],
+                            //['like', 'brand.name', $e->field->value],
                         ]);
 
                     $query->leftJoin(['p' => $q], ['p.parent_id' => new Expression(CmsContentElement::tableName().".id")]);
@@ -2128,6 +2203,7 @@ HTML
         $filterFieldsLabels['barcodes'] = 'Штрихкод';
         $filterFieldsLabels['stores'] = 'Магазин/склад';
         $filterFieldsLabels['brand_id'] = 'Бренд';
+        $filterFieldsLabels['brand_sku'] = 'Артикул бренд';
         $filterFieldsLabels['country_alpha2'] = 'Страна';
         $filterFieldsLabels['empty'] = 'Не заполнено';
         $filterFieldsLabels['supplier_external_jsondata'] = 'Данные поставщика';
@@ -2148,6 +2224,7 @@ HTML
         $filterFieldsRules[] = ['barcodes', 'string'];
         $filterFieldsRules[] = ['stores', 'safe'];
         $filterFieldsRules[] = ['brand_id', 'safe'];
+        $filterFieldsRules[] = ['brand_sku', 'safe'];
         $filterFieldsRules[] = ['empty', 'safe'];
         $filterFieldsRules[] = ['country_alpha2', 'safe'];
         $filterFieldsRules[] = ['marginality_abs_filter', 'safe'];
@@ -2842,7 +2919,7 @@ CSS
         }
 
         if ($this->content) {
-            if ($this->content->name_meny) {
+            if ($this->content->name_meny && $this->content->name_meny != "Элементы") {
                 $this->name = $this->content->name_meny;
             }
         }
@@ -3040,7 +3117,7 @@ JS
 
                 if (\Yii::$app->request->post("act") == "update-price") {
 
-                    $productPrice = $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)\Yii::$app->request->post("price_value"));
+                    $productPrice = $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)\Yii::$app->request->post("price_value"), \Yii::$app->request->post("price_currency_code"));
                     $productPrice->is_fixed = (int)\Yii::$app->request->post("is_fixed");
                     $productPrice->save();
 

@@ -15,6 +15,7 @@ use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopPaySystem;
 use skeeks\cms\shop\paysystem\PaysystemHandler;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
@@ -23,7 +24,6 @@ use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
-use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\base\Exception;
@@ -44,6 +44,7 @@ class AdminPaySystemController extends BackendModelStandartController
         $this->modelClassName = ShopPaySystem::class;
 
         $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -56,55 +57,55 @@ class AdminPaySystemController extends BackendModelStandartController
         return ArrayHelper::merge(parent::actions(),
             [
                 'index' => [
-                        "backendShowings" => false,
-                        "filters"         => false,
+                    "backendShowings" => false,
+                    "filters"         => false,
 
-                        'grid' => [
-                            'on init' => function (Event $e) {
-                                /**
-                                 * @var $dataProvider ActiveDataProvider
-                                 * @var $query ActiveQuery
-                                 */
-                                $query = $e->sender->dataProvider->query;
+                    'grid' => [
+                        'on init' => function (Event $e) {
+                            /**
+                             * @var $dataProvider ActiveDataProvider
+                             * @var $query ActiveQuery
+                             */
+                            $query = $e->sender->dataProvider->query;
 
-                                $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
-                            },
+                            $query->andWhere(['cms_site_id' => \Yii::$app->skeeks->site->id]);
+                        },
 
-                            'defaultOrder' => [
-                                'priority' => SORT_ASC,
+                        'defaultOrder' => [
+                            'priority' => SORT_ASC,
+                        ],
+
+                        'visibleColumns' => [
+                            'checkbox',
+                            'actions',
+                            'name',
+                            'is_active',
+                            'priority',
+                        ],
+
+                        "columns" => [
+                            'name' => [
+                                'class'         => DefaultActionColumn::class,
+                                'viewAttribute' => 'asText',
+                            ],
+                            'priority',
+
+                            [
+                                'class'     => DataColumn::class,
+                                'attribute' => "personTypeIds",
+                                'filter'    => false,
+                                'value'     => function (ShopPaySystem $model) {
+                                    return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
+                                },
                             ],
 
-                            'visibleColumns' => [
-                                'checkbox',
-                                'actions',
-                                'name',
-                                'is_active',
-                                'priority',
-                            ],
-
-                            "columns" => [
-                                'name' => [
-                                    'class'         => DefaultActionColumn::class,
-                                    'viewAttribute' => 'asText',
-                                ],
-                                'priority',
-
-                                [
-                                    'class'     => DataColumn::class,
-                                    'attribute' => "personTypeIds",
-                                    'filter'    => false,
-                                    'value'     => function (ShopPaySystem $model) {
-                                        return implode(", ", ArrayHelper::map($model->personTypes, 'id', 'name'));
-                                    },
-                                ],
-
-                                'is_active' => [
-                                    'class'     => BooleanColumn::class,
-                                    'attribute' => "is_active",
-                                ],
+                            'is_active' => [
+                                'class'     => BooleanColumn::class,
+                                'attribute' => "is_active",
                             ],
                         ],
                     ],
+                ],
 
                 "create" => [
                     'fields'        => [$this, 'updateFields'],
@@ -177,18 +178,20 @@ class AdminPaySystemController extends BackendModelStandartController
          */
         if ($action->model && $action->model->handler) {
             $handler = $action->model->handler;
-            $handlerFields = $handler->getConfigFormFields();
-            $handlerFields = Builder::setModelToFields($handlerFields, $handler);
 
-            $action->formModels['handler'] = $handler;
             if ($post = \Yii::$app->request->post()) {
                 $handler->load($post);
             }
 
+            $handlerFields = $handler->getConfigFormFields();
+            $handlerFields = Builder::setModelToFields($handlerFields, $handler);
+
+            $action->formModels['handler'] = $handler;
+
         }
 
         $result = [
-            'main'         => [
+            'main' => [
                 'class'  => FieldSet::class,
                 'name'   => \Yii::t('skeeks/shop/app', 'Main'),
                 'fields' => [
@@ -213,12 +216,12 @@ class AdminPaySystemController extends BackendModelStandartController
 
 
                     'priority' => [
-                        'class' => NumberField::class
+                        'class' => NumberField::class,
                     ],
 
                     'component' => [
-                        'class'   => SelectField::class,
-                        'items'   => \Yii::$app->shop->getPaysystemHandlersForSelect(),
+                        'class'          => SelectField::class,
+                        'items'          => \Yii::$app->shop->getPaysystemHandlersForSelect(),
                         'elementOptions' => [
                             RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => "true",
                         ],

@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsStorageFile;
@@ -53,6 +54,25 @@ class ShopCmsContentElement extends CmsContentElement
         $this->on(self::EVENT_AFTER_DELETE, [$this, "_updateParentAfterDelete"]);
     }
 
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+
+            CmsLogBehavior::class     => [
+                'class' => CmsLogBehavior::class,
+                /*'no_log_fields' => [
+                    'description_short_type',
+                    'description_full_type',
+                ],
+                'relation_map' => [
+                    'content_id' => 'cmsContent',
+                ],*/
+            ],
+        ]);
+    }
 
     /**
      * TODO:доделать
@@ -294,6 +314,8 @@ class ShopCmsContentElement extends CmsContentElement
      */
     public function asText()
     {
+        return $this->productName;
+
         return "#".$this->id."#".$this->productName;
 
         $text = parent::asText();

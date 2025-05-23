@@ -73,10 +73,42 @@ class AdminMarketplaceController extends BackendModelStandartController
                 'isOpenNewWindow' => false
             ],
 
+            "stores" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 85,
+                'name'     => 'Склады',
+                'icon'     => 'fas fa-info-circle',
+                'isOpenNewWindow' => false
+            ],
+
             "products" => [
                 'class'    => BackendModelAction::class,
                 'priority' => 90,
                 'name'     => 'Товары',
+                'icon'     => 'fas fa-info-circle',
+                'isOpenNewWindow' => false
+            ],
+
+            "orders" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 100,
+                'name'     => 'Заказы',
+                'icon'     => 'fas fa-info-circle',
+                'isOpenNewWindow' => false
+            ],
+
+            "sells" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 100,
+                'name'     => 'Продажи',
+                'icon'     => 'fas fa-info-circle',
+                'isOpenNewWindow' => false
+            ],
+
+            "report" => [
+                'class'    => BackendModelAction::class,
+                'priority' => 100,
+                'name'     => 'Отчет по продажам',
                 'icon'     => 'fas fa-info-circle',
                 'isOpenNewWindow' => false
             ],

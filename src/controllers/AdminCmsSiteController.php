@@ -34,6 +34,14 @@ use yii\helpers\Html;
 class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteController
 {
 
+    public function init()
+    {
+        $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+
+        parent::init();
+    }
+    
     public function actions()
     {
         $result = ArrayHelper::merge(parent::actions(), [

@@ -8,6 +8,7 @@
 
 namespace skeeks\cms\shop\models;
 
+use ShopWbProduct;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\shop\components\WbComponent;
 use yii\helpers\ArrayHelper;

@@ -42,6 +42,7 @@ class AdminOrderController extends BackendModelStandartController
         $this->modelClassName = ShopOrder::class;
 
         $this->generateAccessActions = false;
+        $this->permissionName = "shop/admin-order";
 
         /*$this->modelHeader = function () {
             /**

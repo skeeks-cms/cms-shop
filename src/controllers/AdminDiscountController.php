@@ -42,6 +42,9 @@ class AdminDiscountController extends BackendModelStandartController
         $this->modelShowAttribute = "asText";
         $this->modelClassName = ShopDiscount::class;
 
+        $this->generateAccessActions = false;
+        $this->permissionName = "shop/admin-discount";
+
         parent::init();
     }
 
@@ -214,7 +217,7 @@ class AdminDiscountController extends BackendModelStandartController
         $disabled = [];
         if (!$model->isNewRecord) {
             $disabled = [
-                'disabled' => 'disabled'
+                'disabled' => 'disabled',
             ];
         }
 
@@ -224,11 +227,11 @@ class AdminDiscountController extends BackendModelStandartController
                 'name'   => 'Тип скидки',
                 'fields' => [
                     'assignment_type' => [
-                        'class' => SelectField::class,
-                        'items' => \skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(),
+                        'class'          => SelectField::class,
+                        'items'          => \skeeks\cms\shop\models\ShopDiscount::getAssignmentTypes(),
                         'elementOptions' => ArrayHelper::merge([
                             \skeeks\cms\helpers\RequestResponse::DYNAMIC_RELOAD_FIELD_ELEMENT => 'true',
-                        ], $disabled)
+                        ], $disabled),
                     ],
                 ],
             ],
@@ -284,7 +287,6 @@ class AdminDiscountController extends BackendModelStandartController
             ],
 
 
-
             'limitations' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Условия',
@@ -315,7 +317,7 @@ class AdminDiscountController extends BackendModelStandartController
                 'name'   => 'Дополнительные условия',
                 'fields' => [
                     'min_order_sum' => [
-                        'class'        => NumberField::class,
+                        'class' => NumberField::class,
                     ],
                 ],
             ];

@@ -26,6 +26,8 @@ return [
                 '~shop-<_a:(finish)>'           => 'shop/order/<_a>',
                 '~shop-order/<_a>'              => 'shop/order/<_a>',
                 '~spc'                         => 'shop/coupon',
+
+                '~bill-<_a:(view|pdf)>'           => 'shop/shop-bill/<_a>',
             ],
         ],
 

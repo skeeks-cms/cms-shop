@@ -16,6 +16,7 @@ use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\ImageColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\components\DeliveryHandlerComponent;
 use skeeks\cms\shop\deliveries\BoxberryDeliveryHandler;
 use skeeks\cms\shop\models\ShopDelivery;
@@ -47,6 +48,7 @@ class AdminDeliveryController extends BackendModelStandartController
         $this->modelClassName = ShopDelivery::class;
 
         $this->generateAccessActions = false;
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -248,8 +250,8 @@ class AdminDeliveryController extends BackendModelStandartController
                     ['class' => HtmlRowEnd::class],
 
                     'free_price_from' => [
-                        'class' => NumberField::class
-                    ]
+                        'class' => NumberField::class,
+                    ],
 
                 ],
             ],

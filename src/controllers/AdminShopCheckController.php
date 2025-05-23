@@ -34,7 +34,7 @@ class AdminShopCheckController extends BackendModelStandartController
         $this->modelClassName = ShopCheck::class;
 
         $this->generateAccessActions = false;
-        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
+        $this->permissionName = "shop/admin-shop-check";
 
         parent::init();
     }

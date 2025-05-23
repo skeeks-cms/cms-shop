@@ -55,15 +55,9 @@ JS
 );
 
 ?>
-    <div style="background: #f9f9f9; margin-bottom: 1rem; margin-top: 1rem;">
+    <div class="sx-block">
         <? $form = \yii\widgets\ActiveForm::begin(); ?>
-        <div class="row">
-        <div class="col-12">
-            <div class="alert alert-default">
-                Выберите товары, которые попадут в блок "с этим товаром покупают" и нажмите кнопку "связать"
-            </div>
-            </div>
-        </div>
+        <p>Выберите товары, которые попадут в блок "с этим товаром покупают" и нажмите кнопку "связать"</p>
         <div class="row">
             <div class="col-auto my-auto">
                 <?

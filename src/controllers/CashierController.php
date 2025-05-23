@@ -27,6 +27,7 @@ use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStoreDocMove;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\models\ShopStoreProductMove;
+use skeeks\cms\Skeeks;
 use yii\base\Exception;
 use yii\data\Pagination;
 use yii\db\Expression;
@@ -188,6 +189,9 @@ class CashierController extends BackendController
         $rr = new RequestResponse();
 
         if ($rr->isRequestAjaxPost()) {
+            
+            Skeeks::unlimited();
+            
             \Yii::$app->shop->backendShopStore;
             \Yii::$app->skeeks->site;
             $q = \Yii::$app->request->post("q");

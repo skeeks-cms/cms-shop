@@ -9,6 +9,8 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -33,6 +35,8 @@ use yii\helpers\ArrayHelper;
  */
 class ShopBonusTransaction extends ActiveRecord
 {
+    use HasLogTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -50,6 +54,21 @@ class ShopBonusTransaction extends ActiveRecord
         return parent::init();
     }
 
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            CmsLogBehavior::class     => [
+                'class' => CmsLogBehavior::class,
+                'relation_map' => [
+                    'cms_user_id' => 'cmsUser',
+                    'shop_order_id' => 'shopOrder',
+                ],
+            ],
+        ]);
+    }
 
     /**
      * @return string
@@ -131,7 +150,6 @@ class ShopBonusTransaction extends ActiveRecord
     {
         return $this->hasOne(\Yii::$app->user->identityClass, ['id' => 'cms_user_id']);
     }
-
 
     /**
      * Gets query for [[ShopOrder]].

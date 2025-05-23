@@ -178,66 +178,6 @@ $this->registerCSS(<<<CSS
 
 
 
-/**
- * Современное оформление свойств
- */
-.sx-properties-wrapper.sx-columns-1 ul.sx-properties {
-    -moz-column-count: 1;
-    column-count: 1;
-}
-
-.sx-properties-wrapper.sx-columns-2 ul.sx-properties {
-    -moz-column-count: 2;
-    column-count: 2;
-}
-
-.sx-properties-wrapper.sx-columns-3 ul.sx-properties {
-    -moz-column-count: 3;
-    column-count: 3;
-}
-
-ul.sx-properties {
-    -moz-column-count: 2;
-    column-count: 2;
-    grid-column-gap: 40px;
-    -moz-column-gap: 40px;
-    column-gap: 40px;
-    margin: 0px;
-    padding: 0px;
-}
-
-ul.sx-properties li {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    page-break-inside: avoid;
-    -moz-column-break-inside: avoid;
-    break-inside: avoid;
-}
-
-ul.sx-properties .sx-properties--value {
-    text-align: right;
-    max-width: 200px;
-    line-height: 1.4;
-}
-
-ul.sx-properties .sx-properties--name {
-    color: gray;
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    white-space: nowrap;
-}
-
-ul.sx-properties .sx-properties--name:after {
-    content: "";
-    flex-grow: 1;
-    opacity: .25;
-    margin: 0 6px 0 2px;
-    border-bottom: 1px dotted gray;
-}
-
 
 
 .sx-table td, .sx-table th {
@@ -329,7 +269,7 @@ $noValue = "<span style='color: silver;'>—</span>";
 <?php endif; ?>
 
 
-<div class="row no-gutters sx-bg-secondary">
+<div class="row no-gutters sx-block">
     <div class="col-lg-4 col-sm-6 col-12">
 
         <div style="padding: 10px;">

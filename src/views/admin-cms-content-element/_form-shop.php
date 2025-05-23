@@ -143,7 +143,7 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
             'modelClass' => \skeeks\cms\shop\models\ShopCollection::class,
             "ajaxUrl" => \yii\helpers\Url::to([
                 '/cms/ajax/autocomplete-collections',
-                //'property_id' => $this->property->id,
+                'brand_id' => $shopProduct->brand_id,
                 'cms_site_id' => \Yii::$app->skeeks->site->id,
             ]),
         ]

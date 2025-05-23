@@ -9,8 +9,8 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopOrderStatus;
 use skeeks\cms\widgets\ColorInput;
 use skeeks\cms\widgets\formInputs\comboText\ComboTextInputWidget;
@@ -36,13 +36,7 @@ class AdminOrderStatusController extends BackendModelStandartController
         $this->modelClassName = ShopOrderStatus::class;
 
         $this->generateAccessActions = false;
-
-        $this->accessCallback = function () {
-            if (!\Yii::$app->skeeks->site->is_default) {
-                return false;
-            }
-            return \Yii::$app->user->can($this->uniqueId);
-        };
+        $this->permissionName = CmsManager::PERMISSION_ROLE_ADMIN_ACCESS;
 
         parent::init();
     }
@@ -94,10 +88,10 @@ HTML
                         'name' => [
                             'value' => function (ShopOrderStatus $shopOrderStatus) {
                                 return \yii\helpers\Html::a($shopOrderStatus->name, null, [
-                                    'style' => "background: {$shopOrderStatus->bg_color}; color: {$shopOrderStatus->color}; border-radius: 3px; padding-left: 5px; padding-right: 5px;",
-                                    'class' => "sx-trigger-action",
-                                    'href'  => "#",
-                                ]) . "<br /><span style='color: gray'>" . $shopOrderStatus->description . "</span>";
+                                        'style' => "background: {$shopOrderStatus->bg_color}; color: {$shopOrderStatus->color}; border-radius: 3px; padding-left: 5px; padding-right: 5px;",
+                                        'class' => "sx-trigger-action",
+                                        'href'  => "#",
+                                    ])."<br /><span style='color: gray'>".$shopOrderStatus->description."</span>";
                             },
                         ],
                     ],
@@ -137,12 +131,12 @@ HTML
                         'class' => TextareaField::class,
                     ],
 
-                    'color' => [
-                        'class' => WidgetField::class,
+                    'color'    => [
+                        'class'       => WidgetField::class,
                         'widgetClass' => ColorInput::class,
                     ],
                     'bg_color' => [
-                        'class' => WidgetField::class,
+                        'class'       => WidgetField::class,
                         'widgetClass' => ColorInput::class,
                     ],
 
@@ -154,50 +148,49 @@ HTML
                 'class'  => FieldSet::class,
                 'name'   => 'Дополнительно',
                 'fields' => [
-                    'is_comment_required' => [
-                        'class' => BoolField::class,
+                    'is_comment_required'       => [
+                        'class'     => BoolField::class,
                         'allowNull' => false,
                     ],
                     'client_available_statuses' => [
-                        'class' => SelectField::class,
+                        'class'    => SelectField::class,
                         'multiple' => true,
-                        'items' => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'name'),
+                        'items'    => ArrayHelper::map(ShopOrderStatus::find()->all(), 'id', 'name'),
                     ],
-                ]
+                ],
             ],
 
             'pay' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Оплата',
                 'fields' => [
-                    'is_payment_allowed' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false
+                    'is_payment_allowed'   => [
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ],
                     'is_install_after_pay' => [
-                        'class' => BoolField::class,
-                        'allowNull' => false
+                        'class'     => BoolField::class,
+                        'allowNull' => false,
                     ],
-                ]
+                ],
             ],
-            
 
-            
+
             'additional' => [
                 'class'  => FieldSet::class,
                 'name'   => 'Дополнительные подписи',
                 'fields' => [
                     'btn_name',
                     'order_page_description' => [
-                        'class' => WidgetField::class,
+                        'class'       => WidgetField::class,
                         'widgetClass' => ComboTextInputWidget::class,
                     ],
 
                     'email_notify_description' => [
-                        'class' => WidgetField::class,
+                        'class'       => WidgetField::class,
                         'widgetClass' => ComboTextInputWidget::class,
                     ],
-                ]
+                ],
             ],
 
             'auto' => [
@@ -211,14 +204,14 @@ HTML
                             ShopOrderStatus::find()->all(),
                             'id',
                             'name'
-                        )
+                        ),
                     ],
 
                     'auto_next_status_time' => [
-                        'class' => NumberField::class
-                    ]
+                        'class' => NumberField::class,
+                    ],
 
-                ]
+                ],
             ],
         ];
     }

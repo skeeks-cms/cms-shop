@@ -41,10 +41,10 @@ use yii\helpers\Json;
  * php yii shop/skeeks-suppliers/update-all                                                     [часто] (не обязательно)                    Обновить информацию (коллекцкии, страны, справочники), быстрый скрипт, обновляет информацию если ТОЛЬКО изменилась.
  * php yii shop/skeeks-suppliers/update-all --info_reload=1                                     [редко] (если надо что то поправить)        Обновить информацию (коллекцкии, страны, справочники).
  *
- * php yii shop/skeeks-suppliers/update-products --product_new_info=1       *agent (5 мин)      [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
+ * php yii shop/skeeks-suppliers/update-products --product_new_info=1       *agent (10 мин)      [часто]                                     Обновить недавно измененные товары, их цены, остатки а информацию. (учет даты последнего изменения)
  * php yii shop/skeeks-suppliers/update-products                            *agent (раз в день) [редко]                                     Обновить все товары, их цены, остатки а информацию если ТОЛЬКО изменилась.
  *
- * php yii shop/skeeks-suppliers/update-store-items --store_new_prices=1    *agent (5 мин)      [часто]                                     Обновить недавно измененные цени и наличие. (учет даты последнего изменения)
+ * php yii shop/skeeks-suppliers/update-store-items --store_new_prices=1    *agent (10 мин)      [часто]                                     Обновить недавно измененные цени и наличие. (учет даты последнего изменения)
  * php yii shop/skeeks-suppliers/update-store-items                         *agent (раз в день) [редко]                                     Обновить недавно измененные цени и наличие.
 
  * php yii shop/skeeks-suppliers/update-products --product_reload_info=1                        [елси надо] (если надо что то поправить)    Обновить все товары, их цены, остатки и информацию.
@@ -2277,11 +2277,12 @@ class SkeeksSuppliersController extends Controller
 
         if ($file->extension != "webp") {
             $this->stdout("Uploading ...\n");
-            /*print_r($imageData);die;*/
             $this->stdout($image_src."\n");
 
             $this->stdout("{$file->src}\n");
             $this->stdout("---------------\n");
+
+            $this->stdout("Image no webp!\n");
             die;
         }
 
