@@ -485,6 +485,18 @@ $receiverAttributes = $model->getReceiverAttributes();
     <?php endif; ?>
 <?php endif; ?>
 
+<?php if ($model->comment) : ?>
+<div class="row" style="
+                    margin-top: 20px;
+                ">
+    <div class="col-12">
+        <h5>Комментарий к заказу</h5>
+    </div>
+    <div class="col-12">
+        <pre><?php echo $model->comment; ?></pre>
+    </div>
+</div>
+<?php endif; ?>
 
 <!--<div style="height: 20px;"></div>
 --><? /*= \skeeks\cms\modules\admin\widgets\BlockTitleWidget::widget([
