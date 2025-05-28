@@ -877,11 +877,11 @@ JS
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'enableClientValidation' => false,
     'validationUrl'          => \skeeks\cms\helpers\UrlHelper::construct([
-        'shop/admin-order/validate',
+        '/shop/admin-order/validate',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
     'action'                 => \skeeks\cms\helpers\UrlHelper::construct([
-        'shop/admin-order/save',
+        '/shop/admin-order/save',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
 
@@ -930,11 +930,11 @@ JS*/
 
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-        'shop/admin-order/validate',
+        '/shop/admin-order/validate',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
     'action'        => \skeeks\cms\helpers\UrlHelper::construct([
-        'shop/admin-order/save',
+        '/shop/admin-order/save',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
 
@@ -976,11 +976,11 @@ $form->fieldSelect($model, 'shop_pay_system_id', \yii\helpers\ArrayHelper::map(
 
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
     'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct([
-        'shop/admin-order/validate',
+        '/shop/admin-order/validate',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
     'action'        => \skeeks\cms\helpers\UrlHelper::construct([
-        'shop/admin-order/save',
+        '/shop/admin-order/save',
         'pk' => $model->id,
     ])->enableAdmin()->toString(),
 

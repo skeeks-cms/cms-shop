@@ -13,8 +13,8 @@ $payLink = \yii\helpers\Url::to('shop/cart/payment');
 
 
 <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
-    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct('shop/cart/shop-person-type-validate')->toString(),
-    'action'        => \skeeks\cms\helpers\UrlHelper::construct('shop/cart/shop-person-type-submit')->toString(),
+    'validationUrl' => \skeeks\cms\helpers\UrlHelper::construct('/shop/cart/shop-person-type-validate')->toString(),
+    'action'        => \skeeks\cms\helpers\UrlHelper::construct('/shop/cart/shop-person-type-submit')->toString(),
 
     'afterValidateCallback' => new \yii\web\JsExpression(<<<JS
             function(jForm, ajax)
