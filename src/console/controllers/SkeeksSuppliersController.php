@@ -754,6 +754,58 @@ class SkeeksSuppliersController extends Controller
      * @throws Exception
      * @throws \Throwable
      */
+    public function actionUpdateProduct($sx_id)
+    {
+        $apiQuery = [
+            'id' => $sx_id,
+        ];
+
+        $response = \Yii::$app->skeeksSuppliersApi->methodProducts($apiQuery);
+
+        $updated = 0;
+        $created = 0;
+
+        if ($response->isOk) {
+
+            $this->product_reload_info = 1;
+
+            $counter = 0;
+            $total = count($response->data);
+
+            $this->stdout("Ответ API: {$total} шт.\n");
+
+            foreach ($response->data as $apiData) {
+
+                $id = (int)ArrayHelper::getValue($apiData, "id");
+                if ($model = ShopCmsContentElement::find()->sxId($id)->one()) {
+                    if ($this->_updateProduct($apiData, $model)) {
+                        $this->stdout("\tОбновлено: 1\n", Console::FG_GREEN);
+                        $updated++;
+                    }
+                } else {
+                    if ($this->_updateProduct($apiData)) {
+                        $this->stdout("\tСоздано: 1\n", Console::FG_GREEN);
+                        $created++;
+                    }
+                }
+
+                $counter++;
+            }
+
+
+
+        } else {
+            throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
+        }
+    }
+
+    /**
+     * Получает информацию по новым товарам, и недавно измененным
+     * @param $page
+     * @return false|void
+     * @throws Exception
+     * @throws \Throwable
+     */
     public function actionUpdateProducts($page = 1)
     {
         $apiQuery = [
@@ -1717,10 +1769,13 @@ class SkeeksSuppliersController extends Controller
                         $imgIds = [];
 
                         foreach ($images as $imgApiData) {
+                            /**
+                             * @var $img CmsStorageFile
+                             */
                             $img = $this->_addImage($imgApiData, false);
                             $imgIds[] = $img->id;
                         }
-                        
+
                         $imgIds = array_unique($imgIds);
 
                         $model->setImageIds($imgIds);
@@ -2273,7 +2328,11 @@ class SkeeksSuppliersController extends Controller
         }
 
         $file->sx_id = $image_id;
-        $file->save();
+        if (!$file->save()) {
+            if ($this->stop_on_error) {
+                throw new Exception("Ошибка сохранения файла: " . print_r($file->errors, true));
+            }
+        }
 
         if ($file->extension != "webp") {
             $this->stdout("Uploading ...\n");
