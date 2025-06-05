@@ -710,6 +710,8 @@ HTML;
                         throw new Exception(print_r($sp->errors, true));
                     }
 
+                    $element->refresh();
+
                     if ($purchaseTypePrice) {
                         $price2 = $element->shopProduct->getPrice($purchaseTypePrice->id);
                         if (!$price2) {
