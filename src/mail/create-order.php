@@ -122,8 +122,8 @@ $order->refresh();
                     'format'         => 'raw',
                     'value'          => function (\skeeks\cms\shop\models\ShopOrderItem $shopBasket) {
                         if ($shopBasket->discount_value) {
-                            return "<span style='text-decoration: line-through;'>".(string)$shopBasket->moneyOriginal."</span><br />".Html::tag('small',
-                                    $shopBasket->notes)."<br />".(string)$shopBasket->money."<br />".Html::tag('small',
+                            return "<span style='text-decoration: line-through;'>".(string)$shopBasket->money."</span><br />".Html::tag('small',
+                                    $shopBasket->notes)."<br />".(string)$shopBasket->moneyWithDiscount."<br />".Html::tag('small',
                                     \Yii::t('skeeks/shop/app', 'Discount').": ".$shopBasket->discount_value);
                         } else {
                             return (string)$shopBasket->money;
