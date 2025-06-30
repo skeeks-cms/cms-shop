@@ -121,7 +121,7 @@ class AdminCmsContentElementController extends \skeeks\cms\controllers\AdminCmsC
         $actions = ArrayHelper::merge(parent::actions(), [
 
                 "index" => [
-                    'backendShowings' => false,
+                    /*'backendShowings' => false,*/
                     'on beforeRender' => function (Event $e) {
                         $urlHelper = new BackendUrlHelper();
                         $urlHelper->setBackendParamsByCurrentRequest();
@@ -2175,7 +2175,7 @@ HTML
         }*/
 
         $visibleFilters = [
-            'barcodes',
+            'barcodes', 'brand_id', 'brand_sku',
         ];
 
         if ($is_quantity_our_filter) {
