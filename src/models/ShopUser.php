@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\components\Cms;
+use skeeks\cms\models\CmsCompareElement;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsUser;
@@ -25,50 +26,51 @@ use yii\db\ActiveQuery;
  *
  * Это объект корзины
  *
- * @property integer           $id
- * @property integer           $created_by
- * @property integer           $updated_by
- * @property integer           $created_at
- * @property integer           $updated_at
- * @property integer           $cms_user_id Пользователь сайта
- * @property integer           $shop_order_id
- * @property integer           $cms_site_id
+ * @property integer               $id
+ * @property integer               $created_by
+ * @property integer               $updated_by
+ * @property integer               $created_at
+ * @property integer               $updated_at
+ * @property integer               $cms_user_id Пользователь сайта
+ * @property integer               $shop_order_id
+ * @property integer               $cms_site_id
  *
  * ***
  *
- * @property CmsUser           $cmsUser
+ * @property CmsUser               $cmsUser
  *
- * @property ShopBasket[]      $shopBaskets
- * @property ShopDelivery      $delivery
- * @property ShopBuyer         $buyer
- * @property ShopPaySystem     $paySystem
+ * @property ShopBasket[]          $shopBaskets
+ * @property ShopDelivery          $delivery
+ * @property ShopBuyer             $buyer
+ * @property ShopPaySystem         $paySystem
  *
- * @property ShopPersonType    $personType
- * @property CmsSite           $site
+ * @property ShopPersonType        $personType
+ * @property CmsSite               $site
  *
- * @property int               $countShopBaskets
- * @property float             $quantity
+ * @property int                   $countShopBaskets
+ * @property float                 $quantity
  *
- * @property ShopBuyer[]       $shopBuyers
- * @property ShopPaySystem[]   $paySystems
+ * @property ShopBuyer[]           $shopBuyers
+ * @property ShopPaySystem[]       $paySystems
  *
  *
  * @property ShopFavoriteProduct[] $shopFavoriteProducts
+ * @property CmsCompareElement[]   $cmsCompareElements
  *
  *
- * @property ShopOrder         $shopOrder
- * @property Money             $money
- * @property Money             $moneyOriginal
- * @property Money             $moneyVat
- * @property Money             $moneyDiscount
- * @property Money             $moneyDelivery
+ * @property ShopOrder             $shopOrder
+ * @property Money                 $money
+ * @property Money                 $moneyOriginal
+ * @property Money                 $moneyVat
+ * @property Money                 $moneyDiscount
+ * @property Money                 $moneyDelivery
  *
- * @property int               $weight
- * @property bool              $isEmpty
+ * @property int                   $weight
+ * @property bool                  $isEmpty
  *
- * @property ShopTypePrice     $buyTypePrices
- * @property ShopTypePrice     $viewTypePrices
- * @property CmsContentElement $store
+ * @property ShopTypePrice         $buyTypePrices
+ * @property ShopTypePrice         $viewTypePrices
+ * @property CmsContentElement     $store
  */
 class ShopUser extends ActiveRecord
 {
@@ -111,17 +113,21 @@ class ShopUser extends ActiveRecord
             ],
 
 
-            [['shop_order_id'], 'default', 'value' => function(self $model) {
-                $shopOrder = $this->shopOrder;
+            [
+                ['shop_order_id'],
+                'default',
+                'value' => function (self $model) {
+                    $shopOrder = $this->shopOrder;
 
-                if ($shopOrder->isNewRecord) {
-                    if (!$shopOrder->save(false)) {
-                        throw new UserException("Заказ-черновик не создан: ".print_r($shopOrder->errors, true));
+                    if ($shopOrder->isNewRecord) {
+                        if (!$shopOrder->save(false)) {
+                            throw new UserException("Заказ-черновик не создан: ".print_r($shopOrder->errors, true));
+                        }
                     }
-                }
 
-                return $shopOrder->id;
-            }],
+                    return $shopOrder->id;
+                },
+            ],
 
             [
                 'cms_site_id',
@@ -192,7 +198,7 @@ class ShopUser extends ActiveRecord
             //Для того чтобы применились default rules
             $order->validate();
             if (!$order->save(false)) {
-                throw new Exception("Заказ черновик не создан: " . print_r($order->errors, true));
+                throw new Exception("Заказ черновик не создан: ".print_r($order->errors, true));
             }
 
             $this->shop_order_id = $order->id;
@@ -234,8 +240,6 @@ class ShopUser extends ActiveRecord
     {
         return $this->shopOrder->quantity;
     }
-
-
 
 
     /**
@@ -448,6 +452,15 @@ class ShopUser extends ActiveRecord
     public function getShopFavoriteProducts()
     {
         return $this->hasMany(ShopFavoriteProduct::className(), ['shop_user_id' => 'id']);
+    }
+    /**
+     * Gets query for [[ShopFavoriteProducts]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCmsCompareElements()
+    {
+        return $this->hasMany(CmsCompareElement::className(), ['shop_user_id' => 'id']);
     }
 
 }

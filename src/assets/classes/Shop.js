@@ -81,6 +81,31 @@
 
             });
 
+            //Глобальное место со всем избранным
+            self.on("compareAddProduct compareRemoveProduct", function (e, data) {
+                var total = Number(data.result.total);
+                var jFavoriteProducts = $(".sx-compare-products");
+                var jTotalWrapper = $(".sx-compare-total-wrapper", jFavoriteProducts);
+                var jTotal = $(".sx-compare-total", jFavoriteProducts);
+                jTotal.empty().append(total);
+                if (total > 0) {
+                    jTotalWrapper.show();
+                } else {
+                    jTotalWrapper.hide();
+                }
+
+                jFavoriteProducts.animate({
+                    transform: 'scale(1.3)'
+                }, 200, function () {
+                    $(this).animate({
+                        transform: 'scale(1)'
+                    }, 200, function () {
+                        $(this).removeAttr('style');
+                    });
+                });
+
+            });
+
             //Клик по добавлению и удаления избранного
             $("body").on("click", ".sx-favorite-product-trigger", function () {
 
@@ -109,6 +134,48 @@
                 } else {
                     //add
                     var ajax = self.createAjaxFavoriteAddProduct(product_id);
+                    ajax.on("success", function (e, data) {
+                        jWrapper.trigger("complite", data.response.data);
+                        jWrapper.trigger("added", data.response.data);
+
+                        jWrapper.data("is-added", 1);
+                        jTrigger.empty().append(
+                            "<i class='" + addedIcon + "'></i>"
+                        );
+                    });
+                    ajax.execute();
+                }
+                return false;
+            });
+
+            //Клик по добавлению и удаления избранного
+            $("body").on("click", ".sx-compire-product-trigger", function () {
+
+                var jTrigger = $(this);
+                var jWrapper = $(this).closest('.sx-compire-product');
+                var isAdded = jWrapper.data("is-added");
+                var addedIcon = jWrapper.data("added-icon-class");
+                var notAddedIcon = jWrapper.data("not-added-icon-class");
+                var product_id = jWrapper.data("product_id");
+
+                if (isAdded) {
+                    //remove
+                    //add
+                    var ajax = self.createAjaxCompareRemoveProduct(product_id);
+                    ajax.on("success", function (e, data) {
+                        jWrapper.trigger("complite", data.response.data);
+                        jWrapper.trigger("removed", data.response.data);
+
+                        jWrapper.data("is-added", 0);
+                        jTrigger.empty().append(
+                            "<i class='" + notAddedIcon + "'></i>"
+                        );
+                    });
+                    ajax.execute();
+
+                } else {
+                    //add
+                    var ajax = self.createAjaxCompareAddProduct(product_id);
                     ajax.on("success", function (e, data) {
                         jWrapper.trigger("complite", data.response.data);
                         jWrapper.trigger("added", data.response.data);
@@ -391,6 +458,70 @@
             ajax.onSuccess(function (e, data) {
 
                 self.trigger('favoriteRemoveProduct', {
+                    'product_id': product_id,
+                    'result': data.response.data,
+                });
+            });
+
+            return ajax;
+        },
+
+
+        /**
+         *
+         * @param product_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxCompareAddProduct: function (product_id) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-compare-add-product'));
+
+            product_id = Number(product_id);
+
+            ajax.setData({
+                'product_id': product_id,
+            });
+
+            ajax.onBeforeSend(function (e, data) {
+                self.trigger('beforeCompareAddProduct', {
+                    'product_id': product_id,
+                });
+            });
+
+            ajax.onSuccess(function (e, data) {
+                self.trigger('compareAddProduct', {
+                    'product_id': product_id,
+                    'result': data.response.data,
+                });
+            });
+
+            return ajax;
+        },
+
+        /**
+         *
+         * @param product_id
+         * @returns {*|sx.classes.AjaxQuery}
+         */
+        createAjaxCompareRemoveProduct: function (product_id) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-compare-remove-product'));
+
+            product_id = Number(product_id);
+
+            ajax.setData({
+                'product_id': product_id,
+            });
+
+            ajax.onBeforeSend(function (e, data) {
+                self.trigger('beforeCompareRemoveProduct', {
+                    'product_id': product_id,
+                });
+            });
+
+            ajax.onSuccess(function (e, data) {
+
+                self.trigger('compareRemoveProduct', {
                     'product_id': product_id,
                     'result': data.response.data,
                 });

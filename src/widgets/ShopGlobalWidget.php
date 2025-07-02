@@ -51,6 +51,10 @@ class ShopGlobalWidget extends Widget
             'backend-favorite-remove-product' => UrlHelper::construct('/shop/favorite/remove-product')->toString(),
             'backend-favorite'                => UrlHelper::construct('/shop/favorite')->toString(),
 
+            'backend-compare-add-product'    => UrlHelper::construct('/shop/compare/add-product')->toString(),
+            'backend-compare-remove-product' => UrlHelper::construct('/shop/compare/remove-product')->toString(),
+            'backend-compare'                => UrlHelper::construct('/shop/compare')->toString(),
+
             'currencyCode' => \Yii::$app->money->currency_code,
         ];
     }
