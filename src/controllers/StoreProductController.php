@@ -240,7 +240,7 @@ class StoreProductController extends BackendModelStandartController
                         ],
                     ],
                 ],
-                "backendShowings" => false,
+                //"backendShowings" => true,
                 'grid'            => [
                     'on init'        => function (Event $e) {
                         /**
