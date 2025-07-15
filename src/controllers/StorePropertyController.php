@@ -746,7 +746,7 @@ JS
      */
     public function actionUpdateProperties()
     {
-        set_time_limit(0);
+        Skeeks::unlimited();
 
         $rr = new RequestResponse();
 
