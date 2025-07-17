@@ -127,4 +127,40 @@ class CompareController extends Controller
             return $this->goBack();
         }
     }
+    
+    /**
+     * Removing the basket position
+     *
+     * @return array|\yii\web\Response
+     * @throws \Exception
+     */
+    public function actionClear()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            
+            $tree_id = (int) \Yii::$app->request->post('tree_id');
+            
+            $q = \Yii::$app->shop->shopUser->getCmsCompareElements();
+            if ($tree_id) {
+                $q->joinWith(['cmsContentElement as cmsContentElement']);
+                $q->andWhere(['cmsContentElement.tree_id' => $tree_id]);
+                
+            }
+            foreach ($q->each(10) as $compare) {
+                if ($compare->delete()) {
+                    $rr->success = true;
+                    $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
+                }
+            }
+
+            $rr->success = true;
+            $rr->message = "Товары очищены из сравнения";
+
+            return (array)$rr;
+        } else {
+            return $this->goBack();
+        }
+    }
 }
