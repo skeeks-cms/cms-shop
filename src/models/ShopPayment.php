@@ -61,9 +61,9 @@ use yii\helpers\ArrayHelper;
  * @property string            $external_id
  * @property string            $external_data
  *
- * @property string            $t_name
- * @property string            $t_id
- * @property string            $t_data
+ * //@property string            $t_name
+ * //@property string            $t_id
+ * //@property string            $t_data
  *
  * @property string            $shopStorePaymentTypeAsText
  * @property CmsUser           $cmsUser
@@ -250,9 +250,9 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             [['shop_order_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopOrder::class, 'targetAttribute' => ['shop_order_id' => 'id']],
             [['shop_pay_system_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShopPaySystem::class, 'targetAttribute' => ['shop_pay_system_id' => 'id']],
 
-            [['t_name'], 'string'],
+            /*[['t_name'], 'string'],
             [['t_id'], 'string'],
-            [['t_data'], 'string'],
+            [['t_data'], 'string'],*/
         ];
     }
 
