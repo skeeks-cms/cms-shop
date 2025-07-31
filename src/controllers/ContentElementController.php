@@ -15,15 +15,17 @@ use skeeks\cms\shop\models\ShopCmsContentElement;
  */
 class ContentElementController extends \skeeks\cms\controllers\ContentElementController
 {
-    public $modelClassName = ShopCmsContentElement::class;
-
     public function beforeAction($action)
     {
-        if ($this->model && $this->model->shopProduct) {
+        if ($this->model && $this->model->cmsContent->base_role == "products") {
             //if (ShopContent::find()->where(["content_id" => $this->model->content_id])->exists()) {
             //Это магазин
             //$this->model = ShopCmsContentElement::findOne($this->model->id);
+            $this->modelClassName = ShopCmsContentElement::class;
+            $this->model = false;
+
             $this->model->shopProduct->createNewView();
+
             $this->editControllerRoute = "shop/admin-cms-content-element";
             //}
         }
