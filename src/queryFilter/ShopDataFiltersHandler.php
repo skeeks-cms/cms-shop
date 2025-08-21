@@ -174,7 +174,7 @@ class ShopDataFiltersHandler extends Model
             {
                 $country = CmsCountry::find()->alpha2($val)->one();
                 $rowData = [
-                    'name' => "произвдоства " . $country->name,
+                    'name' => "производства " . $country->name,
                     'type' => "",
                     'property_id' => "field-sd-country",
                     'value' => $val,
