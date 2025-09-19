@@ -3117,7 +3117,12 @@ JS
 
                 if (\Yii::$app->request->post("act") == "update-price") {
 
-                    $productPrice = $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)\Yii::$app->request->post("price_value"), \Yii::$app->request->post("price_currency_code"));
+                    $price = (string) \Yii::$app->request->post("price_value");
+
+                    $price = str_replace(" ", "", $price);
+                    $price = trim($price);
+
+                    $productPrice = $model->shopProduct->savePrice((int)\Yii::$app->request->post("shop_type_price_id"), (float)$price, \Yii::$app->request->post("price_currency_code"));
                     $productPrice->is_fixed = (int)\Yii::$app->request->post("is_fixed");
                     $productPrice->save();
 

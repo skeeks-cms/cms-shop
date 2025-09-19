@@ -179,6 +179,18 @@ class ShopProductPrice extends \skeeks\cms\models\Core
             [['currency_code'], 'string', 'max' => 3],
             [['currency_code'], 'default', 'value' => \Yii::$app->money->currencyCode],
             [['price'], 'default', 'value' => 0.00],
+
+            /*[['price'], function($attr) {
+                $price = $this->{$attr};
+                var_dump($price);die;
+
+                $price = str_replace(" ", "", $price);
+                $price = trim($price);
+
+
+
+                $this->{$attr} = (float) $price;
+            }],*/
         ];
     }
 
