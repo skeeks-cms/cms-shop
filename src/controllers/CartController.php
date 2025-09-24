@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\base\Controller;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsUser;
+use skeeks\cms\money\Money;
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopBasket;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
@@ -99,6 +100,8 @@ class CartController extends Controller
                 }
                 $rr->success = true;
 
+
+
                 //Сначала проверка корректности данных по заказу
                 if (!$order->validate()) {
                     $errors = $order->getFirstErrors();
@@ -115,7 +118,16 @@ class CartController extends Controller
                         return $rr;
                     }
                 }
-                
+
+                if (\Yii::$app->skeeks->site->shopSite->order_min_price) {
+                    if ($order->moneyItems->amount < \Yii::$app->skeeks->site->shopSite->order_min_price) {
+                        $m = new Money((string) \Yii::$app->skeeks->site->shopSite->order_min_price, $order->moneyItems->currency);
+                        $rr->message = "Минимальна сумма заказа {$m} Добавьте еще товары в корзину.";
+                        $rr->success = false;
+                        return $rr;
+                    }
+                }
+
                 $deliveryHandlerCheckoutModel = null;
                 if ($order->deliveryHandlerCheckoutModel) {
                     $deliveryHandlerCheckoutModel = $order->deliveryHandlerCheckoutModel;

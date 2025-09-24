@@ -236,7 +236,10 @@ class AdminShopSiteController extends BackendModelController
                             'first_name' => 'Имя',
                             'last_name'  => 'Фамилия',
                         ],
-                    ]
+                    ],
+                    'order_min_price' => [
+                        'class'    => NumberField::class,
+                    ],
                     /*'order_free_shipping_from_price' => [
                         'class'    => NumberField::class,
                     ],*/

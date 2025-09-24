@@ -34,6 +34,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
  * @property int         $is_allow_edit_products Разрешено редактировать и добавлять товары?
  *
+ * @property number      $order_min_price Минимальная сумма заказа на сайте
  * @property number      $order_free_shipping_from_price Бесплатная доставка от
  * @property array       $order_required_fields Бесплатная доставка от
  *
@@ -76,6 +77,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
     public function _afterFind($event)
     {
         $this->order_free_shipping_from_price = (float)$this->order_free_shipping_from_price;
+        $this->order_min_price = (float)$this->order_min_price;
     }
 
 
@@ -104,6 +106,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::rules(), [
             [['is_receiver'], 'integer'],
             [['order_free_shipping_from_price'], 'number'],
+            [['order_min_price'], 'number'],
 
             [['catalog_cms_tree_id'], 'integer'],
             [['catalog_cms_tree_id'], 'exist', 'skipOnError' => true, 'targetClass' => CmsTree::className(), 'targetAttribute' => ['catalog_cms_tree_id' => 'id']],
@@ -198,6 +201,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 
             'description'                    => "Описание",
             'order_free_shipping_from_price' => "Бесплатная доставка при заказе от",
+            'order_min_price' => "Минимальная сумма заказа",
             'description_internal'           => "Скрытое описание",
             'is_receiver'                    => "Разрешено получать товары от постащиков",
             'catalog_cms_tree_id'            => "Основной раздел для товаров",

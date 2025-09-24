@@ -91,7 +91,11 @@ $noSignature = @$noSignature;
                     <b>Счет №<?= $model->id; ?> от <?= \Yii::$app->formatter->asDate($model->created_at, "long"); ?></b>
                 </h1>
 
-                <p>Плательщик: <b><?= $model->senderContractor->asShortText; ?>, ИНН <?= $model->senderContractor->inn; ?></b></p>
+                <?php if($model->senderContractor) : ?>
+                    <p>Плательщик: <b><?= $model->senderContractor->asShortText; ?>, ИНН <?= $model->senderContractor->inn; ?></b></p>
+                <?php endif; ?>
+                
+                
 
 
                 <table border="2" class="sx-positions">
