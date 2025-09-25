@@ -643,8 +643,14 @@ class SkeeksSuppliersController extends Controller
             foreach ((array)$response->data as $apiData) {
 
                 $id = (int)ArrayHelper::getValue($apiData, "id");
+
                 if ($model = ShopCollection::find()->sxId($id)->one()) {
                     if ($this->_updateCollection($apiData, $model)) {
+
+                        /*if ($id == 684) {
+                            print_r($apiData);die;
+                        }*/
+
                         $updated++;
                     }
                 } else {
