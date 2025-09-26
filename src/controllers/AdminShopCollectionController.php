@@ -347,9 +347,15 @@ class AdminShopCollectionController extends BackendModelStandartController
                 ],
                 'name'           => \Yii::t('skeeks/cms', 'Дополнительно'),
                 'fields'         => [
+
                     'priority' => [
                         'class' => NumberField::class,
                     ],
+
+                    'show_counter' => [
+                        'class' => NumberField::class,
+                    ],
+
                     'external_id',
                 ],
             ],
