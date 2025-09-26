@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
+use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\shop\models\ShopCollection;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -134,6 +135,7 @@ class CollectionController extends Controller
         $model->show_counter = $model->show_counter + 1;
         ShopCollection::updateAll(['show_counter' => $model->show_counter], ['id' => $model->id]);
 
+
         $this->_initStandartMetaData();
 
         return $this->render($this->action->id, [
@@ -179,6 +181,8 @@ class CollectionController extends Controller
             $description = $meta_descripption;
         } elseif ($model->description_short) {
             $description = $model->description_short;
+        }  elseif ($model->description_full) {
+            $description = $model->description_full;
         } else {
             if (isset($model->name)) {
                 if ($model->name != $model->seoName) {
@@ -190,6 +194,7 @@ class CollectionController extends Controller
         }
 
         $description = trim(strip_tags($description));
+        $description = StringHelper::substr($description, 0, 160);
 
         $this->view->registerMetaTag([
             "name"    => 'description',
