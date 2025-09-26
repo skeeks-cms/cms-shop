@@ -36,6 +36,7 @@ use yii\web\Application;
  * @property ineger           $shop_brand_id
  * @property string           $code
  * @property string           $external_id
+ * @property integer           $show_counter
  *
  * @property string|null      $seo_h1
  * @property string|null      $meta_title
@@ -129,6 +130,7 @@ class ShopCollection extends ActiveRecord
                     'priority',
                     'shop_brand_id',
                     'sx_id',
+                    'show_counter',
                 ],
                 'integer',
             ],
@@ -295,6 +297,7 @@ class ShopCollection extends ActiveRecord
             'shop_brand_id'     => Yii::t('skeeks/cms', 'Бренд'),
             'imageIds'          => Yii::t('skeeks/cms', 'Images'),
             'sx_id'             => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'show_counter'             => Yii::t('skeeks/cms', 'Количество просмотров'),
         ]);
     }
     /**

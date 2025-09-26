@@ -131,6 +131,8 @@ class CollectionController extends Controller
             }
         }
 
+        $model->show_counter = $model->show_counter + 1;
+        ShopCollection::updateAll(['show_counter' => $model->show_counter], ['id' => $model->id]);
 
         $this->_initStandartMetaData();
 
