@@ -2123,6 +2123,11 @@ class SkeeksSuppliersController extends Controller
                                     $enum->property_id = $property->id;
                                     $enum->update(false, ['property_id']);
                                 }
+
+                                if ($enum->value != $enumSxValue) {
+                                    $enum->value = $enumSxValue;
+                                    $enum->update(false, ['value']);
+                                }
                             }
 
                             $enumIds[] = $enum->id;
@@ -2149,6 +2154,7 @@ class SkeeksSuppliersController extends Controller
                                     $enum->property_id = $property->id;
                                     $enum->value = $enumSxValue;
                                     $enum->sx_id = $enumSxId;
+
                                     if (!$enum->save()) {
                                         throw new Exception(print_r($enum->errors, true).print_r($enum->toArray(), true));
                                     }
@@ -2156,6 +2162,11 @@ class SkeeksSuppliersController extends Controller
                                     if ($enum->property_id != $property->id) {
                                         $enum->property_id = $property->id;
                                         $enum->update(false, ['property_id']);
+                                    }
+
+                                    if ($enum->value != $enumSxValue) {
+                                        $enum->value = $enumSxValue;
+                                        $enum->update(false, ['value']);
                                     }
                                 }
 
