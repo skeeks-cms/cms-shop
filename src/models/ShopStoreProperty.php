@@ -58,6 +58,8 @@ class ShopStoreProperty extends ActiveRecord
     const PROPERTY_NATURE_TREE = "tree";
     const PROPERTY_NATURE_IMAGE = "image";
     const PROPERTY_NATURE_SECOND_IMAGE = "second_image";
+    const PROPERTY_NATURE_DESCRIPTION_FULL = "description_full";
+    const PROPERTY_NATURE_DESCRIPTION_SHORT = "description_short";
 
     const PROPERTY_NATURE_MEASURE_CODE = "measure_code";
     const PROPERTY_NATURE_MEASURE_RATIO = "measure_ratio";
@@ -134,6 +136,8 @@ class ShopStoreProperty extends ActiveRecord
             self::PROPERTY_NATURE_MEASURE_CODE      => 'Единица измерений',
             self::PROPERTY_NATURE_MEASURE_RATIO     => 'Шаг количества продажи',
             self::PROPERTY_NATURE_MEASURE_RATIO_MIN => 'Минимальное количество продажи',
+            self::PROPERTY_NATURE_DESCRIPTION_FULL  => 'Полное описание',
+            self::PROPERTY_NATURE_DESCRIPTION_SHORT => 'Короткое описание',
         ];
     }
 

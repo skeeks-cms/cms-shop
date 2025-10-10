@@ -1688,4 +1688,43 @@ class ShopProduct extends \skeeks\cms\models\Core
             return \Yii::$app->formatter->asDecimal($value)." часов";
         }
     }
+
+    public function joinToModel(array $product_ids = [])
+    {
+        if ($product_ids) {
+
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+                if (!$this->shop_product_model_id) {
+                    $spModel = new \skeeks\cms\shop\models\ShopProductModel();
+                    $spModel->save();
+
+                    $this->shop_product_model_id = $spModel->id;
+                    $this->update(false, ['shop_product_model_id']);
+                } else {
+                    $spModel = $this->shopProductModel;
+                }
+
+
+                foreach ($product_ids as $product_id) {
+                    if ($product_id) {
+
+                        if ($sp = \skeeks\cms\shop\models\ShopProduct::findOne($product_id)) {
+                            $sp->shop_product_model_id = $spModel->id;
+                            $sp->update(false, ['shop_product_model_id']);
+                        }
+
+                    }
+
+                }
+
+                $t->commit();
+            } catch (\Exception $exception) {
+                $t->rollBack();
+                throw $exception;
+            }
+
+        }
+    }
 }

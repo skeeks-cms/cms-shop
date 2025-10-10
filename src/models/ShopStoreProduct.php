@@ -347,10 +347,33 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                                 $model->relatedPropertiesModel->setAttribute($code, $value);
                             }
 
+
+                        } elseif (is_float($value) || is_int($value)) {
                             $shopProduct->{$property->property_nature} = $value;
                         }
 
                     } elseif (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_DESCRIPTION_FULL,
+                    ])) {
+
+                        if (is_string($value)) {
+                            $value = (string) $value;
+                            $value = trim($value);
+                            $model->description_full = $value;
+                        }
+
+                    } elseif (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_DESCRIPTION_SHORT,
+                    ])) {
+
+                        if (is_string($value)) {
+                            $value = (string) $value;
+                            $value = trim($value);
+                            $model->description_short = $value;
+                        }
+
+                    }
+                    elseif (in_array($property->property_nature, [
                         ShopStoreProperty::PROPERTY_NATURE_BRAND_SKU,
                     ])) {
 
