@@ -1029,7 +1029,9 @@ SQL
     {
         $q = CmsContentProperty::find()
             ->cmsSite()
-            ->andWhere(["is_offer_property" => 1]);
+            ->andWhere(["is_offer_property" => 1])
+            ->orderBy(['priority' => SORT_ASC])
+        ;
 
         return $q->all();
     }
