@@ -13,6 +13,7 @@ use skeeks\cms\helpers\StringHelper;
 use skeeks\cms\models\CmsContentElement;
 use skeeks\cms\models\CmsStorageFile;
 use yii\base\ModelEvent;
+use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -52,6 +53,7 @@ class ShopCmsContentElement extends CmsContentElement
 
         $this->on(self::EVENT_BEFORE_DELETE, [$this, "_deleteShops"]);
         $this->on(self::EVENT_AFTER_DELETE, [$this, "_updateParentAfterDelete"]);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, "_updateTradeOffers"]);
     }
 
     /**
@@ -74,6 +76,19 @@ class ShopCmsContentElement extends CmsContentElement
         ]);
     }
 
+    public function _updateTradeOffers(AfterSaveEvent $event)
+    {
+        if ($this->shopProduct->isOffersProduct && $event->changedAttributes) {
+            //Если имзенился раздел у родительского товара, то нужно поменять у всех дочерних
+            if (in_array("tree_id", array_keys($event->changedAttributes))) {
+                foreach ($this->shopProduct->tradeOffers as $offerElement)
+                {
+                    $offerElement->tree_id = $this->tree_id;
+                    $offerElement->update(false, ['tree_id']);
+                }
+            }
+        }
+    }
     /**
      * TODO:доделать
      * @param ModelEvent $event

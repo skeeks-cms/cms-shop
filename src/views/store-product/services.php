@@ -51,7 +51,7 @@ JS
 ?>
 <h5>Автоматическое создание товаров</h5>
 
-<div class="sx-bg-secondary" style="padding: 10px; max-width: 500px;">
+<div class="sx-bg-secondary" style="padding: 2rem; border-radius: var(--base-radius); max-width: 500px;">
     <?php
     $model = new \skeeks\cms\base\DynamicModel();
     $model->defineAttribute("is_active");
