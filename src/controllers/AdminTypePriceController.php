@@ -171,11 +171,11 @@ CSS
                 'fields' => [
                     'is_default'  => [
                         'class'     => BoolField::class,
-                        'allowNull' => false,
+                        'allowNull' => true,
                     ],
                     'is_purchase' => [
                         'class'     => BoolField::class,
-                        'allowNull' => false,
+                        'allowNull' => true,
                     ],
                     'name',
                     'description' => [
