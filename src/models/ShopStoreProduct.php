@@ -372,6 +372,16 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
                             $model->description_short = $value;
                         }
 
+                    } elseif (in_array($property->property_nature, [
+                        ShopStoreProperty::PROPERTY_NATURE_IMAGE
+                    ])) {
+
+                        if (is_string($value) && $value) {
+                            $value = (string) $value;
+                            $storageFile = \Yii::$app->storage->upload($value);
+                            $model->image_id = $storageFile->id;
+                        }
+
                     }
                     elseif (in_array($property->property_nature, [
                         ShopStoreProperty::PROPERTY_NATURE_BRAND_SKU,

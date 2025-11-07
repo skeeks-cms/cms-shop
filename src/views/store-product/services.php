@@ -14,6 +14,14 @@ $context = $this->context;
 $backendUrl = \yii\helpers\Url::to(['auto-create']);
 
 $this->registerJs(<<<JS
+    
+    $(".field-dynamicmodel-is_no_create_no_tree input").on("change", function() {
+        if ($(this).is(":checked")) {
+            $(".field-dynamicmodel-cms_tree_id").slideUp();
+        } else {
+            $(".field-dynamicmodel-cms_tree_id").slideDown();
+        }
+    });
 
 $(".sx-update").on("click", function() {
     var jBtn = $(this);
@@ -32,7 +40,7 @@ $(".sx-update").on("click", function() {
         }, 1000)
         
         setTimeout(function() {
-            window.location.reload();
+            /*window.location.reload();*/
         }, 3000)
     });
     AjaxHandler.on("error", function () {
@@ -58,7 +66,10 @@ JS
     $model->setAttributeLebel("is_active", "Показывать товары на сайте сразу?");
 
     $model->defineAttribute("cms_tree_id");
-    $model->setAttributeLebel("cms_tree_id", "Раздел");
+    $model->setAttributeLebel("cms_tree_id", "Раздел по умолчанию");
+
+    $model->defineAttribute("is_no_create_no_tree");
+    $model->setAttributeLebel("is_no_create_no_tree", "Не создавать товары без раздела");
 
     $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
         'action'               => $backendUrl,
@@ -88,15 +99,19 @@ JS
         }
     JS
         ),
-    ]); ?>
+    ]);
+
+    ?>
 
     <?php echo $form->field($model, "is_active")->checkbox()->hint("Созданные товары будут сразу показываться на сайте?"); ?>
+    <?php echo $form->field($model, "is_no_create_no_tree")->checkbox(); ?>
+
     <?php echo $form->field($model, "cms_tree_id")->widget(
         \skeeks\cms\widgets\formInputs\selectTree\SelectTreeInputWidget::class,
         [
             'multiple' => false,
         ]
-    )->hint("Созданные товары поместить в папку"); ?>
+    )->hint("Созданные товары поместить в раздел. Если раздел не определен параметрами."); ?>
 
     <div class="d-flex sx-submit-wrapper">
         <button type="submit" href="#" class="btn btn-primary"

@@ -662,6 +662,10 @@ HTML;
             $model->setAttributeLebel("cms_tree_id", "Раздел");
             $model->addRule("cms_tree_id", "integer");
 
+            $model->defineAttribute("is_no_create_no_tree");
+            $model->setAttributeLebel("is_no_create_no_tree", "Не создавать раздел");
+            $model->addRule("is_no_create_no_tree", "integer");
+
             $model->load(\Yii::$app->request->post());
 
             $q = \Yii::$app->shop->backendShopStore->getShopStoreProducts()->andWhere(['shop_product_id' => null])->orderBy(['id' => SORT_ASC])->limit(1000);
@@ -687,7 +691,7 @@ HTML;
                     $element->content_id = $cmsContent->id;
 
                     $element->name = $shopStoreProduct->name;
-                    $element->tree_id = $model->cms_tree_id;
+
 
                     if ($model->is_active) {
                         $element->active = "Y";
@@ -700,6 +704,17 @@ HTML;
                     $sp = new ShopProduct();
 
                     $shopStoreProduct->loadDataToElementProduct($element, $sp);
+
+                    if (!$element->tree_id) {
+                        $element->tree_id = $model->cms_tree_id;
+                    }
+
+                    //Если раздел не определ и не надо создавать
+                    if (!$element->tree_id && $model->is_no_create_no_tree) {
+                        $t->commit();
+                        continue;
+                    }
+
 
                     if (!$element->save()) {
                         throw new Exception(print_r($element->errors, true));
@@ -762,9 +777,9 @@ HTML;
 
                 } catch (\Exception $e) {
                     $t->rollBack();
-                    /*print_r($shopStoreProduct->name);die;
+                    /*print_r($shopStoreProduct->name);die;*/
                     throw $e;
-                    die;*/
+                    die;
                     continue;
                 }
 

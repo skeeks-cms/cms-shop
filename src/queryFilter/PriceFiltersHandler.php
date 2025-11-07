@@ -232,8 +232,8 @@ class PriceFiltersHandler extends Model
         $data = $outerQuery->createCommand()->queryOne();
 
         $this->_min_max_data = [
-            round(ArrayHelper::getValue($data, 'min'), 2),
-            round(ArrayHelper::getValue($data, 'max'), 2),
+            round((float)ArrayHelper::getValue($data, 'min'), 2),
+            round((float)ArrayHelper::getValue($data, 'max'), 2),
         ];
 
         return $this->_min_max_data;
