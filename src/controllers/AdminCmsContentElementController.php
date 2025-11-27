@@ -498,6 +498,7 @@ HTML
                         try {
                             $newModel = $action->model->copy();
                         } catch (\Exception $e) {
+                            throw $e;
                             print_r($e->getMessage());
                             die;
                         }

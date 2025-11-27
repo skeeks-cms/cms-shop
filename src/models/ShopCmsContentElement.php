@@ -78,7 +78,7 @@ class ShopCmsContentElement extends CmsContentElement
 
     public function _updateTradeOffers(AfterSaveEvent $event)
     {
-        if ($this->shopProduct->isOffersProduct && $event->changedAttributes) {
+        if ($this->shopProduct && $this->shopProduct->isOffersProduct && $event->changedAttributes) {
             //Если имзенился раздел у родительского товара, то нужно поменять у всех дочерних
             if (in_array("tree_id", array_keys($event->changedAttributes))) {
                 foreach ($this->shopProduct->tradeOffers as $offerElement)
