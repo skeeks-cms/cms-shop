@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
 use skeeks\cms\models\CmsStorageFile;
@@ -53,6 +54,7 @@ use yii\web\Application;
  * @property CmsStorageFile   $image
  * @property CmsStorageFile[] $images
  * @property ShopProduct[]    $shopProducts
+ * @property ShopCollectionSticker[] $shopCollectionStickers
  *
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -97,6 +99,13 @@ class ShopCollection extends ActiveRecord
                 'ensureUnique'  => false,
                 'maxLength'     => \Yii::$app->cms->element_max_code_length,
             ],
+
+            RelationalBehavior::class => [
+                'class' => RelationalBehavior::class,
+                'relationNames' => [
+                    'shopCollectionStickers',
+                ],
+            ],
         ]);
     }
 
@@ -139,6 +148,10 @@ class ShopCollection extends ActiveRecord
                 ['sx_id',],
                 'default',
                 'value' => null,
+            ],
+            [
+                ['shopCollectionStickers'],
+                'safe',
             ],
             [
                 [
@@ -298,6 +311,7 @@ class ShopCollection extends ActiveRecord
             'imageIds'          => Yii::t('skeeks/cms', 'Images'),
             'sx_id'             => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
             'show_counter'             => Yii::t('skeeks/cms', 'Количество просмотров'),
+            'shopCollectionStickers'             => Yii::t('skeeks/cms', 'Стикеры'),
         ]);
     }
     /**
@@ -364,4 +378,15 @@ class ShopCollection extends ActiveRecord
 
         return Url::to($params, $scheme);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getShopCollectionStickers()
+    {
+        return $this->hasMany(ShopCollectionSticker::class, ['id' => 'shop_collection_sticker_id'])
+            ->viaTable('shop_collection2sticker', ['shop_collection_id' => 'id']);
+    }
+
 }

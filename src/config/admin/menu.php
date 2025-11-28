@@ -10,11 +10,8 @@
 
 return \yii\helpers\ArrayHelper::merge([
 
-    'content' =>
+    /*'shop' =>
         [
-            /*'priority' => 180,
-            'label'    => \Yii::t('skeeks/cms', 'Content'),
-            "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/icon.article.png'],*/
 
             'items' => [
 
@@ -30,7 +27,7 @@ return \yii\helpers\ArrayHelper::merge([
                 ],
 
             ],
-        ],
+        ],*/
 
     'crm' => [
         'items' => [
@@ -122,6 +119,34 @@ return \yii\helpers\ArrayHelper::merge([
                     ],
 
                 ],
+            ],
+            
+            [
+                "label" => "Бренды",
+                "url"   => ["shop/admin-shop-brand"],
+                //"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+                'priority' => 350,
+            ],
+
+            [
+                "label" => "Коллекции",
+                "url"   => ["shop/admin-shop-collection"],
+                //"img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/storage_file.png'],
+                'priority' => 350,
+
+                'items'    => [
+
+                    [
+                        "label" => "Коллекции",
+                        "url"   => ["shop/admin-shop-collection"],
+                    ],
+                    [
+                        "label" => \Yii::t('skeeks/shop/app', 'Стикеры'),
+                        "url"   => ["shop/admin-shop-collection-sticker"],
+                    ],
+                ],
+
+
             ],
         ])
     ],

@@ -19,6 +19,7 @@ use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCollection;
+use skeeks\cms\shop\models\ShopCollectionSticker;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\AjaxSelectModel;
@@ -69,15 +70,18 @@ class AdminShopCollectionController extends BackendModelStandartController
                     'visibleFilters' => [
                         'q',
                         'brand',
+                        'shopCollectionSticker',
                     ],
                     "filtersModel"   => [
                         'rules'            => [
                             ['brand', 'safe'],
+                            ['shopCollectionSticker', 'safe'],
                             ['q', 'safe'],
                         ],
                         'attributeDefines' => [
                             'q',
                             'brand',
+                            'shopCollectionSticker',
                         ],
 
                         'fields' => [
@@ -119,6 +123,29 @@ class AdminShopCollectionController extends BackendModelStandartController
                                     if ($e->field->value) {
                                         $query->andFilterWhere([
                                             'shop_brand_id' => $e->field->value,
+                                        ]);
+                                    }
+
+                                },
+                            ],
+
+                            'shopCollectionSticker' => [
+                                'class'    => WidgetField::class,
+                                'widgetClass'    => AjaxSelectModel::class,
+                                'widgetConfig'    => [
+                                    'modelClass'    => ShopCollectionSticker::class,
+                                    'multiple' => true,
+                                ],
+                                'label'    => \Yii::t('skeeks/cms', 'Стикер'),
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    /**
+                                     * @var $query ActiveQuery
+                                     */
+                                    $query = $e->dataProvider->query;
+                                    if ($e->field->value) {
+                                        $query->joinWith("shopCollectionStickers as shopCollectionStickers");
+                                        $query->andFilterWhere([
+                                            'shopCollectionStickers.id' => $e->field->value,
                                         ]);
                                     }
 
@@ -195,6 +222,47 @@ class AdminShopCollectionController extends BackendModelStandartController
                                 'default' => SORT_ASC,
                             ];
                         },
+
+                    ],
+
+                    'shopCollectionStickers'   => [
+                        'format'    => 'raw',
+                        'value'     => function (ShopCollection $shopCollection) {
+
+                            $result = [];
+
+                            if ($shopCollection->shopCollectionStickers) {
+                                foreach ($shopCollection->shopCollectionStickers as $shopCollectionSticker) {
+                                    $result[] = "<label style='background: {$shopCollectionSticker->color}; color: white; border-radius: 3px; padding: 2px 5px; margin-right: 5px;'>{$shopCollectionSticker->name}</label>";
+                                }
+                            }
+
+                            return implode("", $result);
+                        },
+
+                        'attribute' => 'shopCollectionStickers',
+                        'label'     => 'Стикеры',
+                        /*'beforeCreateCallback' => function (GridView $gridView) {
+                            $query = $gridView->dataProvider->query;
+
+                            $countProductsQuery = ShopProduct::find()
+                                ->joinWith("collections as collections")
+                                ->select(["total" => new \yii\db\Expression("count(1)"),])
+                                ->andWhere([
+                                    'shop_product2collection.shop_collection_id' => new Expression(ShopCollection::tableName().".id"),
+                                ]);
+
+                            $query->addSelect([
+                                'countProducts' => $countProductsQuery,
+                            ]);
+
+                            $gridView->sortAttributes['countProducts'] = [
+                                'asc'     => ['countProducts' => SORT_ASC],
+                                'desc'    => ['countProducts' => SORT_DESC],
+                                'label'   => '',
+                                'default' => SORT_ASC,
+                            ];
+                        },*/
 
                     ],
 
@@ -321,6 +389,23 @@ class AdminShopCollectionController extends BackendModelStandartController
                     'description_full'  => [
                         'class'       => WidgetField::class,
                         'widgetClass' => ComboTextInputWidget::class,
+                    ],
+
+                    'shopCollectionStickers'    => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => AjaxSelectModel::class,
+                        'widgetConfig' => [
+                            'modelClass'       => ShopCollectionSticker::class,
+                            'multiple' => true
+                            /*'searchQuery'      => function ($word = '') {
+                                $query = ShopCollectionSticker::find();
+                                if ($word) {
+                                    $query->search($word);
+                                }
+                                return $query;
+                            },*/
+                        ],
+
                     ],
                 ],
             ],

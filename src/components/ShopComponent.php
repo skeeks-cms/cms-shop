@@ -45,6 +45,7 @@ use yii\widgets\ActiveForm;
  * @property ShopTypePrice[]      $canBuyTypePrices
  * @property ShopTypePrice[]      $canViewTypePrices
  * @property CmsContentProperty[] $offerCmsContentProperties
+ * @property CmsContentProperty $cmsContentPropertyStiсker
  *
  * @property ShopUser             $shopUser
  *
@@ -1200,6 +1201,21 @@ SQL
         return ArrayHelper::merge($stores, $this->supplierStores);
     }
 
+    private $_cms_content_sticker_property = false;
+
+    /**
+     * @return CmsContentProperty|null
+     */
+    public function getCmsContentPropertyStiker()
+    {
+        if ($this->_cms_content_sticker_property === false) {
+            $this->_cms_content_sticker_property = CmsContentProperty::find()->andWhere(['is_sticker' => 1])->one();
+        } 
+        
+        return $this->_cms_content_sticker_property;
+        
+    }
+    
     /**
      * @return ShopStore[]
      */
