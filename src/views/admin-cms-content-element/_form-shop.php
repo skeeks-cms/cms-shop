@@ -120,6 +120,14 @@ if ($shopProduct->product_type == \skeeks\cms\shop\models\ShopProduct::TYPE_OFFE
             },*/
         ]
     ); ?>
+
+    <?php if ($shopProduct->brand && $shopProduct->brand->website_url) : ?>
+        <div class="col-12">
+            <a href="<?php echo $shopProduct->brand->website_url; ?>" target="_blank">
+                <?php echo $shopProduct->brand->website_url; ?>
+            </a>
+        </div>
+    <?php endif; ?>
     <?= $form->field($shopProduct, 'brand_sku'); ?>
 
 
