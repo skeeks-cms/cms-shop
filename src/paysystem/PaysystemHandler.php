@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\paysystem;
 
 use skeeks\cms\IHasConfigForm;
+use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\traits\HasComponentDescriptorTrait;
@@ -74,6 +75,38 @@ abstract class PaysystemHandler extends Model implements IHasConfigForm
     {
         $shopBill = new ShopBill();
 
+        if (!$shopOrder->cms_user_id) {
+            $cmsUser = null;
+            if ($shopOrder->contact_phone) {
+                //Если пользователь найден по телефону, то привязычваем заказа к нему
+                $cmsUser = CmsUser::find()->cmsSite()->phone($shopOrder->contact_phone)->one();
+            }
+    
+            //Если пользователь не найден по телефону пробуем найти по еmail
+            if ($cmsUser === null && $shopOrder->contact_email) {
+                $cmsUser = CmsUser::find()->cmsSite()->email($shopOrder->contact_email)->one();
+            }
+    
+    
+    
+            if (!$cmsUser) {
+                $cmsUser = new CmsUser();
+                $cmsUser->phone = $shopOrder->contact_phone;
+                $cmsUser->email = $shopOrder->contact_email;
+                $cmsUser->first_name = $shopOrder->contact_first_name;
+                $cmsUser->last_name = $shopOrder->contact_last_name;
+    
+                if (!$cmsUser->save()) {
+                    throw new Exception(print_r($cmsUser->errors, true));
+                }
+            }
+            
+            $shopOrder->cms_user_id = $cmsUser->id;
+            
+            $shopOrder->update(false, ['cms_user_id']);
+        }
+        
+        
         $shopBill->cms_user_id = $shopOrder->cms_user_id;
         $shopBill->shop_pay_system_id = $shopOrder->shop_pay_system_id;
         $shopBill->shop_order_id = $shopOrder->id;
