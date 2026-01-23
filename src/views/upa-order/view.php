@@ -96,6 +96,30 @@ CSS
             <?php endif; ?>
         </div>
     </div>
+    
+    <?php if ($model->shop_pay_system_id == 10) : ?>
+            <?php if ($model->cmsUser && $model->cmsUser->cmsContractors) : ?>
+                <div class="sx-pay-wrapper">
+                    <form method="get" target="_blank" action="<?php echo \yii\helpers\Url::to(['/order/pdf']); ?>">
+                        <input type="hidden" name="code" value="<?php echo $model->code; ?>"/>
+                        <? if (count($model->cmsUser->cmsContractors) > 1) : ?>
+                            <div style="margin-bottom: 1rem;">
+                                <?php echo \skeeks\cms\widgets\Select::widget([
+                                    'name'          => 'c_id',
+                                    'allowDeselect' => false,
+                                    'data'          => \yii\helpers\ArrayHelper::map($model->cmsUser->cmsContractors, 'id', 'name'),
+                                    'options'       => ['required' => 'required', 'placeholder' => 'Выберите юридическое лицо для оплаты...'],
+                                ]); ?>
+                            </div>
+                        <? else : ?>
+                            <?php $firstContractor = $model->cmsUser->getCmsContractors()->one(); ?>
+                            <input type="hidden" name="c_id" value="<?php echo $firstContractor->id; ?>"/>
+                        <? endif; ?>
+                        <button type="submit" class="btn btn-xl btn-primary">Скачать счёт</button>
+                    </form>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
 
     <? if ($model->shopOrderStatus->is_payment_allowed && $model->paySystem && $model->paySystem->paySystemHandler && !$model->paid_at) : ?>
         <div style="margin-top: 15px; background: #fafafa; padding: 15px 0;">
