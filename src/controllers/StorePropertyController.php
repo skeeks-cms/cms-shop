@@ -591,7 +591,9 @@ JS
             //'class' => SelectField::class,
             'class'        => WidgetField::class,
             'widgetClass'  => AjaxSelectModel::class,
+
             'widgetConfig' => [
+                "modelShowAttribute" => "nameWithTrees",
                 'modelClass'  => CmsContentProperty::class,
                 'searchQuery' => function ($word = '') {
                     $query = CmsContentProperty::find()->cmsSite();
