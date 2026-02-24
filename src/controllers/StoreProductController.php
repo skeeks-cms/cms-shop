@@ -778,8 +778,8 @@ HTML;
                 } catch (\Exception $e) {
                     $t->rollBack();
                     /*print_r($shopStoreProduct->name);die;*/
-                    throw $e;
-                    die;
+                    /*throw $e;
+                    die;*/
                     continue;
                 }
 
