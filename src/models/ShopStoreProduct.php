@@ -378,8 +378,13 @@ class ShopStoreProduct extends \skeeks\cms\base\ActiveRecord
 
                         if (is_string($value) && $value) {
                             $value = (string) $value;
-                            $storageFile = \Yii::$app->storage->upload($value);
-                            $model->image_id = $storageFile->id;
+                            try {
+                                $storageFile = \Yii::$app->storage->upload($value);
+                                $model->image_id = $storageFile->id;
+                            } catch (\Exception $exception) {
+                                
+                            }
+                            
                         }
 
                     }
