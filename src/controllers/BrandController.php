@@ -152,8 +152,17 @@ class BrandController extends Controller
 
         //Заголовок
         if (!$title = $model->meta_title) {
-            if (isset($model->seoName)) {
-                $title = $model->seoName;
+            if ($model->seo_h1) {
+                $title = $model->seo_h1;
+            } else {
+                $titleData = [];
+                $titleData[] = $model->name;
+                if ($model->country_alpha2) {
+                    $titleData[] = $model->country->name;
+                }
+
+                $title = implode(" ", $titleData) . " — каталог бренда, широкий ассортимент";
+
             }
         }
 
@@ -183,6 +192,15 @@ class BrandController extends Controller
                     $description = $model->seoName;
                 } else {
                     $description = $model->name;
+
+                    $titleData = [];
+                    $titleData[] = $model->name;
+                    if ($model->country_alpha2) {
+                        $titleData[] = $model->country->name;
+                    }
+
+                    $description = implode(" ", $titleData) . " — оригинальные товары бренда в широком ассортименте. Выбирайте подходящие модели по выгодной цене с доставкой.";
+
                 }
             }
         }
