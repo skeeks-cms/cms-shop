@@ -112,6 +112,20 @@
                         ],
                     ]);
                     ?>
+                <? elseif (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['shop.brand_id'])) : ?>
+                    <?
+                    echo \skeeks\cms\backend\widgets\SelectModelDialogWidget::widget([
+                        'name'     => 'value',
+                        'dialogRoute'     => ["/shop/admin-shop-brand"],
+                        'modelClassName'     => \skeeks\cms\shop\models\ShopBrand::class,
+                        'multiple' => true,
+                        'value'    => \yii\helpers\ArrayHelper::getValue($rule, 'value'),
+                        'options'  => [
+                            'data-no-update' => 'true',
+                            'class'          => 'sx-value-element',
+                        ],
+                    ]);
+                    ?>
                 <? elseif (in_array(\yii\helpers\ArrayHelper::getValue($rule, 'field'), ['element.name', 'element.id'])) : ?>
                     <?
                     echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
@@ -123,7 +137,7 @@
                 <? else : ?>
                     <?
                     $value = \yii\helpers\ArrayHelper::getValue($rule, 'value');
-                    if (is_string($value)) {
+                    if (is_string($value) || !$value) {
                         echo \yii\helpers\Html::textInput('value', \yii\helpers\ArrayHelper::getValue($rule, 'value'), [
                             'size'           => 1,
                             'class'          => 'form-control sx-value-element',

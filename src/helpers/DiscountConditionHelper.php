@@ -116,7 +116,8 @@ class DiscountConditionHelper extends Component
 
         } else {
 
-            if ($this->field && strpos("element.", $this->field) != -1) {
+            if ($this->field && strpos($this->field, "element.") !== false) {
+
                 $field = str_replace("element.", "", $this->field);
 
                 return $this->isTrue($this->value, $this->shopCmsContentElement->{$field});
@@ -142,6 +143,10 @@ class DiscountConditionHelper extends Component
                         }
                     }
                 }
+            } elseif ($this->field && strpos($this->field, "shop.") !== false) {
+                $field = str_replace("shop.", "", $this->field);
+
+                return $this->isTrue($this->value, $this->shopCmsContentElement->shopProduct->{$field});
             }
 
             return true;

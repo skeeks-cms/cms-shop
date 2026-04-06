@@ -72,6 +72,11 @@ class DiscountConditionsWidget extends InputWidget
             }
         }
 
+        $fields["Свойства магазина"] = [
+            'shop.brand_id' => 'Бренд'
+        ];
+        $this->allConditions['shop.brand_id'] = "Бренд";
+
         $fields["Основные свойства"] = $elementOptions;
 
         $props = CmsContentProperty::find()->all();
@@ -87,6 +92,9 @@ class DiscountConditionsWidget extends InputWidget
         }
 
         $fields["Свойства"] = $propsOptions;
+
+
+
 
         return $fields;
     }
