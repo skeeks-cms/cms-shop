@@ -54,11 +54,11 @@ return [
                     'interval' => 3600 * 24,
                 ],
 
-                'shop/agents/update-quantity' => [
+                /*'shop/agents/update-quantity' => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление количества'],
                     'interval' => 60 * 5,
-                ],
+                ],*/
 
                 'shop/agents/update-product-type'                       => [
                     'class'    => \skeeks\cms\agent\CmsAgent::class,

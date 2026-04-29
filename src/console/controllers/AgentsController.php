@@ -59,6 +59,15 @@ class AgentsController extends Controller
     }
 
     /**
+     * @deprecated 
+     * @return false
+     */
+    public function actionUpdateQuantity()
+    {
+        return false;
+    }
+
+    /**
      * Добавляет новые товары на сайты получатели
      *
      * @throws \yii\base\Exception
