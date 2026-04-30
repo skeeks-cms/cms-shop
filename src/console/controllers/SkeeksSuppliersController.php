@@ -1107,9 +1107,19 @@ class SkeeksSuppliersController extends Controller
                     $cmsTree->shop_has_collections = (int)ArrayHelper::getValue($apiData, "has_collections");
                     $cmsTree->updated_at = $updated_at;
 
-                    if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
-                        $cmsTree->image_id = $image->id;
+                    $isChangeImg = true;
+                    if ($cmsTree->image_id) {
+                        if (!$cmsTree->image->sx_id) {
+                            $isChangeImg = false;
+                        }
                     }
+
+                    if ($isChangeImg) {
+                        if ($image = $this->_addImage(ArrayHelper::getValue($apiData, "image"))) {
+                            $cmsTree->image_id = $image->id;
+                        }
+                    }
+
 
                     if ($cmsTree->save()) {
                         $result = true;
