@@ -772,6 +772,9 @@ class CartController extends Controller
                     throw new Exception(\Yii::t('skeeks/shop/app', 'Not set coupon code'));
                 }
 
+                /**
+                 * @var $applyShopDiscountCoupon ShopDiscountCoupon
+                 */
                 $applyShopDiscountCoupon = ShopDiscountCoupon::find()
                     ->where(['coupon' => $couponCode])
                     ->andWhere(['is_active' => 1])
@@ -787,12 +790,20 @@ class CartController extends Controller
                     throw new Exception(\Yii::t('skeeks/shop/app', 'Coupon does not exist or is not active'));
                 }
 
-                /*$discount_coupons = [];
-                if (\Yii::$app->shop->shopUser->shopOrder->shopDiscountCoupons) {
-                    $discount_coupons = ArrayHelper::map(\Yii::$app->shop->shopUser->shopOrder->shopDiscountCoupons, 'id', 'id');
+                //Проверить настройки купона
+                if ($applyShopDiscountCoupon->max_use_per_user) {
+                    //Если пользователь неавторизова
+                    if (!\Yii::$app->shop->shopUser->cms_user_id) {
+                        throw new Exception('Этот купон работает только для авторизованного пользователя. Пожалуйста, авторизуйтесь на сайте.');
+                    }
+
+                    $total = ShopOrder::find()->joinWith("shopDiscountCoupons as shopDiscountCoupons", true, "INNER JOIN")->andWhere([ShopOrder::tableName() . '.cms_user_id' => \Yii::$app->shop->shopUser->cms_user_id])->count();
+                    if ($total >= $applyShopDiscountCoupon->max_use_per_user) {
+                        throw new Exception('Этот купон использован ранее.');
+                    }
                 }
-                $discount_coupons[] = $applyShopDiscountCoupon->id;
-                array_unique($discount_coupons);*/
+
+
 
                 $map = new ShopOrder2discountCoupon();
                 $map->order_id = \Yii::$app->shop->shopUser->shopOrder->id;

@@ -151,7 +151,7 @@ UPDATE
 
         WHERE
             subq.is_fixed = 0
-            AND subq.price > 0
+            /*AND subq.price > 0*/
         GROUP BY subq.id
     ) as inner_spp ON inner_spp.id = spp_update.id
 SET
@@ -305,7 +305,7 @@ UPDATE
         ) as subq
         WHERE
             subq.is_fixed = 0
-            AND subq.price > 0
+            /*AND subq.price > 0*/
         GROUP BY subq.id
     ) as inner_spp ON inner_spp.id = spp_update.id
 SET

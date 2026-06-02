@@ -274,6 +274,9 @@ CSS
                     'max_use'          => [
                         'class' => NumberField::class,
                     ],
+                    'max_use_per_user'          => [
+                        'class' => NumberField::class,
+                    ],
                     'cms_user_id'          => [
                         'class' => WidgetField::class,
                         'widgetClass' => AjaxSelectModel::class,

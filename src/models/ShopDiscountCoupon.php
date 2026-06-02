@@ -21,6 +21,7 @@ use Yii;
  * @property integer                    $active_to
  * @property string                     $coupon
  * @property integer                    $max_use
+ * @property integer                    $max_use_per_user
  * @property integer                    $use_count
  * @property integer                    $cms_user_id
  * @property string                     $description
@@ -57,6 +58,7 @@ class ShopDiscountCoupon extends ActiveRecord
                     'active_from',
                     'active_to',
                     'max_use',
+                    'max_use_per_user',
                     'use_count',
                     'cms_user_id',
                 ],
@@ -127,6 +129,7 @@ class ShopDiscountCoupon extends ActiveRecord
             'active_to'        => Yii::t('skeeks/shop/app', 'Active to'),
             'coupon'           => Yii::t('skeeks/shop/app', 'Coupon'),
             'max_use'          => Yii::t('skeeks/shop/app', 'Maximum number of performances'),
+            'max_use_per_user'          => "Максимальное число использования для пользователя",
             'use_count'        => Yii::t('skeeks/shop/app', 'Use count'),
             'cms_user_id'      => Yii::t('skeeks/shop/app', 'User'),
             'description'      => Yii::t('skeeks/shop/app', 'Description'),
@@ -142,7 +145,8 @@ class ShopDiscountCoupon extends ActiveRecord
         return [
             'shop_discount_id' => Yii::t('skeeks/shop/app', 'Скидочный план, из него будут взяты все параметры скидки.'),
             'coupon'           => Yii::t('skeeks/shop/app', 'Код купона, если не будет указан, но будет сгенерирован автоматически.'),
-            'max_use'          => Yii::t('skeeks/shop/app', 'Сколько раз может быть использован этот купон?'),
+            'max_use'          => Yii::t('skeeks/shop/app', 'Сколько раз может быть использован этот купон всего?'),
+            'max_use_per_user'          => Yii::t('skeeks/shop/app', 'Сколько раз может быть использован этот купон одним пользователем? 0 - неограниченно раз. Если параметр указан, то купон будет работать только для авторизованных пользователей.'),
             'description'      => Yii::t('skeeks/shop/app', 'Короткое описание'),
         ];
     }
