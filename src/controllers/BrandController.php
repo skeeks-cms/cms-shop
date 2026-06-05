@@ -243,4 +243,37 @@ class BrandController extends Controller
 
         return $this;
     }
+
+    public function actionCollections()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_HTML;
+
+        $brandId = (int) \Yii::$app->request->get('brand_id');
+
+        $collections = \skeeks\cms\shop\models\ShopCollection::find()
+            ->active()
+            ->andWhere([
+                'shop_brand_id' => $brandId,
+            ])
+            ->orderBy(['name' => SORT_ASC])
+            ->all();
+
+        if (!$collections) {
+            return '<div class="sx-brand-collections-empty">Коллекции не найдены</div>';
+        }
+
+        $html = '';
+
+        foreach ($collections as $collection) {
+            $html .= \yii\helpers\Html::a(
+                \yii\helpers\Html::encode($collection->name),
+                $collection->url,
+                [
+                    'class' => 'sx-brand-collection-link',
+                ]
+            );
+        }
+
+        return $html;
+    }
 }
