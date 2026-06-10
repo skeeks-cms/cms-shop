@@ -76,83 +76,38 @@ class DiscountConditionHelper extends Component
 
     public function getIsTrue()
     {
+        $result = true;
+
         if ($this->type == 'group') {
-
-            if (!$this->rules) {
-                return true;
-            }
-
-            if ($this->rules_type == 'and' && $this->condition == 'equal') {
-
-                foreach ($this->rules as $rule) {
-                    if (!$rule->getIsTrue()) {
-                        /*print_r($rule);die;*/
-                        return false;
+            if ($this->rules) {
+                if ($this->rules_type == 'or') {
+                    $result = false;
+                    foreach ($this->rules as $rule) {
+                        if ($rule->getIsTrue()) {
+                            $result = true;
+                            break;
+                        }
                     }
-                }
-
-                return true;
-
-            } elseif ($this->rules_type == 'or' && $this->condition == 'equal') {
-
-                foreach ($this->rules as $rule) {
-                    if ($rule->getIsTrue()) {
-                        return true;
-                    }
-                }
-
-                return false;
-            } /*elseif ($this->rules_type == 'and' && $this->condition == 'not_equal') {
-
-                foreach ($this->rules as $rule)
-                {
-                    if (!$rule->getIsTrue()) {
-                        return false;
-                    }
-                }
-
-                return false;
-            }*/
-
-        } else {
-
-            if ($this->field && strpos($this->field, "element.") !== false) {
-
-                $field = str_replace("element.", "", $this->field);
-
-                return $this->isTrue($this->value, $this->shopCmsContentElement->{$field});
-
-                if (isset($this->shopCmsContentElement->{$field})) {
-
-
-                    if (is_array($this->value)) {
-
-                    } else {
-                        if (is_array($this->shopCmsContentElement->{$field})) {
-                            if (in_array((int)$this->value, $this->shopCmsContentElement->{$field})) {
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        } else {
-                            if ($this->shopCmsContentElement->{$field} == $this->value) {
-                                return true;
-                            } else {
-                                return false;
-                            }
+                } else {
+                    foreach ($this->rules as $rule) {
+                        if (!$rule->getIsTrue()) {
+                            $result = false;
+                            break;
                         }
                     }
                 }
+            }
+        } else {
+            if ($this->field && strpos($this->field, "element.") !== false) {
+                $field = str_replace("element.", "", $this->field);
+                $result = $this->isTrue($this->value, $this->shopCmsContentElement->{$field});
             } elseif ($this->field && strpos($this->field, "shop.") !== false) {
                 $field = str_replace("shop.", "", $this->field);
-
-                return $this->isTrue($this->value, $this->shopCmsContentElement->shopProduct->{$field});
+                $result = $this->isTrue($this->value, $this->shopCmsContentElement->shopProduct->{$field});
             }
-
-            return true;
         }
 
-        return true;
+        return in_array($this->condition, ['not_equal', 'or'], true) ? !$result : $result;
     }
 
     public function isTrue($value, $fieldValue)
