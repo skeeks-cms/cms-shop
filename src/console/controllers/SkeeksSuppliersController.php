@@ -2087,7 +2087,7 @@ class SkeeksSuppliersController extends Controller
     {
         if ($apiData) {
 
-            $rpmModel = $model->relatedPropertiesModel;
+            $propertyValues = [];
 
             $apiData = ArrayHelper::map($apiData, "property_id", "value");
             $properties = CmsContentProperty::find()->sxId(array_keys($apiData))->all();
@@ -2149,7 +2149,7 @@ class SkeeksSuppliersController extends Controller
 
                         }
 
-                        $rpmModel->{$property->code} = $enumIds;
+                        $propertyValues[$property->code] = $enumIds;
                     } else {
 
                         if ($value) {
@@ -2180,7 +2180,7 @@ class SkeeksSuppliersController extends Controller
                                     }
                                 }
 
-                                $rpmModel->{$property->code} = $enum->id;
+                                $propertyValues[$property->code] = $enum->id;
                             } else {
                                 /*print_r($property->toArray());die;
                                 echo '2222';
@@ -2189,19 +2189,23 @@ class SkeeksSuppliersController extends Controller
 
 
                         } else {
-                            $rpmModel->{$property->code} = "";
+                            $propertyValues[$property->code] = "";
                         }
 
 
                     }
 
                 } else {
-                    $rpmModel->{$property->code} = $value;
+                    $propertyValues[$property->code] = $value;
                 }
             }
 
             /*print_r($apiData);
             print_r($rpmModel->toArray());die;*/
+
+            // List enums must exist before the related-properties model is initialized.
+            $rpmModel = $model->relatedPropertiesModel;
+            $rpmModel->setAttributes($propertyValues, false);
 
             if (!$rpmModel->save()) {
                 throw new Exception("Ошибка сохранения характеристик: ".print_r($rpmModel->errors, true));
