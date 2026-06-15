@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\models\behaviors\Implode;
 use skeeks\cms\models\CmsSite;
 use skeeks\cms\models\CmsTree;
+use skeeks\cms\shop\queryFilter\SortFiltersHandler;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -30,6 +31,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property int         $is_show_product_only_quantity Показывать товары только в наличии на сайте?
  * @property int         $is_show_quantity_product Показывать оставшееся количество товаров на складе?
+ * @property string|null $product_default_sort Сортировка товаров по умолчанию
  * @property string|null $show_filter_property_ids Какие фильтры разрешено показывать на сайте?
  * @property string|null $open_filter_property_ids Какие фильтры по умолчанию открыты на сайте?
  * @property int         $is_allow_edit_products Разрешено редактировать и добавлять товары?
@@ -138,6 +140,9 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
 
             [['show_filter_property_ids'], 'safe'],
             [['open_filter_property_ids'], 'safe'],
+            [['product_default_sort'], 'string', 'max' => 32],
+            [['product_default_sort'], 'default', 'value' => SortFiltersHandler::SORT_POPULAR],
+            [['product_default_sort'], 'in', 'range' => SortFiltersHandler::getAvailableValues()],
             [['order_required_fields'], 'safe'],
             [['order_required_fields'], 'required'],
 
@@ -211,6 +216,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_show_button_no_price'       => "Показывать кнопку «добавить в корзину» для товаров с нулевыми ценами?",
             'is_show_product_no_quantity'   => "Показывать кнопку «добавить в корзину» для товаров не в наличии?",
             'is_show_product_only_quantity' => "Учет наличия",
+            'product_default_sort'          => "Сортировка товаров по умолчанию",
             'show_filter_property_ids'      => "Какие фильтры разрешено показывать на сайте?",
             'open_filter_property_ids'      => "Какие фильтры по умолчанию открыты на сайте?",
             'is_show_quantity_product'      => "Показывать оставшееся количество товаров на складе?",
@@ -247,6 +253,7 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
             'is_show_button_no_price'        => "Если у товара цена 0, и выбрано да, то кнопка «добавить в корзину», будет показываться рядом с товаром",
             'show_filter_property_ids'       => "Если не указано, то показываются все фильтры доступные в разделе. Если выбраны фильтры, то в разделе будут показаны только те фильтры по которым есть товары.",
             'is_show_product_only_quantity'  => "Выберите как товары будут показываться на сайте по умолчанию",
+            'product_default_sort'           => "Используется в каталогах товаров до тех пор, пока пользователь не выбрал сортировку самостоятельно.",
             'is_show_quantity_product'       => "Если выбрано «да», то на странице товара будет отображено количество товаров, указанное в админке. Если «нет», наличие отображаться не будет.",
             'is_show_cart'                   => "Если выбрано «да», то на сайте будет показана корзина, а возле товаров кнопка «в корзину»<br />
 Если выбрано «нет», то фактически на сайте будет отключена корзина

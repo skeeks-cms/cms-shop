@@ -14,6 +14,7 @@ use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentProperty;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopSite;
+use skeeks\cms\shop\queryFilter\SortFiltersHandler;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\NumberField;
@@ -183,6 +184,11 @@ class AdminShopSiteController extends BackendModelController
                             1 => 'Показывать только в наличии',
                             2 => 'Показывать В наличии и под заказ',
                         ],
+                    ],
+
+                    'product_default_sort' => [
+                        'class' => SelectField::class,
+                        'items' => SortFiltersHandler::getAvailableOptions(),
                     ],
 
                     'is_show_quantity_product' => [

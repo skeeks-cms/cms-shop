@@ -33,14 +33,44 @@ use yii\widgets\ActiveForm;
 class SortFiltersHandler extends Model
     implements IQueryFilterHandler
 {
+    const SORT_POPULAR = '-popular';
+    const SORT_PRICE_ASC = 'price';
+    const SORT_PRICE_DESC = '-price';
+    const SORT_NEW = '-new';
 
     public $viewFile = '@skeeks/cms/shop/queryFilter/views/sort-filter-hidden';
     public $viewFileVisible = '@skeeks/cms/shop/queryFilter/views/sort-filter';
 
-    public $value = '-popular';
+    public $value = self::SORT_POPULAR;
     public $formName = 's';
 
     public $type_price_id;
+
+    /**
+     * @return string[]
+     */
+    public static function getAvailableValues()
+    {
+        return [
+            self::SORT_POPULAR,
+            self::SORT_PRICE_ASC,
+            self::SORT_PRICE_DESC,
+            self::SORT_NEW,
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getAvailableOptions()
+    {
+        return [
+            self::SORT_POPULAR    => \Yii::t("skeeks/unify", "Сначала популярные"),
+            self::SORT_PRICE_ASC  => \Yii::t("skeeks/unify-shop", "Cheap first"),
+            self::SORT_PRICE_DESC => \Yii::t("skeeks/unify-shop", "Dear first"),
+            self::SORT_NEW        => \Yii::t("skeeks/unify", "Сначала новые"),
+        ];
+    }
 
     public function formName()
     {
@@ -64,7 +94,9 @@ class SortFiltersHandler extends Model
     public function load($data, $formName = NULL)
     {
         $result = parent::load($data, $formName);
-        \Yii::$app->session->set("sx-sort-value", $this->value);
+        if ($result) {
+            \Yii::$app->session->set("sx-sort-value", $this->value);
+        }
 
         return $result;
     }
@@ -84,7 +116,22 @@ class SortFiltersHandler extends Model
             }
         }
 
-        return '-popular';
+        return $this->defaultValue;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultValue()
+    {
+        $value = (string)ArrayHelper::getValue(\Yii::$app->cms->cmsSite->shopSite, 'product_default_sort', self::SORT_POPULAR);
+        $options = $this->getSortOptions();
+
+        if (isset($options[$value])) {
+            return $value;
+        }
+
+        return self::SORT_POPULAR;
     }
 
     /**
@@ -106,24 +153,13 @@ class SortFiltersHandler extends Model
 
     public function getSortOptions()
     {
+        $options = static::getAvailableOptions();
         if (\Yii::$app->cms->cmsSite->shopSite->is_show_prices) {
-
-            return [
-                '-popular' => \Yii::t("skeeks/unify", "Сначала популярные"),
-                'price'    => \Yii::t("skeeks/unify-shop", "Cheap first"),
-                '-price'   => \Yii::t("skeeks/unify-shop", "Dear first"),
-                '-new'     => \Yii::t("skeeks/unify", "Сначала новые"),
-            ];
-
-        } else {
-
-            return [
-                '-popular' => \Yii::t("skeeks/unify", "Сначала популярные"),
-                '-new'     => \Yii::t("skeeks/unify", "Сначала новые"),
-            ];
-
+            return $options;
         }
 
+        unset($options[self::SORT_PRICE_ASC], $options[self::SORT_PRICE_DESC]);
+        return $options;
     }
     /**
      * @param DataProviderInterface $dataProvider
@@ -141,18 +177,18 @@ class SortFiltersHandler extends Model
     {
         if ($this->value) {
             switch ($this->value) {
-                case ('-popular'):
+                case (self::SORT_POPULAR):
                     $query->orderBy([
                         CmsContentElement::tableName(). '.priority' => SORT_ASC,
                         CmsContentElement::tableName().'.show_counter' => SORT_DESC
                     ]);
                     break;
 
-                case ('-new'):
+                case (self::SORT_NEW):
                     $query->orderBy([CmsContentElement::tableName().'.published_at' => SORT_DESC]);
                     break;
 
-                case ('price'):
+                case (self::SORT_PRICE_ASC):
                     if ($this->type_price_id) {
                         PriceFiltersHandler::addSelectRealPrice($query, $this->type_price_id);
                         $query->orderBy(['realPrice' => SORT_ASC]);
@@ -161,7 +197,7 @@ class SortFiltersHandler extends Model
 
                     break;
 
-                case ('-price'):
+                case (self::SORT_PRICE_DESC):
 
                     if ($this->type_price_id) {
 
