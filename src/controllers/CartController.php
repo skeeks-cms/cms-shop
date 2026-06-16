@@ -14,10 +14,12 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\Money;
 use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\models\ShopBasket;
+use skeeks\cms\shop\models\ShopDelivery;
 use skeeks\cms\shop\models\ShopDiscountCoupon;
 use skeeks\cms\shop\models\ShopOrder;
 use skeeks\cms\shop\models\ShopOrder2discountCoupon;
 use skeeks\cms\shop\models\ShopOrderItem;
+use skeeks\cms\shop\models\ShopPaySystem;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\base\Exception;
 use yii\base\UserException;
@@ -48,6 +50,7 @@ class CartController extends Controller
                 'actions' => [
                     'add-product'               => ['post'],
                     'add-products'               => ['post'],
+                    'buy-one-click'              => ['post'],
                     'remove-basket'             => ['post'],
                     'clear'                     => ['post'],
                     'update-basket'             => ['post'],
@@ -260,6 +263,100 @@ class CartController extends Controller
                 $rr->success = false;
             }
         }
+        return $rr;
+    }
+
+    public function actionBuyOneClick()
+    {
+        $rr = new RequestResponse();
+
+        if ($rr->isRequestAjaxPost()) {
+            $t = \Yii::$app->db->beginTransaction();
+
+            try {
+                $product_id = (int)\Yii::$app->request->post('product_id');
+                $quantity = \Yii::$app->request->post('quantity');
+                $phone = trim((string)\Yii::$app->request->post('phone'));
+
+                if (!$phone) {
+                    throw new UserException('Укажите телефон');
+                }
+
+                /**
+                 * @var ShopProduct $product
+                 */
+                $product = ShopProduct::find()->where(['id' => $product_id])->one();
+
+                if (!$product) {
+                    throw new UserException(\Yii::t('skeeks/shop/app', 'This product is not found, it may be removed.'));
+                }
+
+                if ($product->isOffersProduct) {
+                    throw new UserException('Выберите торговое предложение товара.');
+                }
+
+                $quantity = $this->normalizeProductQuantity($product, $quantity);
+
+                $order = new ShopOrder([
+                    'contact_phone' => $phone,
+                    'comment'       => 'Купить в 1 клик',
+                ]);
+
+                if (!$order->save()) {
+                    throw new UserException($this->getModelErrorMessage($order));
+                }
+
+                $orderItem = new ShopOrderItem([
+                    'shop_order_id'   => $order->id,
+                    'shop_product_id' => $product->id,
+                    'quantity'        => $quantity,
+                ]);
+
+                if (!$orderItem->recalculate()->save()) {
+                    throw new UserException($this->getModelErrorMessage($orderItem));
+                }
+
+                $order->recalculate();
+                $order->link('cmsSite', \Yii::$app->skeeks->site);
+                $order->refresh();
+
+                $cmsUser = $this->findOrCreateCmsUserByOrder($order);
+                $order->cms_user_id = $cmsUser->id;
+                $this->applyDefaultDeliveryAndPaySystem($order);
+                $order->is_created = 1;
+
+                if (!$order->save()) {
+                    throw new UserException($this->getModelErrorMessage($order));
+                }
+
+                $orderUrl = $order->getUrl(['is_created' => 'true']);
+
+                $rr->success = true;
+                $rr->message = 'Заказ создан';
+                $rr->redirect = $orderUrl;
+                $productData = ShopComponent::productDataForJsEvent($product->cmsContentElement);
+                $productData['quantity'] = (float)$quantity;
+
+                $rr->data = [
+                    'order'   => $order->jsonSerialize(),
+                    'product' => $productData,
+                ];
+
+                \Yii::$app->session->setFlash("order", $order->id);
+
+                $t->commit();
+
+                if (\Yii::$app->user->isGuest) {
+                    \Yii::$app->user->login($order->cmsUser, 3600 * 24 * 365 * 5);
+                }
+            } catch (\Exception $exception) {
+                $t->rollBack();
+
+                $rr->message = $exception->getMessage();
+                $rr->success = false;
+            }
+        }
+
         return $rr;
     }
 
@@ -832,6 +929,99 @@ class CartController extends Controller
         } else {
             return $this->goBack();
         }
+    }
+
+    protected function normalizeProductQuantity(ShopProduct $product, $quantity)
+    {
+        $quantity = (float)$quantity;
+        $measureRatio = $product->measure_ratio ? (float)$product->measure_ratio : 1;
+
+        if ($quantity <= 0) {
+            $quantity = $product->measure_ratio_min ? (float)$product->measure_ratio_min : 1;
+        }
+
+        if ($measureRatio > 1) {
+            $va = ($quantity * 1000) % ($measureRatio * 1000);
+            if ($va != 0) {
+                $quantity = $measureRatio;
+            }
+        }
+
+        if ($product->measure_ratio_min > $quantity) {
+            $quantity = $product->measure_ratio_min;
+        }
+
+        $int = round($quantity / $measureRatio);
+        $quantity = $int * $measureRatio;
+
+        if ($product->measure_ratio_min > $quantity) {
+            $quantity = $product->measure_ratio_min;
+        }
+
+        return $quantity;
+    }
+
+    protected function findOrCreateCmsUserByOrder(ShopOrder $order)
+    {
+        if ($order->cms_user_id) {
+            $cmsUser = $order->cmsUser;
+            $order->contact_phone = $cmsUser->phone;
+            $order->contact_email = $cmsUser->email;
+            $order->contact_first_name = $cmsUser->first_name;
+            $order->contact_last_name = $cmsUser->last_name;
+
+            return $cmsUser;
+        }
+
+        $cmsUser = null;
+        if ($order->contact_phone) {
+            $cmsUser = CmsUser::find()->cmsSite()->phone($order->contact_phone)->one();
+        }
+
+        if ($cmsUser === null && $order->contact_email) {
+            $cmsUser = CmsUser::find()->cmsSite()->email($order->contact_email)->one();
+        }
+
+        if (!$cmsUser) {
+            $cmsUser = new CmsUser();
+            $cmsUser->phone = $order->contact_phone;
+            $cmsUser->email = $order->contact_email;
+            $cmsUser->first_name = $order->contact_first_name;
+            $cmsUser->last_name = $order->contact_last_name;
+
+            if (!$cmsUser->save()) {
+                throw new Exception($this->getModelErrorMessage($cmsUser));
+            }
+        }
+
+        return $cmsUser;
+    }
+
+    protected function applyDefaultDeliveryAndPaySystem(ShopOrder $order)
+    {
+        if (!$order->shop_delivery_id) {
+            $shopDelivery = ShopDelivery::find()->orderBy(['priority' => SORT_ASC])->active()->cmsSite()->one();
+            if ($shopDelivery) {
+                $order->shop_delivery_id = $shopDelivery->id;
+            }
+        }
+
+        if (!$order->shop_pay_system_id) {
+            $shopPaySystem = ShopPaySystem::find()->orderBy(['priority' => SORT_ASC])->active()->cmsSite()->one();
+            if ($shopPaySystem) {
+                $order->shop_pay_system_id = $shopPaySystem->id;
+            }
+        }
+    }
+
+    protected function getModelErrorMessage($model)
+    {
+        $errors = $model->getFirstErrors();
+        if ($errors) {
+            return array_shift($errors);
+        }
+
+        return print_r($model->errors, true);
     }
 
 }

@@ -253,6 +253,50 @@
             return ajax;
         },
 
+        createAjaxBuyOneClick: function (product_id, quantity, phone) {
+            var self = this;
+            var ajax = sx.ajax.preparePostQuery(this.get('backend-buy-one-click'));
+
+            product_id = Number(product_id);
+            quantity = Number(quantity);
+
+            if (quantity <= 0) {
+                quantity = 1;
+            }
+
+            ajax.setData({
+                'product_id': product_id,
+                'quantity': quantity,
+                'phone': phone
+            });
+
+            ajax.onBeforeSend(function () {
+                self.trigger('beforeBuyOneClick', {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'phone': phone
+                });
+            });
+
+            ajax.onSuccess(function (e, data) {
+                self.trigger('buyOneClick', {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'phone': phone,
+                    'response': data.response
+                });
+
+                if (data.response.data && data.response.data.product) {
+                    self.trigger('purchase', {
+                        'order': data.response.data.order,
+                        'products': [data.response.data.product]
+                    });
+                }
+            });
+
+            return ajax;
+        },
+
 
         /**
          * Remove coupon to order
@@ -554,6 +598,11 @@
          */
         addProduct: function (product_id, quantity, additional) {
             this.createAjaxAddProduct(product_id, quantity, additional).execute();
+            return this;
+        },
+
+        buyOneClick: function (product_id, quantity, phone) {
+            this.createAjaxBuyOneClick(product_id, quantity, phone).execute();
             return this;
         },
         
