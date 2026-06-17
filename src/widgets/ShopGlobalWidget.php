@@ -13,6 +13,7 @@ use skeeks\cms\shop\assets\ShopAsset;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\web\View;
 
 /**
@@ -47,6 +48,7 @@ class ShopGlobalWidget extends Widget
             'backend-clear-cart'             => UrlHelper::construct('/shop/cart/clear')->toString(),
             'backend-remove-discount-coupon' => UrlHelper::construct('/shop/cart/remove-discount-coupon')->toString(),
             'backend-add-discount-coupon'    => UrlHelper::construct('/shop/cart/add-discount-coupon')->toString(),
+            'cart-url'                       => Url::to(['/shop/cart']),
 
             'backend-favorite-add-product'    => UrlHelper::construct('/shop/favorite/add-product')->toString(),
             'backend-favorite-remove-product' => UrlHelper::construct('/shop/favorite/remove-product')->toString(),
