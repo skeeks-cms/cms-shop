@@ -1076,7 +1076,7 @@ SQL
             $content = \Yii::$app->shop->contentProducts;
             $itemData = [
                 'label'          => $content->name,
-                "img"            => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+                "img"            => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/product.svg'],
                 'url'            => ["shop/admin-cms-content-element", "content_id" => $content->id],
                 "activeCallback" => function ($adminMenuItem) use ($content) {
                     return (bool)($content->id == \Yii::$app->request->get("content_id") && \Yii::$app->controller->uniqueId == 'shop/admin-cms-content-element');
@@ -1104,7 +1104,7 @@ SQL
                 'products' => [
                     'priority' => 260,
                     'label'    => \Yii::t('skeeks/shop/app', 'Goods'),
-                    "img"      => ['\skeeks\cms\shop\assets\Asset', 'icons/e-commerce.png'],
+                    "img"      => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/product.svg'],
 
                     'items' => $result,
                 ],
