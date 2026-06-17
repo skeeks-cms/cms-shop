@@ -36,6 +36,7 @@ use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\FieldSet;
+use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
@@ -612,6 +613,77 @@ HTML
         $model = $action->model;
         $model->load(\Yii::$app->request->get());
 
+        $this->view->registerCSS(<<<CSS
+.field-shoppayment-cms_company_id {
+    display: none;
+}
+.field-shoppayment-cms_user_id {
+    display: none;
+}
+.btn.sx-active {
+    background: #6c757d !important;
+    color: white;
+}
+CSS
+        );
+
+        $cms_company_id = (int) $model->cms_company_id;
+        $cms_user_id = (int) $model->cms_user_id;
+
+        $this->view->registerJs(<<<JS
+var cms_company_id = {$cms_company_id};
+var cms_user_id = {$cms_user_id};
+
+$("body").on("click", ".sx-choose-paymenter .btn", function(e, data) {
+    $(".field-shoppayment-cms_company_id").slideUp();
+    $(".field-shoppayment-cms_user_id").slideUp();
+
+    var is_first = false;
+
+    if (data) {
+        if (data.is_first) {
+            is_first = true;
+        }
+    }
+
+    if (is_first === false) {
+        $("#shoppayment-cms_company_id").val("");
+        $("#shoppayment-cms_user_id").val("");
+    }
+
+    $(".sx-choose-paymenter .btn").removeClass("sx-active");
+    $(this).addClass("sx-active");
+    $($(this).data("view")).slideDown();
+    return false;
+});
+
+function reloadView() {
+    var cms_company_id = $("#shoppayment-cms_company_id").val();
+    var cms_user_id = $("#shoppayment-cms_user_id").val();
+
+    if (cms_company_id) {
+        $(".cms_company_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    } else if(cms_user_id) {
+        $(".cms_user_id-btn").trigger("click", {
+            'is_first' : true
+        });
+    }
+
+    return false;
+}
+
+reloadView();
+
+$(document).on('pjax:complete', function (e) {
+    setTimeout(function() {
+        reloadView();
+    }, 200);
+});
+JS
+        );
+
         $result = [];
 
         $result['main'] = [
@@ -663,6 +735,13 @@ HTML
             'class'  => FieldSet::class,
             'name'   => 'Компания или клиент (заполнить хотя бы одно)',
             'fields' => [
+                'div' => [
+                    'class' => HtmlBlock::class,
+                    'content' => '<div class="col-12 sx-choose-paymenter form-group"><div class="btn-group btn-block" role="group" aria-label="Basic example">
+                          <button type="button" class="btn btn-default cms_company_id-btn" data-view=".field-shoppayment-cms_company_id">&#1050;&#1086;&#1084;&#1087;&#1072;&#1085;&#1080;&#1103;</button>
+                          <button type="button" class="btn btn-default cms_user_id-btn" data-view=".field-shoppayment-cms_user_id">&#1050;&#1083;&#1080;&#1077;&#1085;&#1090;</button>
+                        </div></div>'
+                ],
 
                 'cms_company_id' => [
                     'class'        => WidgetField::class,
