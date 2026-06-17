@@ -3074,6 +3074,8 @@ JS
                     if (!$sp->save(false, ['shop_product_model_id'])) {
                         throw new \yii\base\Exception(print_r($sp->errors, true));
                     }
+                    $sp->cmsContentElement->updated_at = time();
+                    $sp->cmsContentElement->update(false, ['updated_at']);
 
                     if ($spModel->getShopProducts()->count() <= 1) {
                         $spModel->delete();

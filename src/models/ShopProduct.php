@@ -1701,7 +1701,9 @@ class ShopProduct extends \skeeks\cms\models\Core
                     $spModel->save();
 
                     $this->shop_product_model_id = $spModel->id;
+                    $this->cmsContentElement->updated_at = time();
                     $this->update(false, ['shop_product_model_id']);
+                    $this->cmsContentElement->update(false, ['updated_at']);
                 } else {
                     $spModel = $this->shopProductModel;
                 }
@@ -1712,7 +1714,9 @@ class ShopProduct extends \skeeks\cms\models\Core
 
                         if ($sp = \skeeks\cms\shop\models\ShopProduct::findOne($product_id)) {
                             $sp->shop_product_model_id = $spModel->id;
+                            $sp->cmsContentElement->updated_at = time();
                             $sp->update(false, ['shop_product_model_id']);
+                            $sp->cmsContentElement->update(false, ['updated_at']);
                         }
 
                     }

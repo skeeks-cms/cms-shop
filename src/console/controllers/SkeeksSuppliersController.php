@@ -26,6 +26,7 @@ use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopCollection;
 use skeeks\cms\shop\models\ShopProduct;
+use skeeks\cms\shop\models\ShopProductModel;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\Skeeks;
@@ -1204,6 +1205,12 @@ class SkeeksSuppliersController extends Controller
                     $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                     $model->cms_measure_code = trim((string)ArrayHelper::getValue($apiData, "measure_code"));
                     $model->is_multiple = (int)ArrayHelper::getValue($apiData, "is_multiple");
+                    if (array_key_exists("is_offer_property", $apiData)) {
+                        $model->is_offer_property = (int)ArrayHelper::getValue($apiData, "is_offer_property");
+                    }
+                    if (array_key_exists("is_img_offer_property", $apiData)) {
+                        $model->is_img_offer_property = (int)ArrayHelper::getValue($apiData, "is_img_offer_property");
+                    }
                     $model->updated_at = $updated_at;
 
                     $category_ids = (array)ArrayHelper::getValue($apiData, "category_ids");
@@ -1244,6 +1251,7 @@ class SkeeksSuppliersController extends Controller
 
 
                     if ($model->save()) {
+                        $this->_syncPropertyEnums($model, $apiData);
                         $result = true;
                     } else {
                         throw new Exception("Ошибка обновления характеристики {$model->id}: ".print_r($model->errors, true));
@@ -1257,6 +1265,12 @@ class SkeeksSuppliersController extends Controller
                 $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                 $model->cms_measure_code = trim((string)ArrayHelper::getValue($apiData, "measure_code"));
                 $model->is_multiple = (int)ArrayHelper::getValue($apiData, "is_multiple");
+                if (array_key_exists("is_offer_property", $apiData)) {
+                    $model->is_offer_property = (int)ArrayHelper::getValue($apiData, "is_offer_property");
+                }
+                if (array_key_exists("is_img_offer_property", $apiData)) {
+                    $model->is_img_offer_property = (int)ArrayHelper::getValue($apiData, "is_img_offer_property");
+                }
                 $model->sx_id = (int)ArrayHelper::getValue($apiData, "id");
 
                 $category_ids = (array)ArrayHelper::getValue($apiData, "category_ids");
@@ -1296,6 +1310,7 @@ class SkeeksSuppliersController extends Controller
                 $model->updated_at = $updated_at;
                 
                 if ($model->save()) {
+                    $this->_syncPropertyEnums($model, $apiData);
                     $result = true;
                 } else {
                     throw new Exception("Ошибка создания характеристики: ".print_r($model->errors, true));
@@ -1315,6 +1330,65 @@ class SkeeksSuppliersController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * @param CmsContentProperty $property
+     * @param array              $apiData
+     * @return void
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    private function _syncPropertyEnums(CmsContentProperty $property, array $apiData = [])
+    {
+        if ($property->property_type != PropertyType::CODE_LIST) {
+            return;
+        }
+
+        $enumsData = (array)ArrayHelper::getValue($apiData, "enums");
+        if (!$enumsData) {
+            return;
+        }
+
+        foreach ($enumsData as $enumData) {
+            $enumSxId = (int)ArrayHelper::getValue($enumData, "id");
+            $enumSxValue = (string)ArrayHelper::getValue($enumData, "value");
+
+            if (!$enumSxId || !$enumSxValue) {
+                continue;
+            }
+
+            $enum = CmsContentPropertyEnum::find()->andWhere(['sx_id' => $enumSxId])->one();
+            if (!$enum) {
+                $enum = new CmsContentPropertyEnum();
+                $enum->property_id = $property->id;
+                $enum->value = $enumSxValue;
+                $enum->sx_id = $enumSxId;
+
+                if (!$enum->save()) {
+                    throw new Exception(print_r($enum->errors, true));
+                }
+            } else {
+                $fields = [];
+
+                if ((int)$enum->property_id != (int)$property->id) {
+                    $enum->property_id = $property->id;
+                    $fields[] = 'property_id';
+                }
+
+                if ($enum->value != $enumSxValue) {
+                    $enum->value = $enumSxValue;
+                    $fields[] = 'value';
+                }
+
+                if ($fields) {
+                    $enum->update(false, $fields);
+                }
+            }
+
+            $this->_syncPropertyEnumImage($enum, $enumData);
+        }
     }
 
     /**
@@ -1809,6 +1883,8 @@ class SkeeksSuppliersController extends Controller
                     $properties = (array)ArrayHelper::getValue($apiData, "properties");
                     $this->_updatePropertiesForProduct($model, $properties);
 
+                    $this->_syncProductModel($apiData, $model);
+
                     $result = true;
                 }
 
@@ -1940,6 +2016,8 @@ class SkeeksSuppliersController extends Controller
                 $properties = (array)ArrayHelper::getValue($apiData, "properties");
                 $this->_updatePropertiesForProduct($model, $properties);
 
+                $this->_syncProductModel($apiData, $model);
+
                 $result = true;
 
             }
@@ -1958,6 +2036,83 @@ class SkeeksSuppliersController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * Syncs a complex product card by the stable model id from SkeekS Suppliers.
+     *
+     * @param array                 $apiData
+     * @param ShopCmsContentElement $model
+     * @return void
+     * @throws Exception
+     */
+    private function _syncProductModel(array $apiData, ShopCmsContentElement $model)
+    {
+        $sxModelId = (int)ArrayHelper::getValue($apiData, "model_id");
+
+        if (!$sxModelId) {
+            if ($model->shopProduct->shop_product_model_id) {
+                $model->shopProduct->shop_product_model_id = null;
+                if (!$model->shopProduct->save(false, ['shop_product_model_id'])) {
+                    throw new Exception("Ошибка отвязки товара от объединенной карточки {$model->id}: ".print_r($model->errors, true));
+                }
+
+                $model->updated_at = time();
+                $model->save(false, ['updated_at']);
+            }
+
+            return;
+        }
+
+        $shopProductModel = ShopProductModel::find()
+            ->andWhere(['sx_id' => $sxModelId])
+            ->one();
+
+        if (!$shopProductModel) {
+            $shopProductModel = new ShopProductModel();
+            $shopProductModel->sx_id = $sxModelId;
+
+            if (!$shopProductModel->save(false)) {
+                throw new Exception("Ошибка создания объединенной карточки: ".print_r($shopProductModel->errors, true));
+            }
+        }
+
+        $sxProductIds = array_map('intval', (array)ArrayHelper::getValue($apiData, "model_product_ids"));
+        $sxProductIds[] = (int)$model->sx_id;
+        $sxProductIds = array_values(array_unique(array_filter($sxProductIds)));
+
+        $localProductIds = ShopCmsContentElement::find()
+            ->select(['id'])
+            ->andWhere(['sx_id' => $sxProductIds])
+            ->column();
+
+        if (!$localProductIds) {
+            $localProductIds = [$model->id];
+        }
+
+        ShopProduct::updateAll(
+            ['shop_product_model_id' => $shopProductModel->id],
+            ['id' => $localProductIds]
+        );
+
+        $detachedProductIds = ShopProduct::find()
+            ->select(['id'])
+            ->andWhere([
+                'and',
+                ['shop_product_model_id' => $shopProductModel->id],
+                ['not in', 'id', $localProductIds],
+            ])
+            ->column();
+
+        ShopProduct::updateAll(
+            ['shop_product_model_id' => null],
+            ['id' => $detachedProductIds]
+        );
+
+        CmsContentElement::updateAll(
+            ['updated_at' => time()],
+            ['id' => array_merge($localProductIds, $detachedProductIds)]
+        );
     }
 
     private $_stores = [];
@@ -2140,6 +2295,8 @@ class SkeeksSuppliersController extends Controller
                                 }
                             }
 
+                            $this->_syncPropertyEnumImage($enum, $valueObject);
+
                             $enumIds[] = $enum->id;
                             //} else {
                             //    echo '1111';
@@ -2180,6 +2337,8 @@ class SkeeksSuppliersController extends Controller
                                     }
                                 }
 
+                                $this->_syncPropertyEnumImage($enum, $value);
+
                                 $propertyValues[$property->code] = $enum->id;
                             } else {
                                 /*print_r($property->toArray());die;
@@ -2209,6 +2368,30 @@ class SkeeksSuppliersController extends Controller
 
             if (!$rpmModel->save()) {
                 throw new Exception("Ошибка сохранения характеристик: ".print_r($rpmModel->errors, true));
+            }
+        }
+    }
+
+    /**
+     * @param CmsContentPropertyEnum $enum
+     * @param array                  $apiData
+     * @return void
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    private function _syncPropertyEnumImage(CmsContentPropertyEnum $enum, array $apiData = [])
+    {
+        if (!$imageData = ArrayHelper::getValue($apiData, "image")) {
+            return;
+        }
+
+        if ($image = $this->_addImage($imageData, false)) {
+            if ((int)$enum->cms_image_id != (int)$image->id) {
+                $enum->cms_image_id = $image->id;
+                if (!$enum->save(false, ['cms_image_id'])) {
+                    throw new Exception("Ошибка сохранения картинки значения характеристики {$enum->id}: ".print_r($enum->errors, true));
+                }
             }
         }
     }

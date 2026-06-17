@@ -16,6 +16,7 @@ use skeeks\modules\cms\money\models\Currency;
  *
  * @property integer                 $id
  * @property integer                 $created_at
+ * @property integer|null            $sx_id
  *
  * @property ShopProduct[]           $shopProducts
  */

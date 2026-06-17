@@ -38,6 +38,22 @@ $this->registerCss(<<<CSS
 .btn-select-option {
     margin-bottom: 5px;
 }
+.btn-select-option.sx-image-select {
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0.2rem;
+    border-radius: 50%;
+    overflow: hidden;
+    vertical-align: middle;
+}
+.btn-select-option.sx-image-select img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover;
+    line-height: normal;
+}
 
 .sx-need-select label {
     color: red;
@@ -121,6 +137,20 @@ JS
                                 $image = $element->image;
                             }
                         }
+
+                        $imageSrc = \skeeks\cms\helpers\Image::getCapSrc();
+                        if ($image) {
+                            $preview = \Yii::$app->imaging->getPreview(
+                                $image,
+                                new \skeeks\cms\components\imaging\filters\Thumbnail([
+                                    'w'          => 50,
+                                    'h'          => 50,
+                                    'm'          => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
+                                    'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_MICRO,
+                                ])
+                            );
+                            $imageSrc = $preview->src;
+                        }
                         
                         $isChecked = false;
                         $isDisabled = false;
@@ -135,21 +165,12 @@ JS
                         }
                         ?>
                         <?php if($property->is_img_offer_property) : ?>
-                            <button class="<?= $cssClass; ?> btn-select-option sx-image-select" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
+                            <button type="button" class="<?= $cssClass; ?> btn-select-option sx-image-select" title="<?= \yii\helpers\Html::encode($value); ?>" data-value="<?= $key; ?>" data-disabled="<?= (int)$isDisabled; ?>">
                                 
                                 <img
-                                    class="img-fluid lazy"
-                                    style="aspect-ratio: 1/1;"
-                                    src="<?php echo \Yii::$app->cms->image1px; ?>"
-                                    title="<?= $value; ?>"
-        
-                                    data-src="<?= \Yii::$app->imaging->thumbnailUrlOnRequest($image ? $image->src : \skeeks\cms\helpers\Image::getCapSrc(),
-                                    new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                        'w' => 50,
-                                        'h' => 50,
-                                        'm' => \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND,
-                                    ])
-                                ); ?>">
+                                    src="<?= \yii\helpers\Html::encode($imageSrc); ?>"
+                                    alt="<?= \yii\helpers\Html::encode($value); ?>"
+                                >
                                     
                             </button>
                         <?php else : ?>
