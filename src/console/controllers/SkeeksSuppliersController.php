@@ -753,6 +753,7 @@ class SkeeksSuppliersController extends Controller
 
     private $_total_updated = 0;
     private $_total_created = 0;
+    private $_last_error_message = null;
     
     /**
      * Получает информацию по новым товарам, и недавно измененным
@@ -896,21 +897,40 @@ class SkeeksSuppliersController extends Controller
             $total = count($response->data);
             Console::startProgress($counter, $total);
 
-            foreach ($response->data as $apiData) {
+            try {
+                foreach ($response->data as $apiData) {
 
-                $id = (int)ArrayHelper::getValue($apiData, "id");
-                if ($model = ShopCmsContentElement::find()->sxId($id)->one()) {
-                    if ($this->_updateProduct($apiData, $model)) {
-                        $updated++;
+                    $id = (int)ArrayHelper::getValue($apiData, "id");
+                    $this->_last_error_message = null;
+
+                    if ($model = ShopCmsContentElement::find()->sxId($id)->one()) {
+                        $isProductUpdated = $this->_updateProduct($apiData, $model);
+                        if ($isProductUpdated) {
+                            $updated++;
+                        }
+                    } else {
+                        $isProductUpdated = $this->_updateProduct($apiData);
+                        if ($isProductUpdated) {
+                            $created++;
+                        }
                     }
-                } else {
-                    if ($this->_updateProduct($apiData)) {
-                        $created++;
+
+                    $counter++;
+
+                    if (!$isProductUpdated && $this->_last_error_message) {
+                        Console::endProgress();
+                        $this->stdout("\n\nОшибка импорта товара sx_id={$id}\n", Console::FG_RED);
+                        $this->stdout($this->_last_error_message."\n\n", Console::FG_RED);
+                        Console::startProgress($counter, $total);
                     }
+
+                    Console::updateProgress($counter, $total);
                 }
-
-                $counter++;
-                Console::updateProgress($counter, $total);
+            } catch (\Exception $exception) {
+                Console::endProgress();
+                $this->stdout("\n\nОшибка импорта товара sx_id={$id}\n", Console::FG_RED);
+                $this->stdout($exception->getMessage()."\n\n", Console::FG_RED);
+                throw $exception;
             }
 
             Console::endProgress();
@@ -1166,7 +1186,7 @@ class SkeeksSuppliersController extends Controller
                 throw $exception;
             }
 
-            $this->stdout($exception->getMessage(), Console::FG_RED);
+            $this->stdout("\n\n".$exception->getMessage()."\n\n", Console::FG_RED);
         }
 
         return $result;
@@ -1321,12 +1341,13 @@ class SkeeksSuppliersController extends Controller
             $t->commit();
         } catch (\Exception $exception) {
             $t->rollBack();
+            $this->_last_error_message = $exception->getMessage();
 
             if ($this->stop_on_error) {
                 throw $exception;
             }
 
-            $this->stdout($exception->getMessage(), Console::FG_RED);
+            $this->stdout("\n\n".$exception->getMessage()."\n\n", Console::FG_RED);
         }
 
         return $result;
@@ -1471,12 +1492,13 @@ class SkeeksSuppliersController extends Controller
             $t->commit();
         } catch (\Exception $exception) {
             $t->rollBack();
+            $this->_last_error_message = $exception->getMessage();
 
             if ($this->stop_on_error) {
                 throw $exception;
             }
 
-            $this->stdout($exception->getMessage(), Console::FG_RED);
+            $this->stdout("\n\n".$exception->getMessage()."\n\n", Console::FG_RED);
         }
 
         return $result;
@@ -1603,7 +1625,7 @@ class SkeeksSuppliersController extends Controller
                 throw $exception;
             }
 
-            $this->stdout($exception->getMessage(), Console::FG_RED);
+            $this->stdout("\n\n".$exception->getMessage()."\n\n", Console::FG_RED);
         }
 
         return $result;
@@ -1738,7 +1760,7 @@ class SkeeksSuppliersController extends Controller
                 throw $exception;
             }
 
-            $this->stdout($exception->getMessage(), Console::FG_RED);
+            $this->stdout("\n\n".$exception->getMessage()."\n\n", Console::FG_RED);
         }
 
         return $result;
@@ -1782,7 +1804,7 @@ class SkeeksSuppliersController extends Controller
                     $model->description_full = trim((string)ArrayHelper::getValue($apiData, "description_full"));
                     $model->is_adult = (int)ArrayHelper::getValue($apiData, "is_adult");
 
-                    $shopProduct = $model->shopProduct;
+                    $shopProduct = $this->_getOrCreateShopProduct($model);
 
                     $category_id = (int)ArrayHelper::getValue($apiData, "category_id");
                     if ($category_id) {
@@ -1890,7 +1912,7 @@ class SkeeksSuppliersController extends Controller
 
                 if ($this->product_update_prices) {
 
-                    $shopProduct = $model->shopProduct;
+                    $shopProduct = $this->_getOrCreateShopProduct($model);
                     $store_items = (array)ArrayHelper::getValue($apiData, "store_items");
                     if ($this->_updateStoreItemsForProduct($shopProduct, $store_items)) {
                         $result = true;
@@ -2027,15 +2049,44 @@ class SkeeksSuppliersController extends Controller
 
         } catch (\Exception $exception) {
             $t->rollBack();
+            $this->_last_error_message = $exception->getMessage();
 
             if ($this->stop_on_error) {
                 throw $exception;
             }
 
-            $this->stdout($exception->getMessage(), Console::FG_RED);
+            $this->stdout("\n\n".$exception->getMessage()."\n\n", Console::FG_RED);
         }
 
         return $result;
+    }
+
+    /**
+     * @param ShopCmsContentElement $model
+     * @return ShopProduct
+     * @throws Exception
+     */
+    private function _getOrCreateShopProduct(ShopCmsContentElement $model)
+    {
+        if ($model->shopProduct) {
+            return $model->shopProduct;
+        }
+
+        if ($shopProduct = ShopProduct::findOne($model->id)) {
+            $model->populateRelation('shopProduct', $shopProduct);
+            return $shopProduct;
+        }
+
+        $shopProduct = new ShopProduct();
+        $shopProduct->id = $model->id;
+
+        if (!$shopProduct->save(false)) {
+            throw new Exception("Ошибка восстановления shop_product для товара {$model->id}: ".print_r($shopProduct->errors, true).print_r($shopProduct->toArray(), true));
+        }
+
+        $model->populateRelation('shopProduct', $shopProduct);
+
+        return $shopProduct;
     }
 
     /**
@@ -2049,11 +2100,12 @@ class SkeeksSuppliersController extends Controller
     private function _syncProductModel(array $apiData, ShopCmsContentElement $model)
     {
         $sxModelId = (int)ArrayHelper::getValue($apiData, "model_id");
+        $shopProduct = $this->_getOrCreateShopProduct($model);
 
         if (!$sxModelId) {
-            if ($model->shopProduct->shop_product_model_id) {
-                $model->shopProduct->shop_product_model_id = null;
-                if (!$model->shopProduct->save(false, ['shop_product_model_id'])) {
+            if ($shopProduct->shop_product_model_id) {
+                $shopProduct->shop_product_model_id = null;
+                if (!$shopProduct->save(false, ['shop_product_model_id'])) {
                     throw new Exception("Ошибка отвязки товара от объединенной карточки {$model->id}: ".print_r($model->errors, true));
                 }
 
@@ -2475,7 +2527,7 @@ class SkeeksSuppliersController extends Controller
                 throw $exception;
             }
 
-            $this->stdout($exception->getMessage(), Console::FG_RED);
+            $this->stdout("\n\n".$exception->getMessage()."\n\n", Console::FG_RED);
         }
 
         return $result;
