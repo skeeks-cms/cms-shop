@@ -36,6 +36,7 @@ use yii\helpers\Url;
  * @property string         $code
  * @property string         $external_id
  * @property integer|null   $sx_id
+ * @property integer        $is_sx_info_update
  *
  * @property string|null    $seo_h1
  * @property string|null    $meta_title
@@ -114,6 +115,7 @@ class ShopBrand extends ActiveRecord
                     'is_active',
                     'priority',
                     'sx_id',
+                    'is_sx_info_update',
                 ],
                 'integer',
             ],
@@ -121,6 +123,11 @@ class ShopBrand extends ActiveRecord
                 ['sx_id',],
                 'default',
                 'value' => null,
+            ],
+            [
+                ['is_sx_info_update'],
+                'default',
+                'value' => 1,
             ],
             [
                 [
@@ -225,7 +232,8 @@ class ShopBrand extends ActiveRecord
             'meta_description'  => Yii::t('skeeks/cms', 'Meta Description'),
             'priority'          => Yii::t('skeeks/cms', 'Сортировка'),
             'external_id'       => Yii::t('skeeks/cms', 'Внешний код'),
-            'sx_id'             => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'             => Yii::t('skeeks/cms', 'SkeekS ID'),
+            'is_sx_info_update' => Yii::t('skeeks/cms', 'Получать информацию из сервиса SkeekS Товары?'),
         ]);
     }
     /**

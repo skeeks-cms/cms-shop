@@ -45,6 +45,7 @@ use yii\web\Application;
  * @property string|null      $meta_keywords
  * @property integer          $priority
  * @property integer|null     $sx_id
+ * @property integer          $is_sx_info_update
  *
  *
  * @property string           $seoName
@@ -139,6 +140,7 @@ class ShopCollection extends ActiveRecord
                     'priority',
                     'shop_brand_id',
                     'sx_id',
+                    'is_sx_info_update',
                     'show_counter',
                 ],
                 'integer',
@@ -148,6 +150,11 @@ class ShopCollection extends ActiveRecord
                 ['sx_id',],
                 'default',
                 'value' => null,
+            ],
+            [
+                ['is_sx_info_update'],
+                'default',
+                'value' => 1,
             ],
             [
                 ['shopCollectionStickers'],
@@ -309,7 +316,8 @@ class ShopCollection extends ActiveRecord
             'external_id'       => Yii::t('skeeks/cms', 'Внешний код'),
             'shop_brand_id'     => Yii::t('skeeks/cms', 'Бренд'),
             'imageIds'          => Yii::t('skeeks/cms', 'Images'),
-            'sx_id'             => Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'             => Yii::t('skeeks/cms', 'SkeekS ID'),
+            'is_sx_info_update' => Yii::t('skeeks/cms', 'Получать информацию из сервиса SkeekS Товары?'),
             'show_counter'             => Yii::t('skeeks/cms', 'Количество просмотров'),
             'shopCollectionStickers'             => Yii::t('skeeks/cms', 'Стикеры'),
         ]);

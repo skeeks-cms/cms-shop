@@ -2706,13 +2706,16 @@ CSS
                 ]);
             }*/
 
-            if ($post = \Yii::$app->request->post()) {
+            $isSxInfoLocked = $this->_isSxInfoUpdateLocked($model);
+            $post = \Yii::$app->request->post();
+            $postData = $isSxInfoLocked ? $this->_prepareSxInfoLockedPost($model, $post) : $post;
 
-                $model->load(\Yii::$app->request->post());
+            if ($postData) {
+                $model->load($postData);
                 $relatedModel = $model->relatedPropertiesModel;
 
-                $relatedModel->load(\Yii::$app->request->post());
-                $shopProduct->load(\Yii::$app->request->post());
+                $relatedModel->load($postData);
+                $shopProduct->load($postData);
             } else {
                 $relatedModel = $model->relatedPropertiesModel;
             }
@@ -2735,8 +2738,8 @@ CSS
                         ]);
                     }
 
-                    if ($post = \Yii::$app->request->post()) {
-                        $data = ArrayHelper::getValue($post, 'prices.'.$typePrice->id);
+                    if ($postData) {
+                        $data = ArrayHelper::getValue($postData, 'prices.'.$typePrice->id);
                         $productPrice->load($data, "");
                     }
 
@@ -2750,8 +2753,8 @@ CSS
 
                     if (!\Yii::$app->request->post(RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT)) {
 
-                        $model->load(\Yii::$app->request->post());
-                        $relatedModel->load(\Yii::$app->request->post());
+                        $model->load($postData);
+                        $relatedModel->load($postData);
 
                         if ($model->save() && $relatedModel->save() && $shopProduct->save()) {
 
@@ -2810,9 +2813,9 @@ CSS
             } elseif ($rr->isRequestAjaxPost()) {
 
                 try {
-                    $model->load(\Yii::$app->request->post());
-                    $shopProduct->load(\Yii::$app->request->post());
-                    $relatedModel->load(\Yii::$app->request->post());
+                    $model->load($postData);
+                    $shopProduct->load($postData);
+                    $relatedModel->load($postData);
 
                     $shopProduct->validate();
                     $model->validate();
@@ -2910,6 +2913,44 @@ CSS
             'submitBtn' => \Yii::$app->request->post('submit-btn'),
             'redirect'  => $redirect,
         ]);
+    }
+
+    protected function _isSxInfoUpdateLocked(ShopCmsContentElement $model)
+    {
+        return !$model->isNewRecord && (bool)$model->sx_id && (bool)$model->is_sx_info_update;
+    }
+
+    protected function _prepareSxInfoLockedPost(ShopCmsContentElement $model, array $post)
+    {
+        if (!$post) {
+            return $post;
+        }
+
+        $modelFormName = $model->formName();
+        $allowedAttributes = [
+            'seo_h1',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'priority',
+            'show_counter',
+        ];
+
+        $result = [];
+        $modelData = (array)ArrayHelper::getValue($post, $modelFormName, []);
+        foreach ($allowedAttributes as $attribute) {
+            if (array_key_exists($attribute, $modelData)) {
+                $result[$modelFormName][$attribute] = $modelData[$attribute];
+            }
+        }
+
+        foreach (['_csrf', 'submit-btn', RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT] as $key) {
+            if (array_key_exists($key, $post)) {
+                $result[$key] = $post[$key];
+            }
+        }
+
+        return $result;
     }
 
 

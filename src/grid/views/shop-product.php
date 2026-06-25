@@ -8,6 +8,12 @@
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
 $shopSellerProducts = [];
+$apiIconColor = $model->is_sx_info_update ? "green" : "red";
+$apiIconTitle = $model->is_sx_info_update
+    ? "SkeekS ID: {$model->sx_id}. Информация обновляется из сервиса SkeekS Товары"
+    : "SkeekS ID: {$model->sx_id}. Обновление информации из сервиса SkeekS Товары запрещено";
+$apiMarketUrl = $model->sx_id && isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getProductUrl($model->sx_id) : "#";
+$apiIcon = "<i class='fas fa-link' style='color: {$apiIconColor};'></i>";
 ?>
 <!--Товар привязан к главному-->
 <? if ($model->shopProduct->isSubProduct) : ?>
@@ -68,6 +74,15 @@ $shopSellerProducts = [];
                             <span data-toggle="tooltip" title="Этот товар не индексируется поисковыми системами">[no index]</span>
                         </span>
                     <? endif; ?>
+                    <? if ($model->sx_id) : ?>
+                        <?= \yii\helpers\Html::a($apiIcon, $apiMarketUrl, [
+                            'target' => '_blank',
+                            'data-pjax' => '0',
+                            'data-toggle' => 'tooltip',
+                            'title' => $apiIconTitle,
+                            'onclick' => 'event.stopPropagation();',
+                        ]); ?>
+                    <? endif; ?>
                 </div>
                 <? if ($model->tree_id) : ?>
                     <div style="">
@@ -121,7 +136,13 @@ $shopSellerProducts = [];
                         </span>
                     <? endif; ?>
                     <? if ($model->sx_id) : ?>
-                        <span data-toggle='tooltip' title='SkeekS Suppliers ID: <?php echo $model->sx_id; ?>'><i class='fas fa-link'></i></span>
+                        <?= \yii\helpers\Html::a($apiIcon, $apiMarketUrl, [
+                            'target' => '_blank',
+                            'data-pjax' => '0',
+                            'data-toggle' => 'tooltip',
+                            'title' => $apiIconTitle,
+                            'onclick' => 'event.stopPropagation();',
+                        ]); ?>
                     <? endif; ?>
 
                 </div>
@@ -155,6 +176,3 @@ $shopSellerProducts = [];
         <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= $tradeOffers; ?>)</a>
     <? endif; ?>
 </div>
-
-
-

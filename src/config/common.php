@@ -380,6 +380,7 @@ return [
         'skeeksSuppliersApi' => [
             'class' => \skeeks\cms\shop\components\SkeeksSuppliersApiComponent::class,
             'api_key' => \yii\helpers\ArrayHelper::getValue($params, "skeeksSuppliersApi.api_key"),
+            'market_url' => \yii\helpers\ArrayHelper::getValue($params, "skeeksSuppliersApi.market_url", "https://skeeks-market.ru"),
             'timeout' => \yii\helpers\ArrayHelper::getValue($params, "skeeksSuppliersApi.timeout", 20),
         ],
     ],

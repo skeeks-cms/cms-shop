@@ -255,7 +255,7 @@ HTML
                                 
                                 $name = $model->asText;
                                 if (isset($model->sx_id) && $model->sx_id) {
-                                    $data[] = Html::a($name . " <small data-toggle='tooltip' title='SkeekS Suppliers ID: {$model->sx_id}'><i class='fas fa-link'></i></small>", "#", ['class' => 'sx-trigger-action']);
+                                    $data[] = Html::a($name . " <small data-toggle='tooltip' title='SkeekS ID: {$model->sx_id}'><i class='fas fa-link'></i></small>", "#", ['class' => 'sx-trigger-action']);
                                 } else {
                                     $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
                                 }

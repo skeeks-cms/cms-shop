@@ -250,7 +250,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'display_name'                        => 'Отображаемое название',
             'delivery_time'                       => 'Время доставки с этого склада',
             'delivery_info'                       => 'Информация о доставке',
-            'sx_id'                               => \Yii::t('skeeks/cms', 'SkeekS Suppliers ID'),
+            'sx_id'                               => \Yii::t('skeeks/cms', 'SkeekS ID'),
         ]);
     }
     /**

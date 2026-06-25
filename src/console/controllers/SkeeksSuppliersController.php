@@ -1413,6 +1413,19 @@ class SkeeksSuppliersController extends Controller
     }
 
     /**
+     * @param \yii\db\ActiveRecord|null $model
+     * @return bool
+     */
+    private function _isAllowSxInfoUpdate($model = null)
+    {
+        if (!$model || !method_exists($model, 'hasAttribute') || !$model->hasAttribute('is_sx_info_update')) {
+            return true;
+        }
+
+        return (bool)$model->is_sx_info_update;
+    }
+
+    /**
      * @param                $apiData
      * @param ShopBrand|null $model
      * @return bool
@@ -1437,7 +1450,7 @@ class SkeeksSuppliersController extends Controller
                     }
                 }
 
-                if ($isNeedUpdate) {
+                if ($isNeedUpdate && $this->_isAllowSxInfoUpdate($model)) {
                     //TODO:добавить обновление
                     $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                     $model->website_url = trim((string)ArrayHelper::getValue($apiData, "website_url"));
@@ -1656,7 +1669,7 @@ class SkeeksSuppliersController extends Controller
                     }
                 }
 
-                if ($isNeedUpdate) {
+                if ($isNeedUpdate && $this->_isAllowSxInfoUpdate($model)) {
                     //TODO:добавить обновление
                     $model->name = trim((string)ArrayHelper::getValue($apiData, "name"));
                     $model->description_short = trim((string)ArrayHelper::getValue($apiData, "description_short"));
@@ -1795,7 +1808,7 @@ class SkeeksSuppliersController extends Controller
                     }
                 }
 
-                if ($isNeedUpdate) {
+                if ($isNeedUpdate && $this->_isAllowSxInfoUpdate($model)) {
 
 
                     //TODO:добавить обновление
@@ -2543,7 +2556,7 @@ class SkeeksSuppliersController extends Controller
      */
     private function _addImage($imageData = [], $isForceDownload = true)
     {
-        $image_src = (string)ArrayHelper::getValue($imageData, "src");
+        $image_src = \Yii::$app->skeeksSuppliersApi->getImageUrl((string)ArrayHelper::getValue($imageData, "src"));
         $image_id = (int)ArrayHelper::getValue($imageData, "id");
 
         if (!$image_src) {
@@ -2617,7 +2630,7 @@ class SkeeksSuppliersController extends Controller
 
     /*public function actionTest()
     {
-        $image_src = "https://skeeks-market.ru/uploads/all/1a/d0/e3/1ad0e385ef9ef31a4a05886b2728c94f/sx-filter__skeeks-cms-components-imaging-filters-Thumbnail/150956fd0dcf249e18b4b4a51758abc9/galaxy-330707.webp?w=0&h=1200&q=90&m=2&ext=jpg";
+        $image_src = \Yii::$app->skeeksSuppliersApi->getImageUrl("/uploads/all/1a/d0/e3/1ad0e385ef9ef31a4a05886b2728c94f/sx-filter__skeeks-cms-components-imaging-filters-Thumbnail/150956fd0dcf249e18b4b4a51758abc9/galaxy-330707.webp?w=0&h=1200&q=90&m=2&ext=jpg");
         $file = \Yii::$app->storage->upload($image_src);
         print_r($file->toArray());die;
     }*/

@@ -20,6 +20,7 @@ $shopStoreProduct = @$shopStoreProduct;
 $controller = $this->context;
 $action = $controller->action;
 $contentModel = $controller->content;
+$isSxInfoLocked = !$model->isNewRecord && $model->sx_id && $model->is_sx_info_update;
 
 /*$shopContent = \skeeks\cms\shop\models\ShopContent::find()->where(['content_id' => $contentModel->id])->one();*/
 
@@ -37,7 +38,7 @@ if ($model->isNewRecord) {
 }
 ?>
 <div class="">
-    <div class="sx-main-product-wrapper">
+    <div class="sx-main-product-wrapper <?php echo $isSxInfoLocked ? 'sx-sx-info-locked' : ''; ?>">
 
 
         <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
@@ -57,10 +58,82 @@ if ($model->isNewRecord) {
                 <?= Html::activeHiddenInput($contentModel, 'is_parent_content_required'); ?>
             <? endif; ?>
         </div>
+        <?php if ($isSxInfoLocked) : ?>
+            <?= \yii\bootstrap\Alert::widget([
+                'closeButton' => false,
+                'options'     => [
+                    'class' => 'alert-warning',
+                ],
+                'body'        => 'Товар связан с сервисом SkeekS Товары и синхронизация информации включена. Поля, которые обновляются из сервиса, закрыты от ручного редактирования, чтобы изменения не перезатирались. Можно редактировать только SEO, сортировку и количество просмотров. Чтобы изменить остальные данные вручную, отключите синхронизацию в карточке товара.',
+            ]); ?>
+            <?php
+            $allowedInputNames = \yii\helpers\Json::htmlEncode([
+                Html::getInputName($model, 'seo_h1'),
+                Html::getInputName($model, 'meta_title'),
+                Html::getInputName($model, 'meta_description'),
+                Html::getInputName($model, 'meta_keywords'),
+                Html::getInputName($model, 'priority'),
+                Html::getInputName($model, 'show_counter'),
+            ]);
 
+            $this->registerCss(<<<CSS
+.sx-sx-info-locked .form-control:disabled,
+.sx-sx-info-locked select:disabled,
+.sx-sx-info-locked textarea:disabled,
+.sx-sx-info-locked input:disabled {
+    background-color: #f3f5f7;
+    cursor: not-allowed;
+}
+.sx-sx-info-locked .sx-sx-disabled-control {
+    opacity: .65;
+    pointer-events: none;
+}
+CSS
+            );
 
+            $this->registerJs(<<<JS
+(function() {
+    var allowedInputNames = {$allowedInputNames};
+    var wrapper = $(".sx-sx-info-locked");
 
+    wrapper.find(":input").each(function() {
+        var input = $(this);
+        var type = (input.attr("type") || "").toLowerCase();
+        var name = input.attr("name") || "";
 
+        if (type === "hidden" || type === "submit" || name === "submit-btn" || allowedInputNames.indexOf(name) !== -1) {
+            return;
+        }
+
+        input.prop("disabled", true);
+        if (input.is("select")) {
+            input.trigger("change.select2");
+        }
+    });
+
+    wrapper.find("button").each(function() {
+        var button = $(this);
+        if (button.attr("name") === "submit-btn" || (button.attr("type") || "").toLowerCase() === "submit") {
+            return;
+        }
+        button.prop("disabled", true).addClass("sx-sx-disabled-control");
+    });
+
+    wrapper.find(".btn").each(function() {
+        var control = $(this);
+        if (control.is("button") && ((control.attr("type") || "").toLowerCase() === "submit" || control.attr("name") === "submit-btn")) {
+            return;
+        }
+        control.addClass("sx-sx-disabled-control");
+    });
+
+    wrapper.find(".sx-buttons-standart-wrapper .btn").removeClass("sx-sx-disabled-control");
+    wrapper.find(".sx-controll-actions, .sx-btn-search-property, .sx-fast-edit, .sx-btn-create").addClass("sx-sx-disabled-control");
+})();
+JS
+            );
+            ?>
+        <?php endif; ?>
             <?= $this->render('@skeeks/cms/views/admin-cms-content-element/_form-main', [
                 'form'         => $form,
                 'contentModel' => $contentModel,

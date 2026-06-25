@@ -9,6 +9,9 @@
 namespace skeeks\cms\shop\components;
 
 use skeeks\cms\models\CmsAgent;
+use skeeks\cms\models\CmsContentElement;
+use skeeks\cms\shop\models\ShopBrand;
+use skeeks\cms\shop\models\ShopCollection;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\httpclient\Client;
@@ -25,6 +28,11 @@ class SkeeksSuppliersApiComponent extends Component
     public $api_url = "https://gpd-api.skeeks.com/v1";
 
     /**
+     * @var string базовый адрес каталога SkeekS Market
+     */
+    public $market_url = "https://skeeks-market.ru";
+
+    /**
      * @var string ключ полученный в API сервисе
      */
     public $api_key = "";
@@ -39,6 +47,84 @@ class SkeeksSuppliersApiComponent extends Component
      * @var bool скачивать изображения на сервер?
      */
     public $is_download_images = false;
+
+    /**
+     * @param int|string $sx_id
+     * @return string
+     */
+    public function getProductUrl($sx_id)
+    {
+        return $this->getMarketUrl("/p-".(int)$sx_id);
+    }
+
+    /**
+     * @param int|string $sx_id
+     * @return string
+     */
+    public function getCollectionUrl($sx_id)
+    {
+        return $this->getMarketUrl("/p-c".(int)$sx_id);
+    }
+
+    /**
+     * @param int|string $sx_id
+     * @return string
+     */
+    public function getBrandUrl($sx_id)
+    {
+        return $this->getMarketUrl("/p-b".(int)$sx_id);
+    }
+
+    /**
+     * @param mixed $model
+     * @return string|null
+     */
+    public function getModelUrl($model)
+    {
+        if (!$model || !isset($model->sx_id) || !$model->sx_id) {
+            return null;
+        }
+
+        if ($model instanceof ShopBrand) {
+            return $this->getBrandUrl($model->sx_id);
+        }
+
+        if ($model instanceof ShopCollection) {
+            return $this->getCollectionUrl($model->sx_id);
+        }
+
+        if ($model instanceof CmsContentElement) {
+            return $this->getProductUrl($model->sx_id);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function getMarketUrl($path = "")
+    {
+        if (preg_match('#^https?://#i', (string)$path)) {
+            return (string)$path;
+        }
+
+        return rtrim($this->market_url, "/")."/".ltrim((string)$path, "/");
+    }
+
+    /**
+     * @param string $src
+     * @return string
+     */
+    public function getImageUrl($src)
+    {
+        if (!$src) {
+            return "";
+        }
+
+        return $this->getMarketUrl($src);
+    }
 
     /**
      * @param string $api_method метод API полученный

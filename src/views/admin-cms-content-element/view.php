@@ -368,12 +368,65 @@ $noValue = "<span style='color: silver;'>—</span>";
 
     <div class="col-lg-4 col-sm-6 col-12">
         <div style="padding: 10px;">
-            <h4 style="line-height: 1.1;">
-                <?php echo $model->productName; ?>
-            </h4>
-
             <div class="sx-properties-wrapper sx-columns-1" style="max-width: 350px; margin-top: 15px;">
                 <ul class="sx-properties">
+
+                    <?php if ($model->sx_id) : ?>
+                        <?php
+                        $sxInfoUpdateColor = $model->is_sx_info_update ? "green" : "red";
+                        $sxInfoUpdateText = $model->is_sx_info_update ? "Синхронизация включена" : "Синхронизация отключена";
+                        $sxMarketUrl = isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getProductUrl($model->sx_id) : "#";
+                        ?>
+                        <li>
+                            <span class="sx-properties--name">
+                                SkeekS Товары <i class="far fa-question-circle" style="margin-left: 5px;" data-toggle="tooltip" title="Если выключить, скрипт не будут брать информацию о товаре из сервиса SkeekS Товары и ваши изменения по товару не будут перезатираться. Цены и остатки обновляются всегда."></i>
+                            </span>
+                            <span class="sx-properties--value">
+                                <?= \yii\helpers\Html::a("<i class='fas fa-link' style='color: {$sxInfoUpdateColor};'></i>", $sxMarketUrl, [
+                                    'target' => '_blank',
+                                    'data-pjax' => '0',
+                                    'data-toggle' => 'tooltip',
+                                    'title' => "SkeekS ID: ".(int)$model->sx_id,
+                                ]); ?>
+                                <span class="sx-fast-edit sx-fast-edit-popover"
+                                      data-form="#is_sx_info_update-form"
+                                      data-title="Получать информацию из сервиса SkeekS Товары?"
+                                >
+                                    <span style="color: <?= $sxInfoUpdateColor; ?>;"><?= $sxInfoUpdateText; ?></span>
+                                </span>
+                                <div class="sx-fast-edit-form-wrapper">
+                                    <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
+                                        'id'             => "is_sx_info_update-form",
+                                        'action'         => \yii\helpers\Url::to(['update-attribute', 'pk' => $model->id, 'content' => $model->content_id]),
+                                        'options'        => [
+                                            'class' => 'sx-fast-edit-form',
+                                        ],
+                                        'clientCallback' => new \yii\web\JsExpression(<<<JS
+                                            function (ActiveFormAjaxSubmit) {
+                                                ActiveFormAjaxSubmit.on('success', function(e, response) {
+                                                    $.pjax.reload("#{$pjax->id}");
+                                                    $(".sx-fast-edit").popover("hide");
+                                                });
+                                            }
+JS
+                                        ),
+                                    ]); ?>
+                                    <?= \yii\helpers\Html::radioList(
+                                        \yii\helpers\Html::getInputName($model, 'is_sx_info_update'),
+                                        (int)$model->is_sx_info_update,
+                                        [
+                                            1 => 'Да',
+                                            0 => 'Нет',
+                                        ]
+                                    ); ?>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> &#1057;&#1086;&#1093;&#1088;&#1072;&#1085;&#1080;&#1090;&#1100;</button>
+                                        </div>
+                                    <?php $form::end(); ?>
+                                </div>
+                            </span>
+                        </li>
+                    <?php endif; ?>
 
 
                     <li>
@@ -414,7 +467,6 @@ JS
 
                         </span>
                     </li>
-
 
                     <li>
                         <span class="sx-properties--name">
@@ -1814,5 +1866,3 @@ $infoModel = $model;
 --><?php /*endif; */ ?>
 
 <?php $pjax::end(); ?>
-
-
