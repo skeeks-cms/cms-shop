@@ -2325,13 +2325,16 @@ class SkeeksSuppliersController extends Controller
                  * @var CmsContentProperty $property
                  */
                 $property = ArrayHelper::getValue($properties, $sx_id);
+                if (!$property) {
+                    continue;
+                }
 
                 if ($property->property_type == PropertyType::CODE_LIST) {
 
                     if ($property->is_multiple) {
                         $enumIds = [];
 
-                        foreach ($value as $valueObject) {
+                        foreach ((array)$value as $valueObject) {
                             $enumSxId = (int)ArrayHelper::getValue($valueObject, "id");
                             $enumSxValue = (string)ArrayHelper::getValue($valueObject, "value");
                             //if ($enumSxValue) {
