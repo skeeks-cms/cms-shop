@@ -2259,6 +2259,9 @@ class SkeeksSuppliersController extends Controller
                      * @var $shopStoreItem ShopStoreProduct
                      */
                     $shopStoreItem = $shopStore->getShopStoreProducts()->andWhere(['external_id' => $supplier_code])->one();
+                    if (!$shopStoreItem) {
+                        $shopStoreItem = $shopStore->getShopStoreProducts()->andWhere(['shop_product_id' => $shopProduct->id])->one();
+                    }
 
                     $api_supplier_name = trim((string)ArrayHelper::getValue($store_item_data, "supplier_name"));
                     $api_quantity = (float)ArrayHelper::getValue($store_item_data, "quantity");
@@ -2290,6 +2293,11 @@ class SkeeksSuppliersController extends Controller
                         if ($shopStoreItem->shop_product_id != $shopProduct->id) {
                             $shopStoreItem->shop_product_id = $shopProduct->id;
                             $changedAttrs[] = "shop_product_id";
+                        }
+
+                        if ($supplier_code && $shopStoreItem->external_id != $supplier_code) {
+                            $shopStoreItem->external_id = $supplier_code;
+                            $changedAttrs[] = "external_id";
                         }
 
                         if ($shopStoreItem->name != $api_supplier_name) {

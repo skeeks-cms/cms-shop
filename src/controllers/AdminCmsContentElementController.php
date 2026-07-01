@@ -3109,7 +3109,10 @@ JS
                 ob_end_clean();
             }
             $rr->success = false;
-            $rr->message = $exception->getMessage();
+            $rr->message = "Не удалось обновить информацию по товару из сервиса SkeekS Товары.\n"
+                ."SkeekS ID: {$model->sx_id}; ID товара: {$model->id}.\n"
+                ."Причина: ".$exception->getMessage()."\n"
+                ."Если ошибка связана со складом, проверьте складские позиции этого товара: возможно запись склада уже существует с другим внешним кодом поставщика.";
         }
 
         return $rr;
