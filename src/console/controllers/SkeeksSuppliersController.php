@@ -117,6 +117,11 @@ class SkeeksSuppliersController extends Controller
      */
     public $stop_on_error = 0;
 
+    /**
+     * @var bool
+     */
+    public $silent = false;
+
 
     /**
      * @var bool
@@ -156,6 +161,25 @@ class SkeeksSuppliersController extends Controller
     }
 
     private $_start_time = 0;
+
+    /**
+     * @param string $string
+     * @return bool|int
+     */
+    public function stdout($string)
+    {
+        if ($this->silent || !defined('STDOUT')) {
+            return strlen((string)$string);
+        }
+
+        if ($this->isColorEnabled()) {
+            $args = func_get_args();
+            array_shift($args);
+            $string = Console::ansiFormat($string, $args);
+        }
+
+        return Console::stdout($string);
+    }
     
     /**
      * @param $action
@@ -350,6 +374,7 @@ class SkeeksSuppliersController extends Controller
         } else {
             throw new Exception("Ошибка ответа API {$response->request_url}; code: {$response->code}; code: {$response->content}");
         }
+
     }
 
     /**
@@ -764,6 +789,17 @@ class SkeeksSuppliersController extends Controller
      */
     public function actionUpdateProduct($sx_id)
     {
+        $this->updateProductBySxId($sx_id);
+    }
+
+    /**
+     * @param $sx_id
+     * @return array
+     * @throws Exception
+     * @throws \Throwable
+     */
+    public function updateProductBySxId($sx_id)
+    {
         $apiQuery = [
             'id' => $sx_id,
         ];
@@ -797,7 +833,6 @@ class SkeeksSuppliersController extends Controller
                     }
                 }
 
-                $counter++;
             }
 
 

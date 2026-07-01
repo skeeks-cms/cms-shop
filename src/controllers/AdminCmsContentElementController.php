@@ -882,6 +882,25 @@ HTML
                     },
                 ],
 
+                "update-sx-product" => [
+                    'class'     => BackendModelAction::class,
+                    'isVisible' => false,
+                    'callback'  => [$this, 'actionUpdateSxProduct'],
+
+                    'accessCallback' => function (BackendModelAction $action) {
+                        /**
+                         * @var $model ShopCmsContentElement
+                         */
+                        $model = $action->model;
+
+                        if (!$model || !$model->shopProduct || !$model->sx_id || !$model->is_sx_info_update) {
+                            return false;
+                        }
+
+                        return \Yii::$app->user->can($this->permissionName."/update", ['model' => $action->model]);
+                    },
+                ],
+
 
                 'duplicates' => [
                     'class'          => ViewBackendAction::class,
@@ -3042,6 +3061,58 @@ JS
 
         return $rr;
 
+    }
+
+    /**
+     * @return RequestResponse
+     */
+    public function actionUpdateSxProduct()
+    {
+        $rr = new RequestResponse();
+        /**
+         * @var $model ShopCmsContentElement
+         */
+        $model = $this->model;
+
+        if (!$rr->isRequestAjaxPost()) {
+            return $rr;
+        }
+
+        if (!$model || !$model->sx_id) {
+            $rr->success = false;
+            $rr->message = "Товар не связан с сервисом SkeekS Товары";
+            return $rr;
+        }
+
+        if (!$model->is_sx_info_update) {
+            $rr->success = false;
+            $rr->message = "Синхронизация информации по товару отключена";
+            return $rr;
+        }
+
+        try {
+            $controller = new \skeeks\cms\shop\console\controllers\SkeeksSuppliersController("skeeks-suppliers", \Yii::$app);
+            $controller->product_reload_info = 1;
+            $controller->product_update_prices = 1;
+            $controller->stop_on_error = 1;
+            $controller->silent = true;
+
+            ob_start();
+            $result = $controller->updateProductBySxId($model->sx_id);
+            ob_end_clean();
+
+            $rr->success = true;
+            $rr->message = "Информация по товару обновлена из сервиса SkeekS Товары";
+            $rr->data = $result;
+        } catch (\Exception $exception) {
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            $rr->success = false;
+            $rr->message = $exception->getMessage();
+        }
+
+        return $rr;
     }
 
     /**

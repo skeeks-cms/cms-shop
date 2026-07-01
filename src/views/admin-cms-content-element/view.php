@@ -117,6 +117,42 @@ $('[data-fancybox="images"]').fancybox({
 })(sx, sx.$, sx._);
 
 new sx.classes.FastEdit({$jsData});
+
+$("body").off("click.sx-update-sx-product", ".sx-update-sx-product").on("click.sx-update-sx-product", ".sx-update-sx-product", function(e) {
+    e.preventDefault();
+
+    var jBtn = $(this);
+    if (jBtn.hasClass("disabled")) {
+        return false;
+    }
+
+    jBtn.addClass("disabled");
+    jBtn.find(".fa-sync").addClass("fa-spin");
+
+    $.ajax({
+        url: jBtn.attr("href"),
+        type: "post",
+        success: function(response) {
+            if (response && response.success) {
+                jBtn.tooltip("hide");
+                jBtn.find(".fa-sync").removeClass("fa-spin");
+                sx.notify.info("Информация обновлена. Страница сейчас будет перезагружена.");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                alert(response && response.message ? response.message : "Ошибка обновления товара");
+                jBtn.removeClass("disabled");
+                jBtn.find(".fa-sync").removeClass("fa-spin");
+            }
+        },
+        error: function() {
+            alert("Ошибка обновления товара");
+            jBtn.removeClass("disabled");
+            jBtn.find(".fa-sync").removeClass("fa-spin");
+        }
+    });
+});
 JS
 );
 
@@ -209,6 +245,13 @@ $this->registerCSS(<<<CSS
     background: #f9f9f9;
     margin-top: 10px;
     padding: 10px;
+}
+.sx-update-sx-product {
+    margin-left: 8px;
+    padding: 2px 7px;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 0.6rem;
 }
 .sx-title {
     font-weight: bold;
@@ -394,6 +437,19 @@ $noValue = "<span style='color: silver;'>—</span>";
                                 >
                                     <span style="color: <?= $sxInfoUpdateColor; ?>;"><?= $sxInfoUpdateText; ?></span>
                                 </span>
+                                <?php if ($model->is_sx_info_update) : ?>
+                                    <?= \yii\helpers\Html::a("<i class='fas fa-sync'></i> Обновить сейчас", [
+                                        'update-sx-product',
+                                        'pk' => $model->id,
+                                        'content_id' => $model->content_id,
+                                        'content' => $model->content_id,
+                                    ], [
+                                        'class' => 'btn btn-xs btn-default sx-update-sx-product',
+                                        'data-pjax-id' => $pjax->id,
+                                        'data-toggle' => 'tooltip',
+                                        'title' => 'Обновить информацию по этому товару из сервиса SkeekS Товары',
+                                    ]); ?>
+                                <?php endif; ?>
                                 <div class="sx-fast-edit-form-wrapper">
                                     <?php $form = \skeeks\cms\base\widgets\ActiveFormAjaxSubmit::begin([
                                         'id'             => "is_sx_info_update-form",
