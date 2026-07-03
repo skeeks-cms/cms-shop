@@ -14,6 +14,17 @@ if (!@$isPdf) {
 }
 
 $noSignature = @$noSignature;
+$billItems = $model->printableBillItems;
+$hasItemDiscounts = false;
+foreach ($billItems as $billItem) {
+    if ((float)$billItem->discount_amount > 0) {
+        $hasItemDiscounts = true;
+        break;
+    }
+}
+$hasBillDiscount = (float)$model->discount_amount > 0;
+$hasDiscounts = $hasItemDiscounts || $hasBillDiscount;
+$hasDescription = trim((string)$model->description) !== '';
 ?>
 
 <section class="sx-print-no-margin">
@@ -21,35 +32,34 @@ $noSignature = @$noSignature;
         <div class="row">
             <div class="col-12 sx-container-wrapper">
 
-                <p>Поставщик: <?= $model->receiverContractor->asShortText; ?><br/>
-                    Юр. Адрес: <?= $model->receiverContractor->mailing_postcode; ?>, <?= $model->receiverContractor->address; ?>
-                    <? if ($model->receiverContractor->ogrn) : ?>
+                <?php if ($model->due_at) : ?>
+                    <p style="text-align: center; font-weight: bold; margin-bottom: 20px;">
+                        Оплату необходимо произвести до <?= \Yii::$app->formatter->asDate($model->due_at, "long"); ?>
+                    </p>
+                <?php endif; ?>
+
+                <p>Поставщик: <?= \yii\helpers\Html::encode($model->billReceiverName); ?><br/>
+                    Юр. Адрес: <?= \yii\helpers\Html::encode($model->billReceiverPostcode); ?>, <?= \yii\helpers\Html::encode($model->billReceiverAddress); ?>
+                    <? if ($model->billReceiverOgrn) : ?>
                         <br />
-                        <? if ($model->receiverContractor->contractor_type == \skeeks\cms\models\CmsContractor::TYPE_INDIVIDUAL) : ?>
-                            ОГРНИП
-                        <? elseif ($model->receiverContractor->contractor_type == \skeeks\cms\models\CmsContractor::TYPE_LEGAL) : ?>
-                            ОГРН
-                        <? endif; ?>
-                        : <?= $model->receiverContractor->ogrn; ?>
+                        <?= \yii\helpers\Html::encode($model->billReceiverOgrnLabel); ?>: <?= \yii\helpers\Html::encode($model->billReceiverOgrn); ?>
                     <? endif; ?>
                 </p>
-
-                <p style="text-align: center; margin: 15px; 15px;"><b>Образец заполнения платежного поручения</b></p>
 
                 <table border="2" class="bank-data-table" style="border-width: 2px;">
                     <tr>
                         <td rowspan="2" colspan="2" style="border-width: 2px;
     padding: 5px;
     vertical-align: top;">
-                            <?= $model->receiverContractorBank->bank_name; ?><br/>
+                            <?= \yii\helpers\Html::encode($model->billReceiverBankName); ?><br/>
                             Банк получателя
                         </td>
                         <td>
                             БИК
                         </td>
                         <td rowspan="2">
-                            <?= $model->receiverContractorBank->bic; ?><br/>
-                            <?= $model->receiverContractorBank->correspondent_account; ?>
+                            <?= \yii\helpers\Html::encode($model->billReceiverBankBic); ?><br/>
+                            <?= \yii\helpers\Html::encode($model->billReceiverBankCorrespondentAccount); ?>
                         </td>
                     </tr>
                     <tr>
@@ -61,25 +71,25 @@ $noSignature = @$noSignature;
 
                     <tr>
                         <td>
-                            ИНН <?= $model->receiverContractor->inn; ?>
+                            ИНН <?= \yii\helpers\Html::encode($model->billReceiverInn); ?>
                         </td>
                         <td>
                             КПП
-                            <? if ($model->receiverContractor->kpp) : ?>
-                                <?= $model->receiverContractor->kpp; ?>
+                            <? if ($model->billReceiverKpp) : ?>
+                                <?= \yii\helpers\Html::encode($model->billReceiverKpp); ?>
                             <? endif; ?>
                         </td>
                         <td rowspan="3">
                             Сч. №
                         </td>
                         <td rowspan="3">
-                            <?= $model->receiverContractorBank->checking_account; ?>
+                            <?= \yii\helpers\Html::encode($model->billReceiverBankCheckingAccount); ?>
                         </td>
                     </tr>
 
                     <tr>
                         <td rowspan="2" colspan="2">
-                            <?= $model->receiverContractor->asShortText; ?><br/>
+                            <?= \yii\helpers\Html::encode($model->billReceiverName); ?><br/>
                             Получатель
                         </td>
                     </tr>
@@ -91,11 +101,13 @@ $noSignature = @$noSignature;
                     <b>Счет №<?= $model->id; ?> от <?= \Yii::$app->formatter->asDate($model->created_at, "long"); ?></b>
                 </h1>
 
-                <?php if($model->senderContractor) : ?>
-                    <p>Плательщик: <b><?= $model->senderContractor->asShortText; ?>, ИНН <?= $model->senderContractor->inn; ?></b></p>
+                <?php if($model->billSenderName) : ?>
+                    <p>Плательщик: <b><?= \yii\helpers\Html::encode($model->billSenderName); ?>, ИНН <?= \yii\helpers\Html::encode($model->billSenderInn); ?></b></p>
                 <?php endif; ?>
-                
-                
+
+                <?php if ($hasDescription) : ?>
+                    <p style="margin: 8px 0 12px 0;"><?= nl2br(\yii\helpers\Html::encode($model->description)); ?></p>
+                <?php endif; ?>
 
 
                 <table border="2" class="sx-positions">
@@ -105,19 +117,32 @@ $noSignature = @$noSignature;
                         <th>Кол-во</th>
                         <th>Ед.</th>
                         <th>Цена</th>
+                        <?php if ($hasDiscounts) : ?>
+                            <th>Скидка</th>
+                        <?php endif; ?>
                         <th>Сумма</th>
                     </tr>
-                    <tr>
-                        <td>1</td>
-                        <td><?= (string)$model->description; ?></td>
-                        <td>1</td>
-                        <td>шт</td>
-                        <td><?= (string)$model->money; ?></td>
-                        <td><?= (string)$model->money; ?></td>
-                    </tr>
+                    <?php foreach ($billItems as $index => $item) : ?>
+                        <tr>
+                            <td><?= $index + 1; ?></td>
+                            <td><?= \yii\helpers\Html::encode($item->name); ?></td>
+                            <td><?= (float)$item->quantity; ?></td>
+                            <td><?= \yii\helpers\Html::encode($item->measure_name); ?></td>
+                            <td><?= (string)$item->priceMoney; ?></td>
+                            <?php if ($hasDiscounts) : ?>
+                                <td><?= (float)$item->discount_amount > 0 ? (string)$item->discountMoney : ''; ?></td>
+                            <?php endif; ?>
+                            <td><?= (string)$item->money; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
                 </table>
 
                 <p style="text-align: right; font-weight: bold; margin-top: 10px;">
+                    <?php if ($hasBillDiscount) : ?>
+                        <span style="display: block; font-weight: normal;">
+                            Скидка по счету: -<?= (string)(new \skeeks\cms\money\Money($model->discount_amount, (string)$model->currency_code)); ?>
+                        </span>
+                    <?php endif; ?>
                     Итого: <?= (string)$model->money; ?>
                 </p>
                 <?/* if ($model->crmVat) : */?><!--
@@ -141,7 +166,7 @@ $noSignature = @$noSignature;
                 <?/* endif; */?>
 
                 <p style="">
-                    Всего наименований на сумму <?= (string)$model->money; ?>
+                    Всего наименований: <?= count($billItems); ?>, на сумму <?= (string)$model->money; ?>
                 </p>
                 <p style="font-weight: bold;">
                     <?
@@ -159,14 +184,14 @@ $noSignature = @$noSignature;
                 <div style="font-weight: bold;" class="row">
                     <div class="col-md-12" style="line-height: 60px;">
                         Выписал
-                        <? if (!$noSignature && $model->receiverContractor->directorSignature) : ?>
+                        <? if (!$noSignature && $model->receiverContractor && $model->receiverContractor->directorSignature) : ?>
                             <img src="<?= $model->receiverContractor->directorSignature->absoluteSrc; ?>" style="max-height: 60px; margin-bottom: -25px;"/>
                         <? else : ?>
                             <span style="width: 88px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                         <? endif; ?>
-                        <?= $model->receiverContractor->name; ?>
+                        <?= \yii\helpers\Html::encode($model->billReceiverName); ?>
                     </div>
-                    <? if ($model->receiverContractor->stamp && !$noSignature) : ?>
+                    <? if ($model->receiverContractor && $model->receiverContractor->stamp && !$noSignature) : ?>
                         <div class="col-md-12" style="line-height: 60px;">
                             <img src="<?= $model->receiverContractor->stamp->absoluteSrc; ?>" style="max-height: 140px; margin-top: -100px; margin-right: 50px; float: right;"/>
                         </div>

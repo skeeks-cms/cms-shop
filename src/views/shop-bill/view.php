@@ -27,21 +27,21 @@ CSS
                     <p>Клиент: <b><?= $model->cmsUser->shortDisplayName; ?></b></p>
                 <?php endif; ?>
 
-                <?php if($model->company) : ?>
-                    <p>Компания: <b><?= $model->company->asText; ?></b></p>
+                <?php if($model->billCompanyName) : ?>
+                    <p>Компания: <b><?= \yii\helpers\Html::encode($model->billCompanyName); ?></b></p>
                 <?php endif; ?>
 
                 <? if ($model->shopOrder) : ?>
                     <p>Заказ: <b><a href="<?= $model->shopOrder->url; ?>" data-pjax="0">№<?= $model->shopOrder->id; ?></a></b></p>
                 <? endif; ?>
 
-                <p>Комментарий: <b><?= $model->description; ?></b></p>
+                <p>Комментарий: <b><?= \yii\helpers\Html::encode($model->description); ?></b></p>
 
                 <p>
                     К оплате: <?= \yii\helpers\Html::tag('b', (string)$model->money); ?>
                 </p>
                 <p>
-                    Тип оплаты: <?= \yii\helpers\Html::tag('b', (string)$model->shopPaySystem->name); ?>
+                    Тип оплаты: <?= \yii\helpers\Html::tag('b', \yii\helpers\Html::encode($model->billPaySystemName)); ?>
                 </p>
             </div>
             <? if ($model->closed_at) : ?>
