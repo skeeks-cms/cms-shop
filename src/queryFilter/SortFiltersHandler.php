@@ -37,6 +37,7 @@ class SortFiltersHandler extends Model
     const SORT_PRICE_ASC = 'price';
     const SORT_PRICE_DESC = '-price';
     const SORT_NEW = '-new';
+    const SORT_NAME_ASC = 'name';
 
     public $viewFile = '@skeeks/cms/shop/queryFilter/views/sort-filter-hidden';
     public $viewFileVisible = '@skeeks/cms/shop/queryFilter/views/sort-filter';
@@ -56,6 +57,7 @@ class SortFiltersHandler extends Model
             self::SORT_PRICE_ASC,
             self::SORT_PRICE_DESC,
             self::SORT_NEW,
+            self::SORT_NAME_ASC,
         ];
     }
 
@@ -69,6 +71,7 @@ class SortFiltersHandler extends Model
             self::SORT_PRICE_ASC  => \Yii::t("skeeks/unify-shop", "Cheap first"),
             self::SORT_PRICE_DESC => \Yii::t("skeeks/unify-shop", "Dear first"),
             self::SORT_NEW        => \Yii::t("skeeks/unify", "Сначала новые"),
+            self::SORT_NAME_ASC   => \Yii::t("skeeks/unify", "По алфавиту"),
         ];
     }
 
@@ -186,6 +189,10 @@ class SortFiltersHandler extends Model
 
                 case (self::SORT_NEW):
                     $query->orderBy([CmsContentElement::tableName().'.published_at' => SORT_DESC]);
+                    break;
+
+                case (self::SORT_NAME_ASC):
+                    $query->orderBy([CmsContentElement::tableName().'.name' => SORT_ASC]);
                     break;
 
                 case (self::SORT_PRICE_ASC):
