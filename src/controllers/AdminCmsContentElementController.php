@@ -38,6 +38,7 @@ use skeeks\cms\shop\components\ShopComponent;
 use skeeks\cms\shop\grid\ShopProductColumn;
 use skeeks\cms\shop\models\ShopBrand;
 use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\shop\models\ShopCollection;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopProductBarcode;
 use skeeks\cms\shop\models\ShopProductPrice;
@@ -1832,6 +1833,73 @@ HTML
 
         ];
 
+        $filterFields['collections'] = [
+            'class'    => StringFilterField::class,
+            'label'    => 'Коллекции',
+            'on apply' => function (QueryFiltersEvent $e) {
+                /**
+                 * @var $query ActiveQuery
+                 */
+                $query = $e->dataProvider->query;
+                if ($e->field->value) {
+                    $query->joinWith("shopProduct.collections as collections");
+                    $query->andWhere(['collections.id' => $e->field->value]);
+                    $query->addGroupBy(ShopCmsContentElement::tableName().".id");
+                }
+
+            },
+
+            'class'        => WidgetField::class,
+            'widgetClass'  => AjaxSelectModel::class,
+            'widgetConfig' => [
+                'modelClass' => ShopCollection::class,
+                'multiple'   => true,
+                'dataCallback'  => function ($word = '') {
+                    $query = ShopCollection::find()->joinWith("brand as brand");
+
+                    if ($word) {
+                        $query->andWhere([
+                            'or',
+                            ['like', ShopCollection::tableName().'.name', $word],
+                            ['like', 'brand.name', $word],
+                        ]);
+                    }
+
+                    $data = $query->limit(25)->all();
+                    $result = [];
+
+                    if ($data) {
+                        foreach ($data as $model) {
+                            $result[] = [
+                                'id'   => $model->id,
+                                'text' => $model->brand ? $model->name." / ".$model->brand->name : $model->name,
+                            ];
+                        }
+                    }
+
+                    return $result;
+                },
+                'valueCallback' => function ($value) {
+                    $data = ShopCollection::find()
+                        ->joinWith("brand as brand")
+                        ->where([ShopCollection::tableName().'.id' => $value])
+                        ->all();
+
+                    $result = [];
+
+                    if ($data) {
+                        foreach ($data as $model) {
+                            $result[$model->id] = $model->brand ? $model->name." / ".$model->brand->name : $model->name;
+                        }
+                    }
+
+                    return $result;
+                },
+            ],
+            //
+
+        ];
+
         $filterFields['brand_sku'] = [
             'class'    => StringFilterField::class,
             'label'    => 'Артикул бренда',
@@ -2195,7 +2263,7 @@ HTML
         }*/
 
         $visibleFilters = [
-            'barcodes', 'brand_id', 'brand_sku',
+            'barcodes', 'brand_id', 'collections', 'brand_sku',
         ];
 
         if ($is_quantity_our_filter) {
@@ -2223,6 +2291,7 @@ HTML
         $filterFieldsLabels['barcodes'] = 'Штрихкод';
         $filterFieldsLabels['stores'] = 'Магазин/склад';
         $filterFieldsLabels['brand_id'] = 'Бренд';
+        $filterFieldsLabels['collections'] = 'Коллекции';
         $filterFieldsLabels['brand_sku'] = 'Артикул бренд';
         $filterFieldsLabels['country_alpha2'] = 'Страна';
         $filterFieldsLabels['empty'] = 'Не заполнено';
@@ -2244,6 +2313,7 @@ HTML
         $filterFieldsRules[] = ['barcodes', 'string'];
         $filterFieldsRules[] = ['stores', 'safe'];
         $filterFieldsRules[] = ['brand_id', 'safe'];
+        $filterFieldsRules[] = ['collections', 'safe'];
         $filterFieldsRules[] = ['brand_sku', 'safe'];
         $filterFieldsRules[] = ['empty', 'safe'];
         $filterFieldsRules[] = ['country_alpha2', 'safe'];
