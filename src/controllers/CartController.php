@@ -298,6 +298,7 @@ class CartController extends Controller
                 $quantity = $this->normalizeProductQuantity($product, $quantity);
 
                 $order = new ShopOrder([
+                    'scenario'      => ShopOrder::SCENARIO_BUY_ONE_CLICK,
                     'contact_phone' => $phone,
                     'comment'       => 'Купить в 1 клик',
                 ]);

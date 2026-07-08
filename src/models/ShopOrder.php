@@ -149,6 +149,8 @@ class ShopOrder extends ActiveRecord
     const EVENT_AFTER_RECALCULATE = 'afterRecalculate';
     const EVENT_BEFORE_RECALCULATE = 'beforeRecalculate';
 
+    const SCENARIO_BUY_ONE_CLICK = 'buy-one-click';
+
     protected $_email = null;
 
     const TYPE_SALE = "sale";
@@ -185,6 +187,17 @@ class ShopOrder extends ActiveRecord
         return '{{%shop_order}}';
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[static::SCENARIO_BUY_ONE_CLICK] = $scenarios[static::SCENARIO_DEFAULT];
+
+        return $scenarios;
+    }
+
 
     public function orderTypes()
     {
@@ -200,6 +213,18 @@ class ShopOrder extends ActiveRecord
     public function getOrderTypeAsText()
     {
         return (string)ArrayHelper::getValue(static::orderTypes(), $this->order_type);
+    }
+
+    /**
+     * @return array
+     */
+    public function getOrderRequiredFields()
+    {
+        if ($this->scenario == static::SCENARIO_BUY_ONE_CLICK) {
+            return ['phone'];
+        }
+
+        return $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
     }
 
 
@@ -658,7 +683,7 @@ class ShopOrder extends ActiveRecord
                 ['contact_last_name'],
                 'required',
                 'when' => function () {
-                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
+                    $requiredFields = $this->orderRequiredFields;
                     return !$this->cms_user_id && in_array('last_name', $requiredFields);
                 },
             ],
@@ -666,7 +691,7 @@ class ShopOrder extends ActiveRecord
                 ['contact_first_name'],
                 'required',
                 'when' => function () {
-                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
+                    $requiredFields = $this->orderRequiredFields;
                     return !$this->cms_user_id && in_array('first_name', $requiredFields);
                 },
             ],
@@ -674,7 +699,7 @@ class ShopOrder extends ActiveRecord
                 ['contact_email'],
                 'required',
                 'when' => function () {
-                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
+                    $requiredFields = $this->orderRequiredFields;
                     return !$this->cms_user_id && in_array('email', $requiredFields);
                 },
             ],
@@ -682,7 +707,7 @@ class ShopOrder extends ActiveRecord
                 ['contact_phone'],
                 'required',
                 'when' => function () {
-                    $requiredFields = $this->cmsSite->shopSite ? (array) $this->cmsSite->shopSite->order_required_fields : [];
+                    $requiredFields = $this->orderRequiredFields;
                     return !$this->cms_user_id && in_array('phone', $requiredFields);
                 },
             ],
