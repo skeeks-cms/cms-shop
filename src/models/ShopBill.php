@@ -92,12 +92,21 @@ use yii\helpers\Url;
  * @property CmsContractorBank $receiverContractorBank
  *
  * @property ShopPayment[]     $payments
+ * @property ShopDocument[]    $documents
+ * @property ShopDocument[]    $closingDocuments
+ * @property ShopDocumentItem[] $sourceDocumentItems
+ * @property ShopDocumentItem[] $closingDocumentItems
  * @property CmsDeal[]         $deals
  *
  * @property string            $url Ссылка на страницу счета
  * @property string            $payUrl Ссылка на страницу оплаты
  *
  * @property Money             $money
+ * @property Money             $documentedMoney
+ * @property Money             $documentBalanceMoney
+ * @property float             $documentedAmount
+ * @property float             $documentBalanceAmount
+ * @property bool              $isClosedByDocuments
  * @property string            $asFullText
  */
 class ShopBill extends \skeeks\cms\base\ActiveRecord
@@ -808,6 +817,97 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
         return $this->hasMany(ShopPayment::class, ['id' => 'shop_payment_id'])
             ->viaTable(ShopBill2payment::tableName(), ['shop_bill_id' => 'id'])
             ->orderBy(['created_at' => SORT_ASC]);
+    }
+
+    public function getDocument2bills()
+    {
+        return $this->hasMany(ShopDocument2bill::className(), ['shop_bill_id' => 'id']);
+    }
+
+    public function getDocuments()
+    {
+        return $this->hasMany(ShopDocument::class, ['id' => 'shop_document_id'])
+            ->viaTable(ShopDocument2bill::tableName(), ['shop_bill_id' => 'id'])
+            ->orderBy([ShopDocument::tableName().'.issued_at' => SORT_ASC, ShopDocument::tableName().'.id' => SORT_ASC]);
+    }
+
+    public function getClosingDocuments()
+    {
+        return $this->getDocuments()
+            ->andWhere([ShopDocument::tableName().'.type' => ShopDocument::closingTypes()])
+            ->andWhere(['<>', ShopDocument::tableName().'.status', ShopDocument::STATUS_CANCELED]);
+    }
+
+    public function getSourceDocumentItems()
+    {
+        return $this->hasMany(ShopDocumentItem::class, ['source_shop_bill_id' => 'id'])
+            ->orderBy([ShopDocumentItem::tableName().'.sort' => SORT_ASC, ShopDocumentItem::tableName().'.id' => SORT_ASC]);
+    }
+
+    public function getClosingDocumentItems()
+    {
+        return $this->getSourceDocumentItems()
+            ->joinWith('document')
+            ->andWhere([ShopDocument::tableName().'.type' => ShopDocument::closingTypes()])
+            ->andWhere(['<>', ShopDocument::tableName().'.status', ShopDocument::STATUS_CANCELED]);
+    }
+
+    public function getDocumentedAmount()
+    {
+        $amount = 0;
+        foreach ($this->closingDocuments as $document) {
+            $amount += $this->closingDocumentAmountForBill($document);
+        }
+
+        return round($amount, 4);
+    }
+
+    protected function closingDocumentAmountForBill(ShopDocument $document)
+    {
+        $sourceAmount = 0;
+        $hasAnySourceItems = false;
+        $hasSourceItems = false;
+
+        foreach ($document->documentItems as $item) {
+            if ((int)$item->source_shop_bill_id) {
+                $hasAnySourceItems = true;
+            }
+
+            if ((int)$item->source_shop_bill_id == (int)$this->id) {
+                $hasSourceItems = true;
+                $sourceAmount += (float)$item->amount;
+            }
+        }
+
+        if ($hasSourceItems) {
+            return $sourceAmount;
+        }
+
+        if ($hasAnySourceItems) {
+            return 0;
+        }
+
+        return (float)$document->amount;
+    }
+
+    public function getDocumentBalanceAmount()
+    {
+        return round(max((float)$this->amount - $this->documentedAmount, 0), 4);
+    }
+
+    public function getIsClosedByDocuments()
+    {
+        return $this->documentBalanceAmount <= 0.009;
+    }
+
+    public function getDocumentedMoney()
+    {
+        return new Money($this->documentedAmount, (string)$this->currency_code);
+    }
+
+    public function getDocumentBalanceMoney()
+    {
+        return new Money($this->documentBalanceAmount, (string)$this->currency_code);
     }
 
     public function getBillItems()

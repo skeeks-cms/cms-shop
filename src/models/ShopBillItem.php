@@ -35,9 +35,16 @@ use yii\helpers\ArrayHelper;
  *
  * @property ShopBill      $shopBill
  * @property ShopProduct   $shopProduct
+ * @property ShopDocumentItem[] $documentItems
+ * @property ShopDocumentItem[] $closingDocumentItems
  * @property MoneyCurrency $currency
  * @property Money         $money
  * @property Money         $priceMoney
+ * @property float         $documentedQuantity
+ * @property float         $documentedAmount
+ * @property float         $documentBalanceQuantity
+ * @property float         $documentBalanceAmount
+ * @property bool          $isClosedByDocuments
  */
 class ShopBillItem extends \skeeks\cms\base\ActiveRecord
 {
@@ -124,6 +131,20 @@ class ShopBillItem extends \skeeks\cms\base\ActiveRecord
         return $this->hasOne(ShopProduct::class, ['id' => 'shop_product_id']);
     }
 
+    public function getDocumentItems()
+    {
+        return $this->hasMany(ShopDocumentItem::class, ['source_shop_bill_item_id' => 'id'])
+            ->orderBy([ShopDocumentItem::tableName().'.sort' => SORT_ASC, ShopDocumentItem::tableName().'.id' => SORT_ASC]);
+    }
+
+    public function getClosingDocumentItems()
+    {
+        return $this->getDocumentItems()
+            ->joinWith('document')
+            ->andWhere([ShopDocument::tableName().'.type' => ShopDocument::closingTypes()])
+            ->andWhere(['<>', ShopDocument::tableName().'.status', ShopDocument::STATUS_CANCELED]);
+    }
+
     public function getCurrency()
     {
         return $this->hasOne(MoneyCurrency::class, ['code' => 'currency_code']);
@@ -147,6 +168,45 @@ class ShopBillItem extends \skeeks\cms\base\ActiveRecord
     public function getAmountWithoutDiscount()
     {
         return round(((float)$this->quantity ?: 1) * (float)$this->price, 4);
+    }
+
+    public function getDocumentedQuantity()
+    {
+        $quantity = 0;
+        foreach ($this->closingDocumentItems as $item) {
+            $quantity += (float)$item->quantity;
+        }
+
+        return round($quantity, 4);
+    }
+
+    public function getDocumentedAmount()
+    {
+        $amount = 0;
+        foreach ($this->closingDocumentItems as $item) {
+            $amount += (float)$item->amount;
+        }
+
+        return round($amount, 4);
+    }
+
+    public function getDocumentBalanceQuantity()
+    {
+        return round(max((float)$this->quantity - $this->documentedQuantity, 0), 4);
+    }
+
+    public function getDocumentBalanceAmount()
+    {
+        return round(max((float)$this->amount - $this->documentedAmount, 0), 4);
+    }
+
+    public function getIsClosedByDocuments()
+    {
+        if ((float)$this->amount > 0.009) {
+            return $this->documentBalanceAmount <= 0.009;
+        }
+
+        return $this->documentBalanceQuantity <= 0.0009;
     }
 
     public function asArray()

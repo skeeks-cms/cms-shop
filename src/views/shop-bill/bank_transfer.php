@@ -210,23 +210,6 @@ $hasDescription = trim((string)$model->description) !== '';
                         
                     <? endif; ?>
 
-                    <div class="sx-controlls">
-                        <button class="btn btn-primary btn-lg" onclick="window.print();" style="margin-right: 1rem;"><i class="fa fa-print"></i> Печать</button>
-
-                        <a href="<?= \yii\helpers\Url::to(['pdf', 'code' => $model->code]) ?>" target="_blank" class="btn btn-primary btn-lg" style="margin-right: 1rem;">
-                            <i class="fa fa-file"></i>
-                            Скачать PDF
-                        </a>
-
-                        <?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) : ?>
-                            <a href="<?= \yii\helpers\Url::to(['pdf', 'code' => $model->code, 'noSignature' => '1']) ?>" target="_blank" class="btn btn-primary btn-lg">
-                                <i class="fa fa-file"></i>
-                                Скачать PDF (без подписей)
-                            </a>
-                        <?php endif; ?>
-                        
-
-                    </div>
                 <? endif; ?>
 
 
@@ -234,3 +217,16 @@ $hasDescription = trim((string)$model->description) !== '';
         </div>
     </div>
 </section>
+
+<?php if (!$isPdf) : ?>
+    <div class="sx-controlls">
+        <a href="<?= \yii\helpers\Url::to(['pdf', 'code' => $model->code]) ?>" target="_blank" class="btn btn-primary btn-lg">
+            <i class="fa fa-file"></i> Скачать PDF
+        </a>
+        <?php if (\Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) : ?>
+            <a href="<?= \yii\helpers\Url::to(['pdf', 'code' => $model->code, 'noSignature' => '1']) ?>" target="_blank" class="btn btn-primary btn-lg">
+                <i class="fa fa-file"></i> Скачать PDF без подписей
+            </a>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>

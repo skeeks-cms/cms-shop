@@ -1,0 +1,629 @@
+body {
+    font-family: dejavusans, Arial, sans-serif;
+    color: #222;
+    font-size: 12px;
+}
+.sx-document-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 24px;
+}
+.sx-document-page::after {
+    display: block;
+    clear: both;
+    content: "";
+}
+.sx-document-title {
+    text-align: center;
+    font-size: 22px;
+    margin: 14px 0 18px;
+}
+.sx-document-logo-wrap {
+    min-height: 48px;
+}
+.sx-document-logo {
+    max-width: 180px;
+    max-height: 48px;
+}
+.sx-document-muted {
+    color: #777;
+}
+.sx-document-requisites {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+.sx-document-requisites td {
+    width: 50%;
+    vertical-align: top;
+    border: 1px solid #999;
+    padding: 8px;
+}
+.sx-document-requisites-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+.sx-document-comment {
+    margin: 10px 0;
+    white-space: pre-wrap;
+}
+.sx-document-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+.sx-document-items th,
+.sx-document-items td {
+    border: 1px solid #777;
+    padding: 6px;
+    vertical-align: top;
+}
+.sx-document-items th {
+    background: #f1f3f5;
+    font-weight: bold;
+}
+.sx-document-number {
+    width: 34px;
+    text-align: center;
+}
+.sx-document-money,
+.sx-document-quantity {
+    text-align: right;
+    white-space: nowrap;
+}
+.sx-document-summary {
+    margin-top: 12px;
+    text-align: right;
+    font-weight: bold;
+}
+.sx-document-total-text {
+    margin-top: 10px;
+    font-weight: bold;
+}
+.sx-document-signatures {
+    margin-top: 30px;
+    width: 100%;
+    border-collapse: collapse;
+}
+.sx-document-signatures td {
+    width: 50%;
+    vertical-align: top;
+    padding-top: 24px;
+}
+.sx-document-signature-row {
+    width: 100%;
+    border-collapse: collapse;
+}
+.sx-document-signature-row td {
+    width: auto;
+    padding: 0;
+    vertical-align: bottom;
+}
+.sx-document-signature-label {
+    width: 82px !important;
+    padding-right: 8px !important;
+    white-space: nowrap;
+}
+.sx-document-signature-line-cell {
+    width: 145px !important;
+    height: 35px;
+    border-bottom: 1px solid #333;
+    text-align: center;
+}
+.sx-document-signature-name {
+    padding-left: 8px !important;
+}
+.sx-document-signature-image {
+    max-height: 55px;
+    margin-bottom: -12px;
+}
+.sx-document-stamp-wrap {
+    margin-top: -48px;
+    padding-right: 18px;
+    text-align: right;
+}
+.sx-document-stamp {
+    max-height: 120px;
+}
+.sx-controlls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 980px;
+    margin: 16px auto 3rem;
+}
+.sx-upd-page {
+    width: 285mm;
+    height: 197mm;
+    margin: 0 auto;
+    padding: 0;
+    color: #000;
+    font-family: dejavusanscondensed, dejavusans, Arial, sans-serif;
+    font-size: 6.8pt;
+    line-height: 1.08;
+    position: relative;
+    page-break-after: always;
+}
+.sx-upd-page-2 {
+    page-break-after: auto;
+}
+.sx-upd-page table {
+    border-collapse: collapse;
+}
+.sx-upd-head-block {
+    width: 100%;
+    height: 69mm;
+}
+.sx-upd-side {
+    width: 22mm;
+    border-right: .35mm solid #000;
+    vertical-align: top;
+    padding: 5mm 4mm 0 0;
+}
+.sx-upd-side-title {
+    font-size: 7.4pt;
+    line-height: 1.18;
+    margin-bottom: 3mm;
+}
+.sx-upd-status-label {
+    display: inline-block;
+    vertical-align: top;
+}
+.sx-upd-status-box {
+    display: inline-block;
+    width: 8mm;
+    height: 5mm;
+    margin-left: 2mm;
+    border: .35mm solid #000;
+    text-align: center;
+    font-size: 9pt;
+    line-height: 5mm;
+}
+.sx-upd-status-help {
+    margin-top: 2mm;
+    font-size: 6.9pt;
+    line-height: 1.25;
+}
+.sx-upd-head-main {
+    width: 263mm;
+    padding-left: 6mm;
+    vertical-align: top;
+}
+.sx-upd-title-row {
+    width: 100%;
+    margin-bottom: 4mm;
+}
+.sx-upd-title-row td {
+    vertical-align: top;
+}
+.sx-upd-invoice-lines {
+    margin-top: 5mm;
+    font-size: 7.2pt;
+}
+.sx-upd-invoice-lines td {
+    padding: 0 1.2mm .8mm 0;
+    white-space: nowrap;
+}
+.sx-upd-fill {
+    border-bottom: .35mm solid #000;
+    text-align: center;
+}
+.sx-upd-fill-number {
+    width: 44mm;
+}
+.sx-upd-fill-date {
+    width: 34mm;
+}
+.sx-upd-appendix {
+    text-align: right;
+    font-size: 6.4pt;
+    line-height: 1.22;
+    padding-top: 1mm;
+}
+.sx-upd-lines {
+    width: 100%;
+    table-layout: fixed;
+}
+.sx-upd-lines td {
+    padding: .28mm 0;
+    vertical-align: bottom;
+}
+.sx-upd-lines .sx-upd-label {
+    width: 36mm;
+    white-space: nowrap;
+}
+.sx-upd-line-value {
+    border-bottom: .25mm solid #000;
+}
+.sx-upd-code {
+    width: 7mm;
+    text-align: right;
+    white-space: nowrap;
+}
+.sx-upd-long-line {
+    border-bottom: .25mm solid #000;
+    line-height: 1.05;
+}
+.sx-upd-long-line span {
+    white-space: nowrap;
+    padding-left: 2mm;
+}
+.sx-upd-bold {
+    font-weight: bold;
+}
+.sx-upd-products {
+    width: 100%;
+    table-layout: fixed;
+    margin-top: 10mm;
+}
+.sx-upd-products th,
+.sx-upd-products td {
+    border: .28mm solid #000;
+    padding: .6mm .45mm;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 6.35pt;
+    font-weight: normal;
+    line-height: 1.05;
+}
+.sx-upd-products thead th {
+    height: 7mm;
+}
+.sx-upd-products thead tr:first-child th {
+    height: 36mm;
+}
+.sx-upd-products-codes th {
+    height: 3.5mm !important;
+    font-size: 5.8pt;
+}
+.sx-upd-product-row td {
+    height: 27mm;
+    vertical-align: top;
+}
+.sx-upd-num {
+    text-align: right !important;
+    white-space: nowrap;
+}
+.sx-upd-total td {
+    height: 4mm;
+    font-weight: bold;
+    vertical-align: middle;
+}
+.sx-upd-footbar {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 185mm;
+}
+.sx-upd-footbar td {
+    border: none;
+    vertical-align: bottom;
+}
+.sx-upd-footbar-logo {
+    width: 75%;
+}
+.sx-upd-logo {
+    max-width: 14mm;
+    max-height: 10mm;
+}
+.sx-upd-footer {
+    width: 20%;
+    text-align: right;
+    font-size: 6.4pt;
+}
+.sx-upd-page-number {
+    width: 5%;
+    text-align: right;
+    font-size: 6.4pt;
+}
+.sx-upd-page-2 {
+    font-size: 6.55pt;
+}
+.sx-upd-sign-top {
+    width: 100%;
+    height: 28mm;
+}
+.sx-upd-side-second {
+    text-align: center;
+    font-size: 7.3pt;
+    padding-top: 5mm;
+}
+.sx-upd-sign-top-main {
+    padding-left: 4mm;
+    vertical-align: top;
+}
+.sx-upd-sign-grid {
+    width: 100%;
+}
+.sx-upd-sign-grid td {
+    padding: 1.1mm 1.5mm .3mm 0;
+    vertical-align: bottom;
+}
+.sx-upd-sign-label {
+    width: 46mm;
+    font-size: 7pt;
+    line-height: 1.25;
+}
+.sx-upd-under {
+    border-bottom: .3mm solid #000;
+    height: 5mm;
+}
+.sx-upd-fio {
+    width: 48mm;
+}
+.sx-upd-ogrn {
+    text-align: center;
+}
+.sx-upd-hints td,
+.sx-upd-hints {
+    font-size: 6.1pt;
+    line-height: 1.1;
+    text-align: center;
+}
+.sx-upd-second-lines {
+    width: 100%;
+    margin-top: 1mm;
+}
+.sx-upd-second-lines td {
+    padding: .45mm 0;
+    vertical-align: bottom;
+}
+.sx-upd-second-label {
+    width: 69mm;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.sx-upd-second-value {
+    border-bottom: .3mm solid #000;
+}
+.sx-upd-second-code {
+    width: 8mm;
+    text-align: right;
+}
+.sx-upd-transfer {
+    width: 100%;
+    margin-top: 8mm;
+}
+.sx-upd-transfer-side {
+    width: 50%;
+    padding-right: 3mm;
+    vertical-align: top;
+}
+.sx-upd-transfer-buyer {
+    border-left: .35mm solid #000;
+    padding-left: 3mm;
+    padding-right: 0;
+}
+.sx-upd-transfer-title {
+    font-weight: bold;
+    margin: 1.8mm 0 .8mm;
+}
+.sx-upd-transfer-sign {
+    width: 100%;
+}
+.sx-upd-transfer-sign td {
+    padding-right: 3mm;
+}
+.sx-upd-transfer-code {
+    width: 8mm;
+    text-align: right;
+    vertical-align: bottom;
+}
+.sx-upd-date-line {
+    margin-top: 1mm;
+}
+.sx-upd-date-line span {
+    display: inline-block;
+    min-width: 38mm;
+    border-bottom: .3mm solid #000;
+    text-align: center;
+}
+.sx-upd-date-line em {
+    float: right;
+    font-style: normal;
+}
+.sx-upd-wide-under {
+    height: 5mm;
+}
+.sx-upd-center {
+    text-align: center;
+}
+.sx-upd-mp {
+    text-align: right;
+    margin-top: 2mm;
+}
+.sx-invoice-page {
+    width: 285mm;
+    min-height: 197mm;
+    margin: 0 auto;
+    color: #000;
+    font-family: dejavusanscondensed, dejavusans, Arial, sans-serif;
+    font-size: 6.8pt;
+    line-height: 1.08;
+}
+.sx-invoice-page table {
+    border-collapse: collapse;
+}
+.sx-invoice-title-row {
+    width: 100%;
+    margin-bottom: 3mm;
+}
+.sx-invoice-title-row td {
+    vertical-align: top;
+}
+.sx-invoice-products {
+    margin-top: 4mm;
+}
+.sx-invoice-products thead tr:first-child th {
+    height: 22mm;
+}
+.sx-invoice-products .sx-upd-product-row td {
+    height: 18mm;
+}
+.sx-invoice-signatures {
+    width: 100%;
+    margin-top: 9mm;
+}
+.sx-invoice-signatures td {
+    width: 25%;
+    padding-right: 5mm;
+    vertical-align: bottom;
+}
+.sx-invoice-signatures span {
+    display: block;
+    min-height: 7mm;
+    border-bottom: .3mm solid #000;
+}
+.sx-invoice-signatures small {
+    display: block;
+    text-align: center;
+    font-size: 5.8pt;
+}
+.sx-waybill-page {
+    width: 285mm;
+    min-height: 197mm;
+    margin: 0 auto;
+    color: #000;
+    font-family: dejavusanscondensed, dejavusans, Arial, sans-serif;
+    font-size: 7.2pt;
+    line-height: 1.18;
+}
+.sx-waybill-page table {
+    border-collapse: collapse;
+}
+.sx-waybill-top {
+    width: 100%;
+}
+.sx-waybill-logo-cell {
+    width: 70%;
+    height: 13mm;
+    vertical-align: top;
+}
+.sx-waybill-logo {
+    max-width: 32mm;
+    max-height: 12mm;
+}
+.sx-waybill-form-code {
+    width: 30%;
+    text-align: right;
+    vertical-align: top;
+    font-size: 6.4pt;
+}
+.sx-waybill-title {
+    margin: 2mm 0 4mm;
+    text-align: center;
+    font-size: 12pt;
+}
+.sx-waybill-lines {
+    width: 100%;
+    margin-bottom: 4mm;
+}
+.sx-waybill-lines td {
+    padding: .8mm 1mm;
+    border-bottom: .25mm solid #000;
+    vertical-align: bottom;
+}
+.sx-waybill-label {
+    width: 35mm;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.sx-waybill-products {
+    width: 100%;
+    table-layout: fixed;
+}
+.sx-waybill-products th,
+.sx-waybill-products td {
+    border: .28mm solid #000;
+    padding: .8mm .6mm;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 6.6pt;
+}
+.sx-waybill-product-name {
+    text-align: left !important;
+}
+.sx-waybill-num {
+    text-align: right !important;
+    white-space: nowrap;
+}
+.sx-waybill-total td {
+    font-weight: bold;
+}
+.sx-waybill-comment {
+    margin: 4mm 0;
+}
+.sx-waybill-signatures {
+    width: 100%;
+    margin-top: 8mm;
+}
+.sx-waybill-signatures td {
+    width: 33.333%;
+    min-height: 18mm;
+    padding: 2mm 4mm 3mm 0;
+    vertical-align: top;
+}
+.sx-waybill-signatures span {
+    display: block;
+    min-height: 7mm;
+    border-bottom: .3mm solid #000;
+}
+.sx-waybill-signatures small {
+    display: block;
+    text-align: center;
+    font-size: 5.9pt;
+}
+.sx-waybill-signature-image {
+    max-height: 12mm;
+    margin-bottom: -7mm;
+}
+.sx-waybill-stamp {
+    display: block;
+    max-height: 22mm;
+    margin-top: -2mm;
+}
+@media screen {
+    body {
+        background: #f5f5f5;
+    }
+    .sx-document-page,
+    .sx-upd-page,
+    .sx-invoice-page,
+    .sx-waybill-page {
+        background: #fff;
+        border: 1px solid #e4e4e4;
+        box-sizing: border-box;
+        margin-top: 3rem;
+        margin-bottom: 0;
+    }
+    .sx-upd-page-1 {
+        margin-bottom: 3rem;
+    }
+    .sx-upd-page {
+        box-shadow: -10mm 0 0 #fff, 10mm 0 0 #fff;
+    }
+    .sx-upd-page + .sx-controlls,
+    .sx-invoice-page + .sx-controlls,
+    .sx-waybill-page + .sx-controlls {
+        width: 285mm;
+        max-width: none;
+    }
+}
+@media print {
+    .sx-controlls {
+        display: none;
+    }
+    .sx-document-page {
+        padding: 0;
+        max-width: none;
+    }
+    .sx-upd-page {
+        width: auto;
+        min-height: auto;
+    }
+    .sx-invoice-page,
+    .sx-waybill-page {
+        width: auto;
+        min-height: auto;
+    }
+}

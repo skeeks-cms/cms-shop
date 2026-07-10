@@ -25,7 +25,11 @@
 }
 
 .sx-controlls {
-    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 1024px;
+    margin: 16px auto 3rem;
 }
 
 .sx-container-wrapper {
@@ -35,7 +39,7 @@
     max-width: 1024px;
     margin: auto;
     margin-top: 3rem;
-    margin-bottom: 3rem;
+    margin-bottom: 0;
 }
 
 @media print {

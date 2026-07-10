@@ -28,6 +28,7 @@ return [
                 '~spc'                         => 'shop/coupon',
 
                 '~bill-<_a:(view|pdf)>'           => 'shop/shop-bill/<_a>',
+                '~document-<_a:(view|pdf)>'       => 'shop/shop-document/<_a>',
             ],
         ],
 
