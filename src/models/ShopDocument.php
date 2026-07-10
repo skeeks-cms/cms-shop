@@ -1044,8 +1044,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
 
     public function getCmsUser()
     {
-        $userClass = \Yii::$app->user->identityClass;
-        return $this->hasOne($userClass, ['id' => 'cms_user_id']);
+        return $this->hasOne(CmsUser::class, ['id' => 'cms_user_id']);
     }
 
     public function getCreatedBy()
