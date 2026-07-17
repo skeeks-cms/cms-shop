@@ -38,6 +38,7 @@ class ShopDocumentController extends Controller
             ShopDocument::TYPE_UPD,
             ShopDocument::TYPE_INVOICE_FACTURE,
             ShopDocument::TYPE_WAYBILL,
+            ShopDocument::TYPE_RECONCILIATION_ACT,
         ], true);
 
         $pdf->orientation = $isWideDocument ? Pdf::ORIENT_LANDSCAPE : Pdf::ORIENT_PORTRAIT;
@@ -88,6 +89,10 @@ class ShopDocumentController extends Controller
 
         if ($document->type == ShopDocument::TYPE_WAYBILL) {
             return 'waybill';
+        }
+
+        if ($document->type == ShopDocument::TYPE_RECONCILIATION_ACT) {
+            return 'reconciliation-act';
         }
 
         return 'document';
