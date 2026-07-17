@@ -351,6 +351,15 @@ body {
 .sx-upd-fio {
     width: 48mm;
 }
+.sx-upd-signature-cell {
+    position: relative;
+    text-align: center;
+}
+.sx-upd-signature-image {
+    max-width: 35mm;
+    max-height: 9mm;
+    margin-bottom: -3.5mm;
+}
 .sx-upd-ogrn {
     text-align: center;
 }
@@ -429,8 +438,16 @@ body {
     text-align: center;
 }
 .sx-upd-mp {
-    text-align: right;
     margin-top: 2mm;
+}
+.sx-upd-stamp-wrap {
+    height: 26mm;
+    padding-left: 4mm;
+}
+.sx-upd-stamp {
+    display: block;
+    max-width: 36mm;
+    max-height: 26mm;
 }
 .sx-invoice-page {
     width: 285mm;

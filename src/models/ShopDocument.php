@@ -44,6 +44,7 @@ use yii\helpers\Url;
  * @property string|null         $seller_contractor_inn
  * @property string|null         $seller_contractor_kpp
  * @property string|null         $seller_contractor_ogrn
+ * @property string|null         $seller_contractor_registration_date
  * @property string|null         $seller_contractor_address
  * @property string|null         $seller_contractor_mailing_postcode
  * @property string|null         $buyer_contractor_type
@@ -52,6 +53,7 @@ use yii\helpers\Url;
  * @property string|null         $buyer_contractor_inn
  * @property string|null         $buyer_contractor_kpp
  * @property string|null         $buyer_contractor_ogrn
+ * @property string|null         $buyer_contractor_registration_date
  * @property string|null         $buyer_contractor_address
  * @property string|null         $buyer_contractor_mailing_postcode
  * @property string              $amount
@@ -201,11 +203,13 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
                     'seller_contractor_inn',
                     'seller_contractor_kpp',
                     'seller_contractor_ogrn',
+                    'seller_contractor_registration_date',
                     'seller_contractor_mailing_postcode',
                     'buyer_contractor_type',
                     'buyer_contractor_inn',
                     'buyer_contractor_kpp',
                     'buyer_contractor_ogrn',
+                    'buyer_contractor_registration_date',
                     'buyer_contractor_mailing_postcode',
                 ],
                 'string',
@@ -413,6 +417,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         $this->{$prefix.'_contractor_inn'} = $contractor->inn;
         $this->{$prefix.'_contractor_kpp'} = $contractor->kpp;
         $this->{$prefix.'_contractor_ogrn'} = $contractor->ogrn;
+        $this->{$prefix.'_contractor_registration_date'} = $contractor->registration_date;
         $this->{$prefix.'_contractor_address'} = $contractor->address;
         $this->{$prefix.'_contractor_mailing_postcode'} = $contractor->mailing_postcode;
     }
@@ -430,6 +435,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             'contractor_inn'              => $contractor->inn,
             'contractor_kpp'              => $contractor->kpp,
             'contractor_ogrn'             => $contractor->ogrn,
+            'contractor_registration_date'=> $contractor->registration_date,
             'contractor_address'          => $contractor->address,
             'contractor_mailing_postcode' => $contractor->mailing_postcode,
         ];
@@ -572,6 +578,9 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             'advance_documents'         => [],
             'advance_document'          => '',
             'base_document'             => (string)$bill->description,
+            'base_document_name'        => 'Счет',
+            'base_document_number'      => (string)$bill->id,
+            'base_document_date'        => date('Y-m-d', (int)$bill->created_at),
             'transport_info'            => '',
             'shipping_document'         => $shipmentDocumentsText,
             'seller_other_info'         => '',
@@ -617,15 +626,108 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
                 continue;
             }
 
+            $number = $payment->documentNumber();
+            $date = $payment->documentDate();
+
             $items[] = [
-                'number'        => (string)$payment->id,
-                'date'          => date('Y-m-d', (int)$payment->created_at),
+                'number'        => $number,
+                'date'          => $date,
                 'amount'        => round((float)$payment->amount, 4),
                 'currency_code' => $payment->currency_code ?: $bill->currency_code,
             ];
         }
 
         return $items;
+    }
+
+    public function resolvedPaymentDocuments($sectionName = 'upd')
+    {
+        $data = (array)$this->document_data;
+        $section = (array)ArrayHelper::getValue($data, $sectionName, []);
+        $storedRows = static::normalizePaymentDocuments(
+            ArrayHelper::getValue($section, 'payment_documents', []),
+            ArrayHelper::getValue($section, 'payment_document', ArrayHelper::getValue($data, 'payment_document', ''))
+        );
+
+        $liveRows = [];
+        $liveRowsByInternalId = [];
+        $seen = [];
+        foreach ((array)$this->bills as $bill) {
+            $billRows = $this->paymentDocumentsFromBill($bill);
+            foreach ($billRows as $index => $row) {
+                $payment = ArrayHelper::getValue((array)$bill->payments, $index);
+                if ($payment) {
+                    $liveRowsByInternalId[(string)$payment->id] = $row;
+                }
+                $key = implode('|', [
+                    ArrayHelper::getValue($row, 'number'),
+                    ArrayHelper::getValue($row, 'date'),
+                    ArrayHelper::getValue($row, 'amount'),
+                ]);
+                if (!isset($seen[$key])) {
+                    $seen[$key] = true;
+                    $liveRows[] = $row;
+                }
+            }
+        }
+
+        if ($storedRows) {
+            foreach ($storedRows as &$row) {
+                $storedNumber = trim((string)ArrayHelper::getValue($row, 'number'));
+                if (isset($liveRowsByInternalId[$storedNumber])) {
+                    $row = $liveRowsByInternalId[$storedNumber];
+                }
+            }
+            unset($row);
+            return static::normalizePaymentDocuments($storedRows);
+        }
+
+        return static::normalizePaymentDocuments($liveRows);
+    }
+
+    public function resolvedBaseDocument($sectionName = 'upd')
+    {
+        $section = (array)ArrayHelper::getValue((array)$this->document_data, $sectionName, []);
+        $name = trim((string)ArrayHelper::getValue($section, 'base_document_name'));
+        $number = trim((string)ArrayHelper::getValue($section, 'base_document_number'));
+        $date = static::normalizeDocumentDateValue(ArrayHelper::getValue($section, 'base_document_date'));
+        $additionalInfo = trim((string)ArrayHelper::getValue($section, 'base_document', $this->description));
+
+        if ($name !== '' || $number !== '' || $date !== '') {
+            return compact('name', 'number', 'date', 'additionalInfo');
+        }
+
+        $bills = $this->bills;
+        $bill = $bills ? reset($bills) : null;
+        if ($bill) {
+            return [
+                'name'           => 'Счет',
+                'number'         => (string)$bill->id,
+                'date'           => date('Y-m-d', (int)$bill->created_at),
+                'additionalInfo' => $additionalInfo,
+            ];
+        }
+
+        return compact('name', 'number', 'date', 'additionalInfo');
+    }
+
+    public static function formatBaseDocument(array $row)
+    {
+        $name = trim((string)ArrayHelper::getValue($row, 'name'));
+        $number = trim((string)ArrayHelper::getValue($row, 'number'));
+        $date = static::normalizeDocumentDateValue(ArrayHelper::getValue($row, 'date'));
+        $parts = [];
+        if ($name !== '') {
+            $parts[] = $name;
+        }
+        if ($number !== '') {
+            $parts[] = '№'.$number;
+        }
+        if ($date !== '') {
+            $parts[] = 'от '.date('d.m.Y', strtotime($date));
+        }
+
+        return trim(implode(' ', $parts));
     }
 
     protected function shipmentDocumentsTextFromBill(ShopBill $bill)
@@ -672,6 +774,10 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             $section['advance_document'] = $advanceDocuments
                 ? static::formatNumberDateDocuments($advanceDocuments)
                 : trim((string)ArrayHelper::getValue($section, 'advance_document'));
+
+            $section['base_document_date'] = static::normalizeDocumentDateValue(
+                ArrayHelper::getValue($section, 'base_document_date')
+            );
 
             $data[$sectionName] = $section;
         }
@@ -1130,6 +1236,11 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         return $this->snapshotValue('seller_contractor_ogrn', 'sellerContractor', 'ogrn');
     }
 
+    public function getSellerRegistrationDate()
+    {
+        return $this->snapshotValue('seller_contractor_registration_date', 'sellerContractor', 'registration_date');
+    }
+
     public function getSellerAddress()
     {
         return $this->snapshotValue('seller_contractor_address', 'sellerContractor', 'address');
@@ -1159,6 +1270,11 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
     public function getBuyerOgrn()
     {
         return $this->snapshotValue('buyer_contractor_ogrn', 'buyerContractor', 'ogrn');
+    }
+
+    public function getBuyerRegistrationDate()
+    {
+        return $this->snapshotValue('buyer_contractor_registration_date', 'buyerContractor', 'registration_date');
     }
 
     public function getBuyerAddress()

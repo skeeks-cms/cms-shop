@@ -40,6 +40,7 @@ use skeeks\yii2\form\fields\HtmlBlock;
 use skeeks\yii2\form\fields\NumberField;
 use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
+use skeeks\yii2\form\fields\TextField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\base\WidgetEvent;
@@ -729,6 +730,39 @@ JS
             ],
         ];
 
+        // Keep the form available during a rolling deployment when the code may
+        // be uploaded before the migration is applied.
+        if ($model->hasAttribute('document_number')) {
+            $result['payment_document'] = [
+                'class'  => FieldSet::class,
+                'name'   => 'Платежный документ',
+                'fields' => [
+                    'document_number' => [
+                        'class' => TextField::class,
+                    ],
+                    'document_date' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => DateControl::class,
+                        'widgetConfig' => [
+                            'type'       => DateControl::FORMAT_DATE,
+                            'saveFormat' => 'php:Y-m-d',
+                        ],
+                    ],
+                    'operation_at' => [
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => DateControl::class,
+                        'widgetConfig' => [
+                            'type'       => DateControl::FORMAT_DATETIME,
+                            'saveFormat' => 'php:U',
+                        ],
+                    ],
+                    'external_status' => [
+                        'class' => TextField::class,
+                    ],
+                ],
+            ];
+        }
+
         $result['client'] = [
             'class'  => FieldSet::class,
             'name'   => 'Компания или клиент (заполнить хотя бы одно)',
@@ -996,6 +1030,13 @@ JS
             $result['main']['fields']['comment']['elementOptions']['disabled'] = 'disabled';
             $result['main']['fields']['is_debit']['elementOptions']['disabled'] = 'disabled';
             $result['main']['fields']['shop_pay_system_id']['widgetConfig']['options']['disabled'] = 'disabled';
+
+            if (isset($result['payment_document'])) {
+                $result['payment_document']['fields']['document_number']['elementOptions']['disabled'] = 'disabled';
+                $result['payment_document']['fields']['document_date']['elementOptions']['disabled'] = 'disabled';
+                $result['payment_document']['fields']['operation_at']['elementOptions']['disabled'] = 'disabled';
+                $result['payment_document']['fields']['external_status']['elementOptions']['disabled'] = 'disabled';
+            }
         }
 
         $result['shop'] = [

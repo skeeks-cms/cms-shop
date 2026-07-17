@@ -81,12 +81,23 @@ $externalSource = [
 ][$externalName] ?? ($model->external_name ?: 'Банк');
 $externalOperationId = $model->external_id ?: ArrayHelper::getValue($externalData, 'operationId');
 $externalOperationDate = ArrayHelper::getValue($externalData, 'operationDate');
-$externalOperationTimestamp = $externalOperationDate ? strtotime($externalOperationDate) : false;
+$externalOperationTimestamp = $model->hasAttribute('operation_at') && $model->operation_at
+    ? (int)$model->operation_at
+    : ($externalOperationDate ? strtotime($externalOperationDate) : false);
 $externalOperationType = ArrayHelper::getValue($externalData, 'typeOfOperation');
 $externalOperationType = [
     'Credit' => 'Зачисление',
     'Debit'  => 'Списание',
 ][$externalOperationType] ?? $externalOperationType;
+$externalStatus = $model->hasAttribute('external_status') && $model->external_status
+    ? $model->external_status
+    : ArrayHelper::getValue($externalData, 'operationStatus', ArrayHelper::getValue($externalData, 'status'));
+$paymentDocumentNumber = $model->documentNumber();
+$paymentDocumentDate = $model->documentDate();
+$paymentDocumentText = trim(
+    ($paymentDocumentNumber !== '' ? '№'.$paymentDocumentNumber : '')
+    .($paymentDocumentDate !== '' ? ' от '.date('d.m.Y', strtotime($paymentDocumentDate)) : '')
+);
 
 $this->registerCss(<<<CSS
 .sx-payment-card {
@@ -296,7 +307,7 @@ CSS
                 </div>
             </div>
             <div class="sx-payment-overview-item">
-                <div class="sx-payment-overview-label">Дата и время</div>
+                <div class="sx-payment-overview-label">Создано в CRM</div>
                 <div class="sx-payment-overview-value"><?= Html::encode(Yii::$app->formatter->asDatetime($model->created_at)); ?></div>
             </div>
             <div class="sx-payment-overview-item">
@@ -306,6 +317,16 @@ CSS
             <div class="sx-payment-overview-item">
                 <div class="sx-payment-overview-label">Компания</div>
                 <div class="sx-payment-overview-value"><?= $formatValue($model->company ? $model->company->name : ''); ?></div>
+            </div>
+            <div class="sx-payment-overview-item">
+                <div class="sx-payment-overview-label">Платежный документ</div>
+                <div class="sx-payment-overview-value"><?= $formatValue($paymentDocumentText); ?></div>
+            </div>
+            <div class="sx-payment-overview-item">
+                <div class="sx-payment-overview-label">Дата операции</div>
+                <div class="sx-payment-overview-value"><?= $externalOperationTimestamp
+                    ? Html::encode(Yii::$app->formatter->asDatetime($externalOperationTimestamp))
+                    : $formatValue(''); ?></div>
             </div>
         </div>
     </section>
@@ -401,6 +422,9 @@ CSS
                         <?php endif; ?>
                         <?php if ($externalOperationType) : ?>
                             <span class="sx-payment-import-detail">Операция: <strong><?= Html::encode($externalOperationType); ?></strong></span>
+                        <?php endif; ?>
+                        <?php if ($externalStatus) : ?>
+                            <span class="sx-payment-import-detail">Статус: <strong><?= Html::encode($externalStatus); ?></strong></span>
                         <?php endif; ?>
                     </div>
                 </div>

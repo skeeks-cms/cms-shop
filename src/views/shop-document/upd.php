@@ -37,6 +37,25 @@ $pick = function ($values, $fallback = '-') {
 
     return $fallback;
 };
+$pickContractorName = function ($values, $fallback = '-') {
+    $incompleteName = '';
+
+    foreach ((array)$values as $value) {
+        $value = trim((string)$value);
+        if ($value === '' || $value === '-') {
+            continue;
+        }
+
+        if (preg_match('/^(?:ИП|ООО|АО|ПАО|ОАО|ЗАО|НКО|АНО|самозанятый|физическое лицо)\.?$/ui', $value)) {
+            $incompleteName = $incompleteName ?: $value;
+            continue;
+        }
+
+        return $value;
+    }
+
+    return $incompleteName ?: $fallback;
+};
 $e = function ($value, $fallback = '-') use ($pick) {
     return Html::encode($pick($value, $fallback));
 };
@@ -95,6 +114,9 @@ if (!$sellerContractor && $sourceBill) {
 if (!$sellerContractor) {
     $sellerContractor = CmsContractor::find()->our()->one();
 }
+$isSellerLegal = $sellerContractor && $sellerContractor->contractor_type === CmsContractor::TYPE_LEGAL;
+$sellerSignature = !$noSignature && $sellerContractor ? $sellerContractor->directorSignature : null;
+$sellerStamp = !$noSignature && $sellerContractor ? $sellerContractor->stamp : null;
 
 $buyerContractor = $model->buyerContractor;
 if (!$buyerContractor && $sourceBill) {
@@ -109,10 +131,11 @@ if (!$buyerContractor && $sourceBill && $sourceBill->cmsUser && $sourceBill->cms
     $buyerContractor = reset($userContractors);
 }
 
-$sellerName = $pick([
+$sellerName = $pickContractorName([
     $model->sellerFullName,
     $model->sellerName,
-    $sellerContractor ? ($sellerContractor->full_name ?: $sellerContractor->asShortText) : null,
+    $sellerContractor ? $sellerContractor->full_name : null,
+    $sellerContractor ? $sellerContractor->asShortText : null,
 ]);
 $sellerAddress = $pick([
     $model->sellerAddress,
@@ -130,11 +153,16 @@ $sellerOgrn = $pick([
     $model->sellerOgrn,
     $sellerContractor ? $sellerContractor->ogrn : null,
 ], '');
+$sellerRegistrationDate = ShopDocument::normalizeDocumentDateValue($pick([
+    $model->sellerRegistrationDate,
+    $sellerContractor && $sellerContractor->hasAttribute('registration_date') ? $sellerContractor->getAttribute('registration_date') : null,
+], ''));
 
-$buyerName = $pick([
+$buyerName = $pickContractorName([
     $model->buyerFullName,
     $model->buyerName,
-    $buyerContractor ? ($buyerContractor->full_name ?: $buyerContractor->asShortText) : null,
+    $buyerContractor ? $buyerContractor->full_name : null,
+    $buyerContractor ? $buyerContractor->asShortText : null,
     $sourceBill && $sourceBill->company ? $sourceBill->company->name : null,
 ]);
 $buyerAddress = $pick([
@@ -151,10 +179,7 @@ $buyerKpp = $pick([
 ], '');
 
 $paymentDocument = $pick([
-    ShopDocument::formatPaymentDocuments(
-        ArrayHelper::getValue($documentData, 'upd.payment_documents', []),
-        ArrayHelper::getValue($documentData, 'upd.payment_document', ArrayHelper::getValue($documentData, 'payment_document', ''))
-    ),
+    ShopDocument::formatPaymentDocuments($model->resolvedPaymentDocuments('upd')),
 ], '№ - от -');
 $advanceDocument = ShopDocument::formatNumberDateDocuments(
     ShopDocument::normalizeNumberDateDocuments(
@@ -167,6 +192,7 @@ $stateContract = $pick([
     ArrayHelper::getValue($documentData, 'state_contract_identifier'),
 ], '-');
 $baseDocument = $pick([
+    ShopDocument::formatBaseDocument($model->resolvedBaseDocument('upd')),
     ArrayHelper::getValue($documentData, 'upd.base_document'),
     $model->description,
 ], '-');
@@ -315,6 +341,7 @@ if (!$logoSrc && \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site && \Yii::
         <tbody>
             <?php foreach ($items as $index => $item) : ?>
                 <?php $vatName = $pick($item->vat_name, 'Без НДС'); ?>
+                <?php $unitPrice = $item->unitPriceAfterDiscount; ?>
                 <tr class="sx-upd-product-row">
                     <td><?= $index + 1; ?></td>
                     <td></td>
@@ -323,7 +350,7 @@ if (!$logoSrc && \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site && \Yii::
                     <td><?= Html::encode($measureCode($item->measure_name)); ?></td>
                     <td><?= $e($item->measure_name); ?></td>
                     <td class="sx-upd-num"><?= Html::encode($quantity($item->quantity)); ?></td>
-                    <td class="sx-upd-num"><?= Html::encode($money($item->price)); ?></td>
+                    <td class="sx-upd-num"><?= Html::encode($money($unitPrice)); ?></td>
                     <td class="sx-upd-num"><?= Html::encode($money($item->amount)); ?></td>
                     <td>-</td>
                     <td><?= Html::encode($vatName); ?></td>
@@ -373,7 +400,11 @@ if (!$logoSrc && \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site && \Yii::
                 <table class="sx-upd-sign-grid">
                     <tr>
                         <td class="sx-upd-sign-label">Руководитель организации<br>или иное уполномоченное лицо</td>
-                        <td class="sx-upd-under"></td>
+                        <td class="sx-upd-under sx-upd-signature-cell">
+                            <?php if ($sellerSignature && $isSellerLegal) : ?>
+                                <img class="sx-upd-signature-image" src="<?= Html::encode($sellerSignature->absoluteSrc); ?>" />
+                            <?php endif; ?>
+                        </td>
                         <td class="sx-upd-under sx-upd-fio"></td>
                         <td class="sx-upd-sign-label">Главный бухгалтер<br>или иное уполномоченное лицо</td>
                         <td class="sx-upd-under"></td>
@@ -382,10 +413,14 @@ if (!$logoSrc && \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site && \Yii::
                     <tr class="sx-upd-hints"><td></td><td>(подпись)</td><td>(ф.И.О.)</td><td></td><td>(подпись)</td><td>(ф.И.О.)</td></tr>
                     <tr>
                         <td class="sx-upd-sign-label">Индивидуальный предприниматель<br>или иное уполномоченное лицо</td>
-                        <td class="sx-upd-under"></td>
+                        <td class="sx-upd-under sx-upd-signature-cell">
+                            <?php if ($sellerSignature && !$isSellerLegal) : ?>
+                                <img class="sx-upd-signature-image" src="<?= Html::encode($sellerSignature->absoluteSrc); ?>" />
+                            <?php endif; ?>
+                        </td>
                         <td class="sx-upd-under sx-upd-fio"></td>
                         <td></td>
-                        <td colspan="2" class="sx-upd-under sx-upd-ogrn"><?= $e($sellerOgrn ? $sellerOgrn.' от -' : ''); ?></td>
+                        <td colspan="2" class="sx-upd-under sx-upd-ogrn"><?= $e($sellerOgrn ? $sellerOgrn.($sellerRegistrationDate ? ' от '.date('d.m.Y', strtotime($sellerRegistrationDate)) : '') : ''); ?></td>
                     </tr>
                     <tr class="sx-upd-hints"><td></td><td>(подпись)</td><td>(ф.И.О.)</td><td></td><td colspan="2">Основной государственный регистрационный номер индивидуального предпринимателя (ОГРНИП) и дата его присвоения</td></tr>
                 </table>
@@ -434,6 +469,11 @@ if (!$logoSrc && \Yii::$app->has('skeeks') && \Yii::$app->skeeks->site && \Yii::
                 <div class="sx-upd-under sx-upd-wide-under sx-upd-center"><?= Html::encode($sellerSubject); ?></div>
                 <div class="sx-upd-hints">(может не заполняться при проставлении печати в М.П., может быть указан ИНН/КПП)</div>
                 <div class="sx-upd-mp">М.П.</div>
+                <?php if ($sellerStamp) : ?>
+                    <div class="sx-upd-stamp-wrap">
+                        <img class="sx-upd-stamp" src="<?= Html::encode($sellerStamp->absoluteSrc); ?>" />
+                    </div>
+                <?php endif; ?>
             </td>
             <td class="sx-upd-transfer-side sx-upd-transfer-buyer">
                 <div class="sx-upd-transfer-title">Товар (груз) получил/услуги, результаты работ, права принял</div>

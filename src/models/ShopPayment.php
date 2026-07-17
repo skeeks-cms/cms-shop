@@ -60,6 +60,10 @@ use yii\helpers\ArrayHelper;
  * @property string            $external_name
  * @property string            $external_id
  * @property string            $external_data
+ * @property string|null       $document_number Номер платежного документа
+ * @property string|null       $document_date Дата платежного документа
+ * @property int|null          $operation_at Дата и время операции во внешней системе
+ * @property string|null       $external_status Статус операции во внешней системе
  *
  * //@property string            $t_name
  * //@property string            $t_id
@@ -194,7 +198,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [
                 [
                     'created_by',
@@ -254,6 +258,25 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             [['t_id'], 'string'],
             [['t_data'], 'string'],*/
         ];
+
+        if ($this->hasAttribute('document_number')) {
+            $rules[] = [['document_number'], 'string', 'max' => 100];
+            $rules[] = [['document_number'], 'default', 'value' => null];
+        }
+        if ($this->hasAttribute('document_date')) {
+            $rules[] = [['document_date'], 'date', 'format' => 'php:Y-m-d'];
+            $rules[] = [['document_date'], 'default', 'value' => null];
+        }
+        if ($this->hasAttribute('operation_at')) {
+            $rules[] = [['operation_at'], 'integer'];
+            $rules[] = [['operation_at'], 'default', 'value' => null];
+        }
+        if ($this->hasAttribute('external_status')) {
+            $rules[] = [['external_status'], 'string', 'max' => 64];
+            $rules[] = [['external_status'], 'default', 'value' => null];
+        }
+
+        return $rules;
     }
 
     /**
@@ -279,6 +302,10 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             'external_name'               => Yii::t('skeeks/shop/app', 'Внешняя система'),
             'external_id'                 => Yii::t('skeeks/shop/app', 'Внешний ID'),
             'external_data'               => Yii::t('skeeks/shop/app', 'Данные из внешней системы'),
+            'document_number'             => 'Номер платежного документа',
+            'document_date'               => 'Дата платежного документа',
+            'operation_at'                => 'Дата и время операции',
+            'external_status'             => 'Статус во внешней системе',
             'cms_site_id'                 => \Yii::t('skeeks/shop/app', 'Site'),
             'cms_company_id'              => "Компания",
             'sender_contractor_id'        => "Отправитель",
@@ -379,6 +406,120 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
     public function getMoney()
     {
         return new Money($this->amount, (string)$this->currency_code);
+    }
+
+    /**
+     * Returns the normalized payment document number.
+     * Raw provider data is used only as a compatibility fallback.
+     *
+     * @return string
+     */
+    public function documentNumber()
+    {
+        $number = $this->hasAttribute('document_number')
+            ? trim((string)$this->getAttribute('document_number'))
+            : '';
+
+        if ($number !== '') {
+            return $number;
+        }
+
+        $externalData = (array)$this->external_data;
+        foreach (['document_number', 'documentNumber', 'paymentOrderNumber'] as $key) {
+            $number = trim((string)ArrayHelper::getValue($externalData, $key));
+            if ($number !== '') {
+                return $number;
+            }
+        }
+
+        return (string)$this->id;
+    }
+
+    /**
+     * Returns the payment document date in Y-m-d format.
+     * Priority: normalized field, raw provider data, CRM creation timestamp.
+     *
+     * @return string
+     */
+    public function documentDate()
+    {
+        $value = $this->hasAttribute('document_date')
+            ? $this->getAttribute('document_date')
+            : null;
+        $date = static::normalizeDocumentDateValue($value);
+        if ($date !== '') {
+            return $date;
+        }
+
+        $externalData = (array)$this->external_data;
+        foreach (['document_date', 'documentDate', 'docDate', 'paymentOrderDate'] as $key) {
+            $date = static::normalizeDocumentDateValue(ArrayHelper::getValue($externalData, $key));
+            if ($date !== '') {
+                return $date;
+            }
+        }
+
+        return static::normalizeDocumentDateValue($this->created_at);
+    }
+
+    /**
+     * Sets provider-independent payment document fields.
+     * Empty values never erase already normalized data.
+     *
+     * @param mixed $documentNumber
+     * @param mixed $documentDate
+     * @param mixed $operationAt
+     * @param mixed $externalStatus
+     * @return $this
+     */
+    public function setPaymentDocumentData($documentNumber, $documentDate, $operationAt = null, $externalStatus = null)
+    {
+        $number = trim((string)$documentNumber);
+        if ($number !== '' && $this->hasAttribute('document_number')) {
+            $this->setAttribute('document_number', $number);
+        }
+
+        $date = static::normalizeDocumentDateValue($documentDate);
+        if ($date !== '' && $this->hasAttribute('document_date')) {
+            $this->setAttribute('document_date', $date);
+        }
+
+        $operationTimestamp = static::normalizeTimestampValue($operationAt);
+        if ($operationTimestamp && $this->hasAttribute('operation_at')) {
+            $this->setAttribute('operation_at', $operationTimestamp);
+        }
+
+        $status = trim((string)$externalStatus);
+        if ($status !== '' && $this->hasAttribute('external_status')) {
+            $this->setAttribute('external_status', $status);
+        }
+
+        return $this;
+    }
+
+    public static function normalizeDocumentDateValue($value)
+    {
+        $timestamp = static::normalizeTimestampValue($value);
+
+        return $timestamp ? date('Y-m-d', $timestamp) : '';
+    }
+
+    public static function normalizeTimestampValue($value)
+    {
+        if ($value === null || trim((string)$value) === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            $timestamp = (int)$value;
+            if ($timestamp > 20000000000) {
+                $timestamp = (int)floor($timestamp / 1000);
+            }
+        } else {
+            $timestamp = strtotime((string)$value);
+        }
+
+        return $timestamp > 0 ? $timestamp : null;
     }
 
 

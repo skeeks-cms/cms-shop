@@ -65,10 +65,11 @@ class FnsUpdXmlGenerator
             $invoice->setAttribute('ИдГосКон', $stateContract);
         }
 
-        $this->appendSubject($dom, $invoice, 'СвПрод', $model->sellerFullName ?: $model->sellerName, $model->sellerInn, $model->sellerKpp, $model->sellerAddress, $model->sellerOgrn);
+        $this->appendSubject($dom, $invoice, 'СвПрод', $model->sellerFullName ?: $model->sellerName, $model->sellerInn, $model->sellerKpp, $model->sellerAddress, $model->sellerOgrn, $model->sellerRegistrationDate);
         $this->appendShipper($dom, $invoice, $updData, $model);
         $this->appendConsignee($dom, $invoice, $updData, $model);
-        $this->appendSubject($dom, $invoice, 'СвПокуп', $model->buyerFullName ?: $model->buyerName, $model->buyerInn, $model->buyerKpp, $model->buyerAddress, $model->buyerOgrn);
+        $this->appendPaymentDocuments($dom, $invoice, $model->resolvedPaymentDocuments('upd'));
+        $this->appendSubject($dom, $invoice, 'СвПокуп', $model->buyerFullName ?: $model->buyerName, $model->buyerInn, $model->buyerKpp, $model->buyerAddress, $model->buyerOgrn, $model->buyerRegistrationDate);
         $currency = $this->append($dom, $invoice, 'ДенИзм');
         $currency->setAttribute('КодОКВ', $this->currencyCode($model->currency_code));
         $currency->setAttribute('НаимОКВ', $this->currencyName($model->currency_code));
@@ -85,10 +86,15 @@ class FnsUpdXmlGenerator
         $transfer = $this->append($dom, $transferInfo, 'СвПер');
         $transfer->setAttribute('СодОпер', 'Товары переданы, работы выполнены, услуги оказаны');
         $transfer->setAttribute('ДатаПер', date('d.m.Y', $issuedAt));
-        $baseDocument = trim((string)ArrayHelper::getValue($updData, 'base_document', $model->description));
-        if ($baseDocument !== '') {
+        $baseDocument = $model->resolvedBaseDocument('upd');
+        if ($baseDocument['name'] !== '' || $baseDocument['number'] !== '' || $baseDocument['date'] !== '') {
             $base = $this->append($dom, $transfer, 'ОснПер');
-            $base->setAttribute('НаимОсн', $this->short($baseDocument, 255));
+            $base->setAttribute('РеквНаимДок', $this->short($baseDocument['name'] ?: 'Документ', 255));
+            $base->setAttribute('РеквНомерДок', $this->short($baseDocument['number'] ?: 'б/н', 255));
+            $base->setAttribute('РеквДатаДок', $baseDocument['date'] ? date('d.m.Y', strtotime($baseDocument['date'])) : date('d.m.Y', $issuedAt));
+            if ($baseDocument['additionalInfo'] !== '') {
+                $base->setAttribute('РеквДопСведДок', $this->short($baseDocument['additionalInfo'], 2000));
+            }
         } else {
             $this->append($dom, $transfer, 'БезДокОснПер', '1');
         }
@@ -98,10 +104,9 @@ class FnsUpdXmlGenerator
         }
 
         $signer = $this->append($dom, $document, 'Подписант');
-        $signer->setAttribute('ОблПолн', '6');
-        $signer->setAttribute('Статус', $model->sellerKpp ? '1' : '2');
-        $signer->setAttribute('ОснПолн', 'Должностные обязанности');
-        $this->appendSignerName($dom, $signer, $model->sellerName ?: $model->sellerFullName, $model->sellerInn);
+        $signer->setAttribute('СпосПодтПолном', '1');
+        $signer->setAttribute('Должн', $model->sellerKpp ? 'Руководитель' : 'Индивидуальный предприниматель');
+        $this->appendSignerName($dom, $signer, $model->sellerName ?: $model->sellerFullName);
 
         return $dom->saveXML();
     }
@@ -121,7 +126,7 @@ class FnsUpdXmlGenerator
         return $node;
     }
 
-    protected function appendSubject(\DOMDocument $dom, \DOMElement $parent, $tagName, $name, $inn, $kpp, $address, $ogrn = '')
+    protected function appendSubject(\DOMDocument $dom, \DOMElement $parent, $tagName, $name, $inn, $kpp, $address, $ogrn = '', $registrationDate = '')
     {
         $subject = $this->append($dom, $parent, $tagName);
         $id = $this->append($dom, $subject, 'ИдСв');
@@ -132,7 +137,12 @@ class FnsUpdXmlGenerator
             $ip = $this->append($dom, $id, 'СвИП');
             $ip->setAttribute('ИННФЛ', $inn);
             if ($ogrn) {
-                $ip->setAttribute('СвГосРегИП', $ogrn);
+                $registrationDetails = trim((string)$ogrn);
+                $registrationDate = ShopDocument::normalizeDocumentDateValue($registrationDate);
+                if ($registrationDate !== '') {
+                    $registrationDetails .= ' от '.date('d.m.Y', strtotime($registrationDate));
+                }
+                $ip->setAttribute('СвГосРегИП', $this->short($registrationDetails, 100));
             }
             $this->appendFio($dom, $ip, $name);
         } else {
@@ -153,18 +163,68 @@ class FnsUpdXmlGenerator
     {
         $shipper = $this->append($dom, $invoice, 'ГрузОт');
         $text = trim((string)ArrayHelper::getValue($data, 'shipper'));
-        if ($text === '' || stripos($text, (string)$model->sellerName) !== false) {
+        $isSeller = $text === '';
+        foreach ([$model->sellerName, $model->sellerFullName, $model->sellerInn] as $sellerIdentity) {
+            $sellerIdentity = trim((string)$sellerIdentity);
+            if ($sellerIdentity !== '' && $this->containsPartyIdentity($text, $sellerIdentity)) {
+                $isSeller = true;
+                break;
+            }
+        }
+        if ($isSeller) {
             $this->append($dom, $shipper, 'ОнЖе', 'он же');
             return;
         }
 
-        $this->appendSubject($dom, $shipper, 'ГрузОтпр', $text, $model->sellerInn, $model->sellerKpp, $model->sellerAddress, $model->sellerOgrn);
+        $this->appendSubject($dom, $shipper, 'ГрузОтпр', $text, $model->sellerInn, $model->sellerKpp, $model->sellerAddress, $model->sellerOgrn, $model->sellerRegistrationDate);
     }
 
     protected function appendConsignee(\DOMDocument $dom, \DOMElement $invoice, array $data, ShopDocument $model)
     {
         $text = trim((string)ArrayHelper::getValue($data, 'consignee'));
-        $this->appendSubject($dom, $invoice, 'ГрузПолуч', $text ?: ($model->buyerFullName ?: $model->buyerName), $model->buyerInn, $model->buyerKpp, $model->buyerAddress, $model->buyerOgrn);
+        $buyerName = $model->buyerFullName ?: $model->buyerName;
+        $subjectName = $buyerName;
+        if ($text !== '') {
+            $isBuyer = false;
+            foreach ([$model->buyerName, $model->buyerFullName, $model->buyerInn] as $buyerIdentity) {
+                $buyerIdentity = trim((string)$buyerIdentity);
+                if ($buyerIdentity !== '' && $this->containsPartyIdentity($text, $buyerIdentity)) {
+                    $isBuyer = true;
+                    break;
+                }
+            }
+            if (!$isBuyer) {
+                $subjectName = $text;
+            }
+        }
+        $this->appendSubject($dom, $invoice, 'ГрузПолуч', $subjectName, $model->buyerInn, $model->buyerKpp, $model->buyerAddress, $model->buyerOgrn, $model->buyerRegistrationDate);
+    }
+
+    protected function containsPartyIdentity($text, $identity)
+    {
+        $normalize = function ($value) {
+            $value = mb_strtolower((string)$value);
+            $value = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $value);
+            return trim(preg_replace('/\s+/u', ' ', $value));
+        };
+
+        $text = $normalize($text);
+        $identity = $normalize($identity);
+        if ($identity === '' || $text === '') {
+            return false;
+        }
+        if (mb_strpos($text, $identity) !== false) {
+            return true;
+        }
+
+        $tokens = array_values(array_filter(preg_split('/\s+/u', $identity), function ($token) {
+            return !in_array($token, ['ип', 'ооо', 'ао', 'пао', 'зао', 'оао'], true);
+        }));
+        if (count($tokens) < 2) {
+            return false;
+        }
+
+        return mb_strpos($text, $tokens[0].' '.$tokens[1]) !== false;
     }
 
     protected function appendAddress(\DOMDocument $dom, \DOMElement $parent, $address)
@@ -201,6 +261,8 @@ class FnsUpdXmlGenerator
             /** @var ShopDocumentItem $item */
             $baseAmount = $item->amountWithoutDiscount;
             $amount = (float)$item->amount;
+            $quantity = (float)$item->quantity;
+            $unitPrice = $item->unitPriceAfterDiscount;
             $withoutVat += $amount;
             $withVat += $amount;
 
@@ -209,8 +271,8 @@ class FnsUpdXmlGenerator
             $row->setAttribute('НаимТов', $this->short($item->name, 1000));
             $row->setAttribute('ОКЕИ_Тов', $this->measureCode($item->measure_name));
             $row->setAttribute('НаимЕдИзм', $this->measureName($item->measure_name));
-            $row->setAttribute('КолТов', $this->number($item->quantity));
-            $row->setAttribute('ЦенаТов', $this->money($item->price));
+            $row->setAttribute('КолТов', $this->number($quantity));
+            $row->setAttribute('ЦенаТов', $this->money($unitPrice));
             $row->setAttribute('СтТовБезНДС', $this->money($amount));
             $row->setAttribute('НалСт', $this->vatRate($item->vat_name));
             $row->setAttribute('СтТовУчНал', $this->money($amount));
@@ -221,9 +283,9 @@ class FnsUpdXmlGenerator
             $this->append($dom, $vat, 'БезНДС', 'без НДС');
 
             if ((float)$item->discount_amount > 0) {
-                $info = $this->append($dom, $row, 'ДопСведТов');
-                $info->setAttribute('ПрТовРаб', '3');
-                $info->setAttribute('ДопПризн', 'Скидка: '.$this->money($item->discount_amount).'; сумма без скидки: '.$this->money($baseAmount));
+                $info = $this->append($dom, $row, 'ИнфПолФХЖ2');
+                $info->setAttribute('Идентиф', 'Скидка');
+                $info->setAttribute('Значен', 'Сумма скидки: '.$this->money($item->discount_amount).'; сумма без скидки: '.$this->money($baseAmount));
             }
         }
 
@@ -233,14 +295,9 @@ class FnsUpdXmlGenerator
         ];
     }
 
-    protected function appendSignerName(\DOMDocument $dom, \DOMElement $parent, $name, $inn = '')
+    protected function appendSignerName(\DOMDocument $dom, \DOMElement $parent, $name)
     {
-        $person = $this->append($dom, $parent, 'ФЛ');
-        $inn = preg_replace('/\D+/', '', (string)$inn);
-        if (strlen($inn) == 12) {
-            $person->setAttribute('ИННФЛ', $inn);
-        }
-        $this->appendFio($dom, $person, $name);
+        $this->appendFio($dom, $parent, $name);
     }
 
     protected function appendFio(\DOMDocument $dom, \DOMElement $parent, $name)

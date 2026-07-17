@@ -181,6 +181,21 @@ class ShopDocumentItem extends \skeeks\cms\base\ActiveRecord
         return round(((float)$this->quantity ?: 1) * (float)$this->price, 4);
     }
 
+    /**
+     * Unit price represented by the final line amount after discount.
+     * This keeps printed and electronic document totals arithmetically equal.
+     *
+     * @return float
+     */
+    public function getUnitPriceAfterDiscount()
+    {
+        $quantity = (float)$this->quantity;
+
+        return $quantity > 0
+            ? round((float)$this->amount / $quantity, 4)
+            : (float)$this->price;
+    }
+
     public function asArray()
     {
         return [
