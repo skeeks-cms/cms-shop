@@ -64,7 +64,7 @@ if ($model->isNewRecord) {
                 'options'     => [
                     'class' => 'alert-warning',
                 ],
-                'body'        => 'Товар связан с сервисом SkeekS Товары и синхронизация информации включена. Поля, которые обновляются из сервиса, закрыты от ручного редактирования, чтобы изменения не перезатирались. Можно редактировать только SEO, сортировку и количество просмотров. Чтобы изменить остальные данные вручную, отключите синхронизацию в карточке товара.',
+                'body'        => 'Товар связан с сервисом SkeekS Товары и синхронизация информации включена. Поля и характеристики, которые обновляются из сервиса, закрыты от ручного редактирования, чтобы изменения не перезатирались. Можно редактировать SEO, сортировку, количество просмотров и характеристики, не связанные со SkeekS Товарами. Чтобы изменить остальные данные вручную, отключите синхронизацию в карточке товара.',
             ]); ?>
             <?php
             $allowedInputNames = \yii\helpers\Json::htmlEncode([
@@ -75,6 +75,13 @@ if ($model->isNewRecord) {
                 Html::getInputName($model, 'priority'),
                 Html::getInputName($model, 'show_counter'),
             ]);
+            $localPropertyInputNames = [];
+            foreach ($model->relatedProperties as $property) {
+                if (!$property->sx_id) {
+                    $localPropertyInputNames[] = Html::getInputName($model->relatedPropertiesModel, $property->code);
+                }
+            }
+            $localPropertyInputNames = \yii\helpers\Json::htmlEncode($localPropertyInputNames);
 
             $this->registerCss(<<<CSS
 .sx-sx-info-locked .form-control:disabled,
@@ -94,14 +101,29 @@ CSS
             $this->registerJs(<<<JS
 (function() {
     var allowedInputNames = {$allowedInputNames};
+    var localPropertyInputNames = {$localPropertyInputNames};
     var wrapper = $(".sx-sx-info-locked");
+
+    var isLocalPropertyInput = function(name) {
+        return localPropertyInputNames.some(function(localPropertyInputName) {
+            return name === localPropertyInputName || name.indexOf(localPropertyInputName + "[") === 0;
+        });
+    };
+
+    wrapper.find(":input").each(function() {
+        var input = $(this);
+        var name = input.attr("name") || "";
+        if (isLocalPropertyInput(name)) {
+            input.closest(".form-group").addClass("sx-sx-local-property");
+        }
+    });
 
     wrapper.find(":input").each(function() {
         var input = $(this);
         var type = (input.attr("type") || "").toLowerCase();
         var name = input.attr("name") || "";
 
-        if (type === "hidden" || type === "submit" || name === "submit-btn" || allowedInputNames.indexOf(name) !== -1) {
+        if (type === "hidden" || type === "submit" || name === "submit-btn" || allowedInputNames.indexOf(name) !== -1 || isLocalPropertyInput(name)) {
             return;
         }
 
@@ -113,7 +135,7 @@ CSS
 
     wrapper.find("button").each(function() {
         var button = $(this);
-        if (button.attr("name") === "submit-btn" || (button.attr("type") || "").toLowerCase() === "submit") {
+        if (button.attr("name") === "submit-btn" || (button.attr("type") || "").toLowerCase() === "submit" || button.closest(".sx-sx-local-property").length) {
             return;
         }
         button.prop("disabled", true).addClass("sx-sx-disabled-control");
@@ -121,14 +143,19 @@ CSS
 
     wrapper.find(".btn").each(function() {
         var control = $(this);
-        if (control.is("button") && ((control.attr("type") || "").toLowerCase() === "submit" || control.attr("name") === "submit-btn")) {
+        if (control.closest(".sx-sx-local-property").length || (control.is("button") && ((control.attr("type") || "").toLowerCase() === "submit" || control.attr("name") === "submit-btn"))) {
             return;
         }
         control.addClass("sx-sx-disabled-control");
     });
 
     wrapper.find(".sx-buttons-standart-wrapper .btn").removeClass("sx-sx-disabled-control");
-    wrapper.find(".sx-controll-actions, .sx-btn-search-property, .sx-fast-edit, .sx-btn-create").addClass("sx-sx-disabled-control");
+    wrapper.find(".sx-controll-actions, .sx-btn-search-property, .sx-fast-edit, .sx-btn-create").each(function() {
+        var control = $(this);
+        if (!control.closest(".sx-sx-local-property").length) {
+            control.addClass("sx-sx-disabled-control");
+        }
+    });
 })();
 JS
             );

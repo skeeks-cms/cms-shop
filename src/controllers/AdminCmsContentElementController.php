@@ -3033,6 +3033,15 @@ CSS
             }
         }
 
+        $relatedModel = $model->relatedPropertiesModel;
+        $relatedModelFormName = $relatedModel->formName();
+        $relatedModelData = (array)ArrayHelper::getValue($post, $relatedModelFormName, []);
+        foreach ($model->relatedProperties as $property) {
+            if (!$property->sx_id && array_key_exists($property->code, $relatedModelData)) {
+                $result[$relatedModelFormName][$property->code] = $relatedModelData[$property->code];
+            }
+        }
+
         foreach (['_csrf', 'submit-btn', RequestResponse::DYNAMIC_RELOAD_NOT_SUBMIT] as $key) {
             if (array_key_exists($key, $post)) {
                 $result[$key] = $post[$key];
