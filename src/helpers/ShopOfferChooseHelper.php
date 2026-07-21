@@ -121,6 +121,7 @@ class ShopOfferChooseHelper extends Component
          */
         $offersCsmContentElementQuery = $this->shopProduct
             ->getTradeOffers()
+            ->active()
             ->with("shopProduct");
 
         if ($this->is_filter_by_quantity) {
@@ -228,7 +229,11 @@ class ShopOfferChooseHelper extends Component
 
             //Если мы выбрали конкретный оффер, то нужно просто его показать и загрузить его данные в опции
             if ($this->_chooseModel->offer_id) {
-                $this->_offerCmsContentElement = ShopCmsContentElement::findOne($this->_chooseModel->offer_id);
+                $availableOffersById = ArrayHelper::index($this->_availableOffers, 'id');
+                $this->_offerCmsContentElement = ArrayHelper::getValue(
+                    $availableOffersById,
+                    $this->_chooseModel->offer_id
+                );
             } else {
                 //Если конкретный офер не указан, нужно его вычислить загрузив опции
                 if ($this->_chooseFields) {
