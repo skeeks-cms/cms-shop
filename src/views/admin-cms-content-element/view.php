@@ -4,9 +4,14 @@
 /* @var $joinModel \skeeks\cms\shop\models\ShopCmsContentElement */
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
+use skeeks\cms\assets\FancyboxAssets;
+use skeeks\cms\backend\assets\BackendUiAsset;
+
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
+FancyboxAssets::register($this);
+BackendUiAsset::register($this);
 \skeeks\cms\themes\unify\assets\components\UnifyThemeStickAsset::register($this);
 
 
@@ -216,36 +221,6 @@ $this->registerCSS(<<<CSS
 
 
 
-.sx-table td, .sx-table th {
-    border: 0;
-    text-align: center;
-    padding: 7px 10px;
-    font-size: 13px;
-    border-bottom: 1px solid #dee2e68f;
-    background: white;
-}
-
-
-.sx-table th {
-    background: #f9f9f9;
-}
-
-.sx-table-wrapper {
-    border-radius: 5px;
-    border-left: 1px solid #dee2e68f;
-    border-right: 1px solid #dee2e68f;
-    border-top: 1px solid #dee2e68f;
-}
-.sx-table-wrapper table {
-    margin-bottom: 0;
-}
-
-
-.sx-info-block {
-    background: #f9f9f9;
-    margin-top: 10px;
-    padding: 10px;
-}
 .sx-update-sx-product {
     margin-left: 8px;
     padding: 2px 7px;
@@ -253,15 +228,9 @@ $this->registerCSS(<<<CSS
     line-height: 1.4;
     margin-top: 0.6rem;
 }
-.sx-title {
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-}
-
 CSS
 );
-$noValue = "<span style='color: silver;'>—</span>";
+$noValue = "<span class='sx-data-table__empty'>—</span>";
 ?>
 
 <?php $pjax = \skeeks\cms\widgets\Pjax::begin(); ?>
@@ -292,10 +261,10 @@ $noValue = "<span style='color: silver;'>—</span>";
 
         <?php if ($joinModels) : ?>
 
-            <section class="sx-info-block" style="background: #ceffd0;">
+            <section class="sx-detail-section sx-detail-section--success">
                 <div class="row no-gutters">
                     <div class="col-12">
-                        <div class="sx-title">Возможно этот товар уже оформлен</div>
+                        <div class="sx-detail-section__title">Возможно этот товар уже оформлен</div>
                     </div>
                     <div class="col-12">
                         <?php foreach ($joinModels as $joinModel) : ?>
@@ -398,7 +367,7 @@ $noValue = "<span style='color: silver;'>—</span>";
                      data-arrow-left-classes="hs-icon hs-icon-arrow-left sx-left"
                      data-arrow-right-classes="hs-icon hs-icon-arrow-right sx-right"
                      data-nav-for="#carouselCus2">
-                    <div class="js-slide g-bg-cover">
+                    <div class="js-slide">
                         <!--w-100-->
                         <img class="img-fluid" src="<?= \skeeks\cms\helpers\Image::getCapSrc(); ?>" alt="<?= $model->name; ?>">
                     </div>
@@ -1391,11 +1360,11 @@ JS
 ) : ?>
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
-            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Цена на сайте</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
-                                                                                                        title="Эта цена используется на сайте, именно ее видит клиент на сайте."></i></div>
+            <div class="sx-detail-section__title">Цена на сайте <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip"
+                                                                 title="Эта цена используется на сайте, именно ее видит клиент на сайте."></i></div>
 
-            <div class="sx-table-wrapper table-responsive">
-                <table class="table sx-table">
+            <div class="sx-data-table-wrapper table-responsive">
+                <table class="table sx-data-table">
                     <tr>
                         <? foreach ($model->cmsSite->shopTypePrices as $shopTypePrice) : ?>
                             <th><?php echo $shopTypePrice->name; ?></th>
@@ -1483,9 +1452,9 @@ JS
     <?php if ($marketplaces) : ?>
         <div class="row no-gutters" style="margin-top: 10px;">
             <div class="col-12">
-                <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Маркетплейсы</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
-                                                                                                           title="Этот товар на маркетплейсах"></i></div>
-                <div class="sx-table-wrapper table-responsive">
+                <div class="sx-detail-section__title">Маркетплейсы <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip"
+                                                                    title="Этот товар на маркетплейсах"></i></div>
+                <div class="sx-data-table-wrapper table-responsive">
 
                 </div>
             </div>
@@ -1493,11 +1462,11 @@ JS
     <?php endif; ?>
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
-            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Склады и магазины</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
-                                                                                                            title="В каждом магазине может быть своя цена, она может отличатся от цены сайта, это зависит от настроек системы."></i>
+            <div class="sx-detail-section__title">Склады и магазины <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip"
+                                                                     title="В каждом магазине может быть своя цена, она может отличатся от цены сайта, это зависит от настроек системы."></i>
             </div>
-            <div class="sx-table-wrapper table-responsive">
-                <table class="table sx-table">
+            <div class="sx-data-table-wrapper table-responsive">
+                <table class="table sx-data-table">
                     <tr>
                         <th style="text-align: left;">Магазин/склад</th>
 
@@ -1717,11 +1686,11 @@ JS
 
     <div class="row no-gutters" style="margin-top: 10px;">
         <div class="col-12">
-            <div style="margin-bottom: 5px;"><b style="text-transform: uppercase;">Поставщики</b> <i class="far fa-question-circle" style="margin-left: 5px; color: silver;" data-toggle="tooltip"
-                                                                                                     title="Если ваш проект интегрирован с поставщиками, то в этом разделе можно смотреть количество оставшегося товара у поставщика + цены."></i>
+            <div class="sx-detail-section__title">Поставщики <i class="far fa-question-circle sx-hint-icon" data-toggle="tooltip"
+                                                               title="Если ваш проект интегрирован с поставщиками, то в этом разделе можно смотреть количество оставшегося товара у поставщика + цены."></i>
             </div>
-            <div class="sx-table-wrapper table-responsive">
-                <table class="table sx-table">
+            <div class="sx-data-table-wrapper table-responsive">
+                <table class="table sx-data-table">
                     <tr>
                         <th style="text-align: left;">Поставщик</th>
                         <th>Код</th>
@@ -1859,10 +1828,10 @@ JS
 $infoModel = $model;
 ?>
 
-<section class="sx-info-block">
+<section class="sx-detail-section">
     <div class="row no-gutters">
         <div class="col-12">
-            <div class="sx-title">Характеристики</div>
+            <div class="sx-detail-section__title">Характеристики</div>
 
             <?php
             $rp = $infoModel->relatedPropertiesModel;
@@ -1900,20 +1869,20 @@ $infoModel = $model;
     </div>
 </section>
 
-<section class="sx-info-block">
+<section class="sx-detail-section">
     <div class="row no-gutters">
         <div class="col-12">
-            <div class="sx-title">Описание</div>
+            <div class="sx-detail-section__title">Описание</div>
             <?php echo $model->productDescriptionFull; ?>
         </div>
     </div>
 </section>
 
 <?php /*if ($model->shopProduct->supplier_external_jsondata) : */ ?><!--
-    <section class="sx-info-block">
+    <section class="sx-detail-section">
         <div class="row no-gutters">
             <div class="col-12">
-                <div class="sx-title">Прочие данные <i class="far fa-question-circle" title="Неразобранные данные, которые сохранились по товару в момент импорта на сайт" data-toggle="tooltip"
+                <div class="sx-detail-section__title">Прочие данные <i class="far fa-question-circle" title="Неразобранные данные, которые сохранились по товару в момент импорта на сайт" data-toggle="tooltip"
                                                        style="margin-left: 5px;"></i></div>
                 <? /*= \skeeks\cms\shop\widgets\admin\SubProductExternalDataWidget::widget(['shopProduct' => $model->shopProduct]); */ ?>
             </div>

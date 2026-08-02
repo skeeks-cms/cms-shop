@@ -148,7 +148,7 @@ echo \yii\widgets\ListView::widget([
     'pager'        => [
         'container' => '.list-view-products',
         'item'      => '.product-item',
-        'class'     => \skeeks\cms\themes\unify\widgets\ScrollAndSpPager::class,
+        'class'     => \skeeks\cms\backend\widgets\BackendScrollAndSpPager::class,
     ],
     //"\n{items}<div class=\"box-paging\">{pager}</div>{summary}<div class='sx-js-pagination'></div>",
     'layout'       => '<div class="row"><div class="col-md-12">{summary}</div></div>

@@ -38,12 +38,12 @@ return [
                     'shop'      => [
                         'name' => ['skeeks/shop/app', 'Orders'],
                         'url'  => ['/shop/upa-order'],
-                        'icon' => 'icon-basket',
+                        'icon' => 'fas fa-shopping-basket',
                     ],
                     'favorites' => [
                         'name' => "Избранное",
                         'url'  => ['/shop/upa-favorite'],
-                        'icon' => 'icon-heart',
+                        'icon' => 'fas fa-heart',
                     ],
                 ],
             ],
@@ -57,12 +57,12 @@ return [
                     'products' => [
                         'name' => ['skeeks/shop/app', 'Товары'],
                         'url'  => ['/shop/store-product'],
-                        'icon' => 'icon-list',
+                        'icon' => 'fas fa-list',
                     ],
                     'property' => [
                         'name' => ['skeeks/shop/app', 'Характеристики'],
                         'url'  => ['/shop/store-property'],
-                        'icon' => 'icon-list',
+                        'icon' => 'fas fa-list',
                     ],
                 ],
             ],

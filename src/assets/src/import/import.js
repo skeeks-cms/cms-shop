@@ -224,7 +224,15 @@
                 var row = $('<tr />', {
                     'data-row-index' : counter
                 });
-                row.append('<td class="sx-remove-td"><div class="sx-remove-tr-btn" title="Удалить строку"><i class="hs-icon hs-icon-close"></i></div></td>');
+                row.append(
+                    '<td class="sx-remove-td">' +
+                    '<button type="button" class="sx-remove-tr-btn" title="Удалить строку" aria-label="Удалить строку">' +
+                    '<svg class="sx-icon" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' +
+                    '<path d="M18 6 6 18M6 6l12 12"></path>' +
+                    '</svg>' +
+                    '</button>' +
+                    '</td>'
+                );
                 row.append('<td class="sx-counter-td sx-styled">' + counter + '</td>');
                 for (var x in cells) {
                     celsCounter = celsCounter + 1;

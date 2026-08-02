@@ -8,171 +8,121 @@
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
 $shopSellerProducts = [];
-$apiIconColor = $model->is_sx_info_update ? "green" : "red";
+$apiIconClass = $model->is_sx_info_update ? "sx-text--success" : "sx-text--danger";
 $apiIconTitle = $model->is_sx_info_update
     ? "SkeekS ID: {$model->sx_id}. Информация обновляется из сервиса SkeekS Товары"
     : "SkeekS ID: {$model->sx_id}. Обновление информации из сервиса SkeekS Товары запрещено";
 $apiMarketUrl = $model->sx_id && isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getProductUrl($model->sx_id) : "#";
-$apiIcon = "<i class='fas fa-link' style='color: {$apiIconColor};'></i>";
-?>
-<!--Товар привязан к главному-->
-<? if ($model->shopProduct->isSubProduct) : ?>
-    <div class="d-flex flex-row">
+$apiIcon = "<i class='fas fa-link {$apiIconClass}'></i>";
+$isSubProduct = $model->shopProduct->isSubProduct;
+$image = $model->image;
+if (!$image && $isSubProduct && $model->main_cce_id) {
+    $image = $model->mainCmsContentElement->image;
+}
+$imageSrc = $image
+    ? ($isSubProduct
+        ? $image->src
+        : \Yii::$app->imaging->thumbnailUrlOnRequest(
+            $image->src,
+            new \skeeks\cms\components\imaging\filters\Thumbnail(),
+            $model->code
+        ))
+    : \skeeks\cms\helpers\Image::getCapSrc();
+$title = $isSubProduct ? $model->name : $model->productName;
+$statusItems = [];
 
-        <? if ($model->main_cce_id) : ?>
-            <div class="my-auto text-center" style="margin-right: 5px;">
-                <?
-                \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                    'controllerId' => "/shop/admin-cms-content-element",
-                    'modelId'      => $model->main_cce_id,
-                    'options'      => [
-                        'style' => 'color: gray; text-align: left;',
-                        'class' => '',
-                    ],
-                ]);
-                ?>
-                <span style="color: green; font-size: 17px;">
-                        <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Привязан к информационной карточке! <?= $model->mainCmsContentElement->asText; ?>"></i>
-                    </span>
-                <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-            </div>
-        <? elseif ($model->cmsSite->shopSite->is_receiver) : ?>
-            <div class="my-auto text-center" style="margin-right: 5px;">
-                <span style="color: red; font-size: 17px;">
-                    <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Не привязан к информационной карточке"></i>
-                </span>
-            </div>
+if ($isSubProduct && $model->main_cce_id) {
+    $statusItems[] = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+        'controllerId' => "/shop/admin-cms-content-element",
+        'modelId'      => $model->main_cce_id,
+        'content'      => '<i class="fas fa-link"></i>',
+        'options'      => [
+            'class' => 'sx-status sx-status--success',
+            'title' => "Привязан к информационной карточке! {$model->mainCmsContentElement->asText}",
+        ],
+    ]);
+} elseif ($isSubProduct && $model->cmsSite->shopSite->is_receiver) {
+    $statusItems[] = \yii\helpers\Html::tag(
+        'span',
+        '<i class="fas fa-link"></i>',
+        ['class' => 'sx-status sx-status--danger', 'title' => 'Не привязан к информационной карточке']
+    );
+}
+
+if ($model->is_adult) {
+    $statusItems[] = \yii\helpers\Html::tag(
+        'span',
+        '18+',
+        [
+            'class' => 'sx-status sx-status--danger',
+            'title' => 'Этот раздел содержит информацию для взрослых',
+        ]
+    );
+}
+if (!$model->isAllowIndex) {
+    $statusItems[] = \yii\helpers\Html::tag(
+        'span',
+        'noindex',
+        [
+            'class' => 'sx-status sx-status--warning',
+            'title' => 'Этот товар не индексируется поисковыми системами',
+        ]
+    );
+}
+if ($model->sx_id) {
+    $statusItems[] = \yii\helpers\Html::a($apiIcon, $apiMarketUrl, [
+        'class' => 'sx-status',
+        'target' => '_blank',
+        'data-pjax' => '0',
+        'data-toggle' => 'tooltip',
+        'title' => $apiIconTitle,
+        'onclick' => 'event.stopPropagation();',
+    ]);
+}
+
+$related = '';
+if ($model->tree_id) {
+    $related = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
+        'controllerId' => "/cms/admin-tree",
+        'modelId'      => $model->cmsTree->id,
+        'content'      => '<i class="far fa-folder"></i> '.\yii\helpers\Html::encode($model->cmsTree->name),
+        'options'      => [
+            'title' => $model->cmsTree->fullName,
+            'class' => 'sx-preview-card__related',
+        ],
+    ]);
+}
+
+$tradeOffers = $model->shopProduct->getTradeOffers()->count();
+?>
+<div class="sx-preview-card sx-preview-card--file">
+    <div class="sx-preview-card__media">
+        <a href="#" class="sx-preview-card__media-link sx-trigger-action">
+            <img
+                src="<?= \yii\helpers\Html::encode($imageSrc); ?>"
+                class="sx-photo sx-img-size-50"
+                alt=""
+            />
+        </a>
+    </div>
+    <div class="sx-preview-card__content sx-collection-cell sx-collection-cell--stack">
+        <a
+            class="sx-preview-card__title sx-collection-cell__primary sx-trigger-action"
+            href="#"
+            title="id: <?= (int)$model->id; ?>"
+            data-toggle="tooltip"
+        ><?= \yii\helpers\Html::encode($title); ?></a>
+
+        <? if ($statusItems) : ?>
+            <div class="sx-preview-card__statuses"><?= implode('', $statusItems); ?></div>
         <? endif; ?>
 
+        <?= $related; ?>
 
-        <div class="my-auto text-center d-flex flex-row" style="margin-right: 5px; width: 50px; height: 50px; min-width: 50px; min-height: 50px;">
-            <?
-            $image = null;
-            if ($model->image) {
-                $image = $model->image;
-            } elseif ($model->main_cce_id) {
-                $image = $model->mainCmsContentElement->image;
-            }
-            ?>
-            <div class="my-auto mx-auto text-center">
-                <img src='<?= $image ? $image->src : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 50px; max-height: 50px; border-radius: 5px;'/>
-            </div>
-        </div>
-        <div class="my-auto d-flex flex-row" style="height: 50px;">
-            <div class="my-auto">
-                <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
-                    <a class="sx-trigger-action" style="border-bottom: 0;" href="#" title="id: <?= $model->id; ?>" data-toggle="tooltip">
-                        <?= $model->name; ?>
-                    </a>
-                    <? if ($model->is_adult) : ?>
-                        <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
-                            <span data-toggle="tooltip" title="Этот раздел содержит информацию для взрослых. Имеет возрастные ограничения 18+">[18+]</span>
-                        </span>
-                    <? endif; ?>
-                    <? if (!$model->isAllowIndex) : ?>
-                        <span style="font-size: 17px; color: red; font-weight: bold; color: #ff0000bd;">
-                            <span data-toggle="tooltip" title="Этот товар не индексируется поисковыми системами">[no index]</span>
-                        </span>
-                    <? endif; ?>
-                    <? if ($model->sx_id) : ?>
-                        <?= \yii\helpers\Html::a($apiIcon, $apiMarketUrl, [
-                            'target' => '_blank',
-                            'data-pjax' => '0',
-                            'data-toggle' => 'tooltip',
-                            'title' => $apiIconTitle,
-                            'onclick' => 'event.stopPropagation();',
-                        ]); ?>
-                    <? endif; ?>
-                </div>
-                <? if ($model->tree_id) : ?>
-                    <div style="">
-                        <?
-                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                            'controllerId' => "/cms/admin-tree",
-                            'modelId'      => $model->cmsTree->id,
-                            'options'      => [
-                                'title' => $model->cmsTree->fullName,
-                                'class' => "",
-                                'style' => "display: inline-block; color: gray; cursor: pointer; white-space: nowrap;",
-                            ],
-                        ]);
-                        ?>
-                        <i class="far fa-folder" style=""></i>
-                        <?= $model->cmsTree->name; ?>
-                        <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                    </div>
-                <? endif; ?>
-            </div>
-        </div>
+        <? if ($tradeOffers) : ?>
+            <a href="#" class="sx-offers-trigger sx-preview-card__related">
+                <i class="fab fa-product-hunt"></i> Модификации (<?= (int)$tradeOffers; ?>)
+            </a>
+        <? endif; ?>
     </div>
-
-<? else : ?>
-    <!-- Простой товар -->
-
-    <div class="d-flex flex-row">
-        <div class="my-auto text-center d-flex flex-row" style="margin-right: 5px; width: 50px; height: 50px; min-width: 50px; min-height: 50px;">
-            <?
-            $image = null;
-            if ($model->image) {
-                $image = $model->image;
-            }
-            ?>
-            <div class="my-auto mx-auto text-center">
-                <img src='<?= $image ? \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail(), $model->code) : \skeeks\cms\helpers\Image::getCapSrc(); ?>' style='max-width: 40px; max-height: 40px; border-radius: 5px;'/>
-            </div>
-        </div>
-        <div class="my-auto d-flex flex-row" style="height: 50px;">
-            <div class="my-auto">
-                <div style="max-height: 40px; overflow: hidden; line-height: 1.1;">
-                    <a class="sx-trigger-action" style="border-bottom: none;" href="#" title="id: <?= $model->id; ?>" data-toggle="tooltip"><?= $model->productName; ?></a>
-                    <? if ($model->is_adult) : ?>
-                        <span style="font-size: 10px; color: red; font-weight: bold; color: #ff0000bd;">
-                            <span data-toggle="tooltip" title="Этот раздел содержит информацию для взрослых. Имеет возрастные ограничения 18+">[18+]</span>
-                        </span>
-                    <? endif; ?>
-                    <? if (!$model->isAllowIndex) : ?>
-                        <span style="font-size: 10px; color: red; font-weight: bold; color: #ff0000bd;">
-                            <span data-toggle="tooltip" title="Этот товар не индексируется поисковыми системами">[noindex]</span>
-                        </span>
-                    <? endif; ?>
-                    <? if ($model->sx_id) : ?>
-                        <?= \yii\helpers\Html::a($apiIcon, $apiMarketUrl, [
-                            'target' => '_blank',
-                            'data-pjax' => '0',
-                            'data-toggle' => 'tooltip',
-                            'title' => $apiIconTitle,
-                            'onclick' => 'event.stopPropagation();',
-                        ]); ?>
-                    <? endif; ?>
-
-                </div>
-                <? if ($model->tree_id) : ?>
-                    <div style="">
-                        <?
-                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                            'controllerId' => "/cms/admin-tree",
-                            'modelId'      => $model->cmsTree->id,
-                            'options'      => [
-                                'title' => $model->cmsTree->fullName,
-                                'class' => "",
-                                'style' => "display: inline-block; color: silver; cursor: pointer; white-space: nowrap;",
-                            ],
-                        ]);
-                        ?>
-                        <i class="far fa-folder" style=""></i>
-                        <?= $model->cmsTree->name; ?>
-                        <? \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
-                    </div>
-                <? endif; ?>
-            </div>
-        </div>
-    </div>
-
-<? endif; ?>
-
-
-<div class="sx-product-controls">
-    <? if ($tradeOffers = $model->shopProduct->getTradeOffers()->count()) : ?>
-        <a href="#" class="sx-offers-trigger" style="border-bottom: 1px dashed;"><i class="fab fa-product-hunt"></i> Модификации (<?= $tradeOffers; ?>)</a>
-    <? endif; ?>
 </div>

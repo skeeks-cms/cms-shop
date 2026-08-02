@@ -60,7 +60,7 @@ $dataProvider = new \yii\data\ActiveDataProvider([
     <div class="row sx-item-list list-view">{items}</div>
     <div class="row"><div class="col-md-12">{pager}</div></div>',
         'pager'        => [
-            'class' => \skeeks\cms\themes\unify\widgets\ScrollAndSpPager::class,
+            'class' => \skeeks\cms\backend\widgets\BackendScrollAndSpPager::class,
         ],
     ]);
     ?>

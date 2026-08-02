@@ -1,20 +1,30 @@
+.sx-import-wrapper {
+    color: var(--sx-color-text, #262626);
+}
+
 .sx-import-table-wrapper table {
     width: 100%;
+    color: var(--sx-color-text, #262626);
+    background: var(--sx-color-surface-raised, #fff);
 }
 
 .sx-import-table-wrapper table tbody {
     height: 100px;
-    overflow-y: auto;
     overflow-x: hidden;
+    overflow-y: auto;
 }
+
 .sx-import-table-wrapper table th select {
     width: 100%;
+    color: var(--sx-color-text, #262626);
     border: 0;
+    background: var(--sx-color-surface-raised, #fff);
     font-weight: bold;
 }
 
-.sx-import-table-wrapper table th select:focus {
-    outline: none;
+.sx-import-table-wrapper table th select:focus-visible {
+    outline: 2px solid var(--sx-color-accent, #ed7044);
+    outline-offset: -2px;
 }
 
 .sx-max-height-100 {
@@ -22,15 +32,38 @@
 }
 
 .sx-import-table-wrapper table tr:hover td.sx-styled {
-    background: #f7f7f7;
+    background: var(--sx-color-surface-hover, #f4f6f8);
 }
+
 .sx-import-table-wrapper table .sx-remove-tr-btn {
     display: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    color: var(--sx-color-text-muted, #6f7484);
+    border: 0;
+    border-radius: var(--sx-radius-xs, 4px);
+    background: transparent;
     font-size: 12px;
     cursor: pointer;
 }
-.sx-import-table-wrapper table tr:hover .sx-remove-tr-btn {
-    display: block;
+
+.sx-import-table-wrapper table tr:hover .sx-remove-tr-btn,
+.sx-import-table-wrapper table tr:focus-within .sx-remove-tr-btn {
+    display: inline-flex;
+}
+
+.sx-import-table-wrapper table .sx-remove-tr-btn:hover,
+.sx-import-table-wrapper table .sx-remove-tr-btn:focus-visible {
+    color: var(--sx-color-danger, #bd4348);
+    background: var(--sx-color-danger-soft, #fff3f3);
+}
+
+.sx-import-table-wrapper table .sx-remove-tr-btn:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
 }
 
 .sx-import-table-wrapper table td.sx-remove-td {
@@ -38,31 +71,25 @@
     min-width: 20px;
 }
 
-
-
-.sx-import-table-wrapper table .sx-styled
-{
-    text-align: left;
-    padding: 0;
-    border: 1px solid rgba(0,0,0,0.1);
+.sx-import-table-wrapper table .sx-styled {
+    position: relative;
     min-width: 160px;
     max-width: 160px;
-    min-height: 24px;
     height: 24px;
+    min-height: 24px;
     padding: 3px;
+    color: var(--sx-color-text, #262626);
+    border: 1px solid var(--sx-color-border, #dedede);
+    background: var(--sx-color-surface-raised, #fff);
     cursor: default;
     outline: none;
     outline-offset: -2px;
-    position: relative;
+    text-align: left;
     -ms-word-break: break-all;
-    word-break: break-all;
     word-break: break-word;
     -ms-hyphens: auto;
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
-    -webkit-hyphens: auto;
-    -moz-hyphens: auto;
-    -ms-hyphens: auto;
     hyphens: auto;
     font-size: 12px;
     line-height: 1.1;
@@ -75,41 +102,49 @@
 }
 
 .sx-import-table-wrapper table tr.sx-active-tr td.sx-styled {
-    background: #ffbb0026;
+    background: var(--sx-color-accent-soft, #fff4ea);
 }
 
 .sx-value-td textarea {
-    width: 100%;
-    border: none;
-    resize: none;
     position: absolute;
-    left: 0;
     top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
-    outline: 2px solid rgb(82,146,247);
+    color: var(--sx-color-text, #262626);
+    border: none;
+    background: var(--sx-color-surface-raised, #fff);
+    outline: 2px solid var(--sx-color-accent, #ed7044);
+    resize: none;
 }
+
 .sx-value-td textarea:focus {
     border: none;
-    outline: 2px solid rgb(82,146,247);
+    outline: 2px solid var(--sx-color-accent, #ed7044);
 }
 
 .sx-import-values-wrapper {
     display: none;
 }
 
-
 .sx-import-form-wrapper {
     padding: 10px;
 }
+
 .sx-result-th {
-    color: silver;
+    color: var(--sx-color-text-muted, #6f7484);
 }
+
 .sx-error-tr {
-    background: #ffd2d2;
+    color: var(--sx-color-danger, #bd4348);
+    background: var(--sx-color-danger-soft, #fff3f3);
 }
+
 .sx-success-tr {
-    background: #edffed;
+    color: var(--sx-color-success, #23754a);
+    background: var(--sx-color-success-soft, #eef9f3);
 }
+
 .progress-bar {
     min-height: 12px !important;
 }

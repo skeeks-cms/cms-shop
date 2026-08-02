@@ -8,10 +8,9 @@
 
 namespace skeeks\cms\shop\assets\admin;
 
-use common\themes\lex\assets\LexThemeFontsAsset;
 use skeeks\cms\base\AssetBundle;
-use skeeks\cms\themes\unify\admin\assets\UnifyAdminAsset;
-use skeeks\sx\assets\Custom;
+use skeeks\cms\backend\assets\BackendLegacyIconAsset;
+use skeeks\cms\backend\assets\BackendUiAsset;
 
 class AdminShopProductAsset extends AssetBundle
 {
@@ -27,7 +26,7 @@ class AdminShopProductAsset extends AssetBundle
     ];
 
     public $depends = [
-        Custom::class,
-        UnifyAdminAsset::class,
+        BackendUiAsset::class,
+        BackendLegacyIconAsset::class,
     ];
 }

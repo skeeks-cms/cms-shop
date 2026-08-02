@@ -6,50 +6,52 @@
 $controller = $this->context;
 $image = $model->image;
 ?>
-<div class="row" style="margin-bottom: 5px;">
+<div class="row sx-model-header">
     <?php if ($image && $image->src) : ?>
-        <div class="col my-auto" style="max-width: 60px">
-            <img style="border: 2px solid #ededed; border-radius: 5px; width: 50px; height: 50px; object-fit: cover;" src="<?php echo \yii\helpers\Html::encode($image->src); ?>"/>
+        <div class="col my-auto sx-model-header__media">
+            <img class="sx-model-header__image" src="<?php echo \yii\helpers\Html::encode($image->src); ?>"/>
         </div>
     <?php endif; ?>
     <div class="col my-auto">
         <div class="d-flex">
             <div>
-                <h1 style="margin-bottom: 0px; line-height: 1.1;">
+                <h1 class="sx-model-header__title">
                     <?php echo $controller->modelShowName; ?>
                     <?php if ($model->sx_id) : ?>
                         <?php
-                        $sxInfoUpdateColor = $model->is_sx_info_update ? "green" : "red";
+                        $sxInfoUpdateClass = $model->is_sx_info_update
+                            ? "sx-text--success"
+                            : "sx-text--danger";
                         $sxInfoUpdateTitle = $model->is_sx_info_update
                             ? "SkeekS ID: {$model->sx_id}. Информация обновляется из сервиса SkeekS Товары"
                             : "SkeekS ID: {$model->sx_id}. Обновление информации из сервиса SkeekS Товары запрещено";
                         $sxMarketUrl = isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getCollectionUrl($model->sx_id) : "#";
-                        $sxIcon = "<i class='fas fa-link' style='color: {$sxInfoUpdateColor} !important;'></i>";
+                        $sxIcon = "<i class='fas fa-link {$sxInfoUpdateClass}'></i>";
                         ?>
-                        <span style="font-size: 17px; font-weight: bold;">
+                        <span class="sx-model-header__external-id">
                             <?php echo \yii\helpers\Html::a($sxIcon, $sxMarketUrl, [
                                 'target' => '_blank',
                                 'data-pjax' => '0',
                                 'data-toggle' => 'tooltip',
                                 'title' => $sxInfoUpdateTitle,
-                                'style' => "color: {$sxInfoUpdateColor} !important;",
+                                'class' => $sxInfoUpdateClass,
                             ]); ?>
                         </span>
                     <?php endif; ?>
                 </h1>
-                <div class="sx-small-info" style="font-size: 10px; color: silver;">
+                <div class="sx-small-info sx-model-header__meta">
                     <span title="ID записи - уникальный код записи в базе данных." data-toggle="tooltip"><i class="fas fa-key"></i> <?php echo $model->id; ?></span>
                     <?php if ($model->created_at) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i class="far fa-clock"></i> <?php echo \Yii::$app->formatter->asDate($model->created_at); ?></span>
+                        <span data-toggle="tooltip" title="Запись создана в базе: <?php echo \Yii::$app->formatter->asDatetime($model->created_at); ?>"><i class="far fa-clock"></i> <?php echo \Yii::$app->formatter->asDate($model->created_at); ?></span>
                     <?php endif; ?>
                     <?php if ($model->created_by) : ?>
-                        <span style="margin-left: 5px;" data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i class="far fa-user"></i> <?php echo $model->createdBy->shortDisplayName; ?></span>
+                        <span data-toggle="tooltip" title="Запись создана пользователем с ID: <?php echo $model->createdBy->id; ?>"><i class="far fa-user"></i> <?php echo $model->createdBy->shortDisplayName; ?></span>
                     <?php endif; ?>
                 </div>
             </div>
 
             <?php if ($model->absoluteUrl) : ?>
-                <div class="col my-auto" style="max-width: 65px; text-align: right;">
+                <div class="col my-auto sx-model-header__actions">
                     <a href="<?php echo $model->absoluteUrl; ?>" data-toggle="tooltip" class="btn btn-default" target="_blank" data-pjax="0" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>">
                         <i class="fas fa-external-link-alt"></i>
                     </a>
@@ -81,7 +83,7 @@ $image = $model->image;
             'title'       => \Yii::t('skeeks/cms', 'Delete'),
         ]);
         ?>
-        <div class="col my-auto" style="text-align: right; max-width: 65px;">
+        <div class="col my-auto sx-model-header__actions">
             <?php echo $href; ?>
         </div>
     <?php endif; ?>

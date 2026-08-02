@@ -1,16 +1,21 @@
 .sx-hidden-wrapper {
     display: none;
-    background: white;
-    padding: 5px 0px;
-    border-radius: 5px;
+    padding: 5px 0;
+    color: var(--sx-color-text, #262626);
+    border-radius: var(--sx-radius-sm, 5px);
+    background: var(--sx-color-surface-raised, #fff);
 }
 
 .sx-product-controls a:first-child {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .sx-product-controls a {
     margin-left: 15px;
-    color: #333 !important;
+    color: var(--sx-color-text-muted, #6f7484) !important;
 }
 
+.sx-product-controls a:hover,
+.sx-product-controls a:focus-visible {
+    color: var(--sx-color-accent, #ed7044) !important;
+}

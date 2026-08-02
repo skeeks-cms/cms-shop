@@ -1084,7 +1084,11 @@ HTML
                             if ($shopProductPrice = $shopProduct->getShopProductPrices()
                                 ->andWhere(['type_price_id' => $shopTypePrice->id])->one()
                             ) {
-                                return (string)$shopProductPrice->money;
+                                return Html::tag(
+                                    'span',
+                                    Html::encode((string)$shopProductPrice->money),
+                                    ['class' => 'sx-collection-cell__amount']
+                                );
                             }
                         }
 

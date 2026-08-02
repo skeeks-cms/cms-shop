@@ -3,6 +3,7 @@
 /* @var $model \skeeks\cms\shop\models\ShopCollection */
 
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit;
+use skeeks\cms\assets\FancyboxAssets;
 use skeeks\cms\helpers\Image;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -11,6 +12,7 @@ use yii\web\JsExpression;
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
+FancyboxAssets::register($this);
 \skeeks\cms\themes\unify\assets\components\UnifyThemeStickAsset::register($this);
 $this->render("@skeeks/cms/shop/views/admin-shop-store-doc-move/view-css");
 

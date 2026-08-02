@@ -48,6 +48,7 @@ use yii\bootstrap\Alert;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -291,11 +292,25 @@ class AdminPaymentController extends BackendModelStandartController
                                 'style' => 'min-width: 200px;',
                             ],*/
                             'value' => function(ShopPayment $model) {
-                                return \yii\helpers\Html::a( ($model->is_debit ? "Поступление" : "Оплата") . "&nbsp;№{$model->id}", "#", [
-                                    'class' => "sx-trigger-action",
-                                    'style' => "font-size: 15px;",
-                                ]).
-                                    "<div title='" . \Yii::$app->formatter->asDatetime($model->created_at) . "'>" . \Yii::$app->formatter->asDate($model->created_at) . "</div>";
+                                $title = Html::a(
+                                    ($model->is_debit ? "Поступление" : "Оплата")."&nbsp;№{$model->id}",
+                                    "#",
+                                    ['class' => "sx-trigger-action sx-collection-cell__primary"]
+                                );
+                                $date = Html::tag(
+                                    'div',
+                                    \Yii::$app->formatter->asDate($model->created_at),
+                                    [
+                                        'class' => 'sx-collection-cell__secondary',
+                                        'title' => \Yii::$app->formatter->asDatetime($model->created_at),
+                                    ]
+                                );
+
+                                return Html::tag(
+                                    'div',
+                                    $title.$date,
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             }
                         ],
 
@@ -319,7 +334,7 @@ class AdminPaymentController extends BackendModelStandartController
                                         'modelId'      => $crmDeal->company->id,
                                         'content'      => '<i class="fas fa-users"></i> '.$crmDeal->company->asText,
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-collection-cell__primary',
                                         ],
                                     ]);
                                 }
@@ -330,7 +345,7 @@ class AdminPaymentController extends BackendModelStandartController
                                         'modelId'      => $crmDeal->cmsUser->id,
                                         'content'      => '<i class="fas fa-users"></i> '.$crmDeal->cmsUser->asText,
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-collection-cell__primary',
                                         ],
                                     ]);
                                 }
@@ -358,17 +373,31 @@ class AdminPaymentController extends BackendModelStandartController
                             },
                         ],
                         'amount' => [
+                            'format' => 'raw',
                             'value' => function(ShopPayment $shopPayment) {
                                 if ($shopPayment->is_debit) {
-                                    return "<span style='color: green;'>+{$shopPayment->money}</span>";
+                                    return Html::tag(
+                                        'span',
+                                        '+'.Html::encode((string)$shopPayment->money),
+                                        ['class' => 'sx-collection-cell__amount sx-text--success']
+                                    );
                                 } else {
-                                    return "<span style='color: red;'>-{$shopPayment->money}</span>";
+                                    return Html::tag(
+                                        'span',
+                                        '-'.Html::encode((string)$shopPayment->money),
+                                        ['class' => 'sx-collection-cell__amount sx-text--danger']
+                                    );
                                 }
                             }
                         ],
                         'comment' => [
+                            'format' => 'raw',
                             'value' => function(ShopPayment $shopPayment) {
-                                return "<span style='color: gray;'>{$shopPayment->comment}</span>";
+                                return Html::tag(
+                                    'span',
+                                    Html::encode($shopPayment->comment),
+                                    ['class' => 'sx-collection-cell__secondary']
+                                );
                             }
                         ],
 
@@ -417,81 +446,109 @@ class AdminPaymentController extends BackendModelStandartController
                             'value' => function(ShopPayment $shopPayment) {
                                 $data = [];
                                 if ($shopPayment->shop_store_id) {
-                                    $data[] = 'Оплата в магазине (' . $shopPayment->shopStore->name . ')';
-                                    $data[] = "<div style='color: gray;'>{$shopPayment->shopStorePaymentTypeAsText}</div>";
+                                    $data[] = Html::tag(
+                                        'div',
+                                        Html::encode('Оплата в магазине ('.$shopPayment->shopStore->name.')'),
+                                        ['class' => 'sx-collection-cell__primary']
+                                    );
+                                    $data[] = Html::tag(
+                                        'div',
+                                        Html::encode($shopPayment->shopStorePaymentTypeAsText),
+                                        ['class' => 'sx-collection-cell__secondary']
+                                    );
                                     if ($shopPayment->shopCashebox) {
-                                        $data[] = "<div style='color: gray;'>Касса: {$shopPayment->shopCashebox->name}</div>";
+                                        $data[] = Html::tag(
+                                            'div',
+                                            Html::encode('Касса: '.$shopPayment->shopCashebox->name),
+                                            ['class' => 'sx-collection-cell__secondary']
+                                        );
                                     }
                                     if ($shopPayment->shopCasheboxShift) {
-                                        $data[] = "<div style='color: gray;'>{$shopPayment->shopCasheboxShift->asText}</div>";
+                                        $data[] = Html::tag(
+                                            'div',
+                                            Html::encode($shopPayment->shopCasheboxShift->asText),
+                                            ['class' => 'sx-collection-cell__secondary']
+                                        );
                                     }
 
 
                                 } else {
                                     if ($shopPayment->shopPaySystem) {
-                                        $data[] = "<div style='color: gray;'>{$shopPayment->shopPaySystem->name}</div>";
+                                        $data[] = Html::tag(
+                                            'div',
+                                            Html::encode($shopPayment->shopPaySystem->name),
+                                            ['class' => 'sx-collection-cell__secondary']
+                                        );
                                     }
                                     if ($shopPayment->senderContractor && $shopPayment->receiverContractor) {
-                                        $data[] = "<div>{$shopPayment->senderContractor->asText} → {$shopPayment->receiverContractor->asText}</div>";
+                                        $data[] = Html::tag(
+                                            'div',
+                                            Html::encode($shopPayment->senderContractor->asText.' → '.$shopPayment->receiverContractor->asText),
+                                            ['class' => 'sx-collection-cell__primary']
+                                        );
                                     }
                                 }
                                 if($shopPayment->comment) {
-                                    $data[] = "<div style='padding: 10px; font-size: 14px; background: #f9f9f9;'>{$shopPayment->comment}</div>";
+                                    $data[] = Html::tag(
+                                        'div',
+                                        Html::encode($shopPayment->comment),
+                                        ['class' => 'sx-collection-cell__secondary']
+                                    );
                                 }
 
                                 if ($shopPayment->deals) {
-                                    $data[] = '<hr style="border-color: #f3f3f3;"/>';
                                     foreach ($shopPayment->deals as $crmDeal) {
-                                        $data[] = "<div>".AjaxControllerActionsWidget::widget([
-                                                'controllerId' => '/cms/admin-cms-deal',
-                                                'modelId'      => $crmDeal->id,
-                                                'content'      => '<i class="far fa-file"></i> '.$crmDeal->asText,
-                                                'options'      => [
-                                                    'style' => 'text-align: left;',
-                                                ],
-                                            ])."</div>";
+                                        $data[] = AjaxControllerActionsWidget::widget([
+                                                 'controllerId' => '/cms/admin-cms-deal',
+                                                 'modelId'      => $crmDeal->id,
+                                                 'content'      => '<i class="far fa-file"></i> '.$crmDeal->asText,
+                                                 'options'      => [
+                                                     'class' => 'sx-preview-card__related',
+                                                 ],
+                                             ]);
                                     }
                                 }
 
                                 if ($shopPayment->bills) {
-                                    $data[] = '<hr style="border-color: #f3f3f3;"/>';
                                     foreach ($shopPayment->bills as $crmBill) {
-                                        $data[] = "<div>".AjaxControllerActionsWidget::widget([
-                                                'controllerId' => '/cms/admin-cms-bill',
-                                                'modelId'      => $crmBill->id,
-                                                'content'      => '<i class="far fa-file"></i> '.$crmBill->asText,
-                                                'options'      => [
-                                                    'style' => 'text-align: left;',
-                                                ],
-                                            ])."</div>";
+                                        $data[] = AjaxControllerActionsWidget::widget([
+                                                 'controllerId' => '/cms/admin-cms-bill',
+                                                 'modelId'      => $crmBill->id,
+                                                 'content'      => '<i class="far fa-file"></i> '.$crmBill->asText,
+                                                 'options'      => [
+                                                     'class' => 'sx-preview-card__related',
+                                                 ],
+                                             ]);
                                     }
                                 }
 
                                 if ($shopPayment->shop_order_id) {
-                                    $data[] = '<hr style="border-color: #f3f3f3;"/>';
-                                        $data[] = "<div>".AjaxControllerActionsWidget::widget([
-                                                'controllerId' => '/shop/admin-order',
-                                                'modelId'      => $shopPayment->shop_order_id,
-                                                'content'      => '<i class="far fa-file"></i> '.$shopPayment->shopOrder->asText,
-                                                'options'      => [
-                                                    'style' => 'text-align: left;',
-                                                ],
-                                            ])."</div>";
+                                        $data[] = AjaxControllerActionsWidget::widget([
+                                                 'controllerId' => '/shop/admin-order',
+                                                 'modelId'      => $shopPayment->shop_order_id,
+                                                 'content'      => '<i class="far fa-file"></i> '.$shopPayment->shopOrder->asText,
+                                                 'options'      => [
+                                                     'class' => 'sx-preview-card__related',
+                                                 ],
+                                             ]);
                                 }
                                 
                                 if ($shopPayment->shop_check_id) {
-                                    $data[] = '<hr style="border-color: #f3f3f3;"/>';
-                                        $data[] = "<div>".AjaxControllerActionsWidget::widget([
-                                                'controllerId' => '/shop/admin-shop-check',
-                                                'modelId'      => $shopPayment->shop_check_id,
-                                                'content'      => '<i class="far fa-file"></i> '.$shopPayment->shopCheck->asText,
-                                                'options'      => [
-                                                    'style' => 'text-align: left;',
-                                                ],
-                                            ])."</div>";
+                                        $data[] = AjaxControllerActionsWidget::widget([
+                                                 'controllerId' => '/shop/admin-shop-check',
+                                                 'modelId'      => $shopPayment->shop_check_id,
+                                                 'content'      => '<i class="far fa-file"></i> '.$shopPayment->shopCheck->asText,
+                                                 'options'      => [
+                                                     'class' => 'sx-preview-card__related',
+                                                 ],
+                                             ]);
                                 }
 
-                                return implode("", $data);
+                                return Html::tag(
+                                    'div',
+                                    implode("", $data),
+                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                );
                             }
                         ],
                     ],
