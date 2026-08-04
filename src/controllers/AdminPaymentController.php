@@ -13,6 +13,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
@@ -329,10 +330,10 @@ class AdminPaymentController extends BackendModelStandartController
 
                                 $result = [];
                                 if ($crmDeal->cms_company_id) {
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-company',
                                         'modelId'      => $crmDeal->company->id,
-                                        'content'      => '<i class="fas fa-users"></i> '.$crmDeal->company->asText,
+                                        'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->company->asText),
                                         'options'      => [
                                             'class' => 'sx-collection-cell__primary',
                                         ],
@@ -340,10 +341,10 @@ class AdminPaymentController extends BackendModelStandartController
                                 }
                                 
                                 if ($crmDeal->cms_user_id) {
-                                    $result[] = AjaxControllerActionsWidget::widget([
+                                    $result[] = BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-user',
                                         'modelId'      => $crmDeal->cmsUser->id,
-                                        'content'      => '<i class="fas fa-users"></i> '.$crmDeal->cmsUser->asText,
+                                        'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->cmsUser->asText),
                                         'options'      => [
                                             'class' => 'sx-collection-cell__primary',
                                         ],
@@ -358,10 +359,10 @@ class AdminPaymentController extends BackendModelStandartController
                             'value' => function (ShopPayment $crmDeal) {
 
                                 if ($crmDeal->cms_company_id) {
-                                    return AjaxControllerActionsWidget::widget([
+                                    return BackendEntityLink::widget([
                                         'controllerId' => '/cms/admin-cms-company',
                                         'modelId'      => $crmDeal->company->id,
-                                        'content'      => '<i class="fas fa-users"></i> '.$crmDeal->company->asText,
+                                        'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->company->asText),
                                         'options'      => [
                                             'style' => 'text-align: left;',
                                         ],
@@ -498,10 +499,10 @@ class AdminPaymentController extends BackendModelStandartController
 
                                 if ($shopPayment->deals) {
                                     foreach ($shopPayment->deals as $crmDeal) {
-                                        $data[] = AjaxControllerActionsWidget::widget([
+                                        $data[] = BackendEntityLink::widget([
                                                  'controllerId' => '/cms/admin-cms-deal',
                                                  'modelId'      => $crmDeal->id,
-                                                 'content'      => '<i class="far fa-file"></i> '.$crmDeal->asText,
+                                                 'content'      => '<i class="far fa-file"></i> '.Html::encode($crmDeal->asText),
                                                  'options'      => [
                                                      'class' => 'sx-preview-card__related',
                                                  ],
@@ -511,10 +512,10 @@ class AdminPaymentController extends BackendModelStandartController
 
                                 if ($shopPayment->bills) {
                                     foreach ($shopPayment->bills as $crmBill) {
-                                        $data[] = AjaxControllerActionsWidget::widget([
+                                        $data[] = BackendEntityLink::widget([
                                                  'controllerId' => '/cms/admin-cms-bill',
                                                  'modelId'      => $crmBill->id,
-                                                 'content'      => '<i class="far fa-file"></i> '.$crmBill->asText,
+                                                 'content'      => '<i class="far fa-file"></i> '.Html::encode($crmBill->asText),
                                                  'options'      => [
                                                      'class' => 'sx-preview-card__related',
                                                  ],
@@ -523,10 +524,10 @@ class AdminPaymentController extends BackendModelStandartController
                                 }
 
                                 if ($shopPayment->shop_order_id) {
-                                        $data[] = AjaxControllerActionsWidget::widget([
+                                        $data[] = BackendEntityLink::widget([
                                                  'controllerId' => '/shop/admin-order',
                                                  'modelId'      => $shopPayment->shop_order_id,
-                                                 'content'      => '<i class="far fa-file"></i> '.$shopPayment->shopOrder->asText,
+                                                 'content'      => '<i class="far fa-file"></i> '.Html::encode($shopPayment->shopOrder->asText),
                                                  'options'      => [
                                                      'class' => 'sx-preview-card__related',
                                                  ],
@@ -534,10 +535,10 @@ class AdminPaymentController extends BackendModelStandartController
                                 }
                                 
                                 if ($shopPayment->shop_check_id) {
-                                        $data[] = AjaxControllerActionsWidget::widget([
+                                        $data[] = BackendEntityLink::widget([
                                                  'controllerId' => '/shop/admin-shop-check',
                                                  'modelId'      => $shopPayment->shop_check_id,
-                                                 'content'      => '<i class="far fa-file"></i> '.$shopPayment->shopCheck->asText,
+                                                 'content'      => '<i class="far fa-file"></i> '.Html::encode($shopPayment->shopCheck->asText),
                                                  'options'      => [
                                                      'class' => 'sx-preview-card__related',
                                                  ],

@@ -6,15 +6,15 @@
 $controller = $this->context;
 $image = $model->logo;
 ?>
-<div class="row sx-model-header">
+<div class="sx-model-header sx-model-header--split">
+    <div class="sx-model-header__main">
+        <div class="sx-model-header__identity">
     <?php if ($image && $image->src) : ?>
-        <div class="col my-auto sx-model-header__media">
+        <div class="sx-model-header__media">
             <img class="sx-model-header__image" src="<?php echo \yii\helpers\Html::encode($image->src); ?>"/>
         </div>
     <?php endif; ?>
-    <div class="col my-auto">
-        <div class="d-flex">
-            <div>
+            <div class="sx-model-header__content">
                 <h1 class="sx-model-header__title">
                     <?php echo $controller->modelShowName; ?>
                     <?php if ($model->sx_id) : ?>
@@ -49,17 +49,16 @@ $image = $model->logo;
                     <?php endif; ?>
                 </div>
             </div>
-
-            <?php if ($model->absoluteUrl) : ?>
-                <div class="col my-auto sx-model-header__actions">
-                    <a href="<?php echo $model->absoluteUrl; ?>" data-toggle="tooltip" class="btn btn-default" target="_blank" data-pjax="0" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>">
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-            <?php endif; ?>
         </div>
     </div>
 
+    <div class="sx-model-header__side">
+        <div class="sx-model-header__actions">
+            <?php if ($model->absoluteUrl) : ?>
+                <a href="<?php echo $model->absoluteUrl; ?>" data-toggle="tooltip" class="btn btn-default" target="_blank" data-pjax="0" title="<?php echo \Yii::t('skeeks/cms', 'Watch to site (opens new window)'); ?>">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+            <?php endif; ?>
     <?php
     $modelActions = $controller->modelActions;
     $deleteAction = \yii\helpers\ArrayHelper::getValue($modelActions, "delete");
@@ -83,8 +82,8 @@ $image = $model->logo;
             'title'       => \Yii::t('skeeks/cms', 'Delete'),
         ]);
         ?>
-        <div class="col my-auto sx-model-header__actions">
-            <?php echo $href; ?>
-        </div>
+        <?php echo $href; ?>
     <?php endif; ?>
+        </div>
+    </div>
 </div>
