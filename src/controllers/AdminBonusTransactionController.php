@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use chillerlan\QRCode\Data\Number;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
@@ -25,6 +26,7 @@ use skeeks\yii2\form\fields\SelectField;
 use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -100,31 +102,39 @@ class AdminBonusTransactionController extends BackendModelStandartController
                             'class' => UserColumnData::class,
                         ],
                         'value'      => [
+                            'format' => 'raw',
                             'value' => function (ShopBonusTransaction $shopBonusTransaction) {
+                                $value = Html::encode((string)$shopBonusTransaction->value);
                                 if ($shopBonusTransaction->is_debit) {
-                                    return "<span style='color: red;'>-{$shopBonusTransaction->value}</span>";
+                                    return Html::tag('span', '-'.$value, [
+                                        'class' => 'sx-collection-cell__amount sx-text--danger',
+                                    ]);
                                 } else {
-                                    return "<span style='color: green;'>+{$shopBonusTransaction->value}</span>";
+                                    return Html::tag('span', '+'.$value, [
+                                        'class' => 'sx-collection-cell__amount sx-text--success',
+                                    ]);
                                 }
                             },
                         ],
                         'comment'     => [
+                            'format' => 'raw',
                             'value' => function (ShopBonusTransaction $shopBonusTransaction) {
-                                return "<span style='color: gray;'>{$shopBonusTransaction->comment}</span>";
+                                return Html::tag('span', Html::encode($shopBonusTransaction->comment), [
+                                    'class' => 'sx-collection-cell__secondary',
+                                ]);
                             },
                         ],
 
                         'shop_order_id' => [
+                            'format' => 'raw',
                             'value' => function (ShopBonusTransaction $shopBonusTransaction) {
                                 if ($shopBonusTransaction->shopOrder) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-order',
-                                        'modelId'                 => $shopBonusTransaction->shopOrder->id,
-                                        'content'                 => $shopBonusTransaction->shopOrder->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    return BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-order',
+                                        'modelId'      => $shopBonusTransaction->shopOrder->id,
+                                        'label'        => $shopBonusTransaction->shopOrder->asText,
+                                        'options'      => [
+                                            'class' => 'sx-collection-cell__primary',
                                         ],
                                     ]);
                                 } else {

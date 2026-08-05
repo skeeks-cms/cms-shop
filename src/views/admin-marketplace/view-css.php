@@ -26,50 +26,6 @@ h5 {
     min-width: 40px;
     border-bottom: 1px dotted;
 }
-.js-slide img {
-     max-height: 300px;
-     margin: auto;
-}
-.sx-stick-navigation .js-slide {
-    padding: 5px;
-}
-.sx-stick-navigation .slick-slide {
-    opacity: .6;
-}
-.sx-stick-navigation .slick-slide:hover {
-    opacity: 1;
-}
-.sx-stick-navigation .js-slide {
-    cursor: pointer;
-    border: none;
-    margin: 0 0px;
-    position: relative;
-}
-
-.sx-stick-navigation {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.sx-stick-navigation .slick-current:before {
-    border: 1px solid #d2d2d2;
-    content: '';
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    /* border: 1px solid rgba(21,146,165,0); */
-    -moz-transition: all .3s ease;
-    -o-transition: all .3s ease;
-    -webkit-transition: all .3s ease;
-    transition: all .3s ease;
-}
-
-
-
-
 /**
  * Современное оформление свойств
  */

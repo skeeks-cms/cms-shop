@@ -10,6 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
@@ -234,35 +235,57 @@ class AdminShopBrandController extends BackendModelStandartController
                         'format'    => 'raw',
                         'value'     => function (ShopBrand $model) {
 
-                            $data = [];
-                            $name = $model->asText;
+                            $apiLink = '';
                             if ($model->sx_id) {
-                                $apiIconColor = $model->is_sx_info_update ? "green" : "red";
+                                $apiIconClass = $model->is_sx_info_update ? 'sx-text--success' : 'sx-text--danger';
                                 $apiIconTitle = $model->is_sx_info_update
                                     ? "SkeekS ID: {$model->sx_id}. Информация обновляется из сервиса SkeekS Товары"
                                     : "SkeekS ID: {$model->sx_id}. Обновление информации из сервиса SkeekS Товары запрещено";
                                 $apiUrl = isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getBrandUrl($model->sx_id) : "#";
-                                $apiLink = Html::a("<small data-toggle='tooltip' title='{$apiIconTitle}'><i class='fas fa-link' style='color: {$apiIconColor};'></i></small>", $apiUrl, [
-                                    'target'    => '_blank',
-                                    'data-pjax' => '0',
-                                    'onclick'   => 'event.stopPropagation();',
+                                $apiIcon = Html::tag('small', Html::tag('i', '', [
+                                    'class' => 'fas fa-link '.$apiIconClass,
+                                ]), [
+                                    'data-toggle' => 'tooltip',
+                                    'title'       => $apiIconTitle,
                                 ]);
-                                $data[] = Html::a($name, "#", ['class' => 'sx-trigger-action'])." ".$apiLink;
-                            } else {
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $apiLink = $apiUrl !== '#'
+                                    ? Html::a($apiIcon, $apiUrl, [
+                                        'class'     => 'sx-preview-card__related',
+                                        'target'    => '_blank',
+                                        'data-pjax' => '0',
+                                    ])
+                                    : Html::tag('span', $apiIcon, ['class' => 'sx-preview-card__related']);
                             }
-                            
 
-                            $info = implode("<br />", $data);
+                            $media = BackendEntityLink::widget([
+                                'controllerId' => '/shop/admin-shop-brand',
+                                'modelId'      => $model->id,
+                                'content'      => Html::img($model->logo ? $model->logo->src : Image::getCapSrc(), [
+                                    'class' => 'sx-photo sx-img-size-50',
+                                    'alt'   => '',
+                                ]),
+                                'options'      => [
+                                    'class'      => 'sx-preview-card__media-link',
+                                    'aria-label' => (string)$model->asText,
+                                ],
+                            ]);
+                            $title = BackendEntityLink::widget([
+                                'controllerId' => '/shop/admin-shop-brand',
+                                'modelId'      => $model->id,
+                                'label'        => $model->asText,
+                                'options'      => [
+                                    'class'      => 'sx-preview-card__title sx-collection-cell__primary',
+                                    'aria-label' => (string)$model->asText,
+                                ],
+                            ]);
 
-                            return "<div class='row no-gutters'>
-                                            <div class='sx-trigger-action' style='width: 50px;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($model->logo ? $model->logo->src : Image::getCapSrc())."' style='max-width: 50px; max-height: 50px; border-radius: 5px;' />
-                                                </a>
-                                            </div>
-                                            <div style='margin: auto 5px;'>".$info."</div>
-                                        </div>";;
+                            return Html::tag('div',
+                                Html::tag('div', $media, ['class' => 'sx-preview-card__media'])
+                                .Html::tag('div', $title.$apiLink, [
+                                    'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                ]),
+                                ['class' => 'sx-preview-card sx-preview-card--file']
+                            );
                         },
                     ],
 

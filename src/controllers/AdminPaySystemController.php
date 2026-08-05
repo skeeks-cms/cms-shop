@@ -11,7 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
@@ -85,7 +85,8 @@ class AdminPaySystemController extends BackendModelStandartController
 
                         "columns" => [
                             'name' => [
-                                'class'         => DefaultActionColumn::class,
+                                'class'         => BackendEntityLinkColumn::class,
+                                'controllerId'  => '/shop/admin-pay-system',
                                 'viewAttribute' => 'asText',
                             ],
                             'priority',

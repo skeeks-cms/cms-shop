@@ -12,7 +12,8 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
@@ -327,23 +328,34 @@ HTML
                         ],
 
                         'external_code'           => [
-                            'class' => DefaultActionColumn::class,
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/shop/store-property',
                         ],
                         'custom'                  => [
                             'format'    => 'raw',
                             'label'     => 'Характеристика',
                             'attribute' => 'external_code',
                             'value'     => function (ShopStoreProperty $property) {
-                                $result = [];
-                                $result[] = \yii\helpers\Html::a($property->external_code, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);;
-
+                                $content = Html::tag('span', Html::encode($property->external_code), [
+                                    'class' => 'sx-collection-cell__primary',
+                                ]);
                                 if ($property->name) {
-                                    $result[] = $property->name;
+                                    $content .= Html::tag('span', Html::encode($property->name), [
+                                        'class' => 'sx-preview-card__meta',
+                                    ]);
                                 }
 
-                                return implode("<br />", $result);
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/store-property',
+                                    'modelId'      => $property->id,
+                                    'content'      => Html::tag('span', $content, [
+                                        'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__title',
+                                        'aria-label' => (string)$property->asText,
+                                    ],
+                                ]);
                             },
                         ],
                         'name'                    => [

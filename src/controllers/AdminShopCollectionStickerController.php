@@ -10,7 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use Mpdf\Writer\ColorWriter;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn2;
@@ -98,7 +98,8 @@ class AdminShopCollectionStickerController extends BackendModelStandartControlle
                         'class' => UserColumnData::class
                     ],
                     'name'   => [
-                        'class' => DefaultActionColumn::class
+                        'class'        => BackendEntityLinkColumn::class,
+                        'controllerId' => '/shop/admin-shop-collection-sticker',
                     ],
 
 

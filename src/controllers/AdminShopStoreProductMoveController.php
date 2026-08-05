@@ -11,7 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -126,23 +126,23 @@ class AdminShopStoreProductMoveController extends BackendModelStandartController
                         'quantity' => [
 
                             'value'         => function(ShopStoreProductMove $shopStoreProductMove) {
-                                return "<b>{$shopStoreProductMove->quantity}</b>";
+                                return Html::tag('span', Html::encode($shopStoreProductMove->quantity), [
+                                    'class' => 'sx-collection-cell--metric',
+                                ]);
                             },
 
                         ],
                         'shop_store_doc_move_id' => [
 
                             'value'         => function(ShopStoreProductMove $shopStoreProductMove) {
-                                return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                    'controllerId'            => 'shop/admin-shop-store-doc-move',
-                                    'tag'                     => 'span',
-                                    'content' => $shopStoreProductMove->shopStoreDocMove->asText,
-                                    'defaultOptions'          => [
-                                        'class' => 'd-flex',
-                                        'style' => 'line-height: 1.1; cursor: pointer;',
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-shop-store-doc-move',
+                                    'modelId'      => $shopStoreProductMove->shopStoreDocMove->id,
+                                    'label'        => $shopStoreProductMove->shopStoreDocMove->asText,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__related',
+                                        'aria-label' => (string)$shopStoreProductMove->shopStoreDocMove->asText,
                                     ],
-                                    'modelId'                 => $shopStoreProductMove->shopStoreDocMove->id,
-                                    'isRunFirstActionOnClick' => true,
                                 ]);
                             },
 

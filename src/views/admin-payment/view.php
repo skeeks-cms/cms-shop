@@ -5,7 +5,7 @@
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -44,13 +44,13 @@ $entityCard = static function ($controllerId, $entity, $title, $subtitle = '', $
 
     $content .= '</div></div>';
 
-    return AjaxControllerActionsWidget::widget([
-        'controllerId'            => $controllerId,
-        'modelId'                 => $entity->id,
-        'isRunFirstActionOnClick' => true,
-        'content'                 => $content,
-        'options'                 => [
-            'class' => 'sx-payment-entity-link',
+    return BackendEntityLink::widget([
+        'controllerId' => $controllerId,
+        'modelId'      => $entity->id,
+        'content'      => $content,
+        'options'      => [
+            'class'      => 'sx-payment-entity-link',
+            'aria-label' => (string)$entity->asText,
         ],
     ]);
 };

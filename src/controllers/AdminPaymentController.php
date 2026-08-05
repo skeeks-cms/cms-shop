@@ -12,7 +12,6 @@ use kartik\datecontrol\DateControl;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\widgets\AjaxControllerActionsWidget;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -293,11 +292,14 @@ class AdminPaymentController extends BackendModelStandartController
                                 'style' => 'min-width: 200px;',
                             ],*/
                             'value' => function(ShopPayment $model) {
-                                $title = Html::a(
-                                    ($model->is_debit ? "Поступление" : "Оплата")."&nbsp;№{$model->id}",
-                                    "#",
-                                    ['class' => "sx-trigger-action sx-collection-cell__primary"]
-                                );
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-payment',
+                                    'modelId'      => $model->id,
+                                    'content'      => ($model->is_debit ? "Поступление" : "Оплата")."&nbsp;№{$model->id}",
+                                    'options'      => [
+                                        'class' => 'sx-collection-cell__primary',
+                                    ],
+                                ]);
                                 $date = Html::tag(
                                     'div',
                                     \Yii::$app->formatter->asDate($model->created_at),
@@ -356,6 +358,7 @@ class AdminPaymentController extends BackendModelStandartController
                             },
                         ],
                         'cms_company_id' => [
+                            'format' => 'raw',
                             'value' => function (ShopPayment $crmDeal) {
 
                                 if ($crmDeal->cms_company_id) {
@@ -364,7 +367,7 @@ class AdminPaymentController extends BackendModelStandartController
                                         'modelId'      => $crmDeal->company->id,
                                         'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->company->asText),
                                         'options'      => [
-                                            'style' => 'text-align: left;',
+                                            'class' => 'sx-collection-cell__primary',
                                         ],
                                     ]);
                                 }
@@ -403,16 +406,15 @@ class AdminPaymentController extends BackendModelStandartController
                         ],
 
                         'shop_order_id' => [
+                            'format'        => 'raw',
                             'value'         => function(ShopPayment $shopPayment) {
                                 if ($shopPayment->shopOrder) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-order',
-                                        'modelId'                 => $shopPayment->shopOrder->id,
-                                        'content'                 => $shopPayment->shopOrder->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    return BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-order',
+                                        'modelId'      => $shopPayment->shopOrder->id,
+                                        'label'        => $shopPayment->shopOrder->asText,
+                                        'options'      => [
+                                            'class' => 'sx-collection-cell__primary',
                                         ],
                                     ]);
                                 } else {
@@ -422,16 +424,15 @@ class AdminPaymentController extends BackendModelStandartController
                         ],
 
                         'shop_check_id' => [
+                            'format'        => 'raw',
                             'value'         => function(ShopPayment $shopPayment) {
                                 if ($shopPayment->shopCheck) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-shop-check',
-                                        'modelId'                 => $shopPayment->shopCheck->id,
-                                        'content'                 => $shopPayment->shopCheck->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    return BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-shop-check',
+                                        'modelId'      => $shopPayment->shopCheck->id,
+                                        'label'        => $shopPayment->shopCheck->asText,
+                                        'options'      => [
+                                            'class' => 'sx-collection-cell__primary',
                                         ],
                                     ]);
                                 } else {

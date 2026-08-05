@@ -12,6 +12,7 @@ use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\models\CmsSiteDomain;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\modules\admin\actions\modelEditor\AdminModelEditorAction;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;

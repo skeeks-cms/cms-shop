@@ -8,18 +8,14 @@
 
 namespace skeeks\cms\shop\controllers;
 
-use Cassandra\DefaultColumn;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\DateTimeColumnData;
-use skeeks\cms\models\CmsAgent;
-use skeeks\cms\rbac\CmsManager;
-use skeeks\cms\shop\models\ShopCachebox;
 use skeeks\cms\shop\models\ShopCheck;
 use yii\base\Event;
-use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\UnsetArrayValue;
 
 /**
@@ -52,19 +48,6 @@ class AdminShopCheckController extends BackendModelStandartController
             ],
 
             'index' => [
-                'on beforeRender' => function (Event $e) {
-                    /*$e->content = Alert::widget([
-                        'closeButton' => false,
-                        'options'     => [
-                            'class' => 'alert-default',
-                        ],
-
-                        'body' => <<<HTML
-Для работы магазина можно добавить кассу
-HTML
-                        ,
-                    ]);*/
-                },
                 "filters"         => false,
                 "backendShowings" => false,
                 'grid'            => [
@@ -107,29 +90,25 @@ HTML
                             'class' => DateTimeColumnData::class,
                         ],
                         'id'             => [
+                            'format' => 'raw',
                             'value' => function(ShopCheck $model) {
-                                return \yii\helpers\Html::a("{$model->asText}", "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);
-                            }
+                                return $this->renderEntityLink(
+                                    '/shop/admin-shop-check',
+                                    $model->id,
+                                    $model->asText
+                                );
+                            },
                         ],
                         'shop_cashebox_id'       => [
                             'format' => 'raw',
                             'value'  => function (ShopCheck $shopCheck) {
 
-                                $result = [];
-
                                 if ($shopCheck->shopCashebox) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-shop-cashebox',
-                                        'modelId'                 => $shopCheck->shopCashebox->id,
-                                        'content'                 => $shopCheck->shopCashebox->name,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
-                                        ],
-                                    ]);
+                                    return $this->renderEntityLink(
+                                        '/shop/admin-shop-cashebox',
+                                        $shopCheck->shopCashebox->id,
+                                        $shopCheck->shopCashebox->name
+                                    );
                                 }
 
                                 return "";
@@ -141,19 +120,12 @@ HTML
                             'label' => 'Магазин',
                             'value'  => function (ShopCheck $shopCheck) {
 
-                                $result = [];
-
                                 if ($shopCheck->shopCashebox && $shopCheck->shopCashebox->shopStore) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-shop-store',
-                                        'modelId'                 => $shopCheck->shopCashebox->shopStore->id,
-                                        'content'                 => $shopCheck->shopCashebox->shopStore->name,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
-                                        ],
-                                    ]);
+                                    return $this->renderEntityLink(
+                                        '/shop/admin-shop-store',
+                                        $shopCheck->shopCashebox->shopStore->id,
+                                        $shopCheck->shopCashebox->shopStore->name
+                                    );
                                 }
 
                                 return "";
@@ -163,19 +135,12 @@ HTML
                         'shop_cashebox_shift_id' => [
                             'format' => 'raw',
                             'value'  => function (ShopCheck $shopCheck) {
-                                $result = [];
-
                                 if ($shopCheck->shopCasheboxShift) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-shop-cashebox-shift',
-                                        'modelId'                 => $shopCheck->shopCasheboxShift->id,
-                                        'content'                 => $shopCheck->shopCasheboxShift->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
-                                        ],
-                                    ]);
+                                    return $this->renderEntityLink(
+                                        '/shop/admin-shop-cashebox-shift',
+                                        $shopCheck->shopCasheboxShift->id,
+                                        $shopCheck->shopCasheboxShift->asText
+                                    );
                                 }
 
                                 return "";
@@ -184,18 +149,14 @@ HTML
 
 
                         'shop_order_id' => [
+                            'format'        => 'raw',
                             'value'         => function(ShopCheck $shopCheck) {
                                 if ($shopCheck->shopOrder) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-order',
-                                        'modelId'                 => $shopCheck->shopOrder->id,
-                                        'content'                 => $shopCheck->shopOrder->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
-                                        ],
-                                    ]);
+                                    return $this->renderEntityLink(
+                                        '/shop/admin-order',
+                                        $shopCheck->shopOrder->id,
+                                        $shopCheck->shopOrder->asText
+                                    );
                                 } else {
                                     return '';
                                 }
@@ -203,18 +164,14 @@ HTML
                         ],
 
                         'cms_user_id' => [
+                            'format'        => 'raw',
                             'value'         => function(ShopCheck $shopCheck) {
                                 if ($shopCheck->cmsUser) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/cms/admin-user',
-                                        'modelId'                 => $shopCheck->cmsUser->id,
-                                        'content'                 => $shopCheck->cmsUser->shortDisplayName,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
-                                        ],
-                                    ]);
+                                    return $this->renderEntityLink(
+                                        '/cms/admin-user',
+                                        $shopCheck->cmsUser->id,
+                                        $shopCheck->cmsUser->shortDisplayName
+                                    );
                                 } else {
                                     return '';
                                 }
@@ -223,62 +180,24 @@ HTML
 
                         'status'                 => [
                             'format' => 'raw',
-                            'value'  => function (ShopCheck $shopCheck, $key) {
-
-
-                                if ($shopCheck->status == ShopCheck::STATUS_APPROVED) {
-                                    $this->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-green');
-JS
-                                    );
-
-                                    $this->view->registerCss(<<<CSS
-tr.sx-tr-green, tr.sx-tr-green:nth-of-type(odd), tr.sx-tr-green td
-{
-background: #d5ffd5 !important;
-}
-CSS
-                                    );
-                                } elseif ($shopCheck->status == ShopCheck::STATUS_WAIT) {
-                                    $this->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-orange');
-JS
-                                    );
-
-                                    $this->view->registerCss(<<<CSS
-tr.sx-tr-orange, tr.sx-tr-orange:nth-of-type(odd), tr.sx-tr-orange td
-{
-background: #fff3d5 !important;
-}
-CSS
-                                    );
-                                } elseif ($shopCheck->status == ShopCheck::STATUS_NEW) {
-                                    $this->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-new');
-JS
-                                    );
-
-                                    $this->view->registerCss(<<<CSS
-tr.sx-tr-new, tr.sx-tr-new:nth-of-type(odd), tr.sx-tr-new td
-{
-    opacity: 0.5;
-}
-tr.sx-tr-new:hover, tr.sx-tr-new:hover:nth-of-type(odd), tr.sx-tr-new:hover td
-{
-    opacity: 1;
-}
-CSS
-                                    );
-                                }
-
-
-                                return $shopCheck->statusAsText;
+                            'value'  => function (ShopCheck $shopCheck) {
+                                return self::renderStatus($shopCheck);
                             },
                         ],
                         'doc_type'                 => [
                             'format' => 'raw',
                             'value'  => function (ShopCheck $shopCheck) {
-                                return $shopCheck->docTypeAsText;
+                                return Html::tag('span', Html::encode($shopCheck->docTypeAsText), [
+                                    'class' => 'sx-collection-cell__secondary',
+                                ]);
+                            },
+                        ],
+                        'amount' => [
+                            'format' => 'raw',
+                            'value'  => function (ShopCheck $shopCheck) {
+                                return Html::tag('span', Html::encode((string)$shopCheck->amount), [
+                                    'class' => 'sx-collection-cell__amount',
+                                ]);
                             },
                         ],
                     ],
@@ -290,6 +209,34 @@ CSS
             "update"       => new UnsetArrayValue(),
             "delete"       => new UnsetArrayValue(),
             "delete-multi" => new UnsetArrayValue(),
+        ]);
+    }
+
+    private function renderEntityLink($controllerId, $modelId, $label)
+    {
+        return BackendEntityLink::widget([
+            'controllerId' => $controllerId,
+            'modelId'      => $modelId,
+            'label'        => (string)$label,
+            'options'      => [
+                'class' => 'sx-collection-cell__primary',
+            ],
+        ]);
+    }
+
+    private static function renderStatus(ShopCheck $shopCheck)
+    {
+        $statusClass = '';
+        if ($shopCheck->status === ShopCheck::STATUS_APPROVED) {
+            $statusClass = 'sx-status--success';
+        } elseif ($shopCheck->status === ShopCheck::STATUS_WAIT) {
+            $statusClass = 'sx-status--warning';
+        } elseif ($shopCheck->status === ShopCheck::STATUS_ERROR) {
+            $statusClass = 'sx-status--danger';
+        }
+
+        return Html::tag('span', Html::encode($shopCheck->getStatusAsText()), [
+            'class' => trim('sx-status '.$statusClass),
         ]);
     }
 

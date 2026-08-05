@@ -12,7 +12,7 @@ use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
 use skeeks\cms\backend\events\ViewRenderEvent;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContentElement;
@@ -190,8 +190,14 @@ HTML
                     'columns'        => [
                         'sender_cms_site_id' => [
                             'value' => function(ShopImportCmsSite $model) {
-                                return \yii\helpers\Html::a($model->senderCmsSite->asText, "#", [
-                                    'class' => "sx-trigger-action",
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-shop-import-cms-site',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->senderCmsSite->asText,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__title',
+                                        'aria-label' => (string)$model->senderCmsSite->asText,
+                                    ],
                                 ]);
                             }
                         ],

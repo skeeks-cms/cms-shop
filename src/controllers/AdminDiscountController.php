@@ -12,7 +12,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\shop\models\ShopDiscount;
@@ -105,7 +105,8 @@ class AdminDiscountController extends BackendModelStandartController
                     ],
                     'columns'        => [
                         'name'      => [
-                            'class' => DefaultActionColumn::class,
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/shop/admin-discount',
                         ],
                         'is_active' => [
                             'class' => BooleanColumn::class,

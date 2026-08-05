@@ -11,6 +11,7 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\helpers\Image;
@@ -43,23 +44,6 @@ class AdminOrderController extends BackendModelStandartController
 
         $this->generateAccessActions = false;
         $this->permissionName = "shop/admin-order";
-
-        /*$this->modelHeader = function () {
-            /**
-             * @var $model ShopOrder
-            $model = $this->model;
-            $date = \Yii::$app->formatter->asDatetime($model->created_at);
-            return Html::tag('h1', "Заказ <span class='g-color-primary'>№{$model->id}</span> на сумму<span class='g-color-primary'> " . $model->money . "</span>" .  Html::a('<i class="fas fa-external-link-alt"></i>', $model->getPublicUrl(), [
-                    'target' => "_blank",
-                    'class'  => "g-ml-20",
-                    'title'  => \Yii::t('skeeks/cms', 'Watch to site (opens new window)'),
-                ]), [
-                    'style'  => "margin-bottom: 0px;",
-                ])
-                .
-                "<h6 style='color: gray;'>от " . Html::tag("span", \Yii::$app->formatter->asDatetime($model->created_at)) . "</h6>";
-                ;
-        };*/
 
         parent::init();
     }
@@ -302,22 +286,21 @@ HTML;
                             'format'    => "raw",
                             'label'     => "Номер заказа",
                             'value'     => function (ShopOrder $shopOrder) {
-                                $name = $shopOrder->asText;
-                                if (!$shopOrder->shopOrderStatus) {
-                                    return $name;
-                                }
-
                                 $data = [];
-
-                                $data[] = Html::a($name, "#", [
-                                    'class' => "sx-trigger-action",
-                                    //'style' => "font-size: 18px;",
+                                $data[] = BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-order',
+                                    'modelId'      => $shopOrder->id,
+                                    'label'        => $shopOrder->asText,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__title sx-collection-cell__primary',
+                                        'aria-label' => (string)$shopOrder->asText,
+                                    ],
                                 ]);
 
-                                if ($shopOrder->is_order) {
-                                    $data[] = \yii\helpers\Html::tag("span", $shopOrder->shopOrderStatus->name, [
-                                        'style' => "background: {$shopOrder->shopOrderStatus->bg_color}; color: {$shopOrder->shopOrderStatus->color}; padding: 5px; 0px;",
-                                        //'class' => "label",
+                                if ($shopOrder->is_order && $shopOrder->shopOrderStatus) {
+                                    $data[] = Html::tag('span', Html::encode($shopOrder->shopOrderStatus->name), [
+                                        'style' => "background: {$shopOrder->shopOrderStatus->bg_color}; color: {$shopOrder->shopOrderStatus->color};",
+                                        'class' => 'sx-status',
                                     ]);
                                 }
 
@@ -331,7 +314,9 @@ HTML;
                                 if ($shopOrder->shopDelivery) {
                                     $data[] = "" . $shopOrder->shopDelivery->name;
                                 }*/
-                                return implode(" ", $data);
+                                return Html::tag('span', implode(' ', $data), [
+                                    'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                ]);
                             },
                         ],
                         'shop_order_status_id' => [

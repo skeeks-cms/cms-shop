@@ -12,7 +12,8 @@ use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -148,8 +149,9 @@ HTML
                             }
                         ],
                         'shift_number' => [
-                            'class'         => DefaultActionColumn::class,
-                            'viewAttribute'         => "asText"
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/shop/admin-shop-cashebox-shift',
+                            'viewAttribute' => "asText"
                         ],
                         'created_by' => [
                             'class'         => UserColumnData::class
@@ -160,14 +162,13 @@ HTML
                             'format'         => 'raw',
                             'value' => function(ShopCasheboxShift $casheboxShift) {
 
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-shop-cashebox',
-                                        'modelId'                 => $casheboxShift->shopCashebox->id,
-                                        'content'                 => $casheboxShift->shopCashebox->name,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    return BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-shop-cashebox',
+                                        'modelId'      => $casheboxShift->shopCashebox->id,
+                                        'label'        => $casheboxShift->shopCashebox->name,
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$casheboxShift->shopCashebox->name,
                                         ],
                                     ]);
 
@@ -179,29 +180,17 @@ HTML
                             'format'         => 'raw',
                             'value' => function(ShopCasheboxShift $casheboxShift) {
 
-                                return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                    'controllerId'            => '/shop/admin-shop-store',
-                                    'modelId'                 => $casheboxShift->shopCashebox->shopStore->id,
-                                    'content'                 => $casheboxShift->shopCashebox->shopStore->name,
-                                    'isRunFirstActionOnClick' => true,
-                                    'options'                 => [
-                                        'class' => 'btn btn-xs btn-default',
-                                        //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-shop-store',
+                                    'modelId'      => $casheboxShift->shopCashebox->shopStore->id,
+                                    'label'        => $casheboxShift->shopCashebox->shopStore->name,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__related',
+                                        'aria-label' => (string)$casheboxShift->shopCashebox->shopStore->name,
                                     ],
                                 ]);
                             },
                         ],
-                        /*'is_active' => [
-                            'class'      => BooleanColumn::class,
-                            'trueValue'  => 1,
-                            'falseValue' => 1,
-                        ],
-
-                        'name' => [
-                            'class'         => DefaultActionColumn::class,
-                            'viewAttribute' => 'asText',
-                        ],*/
-
                     ],
                 ],
             ],

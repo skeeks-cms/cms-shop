@@ -1,4 +1,7 @@
 <?php
+use skeeks\cms\backend\widgets\BackendEntityLink;
+use yii\helpers\Html;
+
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopStoreDocMove */
 /* @var $controller \skeeks\cms\backend\controllers\BackendModelController */
@@ -19,17 +22,15 @@ $this->render("view-css");
             </span>
             <span class="sx-properties--value">
                 <?php if ($model->shopStore) : ?>
-                    <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                        'controllerId'            => '/shop/admin-shop-store',
-                        'modelId'                 => $model->shopStore->id,
-                        'isRunFirstActionOnClick' => true,
-                        'options'                 => [
-                            'class' => 'sx-dashed',
-                            'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                    <?php echo BackendEntityLink::widget([
+                        'controllerId' => '/shop/admin-shop-store',
+                        'modelId'      => $model->shopStore->id,
+                        'label'        => $model->shopStore->name,
+                        'options'      => [
+                            'class'      => 'sx-preview-card__related',
+                            'aria-label' => $model->shopStore->name,
                         ],
                     ]); ?>
-                    <?php echo $model->shopStore->name; ?>
-                    <?php $widget::end(); ?>
                 <?php else : ?>
                     -
                 <?php endif; ?>
@@ -56,17 +57,15 @@ $this->render("view-css");
                     Заказ/возврат
                 </span>
                 <span class="sx-properties--value">
-                        <?php $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                            'controllerId'            => '/shop/admin-order',
-                            'modelId'                 => $model->shopOrder->id,
-                            'isRunFirstActionOnClick' => true,
-                            'options'                 => [
-                                'class' => 'sx-dashed',
-                                'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                        <?php echo BackendEntityLink::widget([
+                            'controllerId' => '/shop/admin-order',
+                            'modelId'      => $model->shopOrder->id,
+                            'label'        => $model->shopOrder->asText,
+                            'options'      => [
+                                'class'      => 'sx-preview-card__related',
+                                'aria-label' => $model->shopOrder->asText,
                             ],
                         ]); ?>
-                        <?php echo $model->shopOrder->asText; ?>
-                        <?php $widget::end(); ?>
                 </span>
             </li>
         <? endif; ?>
@@ -222,20 +221,6 @@ JS
                         <tr data-id="<?php echo $productMove->id; ?>">
                             <td>
                                 <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
-                                    <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                        'controllerId'            => 'shop/admin-cms-content-element',
-                                        'urlParams'               => [
-                                            'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
-                                        ],
-                                        'tag'                     => 'span',
-                                        'defaultOptions'          => [
-                                            'class' => 'd-flex',
-                                            'style' => 'line-height: 1.1; cursor: pointer;',
-                                        ],
-                                        'modelId'                 => $productMove->shopStoreProduct->shopProduct->id,
-                                        'isRunFirstActionOnClick' => true,
-                                    ]); ?>
-
                                     <?
                                     $image = null;
                                     if ($product = $productMove->shopStoreProduct) {
@@ -247,20 +232,31 @@ JS
                                             }
                                         }
                                     }
+                                    $productContent = '';
+                                    if ($image) {
+                                        $productContent .= Html::tag('span', Html::img(
+                                            \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()),
+                                            [
+                                                'class' => 'my-auto',
+                                                'style' => 'max-width: 30px; height: 100%; width: 100%; margin-right: 5px;',
+                                                'alt'   => '',
+                                            ]
+                                        ), ['class' => 'my-auto']);
+                                    }
+                                    $productContent .= Html::tag('span', Html::encode($productMove->product_name), ['class' => 'my-auto']);
                                     ?>
-
-                                    <?php if ($image) : ?>
-                                        <span class="my-auto">
-                                        <img class="my-auto" src="<?php echo \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"
-                                             style="max-width: 30px; height: 100%;
-                        width: 100%; margin-right: 5px;"/>
-                                    </span>
-                                    <?php endif; ?>
-
-                                    <span class="my-auto">
-                                    <?php echo $productMove->product_name; ?>
-                            </span>
-                                    <? $widget::end(); ?>
+                                    <?php echo BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-cms-content-element',
+                                        'modelId'      => $productMove->shopStoreProduct->shopProduct->id,
+                                        'urlParams'    => [
+                                            'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
+                                        ],
+                                        'content'      => $productContent,
+                                        'options'      => [
+                                            'class'      => 'd-flex sx-preview-card__related',
+                                            'aria-label' => $productMove->product_name,
+                                        ],
+                                    ]); ?>
                                 <?php else : ?>
                                     <?php echo $productMove->product_name; ?>
                                 <?php endif; ?>
@@ -319,20 +315,6 @@ JS
                     <tr data-id="<?php echo $productMove->id; ?>">
                         <td>
                             <?php if ($productMove->shop_store_product_id && $productMove->shopStoreProduct->shopProduct) : ?>
-                                <? $widget = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                    'controllerId'            => 'shop/admin-cms-content-element',
-                                    'urlParams'               => [
-                                        'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
-                                    ],
-                                    'tag'                     => 'span',
-                                    'defaultOptions'          => [
-                                        'class' => 'd-flex',
-                                        'style' => 'line-height: 1.1; cursor: pointer;',
-                                    ],
-                                    'modelId'                 => $productMove->shopStoreProduct->shopProduct->id,
-                                    'isRunFirstActionOnClick' => true,
-                                ]); ?>
-
                                 <?
                                 $image = null;
                                 if ($product = $productMove->shopStoreProduct) {
@@ -344,20 +326,31 @@ JS
                                         }
                                     }
                                 }
+                                $productContent = '';
+                                if ($image) {
+                                    $productContent .= Html::tag('span', Html::img(
+                                        \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()),
+                                        [
+                                            'class' => 'my-auto',
+                                            'style' => 'max-width: 30px; height: 100%; width: 100%; margin-right: 5px;',
+                                            'alt'   => '',
+                                        ]
+                                    ), ['class' => 'my-auto']);
+                                }
+                                $productContent .= Html::tag('span', Html::encode($productMove->product_name), ['class' => 'my-auto']);
                                 ?>
-
-                                <?php if ($image) : ?>
-                                    <span class="my-auto">
-                                        <img class="my-auto" src="<?php echo \Yii::$app->imaging->thumbnailUrlOnRequest($image->src, new \skeeks\cms\components\imaging\filters\Thumbnail()); ?>"
-                                             style="max-width: 30px; height: 100%;
-                        width: 100%; margin-right: 5px;"/>
-                                    </span>
-                                <?php endif; ?>
-
-                                <span class="my-auto">
-                                    <?php echo $productMove->product_name; ?>
-                            </span>
-                                <? $widget::end(); ?>
+                                <?php echo BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-cms-content-element',
+                                    'modelId'      => $productMove->shopStoreProduct->shopProduct->id,
+                                    'urlParams'    => [
+                                        'content_id' => $productMove->shopStoreProduct->shopProduct->cmsContentElement->content_id,
+                                    ],
+                                    'content'      => $productContent,
+                                    'options'      => [
+                                        'class'      => 'd-flex sx-preview-card__related',
+                                        'aria-label' => $productMove->product_name,
+                                    ],
+                                ]); ?>
                             <?php else : ?>
                                 <?php echo $productMove->product_name; ?>
                             <?php endif; ?>

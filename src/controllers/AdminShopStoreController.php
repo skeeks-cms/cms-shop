@@ -11,7 +11,8 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
@@ -120,7 +121,8 @@ HTML
                                 'style' => 'width: 320px;',
                             ],
                             'value'         => function (ShopStore $shopStore) {
-                                return Html::a('Панель <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/store-product', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
+                                return Html::tag('div',
+                                    Html::a('Панель <i class="fas fa-external-link-alt"></i>', Url::to(['/shop/store-product', StoreUrlRule::STORE_PARAM_NAME => $shopStore->id]), [
                                         'class'       => 'btn btn-secondary',
                                         'data-pjax'   => 0,
                                         'target'      => '_blank',
@@ -130,10 +132,9 @@ HTML
                                         'class'       => 'btn btn-secondary',
                                         'data-pjax'   => 0,
                                         'target'      => '_blank',
-                                        'style'       => 'margin-left: 20px; ',
                                         'title'       => 'Открыть интерфейс кассира',
                                         'data-toggle' => 'tooltip',
-                                    ]);
+                                    ]), ['class' => 'sx-button-group']);
                             },
                         ],
 
@@ -150,7 +151,8 @@ HTML
                         ],
 
                         'name' => [
-                            'class'         => DefaultActionColumn::class,
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/shop/admin-shop-store',
                             'viewAttribute' => 'asText',
                         ],
 
@@ -159,21 +161,35 @@ HTML
                             'format'    => 'raw',
                             'value'     => function (ShopStore $model) {
 
-                                $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $content = Html::tag('span', Html::img(
+                                    $model->cmsImage ? $model->cmsImage->src : Image::getCapSrc(),
+                                    [
+                                        'class' => 'sx-photo sx-img-size-small',
+                                        'alt'   => '',
+                                    ]
+                                ), ['class' => 'sx-preview-card__media']);
 
+                                $info = Html::tag('span', Html::encode($model->asText), [
+                                    'class' => 'sx-collection-cell__primary',
+                                ]);
                                 if ($model->address) {
-                                    $data[] = $model->address;
+                                    $info .= Html::tag('span', Html::encode($model->address), [
+                                        'class' => 'sx-preview-card__meta',
+                                    ]);
                                 }
-                                $info = implode("<br />", $data);
+                                $content .= Html::tag('span', $info, [
+                                    'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                ]);
 
-                                return "<div class='d-flex no-gutters'>
-                                                <div class='sx-trigger-action my-auto' style='width: 50px;'>
-                                                    <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                        <img src='".($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc())."' style='max-width: 40px; max-height: 40px; border-radius: 5px;' />
-                                                    </a>
-                                                </div>
-                                                <div style='margin-left: 5px;' class='my-auto'>".$info."</div></div>";;
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-shop-store',
+                                    'modelId'      => $model->id,
+                                    'content'      => $content,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card sx-preview-card__title',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
                             },
                         ],
 
@@ -213,7 +229,7 @@ HTML
                                 'style' => 'width: 100px;',
                             ],
                             'value'         => function (ShopStore $shopStore) {
-                                return "<div style='color: green;'>".$shopStore->raw_row['countReadyProducts']."</div>";
+                                return Html::encode($shopStore->raw_row['countReadyProducts']);
                             },
                             'format'        => 'raw',
                             'attribute'     => 'countProducts',

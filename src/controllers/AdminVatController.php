@@ -9,7 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\rbac\CmsManager;
@@ -67,7 +67,8 @@ class AdminVatController extends BackendModelStandartController
                     ],
                     'columns'        => [
                         'name'      => [
-                            'class' => DefaultActionColumn::class,
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/shop/admin-vat',
                         ],
                         'is_active' => [
                             'class' => BooleanColumn::class,

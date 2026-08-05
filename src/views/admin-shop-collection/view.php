@@ -5,6 +5,7 @@
 use skeeks\cms\base\widgets\ActiveFormAjaxSubmit;
 use skeeks\cms\assets\FancyboxAssets;
 use skeeks\cms\helpers\Image;
+use skeeks\cms\shop\widgets\admin\ShopAdminGallery;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\JsExpression;
@@ -13,8 +14,6 @@ $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
 FancyboxAssets::register($this);
-\skeeks\cms\themes\unify\assets\components\UnifyThemeStickAsset::register($this);
-$this->render("@skeeks/cms/shop/views/admin-shop-store-doc-move/view-css");
 
 $apiColor = $model->is_sx_info_update ? "green" : "red";
 $apiText = $model->is_sx_info_update
@@ -94,11 +93,6 @@ $this->registerCss(<<<CSS
     min-width: 40px;
     border-bottom: 1px dotted;
 }
-.sx-shop-card-image {
-    max-height: 360px;
-    max-width: 100%;
-    object-fit: contain;
-}
 .sx-shop-description-block {
     background: #fff;
     border-radius: 5px;
@@ -122,66 +116,43 @@ CSS
     <div class="row">
         <div class="col-lg-5 col-md-6 col-12">
             <div style="padding: 10px; text-align: center;">
-                <?php if ($galleryImages) : ?>
-                    <div id="collectionCarouselMain" class="js-carousel sx-stick sx-stick-slider"
-                         data-infinite="true"
-                         data-fade="true"
-                         data-arrows-classes="g-color-primary--hover sx-arrows sx-images-carousel-arrows sx-color-silver"
-                         data-arrow-left-classes="hs-icon hs-icon-arrow-left sx-left"
-                         data-arrow-right-classes="hs-icon hs-icon-arrow-right sx-right"
-                         data-nav-for="#collectionCarouselNav">
-                        <?php foreach ($galleryImages as $image) : ?>
-                            <?
-                            $preview = \Yii::$app->imaging->getPreview($image,
-                                new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                    'w' => 700,
-                                    'h' => 700,
-                                    'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_INSET,
-                                    'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_BIG,
-                                ]), $model->code
-                            );
-                            ?>
-                            <div class="js-slide">
-                                <a class="sx-fancybox-gallary" data-fancybox="collection-images" href="<?= $image->src; ?>">
-                                    <img class="img-fluid sx-shop-card-image" src="<?= $preview->src; ?>" alt="<?= Html::encode($model->name); ?>">
-                                </a>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <?php if (count($galleryImages) > 1) : ?>
-                        <div id="collectionCarouselNav" class="js-carousel text-center g-mx-minus-5 sx-stick sx-stick-navigation"
-                             data-infinite="true"
-                             data-center-mode="true"
-                             data-slides-show="8"
-                             data-is-thumbs="true"
-                             data-vertical="false"
-                             data-focus-on-select="false"
-                             data-nav-for="#collectionCarouselMain"
-                             data-arrows-classes="sx-arrows g-color-primary--hover sx-color-silver"
-                             data-arrow-left-classes="hs-icon hs-icon-arrow-left sx-left"
-                             data-arrow-right-classes="hs-icon hs-icon-arrow-right sx-right"
-                        >
-                            <?php foreach ($galleryImages as $image) : ?>
-                                <?
-                                $preview = \Yii::$app->imaging->getPreview($image,
-                                    new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                        'w' => 100,
-                                        'h' => 100,
-                                        'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
-                                        'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_MICRO,
-                                    ]), $model->code
-                                );
-                                ?>
-                                <div class="js-slide">
-                                    <img class="img-fluid" src="<?= $preview->src; ?>" alt="<?= Html::encode($model->name); ?>">
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-                <?php else : ?>
-                    <img class="sx-shop-card-image" src="<?= Html::encode(Image::getCapSrc()); ?>" alt="<?= Html::encode($model->name); ?>">
-                <?php endif; ?>
+                <?php
+                $galleryItems = [];
+                foreach ($galleryImages as $image) {
+                    $mainPreview = \Yii::$app->imaging->getPreview($image,
+                        new \skeeks\cms\components\imaging\filters\Thumbnail([
+                            'w' => 700,
+                            'h' => 700,
+                            'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_INSET,
+                            'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_BIG,
+                        ]), $model->code
+                    );
+                    $thumbnail = \Yii::$app->imaging->getPreview($image,
+                        new \skeeks\cms\components\imaging\filters\Thumbnail([
+                            'w' => 100,
+                            'h' => 100,
+                            'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
+                            'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_MICRO,
+                        ]), $model->code
+                    );
+                    $galleryItems[] = [
+                        'full' => $image->src,
+                        'preview' => $mainPreview->src,
+                        'thumbnail' => $thumbnail->src,
+                        'alt' => $model->name,
+                    ];
+                }
+                if (!$galleryItems) {
+                    $galleryItems[] = [
+                        'preview' => Image::getCapSrc(),
+                        'alt' => $model->name,
+                    ];
+                }
+                ?>
+                <?= ShopAdminGallery::widget([
+                    'items' => $galleryItems,
+                    'fancyboxGroup' => 'collection-images',
+                ]); ?>
             </div>
         </div>
 

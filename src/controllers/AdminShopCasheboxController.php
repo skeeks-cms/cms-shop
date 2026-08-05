@@ -11,7 +11,8 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\models\CmsAgent;
@@ -124,7 +125,8 @@ HTML
                         ],
 
                         'name' => [
-                            'class'         => DefaultActionColumn::class,
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/shop/admin-shop-cashebox',
                             'viewAttribute' => 'asText',
                         ],
 
@@ -134,14 +136,13 @@ HTML
                             'format'         => 'raw',
                             'value' => function(ShopCashebox $model) {
 
-                                return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                    'controllerId'            => '/shop/admin-shop-store',
-                                    'modelId'                 => $model->shopStore->id,
-                                    'content'                 => $model->shopStore->name,
-                                    'isRunFirstActionOnClick' => true,
-                                    'options'                 => [
-                                        'class' => 'btn btn-xs btn-default',
-                                        //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-shop-store',
+                                    'modelId'      => $model->shopStore->id,
+                                    'label'        => $model->shopStore->name,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__related',
+                                        'aria-label' => (string)$model->shopStore->name,
                                     ],
                                 ]);
                             },
@@ -163,20 +164,21 @@ HTML
                                 if ($model->workers) {
                                     foreach ($model->workers as $worker)
                                     {
-                                        $result[] = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                            'controllerId'            => '/cms/admin-user',
-                                            'modelId'                 => $worker->id,
-                                            'content'                 => $worker->shortDisplayName,
-                                            'isRunFirstActionOnClick' => true,
-                                            'options'                 => [
-                                                'class' => 'btn btn-xs btn-default',
-                                                //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                        $result[] = BackendEntityLink::widget([
+                                            'controllerId' => '/cms/admin-user',
+                                            'modelId'      => $worker->id,
+                                            'label'        => $worker->shortDisplayName,
+                                            'options'      => [
+                                                'class'      => 'sx-preview-card__related',
+                                                'aria-label' => (string)$worker->shortDisplayName,
                                             ],
                                         ]);
                                     }
 
                                 }
-                                return implode(" ", $result);
+                                return Html::tag('span', implode('', $result), [
+                                    'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                ]);
                             }
                         ],
 

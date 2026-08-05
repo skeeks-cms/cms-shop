@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -98,22 +99,42 @@ HTML
                             'value'     => function (ShopTypePrice $model) {
 
                                 $data = [];
-                                $name = '';
+                                $marker = '';
                                 if ($model->is_default) {
-                                    $name = '<span class="fas fa-lock" title="Базовая розничная цена" style="margin-right: 5px;"></span>';
+                                    $marker = Html::tag('span', '', [
+                                        'class' => 'fas fa-lock sx-preview-card__related',
+                                        'title' => 'Базовая розничная цена',
+                                    ]);
                                 }
                                 if ($model->is_purchase) {
-                                    $name = '<span class="fas fa-lock" title="Закупочная цена" style="margin-right: 5px;"></span>';
+                                    $marker = Html::tag('span', '', [
+                                        'class' => 'fas fa-lock sx-preview-card__related',
+                                        'title' => 'Закупочная цена',
+                                    ]);
                                 }
-                                $data[] = $name.Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                $data[] = $marker.BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-type-price',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->asText,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__title sx-collection-cell__primary',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
                                 if ($model->description) {
-                                    $data[] = $model->description;
+                                    $data[] = Html::tag('span', Html::encode($model->description), [
+                                        'class' => 'sx-preview-card__meta',
+                                    ]);
                                 }
                                 if ($model->is_auto) {
-                                    $data[] = "<small style='color: gray;'>Цена рассчитывается автоматически от цены: ".$model->baseAutoShopTypePrice->asText."</small>";
+                                    $data[] = Html::tag('small', Html::encode(
+                                        'Цена рассчитывается автоматически от цены: '.$model->baseAutoShopTypePrice->asText
+                                    ), ['class' => 'sx-preview-card__meta']);
                                 }
 
-                                return implode("<br />", $data);
+                                return Html::tag('span', implode('', $data), [
+                                    'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                ]);
                             },
                         ],
 

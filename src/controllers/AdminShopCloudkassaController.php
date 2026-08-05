@@ -10,7 +10,7 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\RequestResponse;
 use skeeks\cms\models\CmsCallcheckProvider;
@@ -109,7 +109,8 @@ HTML
                         'custom' => [
                             'attribute' => 'name',
                             'format'    => "raw",
-                            'class' => DefaultActionColumn::class
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/shop/admin-shop-cloudkassa',
                         ],
                         'is_main' => [
                             'class' => BooleanColumn::class,

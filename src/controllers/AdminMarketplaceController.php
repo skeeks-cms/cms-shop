@@ -12,7 +12,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\ImageColumn;
@@ -185,116 +185,11 @@ HTML
 
 
                         'name' => [
-                            'class'         => DefaultActionColumn::class,
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/shop/admin-marketplace',
                             'viewAttribute' => 'asText',
                         ],
 
-
-                        'doc_type' => [
-                            'value'         => function(ShopStoreDocMove $shopStoreDocMove, $key, $index) {
-
-                if (!$shopStoreDocMove->is_active) {
-                    \Yii::$app->view->registerJs(<<<JS
-$('tr[data-key={$key}]').addClass('sx-tr-no-active');
-JS
-                                        );
-                }
-
-
-                                        \Yii::$app->view->registerCss(<<<CSS
-tr.sx-tr-no-active td
-{
-opacity: 0.2;
-}
-tr.sx-tr-no-active:hover td
-{
-opacity: 1;
-}
-CSS
-                                        );
-
-
-
-
-                                $result = [];
-                                $result[] = \yii\helpers\Html::a($shopStoreDocMove->asText, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]);
-                                if ($shopStoreDocMove->comment) {
-                                    $result[] = "<small style='color: gray;'>{$shopStoreDocMove->comment}</small>";
-                                }
-                                return implode("<br />", $result);
-                            }
-                        ],
-
-                        'shop_order_id' => [
-                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
-                                if ($shopStoreDocMove->shopOrder) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-order',
-                                        'modelId'                 => $shopStoreDocMove->shopOrder->id,
-                                        'content'                 => $shopStoreDocMove->shopOrder->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
-                                        ],
-                                    ]);
-                                } else {
-                                    return '';
-                                }
-                            },
-                        ],
-
-                        'shop_store_id' => [
-                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
-                                if ($shopStoreDocMove->shopStore) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-shop-store',
-                                        'modelId'                 => $shopStoreDocMove->shopStore->id,
-                                        'content'                 => $shopStoreDocMove->shopStore->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
-                                        ],
-                                    ]);
-                                } else {
-                                    return '';
-                                }
-                            },
-                        ],
-
-                        'number_products' => [
-
-                            'label' => 'Позиций',
-                            'attribute' => 'number_products',
-
-                            'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
-                                return $shopStoreDocMove->raw_row['number_products'];
-                            },
-
-                            'beforeCreateCallback' => function (GridView $grid) {
-                                /**
-                                 * @var $query ActiveQuery
-                                 */
-                                $query = $grid->dataProvider->query;
-
-                                $subQuery = ShopStoreProductMove::find()->select([new Expression("count(1)")])->where(
-                                    ['shop_store_doc_move_id' => new Expression(ShopStoreDocMove::tableName() . ".id")],
-                                );
-
-                                $query->addSelect([
-                                    'number_products' => $subQuery,
-                                ]);
-
-
-                                $grid->sortAttributes["number_products"] = [
-                                    'asc'  => ['number_products' => SORT_ASC],
-                                    'desc' => ['number_products' => SORT_DESC],
-                                ];
-                            },
-                        ],
 
                     ],
                 ],

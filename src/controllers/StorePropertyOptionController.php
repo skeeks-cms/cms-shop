@@ -9,7 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
 use skeeks\cms\backend\widgets\SelectModelDialogTreeWidget;
 use skeeks\cms\components\Cms;
 use skeeks\cms\helpers\RequestResponse;
@@ -165,7 +165,8 @@ HTML
                         ],
 
                         'name' => [
-                            'class' => DefaultActionColumn::class,
+                            'class'        => BackendEntityLinkColumn::class,
+                            'controllerId' => '/shop/store-property-option',
                         ],
                     ],
                 ],

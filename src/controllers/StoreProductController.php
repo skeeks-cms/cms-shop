@@ -12,6 +12,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\backend\ViewBackendAction;
 use skeeks\cms\components\Cms;
 use skeeks\cms\grid\BooleanColumn;
@@ -339,17 +340,11 @@ class StoreProductController extends BackendModelStandartController
                                 ];
                             },
                             'value'                => function (ShopStoreProduct $shopStoreProduct) {
-                                $result = $shopStoreProduct->raw_row['marginality_abs'] ? \Yii::$app->formatter->asDecimal($shopStoreProduct->raw_row['marginality_abs']) : "";
-                                $color = "red";
-                                if ($result < 0) {
-                                    $color = "red";
-                                }
-                                if ($result > 0) {
-                                    $color = "green";
-                                }
-
-                                return Html::tag("div", $result, [
-                                    'style' => "color: {$color}",
+                                $value = $shopStoreProduct->raw_row['marginality_abs'];
+                                $result = $value !== null ? \Yii::$app->formatter->asDecimal($value) : '';
+                                return Html::tag('span', Html::encode($result), [
+                                    'class' => ($value > 0 ? 'sx-text--success' : 'sx-text--danger')
+                                        .' sx-collection-cell--metric',
                                 ]);
                             },
                         ],
@@ -380,19 +375,12 @@ class StoreProductController extends BackendModelStandartController
                                 ];
                             },
                             'value'                => function (ShopStoreProduct $shopStoreProduct) {
-                                $result = $shopStoreProduct->raw_row['marginality_per'] ? \Yii::$app->formatter->asDecimal($shopStoreProduct->raw_row['marginality_per']) : "";
-                                $color = "red";
-                                if ($result < 0) {
-                                    $color = "red";
-                                }
-                                if ($result > 0) {
-                                    $color = "green";
-                                }
-
-                                return Html::tag("div", $result, [
-                                    'style' => "color: {$color}",
+                                $value = $shopStoreProduct->raw_row['marginality_per'];
+                                $result = $value !== null ? \Yii::$app->formatter->asDecimal($value) : '';
+                                return Html::tag('span', Html::encode($result), [
+                                    'class' => ($value > 0 ? 'sx-text--success' : 'sx-text--danger')
+                                        .' sx-collection-cell--metric',
                                 ]);
-
                             },
                         ],
 
@@ -401,55 +389,63 @@ class StoreProductController extends BackendModelStandartController
                             'format'    => 'raw',
                             'value'     => function (ShopStoreProduct $model) {
 
-                                $data = [];
-                                $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action', 'style' => 'border-bottom: 0;']);
-
                                 $imageSrc = Image::getCapSrc();
                                 if ($model->shopProduct && $model->shopProduct->cmsContentElement->mainProductImage) {
                                     $imageSrc = $model->shopProduct->cmsContentElement->mainProductImage->src;
                                 }
 
-                                $info = implode("<br />", $data);
-
-
                                 if ($model->shop_product_id) {
-                                    $attched = '<div class="my-auto text-center" style="margin-right: 5px;">';
-                                    $attched .= \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId' => "/shop/admin-cms-content-element",
+                                    $attached = BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-cms-content-element',
                                         'modelId'      => $model->shop_product_id,
-                                        'options'      => [
-                                            'style' => 'color: gray; text-align: left;',
-                                            'class' => '',
+                                        'urlParams'    => [
+                                            'content_id' => $model->shopProduct->cmsContentElement->content_id,
                                         ],
-                                        'content'      => <<<HTML
-
-<span style="color: green; font-size: 17px;">
-    <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Товар оформлен {$model->asText}"></i>
-</span>
-HTML
-                                        ,
-
+                                        'content'      => Html::tag('i', '', ['class' => 'fas fa-link']),
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related sx-text--success',
+                                            'title'      => "Товар оформлен {$model->asText}",
+                                            'aria-label' => "Товар оформлен {$model->asText}",
+                                        ],
                                     ]);
-                                    $attched .= "</div>";
                                 } else {
-                                    $attched = <<<HTML
-<div class="my-auto text-center" style="margin-right: 5px;">
-    <span style="color: red; font-size: 17px;">
-        <i class="fas fa-link" style="width: 20px;" data-toggle="tooltip" title="Это товар не оформлен и не показывается на сайте"></i>
-    </span>
-</div>
-HTML;
-
+                                    $attached = Html::tag('span', Html::tag('i', '', ['class' => 'fas fa-link']), [
+                                        'class'      => 'sx-preview-card__related sx-text--danger',
+                                        'title'      => 'Этот товар не оформлен и не показывается на сайте',
+                                        'aria-label' => 'Этот товар не оформлен и не показывается на сайте',
+                                    ]);
                                 }
-                                return "<div class='d-flex no-gutters'>
-                                            {$attched}
-                                            <div class='my-auto sx-trigger-action' style='width: 30px; text-align: center;'>
-                                                <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                    <img src='".($imageSrc)."' style='max-width: 30px; max-height: 30px; border-radius: 5px;' />
-                                                </a>
-                                            </div>
-                                            <div style='margin-left: 5px; line-height: 1.1;' class='my-auto'>".$info."</div>
-                                        </div>";;
+
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/shop/store-product',
+                                    'modelId'      => $model->id,
+                                    'content'      => Html::img($imageSrc, [
+                                        'class' => 'sx-photo sx-img-size-small',
+                                        'alt'   => '',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/shop/store-product',
+                                    'modelId'      => $model->id,
+                                    'label'        => $model->asText,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__title sx-collection-cell__primary',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
+
+                                return Html::tag('div',
+                                    $attached
+                                    .Html::tag('div', $media, ['class' => 'sx-preview-card__media'])
+                                    .Html::tag('div', $title, [
+                                        'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    ['class' => 'sx-preview-card sx-preview-card--file']
+                                );
                             },
                         ],
 

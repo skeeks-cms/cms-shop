@@ -9,7 +9,8 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\helpers\Image;
 use skeeks\cms\helpers\RequestResponse;
@@ -225,7 +226,8 @@ HTML
                         ],
 
                         'name' => [
-                            'class'         => DefaultActionColumn::class,
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/shop/admin-shop-store-supplier',
                             'viewAttribute' => 'asText',
                         ],
 
@@ -251,29 +253,42 @@ HTML
                             'format'    => 'raw',
                             'value'     => function (ShopStore $model) {
 
-                                $data = [];
-                                
-                                $name = $model->asText;
+                                $content = Html::tag('span', Html::img(
+                                    $model->cmsImage ? $model->cmsImage->src : Image::getCapSrc(),
+                                    [
+                                        'class' => 'sx-photo sx-img-size-small',
+                                        'alt'   => '',
+                                    ]
+                                ), ['class' => 'sx-preview-card__media']);
+
+                                $name = Html::encode($model->asText);
                                 if (isset($model->sx_id) && $model->sx_id) {
-                                    $data[] = Html::a($name . " <small data-toggle='tooltip' title='SkeekS ID: {$model->sx_id}'><i class='fas fa-link'></i></small>", "#", ['class' => 'sx-trigger-action']);
-                                } else {
-                                    $data[] = Html::a($model->asText, "#", ['class' => 'sx-trigger-action']);
+                                    $name .= ' '.Html::tag('small', Html::tag('i', '', ['class' => 'fas fa-link']), [
+                                        'data-toggle' => 'tooltip',
+                                        'title'       => 'SkeekS ID: '.$model->sx_id,
+                                    ]);
                                 }
-                                
-                                
-
+                                $info = Html::tag('span', $name, [
+                                    'class' => 'sx-collection-cell__primary',
+                                ]);
                                 if ($model->address) {
-                                    $data[] = $model->address;
+                                    $info .= Html::tag('span', Html::encode($model->address), [
+                                        'class' => 'sx-preview-card__meta',
+                                    ]);
                                 }
-                                $info = implode("<br />", $data);
+                                $content .= Html::tag('span', $info, [
+                                    'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                ]);
 
-                                return "<div class='d-flex no-gutters'>
-                                                <div class='sx-trigger-action my-auto' style='width: 50px;'>
-                                                    <a href='#' style='text-decoration: none; border-bottom: 0;'>
-                                                        <img src='".($model->cmsImage ? $model->cmsImage->src : Image::getCapSrc())."' style='max-width: 40px; max-height: 40px; border-radius: 5px;' />
-                                                    </a>
-                                                </div>
-                                                <div style='margin-left: 5px;' class='my-auto'>".$info."</div></div>";;
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-shop-store-supplier',
+                                    'modelId'      => $model->id,
+                                    'content'      => $content,
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card sx-preview-card__title',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
                             },
                         ],
 
@@ -414,7 +429,7 @@ HTML
                                 'style' => 'width: 100px;',
                             ],
                             'value'         => function (ShopStore $shopStore) {
-                                return "<div style='color: green;'>".$shopStore->raw_row['countReadyProducts']."</div>";
+                                return Html::encode($shopStore->raw_row['countReadyProducts']);
                             },
                             'format'        => 'raw',
                             'attribute'     => 'countProducts',

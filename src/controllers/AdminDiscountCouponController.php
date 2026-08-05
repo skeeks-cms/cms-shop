@@ -12,7 +12,7 @@ use skeeks\cms\actions\backend\BackendModelMultiActivateAction;
 use skeeks\cms\actions\backend\BackendModelMultiDeactivateAction;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\UserColumnData;
 use skeeks\cms\models\CmsAgent;
@@ -29,6 +29,7 @@ use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -108,9 +109,6 @@ class AdminDiscountCouponController extends BackendModelStandartController
                         'countOrders',
                     ],
                     'columns'        => [
-                        /*'coupon'    => [
-                            'class' => DefaultActionColumn::class,
-                        ],*/
                         'is_active' => [
                             'class' => BooleanColumn::class,
                         ],
@@ -120,9 +118,23 @@ class AdminDiscountCouponController extends BackendModelStandartController
 
                         'coupon' => [
                             'value'                => function (ShopDiscountCoupon $model) {
-                                return \yii\helpers\Html::a($model->coupon, "#", [
-                                    'class' => "sx-trigger-action",
-                                ]) . "<br /><small>{$model->shopDiscount->name}</small>" ;
+                                $content = Html::tag('span', Html::encode($model->coupon), [
+                                    'class' => 'sx-collection-cell__primary',
+                                ]).Html::tag('small', Html::encode($model->shopDiscount->name), [
+                                    'class' => 'sx-preview-card__meta',
+                                ]);
+
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-discount-coupon',
+                                    'modelId'      => $model->id,
+                                    'content'      => Html::tag('span', $content, [
+                                        'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__title',
+                                        'aria-label' => (string)$model->coupon,
+                                    ],
+                                ]);
                             },
                         ],
                         'countOrders' => [

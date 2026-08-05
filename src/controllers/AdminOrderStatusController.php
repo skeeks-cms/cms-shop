@@ -9,6 +9,7 @@
 namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\ShopOrderStatus;
@@ -23,6 +24,7 @@ use skeeks\yii2\form\fields\WidgetField;
 use yii\base\Event;
 use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -87,11 +89,26 @@ HTML
                     'columns'        => [
                         'name' => [
                             'value' => function (ShopOrderStatus $shopOrderStatus) {
-                                return \yii\helpers\Html::a($shopOrderStatus->name, null, [
-                                        'style' => "background: {$shopOrderStatus->bg_color}; color: {$shopOrderStatus->color}; border-radius: 3px; padding-left: 5px; padding-right: 5px;",
-                                        'class' => "sx-trigger-action",
-                                        'href'  => "#",
-                                    ])."<br /><span style='color: gray'>".$shopOrderStatus->description."</span>";
+                                $title = BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-order-status',
+                                    'modelId'      => $shopOrderStatus->id,
+                                    'content'      => Html::tag('span', Html::encode($shopOrderStatus->name), [
+                                        'class' => 'sx-status',
+                                        'style' => "background: {$shopOrderStatus->bg_color}; color: {$shopOrderStatus->color};",
+                                    ]),
+                                    'options'      => [
+                                        'aria-label' => (string)$shopOrderStatus->name,
+                                    ],
+                                ]);
+                                $description = $shopOrderStatus->description
+                                    ? Html::tag('span', Html::encode($shopOrderStatus->description), [
+                                        'class' => 'sx-preview-card__meta',
+                                    ])
+                                    : '';
+
+                                return Html::tag('span', $title.$description, [
+                                    'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                ]);
                             },
                         ],
                     ],

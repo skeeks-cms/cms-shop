@@ -11,7 +11,8 @@ namespace skeeks\cms\shop\controllers;
 use skeeks\cms\backend\actions\BackendGridModelRelatedAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
+use skeeks\cms\backend\grid\BackendEntityLinkColumn;
+use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -176,7 +177,8 @@ HTML
 
 
                         'name' => [
-                            'class'         => DefaultActionColumn::class,
+                            'class'         => BackendEntityLinkColumn::class,
+                            'controllerId'  => '/shop/admin-shop-store-doc-move',
                             'viewAttribute' => 'asText',
                         ],
 
@@ -207,28 +209,39 @@ CSS
 
 
 
-                                $result = [];
-                                $result[] = \yii\helpers\Html::a($shopStoreDocMove->asText, "#", [
-                                    'class' => "sx-trigger-action",
+                                $content = Html::tag('span', Html::encode($shopStoreDocMove->asText), [
+                                    'class' => 'sx-collection-cell__primary',
                                 ]);
                                 if ($shopStoreDocMove->comment) {
-                                    $result[] = "<small style='color: gray;'>{$shopStoreDocMove->comment}</small>";
+                                    $content .= Html::tag('small', Html::encode($shopStoreDocMove->comment), [
+                                        'class' => 'sx-preview-card__meta',
+                                    ]);
                                 }
-                                return implode("<br />", $result);
+
+                                return BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-shop-store-doc-move',
+                                    'modelId'      => $shopStoreDocMove->id,
+                                    'content'      => Html::tag('span', $content, [
+                                        'class' => 'sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__title',
+                                        'aria-label' => (string)$shopStoreDocMove->asText,
+                                    ],
+                                ]);
                             }
                         ],
 
                         'shop_order_id' => [
                             'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
                                 if ($shopStoreDocMove->shopOrder) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-order',
-                                        'modelId'                 => $shopStoreDocMove->shopOrder->id,
-                                        'content'                 => $shopStoreDocMove->shopOrder->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    return BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-order',
+                                        'modelId'      => $shopStoreDocMove->shopOrder->id,
+                                        'label'        => $shopStoreDocMove->shopOrder->asText,
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$shopStoreDocMove->shopOrder->asText,
                                         ],
                                     ]);
                                 } else {
@@ -240,14 +253,13 @@ CSS
                         'shop_store_id' => [
                             'value'         => function(ShopStoreDocMove $shopStoreDocMove) {
                                 if ($shopStoreDocMove->shopStore) {
-                                    return \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-                                        'controllerId'            => '/shop/admin-shop-store',
-                                        'modelId'                 => $shopStoreDocMove->shopStore->id,
-                                        'content'                 => $shopStoreDocMove->shopStore->asText,
-                                        'isRunFirstActionOnClick' => true,
-                                        'options'                 => [
-                                            'class' => 'btn btn-xs btn-default',
-                                            //'style' => 'cursor: pointer; border-bottom: 1px dashed;',
+                                    return BackendEntityLink::widget([
+                                        'controllerId' => '/shop/admin-shop-store',
+                                        'modelId'      => $shopStoreDocMove->shopStore->id,
+                                        'label'        => $shopStoreDocMove->shopStore->asText,
+                                        'options'      => [
+                                            'class'      => 'sx-preview-card__related',
+                                            'aria-label' => (string)$shopStoreDocMove->shopStore->asText,
                                         ],
                                     ]);
                                 } else {

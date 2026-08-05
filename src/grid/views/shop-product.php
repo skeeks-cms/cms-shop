@@ -7,12 +7,16 @@
  */
 /* @var $this yii\web\View */
 /* @var $model \skeeks\cms\shop\models\ShopCmsContentElement */
+
+use skeeks\cms\backend\widgets\BackendEntityLink;
+use yii\helpers\Html;
+
 $shopSellerProducts = [];
 $apiIconClass = $model->is_sx_info_update ? "sx-text--success" : "sx-text--danger";
 $apiIconTitle = $model->is_sx_info_update
     ? "SkeekS ID: {$model->sx_id}. Информация обновляется из сервиса SkeekS Товары"
     : "SkeekS ID: {$model->sx_id}. Обновление информации из сервиса SkeekS Товары запрещено";
-$apiMarketUrl = $model->sx_id && isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getProductUrl($model->sx_id) : "#";
+$apiMarketUrl = $model->sx_id && isset(\Yii::$app->skeeksSuppliersApi) ? \Yii::$app->skeeksSuppliersApi->getProductUrl($model->sx_id) : null;
 $apiIcon = "<i class='fas fa-link {$apiIconClass}'></i>";
 $isSubProduct = $model->shopProduct->isSubProduct;
 $image = $model->image;
@@ -32,13 +36,17 @@ $title = $isSubProduct ? $model->name : $model->productName;
 $statusItems = [];
 
 if ($isSubProduct && $model->main_cce_id) {
-    $statusItems[] = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-        'controllerId' => "/shop/admin-cms-content-element",
+    $statusItems[] = BackendEntityLink::widget([
+        'controllerId' => '/shop/admin-cms-content-element',
         'modelId'      => $model->main_cce_id,
+        'urlParams'    => [
+            'content_id' => $model->mainCmsContentElement->content_id,
+        ],
         'content'      => '<i class="fas fa-link"></i>',
         'options'      => [
-            'class' => 'sx-status sx-status--success',
-            'title' => "Привязан к информационной карточке! {$model->mainCmsContentElement->asText}",
+            'class'      => 'sx-status sx-status--success',
+            'title'      => "Привязан к информационной карточке! {$model->mainCmsContentElement->asText}",
+            'aria-label' => "Привязан к информационной карточке! {$model->mainCmsContentElement->asText}",
         ],
     ]);
 } elseif ($isSubProduct && $model->cmsSite->shopSite->is_receiver) {
@@ -70,59 +78,81 @@ if (!$model->isAllowIndex) {
     );
 }
 if ($model->sx_id) {
-    $statusItems[] = \yii\helpers\Html::a($apiIcon, $apiMarketUrl, [
-        'class' => 'sx-status',
-        'target' => '_blank',
-        'data-pjax' => '0',
+    $apiOptions = [
+        'class'       => 'sx-status',
         'data-toggle' => 'tooltip',
-        'title' => $apiIconTitle,
-        'onclick' => 'event.stopPropagation();',
-    ]);
+        'title'       => $apiIconTitle,
+    ];
+    $statusItems[] = $apiMarketUrl
+        ? Html::a($apiIcon, $apiMarketUrl, array_merge($apiOptions, [
+            'target'    => '_blank',
+            'data-pjax' => '0',
+        ]))
+        : Html::tag('span', $apiIcon, $apiOptions);
 }
 
 $related = '';
 if ($model->tree_id) {
-    $related = \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::widget([
-        'controllerId' => "/cms/admin-tree",
+    $related = BackendEntityLink::widget([
+        'controllerId' => '/cms/admin-tree',
         'modelId'      => $model->cmsTree->id,
-        'content'      => '<i class="far fa-folder"></i> '.\yii\helpers\Html::encode($model->cmsTree->name),
+        'content'      => '<i class="far fa-folder"></i> '.Html::encode($model->cmsTree->name),
         'options'      => [
-            'title' => $model->cmsTree->fullName,
-            'class' => 'sx-preview-card__related',
+            'title'      => $model->cmsTree->fullName,
+            'class'      => 'sx-preview-card__related',
+            'aria-label' => (string)$model->cmsTree->name,
         ],
     ]);
 }
 
 $tradeOffers = $model->shopProduct->getTradeOffers()->count();
+$media = BackendEntityLink::widget([
+    'controllerId' => '/shop/admin-cms-content-element',
+    'modelId'      => $model->id,
+    'urlParams'    => [
+        'content_id' => $model->content_id,
+    ],
+    'content'      => Html::img($imageSrc, [
+        'class' => 'sx-photo sx-img-size-50',
+        'alt'   => '',
+    ]),
+    'options'      => [
+        'class'      => 'sx-preview-card__media-link',
+        'aria-label' => (string)$title,
+    ],
+]);
+$titleLink = BackendEntityLink::widget([
+    'controllerId' => '/shop/admin-cms-content-element',
+    'modelId'      => $model->id,
+    'urlParams'    => [
+        'content_id' => $model->content_id,
+    ],
+    'label'        => $title,
+    'options'      => [
+        'class'       => 'sx-preview-card__title sx-collection-cell__primary',
+        'title'       => 'id: '.(int)$model->id,
+        'data-toggle' => 'tooltip',
+        'aria-label'  => (string)$title,
+    ],
+]);
 ?>
 <div class="sx-preview-card sx-preview-card--file">
     <div class="sx-preview-card__media">
-        <a href="#" class="sx-preview-card__media-link sx-trigger-action">
-            <img
-                src="<?= \yii\helpers\Html::encode($imageSrc); ?>"
-                class="sx-photo sx-img-size-50"
-                alt=""
-            />
-        </a>
+        <?= $media; ?>
     </div>
     <div class="sx-preview-card__content sx-collection-cell sx-collection-cell--stack">
-        <a
-            class="sx-preview-card__title sx-collection-cell__primary sx-trigger-action"
-            href="#"
-            title="id: <?= (int)$model->id; ?>"
-            data-toggle="tooltip"
-        ><?= \yii\helpers\Html::encode($title); ?></a>
+        <?= $titleLink; ?>
 
-        <? if ($statusItems) : ?>
+        <?php if ($statusItems) : ?>
             <div class="sx-preview-card__statuses"><?= implode('', $statusItems); ?></div>
-        <? endif; ?>
+        <?php endif; ?>
 
         <?= $related; ?>
 
-        <? if ($tradeOffers) : ?>
-            <a href="#" class="sx-offers-trigger sx-preview-card__related">
+        <?php if ($tradeOffers) : ?>
+            <button type="button" class="sx-offers-trigger sx-preview-card__related sx-preview-card__inline-action">
                 <i class="fab fa-product-hunt"></i> Модификации (<?= (int)$tradeOffers; ?>)
-            </a>
-        <? endif; ?>
+            </button>
+        <?php endif; ?>
     </div>
 </div>

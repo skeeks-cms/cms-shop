@@ -12,7 +12,6 @@ use skeeks\cms\backend\actions\BackendGridModelAction;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\BackendController;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
-use skeeks\cms\backend\grid\DefaultActionColumn;
 use skeeks\cms\grid\BooleanColumn;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -109,17 +108,6 @@ HTML
 
                         /*'cms_user_id' => [
                             'class'         => UserColumnData::class
-                        ],*/
-
-                        /*'is_active' => [
-                            'class'      => BooleanColumn::class,
-                            'trueValue'  => 1,
-                            'falseValue' => 1,
-                        ],
-
-                        'name' => [
-                            'class'         => DefaultActionColumn::class,
-                            'viewAttribute' => 'asText',
                         ],*/
 
                         'cashiers_name' => [

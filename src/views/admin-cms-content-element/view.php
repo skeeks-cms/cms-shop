@@ -6,13 +6,14 @@
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 use skeeks\cms\assets\FancyboxAssets;
 use skeeks\cms\backend\assets\BackendUiAsset;
+use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\shop\widgets\admin\ShopAdminGallery;
 
 $controller = $this->context;
 $action = $controller->action;
 $model = $action->model;
 FancyboxAssets::register($this);
 BackendUiAsset::register($this);
-\skeeks\cms\themes\unify\assets\components\UnifyThemeStickAsset::register($this);
 
 
 $jsData = \yii\helpers\Json::encode([
@@ -175,52 +176,6 @@ $this->registerCSS(<<<CSS
     min-width: 40px;
     border-bottom: 1px dotted;
 }
-.js-slide img {
-     max-height: 300px;
-     margin: auto;
-}
-.sx-stick-navigation .js-slide {
-    padding: 5px;
-}
-.sx-stick-navigation .slick-slide {
-    opacity: .6;
-}
-.sx-stick-navigation .slick-slide:hover {
-    opacity: 1;
-}
-.sx-stick-navigation .js-slide {
-    cursor: pointer;
-    border: none;
-    margin: 0 0px;
-    position: relative;
-}
-
-.sx-stick-navigation {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.sx-stick-navigation .slick-current:before {
-    border: 1px solid #d2d2d2;
-    content: '';
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    /* border: 1px solid rgba(21,146,165,0); */
-    -moz-transition: all .3s ease;
-    -o-transition: all .3s ease;
-    -webkit-transition: all .3s ease;
-    transition: all .3s ease;
-}
-
-
-
-
-
-
 .sx-update-sx-product {
     margin-left: 8px;
     padding: 2px 7px;
@@ -299,80 +254,43 @@ $noValue = "<span class='sx-data-table__empty'>—</span>";
 
 
             ?>
-            <? if ($images) : ?>
-                <div id="carouselCus1" class="js-carousel sx-stick sx-stick-slider"
-                     data-infinite="true"
-                     data-fade="true"
-                     data-arrows-classes="g-color-primary--hover sx-arrows sx-images-carousel-arrows sx-color-silver"
-                     data-arrow-left-classes="hs-icon hs-icon-arrow-left sx-left"
-                     data-arrow-right-classes="hs-icon hs-icon-arrow-right sx-right"
-                     data-nav-for="#carouselCus2">
-
-                    <? foreach ($images as $image) : ?>
-                        <?
-                        $preview = \Yii::$app->imaging->getPreview($image,
-                            new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                'w' => 700,
-                                'h' => 700,
-                                'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_INSET,
-                                'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_BIG,
-                            ]), $model->code
-                        );
-                        ?>
-                            
-                        <div class="js-slide">
-                            <!--w-100-->
-                            <a class="sx-fancybox-gallary" data-fancybox="images" href="<?= $image->src; ?>">
-                                <img class="img-fluid" src="<?= $preview->src; ?>" alt="<?= $model->name; ?>">
-                            </a>
-                        </div>
-                    <? endforeach; ?>
-                </div>
-
-                <? if (count($images) > 1) : ?>
-                    <div id="carouselCus2" class="js-carousel text-center g-mx-minus-5 sx-stick sx-stick-navigation"
-                         data-infinite="true"
-                         data-center-mode="true"
-                         data-slides-show="8"
-                         data-is-thumbs="true"
-                         data-vertical="false"
-                         data-focus-on-select="false"
-                         data-nav-for="#carouselCus1"
-                         data-arrows-classes="sx-arrows g-color-primary--hover sx-color-silver"
-                         data-arrow-left-classes="hs-icon hs-icon-arrow-left sx-left"
-                         data-arrow-right-classes="hs-icon hs-icon-arrow-right sx-right"
-                    >
-                        <? foreach ($images as $image) : ?>
-                            <?
-                            $preview = \Yii::$app->imaging->getPreview($image,
-                                new \skeeks\cms\components\imaging\filters\Thumbnail([
-                                    'w' => 100,
-                                    'h' => 100,
-                                    'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
-                                    'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_MICRO,
-                                ]), $model->code
-                            );
-                            ?>
-                            <div class="js-slide">
-                                <img class="img-fluid" src="<?= $preview->src; ?>" alt="<?= $model->name; ?>">
-                            </div>
-                        <? endforeach; ?>
-                    </div>
-                <? endif; ?>
-            <? else: ?>
-                <div id="carouselCus1" class="js-carousel sx-stick sx-stick-slider"
-                     data-infinite="true"
-                     data-fade="true"
-                     data-arrows-classes="u-arrow-v1 g-brd-around g-brd-gray-dark-v5 g-absolute-centered--y g-width-45 g-height-45 g-font-size-25 g-color-gray-dark-v5 g-color-primary--hover rounded-circle"
-                     data-arrow-left-classes="hs-icon hs-icon-arrow-left sx-left"
-                     data-arrow-right-classes="hs-icon hs-icon-arrow-right sx-right"
-                     data-nav-for="#carouselCus2">
-                    <div class="js-slide">
-                        <!--w-100-->
-                        <img class="img-fluid" src="<?= \skeeks\cms\helpers\Image::getCapSrc(); ?>" alt="<?= $model->name; ?>">
-                    </div>
-                </div>
-            <? endif; ?>
+            <?php
+            $galleryItems = [];
+            foreach ($images as $image) {
+                $mainPreview = \Yii::$app->imaging->getPreview($image,
+                    new \skeeks\cms\components\imaging\filters\Thumbnail([
+                        'w' => 700,
+                        'h' => 700,
+                        'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_INSET,
+                        'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_BIG,
+                    ]), $model->code
+                );
+                $thumbnail = \Yii::$app->imaging->getPreview($image,
+                    new \skeeks\cms\components\imaging\filters\Thumbnail([
+                        'w' => 100,
+                        'h' => 100,
+                        'm' => \Imagine\Image\ManipulatorInterface::THUMBNAIL_OUTBOUND,
+                        'sx_preview' => \skeeks\cms\components\storage\SkeeksSuppliersCluster::IMAGE_PREVIEW_MICRO,
+                    ]), $model->code
+                );
+                $galleryItems[] = [
+                    'full' => $image->src,
+                    'preview' => $mainPreview->src,
+                    'thumbnail' => $thumbnail->src,
+                    'alt' => $model->name,
+                ];
+            }
+            if (!$galleryItems) {
+                $galleryItems[] = [
+                    'preview' => \skeeks\cms\helpers\Image::getCapSrc(),
+                    'alt' => $model->name,
+                ];
+            }
+            ?>
+            <?= ShopAdminGallery::widget([
+                'items' => $galleryItems,
+                'fancyboxGroup' => 'images',
+            ]); ?>
 
 
         </div>
@@ -1503,20 +1421,15 @@ JS
                             <tr>
                                 <td style="text-align: left;">
                                     <?php if ($storeProduct) : ?>
-                                        <?
-                                        \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::begin([
-                                            'controllerId'            => "/shop/store-product",
-                                            'modelId'                 => $storeProduct->id,
-                                            'tag'                     => 'span',
-                                            'isRunFirstActionOnClick' => true,
-                                            'options'                 => [
-                                                'style' => 'text-align: left;',
-                                                'class' => 'sx-fast-edit',
+                                        <?php echo BackendEntityLink::widget([
+                                            'controllerId' => '/shop/store-product',
+                                            'modelId'      => $storeProduct->id,
+                                            'label'        => $shopStore->name,
+                                            'options'      => [
+                                                'class'      => 'sx-preview-card__related',
+                                                'aria-label' => $shopStore->name,
                                             ],
-                                        ]);
-                                        ?>
-                                        <?php echo $shopStore->name; ?>
-                                        <?php \skeeks\cms\backend\widgets\AjaxControllerActionsWidget::end(); ?>
+                                        ]); ?>
                                     <?php else : ?>
                                         <?php echo $shopStore->name; ?>
                                     <?php endif; ?>
