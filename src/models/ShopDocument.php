@@ -413,7 +413,9 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
 
         $this->{$prefix.'_contractor_type'} = $contractor->contractor_type;
         $this->{$prefix.'_contractor_name'} = $contractor->asShortText;
-        $this->{$prefix.'_contractor_full_name'} = $contractor->full_name ?: $contractor->asShortText;
+        $this->{$prefix.'_contractor_full_name'} = $contractor->contractor_type === CmsContractor::TYPE_LEGAL
+            ? ($contractor->full_name ?: $contractor->asShortText)
+            : $contractor->asShortText;
         $this->{$prefix.'_contractor_inn'} = $contractor->inn;
         $this->{$prefix.'_contractor_kpp'} = $contractor->kpp;
         $this->{$prefix.'_contractor_ogrn'} = $contractor->ogrn;
@@ -431,7 +433,9 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         $values = [
             'contractor_type'             => $contractor->contractor_type,
             'contractor_name'             => $contractor->asShortText,
-            'contractor_full_name'        => $contractor->full_name ?: $contractor->asShortText,
+            'contractor_full_name'        => $contractor->contractor_type === CmsContractor::TYPE_LEGAL
+                ? ($contractor->full_name ?: $contractor->asShortText)
+                : $contractor->asShortText,
             'contractor_inn'              => $contractor->inn,
             'contractor_kpp'              => $contractor->kpp,
             'contractor_ogrn'             => $contractor->ogrn,
@@ -520,7 +524,9 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
     {
         $this->{$documentPrefix.'_contractor_type'} = (string)$bill->{$billPrefix.'_contractor_type'};
         $this->{$documentPrefix.'_contractor_name'} = $bill->{'bill'.ucfirst($billPrefix).'Name'};
-        $this->{$documentPrefix.'_contractor_full_name'} = (string)$bill->{$billPrefix.'_contractor_full_name'} ?: $this->{$documentPrefix.'_contractor_name'};
+        $this->{$documentPrefix.'_contractor_full_name'} = $this->{$documentPrefix.'_contractor_type'} === CmsContractor::TYPE_LEGAL
+            ? ((string)$bill->{$billPrefix.'_contractor_full_name'} ?: $this->{$documentPrefix.'_contractor_name'})
+            : $this->{$documentPrefix.'_contractor_name'};
         $this->{$documentPrefix.'_contractor_inn'} = $bill->{'bill'.ucfirst($billPrefix).'Inn'};
         $this->{$documentPrefix.'_contractor_kpp'} = $bill->{'bill'.ucfirst($billPrefix).'Kpp'};
         $this->{$documentPrefix.'_contractor_ogrn'} = $bill->{'bill'.ucfirst($billPrefix).'Ogrn'};
@@ -1210,6 +1216,21 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         return (string)$related->{$relationAttribute};
     }
 
+    protected function contractorFullName($prefix, $relation)
+    {
+        $type = $this->snapshotValue($prefix.'_contractor_type', $relation, 'contractor_type');
+        $name = $this->snapshotValue($prefix.'_contractor_name', $relation, 'asShortText');
+        $fullName = $this->snapshotValue($prefix.'_contractor_full_name', $relation, 'full_name');
+
+        // For individuals full_name may contain a trade name. Tax documents must
+        // identify the person (for example, "ИП Иванов Иван Иванович").
+        if ($type !== CmsContractor::TYPE_LEGAL && $name !== '') {
+            return $name;
+        }
+
+        return $fullName ?: $name;
+    }
+
     public function getSellerName()
     {
         return $this->snapshotValue('seller_contractor_name', 'sellerContractor', 'asShortText');
@@ -1217,8 +1238,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
 
     public function getSellerFullName()
     {
-        $value = $this->snapshotValue('seller_contractor_full_name', 'sellerContractor', 'full_name');
-        return $value ?: $this->sellerName;
+        return $this->contractorFullName('seller', 'sellerContractor');
     }
 
     public function getSellerInn()
@@ -1253,8 +1273,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
 
     public function getBuyerFullName()
     {
-        $value = $this->snapshotValue('buyer_contractor_full_name', 'buyerContractor', 'full_name');
-        return $value ?: $this->buyerName;
+        return $this->contractorFullName('buyer', 'buyerContractor');
     }
 
     public function getBuyerInn()

@@ -470,7 +470,9 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
 
         $this->{$prefix.'_contractor_type'} = $contractor->contractor_type;
         $this->{$prefix.'_contractor_name'} = $contractor->asShortText;
-        $this->{$prefix.'_contractor_full_name'} = $contractor->full_name ?: $contractor->asShortText;
+        $this->{$prefix.'_contractor_full_name'} = $contractor->contractor_type === CmsContractor::TYPE_LEGAL
+            ? ($contractor->full_name ?: $contractor->asShortText)
+            : $contractor->asShortText;
         $this->{$prefix.'_contractor_inn'} = $contractor->inn;
         $this->{$prefix.'_contractor_kpp'} = $contractor->kpp;
         $this->{$prefix.'_contractor_ogrn'} = $contractor->ogrn;
@@ -649,6 +651,19 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
         return (string)$related->{$relationAttribute};
     }
 
+    protected function contractorFullName($prefix, $relation)
+    {
+        $type = $this->snapshotValue($prefix.'_contractor_type', $relation, 'contractor_type');
+        $name = $this->snapshotValue($prefix.'_contractor_name', $relation, 'asShortText');
+        $fullName = $this->snapshotValue($prefix.'_contractor_full_name', $relation, 'full_name');
+
+        if ($type !== CmsContractor::TYPE_LEGAL && $name !== '') {
+            return $name;
+        }
+
+        return $fullName ?: $name;
+    }
+
     public function getBillCompanyName()
     {
         return $this->snapshotValue('company_name', 'company', 'name');
@@ -662,6 +677,11 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
     public function getBillSenderName()
     {
         return $this->snapshotValue('sender_contractor_name', 'senderContractor', 'asShortText');
+    }
+
+    public function getBillSenderFullName()
+    {
+        return $this->contractorFullName('sender', 'senderContractor');
     }
 
     public function getBillSenderInn()
@@ -696,8 +716,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
 
     public function getBillReceiverFullName()
     {
-        $value = $this->snapshotValue('receiver_contractor_full_name', 'receiverContractor', 'full_name');
-        return $value ?: $this->billReceiverName;
+        return $this->contractorFullName('receiver', 'receiverContractor');
     }
 
     public function getBillReceiverInn()
