@@ -6,6 +6,7 @@
 /* @var $action \skeeks\cms\backend\actions\BackendModelCreateAction|\skeeks\cms\backend\actions\IHasActiveForm */
 
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -23,7 +24,7 @@ $formatValue = static function ($value, $empty = 'Не указано') {
 
 $entityCard = static function ($controllerId, $entity, $title, $subtitle = '', $icon = 'fa fa-file') use ($formatValue) {
     if (!$entity) {
-        return '<div class="sx-payment-entity is-empty">'
+        return '<div class="sx-surface sx-payment-entity is-empty">'
             . '<div class="sx-payment-entity-icon"><i class="'.$icon.'"></i></div>'
             . '<div class="sx-payment-entity-body">'
             . '<div class="sx-payment-entity-label">'.Html::encode($title).'</div>'
@@ -32,7 +33,7 @@ $entityCard = static function ($controllerId, $entity, $title, $subtitle = '', $
             . '</div>';
     }
 
-    $content = '<div class="sx-payment-entity">'
+    $content = '<div class="sx-surface sx-payment-entity">'
         . '<div class="sx-payment-entity-icon"><i class="'.$icon.'"></i></div>'
         . '<div class="sx-payment-entity-body">'
         . '<div class="sx-payment-entity-label">'.Html::encode($title).'</div>'
@@ -56,7 +57,7 @@ $entityCard = static function ($controllerId, $entity, $title, $subtitle = '', $
 };
 
 $requisiteCard = static function ($label, $value) use ($formatValue) {
-    return '<div class="sx-payment-requisite">'
+    return '<div class="sx-surface sx-payment-requisite">'
         . '<div class="sx-payment-requisite-label">'.Html::encode($label).'</div>'
         . '<div class="sx-payment-requisite-value">'.$formatValue($value).'</div>'
         . '</div>';
@@ -100,15 +101,9 @@ $paymentDocumentText = trim(
 );
 
 $this->registerCss(<<<CSS
-.sx-payment-card {
-    background: #fff;
-    border: 1px solid #e3e7eb;
-    border-radius: 10px;
-    overflow: hidden;
-}
 .sx-payment-section {
     padding: 22px 28px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--sx-color-border);
 }
 .sx-payment-section:last-child {
     border-bottom: 0;
@@ -126,19 +121,16 @@ $this->registerCss(<<<CSS
 .sx-payment-overview-item {
     min-height: 82px;
     padding: 14px;
-    border: 1px solid #e3e7eb;
-    border-radius: 8px;
-    background: #fff;
 }
 .sx-payment-overview-label,
 .sx-payment-entity-label,
 .sx-payment-requisite-label {
-    color: #8a929a;
+    color: var(--sx-color-text-subtle);
     font-size: 12px;
     margin-bottom: 4px;
 }
 .sx-payment-overview-value {
-    color: #303942;
+    color: var(--sx-color-text);
     font-weight: 600;
     overflow-wrap: anywhere;
 }
@@ -147,10 +139,10 @@ $this->registerCss(<<<CSS
     line-height: 1.25;
 }
 .sx-payment-amount.is-income {
-    color: #188b38;
+    color: var(--sx-color-success);
 }
 .sx-payment-amount.is-expense {
-    color: #c43c35;
+    color: var(--sx-color-danger);
 }
 .sx-payment-entities {
     display: grid;
@@ -172,12 +164,9 @@ $this->registerCss(<<<CSS
     min-height: 84px;
     height: 100%;
     padding: 14px;
-    border: 1px solid #e3e7eb;
-    border-radius: 8px;
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    background: #fff;
     transition: border-color .15s ease, box-shadow .15s ease;
 }
 .sx-payment-entity-link:hover,
@@ -188,15 +177,15 @@ $this->registerCss(<<<CSS
 }
 .sx-payment-entity-link:hover .sx-payment-entity,
 .sx-payment-entity-link:focus .sx-payment-entity {
-    border-color: #9dc8f0;
-    box-shadow: 0 8px 24px rgba(31, 82, 130, .08);
+    border-color: var(--sx-color-accent-border);
+    box-shadow: var(--sx-button-focus-shadow);
 }
 .sx-payment-entity-icon {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #eef3f7;
-    color: #607080;
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -209,12 +198,12 @@ $this->registerCss(<<<CSS
     overflow-wrap: anywhere;
 }
 .sx-payment-entity-subtitle {
-    color: #606a73;
+    color: var(--sx-color-text-muted);
     font-size: 13px;
     margin-top: 4px;
 }
 .sx-payment-muted {
-    color: #a5adb5;
+    color: var(--sx-color-text-subtle);
 }
 .sx-payment-bank-columns {
     display: grid;
@@ -223,7 +212,7 @@ $this->registerCss(<<<CSS
 }
 .sx-payment-bank-title {
     margin: 0 0 12px;
-    color: #606a73;
+    color: var(--sx-color-text-muted);
     font-size: 14px;
     font-weight: 600;
 }
@@ -235,12 +224,10 @@ $this->registerCss(<<<CSS
 .sx-payment-requisite {
     min-height: 72px;
     padding: 12px;
-    border-radius: 8px;
-    background: #f8fafb;
 }
 .sx-payment-comment {
     margin: 0;
-    color: #4d5963;
+    color: var(--sx-color-text-muted);
     white-space: pre-wrap;
 }
 .sx-payment-import {
@@ -252,20 +239,20 @@ $this->registerCss(<<<CSS
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: #eaf6ee;
-    color: #188b38;
+    background: var(--sx-status-success-background);
+    color: var(--sx-status-success-color);
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
 }
 .sx-payment-import-title {
-    color: #303942;
+    color: var(--sx-color-text);
     font-weight: 600;
 }
 .sx-payment-import-description {
     margin-top: 3px;
-    color: #77818a;
+    color: var(--sx-color-text-subtle);
     font-size: 13px;
 }
 .sx-payment-import-details {
@@ -273,11 +260,11 @@ $this->registerCss(<<<CSS
     flex-wrap: wrap;
     gap: 8px 24px;
     margin-top: 10px;
-    color: #606a73;
+    color: var(--sx-color-text-muted);
     font-size: 13px;
 }
 .sx-payment-import-detail strong {
-    color: #303942;
+    color: var(--sx-color-text);
     font-weight: 500;
 }
 @media (max-width: 1100px) {
@@ -297,32 +284,37 @@ CSS
 );
 ?>
 
-<div class="sx-payment-card">
+<?php BackendSurfaceWidget::begin([
+    'raised'    => true,
+    'clip'      => true,
+    'bodyFlush' => true,
+    'options'   => ['class' => 'sx-payment-card'],
+]); ?>
     <section class="sx-payment-section">
         <div class="sx-payment-overview">
-            <div class="sx-payment-overview-item">
+            <div class="sx-surface sx-payment-overview-item">
                 <div class="sx-payment-overview-label"><?= Html::encode($paymentDirection); ?></div>
                 <div class="sx-payment-overview-value sx-payment-amount <?= $amountClass; ?>">
                     <?= Html::encode($amountPrefix.(string)$model->money); ?>
                 </div>
             </div>
-            <div class="sx-payment-overview-item">
+            <div class="sx-surface sx-payment-overview-item">
                 <div class="sx-payment-overview-label">Создано в CRM</div>
                 <div class="sx-payment-overview-value"><?= Html::encode(Yii::$app->formatter->asDatetime($model->created_at)); ?></div>
             </div>
-            <div class="sx-payment-overview-item">
+            <div class="sx-surface sx-payment-overview-item">
                 <div class="sx-payment-overview-label">Тип платежа</div>
                 <div class="sx-payment-overview-value"><?= $formatValue($model->shopPaySystem ? $model->shopPaySystem->name : ''); ?></div>
             </div>
-            <div class="sx-payment-overview-item">
+            <div class="sx-surface sx-payment-overview-item">
                 <div class="sx-payment-overview-label">Компания</div>
                 <div class="sx-payment-overview-value"><?= $formatValue($model->company ? $model->company->name : ''); ?></div>
             </div>
-            <div class="sx-payment-overview-item">
+            <div class="sx-surface sx-payment-overview-item">
                 <div class="sx-payment-overview-label">Платежный документ</div>
                 <div class="sx-payment-overview-value"><?= $formatValue($paymentDocumentText); ?></div>
             </div>
-            <div class="sx-payment-overview-item">
+            <div class="sx-surface sx-payment-overview-item">
                 <div class="sx-payment-overview-label">Дата операции</div>
                 <div class="sx-payment-overview-value"><?= $externalOperationTimestamp
                     ? Html::encode(Yii::$app->formatter->asDatetime($externalOperationTimestamp))
@@ -431,4 +423,4 @@ CSS
             </div>
         </section>
     <?php endif; ?>
-</div>
+<?php BackendSurfaceWidget::end(); ?>
