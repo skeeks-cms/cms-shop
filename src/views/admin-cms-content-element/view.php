@@ -236,7 +236,7 @@ $noValue = "<span class='sx-data-table__empty'>—</span>";
 <?php endif; ?>
 
 
-<div class="row no-gutters sx-block">
+<div class="row no-gutters sx-surface sx-surface--raised sx-surface--padded">
     <div class="col-lg-4 col-sm-6 col-12">
 
         <div style="padding: 10px;">

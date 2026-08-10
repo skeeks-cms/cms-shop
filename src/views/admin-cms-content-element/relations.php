@@ -55,7 +55,7 @@ JS
 );
 
 ?>
-    <div class="sx-block">
+    <div class="sx-surface sx-surface--raised sx-surface--padded">
         <? $form = \yii\widgets\ActiveForm::begin(); ?>
         <p>Выберите товары, которые попадут в блок "с этим товаром покупают" и нажмите кнопку "связать"</p>
         <div class="row">
