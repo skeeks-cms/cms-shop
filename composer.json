@@ -26,6 +26,7 @@
     ],
     "require": {
         "skeeks/cms": "^6.0 || dev-master",
+        "skeeks/cms-backend": "^2.0 || dev-master@dev",
         "skeeks/cms-money": "^2.0 || dev-master",
 
         "chillerlan/php-qrcode": "^5.0",

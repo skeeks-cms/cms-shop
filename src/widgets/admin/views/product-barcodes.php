@@ -79,7 +79,7 @@ CSS
 
 
 <?
-\yii\jui\Sortable::widget();
+\skeeks\cms\backend\widgets\sortable\assets\BackendSortableAdapterAsset::register($this);
 
 $jsOptions = \yii\helpers\Json::encode(\yii\helpers\ArrayHelper::merge($widget->clientOptions, [
         'value' => $widget->model->{$widget->attribute},
@@ -181,13 +181,15 @@ $this->registerJs(<<<JS
             
             
             var jElementsWrapper = $('.sx-elements-wrapper', self.getJWrapper());
-            jElementsWrapper.sortable({
-                /*cursor: "move",
-                handle: ".sx-btn-move",*/
+            this.Sortable = sx.backend.sortable.create(jElementsWrapper, {
+                itemSelector: "> .sx-barcode-row",
                 forceHelperSize: true,
                 forcePlaceholderSize: true,
                 opacity: 0.5,
-                placeholder: "ui-state-highlight",
+                placeholderClass: "ui-state-highlight",
+                onUpdate: function() {
+                    self.trigger("innerUpdate");
+                }
             });
             
             var value = self.get("value");
