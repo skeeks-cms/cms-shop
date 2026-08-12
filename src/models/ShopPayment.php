@@ -168,7 +168,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
                         }
 
                         //Если сумма платежей больше или равна сумме счета, делаем его оплаченным
-                        if ($amountPayemnt >= $bill->amount) {
+                        if (static::isAmountEnoughForBill($amountPayemnt, $bill->amount)) {
                             $bill->paid_at = $lastPayment->created_at;
                             $bill->update(false, ['paid_at']);
                         }
@@ -177,6 +177,21 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
 
             }
         }
+    }
+
+    /**
+     * Compares amounts with the same two-decimal precision used to display and
+     * settle payments. Bill discounts may leave fractions of a kopeck in the
+     * database (for example 19999.643), while the bank can only transfer
+     * 19999.64 RUB.
+     *
+     * @param int|float|string $paymentAmount
+     * @param int|float|string $billAmount
+     * @return bool
+     */
+    public static function isAmountEnoughForBill($paymentAmount, $billAmount)
+    {
+        return round((float)$paymentAmount, 2) >= round((float)$billAmount, 2);
     }
 
     static public function getShopStorePaymentTypes()
