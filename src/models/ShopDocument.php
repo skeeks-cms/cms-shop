@@ -396,11 +396,11 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             return;
         }
 
-        if ($this->seller_contractor_id && ($this->isNewRecord || $this->isAttributeChanged('seller_contractor_id') || !$this->seller_contractor_name)) {
+        if ($this->seller_contractor_id && ($this->isNewRecord || $this->isAttributeChanged('seller_contractor_id', false) || !$this->seller_contractor_name)) {
             $this->fillContractorSnapshot('seller', $this->sellerContractor);
         }
 
-        if ($this->buyer_contractor_id && ($this->isNewRecord || $this->isAttributeChanged('buyer_contractor_id') || !$this->buyer_contractor_name)) {
+        if ($this->buyer_contractor_id && ($this->isNewRecord || $this->isAttributeChanged('buyer_contractor_id', false) || !$this->buyer_contractor_name)) {
             $this->fillContractorSnapshot('buyer', $this->buyerContractor);
         }
     }
