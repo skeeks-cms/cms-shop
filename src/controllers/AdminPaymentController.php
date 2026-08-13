@@ -343,6 +343,12 @@ class AdminPaymentController extends BackendModelStandartController
                         'client' => [
                             'format' => 'raw',
                             'label' => 'Клиент',
+                            'headerOptions' => [
+                                'style' => 'width: 180px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'width: 180px;',
+                            ],
                             
                             'value' => function (ShopPayment $crmDeal) {
 
@@ -353,7 +359,8 @@ class AdminPaymentController extends BackendModelStandartController
                                         'modelId'      => $crmDeal->company->id,
                                         'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->company->asText),
                                         'options'      => [
-                                            'class' => 'sx-preview-card__related',
+                                            'class' => 'sx-preview-card__related sx-collection-cell--inline',
+                                            'style' => 'white-space: nowrap;',
                                         ],
                                     ]);
                                 }
@@ -364,7 +371,8 @@ class AdminPaymentController extends BackendModelStandartController
                                         'modelId'      => $crmDeal->cmsUser->id,
                                         'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->cmsUser->asText),
                                         'options'      => [
-                                            'class' => 'sx-preview-card__related',
+                                            'class' => 'sx-preview-card__related sx-collection-cell--inline',
+                                            'style' => 'white-space: nowrap;',
                                         ],
                                     ]);
                                 }
