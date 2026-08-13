@@ -12,6 +12,7 @@ use kartik\datecontrol\DateControl;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelLogAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
+use skeeks\cms\backend\widgets\BackendEntityMedia;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\grid\DateTimeColumnData;
 use skeeks\cms\grid\UserColumnData;
@@ -309,10 +310,25 @@ class AdminPaymentController extends BackendModelStandartController
                                     ]
                                 );
 
-                                return Html::tag(
-                                    'div',
-                                    $title.$date,
-                                    ['class' => 'sx-collection-cell sx-collection-cell--stack']
+                                $media = BackendEntityLink::widget([
+                                    'controllerId' => '/shop/admin-payment',
+                                    'modelId'      => $model->id,
+                                    'content'      => BackendEntityMedia::widget([
+                                        'image' => $model->company ? $model->company->cmsImage : null,
+                                        'icon'  => 'credit-card',
+                                    ]),
+                                    'options'      => [
+                                        'class'      => 'sx-preview-card__media-link',
+                                        'aria-label' => (string)$model->asText,
+                                    ],
+                                ]);
+
+                                return Html::tag('div',
+                                    Html::tag('div', $media, ['class' => 'sx-preview-card__media']).
+                                    Html::tag('div', $title.$date, [
+                                        'class' => 'sx-preview-card__content sx-collection-cell sx-collection-cell--stack',
+                                    ]),
+                                    ['class' => 'sx-preview-card']
                                 );
                             }
                         ],
@@ -337,7 +353,7 @@ class AdminPaymentController extends BackendModelStandartController
                                         'modelId'      => $crmDeal->company->id,
                                         'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->company->asText),
                                         'options'      => [
-                                            'class' => 'sx-collection-cell__primary',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 }
@@ -348,7 +364,7 @@ class AdminPaymentController extends BackendModelStandartController
                                         'modelId'      => $crmDeal->cmsUser->id,
                                         'content'      => '<i class="fas fa-users"></i> '.Html::encode($crmDeal->cmsUser->asText),
                                         'options'      => [
-                                            'class' => 'sx-collection-cell__primary',
+                                            'class' => 'sx-preview-card__related',
                                         ],
                                     ]);
                                 }
