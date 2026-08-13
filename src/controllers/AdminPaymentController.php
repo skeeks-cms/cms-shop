@@ -1092,8 +1092,8 @@ JS
 
             if (isset($result['payment_document'])) {
                 $result['payment_document']['fields']['document_number']['elementOptions']['disabled'] = 'disabled';
-                $result['payment_document']['fields']['document_date']['elementOptions']['disabled'] = 'disabled';
-                $result['payment_document']['fields']['operation_at']['elementOptions']['disabled'] = 'disabled';
+                $result['payment_document']['fields']['document_date']['widgetConfig']['options']['disabled'] = 'disabled';
+                $result['payment_document']['fields']['operation_at']['widgetConfig']['options']['disabled'] = 'disabled';
                 $result['payment_document']['fields']['external_status']['elementOptions']['disabled'] = 'disabled';
             }
         }
