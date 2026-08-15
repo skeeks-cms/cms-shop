@@ -289,9 +289,12 @@ class AdminPaymentController extends BackendModelStandartController
                             'attribute' => 'created_at',
                             'format' => 'raw',
                             'label' => 'Платеж',
-                            /*'headerOptions'  => [
+                            'headerOptions'  => [
                                 'style' => 'min-width: 200px;',
-                            ],*/
+                            ],
+                            'contentOptions' => [
+                                'style' => 'min-width: 200px;',
+                            ],
                             'value' => function(ShopPayment $model) {
                                 $title = BackendEntityLink::widget([
                                     'controllerId' => '/shop/admin-payment',
@@ -402,6 +405,12 @@ class AdminPaymentController extends BackendModelStandartController
                         ],
                         'amount' => [
                             'format' => 'raw',
+                            'headerOptions'  => [
+                                'style' => 'width: 140px;',
+                            ],
+                            'contentOptions' => [
+                                'style' => 'width: 140px;',
+                            ],
                             'value' => function(ShopPayment $shopPayment) {
                                 if ($shopPayment->is_debit) {
                                     return Html::tag(
