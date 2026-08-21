@@ -13,12 +13,15 @@ use skeeks\cms\backend\widgets\ActiveFormBackend;
 use skeeks\cms\models\CmsAgent;
 use skeeks\cms\models\CmsContent;
 use skeeks\cms\models\CmsContentProperty;
+use skeeks\cms\models\CmsLead;
 use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopPersonType;
+use skeeks\cms\shop\models\ShopPartnerLead;
+use skeeks\cms\shop\models\ShopPartnerPayout;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopTypePrice;
@@ -108,6 +111,30 @@ class ShopComponent extends Component implements BootstrapInterface
 
     public function bootstrap($application)
     {
+        if ($application->has('skeeks')) {
+            $application->skeeks->modelsConfig[ShopPartnerPayout::class] = [
+                'name' => 'Заявки на вывод бонусов',
+                'name_one' => 'Заявка на вывод бонусов',
+                'controller' => 'shop/admin-partner-payout',
+            ];
+        }
+
+        Event::on(CmsLead::class, CmsLead::EVENT_PARTNER_SUCCESS, static function (Event $event) {
+            /** @var CmsLead $lead */
+            $lead = $event->sender;
+            if (ShopPartnerLead::find()->andWhere(['cms_lead_id' => $lead->id])->exists()) {
+                return;
+            }
+
+            $reward = new ShopPartnerLead();
+            $reward->cms_lead_id = (int)$lead->id;
+            $reward->reward_value = (float)$lead->partner_reward_value;
+            if (!$reward->save()) {
+                throw new \RuntimeException('Не удалось начислить партнёрское вознаграждение: '
+                    .print_r($reward->errors, true));
+            }
+        });
+
         if ($application instanceof Application) {
             Event::on(BackendComponent::class, "beforeRun", function (Event $e) {
                 $backendComponent = $e->sender;

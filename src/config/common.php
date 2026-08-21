@@ -198,6 +198,17 @@ return [
                                 "shop/admin-shop-check",
                                 "shop/admin-order",
                                 "shop/admin-payment",
+                                "shop/admin-bonus-transaction",
+                                "shop/admin-partner-payout",
+                            ],
+                        ],
+                    ],
+
+                    [
+                        'name'  => \skeeks\cms\rbac\CmsManager::ROLE_MARKETER,
+                        'child' => [
+                            'permissions' => [
+                                "shop/admin-partner-payout",
                             ],
                         ],
                     ],
@@ -234,6 +245,8 @@ return [
                                 "shop/admin-shop-product-relation",
 
                                 "shop/admin-discount",
+                                "shop/admin-bonus-transaction",
+                                "shop/admin-partner-payout",
 
                             ],
                         ],
@@ -243,6 +256,14 @@ return [
 
                 ],
                 'permissions' => [
+                    [
+                        'name' => 'shop/admin-bonus-transaction',
+                        'description' => 'Движение бонусов',
+                    ],
+                    [
+                        'name' => 'shop/admin-partner-payout',
+                        'description' => 'Заявки партнёров на вывод бонусов',
+                    ],
                     [
                         'name'        => 'shop/admin-shop-import-cms-site',
                         'description' => ['skeeks/cms', 'Поставщики'],

@@ -27,6 +27,7 @@ use skeeks\yii2\form\fields\TextareaField;
 use skeeks\yii2\form\fields\WidgetField;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\web\NotFoundHttpException;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -38,6 +39,7 @@ class AdminBonusTransactionController extends BackendModelStandartController
         $this->name = \Yii::t('skeeks/shop/app', 'Бонусы');
         $this->modelClassName = ShopBonusTransaction::class;
         $this->modelShowAttribute = "asText";
+        $this->permissionName = 'shop/admin-bonus-transaction';
 
         $this->generateAccessActions = false;
 
@@ -57,6 +59,23 @@ class AdminBonusTransactionController extends BackendModelStandartController
                         'shop_order_id',
                         'cms_user_id',
                     ],
+                    'filtersModel' => [
+                        'fields' => [
+                            'cms_user_id' => [
+                                'field' => [
+                                    'widgetConfig' => [
+                                        'searchQuery' => static function ($word = '') {
+                                            $query = CmsUser::find()->forManager()->cmsSite();
+                                            if ($word) {
+                                                $query->search($word);
+                                            }
+                                            return $query;
+                                        },
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
 
                 'grid' => [
@@ -71,7 +90,7 @@ class AdminBonusTransactionController extends BackendModelStandartController
                          */
                         $query = $e->sender->dataProvider->query;
 
-                        $query->cmsSite();
+                        $query->forManager()->cmsSite();
 
                     },
 
@@ -194,7 +213,7 @@ class AdminBonusTransactionController extends BackendModelStandartController
                     'modelClass' => CmsUser::class,
                     'options' => [],
                     'searchQuery' => function($word = '') {
-                        $query = CmsUser::find()->cmsSite();
+                        $query = CmsUser::find()->forManager()->cmsSite();
                         if ($word) {
                             $query->search($word);
                         }
@@ -243,5 +262,30 @@ class AdminBonusTransactionController extends BackendModelStandartController
         ];
     }
 
+    public function getModel()
+    {
+        // BackendGridModelRelatedAction creates this controller while the
+        // request `pk` still identifies the parent model (for example, a user).
+        if (\Yii::$app->controller !== $this) {
+            return $this->_model;
+        }
+
+        if ($this->_model === null) {
+            $pk = \Yii::$app->request->get($this->requestPkParamName);
+            if ($pk) {
+                $this->_model = ShopBonusTransaction::find()
+                    ->forManager()
+                    ->cmsSite()
+                    ->andWhere([$this->modelPkAttribute => $pk])
+                    ->limit(1)
+                    ->one();
+                if (!$this->_model) {
+                    throw new NotFoundHttpException('Бонусная операция не найдена.');
+                }
+            }
+        }
+
+        return $this->_model;
+    }
 
 }

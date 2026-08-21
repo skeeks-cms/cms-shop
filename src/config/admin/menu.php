@@ -294,6 +294,14 @@ return \yii\helpers\ArrayHelper::merge([
                 "label" => \Yii::t('skeeks/shop/app', 'Бонусы'),
                 "url"   => ["shop/admin-bonus-transaction"],
                 "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/coupon.svg'],
+                'priority' => 100,
+            ],
+
+            'partner-payouts' => [
+                'label' => 'Вывод бонусов',
+                'url' => ['shop/admin-partner-payout'],
+                'img' => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/coupon.svg'],
+                'priority' => 100,
             ],
 
             [

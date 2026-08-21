@@ -11,6 +11,8 @@ namespace skeeks\cms\shop\models;
 use skeeks\cms\base\ActiveRecord;
 use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\models\behaviors\traits\HasLogTrait;
+use skeeks\cms\models\CmsWebNotify;
+use skeeks\cms\shop\models\queries\ShopBonusTransactionQuery;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -45,6 +47,11 @@ class ShopBonusTransaction extends ActiveRecord
         return 'shop_bonus_transaction';
     }
 
+    public static function find()
+    {
+        return new ShopBonusTransactionQuery(get_called_class());
+    }
+
     public function init()
     {
         $this->on(self::EVENT_AFTER_FIND, function() {
@@ -52,6 +59,50 @@ class ShopBonusTransaction extends ActiveRecord
         });
 
         return parent::init();
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert || $this->is_debit || !$this->cms_user_id) {
+            return;
+        }
+
+        $currentUserId = \Yii::$app->has('user') && !\Yii::$app->user->isGuest
+            ? (int)\Yii::$app->user->id
+            : null;
+        if ($currentUserId !== null && $currentUserId === (int)$this->cms_user_id) {
+            return;
+        }
+
+        $value = rtrim(rtrim(number_format((float)$this->value, 2, '.', ' '), '0'), '.');
+        $notify = new CmsWebNotify();
+        $notify->cms_user_id = (int)$this->cms_user_id;
+        $notify->name = 'Вам начислены бонусы: '.$value;
+        $notify->comment = $this->comment;
+        $notify->model_code = static::class;
+        $notify->model_id = (int)$this->id;
+        $notify->url = $this->getPartnerBonusUrl();
+        $notify->save();
+    }
+
+    public function getPartnerBonusUrl(): string
+    {
+        $urlPrefix = '~upa';
+        if (\Yii::$app->has('upa')) {
+            $urlPrefix = (string)ArrayHelper::getValue(
+                \Yii::$app->upa->urlRule,
+                'urlPrefix',
+                $urlPrefix
+            );
+        }
+
+        $baseUrl = \Yii::$app->has('request') && \Yii::$app->request instanceof \yii\web\Request
+            ? (string)\Yii::$app->request->baseUrl
+            : '';
+
+        return rtrim($baseUrl, '/').'/'.trim($urlPrefix, '/').'/shop/upa-partner-bonus';
     }
 
     /**
@@ -76,9 +127,9 @@ class ShopBonusTransaction extends ActiveRecord
     public function asText()
     {
         if ($this->is_debit) {
-            return "Списание с клиента №" . $this->id;
+            return "Списание бонусов №" . $this->id;
         } else {
-            return "Начисление клиенту №" . $this->id;
+            return "Начисление бонусов №" . $this->id;
         }
     }
 
