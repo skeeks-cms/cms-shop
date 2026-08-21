@@ -55,4 +55,25 @@ if (strpos($commonConfig, "'name' => 'shop/admin-partner-payout'") === false
     throw new RuntimeException('Cms-shop must own and grant the partner payout permission.');
 }
 
+foreach ([
+    '$lead->addSystemActivity(',
+    "'Лид успешно завершён — начислено '",
+    "rtrim(rtrim(number_format((float)\$reward->reward_value, 2, '.', ' '), '0'), '.')",
+    'Html::encode(',
+] as $activityContract) {
+    if (strpos($component, $activityContract) === false) {
+        throw new RuntimeException('A successful partner lead must report its actual reward: '.$activityContract);
+    }
+}
+$rewardSavePosition = strpos($component, 'if (!$reward->save()) {');
+$rewardActivityPosition = strpos($component, '$lead->addSystemActivity(');
+if ($rewardSavePosition === false || $rewardActivityPosition === false || $rewardActivityPosition < $rewardSavePosition) {
+    throw new RuntimeException('The success entry must follow the persisted reward and its bonus transaction.');
+}
+if (strpos($model, 'if (!$transaction->save()) {') === false
+    || strpos($model, '$this->shop_bonus_transaction_id = $transaction->id;') === false
+) {
+    throw new RuntimeException('The reward row must own its ledger transaction before any activity can announce it.');
+}
+
 echo "Partner lead finance boundary: ok\n";

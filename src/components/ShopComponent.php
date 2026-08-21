@@ -35,6 +35,7 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\Application;
 use yii\widgets\ActiveForm;
 
@@ -133,6 +134,15 @@ class ShopComponent extends Component implements BootstrapInterface
                 throw new \RuntimeException('Не удалось начислить партнёрское вознаграждение: '
                     .print_r($reward->errors, true));
             }
+
+            // Only a persisted reward row and its ledger transaction may
+            // announce a completed lead. A rejected activity entry throws and
+            // rolls the whole success transition back.
+            $lead->addSystemActivity(
+                'Лид успешно завершён — начислено '
+                .Html::encode(rtrim(rtrim(number_format((float)$reward->reward_value, 2, '.', ' '), '0'), '.'))
+                .' бонусов'
+            );
         });
 
         if ($application instanceof Application) {
