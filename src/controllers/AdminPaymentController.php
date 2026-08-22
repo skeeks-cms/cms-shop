@@ -857,7 +857,7 @@ JS
 
         $result['client'] = [
             'class'  => FieldSet::class,
-            'name'   => 'Компания или клиент (заполнить хотя бы одно)',
+            'name'   => 'Клиент',
             'fields' => [
                 'div' => [
                     'class' => HtmlBlock::class,
