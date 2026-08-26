@@ -104,6 +104,11 @@ class ShopOfferChooseHelper extends Component
      */
     public $is_filter_by_quantity = false;
 
+    /**
+     * @var bool
+     */
+    public $is_filter_by_active = true;
+
     public function init()
     {
         parent::init();
@@ -121,8 +126,11 @@ class ShopOfferChooseHelper extends Component
          */
         $offersCsmContentElementQuery = $this->shopProduct
             ->getTradeOffers()
-            ->active()
             ->with("shopProduct");
+
+        if ($this->is_filter_by_active) {
+            $offersCsmContentElementQuery->active();
+        }
 
         if ($this->is_filter_by_quantity) {
                \Yii::$app->shop->filterByQuantityQuery($offersCsmContentElementQuery);
