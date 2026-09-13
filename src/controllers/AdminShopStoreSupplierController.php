@@ -19,6 +19,7 @@ use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
 use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\components\ShopComponent;
+use skeeks\cms\shop\helpers\SupplierImportStatus;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopStoreProduct;
 use skeeks\cms\shop\store\StoreUrlRule;
@@ -63,6 +64,7 @@ class AdminShopStoreSupplierController extends BackendModelStandartController
      */
     public function actions()
     {
+        $importStatus = new SupplierImportStatus((int)\Yii::$app->skeeks->site->id);
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'on beforeRender' => function (Event $e) {
@@ -136,20 +138,30 @@ HTML
                 "filters"         => [
                     'visibleFilters' => [
                         'q',
+                        'import_status',
                     ],
 
                     'filtersModel' => [
                         'rules' => [
-                            ['q', 'safe'],
+                            [['q', 'import_status'], 'safe'],
                         ],
 
                         'attributeDefines' => [
                             'q',
+                            'import_status',
                         ],
 
 
                         'fields' => [
 
+                            'import_status' => [
+                                'class' => SelectField::class,
+                                'label' => 'Обновление поставщика',
+                                'items' => SupplierImportStatus::labels(),
+                                'on apply' => function (QueryFiltersEvent $e) use ($importStatus) {
+                                    $importStatus->apply($e->dataProvider->query, $e->field->value);
+                                },
+                            ],
                             'q' => [
                                 'label'          => 'Поиск',
                                 'elementOptions' => [
@@ -207,6 +219,7 @@ HTML
 
                         'is_active',
 
+                        'importSchedule',
                         'lastProductUpdate',
                         'countProducts',
                         'countReadyProducts',
@@ -214,6 +227,19 @@ HTML
                         'panel',
                     ],
                     'columns'        => [
+                        'importSchedule' => [
+                            'label' => 'Расписание обновления',
+                            'format' => 'raw',
+                            'value' => function (ShopStore $store) use ($importStatus) {
+                                $state = $importStatus->get((int)$store->id);
+                                $label = SupplierImportStatus::labels()[$state['state']];
+                                $html = $state['agent_id'] ? BackendEntityLink::widget([
+                                    'controllerId'=>'/cmsAgent/admin-cms-agent', 'action'=>'view',
+                                    'modelId'=>$state['agent_id'], 'label'=>'#'.$state['agent_id'].' '.$state['name'],
+                                ]) : '';
+                                return $html.Html::tag('div', Html::encode($label), ['class'=>'sx-collection-cell__secondary']);
+                            },
+                        ],
                         'priority'  => [
                             'headerOptions' => [
                                 'style' => 'width: 100px;',
@@ -584,6 +610,10 @@ CSS
                         'allowNull' => false,
                     ],
                     'external_id',
+                    'import_agent_id' => [
+                        'class'=>SelectField::class,
+                        'items'=>(new SupplierImportStatus((int)\Yii::$app->skeeks->site->id))->options(),
+                    ],
                     'priority'    => [
                         'class' => NumberField::class,
                     ],

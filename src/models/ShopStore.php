@@ -29,6 +29,8 @@ use yii\helpers\ArrayHelper;
  * @property float|null          $longitude Долгота
  * @property string|null         $work_time Рабочее время
  * @property int                 $priority
+ * @property int|null            $import_agent_id
+ * @property \skeeks\cms\agent\models\CmsAgentModel|null $importAgent
  * @property bool                $is_supplier
  * @property string              $source_selling_price
  * @property string              $source_purchase_price
@@ -107,6 +109,9 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
         return ArrayHelper::merge(parent::rules(), [
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'sx_id'], 'integer'],
             [['priority'], 'integer'],
+            [['import_agent_id'], 'default', 'value' => null],
+            [['import_agent_id'], 'integer'],
+            [['import_agent_id'], 'validateImportAgent'],
 
             [['is_sync_external'], 'integer'],
             [['is_allow_no_check'], 'integer'],
@@ -247,6 +252,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
             'cashier_default_cms_user_id'         => 'Клиент выбранный по умолчанию',
             'is_allow_no_check'                   => 'Разрешить продажу без чека?',
             'is_sync_external'                    => 'Синхронизирован с внешней системой?',
+            'import_agent_id'                     => 'Расписание обновления',
             'display_name'                        => 'Отображаемое название',
             'delivery_time'                       => 'Время доставки с этого склада',
             'delivery_info'                       => 'Информация о доставке',
@@ -259,6 +265,7 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function attributeHints()
     {
         return ArrayHelper::merge(parent::attributeHints(), [
+            'import_agent_id'                     => 'Активное расписание запускает автоматическое обновление. Результат берётся из последнего завершённого задания.',
             'display_name'                        => "Если клиент видит название склада/склада поставщика, то будет показываться это название",
             'delivery_info'                       => "Информация о доставке с этого склада",
             'delivery_time'                       => "Через сколько дней после создания заказа, товар будет готов к отправке клиенту. Используется при рассчете времени доставки заказа.",
@@ -393,5 +400,23 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
     public function getShopStoreDocMoves()
     {
         return $this->hasMany(ShopStoreDocMove::className(), ['shop_store_id' => 'id']);
+    }
+
+    /** An import schedule cannot be linked across sites. */
+    public function validateImportAgent($attribute): void
+    {
+        if (!$this->$attribute) { return; }
+        if (!$this->is_supplier || !class_exists(\skeeks\cms\agent\models\CmsAgentModel::class)
+            || !\skeeks\cms\agent\models\CmsAgentModel::find()->where([
+                'id'=>$this->$attribute, 'cms_site_id'=>$this->cms_site_id,
+            ])->exists()) {
+            $this->addError($attribute, 'Выберите расписание поставщика на этом сайте.');
+        }
+    }
+
+    public function getImportAgent()
+    {
+        return $this->hasOne(\skeeks\cms\agent\models\CmsAgentModel::class, ['id'=>'import_agent_id'])
+            ->andOnCondition(['cms_site_id'=>$this->cms_site_id]);
     }
 }
