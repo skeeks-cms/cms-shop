@@ -25,17 +25,8 @@ class FlushController extends Controller
      */
     public function actionPriceChanges($countDay = 30)
     {
-        if ($count = ShopProductPriceChange::find()->where([
-            '<=',
-            'created_at',
-            time() - 3600 * 24 * $countDay,
-        ])->count()
-        ) {
-            $this->stdout("Total price changes for delete: {$count}\n", Console::BOLD);
-            $totalDeleted = ShopProductPriceChange::deleteAll(['<=', 'created_at', time() - 3600 * 24 * $countDay]);
-            $this->stdout("Total deleted: {$totalDeleted}\n");
-        } else {
-            $this->stdout("Нечего удалять\n", Console::BOLD);
-        }
+        $result = (new \skeeks\cms\shop\services\ScheduledMaintenance())->deletePriceChanges((int)$countDay);
+        $this->stdout(json_encode($result, JSON_UNESCAPED_UNICODE).PHP_EOL);
+        return \yii\console\ExitCode::OK;
     }
 }

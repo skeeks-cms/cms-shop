@@ -9,6 +9,94 @@ return [
 
     'bootstrap'  => ['shop'],
     'components' => [
+        'jobRegistry' => [
+            'types' => [
+                'shop.delete-empty-carts' => [
+                    'type' => 'shop.delete-empty-carts',
+                    'title' => 'Удаление старых корзин',
+                    'handler' => \skeeks\cms\shop\jobs\DeleteEmptyCartsJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'shop:carts'; },
+                    'dedupKey' => static function () { return 'shop:delete-empty-carts'; },
+                ],
+                'shop.delete-price-changes' => [
+                    'type' => 'shop.delete-price-changes',
+                    'title' => 'Удаление старых изменений цен',
+                    'handler' => \skeeks\cms\shop\jobs\DeletePriceChangesJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'shop:price-changes'; },
+                    'dedupKey' => static function () { return 'shop:delete-price-changes'; },
+                ],
+                'shop.update-product-type' => [
+                    'type' => 'shop.update-product-type',
+                    'title' => 'Обновление типа товаров',
+                    'handler' => \skeeks\cms\shop\jobs\UpdateProductTypeJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'shop:catalog'; },
+                    'dedupKey' => static function () { return 'shop:update-product-type'; },
+                ],
+                'shop.update-store-prices' => [
+                    'type' => 'shop.update-store-prices',
+                    'title' => 'Обновление цен из складских цен',
+                    'handler' => \skeeks\cms\shop\jobs\UpdateStorePricesJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'shop:catalog'; },
+                    'dedupKey' => static function () { return 'shop:update-store-prices'; },
+                ],
+                'shop.update-auto-prices' => [
+                    'type' => 'shop.update-auto-prices',
+                    'title' => 'Обновление автоматических цен',
+                    'handler' => \skeeks\cms\shop\jobs\UpdateAutoPricesJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'shop:catalog'; },
+                    'dedupKey' => static function () { return 'shop:update-auto-prices'; },
+                ],
+                'shop.update-product-rating' => [
+                    'type' => 'shop.update-product-rating',
+                    'title' => 'Обновление рейтинга товаров',
+                    'handler' => \skeeks\cms\shop\jobs\UpdateProductRatingJobHandler::class,
+                    'queue' => 'maintenance',
+                    'timeout' => 7200,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 1,
+                    'idempotent' => false,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function () { return 'shop:catalog'; },
+                    'dedupKey' => static function () { return 'shop:update-product-rating'; },
+                ],
+            ],
+        ],
         'shop'        => [
             'class'            => 'skeeks\cms\shop\components\ShopComponent',
             'deliveryHandlers' => [
@@ -42,6 +130,7 @@ return [
             'commands' => [
 
                 'shop/agents/delete-empty-carts' => [
+                    'jobType' => 'shop.delete-empty-carts',
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Remove empty baskets'],
                     'interval' => 3600 * 6,
@@ -49,6 +138,7 @@ return [
 
 
                 'shop/flush/price-changes' => [
+                    'jobType' => 'shop.delete-price-changes',
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Removing the old price changes'],
                     'interval' => 3600 * 24,
@@ -61,22 +151,26 @@ return [
                 ],*/
 
                 'shop/agents/update-product-type'                       => [
+                    'jobType' => 'shop.update-product-type',
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление типа товаров'],
                     'interval' => 60 * 60,
                 ],
                 'shop/agents/update-product-prices-from-store-products' => [
+                    'jobType' => 'shop.update-store-prices',
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление цен из складских цен'],
                     'interval' => 60 * 60,
                 ],
 
                 'shop/agents/update-auto-prices'                        => [
+                    'jobType' => 'shop.update-auto-prices',
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление цен, которые рассчитываются автоматически'],
                     'interval' => 60 * 5,
                 ],
                 'shop/agents/update-product-rating'                        => [
+                    'jobType' => 'shop.update-product-rating',
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
                     'name'     => ['skeeks/shop/app', 'Обновление рейтинга, которые рассчитываются автоматически'],
                     'interval' => 3600,

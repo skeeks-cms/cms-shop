@@ -40,22 +40,9 @@ class AgentsController extends Controller
      */
     public function actionUpdateProductPricesFromStoreProducts($cms_site_id = null)
     {
-        $q = ShopSite::find();
-        
-        if ($cms_site_id) {
-            $q->andWhere(['id' => $cms_site_id]);
-        }
-        
-        /**
-         * @var $shopSite ShopSite
-         */
-        if ($count = $q->count()) {
-            $this->stdout("Найдено сайтов получателей: " . $count . "\n");
-            foreach ($q->each(10) as $shopSite) {
-                $this->stdout("\tСайт: " . $shopSite->id . "\n");
-                ShopComponent::updateProductPrices($shopSite->cmsSite);
-            }
-        }
+        $result = (new \skeeks\cms\shop\services\ScheduledMaintenance())->updateStorePrices($cms_site_id ? (int)$cms_site_id : null);
+        $this->stdout(json_encode($result, JSON_UNESCAPED_UNICODE).PHP_EOL);
+        return \yii\console\ExitCode::OK;
     }
 
     /**
@@ -417,30 +404,9 @@ class AgentsController extends Controller
 
     public function actionUpdateProductRating()
     {
-        $result = \Yii::$app->db->createCommand(<<<SQL
-UPDATE 
-	`shop_product` as update_product 
-	INNER JOIN (
-		SELECT 
-			sp.id, 
-			FLOOR(shop_site_settings.generate_min_product_rating_count + RAND() * (shop_site_settings.generate_max_product_rating_count - shop_site_settings.generate_min_product_rating_count)) as calc_rating_count,
-			ROUND(FLOOR(shop_site_settings.generate_min_product_rating_value + RAND() * (shop_site_settings.generate_max_product_rating_value - shop_site_settings.generate_min_product_rating_value)) + RAND(), 4)  as calc_rating_value
-		FROM 
-			`shop_product` as sp
-			INNER JOIN cms_content_element as cce on cce.id = sp.id
-			INNER JOIN shop_site as shop_site_settings on shop_site_settings.id = cce.cms_site_id
-        WHERE 
-                shop_site_settings.is_generate_product_rating = 1
-            AND 
-                sp.rating_count = 0 
-            AND
-                sp.rating_value = 0 
-	) as result_sp ON result_sp.id = update_product.id 
-SET 
-	update_product.rating_count = result_sp.calc_rating_count,
-	update_product.rating_value = result_sp.calc_rating_value
-SQL
-        )->execute();
+        $result = (new \skeeks\cms\shop\services\ScheduledMaintenance())->updateProductRating();
+        $this->stdout(json_encode($result, JSON_UNESCAPED_UNICODE).PHP_EOL);
+        return \yii\console\ExitCode::OK;
     }
 
     /**
@@ -448,74 +414,9 @@ SQL
      */
     public function actionUpdateAutoPrices()
     {
-        $q = ShopTypePrice::find()->where(['is_auto' => 1]);
-
-        $this->stdout("Найдено автообновляемых цен: " . $q->count() . "\n");
-
-        /**
-         * @var $shopTypePrice ShopTypePrice
-         */
-        foreach ($q->each(10) as $shopTypePrice) {
-            $type_price_id = $shopTypePrice->id;
-            $cms_site_id = $shopTypePrice->cms_site_id;
-            $base_auto_shop_type_price_id = $shopTypePrice->base_auto_shop_type_price_id;
-            $auto_extra_charge = $shopTypePrice->auto_extra_charge;
-
-            $result = \Yii::$app->db->createCommand(<<<SQL
-INSERT IGNORE
-    INTO shop_product_price (`product_id`, `type_price_id`, `price`, `currency_code`)
-    SELECT 
-        spp.product_id,
-        {$type_price_id},
-        ROUND(spp.price * {$auto_extra_charge} / 100),
-        spp.currency_code
-    FROM 
-        shop_product_price as spp
-    WHERE
-        spp.type_price_id = {$base_auto_shop_type_price_id}
-SQL
-        )->execute();
-
-
-
-        $result = \Yii::$app->db->createCommand(<<<SQL
-UPDATE 
-	`shop_product_price` as update_price 
-	INNER JOIN (
-		SELECT 
-			spp.id, 
-			spp.currency_code, 
-			UNIX_TIMESTAMP() as updated_at_now, 
-			(
-				SELECT 
-					ROUND(
-						calc_price.price * stp.auto_extra_charge / 100
-					) 
-				FROM 
-					shop_product_price as calc_price 
-				WHERE 
-					calc_price.product_id = spp.product_id 
-					AND calc_price.type_price_id = stp.base_auto_shop_type_price_id
-			) as new_price, 
-			spp.price as old_price 
-		FROM 
-			`shop_product_price` as spp 
-			INNER JOIN (
-				SELECT 
-					* 
-				FROM 
-					shop_type_price as inner_stp 
-				WHERE 
-					inner_stp.is_auto = 1
-			) as stp ON stp.id = spp.type_price_id 
-			LEFT JOIN shop_type_price as baseTypePrice on baseTypePrice.id = stp.base_auto_shop_type_price_id
-	) as calced_price ON calced_price.id = update_price.id 
-SET 
-	update_price.price = calced_price.new_price
-SQL
-        )->execute();
-
-        }
+        $result = (new \skeeks\cms\shop\services\ScheduledMaintenance())->updateAutoPrices();
+        $this->stdout(json_encode($result, JSON_UNESCAPED_UNICODE).PHP_EOL);
+        return \yii\console\ExitCode::OK;
     }
 
     /**
@@ -536,7 +437,9 @@ SQL
      */
     public function actionUpdateProductType()
     {
-        \Yii::$app->shop->updateAllTypes();
+        $result = (new \skeeks\cms\shop\services\ScheduledMaintenance())->updateProductType();
+        $this->stdout(json_encode($result, JSON_UNESCAPED_UNICODE).PHP_EOL);
+        return \yii\console\ExitCode::OK;
     }
 
     /**
@@ -545,65 +448,8 @@ SQL
      */
     public function actionDeleteEmptyCarts($days = 3)
     {
-        $condition = [
-            //'and',
-            //['shop_order.is_created' => 0],
-            //['<=', 'shop_order.created_at', time()-3600*24*$days],
-            //['shop_order.is_created' => 0],
-            /*['shop_order.person_type_id' => null],
-            ['shop_fuser.pay_system_id' => null],
-            ['shop_fuser.delivery_id' => null],
-            ['shop_fuser.buyer_id' => null],*/
-            /*new Expression(<<<SQL
-            (SELECT count(id) as count FROM shop_order_item WHERE shop_order_item.shop_order_id = shop_order.id) = 0
-SQL
-            ),*/
-        ];
-        //$forDelete = ShopOrder::find()->where($condition)->count(1);
-        $forDeleteQuery = ShopOrder::find()
-            //->joinWith('shopOrderItems as shopOrderItems')
-            ->andWhere([
-                'and',
-                ['shop_order.is_created' => 0], //Не созданные заказы
-                ['<=', 'shop_order.created_at', time() - 3600 * 24 * $days] //старше 1 дня
-            ])
-            //->andWhere(['shopOrderItems.id' => null])//У которых нет ничего в корзине
-            ->limit(5000)
-            ->orderBy(['shop_order.id' => SORT_ASC])
-            ->select(["shop_order.id"])
-            ->asArray()
-            ->all();
-
-        $ids = ArrayHelper::map($forDeleteQuery, 'id', 'id');
-
-
-        /*
-                $counter = 0;
-                $models = $query->all();
-                $allCount = count($models);
-                Console::startProgress(0, $allCount);
-        
-                foreach ($query->each() as $model)
-                {
-                    // $users is indexed by the "username" column
-                    $counter ++;
-                    $model->delete();
-                    Console::updateProgress($counter, $allCount);
-                }
-        
-                Console::endProgress();*/
-
-        if ($ids) {
-            $this->stdout("Empty orders for delete: ".count($ids)."\n");
-            $deleted = ShopOrder::deleteAll(['id' => $ids]);
-            $this->stdout("Removed empty orders: ".$deleted."\n");
-        } else {
-            $this->stdout("Not found orders for delete\n");
-        }
-
-        $deleted = ShopUser::deleteAll([
-            'shop_order_id' => null,
-        ]);
-        $this->stdout("Removed empty carts: ".$deleted."\n");
+        $result = (new \skeeks\cms\shop\services\ScheduledMaintenance())->deleteEmptyCarts((int)$days);
+        $this->stdout(json_encode($result, JSON_UNESCAPED_UNICODE).PHP_EOL);
+        return \yii\console\ExitCode::OK;
     }
 }
