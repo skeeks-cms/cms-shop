@@ -8,7 +8,8 @@ final class CatalogTransport implements CatalogTransportInterface
 {
     private $url;
     private $key;
-    public function __construct(string $url, string $key)
+    private $client;
+    public function __construct(string $url, string $key, ?Client $client = null)
     {
         $parts = parse_url($url);
         if (!$parts || ($parts['scheme'] ?? '') !== 'https' || empty($parts['host']) ||
@@ -17,16 +18,20 @@ final class CatalogTransport implements CatalogTransportInterface
         }
         $this->url = rtrim($url, '/');
         $this->key = $key;
+        $this->client = $client ?? new Client();
     }
     public function request(string $method, string $endpoint, array $data = []): array
     {
         $allowed = ['status'=>'GET', 'bootstrap'=>'POST', 'manifest'=>'GET', 'changes'=>'GET', 'batch'=>'POST'];
         if (($allowed[$endpoint] ?? null) !== $method) throw new ProtocolException('invalid_request');
         try {
-            $client = new Client();
-            $request = $client->createRequest()->setMethod($method)->setUrl($this->url.'/sync/'.$endpoint)
+            $url = $this->url.'/sync/'.$endpoint;
+            if ($method === 'GET' && $data) $url .= '?'.http_build_query($data);
+            $request = $this->client->createRequest()->setMethod($method)->setUrl($url)
                 ->setHeaders(['Authorization'=>$this->key, 'Accept'=>'application/json'])
-                ->setFormat(Client::FORMAT_JSON)->setOptions(['timeout'=>20, 'maxRedirects'=>0])->setData($data);
+                ->setOptions(['timeout'=>20, 'maxRedirects'=>0]);
+            if ($method === 'POST') $request->setFormat(Client::FORMAT_JSON)->setData($data);
+            else $request->setContent('');
             $response = $request->send();
             if (strlen($response->content) > 5 * 1024 * 1024) throw new ProtocolException('response_too_large');
             $body = json_decode($response->content, true, 512, JSON_THROW_ON_ERROR);
