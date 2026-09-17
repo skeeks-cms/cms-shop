@@ -9,8 +9,24 @@ return [
 
     'bootstrap'  => ['shop'],
     'components' => [
+        'gpdReceiver' => ['class' => \skeeks\cms\shop\gpd\ReceiverComponent::class],
+        'jobQueueFactory' => ['queues' => ['gpd-receive' => []]],
         'jobRegistry' => [
             'types' => [
+                'shop.gpd.catalog.receive' => [
+                    'type' => 'shop.gpd.catalog.receive',
+                    'title' => 'GPD: приём журнала каталога (без применения)',
+                    'handler' => \skeeks\cms\shop\jobs\GpdCatalogReceiveJobHandler::class,
+                    'queue' => 'gpd-receive',
+                    'timeout' => 180,
+                    'leaseSeconds' => 120,
+                    'maxAttempts' => 3,
+                    'idempotent' => true,
+                    'overlapPolicy' => 'skip',
+                    'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey' => static function (array $payload) { return 'shop:gpd:receive:'.($payload['connection'] ?? 'invalid'); },
+                    'dedupKey' => static function (array $payload) { return 'shop:gpd:receive:'.($payload['connection'] ?? 'invalid'); },
+                ],
                 'shop.delete-empty-carts' => [
                     'type' => 'shop.delete-empty-carts',
                     'title' => 'Удаление старых корзин',
