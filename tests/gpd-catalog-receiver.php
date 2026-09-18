@@ -13,6 +13,7 @@ $db=Yii::$app->db;
 $name='receiver_'.bin2hex(random_bytes(5));
 $db->createCommand("CREATE DATABASE $name")->execute(); $db->createCommand("USE $name")->execute();
 require dirname(__DIR__).'/src/migrations/m260917_030000_gpd_catalog_receiver.php';
+require dirname(__DIR__).'/src/migrations/m260917_120000_gpd_catalog_application.php';
 use skeeks\cms\shop\gpd\CatalogReceiver;
 use skeeks\cms\shop\gpd\CatalogTransportInterface;
 use skeeks\cms\shop\gpd\ProtocolException;
@@ -29,7 +30,7 @@ class FixtureTransport implements CatalogTransportInterface {
 }
 class ReceiverFixtureContext extends \skeeks\cms\job\runtime\JobContext {
     public $position=[];
-    public function getPayload() {return ['connection'=>'large'];}
+    public function getPayload() {return [];}
     public function getCursor() {return $this->position;}
     public function setCursor(array $cursor) {$this->position=$cursor;}
     public function get($key,$default=null) {return $this->getPayload()[$key]??$default;}
@@ -37,11 +38,11 @@ class ReceiverFixtureContext extends \skeeks\cms\job\runtime\JobContext {
 class ReceiverFixtureReporter extends \skeeks\cms\job\runtime\JobReporter {
     public $result=[]; public $cancel=false; public $errors=0; public $totals=[];
     public function init() {}
-    public function setStage(string $stage,?string $message=null):void {}
+    public function setStage(string $stage,?string $message=null):void {$this->run->progress_message=$message;}
     public function setTotal(?int $total):void {$this->totals[]=$total;}
     public function advance(int $by=1):void {$this->run->progress_current+=$by;}
     public function countSuccess(int $by=1):void {}
-    public function setResult(array $result):void {$this->result=$result;}
+    public function setResult(array $result):void {$this->result=$result;$this->run->result_json=json_encode($result);}
     public function heartbeat():void {}
     public function isCancelled():bool {return $this->cancel;}
     public function itemError(string $type,$id,string $message,array $row=[]):void {$this->errors++;}
@@ -56,6 +57,7 @@ try {
 foreach (['','sx_'] as $prefix) {
     $db->tablePrefix=$prefix; $db->schema->refresh();
     (new m260917_030000_gpd_catalog_receiver())->safeUp();
+    (new m260917_120000_gpd_catalog_application())->safeUp();
     $t=new FixtureTransport(); $r=new CatalogReceiver($db,'test',$t);
     $fingerprint=hash('sha256','fixture-only');
     $r->register(1,'https://fixture.invalid/v2',$fingerprint);
@@ -139,6 +141,37 @@ failWith('connection_disabled_or_wrong_site',fn()=>$component->receiver('configu
 Yii::$app->set('skeeksSuppliersApi',new class extends yii\base\Component {public $api_key='fixture-only';public $api_url='https://fixture.invalid/v1';});
 $component->receiver('configured',2);
 check(Yii::$app->skeeksSuppliersApi->api_url==='https://fixture.invalid/v1','New receiver does not change v1 component');
+check($component->connectionIdForSite(2)==='configured','Empty payload resolves the existing pilot configuration');
+failWith('connection_disabled_or_wrong_site',fn()=>$component->receiverForSite(2,'another'));
+$component->connections['duplicate']=['enabled'=>true,'siteId'=>2];
+failWith('ambiguous_site_connection',fn()=>$component->connectionIdForSite(2));
+$flat=new \skeeks\cms\shop\gpd\ReceiverComponent(['enabled'=>true,'siteId'=>3,'url'=>'https://fixture.invalid/v2']);
+check($flat->connectionIdForSite(3)==='site-3','Fresh configuration needs no named connection');
+$flat->receiverForSite(3);
+check($flat->receiverForSite(3)->state()['id']==='site-3','Flat configuration registers once');
+failWith('connection_disabled_or_wrong_site',fn()=>$flat->receiverForSite(2));
+$preserved=new CatalogReceiver($db,'pilot',$t);
+$preserved->register(4,'https://fixture.invalid/v2',$fingerprint);
+$db->createCommand()->update('{{%shop_gpd_connection}}',['cursor'=>'preserved-cursor','phase'=>'changes'],['id'=>'pilot'])->execute();
+$flat->siteId=4;
+check($flat->receiverForSite(4)->state()['cursor']==='preserved-cursor','Flattening keeps pilot identity and cursor');
+check($flat->receiverForSite(4,'pilot')->state()['id']==='pilot','Already queued legacy payload remains valid');
+Yii::$app->skeeksSuppliersApi->api_key='different-fixture';
+failWith('connection_identity_changed',fn()=>$flat->receiverForSite(4));
+Yii::$app->skeeksSuppliersApi->api_key='fixture-only';
+Yii::$app->set('skeeks',new class extends yii\base\Component {public $site;public function init(){$this->site=(object)['id'=>4];}});
+Yii::$app->set('gpd',new class extends yii\base\Component {public $enabled=true;public function forSite($id){return $this;}});
+$automatic=new \skeeks\cms\shop\gpd\ReceiverComponent(['url'=>'https://fixture.invalid/v2']);
+check($automatic->receiverForSite(4)->state()['cursor']==='preserved-cursor','Automatic settings keep existing pilot cursor');
+check($automatic->referencesEnabled && $automatic->offersEnabled,'Automatic streams enabled');
+failWith('connection_disabled_or_wrong_site',fn()=>$automatic->receiverForSite(3));
+Yii::$app->gpd->enabled=false;
+failWith('connection_disabled_or_wrong_site',fn()=>$automatic->receiverForSite(4));
+Yii::$app->gpd->enabled=true;
+$automatic->enabled=false;
+failWith('connection_disabled_or_wrong_site',fn()=>$automatic->receiverForSite(4));
+Yii::$app->clear('gpd');
+Yii::$app->clear('skeeks');
 // Real native handler, including cooperative cancellation and resumable chunk loop.
 $transport=new FixtureTransport();
 $large=new CatalogReceiver($db,'large',$transport);
@@ -152,7 +185,7 @@ $transport->responses[]=['changes',changes([],'tail')];
 Yii::$app->set('gpdReceiver',new class($large) extends yii\base\Component {
     private $service;
     public function __construct($service) {$this->service=$service;parent::__construct();}
-    public function receiver($id,$site) {if($id!=='large'||$site!==1)throw new RuntimeException('Wrong binding');return $this->service;}
+    public function receiverForSite($site,$id=null) {if($id!==null||$site!==1)throw new RuntimeException('Wrong binding');return $this->service;}
 });
 $params=[];
 $config=require dirname(__DIR__).'/src/config/common.php';
@@ -179,5 +212,47 @@ check($reporter->result['applied_to_shop']===false && $reporter->errors===0,'Nat
 check($context->run->progress_current===10000,'Native progress reports 10000 receipts');
 check(!$transport->responses,'All expected protocol requests consumed');
 check(array_unique(array_filter($reporter->totals,fn($v)=>$v!==null))===[10000],'Progress total remains stable during bootstrap');
+check($reporter->result['run']['cards_received']===10000,'Receipt counters survive native process continuations');
+check(strpos($context->run->progress_message,'карточек 10000')!==false,'Completed bootstrap reports received cards');
+$context=new ReceiverFixtureContext(['run'=>(object)['cms_site_id'=>1,'progress_current'=>0],'definition'=>$definition]);
+$reporter=new ReceiverFixtureReporter(['run'=>$context->run]);
+$transport->responses=[['changes',changes([],'tail')]];
+$definition->createHandler()->run($context,$reporter);
+check($reporter->result['run']['cards_received']===0 && $reporter->result['tracked']===10000,'New run counters do not repeat historical catalog total');
+check(strpos($context->run->progress_message,'Новых изменений нет.')===0,'Empty poll has a human-readable final message');
+$context=new ReceiverFixtureContext(['run'=>(object)['cms_site_id'=>1,'progress_current'=>0],'definition'=>$definition]);
+$reporter=new ReceiverFixtureReporter(['run'=>$context->run]);
+$transport->responses=[['changes',changes([card(1,10001,'revoke')+['position'=>'10001']],'newtail')]];
+$definition->createHandler()->run($context,$reporter);
+check($reporter->result['run']['exclusions_received']===1 && $reporter->result['run']['cards_received']===0,'Revocations counted separately for this run');
+check(strpos($context->run->progress_message,'Товары сайта не изменялись.')!==false,'Receipt message never claims product application');
+// Application acknowledgements use the same transaction as domain writes.
+$db->createCommand()->createTable('fixture_shop',['id'=>'int primary key','revision'=>'bigint'])->execute();
+$writer=new class implements \skeeks\cms\shop\gpd\CatalogWriterInterface {
+    public $fail=false;
+    public function prepare(array $item):void {}
+    public function apply(array $item,array $state):array {
+        Yii::$app->db->createCommand()->upsert('fixture_shop',['id'=>$item['id'],'revision'=>$item['revision']])->execute();
+        if($this->fail)throw new RuntimeException('Fixture after shop write');
+        return ['outcome'=>'updated','local_product_id'=>$item['id']];
+    }
+};
+$at=new FixtureTransport();
+$applier=new \skeeks\cms\shop\gpd\CatalogApplier($db,'large',$at,$writer);
+$entry=['state'=>(new yii\db\Query())->from('{{%shop_gpd_catalog_state}}')->where(['connection_id'=>'large','product_id'=>2])->one(),'item'=>card(2,2)+['data'=>['id'=>2,'name'=>'Fixture']]];
+$writer->fail=true;
+try{$applier->apply($entry);throw new RuntimeException('Missing rollback');}catch(RuntimeException $e){check($e->getMessage()==='Fixture after shop write','Fixture fails after shop write');}
+check(!(new yii\db\Query())->from('fixture_shop')->exists(),'Domain write rolls back with failed apply');
+check((int)(new yii\db\Query())->select('applied_revision')->from('{{%shop_gpd_catalog_state}}')->where(['connection_id'=>'large','product_id'=>2])->scalar()===0,'Failed application leaves applied revision unchanged');
+$writer->fail=false;$applier->apply($entry);
+$state=(new yii\db\Query())->from('{{%shop_gpd_catalog_state}}')->where(['connection_id'=>'large','product_id'=>2])->one();
+check((int)$state['applied_revision']===2 && (int)$state['local_product_id']===2,'Shop write and applied version committed');
+check($applier->apply($entry)['outcome']==='unchanged','Redelivery does not write twice');
+$db->createCommand()->update('{{%shop_gpd_catalog_state}}',['revision'=>5],['connection_id'=>'large','product_id'=>2])->execute();
+check($applier->apply($entry)['outcome']==='pending','Receipt arriving during HTTP supersedes stale apply');
+$entry['item']=['id'=>2,'status'=>'not_available'];check($applier->apply($entry)['outcome']==='pending','Not available never means delete');
+$entry['item']=['id'=>2,'status'=>'pending'];check($applier->apply($entry)['outcome']==='pending','Pending cannot be acknowledged');
+$at->responses=[['batch',['items'=>[]]]];failWith('incomplete_batch',fn()=>$applier->page());
+$entry['item']=card(2,5)+['data'=>['id'=>999]];failWith('invalid_product_data',fn()=>$applier->apply($entry));
 echo "PASS $checks receiver/native-job checks including 10000 products, two table prefixes.\n";
 } finally {$db->createCommand("DROP DATABASE $name")->execute();}

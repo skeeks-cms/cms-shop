@@ -7,14 +7,18 @@ use yii\db\Query;
 /** Durable receipt of catalog metadata. Receipt is NOT application to the shop. */
 final class CatalogReceiver
 {
-    private $db;
+    private $db; private $connectionTable; private $stateTable; private $stream;
     private $id;
     private $transport;
-    public function __construct(Connection $db, string $id, CatalogTransportInterface $transport)
+    public function __construct(Connection $db, string $id, CatalogTransportInterface $transport, string $stream = 'catalog')
     {
         $this->db=$db; $this->id=$id; $this->transport=$transport;
+        if(!in_array($stream,['catalog','references','offers'],true))throw new ProtocolException('invalid_stream');
+        $this->stream=$stream;
+        $this->connectionTable=['catalog'=>'{{%shop_gpd_connection}}','references'=>'{{%shop_gpd_reference_connection}}','offers'=>'{{%shop_gpd_offer_connection}}'][$stream];
+        $this->stateTable=['catalog'=>'{{%shop_gpd_catalog_state}}','references'=>'{{%shop_gpd_reference_state}}','offers'=>'{{%shop_gpd_offer_state}}'][$stream];
     }
-    private function query(): Query { return (new Query())->from('{{%shop_gpd_connection}}')->where(['id'=>$this->id]); }
+    private function query(): Query { return (new Query())->from($this->connectionTable)->where(['id'=>$this->id]); }
     public function state(): array
     {
         $row=$this->query()->one($this->db);
@@ -26,7 +30,7 @@ final class CatalogReceiver
         if (!preg_match('/^[a-z0-9][a-z0-9_.-]{0,99}$/D',$this->id) || $site<1 || strlen($url)>512 || strlen($fingerprint)!==64) {
             throw new ProtocolException('invalid_connection_configuration');
         }
-        $this->db->createCommand()->upsert('{{%shop_gpd_connection}}',[
+        $this->db->createCommand()->upsert($this->connectionTable,[
             'id'=>$this->id,'cms_site_id'=>$site,'source_url'=>rtrim($url,'/'),
             'credential_fingerprint'=>$fingerprint,'updated_at'=>time(),
         ],false)->execute();
@@ -38,7 +42,7 @@ final class CatalogReceiver
     private function atomic(array $expected, callable $callback): void
     {
         $this->db->transaction(function()use($expected,$callback){
-            $row=$this->db->createCommand('SELECT * FROM {{%shop_gpd_connection}} WHERE id=:id FOR UPDATE',[':id'=>$this->id])->queryOne();
+            $row=$this->db->createCommand('SELECT * FROM '.$this->connectionTable.' WHERE id=:id FOR UPDATE',[':id'=>$this->id])->queryOne();
             foreach (['phase','cursor','generation'] as $field) {
                 if ((string)$row[$field] !== (string)$expected[$field]) throw new ProtocolException('concurrent_receiver');
             }
@@ -47,7 +51,7 @@ final class CatalogReceiver
     }
     private function update(array $values): void
     {
-        $this->db->createCommand()->update('{{%shop_gpd_connection}}',$values+['updated_at'=>time()],['id'=>$this->id])->execute();
+        $this->db->createCommand()->update($this->connectionTable,$values+['updated_at'=>time()],['id'=>$this->id])->execute();
     }
     private function token($value): string
     {
@@ -84,7 +88,7 @@ final class CatalogReceiver
     private function remember(array $item, int $generation, bool $seen): void
     {
         $key=['connection_id'=>$this->id,'product_id'=>$item['id']];
-        $row=(new Query())->from('{{%shop_gpd_catalog_state}}')->where($key)->one($this->db);
+        $row=(new Query())->from($this->stateTable)->where($key)->one($this->db);
         if ($seen && $row && (int)$row['seen_generation']===$generation) {
             throw new ProtocolException('duplicate_snapshot_product');
         }
@@ -99,7 +103,7 @@ final class CatalogReceiver
                 $values['product_revision']=$item['product_revision']??null;
             }
         }
-        $this->db->createCommand()->upsert('{{%shop_gpd_catalog_state}}',$key+$values,$values)->execute();
+        $this->db->createCommand()->upsert($this->stateTable,$key+$values,$values)->execute();
     }
     /** One bounded API page, committed together with its cursor. */
     public function receive(): array
@@ -108,7 +112,7 @@ final class CatalogReceiver
         try {
             if ($state['phase']==='bootstrap') {
                 $status=$this->transport->request('GET','status');
-                if (($status['protocol']??null)!==1 || ($status['stream']??null)!=='catalog' || ($status['seeded']??null)!==true) {
+                if (($status['protocol']??null)!==1 || ($status['stream']??null)!==$this->stream || ($status['seeded']??null)!==true) {
                     throw new ProtocolException('unsupported_or_unready_catalog');
                 }
                 $page=$this->transport->request('POST','bootstrap');
@@ -141,7 +145,7 @@ final class CatalogReceiver
                     $values['received']=(int)$state['received']+count($items);
                     if (!$more) {
                         // Absence is only a request for explicit batch verification, never a revoke.
-                        $this->db->createCommand()->update('{{%shop_gpd_catalog_state}}',['needs_resolution'=>1],[
+                        $this->db->createCommand()->update($this->stateTable,['needs_resolution'=>1],[
                             'and',['connection_id'=>$this->id],['<','seen_generation',(int)$state['generation']],
                         ])->execute();
                         $values['phase']='changes'; $values['cursor']=$state['changes_cursor'];
@@ -149,7 +153,7 @@ final class CatalogReceiver
                 }
                 $this->update($values);
             });
-            return ['count'=>count($items),'more'=>$snapshot||$more,'stage'=>$snapshot?'snapshot':'changes'];
+            return ['count'=>count($items),'more'=>$snapshot||$more,'stage'=>$snapshot?'snapshot':'changes','operations'=>$this->operations($items)];
         } catch (ProtocolException $e) {
             if (!in_array($e->reason,['cursor_expired','snapshot_expired'],true)) throw $e;
             $this->atomic($state,function(){ $this->update(['phase'=>'bootstrap','cursor'=>null,'changes_cursor'=>null]); });
@@ -160,7 +164,7 @@ final class CatalogReceiver
     public function resolve(int $after=0): array
     {
         $state=$this->state();
-        $ids=(new Query())->select('product_id')->from('{{%shop_gpd_catalog_state}}')->where(['connection_id'=>$this->id,'needs_resolution'=>1])
+        $ids=(new Query())->select('product_id')->from($this->stateTable)->where(['connection_id'=>$this->id,'needs_resolution'=>1])
             ->andWhere(['>','product_id',$after])->orderBy('product_id')->limit(20)->column($this->db);
         if (!$ids) return ['count'=>0,'after'=>$after,'more'=>false];
         $ids=array_map('intval',$ids);
@@ -180,12 +184,21 @@ final class CatalogReceiver
                 if (($item['status']??null)!=='not_available') $this->remember($item,(int)$state['generation'],false);
             }
         });
-        return ['count'=>count($ids),'after'=>max($ids),'more'=>true];
+        return ['count'=>count($ids),'after'=>max($ids),'more'=>true,'operations'=>$this->operations($items)];
+    }
+    private function operations(array $items): array
+    {
+        $counts=['upsert'=>0,'revoke'=>0,'pending'=>0];
+        foreach($items as $item) {
+            $key=isset($item['status'])?'pending':$item['operation'];
+            ++$counts[$key];
+        }
+        return $counts;
     }
     public function summary(): array
     {
         $state=$this->state();
-        $base=(new Query())->from('{{%shop_gpd_catalog_state}}')->where(['connection_id'=>$this->id]);
+        $base=(new Query())->from($this->stateTable)->where(['connection_id'=>$this->id]);
         return ['mode'=>'receipt_only','phase'=>$state['phase'],'snapshot_received'=>(int)$state['received'],'snapshot_total'=>(int)$state['total'],
             'tracked'=>(int)(clone $base)->count('*',$this->db),
             'unresolved'=>(int)(clone $base)->andWhere(['needs_resolution'=>1])->count('*',$this->db),

@@ -22,7 +22,7 @@ UPDATE
                         store_select.priority
                     FROM
                         {{%shop_store_product}} as ssp_select
-                        INNER JOIN {{%shop_store}} as store_select ON ssp_select.shop_store_id = store_select.id
+                        INNER JOIN {{%shop_store}} as store_select ON ssp_select.shop_store_id = store_select.id AND ssp_select.is_active = 1 AND store_select.is_active = 1
                     WHERE
                         store_select.cms_site_id = :site_id
                         AND (store_select.is_supplier = 1 || store_select.is_sync_external = 1)
@@ -68,7 +68,7 @@ UPDATE
                     ssp_join.shop_product_id as product_id
                 FROM
                     {{%shop_store_product}} as ssp_join
-                    INNER JOIN {{%shop_store}} as store ON ssp_join.shop_store_id = store.id
+                    INNER JOIN {{%shop_store}} as store ON ssp_join.shop_store_id = store.id AND ssp_join.is_active = 1 AND store.is_active = 1
                 WHERE
                     store.cms_site_id = :site_id
                     AND (store.is_supplier = 1 || store.is_sync_external = 1)

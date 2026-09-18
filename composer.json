@@ -27,7 +27,7 @@
     "require": {
         "skeeks/cms-agent": "^3.2.4 || dev-master",
         "skeeks/cms-job": "^1.0.6 || dev-master",
-        "skeeks/cms": "^6.0 || dev-master",
+        "skeeks/cms": "^6.4.9.28 || dev-master",
         "skeeks/cms-backend": "^2.0 || dev-master@dev",
         "skeeks/cms-money": "^2.0 || dev-master",
 

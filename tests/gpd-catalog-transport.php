@@ -24,4 +24,25 @@ $transport->request('POST','batch',['ids'=>[10,20]]);
 $r=$mock->flushRequests()[0];$r->prepare();
 $check(json_decode($r->getContent(),true)===['ids'=>[10,20]],'POST retains JSON body');
 $check(parse_url($r->getFullUrl(),PHP_URL_QUERY)===null,'POST has no query data');
+$referenceTransport=new skeeks\cms\shop\gpd\CatalogTransport('https://fixture.invalid/v2','fixture-key',$client,'references');
+$mock->appendResponse(new yii\httpclient\Response(['headers'=>['http-code'=>200],'content'=>'{"items":[]}']));
+$referenceTransport->request('GET','changes',['cursor'=>'reference-cursor']);
+$r=$mock->flushRequests()[0];$r->prepare();
+$check(parse_url($r->getFullUrl(),PHP_URL_PATH)==='/v2/references/changes','Separate reference route');
+$check($r->getContent()==='','Reference GET has empty body');
+$stable=new skeeks\cms\shop\gpd\CatalogTransport('https://fixture.invalid/v2','fixture-key',$client,'dictionaries');
+foreach(['countries','measures'] as $endpoint) {
+    $mock->appendResponse(new yii\httpclient\Response(['headers'=>['http-code'=>200],'content'=>'[]']));
+    $check($stable->request('GET',$endpoint)===[],'Empty stable dictionary is valid');
+    $r=$mock->flushRequests()[0];$r->prepare();
+    $check(parse_url($r->getFullUrl(),PHP_URL_PATH)==='/v2/'.$endpoint,'Stable dictionary uses direct v2 URL');
+    $check($r->getContent()==='','Stable dictionary GET body empty');
+}
+try {$stable->request('POST','countries');throw new RuntimeException('POST accepted');}
+catch(skeeks\cms\shop\gpd\ProtocolException $e){$check($e->reason==='invalid_request','Stable dictionary is read only');}
+$offers=new skeeks\cms\shop\gpd\CatalogTransport('https://fixture.invalid/v2','fixture-key',$client,'offers');
+$mock->appendResponse(new yii\httpclient\Response(['headers'=>['http-code'=>200],'content'=>'{"items":[]}']));
+$offers->request('GET','changes',['cursor'=>'offer-cursor']);$r=$mock->flushRequests()[0];$r->prepare();
+$check(parse_url($r->getFullUrl(),PHP_URL_PATH)==='/v2/offers/changes','Offers use separate v2 route');
+$check($r->getContent()==='','Offers GET body empty');
 echo "PASS $checks HTTP wire checks.\n";

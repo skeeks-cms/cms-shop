@@ -36,7 +36,7 @@ FROM (
             ssp.shop_product_id
         FROM
             {{%shop_store_product}} as ssp
-            INNER JOIN {{%shop_store}} as store ON ssp.shop_store_id = store.id
+            INNER JOIN {{%shop_store}} as store ON ssp.shop_store_id = store.id AND ssp.is_active = 1 AND store.is_active = 1
         WHERE
             store.cms_site_id = :site_id
             AND (store.is_supplier = 1 || store.is_sync_external = 1)

@@ -6,26 +6,28 @@ use yii\httpclient\Client;
 /** Separate additive transport; the existing v1 component is never mutated. */
 final class CatalogTransport implements CatalogTransportInterface
 {
-    private $url;
+    private $url; private $route;
     private $key;
     private $client;
-    public function __construct(string $url, string $key, ?Client $client = null)
+    public function __construct(string $url, string $key, ?Client $client = null, string $stream = 'catalog')
     {
         $parts = parse_url($url);
         if (!$parts || ($parts['scheme'] ?? '') !== 'https' || empty($parts['host']) ||
             isset($parts['user']) || isset($parts['pass']) || isset($parts['query']) || isset($parts['fragment']) || $key === '') {
             throw new ProtocolException('invalid_connection_configuration');
         }
+        if(!in_array($stream,['catalog','references','offers','dictionaries'],true))throw new ProtocolException('invalid_stream');
+        $this->route=['catalog'=>'sync','references'=>'references','offers'=>'offers','dictionaries'=>''][$stream];
         $this->url = rtrim($url, '/');
         $this->key = $key;
         $this->client = $client ?? new Client();
     }
     public function request(string $method, string $endpoint, array $data = []): array
     {
-        $allowed = ['status'=>'GET', 'bootstrap'=>'POST', 'manifest'=>'GET', 'changes'=>'GET', 'batch'=>'POST'];
+        $allowed = $this->route==='' ? ['countries'=>'GET','measures'=>'GET','stores'=>'GET'] : ['status'=>'GET', 'bootstrap'=>'POST', 'manifest'=>'GET', 'changes'=>'GET', 'batch'=>'POST'];
         if (($allowed[$endpoint] ?? null) !== $method) throw new ProtocolException('invalid_request');
         try {
-            $url = $this->url.'/sync/'.$endpoint;
+            $url = $this->url.'/'.($this->route!==''?$this->route.'/':'').$endpoint;
             if ($method === 'GET' && $data) $url .= '?'.http_build_query($data);
             $request = $this->client->createRequest()->setMethod($method)->setUrl($url)
                 ->setHeaders(['Authorization'=>$this->key, 'Accept'=>'application/json'])

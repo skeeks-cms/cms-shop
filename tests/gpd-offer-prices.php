@@ -1,0 +1,22 @@
+<?php
+$loader=require '/deps/autoload.php';$loader->addPsr4('skeeks\\cms\\shop\\','/shared-vendor/skeeks/cms-shop/src',true);require '/deps/yiisoft/yii2/Yii.php';
+new yii\console\Application(['id'=>'offer-price-test','basePath'=>__DIR__,'vendorPath'=>'/deps','extensions'=>[],'components'=>['db'=>['class'=>yii\db\Connection::class,'dsn'=>'mysql:host=gpd-receiver-db','username'=>'root']]]);
+$db=Yii::$app->db;$name='prices_'.bin2hex(random_bytes(5));$db->createCommand("CREATE DATABASE $name")->execute();$db->createCommand("USE $name")->execute();$n=0;
+function check($v,$m){global $n;if(!$v)throw new RuntimeException($m);++$n;}
+function price($type){return (float)Yii::$app->db->createCommand('SELECT price FROM shop_product_price WHERE product_id=10 AND type_price_id=:t',[':t'=>$type])->queryScalar();}
+try{
+ foreach(['shop_store'=>'id INT PRIMARY KEY,cms_site_id INT,is_active INT,is_supplier INT,is_sync_external INT,priority INT,source_purchase_price VARCHAR(30),source_selling_price VARCHAR(30),purchase_extra_charge DECIMAL(12,2),selling_extra_charge DECIMAL(12,2)', 'shop_store_product'=>'id INT PRIMARY KEY,shop_product_id INT,shop_store_id INT,is_active INT,quantity DECIMAL(12,3),purchase_price DECIMAL(12,2),selling_price DECIMAL(12,2)','shop_type_price'=>'id INT PRIMARY KEY,cms_site_id INT,is_default INT,is_purchase INT,is_auto INT,base_auto_shop_type_price_id INT,auto_extra_charge DECIMAL(12,2)','shop_product_price'=>'id INT AUTO_INCREMENT PRIMARY KEY,product_id INT,type_price_id INT,price DECIMAL(12,2),currency_code VARCHAR(3),is_fixed INT NOT NULL DEFAULT 0,UNIQUE KEY identity(product_id,type_price_id)'] as $t=>$ddl)$db->createCommand("CREATE TABLE $t ($ddl)")->execute();
+ $db->createCommand()->batchInsert('shop_store',['id','cms_site_id','is_active','is_supplier','is_sync_external','priority','source_purchase_price','source_selling_price','purchase_extra_charge','selling_extra_charge'],[[1,1,1,1,1,1,'purchase_price','selling_price',100,120],[2,1,1,1,1,2,'purchase_price','selling_price',100,110],[3,2,1,1,1,0,'purchase_price','selling_price',100,100]])->execute();
+ $db->createCommand()->batchInsert('shop_store_product',['id','shop_product_id','shop_store_id','is_active','quantity','purchase_price','selling_price'],[[1,10,1,1,0,100,200],[2,10,2,1,10,300,400],[3,10,3,1,100,1,1]])->execute();
+ $db->createCommand()->batchInsert('shop_type_price',['id','cms_site_id','is_default','is_purchase','is_auto','base_auto_shop_type_price_id','auto_extra_charge'],[[1,1,1,0,0,null,null],[2,1,0,1,0,null,null],[3,1,0,0,1,1,90],[4,1,0,0,1,3,50]])->execute();
+ $calc=new skeeks\cms\shop\gpd\OfferPrices();$calc->recalculate(1,10);
+ check(price(1)===440.0&&price(2)===300.0,'availability beats priority and site isolated');check(price(3)===396.0&&price(4)===198.0,'chained automatic markup');
+ $db->createCommand()->update('shop_store_product',['quantity'=>1],['id'=>1])->execute();$calc->recalculate(1,10);check(price(1)===240.0,'priority selects stocked warehouse');
+ $db->createCommand()->update('shop_product_price',['is_fixed'=>1,'price'=>777],['product_id'=>10,'type_price_id'=>1])->execute();$calc->recalculate(1,10);check(price(1)===777.0,'fixed retail preserved');
+ $db->createCommand()->update('shop_product_price',['is_fixed'=>0],['product_id'=>10,'type_price_id'=>1])->execute();
+ $db->createCommand()->update('shop_store_product',['is_active'=>0],['id'=>1])->execute();$calc->recalculate(1,10);check(price(1)===440.0,'inactive position excluded');
+ $db->createCommand()->update('shop_store',['is_active'=>0],['id'=>2])->execute();$calc->recalculate(1,10);check(price(1)===0.0&&price(2)===0.0&&price(3)===0.0,'no eligible offers clears calculated prices');
+ $db->createCommand()->update('shop_store_product',['is_active'=>1],['id'=>1])->execute();$calc->recalculate(1,10);check(price(1)===240.0,'return restores price');
+ $db->createCommand()->update('shop_type_price',['base_auto_shop_type_price_id'=>4],['id'=>3])->execute();try{$calc->recalculate(1,10);throw new RuntimeException('cycle accepted');}catch(RuntimeException $e){check(strpos($e->getMessage(),'Циклическая')!==false,'cycle detected');}
+ echo "PASS $n offer price checks\n";
+}finally{$db->createCommand("DROP DATABASE $name")->execute();}

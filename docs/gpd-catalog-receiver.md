@@ -1,5 +1,9 @@
 # GPD: приём журнала каталога на клиенте
 
+Текущая схема и правила: [GPD v2](gpd.md). Разделы с датами — история внедрения.
+
+Текущее применение карточек и компонент настроек описаны в [gpd-catalog-application.md](gpd-catalog-application.md). Ниже также сохранена история этапа приёма без применения.
+
 Первый клиентский этап — приём метаданных без изменения каталога магазина.
 `shop.gpd.catalog.receive` получает manifest/bootstrap, затем ленту изменений и
 проверяет pending через batch. Он НЕ импортирует карточки, не меняет цены/остатки,
@@ -37,14 +41,10 @@
 3. В конфигурации КЛИЕНТСКОГО сайта добавить компоненту gpdReceiver:
 
 ```php
-'connections' => [
-    'main' => [
-        'enabled' => true,
-        'siteId' => 1, // фактический cms_site.id, не копировать без проверки
-        'url' => 'https://gpd-api.skeeks.com/v2',
-        'apiComponent' => 'skeeksSuppliersApi',
-    ],
-],
+'enabled' => true,
+'siteId' => 1, // фактический cms_site.id, не копировать без проверки
+'url' => 'https://gpd-api.skeeks.com/v2',
+'apiComponent' => 'skeeksSuppliersApi',
 ```
 
 Ключ берётся из указанного существующего компонента и не помещается в job payload.
@@ -54,10 +54,10 @@ ID подключения глобально уникален в установ�
 
 4. Развернуть отдельный worker `yii cms-job/worker --queue=gpd-receive`.
 5. Создать расписание с job_type `shop.gpd.catalog.receive`, payload
-   `{"connection":"main"}`, правильным сайтом и интервалом 60 секунд. Сначала
+   `{}`, правильным сайтом и интервалом 60 секунд. Сначала
    проверить ручной запуск. Нынешние четыре команды не переключаются автоматически.
 
-Ресурс и dedup относятся к подключению; overlap=skip, до трёх попыток при сбое.
+Ресурс и dedup относятся к приёму каталога установки; overlap=skip, до трёх попыток при сбое.
 Обработчик использует ChunkedJobHandler, страницы по 50, batch по 20, перезапуск
 процесса примерно через 15 секунд. Нет собственного worker, claim или retry loop.
 Каждый запуск один раз проходит unresolved; если они остались, результат — с
@@ -101,3 +101,43 @@ SHA256 отсортированных ID/revision/product_revision/operation с�
 Диагностика /tmp/elitkras-gpd/status.php и verify-client.php, резерв до установки
 /tmp/elitkras-gpd/backup-code.tar.gz (root-only). Применение карточек/деактивация
 по-прежнему не реализованы и не включены; четыре прежних обмена продолжаются.
+
+## Понятный результат каждого запуска
+
+Обработчик сохраняет run.cards_received, exclusions_received, pending_received,
+rechecked отдельно от общего состояния597/597. Эти счётчики продолжаются между
+порциями одного run и начинаются с нуля у следующего. Завершение выставляет
+progress_message через setStage('complete', ...), как мониторинг hosting.sites.monitor.
+При пустой ленте: «Новых изменений нет. Требуют проверки: 0. Товары сайта не изменялись.»
+Проверено85 сценариев получателя, включая10тыс, продолжение счётчиков, новый пустой
+запуск и отдельный revoke. На elitkras.ru новый run33 succeeded с таким сообщением.
+Список запусков cms-job теперь предпочитает progress_message техническому stage;
+старый stage остаётся запасным вариантом, HTML сообщения экранируется.
+
+## Запуск без параметров подключения
+
+Задание принимает пустой payload {} и выбирает настройку по cms_site_id запуска.
+Публичное имя connection больше не требуется: одно подключение на сайт.
+ReceiverComponent имеет плоские enabled/siteId/url/apiComponent. Внутренний ID
+строки состояния сохраняется при переходе со старой конфигурации, поэтому
+переименование настроек не сбрасывает курсор. Для новой установки ID формируется
+автоматически как site-N. Неоднозначная конфигурация отклоняется; смена ключа
+по-прежнему не подменяет прежнюю товарную базу молча. Старые connections и payload
+принимаются для совместимости уже поставленных заданий, с проверкой сайта.
+Старый и пустой payload используют один ресурсный ключ.
+
+Пилот: расписание60 теперь {}, интервал60s; новый запуск70 succeeded.
+Перед изменением проверено сохранение всей строки состояния, tracked597.
+94 проверки, включая сохранённый курсор, неверный сайт, смену ключа,
+неоднозначность и настоящий job без параметров на10000 товаров.
+Новые применяющие jobs разрабатываются отдельно; старые команды остаются
+справочником бизнес-правил, а не исполняемым адаптером новых jobs.
+
+After receipt/resolve commits new metadata, CatalogApplyDispatch checks for
+unapplied resolved rows scoped through the site's connection and pushes the
+native shop.gpd.catalog.apply job with an empty payload. It respects the GPD
+component switch and existing job resource/dedup policy. Each bounded receiver
+execution wakes once on its first nonempty page and checks again on finish,
+including empty polls with pending application. Regular apply schedules remain
+the recovery path if enqueue fails or overlaps an already running writer.
+The receiver owns no source JSON generation or publisher-specific bootstrap.

@@ -1137,6 +1137,9 @@ class SkeeksSuppliersController extends Controller
      */
     private function _updateTree($apiData = [], CmsTree $cmsTree = null)
     {
+        if ($cmsTree && $cmsTree->hasAttribute('is_sx_info_update') && !$cmsTree->is_sx_info_update) {
+            return false;
+        }
         $id = (int)ArrayHelper::getValue($apiData, "id");
         $updated_at = (int)ArrayHelper::getValue($apiData, "updated_at.timestamp");
         $result = false;

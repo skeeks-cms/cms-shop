@@ -9,10 +9,47 @@ return [
 
     'bootstrap'  => ['shop'],
     'components' => [
+        'gpd' => ['class' => \skeeks\cms\shop\components\GpdComponent::class],
         'gpdReceiver' => ['class' => \skeeks\cms\shop\gpd\ReceiverComponent::class],
-        'jobQueueFactory' => ['queues' => ['gpd-receive' => []]],
+        'jobQueueFactory' => ['queues' => ['gpd-receive' => [], 'gpd-apply' => [], 'gpd-offers' => []]],
         'jobRegistry' => [
             'types' => [
+                'shop.gpd.dictionaries.sync' => [
+                    'type'=>'shop.gpd.dictionaries.sync','title'=>'GPD: страны и единицы измерения',
+                    'handler'=>\skeeks\cms\shop\jobs\GpdStableReferencesJobHandler::class,
+                    'queue'=>'gpd-apply','timeout'=>600,'leaseSeconds'=>120,'maxAttempts'=>3,
+                    'idempotent'=>true,'overlapPolicy'=>'skip',
+                    'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey'=>static function(){return 'shop:gpd:apply';},
+                    'dedupKey'=>static function(){return 'shop:gpd:dictionaries';},
+                ],
+                'shop.gpd.offers.sync' => [
+                    'type'=>'shop.gpd.offers.sync','title'=>'GPD: синхронизация цен и остатков',
+                    'handler'=>\skeeks\cms\shop\jobs\GpdOffersJobHandler::class,
+                    'queue'=>'gpd-offers','timeout'=>600,'leaseSeconds'=>120,'maxAttempts'=>3,
+                    'idempotent'=>true,'overlapPolicy'=>'skip',
+                    'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey'=>static function(){return 'shop:gpd:apply';},
+                    'dedupKey'=>static function(){return 'shop:gpd:offers';},
+                ],
+                'shop.gpd.references.sync' => [
+                    'type'=>'shop.gpd.references.sync','title'=>'GPD: синхронизация справочников',
+                    'handler'=>\skeeks\cms\shop\jobs\GpdReferencesJobHandler::class,
+                    'queue'=>'gpd-apply','timeout'=>600,'leaseSeconds'=>120,'maxAttempts'=>3,
+                    'idempotent'=>true,'overlapPolicy'=>'skip',
+                    'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey'=>static function(){return 'shop:gpd:apply';},
+                    'dedupKey'=>static function(){return 'shop:gpd:references';},
+                ],
+                'shop.gpd.catalog.apply' => [
+                    'type'=>'shop.gpd.catalog.apply', 'title'=>'GPD: применение изменений каталога',
+                    'handler'=>\skeeks\cms\shop\jobs\GpdCatalogApplyJobHandler::class,
+                    'queue'=>'gpd-apply', 'timeout'=>600, 'leaseSeconds'=>120, 'maxAttempts'=>3,
+                    'idempotent'=>true, 'overlapPolicy'=>'skip',
+                    'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey'=>static function(){return 'shop:gpd:apply';},
+                    'dedupKey'=>static function(){return 'shop:gpd:apply';},
+                ],
                 'shop.gpd.catalog.receive' => [
                     'type' => 'shop.gpd.catalog.receive',
                     'title' => 'GPD: приём журнала каталога (без применения)',
@@ -24,8 +61,8 @@ return [
                     'idempotent' => true,
                     'overlapPolicy' => 'skip',
                     'permission' => \skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
-                    'resourceKey' => static function (array $payload) { return 'shop:gpd:receive:'.($payload['connection'] ?? 'invalid'); },
-                    'dedupKey' => static function (array $payload) { return 'shop:gpd:receive:'.($payload['connection'] ?? 'invalid'); },
+                    'resourceKey' => static function (array $payload) { return 'shop:gpd:receive'; },
+                    'dedupKey' => static function (array $payload) { return 'shop:gpd:receive'; },
                 ],
                 'shop.delete-empty-carts' => [
                     'type' => 'shop.delete-empty-carts',
