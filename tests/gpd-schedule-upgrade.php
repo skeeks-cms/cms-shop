@@ -33,7 +33,7 @@ foreach (['','sx_'] as $prefix) {
         'job_type'=>'shop.gpd.catalog.receive','job_payload'=>'{"connection":"pilot"}','agent_interval'=>47,'is_active'=>1])->execute();
     $query=static fn($site)=>(new yii\db\Query())->from('{{%cms_agent}}')->where(['cms_site_id'=>$site])->andWhere(['not',['job_type'=>null]]);
     $enabled=[];
-    $upgrade=new ScheduleUpgrade($db);
+    $busy=false; $upgrade=new ScheduleUpgrade($db, static function()use(&$busy){if($busy)throw new RuntimeException("busy #5");});
     verify($upgrade->run(function($site,$enable)use(&$enabled){if($enable)$enabled[]=$site;})===4,'All legacy sites migrated');
     verify($enabled===[1,3],'Only previously active, non-pilot sites enabled');
     verify((int)$query(1)->count()===5 && (int)$query(1)->andWhere(['is_active'=>1])->count()===5,'Active schedules replaced');
@@ -51,8 +51,14 @@ foreach (['','sx_'] as $prefix) {
     catch(RuntimeException $e){verify($e->getMessage()==='fixture','Settings failure is propagated');}
     verify((int)$query(5)->count()===0,'Settings failure rolls back new schedules');
     $db->createCommand()->update('{{%cms_agent}}',['is_running'=>1],['cms_site_id'=>5])->execute();
+    $busy=true;
     try{$upgrade->run(static function(){});throw new LogicException('Running legacy was accepted');}
     catch(RuntimeException $e){verify(strpos($e->getMessage(),'#5')!==false,'Running command prevents overlap');}
+    verify((int)$query(5)->count()===0,'Live process rolls back migration');
+    $busy=false;
+    $upgrade->run(static function(){});
+    verify((int)$query(5)->count()===5,'Stale running flag allows migration');
+    verify(!(new yii\db\Query())->from('{{%cms_agent}}')->where(['cms_site_id'=>5,'is_running'=>1])->exists(),'Stale flag cleared');
 }
 echo "OK $checks schedule migration checks\n";
 } finally {$db->createCommand("DROP DATABASE $name")->execute();}
