@@ -88,6 +88,21 @@ class ScheduledMaintenance extends BaseObject
         }
     }
 
+    public function updateSubproducts(?callable $checkpoint = null): array
+    {
+        $processed = 0;
+        $this->execute('subproducts', [], $checkpoint, $processed);
+        return ['processed' => $processed];
+    }
+
+    /** Preserve the explicitly disabled legacy notifier; never enable mail through migration. */
+    public function quantityEmails(?callable $checkpoint = null): array
+    {
+        $this->checkpoint($checkpoint, 'disabled', 0);
+        return ['processed' => 0, 'enabled' => false,
+            'reason' => 'Уведомления о поступлении отключены в текущей реализации. Письма не отправлялись.'];
+    }
+
     public function updateProductType(?callable $checkpoint = null): array
     {
         $processed = 0;

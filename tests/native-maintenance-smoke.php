@@ -22,6 +22,7 @@ class MaintenanceFixtureReporter extends \skeeks\cms\job\runtime\JobReporter {
     public function advance(int $by = 1): void { $this->advanced += $by; }
     public function countSuccess(int $by = 1): void { $this->success += $by; }
     public function heartbeat(): void { ++$this->beats; }
+    public function countSkipped(int $by = 1): void {}
     public function isCancelled(): bool { return $this->cancel; }
     public function setResult(array $result): void { $this->result = $result; }
 }
@@ -36,13 +37,13 @@ foreach (['', 'sx_'] as $prefix) {
         'shop_order'=>'id INT PRIMARY KEY, is_created INT, created_at INT',
         'shop_user'=>'id INT PRIMARY KEY, shop_order_id INT NULL',
         'shop_product_price_change'=>'id INT PRIMARY KEY, created_at INT',
-        'shop_product'=>'id INT PRIMARY KEY, offers_pid INT NULL, product_type VARCHAR(30), rating_count INT DEFAULT 0, rating_value DECIMAL(10,4) DEFAULT 0',
-        'cms_content_element'=>'id INT PRIMARY KEY, cms_site_id INT, tree_id INT NULL',
+        'shop_product'=>'id INT PRIMARY KEY, offers_pid INT NULL, product_type VARCHAR(30), rating_count INT DEFAULT 0, rating_value DECIMAL(10,4) DEFAULT 0, measure_ratio DECIMAL(10,2), measure_ratio_min DECIMAL(10,2), measure_matches_jsondata TEXT, measure_code VARCHAR(20), width DECIMAL(10,2), length DECIMAL(10,2), height DECIMAL(10,2), weight DECIMAL(10,2)',
+        'cms_content_element'=>'id INT PRIMARY KEY, cms_site_id INT, tree_id INT NULL, main_cce_id INT NULL',
         'shop_site'=>'id INT PRIMARY KEY, is_generate_product_rating INT DEFAULT 0, generate_min_product_rating_count INT DEFAULT 10, generate_max_product_rating_count INT DEFAULT 20, generate_min_product_rating_value INT DEFAULT 4, generate_max_product_rating_value INT DEFAULT 5',
         'shop_type_price'=>'id INT PRIMARY KEY, cms_site_id INT, is_auto INT DEFAULT 0, base_auto_shop_type_price_id INT NULL, auto_extra_charge DECIMAL(10,2), is_purchase INT DEFAULT 0, is_default INT DEFAULT 0',
         'shop_product_price'=>'id INT PRIMARY KEY AUTO_INCREMENT, product_id INT, type_price_id INT, price DECIMAL(14,2) NULL, currency_code VARCHAR(3), is_fixed INT DEFAULT 0, UNIQUE(product_id,type_price_id)',
-        'shop_store'=>'id INT PRIMARY KEY, cms_site_id INT, is_supplier INT DEFAULT 1, is_sync_external INT DEFAULT 0, source_purchase_price VARCHAR(30), source_selling_price VARCHAR(30), purchase_extra_charge DECIMAL(10,2), selling_extra_charge DECIMAL(10,2), priority INT',
-        'shop_store_product'=>'id INT PRIMARY KEY, shop_product_id INT, shop_store_id INT, quantity INT, purchase_price DECIMAL(14,2), selling_price DECIMAL(14,2)',
+        'shop_store'=>'id INT PRIMARY KEY, is_active INT DEFAULT 1, cms_site_id INT, is_supplier INT DEFAULT 1, is_sync_external INT DEFAULT 0, source_purchase_price VARCHAR(30), source_selling_price VARCHAR(30), purchase_extra_charge DECIMAL(10,2), selling_extra_charge DECIMAL(10,2), priority INT',
+        'shop_store_product'=>'id INT PRIMARY KEY, is_active INT DEFAULT 1, shop_product_id INT, shop_store_id INT, quantity INT, purchase_price DECIMAL(14,2), selling_price DECIMAL(14,2)',
     ];
     foreach ($schemas as $table=>$schema) { $db->createCommand("CREATE TABLE $prefix$table ($schema) ENGINE=InnoDB")->execute(); }
     $insert = static function ($table, $row) use ($db,$prefix) { $db->createCommand()->insert($prefix.$table,$row)->execute(); };
@@ -128,6 +129,19 @@ foreach (['', 'sx_'] as $prefix) {
     } catch (skeeks\cms\job\exceptions\JobCancelledException $e) {
         $check(!$q('shop_product_price')->where(['type_price_id'=>2])->exists() && !$db->getTransaction(),'Cancellation rolls back incomplete store-price transaction');
     }
+    foreach([81,82,83,84] as $id){
+        $insert('shop_product',['id'=>$id,'width'=>($id===81?12:99),'measure_code'=>'piece']);
+        $insert('cms_content_element',['id'=>$id,'main_cce_id'=>($id===81?null:81)]);
+    }
+    try{
+        $service->updateSubproducts(static function($p){if($p['processed']>=1)throw new skeeks\cms\job\exceptions\JobCancelledException('cancel');});
+        throw new RuntimeException('No cancellation');
+    }catch(skeeks\cms\job\exceptions\JobCancelledException $e){
+        $check((int)$q('shop_product')->where(['width'=>99])->count()>0,'Cancellation leaves later batches untouched');
+    }
+    $service->updateSubproducts();
+    $check((int)$q('shop_product')->where(['id'=>[82,83,84],'width'=>12])->count()===3,'Subproducts inherit dimensions in batches');
+    $check($service->quantityEmails()['enabled']===false,'Disabled notifier stays disabled without mail component');
     $beats=0;
     $service->deleteEmptyCarts(3,static function($p)use(&$beats){++$beats;});
     $check($beats>0,'Cleanup emits progress checkpoints');
@@ -137,6 +151,7 @@ foreach (['', 'sx_'] as $prefix) {
     $params = [];
     $config = require dirname(__DIR__).'/src/config/common.php';
     foreach ($config['components']['jobRegistry']['types'] as $definition) {
+        if ($definition['queue'] !== 'maintenance') continue;
         $handler = new $definition['handler']();
         $reporter = new MaintenanceFixtureReporter();
         $handler->run(new \skeeks\cms\job\runtime\JobContext(), $reporter);
@@ -153,7 +168,7 @@ foreach (['', 'sx_'] as $prefix) {
     $catalog = array_filter($types, static function($t){return strpos($t['type'],'shop.update-')===0;});
     $resources=[];$dedup=[];
     foreach($catalog as $type){$resources[]=($type['resourceKey'])();$dedup[]=($type['dedupKey'])();}
-    $check(count(array_unique($resources))===1 && count(array_unique($dedup))===4,
+    $check(count(array_unique($resources))===1 && count(array_unique($dedup))===5,
         'Catalog types share a resource lock without suppressing distinct operations');
 
 echo "PASS: $checks native shop checks\n";

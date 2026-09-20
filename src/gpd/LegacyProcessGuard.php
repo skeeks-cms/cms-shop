@@ -4,7 +4,7 @@ namespace skeeks\cms\shop\gpd;
 /** Local-process evidence only; deployment must pause producers before migration. */
 final class LegacyProcessGuard
 {
-    public static function assertStopped(string $root, string $proc = '/proc'): void
+    public static function assertStopped(string $root, string $proc = '/proc', array $extraRoutes = []): void
     {
         $root = realpath($root);
         $entries = glob($proc.'/[0-9]*', GLOB_ONLYDIR);
@@ -21,6 +21,7 @@ final class LegacyProcessGuard
             $args = explode("\0", $cmd);
             $relevant = false;
             foreach ($args as $arg) {
+                if (in_array($arg, $extraRoutes, true)) $relevant = true;
                 if (preg_match('~^(?:shop/skeeks-suppliers/(?:update-products|update-store-items)|cmsAgent/execute)(?:/index)?$~', $arg)) $relevant = true;
             }
             if (!$relevant) continue;

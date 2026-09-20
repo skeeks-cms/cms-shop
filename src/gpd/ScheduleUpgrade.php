@@ -44,7 +44,7 @@ final class ScheduleUpgrade
                     $active=$group==='products'?$products:($group==='offers'?$offers:($products||$offers));
                     $this->db->createCommand()->insert('{{%cms_agent}}',[
                         'cms_site_id'=>$site,'name'=>'job:'.$type,'description'=>$title,'job_type'=>$type,'job_payload'=>'{}',
-                        'agent_interval'=>$interval,'priority'=>100,'is_period'=>0,'is_running'=>0,'is_system'=>0,
+                        'agent_interval'=>$interval,'priority'=>100,'is_period'=>0,'is_running'=>0,'is_system'=>1,
                         'is_active'=>(int)$active,'last_exec_at'=>0,'next_exec_at'=>time(),
                     ])->execute();
                 }

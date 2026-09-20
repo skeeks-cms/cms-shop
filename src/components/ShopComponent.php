@@ -627,35 +627,9 @@ class ShopComponent extends Component implements BootstrapInterface
      */
     public function updateAllSubproducts()
     {
-        $result = \Yii::$app->db->createCommand(<<<SQL
-            UPDATE 
-                `shop_product` as sp 
-                INNER JOIN (
-                    /*Товары у которых задан главный товар*/
-                    SELECT 
-                        inner_cce.id as inner_sp_id,
-                        inner_cce.main_cce_id as main_cce_id
-                    FROM 
-                        cms_content_element inner_cce 
-                    WHERE 
-                        inner_cce.main_cce_id is not null
-                ) sp_has_main_pid ON sp_has_main_pid.inner_sp_id = sp.id 
-                LEFT JOIN shop_product as sp_main on sp_main.id = sp_has_main_pid.main_cce_id 
-            SET 
-                sp.`measure_ratio` = sp_main.measure_ratio, 
-                sp.`measure_ratio_min` = sp_main.measure_ratio_min, 
-                sp.`measure_matches_jsondata` = sp_main.measure_matches_jsondata, 
-                sp.`measure_code` = sp_main.measure_code, 
-                sp.`width` = sp_main.width, 
-                sp.`length` = sp_main.length, 
-                sp.`height` = sp_main.height, 
-                sp.`weight` = sp_main.weight
-SQL
-        )->execute();
-
+        (new \skeeks\cms\shop\services\ScheduledMaintenance())->updateSubproducts();
         return $this;
     }
-
 
     /**
      *

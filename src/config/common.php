@@ -64,6 +64,23 @@ return [
                     'resourceKey' => static function (array $payload) { return 'shop:gpd:receive'; },
                     'dedupKey' => static function (array $payload) { return 'shop:gpd:receive'; },
                 ],
+                'shop.update-subproducts' => [
+                    'type'=>'shop.update-subproducts', 'title'=>'Обновление данных по вложенным товарам',
+                    'handler'=>\skeeks\cms\shop\jobs\UpdateSubproductsJobHandler::class,
+                    'queue'=>'maintenance', 'timeout'=>7200, 'leaseSeconds'=>120,
+                    'maxAttempts'=>1, 'idempotent'=>false, 'overlapPolicy'=>'skip',
+                    'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey'=>static function(){return 'shop:catalog';},
+                    'dedupKey'=>static function(){return 'shop:update-subproducts';},
+                ],
+                'shop.quantity-emails' => [
+                    'type'=>'shop.quantity-emails', 'title'=>'Уведомить о поступлении',
+                    'handler'=>\skeeks\cms\shop\jobs\QuantityEmailsJobHandler::class,
+                    'queue'=>'maintenance', 'timeout'=>60, 'leaseSeconds'=>120,
+                    'maxAttempts'=>1, 'idempotent'=>false, 'overlapPolicy'=>'skip',
+                    'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey'=>static function(){return 'shop:quantity-emails';},
+                ],
                 'shop.delete-empty-carts' => [
                     'type' => 'shop.delete-empty-carts',
                     'title' => 'Удаление старых корзин',
@@ -182,6 +199,16 @@ return [
         'cmsAgent'    => [
             'commands' => [
 
+                'shop/agents/update-subproducts' => [
+                    'jobType'=>'shop.update-subproducts',
+                    'class'=>\skeeks\cms\agent\CmsAgent::class,
+                    'name'=>'Обновление данных по вложенным товарам', 'interval'=>300,
+                ],
+                'shop/notify/quantity-emails' => [
+                    'jobType'=>'shop.quantity-emails',
+                    'class'=>\skeeks\cms\agent\CmsAgent::class,
+                    'name'=>'Уведомить о поступлении', 'interval'=>600,
+                ],
                 'shop/agents/delete-empty-carts' => [
                     'jobType' => 'shop.delete-empty-carts',
                     'class'    => \skeeks\cms\agent\CmsAgent::class,
