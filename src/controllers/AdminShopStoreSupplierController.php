@@ -139,21 +139,37 @@ HTML
                     'visibleFilters' => [
                         'q',
                         'import_status',
+                        'is_active',
                     ],
 
                     'filtersModel' => [
                         'rules' => [
-                            [['q', 'import_status'], 'safe'],
+                            [['q', 'import_status', 'is_active'], 'safe'],
                         ],
 
                         'attributeDefines' => [
                             'q',
                             'import_status',
+                            'is_active',
                         ],
 
 
                         'fields' => [
 
+                            'is_active' => [
+                                'class' => BoolField::class,
+                                'label' => 'Активность',
+                                'trueLabel' => 'Да',
+                                'falseLabel' => 'Нет',
+                                'allowNull' => true,
+                                'nullLabel' => 'Все',
+                                'on apply' => function (QueryFiltersEvent $e) {
+                                    $value = $e->field->value;
+                                    if (in_array($value, [0, 1, '0', '1'], true)) {
+                                        $e->dataProvider->query->andWhere([ShopStore::tableName().'.is_active' => (int)$value]);
+                                    }
+                                },
+                            ],
                             'import_status' => [
                                 'class' => SelectField::class,
                                 'label' => 'Обновление поставщика',
@@ -192,7 +208,7 @@ HTML
                         ],
                     ],
                 ],
-                "backendShowings" => false,
+                "backendShowings" => null,
                 'grid'            => [
                     'on init'        => function (Event $e) {
                         /**
