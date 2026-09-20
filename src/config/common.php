@@ -197,6 +197,13 @@ return [
                 ],
         ],
         'cmsAgent'    => [
+            'jobs' => [
+                'shop.gpd.catalog.receive' => ['jobType'=>'shop.gpd.catalog.receive','name'=>'GPD: получение изменений товаров','interval'=>60],
+                'shop.gpd.catalog.apply' => ['jobType'=>'shop.gpd.catalog.apply','name'=>'GPD: применение изменений товаров','interval'=>60],
+                'shop.gpd.references.sync' => ['jobType'=>'shop.gpd.references.sync','name'=>'GPD: синхронизация справочников','interval'=>60],
+                'shop.gpd.dictionaries.sync' => ['jobType'=>'shop.gpd.dictionaries.sync','name'=>'GPD: страны и единицы измерения','interval'=>86400],
+                'shop.gpd.offers.sync' => ['jobType'=>'shop.gpd.offers.sync','name'=>'GPD: цены, остатки и склады','interval'=>60],
+            ],
             'commands' => [
 
                 'shop/agents/update-subproducts' => [

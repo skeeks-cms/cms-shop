@@ -20,4 +20,9 @@ if($out[3]['is_system']!=1||$out[3]['job_payload']!=='{"connection":"custom"}'||
 if($out[4]['is_system']!=0)throw new RuntimeException('Custom schedule touched');
 $m->up();
 if($out!==(new yii\db\Query())->from('cms_agent')->indexBy('id')->all())throw new RuntimeException('Not repeatable');
-echo "OK system schedule migration: identity, activation, cadence, payload, custom rows, repeat\n";
+echo "OK system schedule migration: identity, activation, cadence, payload, custom rows, repeat\n";$config=require dirname(__DIR__).'/src/config/common.php';
+foreach(skeeks\cms\shop\gpd\ScheduleUpgrade::SCHEDULES as $type=>$definition){
+ $schedule=$config['components']['cmsAgent']['jobs'][$type]??null;
+ if(!$schedule||$schedule['jobType']!==$type||$schedule['interval']!==$definition[1])throw new RuntimeException('Missing configured GPD schedule');
+}
+echo "OK five GPD schedules are configuration-owned\n";

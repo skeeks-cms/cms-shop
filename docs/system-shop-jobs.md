@@ -24,3 +24,11 @@ shop.quantity-emails сохраняет отключённое поведени�
 
 Проверки: native-maintenance-smoke.php (отдельная MariaDB), system-shop-jobs.php
 (SQLite), gpd-schedule-upgrade.php и gpd-legacy-process-guard.php.
+Основной источник системности — cmsAgent.commands/jobs в config/common.php.
+cmsAgent/init штатно ставит is_system=1 и восстанавливает конфигурационные поля.
+Пять расписаний GPD зарегистрированы в jobs; миграция нужна для уже установленных
+сайтов без отдельного init, а не вместо конфигурации. is_active штатный init не меняет.
+Интервалы GPD задаются конфигом. Старый параметр connection больше не нужен:
+ReceiverComponent выбирает сохранённое подключение сайта и сохраняет его курсоры;
+неоднозначное подключение вызывает ошибку. Настройки проекта могут явно задать
+jobPayload в конфигурации соответствующего задания.
