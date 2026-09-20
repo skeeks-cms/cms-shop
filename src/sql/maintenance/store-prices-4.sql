@@ -25,6 +25,7 @@ UPDATE
                         INNER JOIN {{%shop_store}} as store_select ON ssp_select.shop_store_id = store_select.id AND ssp_select.is_active = 1 AND store_select.is_active = 1
                     WHERE
                         store_select.cms_site_id = :site_id
+                        AND ssp_select.shop_product_id BETWEEN :from_id AND :to_id
                         AND (store_select.is_supplier = 1 || store_select.is_sync_external = 1)
 
 
@@ -71,11 +72,13 @@ UPDATE
                     INNER JOIN {{%shop_store}} as store ON ssp_join.shop_store_id = store.id AND ssp_join.is_active = 1 AND store.is_active = 1
                 WHERE
                     store.cms_site_id = :site_id
+                AND ssp_join.shop_product_id BETWEEN :from_id AND :to_id
                     AND (store.is_supplier = 1 || store.is_sync_external = 1)
                 ORDER BY
                     is_quantity DESC,
                     store.priority
             ) as price_data ON price_data.product_id = spp.product_id
+            WHERE spp.product_id BETWEEN :from_id AND :to_id
         ) as subq
         WHERE
             subq.is_fixed = 0

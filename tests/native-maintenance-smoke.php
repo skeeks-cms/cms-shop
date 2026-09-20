@@ -124,10 +124,10 @@ foreach (['', 'sx_'] as $prefix) {
     $check((float)$price(1,1)===999.0,'Fixed store price remains unchanged');
     $db->createCommand()->delete($prefix.'shop_product_price',['type_price_id'=>2])->execute();
     try {
-        $service->updateStorePrices(null,static function($p){if($p['processed']>0)throw new skeeks\cms\job\exceptions\JobCancelledException('cancel');});
+        $service->updateStorePrices(null,static function($p)use($db,$check){$check(!$db->getTransaction(),"Heartbeat is outside price transaction");if($p['processed']>0)throw new skeeks\cms\job\exceptions\JobCancelledException('cancel');});
         throw new RuntimeException('Cancellation ignored');
     } catch (skeeks\cms\job\exceptions\JobCancelledException $e) {
-        $check(!$q('shop_product_price')->where(['type_price_id'=>2])->exists() && !$db->getTransaction(),'Cancellation rolls back incomplete store-price transaction');
+        $check($q('shop_product_price')->where(['type_price_id'=>2])->exists() && !$db->getTransaction(),'Cancellation stops later price stages without an open transaction');
     }
     foreach([81,82,83,84] as $id){
         $insert('shop_product',['id'=>$id,'width'=>($id===81?12:99),'measure_code'=>'piece']);

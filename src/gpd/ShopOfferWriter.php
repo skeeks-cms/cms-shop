@@ -41,13 +41,30 @@ final class ShopOfferWriter implements CatalogWriterInterface
         $offers=$item['operation']==='upsert'?$this->bundle($item):[];$stores=[];
         foreach($this->stores() as $store){if(isset($stores[$store->sx_id]))throw new \RuntimeException('Дубли привязки склада GPD #'.$store->sx_id);$stores[$store->sx_id]=$store;}
         foreach($offers as $r)if(!isset($stores[$r['store_id']]))throw new ReferencePendingException('Настройте склад GPD #'.$r['store_id']);
-        $kept=[];$changed=false;
+        $kept=[];$changed=false;$previousProducts=[];
         foreach($offers as $r){
             ($this->checkpoint)();$store=$stores[$r['store_id']];
-            $m=ShopStoreProduct::find()->where(['shop_store_id'=>$store->id,'shop_product_id'=>$product->id])->one();
-            if(!$m&&$r['supplier_code']!==''){
+            // Supplier code identifies the warehouse row, including previously
+            // unbound imports. Source-side reassignment stays within this site.
+            $m=null;
+            if($r['supplier_code']!==''){
                 $m=ShopStoreProduct::find()->where(['shop_store_id'=>$store->id,'external_id'=>$r['supplier_code']])->one();
-                if($m&&$m->shop_product_id&&$m->shop_product_id!=$product->id)throw new \RuntimeException('Код поставщика связан с другим товаром.');
+                if($m&&$m->shop_product_id&&$m->shop_product_id!=$product->id){
+                    $previous=ShopCmsContentElement::find()->where(['id'=>$m->shop_product_id,'cms_site_id'=>$this->site])->one();
+                    if(!$previous)throw new \RuntimeException('Складская позиция связана с товаром другого сайта.');
+                    $previousProducts[(int)$m->shop_product_id]=true;
+                }
+            }
+            if(!$m)$m=ShopStoreProduct::find()->where(['shop_store_id'=>$store->id,'shop_product_id'=>$product->id])->orderBy(['id'=>SORT_ASC])->one();
+            if($m&&$m->id){
+                // Release the obsolete target row's unique warehouse/product slot.
+                // Keep the supplier row and its identity instead of deleting it.
+                $occupied=ShopStoreProduct::find()->where(['shop_store_id'=>$store->id,'shop_product_id'=>$product->id])->all();
+                foreach($occupied as $other){
+                    if($other->id==$m->id)continue;
+                    $other->shop_product_id=null;$other->is_active=0;$other->quantity=0;
+                    $this->save($other);$changed=true;
+                }
             }
             if(!$m)$m=new ShopStoreProduct();
             $m->shop_store_id=$store->id;$m->shop_product_id=$product->id;$m->external_id=$r['supplier_code']?:null;$m->name=$r['supplier_name'];
@@ -61,6 +78,7 @@ final class ShopOfferWriter implements CatalogWriterInterface
             if($kept)$q->andWhere(['not in','id',$kept]);
             foreach($q->all() as $m){if($m->is_active||(float)$m->quantity!==0.0){$m->is_active=0;$m->quantity=0;$this->save($m);$changed=true;}}
         }
+        foreach(array_keys($previousProducts) as $previousId)(new OfferPrices())->recalculate($this->site,$previousId);
         (new OfferPrices())->recalculate($this->site,(int)$product->id);
         return ['outcome'=>$changed?'updated':'unchanged','local_product_id'=>(int)$product->id];
     }

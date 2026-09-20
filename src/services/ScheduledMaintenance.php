@@ -145,11 +145,11 @@ class ScheduledMaintenance extends BaseObject
         if ($siteId !== null) { $query->andWhere(['id' => $siteId]); }
         foreach ($query->each(10) as $site) {
             $this->checkpoint($checkpoint, 'store_prices', $processed);
-            \Yii::$app->db->transaction(function () use ($site, $checkpoint, &$processed) {
-                for ($i = 1; $i <= 4; ++$i) {
-                    $this->execute('store-prices-'.$i, [':site_id' => (int)$site['id']], $checkpoint, $processed);
-                }
-            });
+            // Each SQL batch commits before the reporter heartbeat. A site-wide
+            // transaction otherwise holds both price and job/lease rows for minutes.
+            for ($i = 1; $i <= 4; ++$i) {
+                $this->execute('store-prices-'.$i, [':site_id' => (int)$site['id']], $checkpoint, $processed);
+            }
             ++$sites;
         }
         return ['processed' => $processed, 'sites' => $sites];
