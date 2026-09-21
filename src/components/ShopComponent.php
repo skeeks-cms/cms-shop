@@ -551,9 +551,9 @@ class ShopComponent extends Component implements BootstrapInterface
             if ($this->stores) {
                 $storeIds = ArrayHelper::map($this->stores, "id", "id");
             }
-            if ($this->supplierStores) {
-                $supploerStoreIds = ArrayHelper::map($this->supplierStores, "id", "id");
-                $storeIds = ArrayHelper::merge($storeIds, $supploerStoreIds);
+            $supplierStoreIds = $this->getSupplierStoreIds();
+            if ($supplierStoreIds) {
+                $storeIds = ArrayHelper::merge($storeIds, $supplierStoreIds);
             }
 
 
@@ -1092,6 +1092,33 @@ SQL
      */
     protected $_supplierStores = null;
 
+    private $_supplierStoreIds = null;
+    private $_supplierStoreIdsSiteId = null;
+
+    /**
+     * Идентификаторы поставщиков для фильтра наличия, без гидратации моделей.
+     * Снимок принадлежит компоненту; общий и статический кеш не используются.
+     * @return array
+     */
+    public function getSupplierStoreIds()
+    {
+        // Явно заданные/загруженные склады и проектные getters имеют приоритет.
+        if ($this->_supplierStores !== null
+            || (new \ReflectionMethod($this, 'getSupplierStores'))->getDeclaringClass()->getName() !== self::class) {
+            return ArrayHelper::map($this->getSupplierStores(), 'id', 'id');
+        }
+
+        $siteId = \Yii::$app->skeeks->site->id;
+        if ($this->_supplierStoreIds === null || $this->_supplierStoreIdsSiteId !== $siteId) {
+            $ids = ShopStore::find()->cmsSite()->andWhere(['is_supplier' => 1])->select('id')->column();
+            // column() не выполняет приведение типов ActiveRecord.
+            $ids = array_map([ShopStore::getTableSchema()->columns['id'], 'phpTypecast'], $ids);
+            $this->_supplierStoreIds = $ids ? array_combine($ids, $ids) : [];
+            $this->_supplierStoreIdsSiteId = $siteId;
+        }
+        return $this->_supplierStoreIds;
+    }
+
 
     /**
      * @return ShopStore[]
@@ -1112,6 +1139,8 @@ SQL
     public function setSupplierStores($shopStores = [])
     {
         $this->_supplierStores = $shopStores;
+        $this->_supplierStoreIds = null;
+        $this->_supplierStoreIdsSiteId = null;
         return $this;
     }
 
