@@ -430,8 +430,10 @@ class ShopComponent extends Component implements BootstrapInterface
     public function getShopContents()
     {
         $result = [];
-        if ($this->contentProducts) {
-            $result[] = $this->contentProducts;
+        // Один вызов getter выполняет один SQL-запрос; результат нужен дважды.
+        $content = $this->contentProducts;
+        if ($content) {
+            $result[] = $content;
         }
 
         return $result;
