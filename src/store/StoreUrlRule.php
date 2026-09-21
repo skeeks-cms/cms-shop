@@ -50,13 +50,18 @@ class StoreUrlRule extends BackendUrlRule
      */
     public function parseRequest($manager, $request)
     {
+        // Как в BackendUrlRule: склад нужен только для адресов этого раздела.
+        // Выбираем его до parent::parseRequest(), который запускает backend.
+        if (substr($request->getPathInfo(), 0, strlen($this->urlPrefix)) != $this->urlPrefix) {
+            return false;
+        }
         $params = $request->getQueryParams();
         if (isset($params[self::STORE_PARAM_NAME])) {
             \Yii::$app->shop->backendShopStore = ShopStore::find()->cmsSite()->andWhere(['id' => $params[self::STORE_PARAM_NAME]])->one();
         } else {
             $shopStore = ShopStore::find()->cmsSite()->one();
             if ($shopStore) {
-                \Yii::$app->shop->backendShopStore = ShopStore::find()->cmsSite()->one();
+                \Yii::$app->shop->backendShopStore = $shopStore;
             }
         }
 
