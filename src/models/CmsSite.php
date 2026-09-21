@@ -117,7 +117,15 @@ class CmsSite extends \skeeks\cms\models\CmsSite
      */
     public function getShopSite()
     {
-        return $this->hasOne(ShopSite::className(), ['id' => 'id']);
+        $query = $this->hasOne(ShopSite::className(), ['id' => 'id']);
+        $cache = ShopSite::getDb()->queryCache;
+        $cache = is_string($cache) ? \Yii::$app->get($cache, false) : $cache;
+        if ($this->id !== null && $cache !== null && $cache === \Yii::$app->get('cache', false)) {
+            $query->cache(8 * 3600, new \yii\caching\TagDependency([
+                'tags' => [(new ShopSite())->getTableCacheTag(), $this->getCacheTag()],
+            ]));
+        }
+        return $query;
     }
 
     /**
