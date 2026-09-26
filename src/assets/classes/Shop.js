@@ -286,7 +286,8 @@
                     'response': data.response
                 });
 
-                if (data.response.data && data.response.data.product) {
+                //Если сервер вернул переход на страницу заказа, покупку отправит она (один источник purchase)
+                if (data.response.data && data.response.data.product && !data.response.redirect) {
                     self.trigger('purchase', {
                         'order': data.response.data.order,
                         'products': [data.response.data.product]
