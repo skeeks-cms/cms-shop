@@ -286,7 +286,7 @@ class ShopDelivery extends ActiveRecord
             $model->shopOrder = $order;
             $model->deliveryHandler = $this->handler;
             $model->delivery = $this;
-            $model->load($order->deliveryHandlerData, "");
+            $model->loadStoredDeliveryData($order->deliveryHandlerData);
 
             return $model->money;
         }

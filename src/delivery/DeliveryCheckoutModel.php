@@ -36,6 +36,39 @@ abstract class DeliveryCheckoutModel extends Model
      */
     public $delivery = null;
 
+    /** Server-owned quote metadata. Never load these values from a checkout POST. */
+    public $deliveryCalculationHash;
+    public $deliveryCalculatedAt;
+    public $deliveryCalculationError;
+
+    /** Fixed-price and existing adapters remain opt-out. */
+    public function supportsAutomaticCalculation()
+    {
+        return false;
+    }
+
+    /** Refresh from server-side cart data. On failure clear stale money and return false. */
+    public function refreshDeliveryPrice($force = false)
+    {
+        return true;
+    }
+
+    /** Only persisted order data may restore quote metadata. */
+    public function loadStoredDeliveryData(array $data)
+    {
+        $this->load($data, '');
+        foreach (['deliveryCalculationHash', 'deliveryCalculatedAt', 'deliveryCalculationError'] as $attribute) {
+            $this->$attribute = isset($data[$attribute]) ? $data[$attribute] : null;
+        }
+    }
+
+    public function getStoredDeliveryData()
+    {
+        $data = $this->toArray();
+        unset($data['shopOrder'], $data['deliveryHandler'], $data['delivery']);
+        return $data;
+    }
+
     /**
      * @return Money
      */

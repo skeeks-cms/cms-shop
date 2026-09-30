@@ -1261,6 +1261,7 @@ class ShopOrder extends ActiveRecord
     public function recalculate()
     {
         $this->trigger(self::EVENT_BEFORE_RECALCULATE, new Event());
+        $this->refreshDeliveryCalculation();
         
         $this->tax_amount = (float)$this->calcMoneyVat->amount;
 
@@ -1277,6 +1278,26 @@ class ShopOrder extends ActiveRecord
         $this->trigger(self::EVENT_AFTER_RECALCULATE, new Event());
 
         return $this;
+    }
+
+    /** Common carrier hook, shared by cart mutations and checkout. Does not save recursively. */
+    public function refreshDeliveryCalculation($force = false)
+    {
+        // Completed orders retain their agreed delivery amount.
+        if ($this->is_created && !$this->isAttributeChanged('is_created')) {
+            return true;
+        }
+        $model = $this->deliveryHandlerCheckoutModel;
+        if (!$model || !$model->supportsAutomaticCalculation()) {
+            return true;
+        }
+        // An item save/delete may leave an eagerly loaded cart relation stale.
+        if ($this->isRelationPopulated('shopOrderItems')) {
+            unset($this->shopOrderItems);
+        }
+        $success = $model->refreshDeliveryPrice($force);
+        $this->delivery_handler_data_jsoned = Json::encode($model->getStoredDeliveryData());
+        return $success;
     }
 
 
@@ -1321,6 +1342,11 @@ class ShopOrder extends ActiveRecord
     public function jsonSerialize()
     {
         $result = ArrayHelper::merge($this->toArray([], $this->extraFields()), [
+            'deliveryCalculation' => [
+                'inputHash' => ArrayHelper::getValue($this->deliveryHandlerData, 'deliveryCalculationHash'),
+                'error' => ArrayHelper::getValue($this->deliveryHandlerData, 'deliveryCalculationError'),
+                'calculatedAt' => ArrayHelper::getValue($this->deliveryHandlerData, 'deliveryCalculatedAt'),
+            ],
             'money'         => ArrayHelper::merge($this->money->jsonSerialize(),
                 ['convertAndFormat' => \Yii::$app->money->convertAndFormat($this->money)]),
             'moneyDelivery' => ArrayHelper::merge($this->moneyDelivery->jsonSerialize(),
@@ -1724,7 +1750,7 @@ class ShopOrder extends ActiveRecord
             $model->shopOrder = $this;
             $model->deliveryHandler = $this->shopDelivery->handler;
             $model->delivery = $this->shopDelivery;
-            $model->load($this->deliveryHandlerData, "");
+            $model->loadStoredDeliveryData($this->deliveryHandlerData);
         }
 
         return $model;

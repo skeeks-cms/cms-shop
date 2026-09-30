@@ -75,6 +75,14 @@ class CartController extends Controller
         }
 
 
+        $order = \Yii::$app->shop->shopUser->shopOrder;
+        if ($order && !$order->is_created && $order->deliveryHandlerCheckoutModel
+            && $order->deliveryHandlerCheckoutModel->supportsAutomaticCalculation()) {
+            $order->recalculate();
+            if ($order->getDirtyAttributes()) {
+                $order->save(false);
+            }
+        }
         $this->view->title = \Yii::t('skeeks/shop/app', 'Basket').' | '.\Yii::t('skeeks/shop/app', 'Shop');
         return $this->render($this->action->id);
     }
@@ -102,6 +110,23 @@ class CartController extends Controller
                     throw new Exception("Обновите страницу заказ уже не найден");
                 }
                 $rr->success = true;
+
+                $previousDeliveryAmount = (float)$order->delivery_amount;
+                if (!$order->refreshDeliveryCalculation(true)) {
+                    throw new Exception($order->deliveryHandlerCheckoutModel->deliveryCalculationError
+                        ?: 'Не удалось обновить стоимость доставки. Повторите попытку.');
+                }
+                $order->recalculate();
+                if (abs($previousDeliveryAmount - (float)$order->delivery_amount) > 0.001) {
+                    if (!$order->save(false)) {
+                        throw new Exception('Не удалось сохранить обновлённую стоимость доставки.');
+                    }
+                    $t->commit();
+                    $rr->success = false;
+                    $rr->message = 'Стоимость доставки обновилась. Проверьте итоговую сумму и повторите оформление заказа.';
+                    $rr->data = $order->jsonSerialize();
+                    return $rr;
+                }
 
 
 
@@ -405,7 +430,7 @@ class CartController extends Controller
                         if ($deliveryData) {
                             $checkoutModel = $order->deliveryHandlerCheckoutModel;
                             $checkoutModel->load($deliveryData);
-                            $order->delivery_handler_data_jsoned = Json::encode($checkoutModel->toArray());
+                            $order->delivery_handler_data_jsoned = Json::encode($checkoutModel->getStoredDeliveryData());
                         }
                     }
                 } else {
