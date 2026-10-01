@@ -1797,9 +1797,12 @@ HTML
                  * @var $query ActiveQuery
                  */
                 $query = $e->dataProvider->query;
-                $query->joinWith("shopProduct.shopStoreProducts as shopStoreProducts");
                 if ($e->field->value) {
-                    $query->andWhere(['shopStoreProducts.shop_store_id' => $e->field->value]);
+                    // A product may have several positions, including in the same store.
+                    // Filter membership without multiplying the rows paginated by the grid.
+                    $query->andWhere(['in', 'sp.id', ShopStoreProduct::find()
+                        ->select('shop_product_id')
+                        ->andWhere(['shop_store_id' => $e->field->value])]);
                 }
 
                 /*if ($e->field->value) {
@@ -1941,6 +1944,7 @@ HTML
 
                     $q = CmsContentElement::find()
                         ->select(['parent_id' => 'parent_content_element_id'])
+                        ->distinct()
                         ->where([
                             'or',
                             ['like', CmsContentElement::tableName().'.id', $e->field->value],
