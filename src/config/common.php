@@ -14,6 +14,15 @@ return [
         'jobQueueFactory' => ['queues' => ['gpd-receive' => [], 'gpd-apply' => [], 'gpd-offers' => []]],
         'jobRegistry' => [
             'types' => [
+                'shop.gpd.catalog.reconcile' => [
+                    'type'=>'shop.gpd.catalog.reconcile','title'=>'GPD: полная сверка товаров, брендов и коллекций',
+                    'handler'=>\skeeks\cms\shop\jobs\GpdCatalogReconcileJobHandler::class,
+                    'queue'=>'gpd-apply','timeout'=>600,'leaseSeconds'=>120,'maxAttempts'=>3,
+                    'idempotent'=>true,'overlapPolicy'=>'skip','chunkDelayMs'=>1000,
+                    'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
+                    'resourceKey'=>static function(){return 'shop:gpd:apply';},
+                    'dedupKey'=>static function(){return 'shop:gpd:reconcile';},
+                ],
                 'shop.gpd.dictionaries.sync' => [
                     'type'=>'shop.gpd.dictionaries.sync','title'=>'GPD: страны и единицы измерения',
                     'handler'=>\skeeks\cms\shop\jobs\GpdStableReferencesJobHandler::class,
@@ -198,6 +207,7 @@ return [
         ],
         'cmsAgent'    => [
             'jobs' => [
+                'shop.gpd.catalog.reconcile' => ['jobType'=>'shop.gpd.catalog.reconcile','name'=>'GPD: полная сверка товаров, брендов и коллекций','interval'=>2592000],
                 'shop.gpd.catalog.receive' => ['jobType'=>'shop.gpd.catalog.receive','name'=>'GPD: получение изменений товаров','interval'=>60],
                 'shop.gpd.catalog.apply' => ['jobType'=>'shop.gpd.catalog.apply','name'=>'GPD: применение изменений товаров','interval'=>60],
                 'shop.gpd.references.sync' => ['jobType'=>'shop.gpd.references.sync','name'=>'GPD: синхронизация справочников','interval'=>60],
@@ -588,6 +598,9 @@ return [
     ],
 
     'modules' => [
+        'cmsJob' => [
+            'controllerMap' => ['admin-cms-job-run' => \skeeks\cms\shop\controllers\GpdJobRunController::class],
+        ],
         'shop' => [
             'class' => 'skeeks\cms\shop\Module',
         ],

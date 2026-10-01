@@ -12,9 +12,9 @@ use yii\db\Query;
 final class ShopReferenceWriter implements CatalogWriterInterface
 {
     public const CLASSES=['categories'=>CmsTree::class,'brands'=>ShopBrand::class,'properties'=>CmsContentProperty::class,'collections'=>ShopCollection::class];
-    private $site;private $connection;private $media;
-    public function __construct(int $site,string $connection,ShopCatalogWriter $media)
-    {$this->site=$site;$this->connection=$connection;$this->media=$media;}
+    private $site;private $connection;private $media;private $settings;
+    public function __construct(int $site,string $connection,ShopCatalogWriter $media,?\skeeks\cms\shop\components\GpdComponent $settings=null)
+    {$this->site=$site;$this->connection=$connection;$this->media=$media;$this->settings=$settings;}
     public static function find(int $site,string $kind,int $id)
     {
         if(!isset(self::CLASSES[$kind])||$id<1)throw new ProtocolException('invalid_reference');
@@ -58,8 +58,7 @@ final class ShopReferenceWriter implements CatalogWriterInterface
     }
     public function apply(array $item,array $state): array
     {
-        // References can still belong to local/protected products: never cascade-delete them.
-        if($item['operation']==='revoke')return ['outcome'=>'kept'];
+        if($item['operation']==='revoke')return $this->revoke($item,$state);
         $d=$this->decode($item);$kind=$d['kind'];$p=$d['payload'];$m=self::find($this->site,$kind,$d['source_id']);$created=!$m;
         \Yii::$app->db->createCommand()->update('{{%shop_gpd_reference_state}}',['kind'=>$kind,'source_id'=>$d['source_id']],['connection_id'=>$this->connection,'product_id'=>$item['id']])->execute();
         if($m&&$m->hasAttribute('is_sx_info_update')&&!$m->is_sx_info_update)return ['outcome'=>'protected'];
@@ -101,6 +100,40 @@ final class ShopReferenceWriter implements CatalogWriterInterface
             $e=CmsContentPropertyEnum::find()->andWhere(['property_id'=>$m->id,'sx_id'=>$value['id']])->one()?:new CmsContentPropertyEnum(['property_id'=>$m->id,'sx_id'=>$value['id']]);
             $e->value=(string)$value['value'];$e->value_for_saved_filter=$value['value_for_saved_filter']??null;$e->cms_image_id=$this->media->image($value['image']??null);$this->save($e);
         }
-        return ['outcome'=>$created?'created':'updated'];
+        if(!$created && !empty($state['deactivated_by_gpd']) && $this->settings && $this->settings->reactivateProducts && $m->hasAttribute('is_active')) {
+            $m->is_active=1;$this->save($m);
+        }
+        return ['outcome'=>$created?'created':'updated','local_product_id'=>$m->id,'deactivated_by_gpd'=>0];
+    }
+    private function revoke(array $item,array $state): array
+    {
+        $kind=$item['kind']??$state['kind']??null;$source=(int)($item['source_id']??$state['source_id']??0);
+        if(!in_array($kind,['brands','collections'],true))return ['outcome'=>'kept'];
+        if(!$source)return ['outcome'=>'pending'];
+        if(!empty($state['kind']) && ($state['kind']!==$kind || (int)$state['source_id']!==$source))throw new ProtocolException('conflicting_reference_identity');
+        \Yii::$app->db->createCommand()->update('{{%shop_gpd_reference_state}}',['kind'=>$kind,'source_id'=>$source],['connection_id'=>$this->connection,'product_id'=>$item['id']])->execute();
+        $m=self::find($this->site,$kind,$source);
+        if(!$m)return ['outcome'=>'absent','local_product_id'=>null,'deactivated_by_gpd'=>0];
+        $policy=$this->settings?($kind==='brands'?$this->settings->excludedBrandAction:$this->settings->excludedCollectionAction):'keep';
+        if($policy==='keep')return ['outcome'=>'kept','local_product_id'=>$m->id];
+        $removal=new ReferenceRemoval(\Yii::$app->db);
+        \Yii::$app->db->createCommand('SELECT id FROM '.$m::tableName().' WHERE id=:id FOR UPDATE',[':id'=>$m->id])->queryScalar();
+        if($removal->hasProducts($m,$kind)||$removal->otherSite($m,$kind,$this->site))return ['outcome'=>'protected','local_product_id'=>$m->id];
+        if(in_array($policy,['delete','delete_related'],true)) {
+            $parentSource=$kind==='collections' && $m->shop_brand_id?(int)(new Query())->select('sx_id')->from('{{%shop_brand}}')->where(['id'=>$m->shop_brand_id])->scalar():0;
+            $tx=\Yii::$app->db->beginTransaction();
+            try {
+                if((new ReferenceRemoval(\Yii::$app->db))->remove($m,$kind,$this->site,$policy==='delete_related')) {
+                    // Retry an already acknowledged brand revoke once its blocking collection is gone.
+                    if($parentSource)\Yii::$app->db->createCommand()->update('{{%shop_gpd_reference_state}}',['applied_revision'=>0],['connection_id'=>$this->connection,'kind'=>'brands','source_id'=>$parentSource,'operation'=>'revoke','needs_resolution'=>0])->execute();
+                    $tx->commit();return ['outcome'=>'deleted','local_product_id'=>null,'deactivated_by_gpd'=>0];
+                }
+                $tx->rollBack();
+            } catch(\yii\db\IntegrityException $e){$tx->rollBack();$m=self::find($this->site,$kind,$source);}
+            catch(\Throwable $e){$tx->rollBack();throw $e;}
+        }
+        $flag=(int)($state['deactivated_by_gpd']??0);
+        if($m->is_active){$m->is_active=0;$this->save($m);$flag=1;}
+        return ['outcome'=>'deactivated','local_product_id'=>$m->id,'deactivated_by_gpd'=>$flag];
     }
 }

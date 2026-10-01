@@ -31,12 +31,13 @@ class GpdReferencesJobHandler extends ChunkedJobHandler
             $transport=new CatalogTransport($base['source_url'],(string)$api->api_key,null,'references');
             $this->receiver=new CatalogReceiver(\Yii::$app->db,$base['id'],$transport,'references');
             $this->receiver->register($site,$base['source_url'],$base['credential_fingerprint']);
-            $writer=new ShopReferenceWriter($site,$base['id'],new ShopCatalogWriter($site,$settings,$api,$checkpoint));
+            $writer=new ShopReferenceWriter($site,$base['id'],new ShopCatalogWriter($site,$settings,$api,$checkpoint),$settings);
             $this->applier=new CatalogApplier(\Yii::$app->db,$base['id'],$transport,$writer,'references');
         }
         $cursor=$items[0];$phase=$cursor['phase']??'receive';
         $result=json_decode($context->getRun()->result_json??'{}',true)?:[];
         $counts=$result['counts']??['received'=>0,'created'=>0,'updated'=>0,'protected'=>0,'kept'=>0,'pending'=>0,'unchanged'=>0,'errors'=>0];
+        $counts+=['deactivated'=>0,'deleted'=>0,'absent'=>0];
         $checkpoint();
         if($phase==='receive') {
             $r=$this->receiver->receive();$counts['received']+=$r['count'];
@@ -50,7 +51,7 @@ class GpdReferencesJobHandler extends ChunkedJobHandler
                 $checkpoint();
                 try {
                     $r=$this->applier->apply($entry);++$counts[$r['outcome']];
-                    if(in_array($r['outcome'],['created','updated'],true))$reporter->countSuccess();else $reporter->countSkipped();
+                    if(in_array($r['outcome'],['created','updated','deleted','deactivated'],true))$reporter->countSuccess();else $reporter->countSkipped();
                 } catch(JobCancelledException $e){throw $e;}
                 catch(ReferencePendingException $e){++$counts['pending'];$reporter->countSkipped();}
                 catch(\Throwable $e){++$counts['errors'];$reporter->itemError('gpd_reference',$entry['item']['id'],$e instanceof \yii\db\Exception?'Ошибка сохранения справочника в БД.':$e->getMessage());}
@@ -58,7 +59,7 @@ class GpdReferencesJobHandler extends ChunkedJobHandler
             }
             $this->next=$page?['phase'=>'apply','after'=>(int)end($page)['state']['product_id']]:null;
         }
-        $message='Справочники: получено '.$counts['received'].'; создано '.$counts['created'].'; обновлено '.$counts['updated'].'; защищено '.$counts['protected'].'; ожидают зависимостей '.$counts['pending'].'; ошибок '.$counts['errors'].'.';
+        $message='Справочники: получено '.$counts['received'].'; создано '.$counts['created'].'; обновлено '.$counts['updated'].'; удалено '.$counts['deleted'].'; отключено '.$counts['deactivated'].'; защищено '.$counts['protected'].'; ожидают зависимостей '.$counts['pending'].'; ошибок '.$counts['errors'].'.';
         $reporter->setStage($phase,$message);$reporter->setResult(['counts'=>$counts,'remaining'=>$this->applier->remaining(),'message'=>$message]);
     }
     protected function nextCursor(array $cursor,array $items,JobContext $context){return $this->next;}

@@ -204,4 +204,33 @@ final class CatalogReceiver
             'unresolved'=>(int)(clone $base)->andWhere(['needs_resolution'=>1])->count('*',$this->db),
             'applied_to_shop'=>false];
     }
+    /** An explicit batch audit does not move the change-stream cursor. */
+    public function acceptBatch(array $ids,array $items,bool $reapplyRevoke=false): array
+    {
+        if(!$ids || count($ids)>20 || count($items)!==count($ids))throw new ProtocolException('incomplete_batch');
+        $seen=[];$accepted=[];$pending=0;
+        foreach($items as $item) {
+            if(!is_array($item)||!is_int($item['id']??null)||!in_array($item['id'],$ids,true)||isset($seen[$item['id']]))throw new ProtocolException('invalid_batch_ids');
+            $seen[$item['id']]=true;
+            if(($item['status']??null)==='not_available'){++$pending;continue;}
+            $this->items([$item]);$accepted[]=$item;
+            if(isset($item['status']))++$pending;
+        }
+        $state=$this->state();
+        $this->atomic($state,function()use($accepted,$state,$reapplyRevoke){
+            foreach($accepted as $item) {
+                $this->remember($item,(int)$state['generation'],false);
+                if($this->stream==='references' && isset($item['kind'],$item['source_id'])) {
+                    if(!in_array($item['kind'],['brands','collections','properties','categories'],true)||!is_int($item['source_id'])||$item['source_id']<1)throw new ProtocolException('invalid_reference');
+                    $row=(new Query())->from($this->stateTable)->where(['connection_id'=>$this->id,'product_id'=>$item['id']])->one($this->db);
+                    if(!empty($row['kind']) && ($row['kind']!==$item['kind'] || (int)$row['source_id']!==$item['source_id']))throw new ProtocolException('conflicting_reference_identity');
+                    $this->db->createCommand()->update($this->stateTable,['kind'=>$item['kind'],'source_id'=>$item['source_id']],['connection_id'=>$this->id,'product_id'=>$item['id']])->execute();
+                }
+                if($reapplyRevoke && ($item['operation']??null)==='revoke') {
+                    $this->db->createCommand()->update($this->stateTable,['applied_revision'=>0],['connection_id'=>$this->id,'product_id'=>$item['id'],'revision'=>$item['revision'],'operation'=>'revoke','needs_resolution'=>0])->execute();
+                }
+            }
+        });
+        return ['accepted'=>count($accepted),'pending'=>$pending];
+    }
 }

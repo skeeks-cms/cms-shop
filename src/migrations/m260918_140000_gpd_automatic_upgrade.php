@@ -8,7 +8,8 @@ class m260918_140000_gpd_automatic_upgrade extends Migration
 {
     public function safeUp()
     {
-        $table=$this->db->schema->getTableSchema('{{%cms_agent}}');
+        // Earlier migrations in this update may have changed a cached schema.
+        $table=$this->db->schema->getTableSchema('{{%cms_agent}}', true);
         if(!$table || !isset($table->columns['job_type']))throw new RuntimeException('Сначала примените миграции cms-agent/cms-job.');
         (new ScheduleUpgrade($this->db))->run(static function(int $site,bool $enable){
             if(!$enable)return;

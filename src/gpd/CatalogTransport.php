@@ -25,6 +25,7 @@ final class CatalogTransport implements CatalogTransportInterface
     public function request(string $method, string $endpoint, array $data = []): array
     {
         $allowed = $this->route==='' ? ['countries'=>'GET','measures'=>'GET','stores'=>'GET'] : ['status'=>'GET', 'bootstrap'=>'POST', 'manifest'=>'GET', 'changes'=>'GET', 'batch'=>'POST'];
+        if($this->route==='references')$allowed['resolve']='POST';
         if (($allowed[$endpoint] ?? null) !== $method) throw new ProtocolException('invalid_request');
         try {
             $url = $this->url.'/'.($this->route!==''?$this->route.'/':'').$endpoint;

@@ -16,6 +16,8 @@ class GpdComponent extends Component
     /** @deprecated Compatibility with saved settings; media policy belongs to the writer and existing API component. */
     public $imageMode = 'link';
     public $excludedAction = 'deactivate';
+    public $excludedBrandAction = 'keep';
+    public $excludedCollectionAction = 'keep';
     public $reactivateProducts = 1;
     public $newProductsActive = 1;
 
@@ -29,16 +31,20 @@ class GpdComponent extends Component
             [['enabled','createProducts','updateProducts','reactivateProducts','newProductsActive'],'boolean'],
             ['imageMode','in','range'=>['link','download']],
             ['excludedAction','in','range'=>['keep','deactivate','delete']],
+            [['excludedBrandAction','excludedCollectionAction'],'in','range'=>['keep','deactivate','delete','delete_related']],
         ]);
     }
     public function attributeLabels()
     {
-        return ['enabled'=>'Синхронизация включена','createProducts'=>'Создавать новые товары','updateProducts'=>'Обновлять существующие товары',
+        return ['excludedBrandAction'=>'Бренд исключён из API','excludedCollectionAction'=>'Коллекция исключена из API',
+            'enabled'=>'Синхронизация включена','createProducts'=>'Создавать новые товары','updateProducts'=>'Обновлять существующие товары',
             'imageMode'=>'Изображения','excludedAction'=>'Товар исключён из API','reactivateProducts'=>'Восстанавливать активность при возвращении в API','newProductsActive'=>'Создавать новые товары активными'];
     }
     public function attributeHints()
     {
-        return ['enabled'=>'Управляет новыми заданиями GPD. Курсор сохраняется при отключении. Старые команды имеют отдельное расписание.',
+        return ['excludedBrandAction'=>'Только подтверждённое исключение из API. Пока есть товары, бренд остаётся без изменений. Удалять, включая сохранённые фильтры: сначала удаляются фильтры, затем бренд. Товары и документы сохраняются.',
+            'excludedCollectionAction'=>'Только подтверждённое исключение из API. Пока есть товары, коллекция остаётся без изменений. Товары и документы сохраняются.',
+            'enabled'=>'Управляет новыми заданиями GPD. Курсор сохраняется при отключении. Старые команды имеют отдельное расписание.',
             'updateProducts'=>'Запрет синхронизации в самом товаре сохраняет его название, описание, характеристики и изображения.',
             'excludedAction'=>'Только подтверждённое исключение из API. Товары с другими источниками сохраняются. При невозможности удаления товар деактивируется.',
             'reactivateProducts'=>'Только если товар ранее деактивировала GPD. Вручную отключённые товары не включаются.'];
@@ -46,9 +52,11 @@ class GpdComponent extends Component
     public function getConfigFormFields()
     {
         $bool=static fn()=>['class'=>BoolField::class,'allowNull'=>false];
+        $referenceAction=['class'=>SelectField::class,'items'=>['keep'=>'Оставлять без изменений','deactivate'=>'Деактивировать','delete'=>'Удалять, если нет связанных данных','delete_related'=>'Удалять, включая сохранённые фильтры']];
         return [
             'catalog'=>['class'=>FieldSet::class,'name'=>'Синхронизация','fields'=>['enabled'=>$bool(),'createProducts'=>$bool(),'updateProducts'=>$bool(),'newProductsActive'=>$bool()]],
             'exclusions'=>['class'=>FieldSet::class,'name'=>'Исключённые товары','fields'=>['excludedAction'=>['class'=>SelectField::class,'items'=>['keep'=>'Оставлять без изменений','deactivate'=>'Деактивировать','delete'=>'Удалять, если нет связанных данных']],'reactivateProducts'=>$bool()]],
+            'referenceExclusions'=>['class'=>FieldSet::class,'name'=>'Исключённые бренды и коллекции','fields'=>['excludedBrandAction'=>$referenceAction,'excludedCollectionAction'=>$referenceAction]],
         ];
     }
     public function forSite(int $id): self
