@@ -9,7 +9,9 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\models\CmsCountry;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\shop\models\queries\ShopBrandQuery;
@@ -56,6 +58,8 @@ use yii\helpers\Url;
  */
 class ShopBrand extends ActiveRecord
 {
+    use HasLogTrait;
+
     /**
      * @inheritdoc
      */
@@ -71,6 +75,15 @@ class ShopBrand extends ActiveRecord
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
+            // Capture related values before storage removes the previous image.
+            CmsLogBehavior::class => [
+                'class' => CmsLogBehavior::class,
+                'no_log_fields' => ['show_counter'],
+                'relation_map' => [
+                    'country_alpha2' => 'country',
+                    'logo_image_id' => 'logo',
+                ],
+            ],
             HasStorageFile::class => [
                 'class'  => HasStorageFile::class,
                 'fields' => ['logo_image_id'],

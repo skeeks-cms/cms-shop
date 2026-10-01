@@ -18,6 +18,8 @@ use skeeks\cms\models\CmsSavedFilter;
 use skeeks\cms\models\CmsTree;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\shop\models\CmsSite;
+use skeeks\cms\shop\models\ShopBrand;
+use skeeks\cms\shop\models\ShopCollection;
 use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopPersonType;
 use skeeks\cms\shop\models\ShopPartnerLead;
@@ -113,6 +115,18 @@ class ShopComponent extends Component implements BootstrapInterface
     public function bootstrap($application)
     {
         if ($application->has('skeeks')) {
+            $application->skeeks->modelsConfig += [
+                ShopBrand::class => [
+                    'name' => 'Бренды',
+                    'name_one' => 'Бренд',
+                    'controller' => 'shop/admin-shop-brand',
+                ],
+                ShopCollection::class => [
+                    'name' => 'Коллекции',
+                    'name_one' => 'Коллекция',
+                    'controller' => 'shop/admin-shop-collection',
+                ],
+            ];
             $application->skeeks->modelsConfig[ShopPartnerPayout::class] = [
                 'name' => 'Заявки на вывод бонусов',
                 'name_one' => 'Заявка на вывод бонусов',

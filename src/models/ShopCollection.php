@@ -9,9 +9,11 @@
 namespace skeeks\cms\shop\models;
 
 use skeeks\cms\base\ActiveRecord;
+use skeeks\cms\behaviors\CmsLogBehavior;
 use skeeks\cms\behaviors\RelationalBehavior;
 use skeeks\cms\models\behaviors\HasStorageFile;
 use skeeks\cms\models\behaviors\HasStorageFileMulti;
+use skeeks\cms\models\behaviors\traits\HasLogTrait;
 use skeeks\cms\models\CmsStorageFile;
 use skeeks\cms\models\StorageFile;
 use skeeks\cms\shop\models\queries\ShopCollectionQuery;
@@ -61,6 +63,8 @@ use yii\web\Application;
  */
 class ShopCollection extends ActiveRecord
 {
+    use HasLogTrait;
+
     protected $_image_ids = null;
 
     /**
@@ -78,6 +82,21 @@ class ShopCollection extends ActiveRecord
     public function behaviors()
     {
         return array_merge(parent::behaviors(), [
+            RelationalBehavior::class => [
+                'class' => RelationalBehavior::class,
+                'relationNames' => [
+                    'shopCollectionStickers',
+                ],
+            ],
+            // Log persisted relations before storage removes the previous image.
+            CmsLogBehavior::class => [
+                'class' => CmsLogBehavior::class,
+                'no_log_fields' => ['show_counter'],
+                'relation_map' => [
+                    'shop_brand_id' => 'brand',
+                    'cms_image_id' => 'image',
+                ],
+            ],
             HasStorageFile::class => [
                 'class'  => HasStorageFile::class,
                 'fields' => ['cms_image_id'],
@@ -99,13 +118,6 @@ class ShopCollection extends ActiveRecord
                 'slugAttribute' => 'code',
                 'ensureUnique'  => false,
                 'maxLength'     => \Yii::$app->cms->element_max_code_length,
-            ],
-
-            RelationalBehavior::class => [
-                'class' => RelationalBehavior::class,
-                'relationNames' => [
-                    'shopCollectionStickers',
-                ],
             ],
         ]);
     }
