@@ -22,6 +22,7 @@ return [
                     'permission'=>\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS,
                     'resourceKey'=>static function(){return 'shop:gpd:apply';},
                     'dedupKey'=>static function(){return 'shop:gpd:reconcile';},
+                    'report'=>\skeeks\cms\shop\jobs\GpdReconcileReport::class,
                 ],
                 'shop.gpd.dictionaries.sync' => [
                     'type'=>'shop.gpd.dictionaries.sync','title'=>'GPD: страны и единицы измерения',
@@ -598,9 +599,6 @@ return [
     ],
 
     'modules' => [
-        'cmsJob' => [
-            'controllerMap' => ['admin-cms-job-run' => \skeeks\cms\shop\controllers\GpdJobRunController::class],
-        ],
         'shop' => [
             'class' => 'skeeks\cms\shop\Module',
         ],

@@ -1,7 +1,14 @@
 <?php
+/**
+ * GPD reconcile report; cms-job renders it above the standard operation card.
+ *
+ * @var \yii\web\View $this
+ * @var \skeeks\cms\job\models\CmsJobRun $model
+ * @var array $details
+ * @var string $detailsUrl
+ */
 use yii\helpers\Html;
 use yii\helpers\Json;
-use yii\helpers\Url;
 use skeeks\cms\backend\widgets\BackendSurfaceWidget;
 $id='gpd-reconcile-summary-'.(int)$model->id;
 ?>
@@ -18,9 +25,7 @@ $id='gpd-reconcile-summary-'.(int)$model->id;
 <?php BackendSurfaceWidget::end(); ?>
 </section>
 <?php
-echo $this->render('@skeeks/cms/job/views/admin-cms-job-run/view',compact('model','canCancel','canRetry','progressUrl'));
-$options=Json::htmlEncode(['selector'=>'#'.$id,'initial'=>$summary,
-    'url'=>Url::to(['progress','id'=>$model->id,'gpd_details'=>'1']),'id'=>(int)$model->id]);
+$options=Json::htmlEncode(['selector'=>'#'.$id,'initial'=>$details,'url'=>$detailsUrl,'id'=>(int)$model->id]);
 $this->registerJs(<<<JS
 (function(options){
  const root=document.querySelector(options.selector);if(!root)return;
@@ -42,7 +47,7 @@ $this->registerJs(<<<JS
   if(stopped||!root.isConnected)return;if(document.hidden){schedule();return;}
   const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),15000);
   try{const r=await fetch(options.url,{signal:abort.signal,credentials:'same-origin',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}});
-   if(!r.ok)throw Error();const data=await r.json(),report=data.data?.[options.id]?.gpdReconcile;if(!report)throw Error();
+   if(!r.ok)throw Error();const data=await r.json(),report=data.data?.[options.id]?.report;if(!report)throw Error();
    root.querySelector('[data-sx-gpd-refresh]').textContent='';if(paint(report))schedule();
   }catch(e){root.querySelector('[data-sx-gpd-refresh]').textContent='Не удалось обновить сведения. Повторяем запрос…';schedule();}
   finally{clearTimeout(timeout);}
