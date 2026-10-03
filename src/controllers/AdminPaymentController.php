@@ -24,6 +24,7 @@ use skeeks\cms\models\CmsDeal;
 use skeeks\cms\models\CmsUser;
 use skeeks\cms\money\Money;
 use skeeks\cms\queryfilters\QueryFiltersEvent;
+use skeeks\cms\rbac\CmsManager;
 use skeeks\cms\shop\models\queries\ShopPaymentQuery;
 use skeeks\cms\shop\models\ShopBill;
 use skeeks\cms\shop\models\ShopCashebox;
@@ -33,6 +34,7 @@ use skeeks\cms\shop\models\ShopOrderChange;
 use skeeks\cms\shop\models\ShopPayment;
 use skeeks\cms\shop\models\ShopPaySystem;
 use skeeks\cms\shop\models\ShopStore;
+use skeeks\cms\shop\widgets\PaymentFiltersWidget;
 use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\formInputs\daterange\DaterangeInputWidget;
 use skeeks\cms\widgets\GridView;
@@ -85,6 +87,7 @@ class AdminPaymentController extends BackendModelStandartController
 
             "index" => [
                 "filters" => [
+                    'class' => PaymentFiltersWidget::class,
                     "visibleFilters" => [
                         //'id',
                         'q',
@@ -122,14 +125,13 @@ class AdminPaymentController extends BackendModelStandartController
                                     $query = $e->dataProvider->query;
 
                                     if ($e->field->value) {
-                                        $query->search($e->field->value);
                                         $query->joinWith('company as company');
                                         $query->joinWith('senderContractor as senderContractor');
-                                        $query->orWhere([
-                                            'LIKE', 'company.name', $e->field->value
-                                        ]);
-                                        $query->orWhere([
-                                            'LIKE', 'senderContractor.name', $e->field->value
+                                        $query->andWhere([
+                                            'or',
+                                            ShopPayment::find()->search($e->field->value)->where,
+                                            ['LIKE', 'company.name', $e->field->value],
+                                            ['LIKE', 'senderContractor.name', $e->field->value],
                                         ]);
                                     }
                                 },
@@ -692,6 +694,32 @@ HTML
        /// ArrayHelper::remove($result, "create");
         /*ArrayHelper::remove($result, "delete");*/
         ArrayHelper::remove($result, "delete-multi");
+
+        if (\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS)) {
+            $result['index']['filters']['visibleFilters'][] = 'available_for_user_id';
+            $result['index']['filters']['filtersModel']['attributeDefines'][] = 'available_for_user_id';
+            $result['index']['filters']['filtersModel']['attributeLabels']['available_for_user_id'] = 'Доступны сотруднику';
+            $result['index']['filters']['filtersModel']['rules'][] = ['available_for_user_id', 'integer', 'min' => 1];
+            $result['index']['filters']['filtersModel']['fields']['available_for_user_id'] = [
+                'class' => SelectField::class,
+                'label' => 'Доступны сотруднику',
+                'items' => ArrayHelper::map(CmsUser::find()->isWorker()->all(), 'id', 'asText'),
+                'on apply' => function (QueryFiltersEvent $e) {
+                    if (!\Yii::$app->user->can(CmsManager::PERMISSION_ROLE_ADMIN_ACCESS) || !$e->field->value) {
+                        return;
+                    }
+
+                    $worker = CmsUser::find()->isWorker()->andWhere(['id' => $e->field->value])->one();
+                    if (!$worker) {
+                        $e->dataProvider->query->andWhere('0=1');
+                        return;
+                    }
+
+                    // Add the employee's visibility scope; never replace the viewer's scope.
+                    $e->dataProvider->query->forManager($worker);
+                },
+            ];
+        }
 
         return $result;
     }

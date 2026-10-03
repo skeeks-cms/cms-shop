@@ -41,8 +41,8 @@ class ShopPaymentQuery extends CmsActiveQuery
         //Если нет прав админа, нужно показать только доступные сделки
         if (!$isCanAdmin) {
 
-            $cmsCompanyQuery = CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id');
-            $cmsUserQuery = CmsUser::find()->forManager()->select(CmsUser::tableName() . '.id');
+            $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
+            $cmsUserQuery = CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id');
 
             //Поиск клиентов с которыми связан сотрудник + все дочерние сотрудники
             $this->andWhere([
