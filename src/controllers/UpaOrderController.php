@@ -44,11 +44,11 @@ class UpaOrderController extends BackendController
     public function actionView()
     {
         $pk = \Yii::$app->request->get("pk");
-        if (!$pk) {
+        if (!$pk || \Yii::$app->user->isGuest) {
             throw new NotFoundHttpException("Заказ не найден!");
         }
         $order = ShopOrder::find()->andWhere(['id' => (int) $pk])->andWhere(['cms_user_id' => \Yii::$app->user->id])->one();
-        if (!$pk) {
+        if (!$order) {
             throw new NotFoundHttpException("Заказ не найден!");
         }
         return $this->render($this->action->id, [

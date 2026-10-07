@@ -248,7 +248,7 @@ class ShopOrder extends ActiveRecord
         if ($this->email) {
             \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-            $result = \Yii::$app->mailer->compose('create-order', [
+            $result = \Yii::$app->mailer->compose('customer-order', [
                 'order' => $this,
             ])
                 ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
@@ -432,8 +432,9 @@ class ShopOrder extends ActiveRecord
                 try {
                     \Yii::$app->mailer->view->theme->pathMap['@app/mail'][] = '@skeeks/cms/shop/mail';
 
-                    \Yii::$app->mailer->compose('order-status-change', [
+                    \Yii::$app->mailer->compose('customer-order', [
                         'order' => $this,
+                        'isStatusChange' => true,
                     ])
                         ->setFrom([\Yii::$app->cms->adminEmail => \Yii::$app->cms->appName.''])
                         ->setTo($this->email)
@@ -1332,6 +1333,15 @@ class ShopOrder extends ActiveRecord
             ['/shop/order/finish', 'code' => $this->code],
             $options
         ), $scheme);
+    }
+
+    /**
+     * Order details in the authenticated customer's cabinet, without an access code.
+     * @return string
+     */
+    public function getCabinetUrl()
+    {
+        return Url::to(['/shop/upa-order/view', 'pk' => $this->id], true);
     }
     /**
      *
