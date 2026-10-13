@@ -159,6 +159,23 @@ class ShopComponent extends Component implements BootstrapInterface
             );
         });
 
+        // The CMS lead report asks for partner rewards; they live in this package.
+        if (class_exists(\skeeks\cms\services\CmsLeadReportService::class)) {
+            Event::on(\skeeks\cms\services\CmsLeadReportService::class, \skeeks\cms\services\CmsLeadReportService::EVENT_PARTNER_REWARDS, static function ($event) {
+                if (!$event->leadIds) {
+                    return;
+                }
+                $rows = ShopPartnerLead::find()
+                    ->select(['cms_lead_id', 'reward_value'])
+                    ->andWhere(['cms_lead_id' => array_map('intval', $event->leadIds)])
+                    ->asArray()
+                    ->all();
+                foreach ($rows as $row) {
+                    $event->rewards[(int)$row['cms_lead_id']] = (float)$row['reward_value'];
+                }
+            });
+        }
+
         if ($application instanceof Application) {
             Event::on(BackendComponent::class, "beforeRun", function (Event $e) {
                 $backendComponent = $e->sender;

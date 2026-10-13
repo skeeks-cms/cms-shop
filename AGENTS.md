@@ -81,3 +81,10 @@ filterByQuantityQuery. Типы ID приводятся через ColumnSchema:
 Тест tests/supplier-store-ids.php с Composer autoload проверяет отсутствие
 гидратации, типы, повторные/пустые чтения, смену сайта, setters, override и
 результаты фильтра для собственных/поставщицких складов и товарных предложений.
+
+## Вознаграждения партнёров в отчёте по лидам
+
+ShopComponent отвечает на событие CmsLeadReportService::EVENT_PARTNER_REWARDS
+(skeeks/cms): заполняет rewards как cms_lead_id => reward_value из
+shop_partner_lead. Подписка ставится только если класс отчёта есть в
+установленном skeeks/cms. Ядро не зависит от магазина.
