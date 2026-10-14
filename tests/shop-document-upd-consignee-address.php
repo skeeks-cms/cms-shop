@@ -13,8 +13,13 @@ function shopDocumentUpdConsigneeExpect($condition, $message)
 }
 
 shopDocumentUpdConsigneeExpect(
-    strpos($model, "'consignee_address'         => \$buyerAddress,") !== false,
-    'A UPD created from a bill must store the consignee address separately from its name.'
+    substr_count($model, "=> \$consigneeAddress,") === 3,
+    'UPD, waybill and invoice-facture created from a bill must store the consignee address separately from its name.'
+);
+shopDocumentUpdConsigneeExpect(
+    strpos($model, "\$buyerContractor->hasAttribute('delivery_address')") !== false
+    && strpos($model, "\$consigneeAddress = \$buyerAddress;") !== false,
+    'The consignee address must come from the buyer delivery address and fall back to the buyer address.'
 );
 shopDocumentUpdConsigneeExpect(
     strpos($view, "'upd.consignee_address'") !== false,

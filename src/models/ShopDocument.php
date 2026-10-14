@@ -476,7 +476,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         $model->copyBillContractorSnapshot('buyer', $bill, 'sender');
         $model->fillMissingContractorSnapshot('seller', $sellerContractor);
         $model->fillMissingContractorSnapshot('buyer', $buyerContractor);
-        $model->document_data = $model->documentDataFromBill($bill, $sellerContractor);
+        $model->document_data = $model->documentDataFromBill($bill, $sellerContractor, $buyerContractor);
 
         $items = [];
         foreach ($bill->printableBillItems as $item) {
@@ -554,7 +554,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         return null;
     }
 
-    protected function documentDataFromBill(ShopBill $bill, CmsContractor $sellerContractor = null)
+    protected function documentDataFromBill(ShopBill $bill, CmsContractor $sellerContractor = null, CmsContractor $buyerContractor = null)
     {
         $data = [];
 
@@ -571,6 +571,13 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         $buyerName = trim((string)($this->buyerFullName ?: $this->buyerName));
         $buyerAddress = trim((string)$this->buyerAddress);
         $sellerWithAddress = trim($sellerName.($sellerAddress ? ', '.$sellerAddress : ''));
+        //Адрес доставки из карточки покупателя, иначе его адрес из снимка счёта
+        $consigneeAddress = $buyerContractor && $buyerContractor->hasAttribute('delivery_address')
+            ? trim((string)$buyerContractor->delivery_address)
+            : '';
+        if ($consigneeAddress === '') {
+            $consigneeAddress = $buyerAddress;
+        }
         $paymentDocuments = $this->paymentDocumentsFromBill($bill);
         $paymentDocument = static::formatPaymentDocuments($paymentDocuments);
         $shipmentDocumentsText = $this->shipmentDocumentsTextFromBill($bill);
@@ -593,14 +600,14 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             'shipper'                   => $sellerWithAddress,
             'consignee'                 => $buyerName,
             //Пустой адрес грузополучателя в печати и XML заменяется адресом покупателя
-            'consignee_address'         => $buyerAddress,
+            'consignee_address'         => $consigneeAddress,
         ];
 
         $data['waybill'] = [
             'shipper'            => $sellerName,
             'shipper_address'    => $sellerAddress,
             'consignee'          => $buyerName,
-            'consignee_address'  => $buyerAddress,
+            'consignee_address'  => $consigneeAddress,
             'transport_document' => '',
             'base_document'      => (string)$bill->description,
             'operation_type'     => '',
@@ -610,7 +617,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             'shipper'                   => $sellerName,
             'shipper_address'           => $sellerAddress,
             'consignee'                 => $buyerName,
-            'consignee_address'         => $buyerAddress,
+            'consignee_address'         => $consigneeAddress,
             'payment_documents'         => $paymentDocuments,
             'payment_document'          => $paymentDocument,
             'state_contract_identifier' => '',
