@@ -197,7 +197,11 @@ class FnsUpdXmlGenerator
                 $subjectName = $text;
             }
         }
-        $this->appendSubject($dom, $invoice, 'ГрузПолуч', $subjectName, $model->buyerInn, $model->buyerKpp, $model->buyerAddress, $model->buyerOgrn, $model->buyerRegistrationDate);
+        $address = trim((string)ArrayHelper::getValue($data, 'consignee_address'));
+        if ($address === '') {
+            $address = $model->buyerAddress;
+        }
+        $this->appendSubject($dom, $invoice, 'ГрузПолуч', $subjectName, $model->buyerInn, $model->buyerKpp, $address, $model->buyerOgrn, $model->buyerRegistrationDate);
     }
 
     protected function containsPartyIdentity($text, $identity)

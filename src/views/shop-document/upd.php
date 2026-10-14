@@ -206,7 +206,15 @@ $shippingDocument = $pick(
 $updStatus = $pick(ArrayHelper::getValue($documentData, 'upd.status'), '2');
 $currencyName = $model->currency_code == 'RUB' ? 'Российский рубль, 643' : $model->currency_code;
 $shipper = $pick(ArrayHelper::getValue($documentData, 'upd.shipper'), $sellerName.', '.$sellerAddress);
-$consignee = $pick(ArrayHelper::getValue($documentData, 'upd.consignee'), $buyerName.', '.$buyerAddress);
+//Отдельный адрес грузополучателя; в старых документах адрес записан в самом поле consignee
+$consigneeText = trim((string)ArrayHelper::getValue($documentData, 'upd.consignee'));
+$consigneeAddress = trim((string)ArrayHelper::getValue($documentData, 'upd.consignee_address'));
+if ($consigneeAddress === '' && ($consigneeText === '' || $consigneeText === $buyerName)) {
+    $consigneeAddress = $buyerAddress;
+}
+$consignee = $consigneeAddress !== ''
+    ? ($consigneeText !== '' ? $consigneeText : $buyerName).', '.$consigneeAddress
+    : $consigneeText;
 $sellerSubject = $sellerName.', ИНН/КПП '.$subjectInnKpp($sellerInn, $sellerKpp);
 $buyerSubject = $buyerName.', ИНН/КПП '.$subjectInnKpp($buyerInn, $buyerKpp);
 $logoSrc = $pick(ArrayHelper::getValue($documentData, 'logo_src'), '');

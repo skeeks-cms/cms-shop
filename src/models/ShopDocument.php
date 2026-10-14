@@ -571,7 +571,6 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         $buyerName = trim((string)($this->buyerFullName ?: $this->buyerName));
         $buyerAddress = trim((string)$this->buyerAddress);
         $sellerWithAddress = trim($sellerName.($sellerAddress ? ', '.$sellerAddress : ''));
-        $buyerWithAddress = trim($buyerName.($buyerAddress ? ', '.$buyerAddress : ''));
         $paymentDocuments = $this->paymentDocumentsFromBill($bill);
         $paymentDocument = static::formatPaymentDocuments($paymentDocuments);
         $shipmentDocumentsText = $this->shipmentDocumentsTextFromBill($bill);
@@ -592,7 +591,9 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             'seller_other_info'         => '',
             'buyer_other_info'          => '',
             'shipper'                   => $sellerWithAddress,
-            'consignee'                 => $buyerWithAddress,
+            'consignee'                 => $buyerName,
+            //Пустой адрес грузополучателя в печати и XML заменяется адресом покупателя
+            'consignee_address'         => $buyerAddress,
         ];
 
         $data['waybill'] = [

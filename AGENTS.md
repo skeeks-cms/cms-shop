@@ -82,6 +82,19 @@ filterByQuantityQuery. Типы ID приводятся через ColumnSchema:
 гидратации, типы, повторные/пустые чтения, смену сайта, setters, override и
 результаты фильтра для собственных/поставщицких складов и товарных предложений.
 
+## Грузополучатель в УПД
+
+document_data.upd хранит грузополучателя (consignee) и его адрес
+(consignee_address) раздельно, как waybill и invoice_facture. createFromBill
+заполняет их названием и адресом покупателя из снимка счёта. Печать (upd.php)
+выводит в поле (4) «грузополучатель, адрес»; пустой адрес у покупателя-
+грузополучателя заменяется адресом покупателя. Старые документы без
+consignee_address печатают consignee как есть (там адрес записан в текст).
+FnsUpdXmlGenerator берёт адрес ГрузПолуч из consignee_address, иначе адрес
+покупателя: текст consignee адрес в XML не передаёт. Форма документа — в
+skeeks/cms AdminCmsDocumentController. Проверка исходников:
+tests/shop-document-upd-consignee-address.php.
+
 ## Вознаграждения партнёров в отчёте по лидам
 
 ShopComponent отвечает на событие CmsLeadReportService::EVENT_PARTNER_REWARDS
