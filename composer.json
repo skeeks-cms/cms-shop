@@ -33,7 +33,7 @@
 
         "chillerlan/php-qrcode": "^5.0",
         "kartik-v/yii2-mpdf": "1.0.6",
-        "picqer/php-barcode-generator": "^2.2",
+        "picqer/php-barcode-generator": "^2.2 || ^3.0",
         "violuke/php-barcodes" : "^1.0"
     },
     "autoload": {
