@@ -35,7 +35,17 @@ class GpdCatalogApplyJobHandler extends ChunkedJobHandler
         $stats=$saved['counts']??['created'=>0,'updated'=>0,'deactivated'=>0,'deleted'=>0,'protected'=>0,'kept'=>0,'other_source'=>0,'absent'=>0,'pending'=>0,'unchanged'=>0,'errors'=>0];
         $reporter->setStage('apply','Применяем изменения каталога GPD');
         $page=$this->service->page((int)($items[0]['after']??0));
-        $reporter->setTotal((int)$context->getRun()->progress_current+$this->service->remaining((int)($items[0]['after']??0)));
+        if(!$page) {
+            // finish() owns the final exact backlog count, including an empty start.
+            $this->next=null;
+            $reporter->setResult(array_merge($saved,['counts'=>$stats,'pending_details'=>$pendingDetails]));
+            return;
+        }
+        $after=(int)($items[0]['after']??0);
+        // Snapshot the backlog per chunk, not per product. Pending/errors may
+        // remain, and the receiver may publish new revisions during this chunk.
+        $remaining=$this->service->remaining();
+        $reporter->setTotal((int)$context->getRun()->progress_current+($after===0?$remaining:$this->service->remaining($after)));
         foreach($page as $entry) {
             $checkpoint();
             try {
@@ -45,7 +55,7 @@ class GpdCatalogApplyJobHandler extends ChunkedJobHandler
             catch(\skeeks\cms\shop\gpd\ReferencePendingException $e){$stats['pending']++;$reporter->countSkipped();if(count($pendingDetails)<20)$pendingDetails[]=['product_id'=>$entry['item']['id'],'reason'=>$e->getMessage()];}
             catch(\Throwable $e){$stats['errors']++;$reporter->itemError('gpd_product',$entry['item']['id'],$e instanceof \yii\db\Exception?'Ошибка сохранения товара в БД.':$e->getMessage());}
             $reporter->advance();
-            $reporter->setResult(['counts'=>$stats,'remaining'=>$this->service->remaining(),'pending_details'=>$pendingDetails]);
+            $reporter->setResult(['counts'=>$stats,'remaining'=>$remaining,'pending_details'=>$pendingDetails]);
             $reporter->setStage('apply',$this->message($stats));
         }
         $this->next=$page?['after'=>(int)end($page)['state']['product_id']]:null;
