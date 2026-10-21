@@ -17,7 +17,7 @@ use skeeks\cms\shop\models\CmsSite;
 use skeeks\cms\shop\models\ShopProduct;
 use skeeks\cms\shop\models\ShopStore;
 use skeeks\cms\shop\models\ShopTypePrice;
-use skeeks\cms\widgets\formInputs\ckeditor\Ckeditor;
+use skeeks\cms\widgets\formInputs\richText\RichTextInputWidget;
 use skeeks\cms\widgets\GridView;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
@@ -257,8 +257,13 @@ class AdminCmsSiteController extends \skeeks\cms\controllers\AdminCmsSiteControl
                     ],
 
                     'shopSite.description_internal'    => [
-                        'class'       => WidgetField::class,
-                        'widgetClass' => Ckeditor::class,
+                        // ShopSite cleans it with the same preset (RichTextBehavior).
+                        'class'        => WidgetField::class,
+                        'widgetClass'  => RichTextInputWidget::class,
+                        'widgetConfig' => [
+                            'preset'    => ['preset' => 'standard', 'images' => true],
+                            'minHeight' => 200,
+                        ],
                     ],
                 ],
             ],

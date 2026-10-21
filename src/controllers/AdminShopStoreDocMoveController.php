@@ -38,7 +38,6 @@ use skeeks\cms\widgets\AjaxSelectModel;
 use skeeks\cms\widgets\GridView;
 use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
 use skeeks\cms\ya\map\widgets\YaMapInput;
-use skeeks\yii2\ckeditor\CKEditorWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;

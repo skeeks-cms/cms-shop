@@ -98,6 +98,11 @@ class ShopStore extends \skeeks\cms\base\ActiveRecord
                 'class'  => HasJsonFieldsBehavior::className(),
                 'fields' => ['work_time'],
             ],
+            // The description is edited with RichTextInputWidget (preset "basic") in the store and supplier forms.
+            \skeeks\cms\behaviors\RichTextBehavior::class => [
+                'class'      => \skeeks\cms\behaviors\RichTextBehavior::class,
+                'attributes' => ['description' => 'basic'],
+            ],
         ]);
     }
 

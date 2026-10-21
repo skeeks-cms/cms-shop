@@ -27,7 +27,7 @@ use skeeks\cms\widgets\AjaxFileUploadWidget;
 use skeeks\cms\widgets\GridView;
 use skeeks\cms\ya\map\widgets\YaMapDecodeInput;
 use skeeks\cms\ya\map\widgets\YaMapInput;
-use skeeks\yii2\ckeditor\CKEditorWidget;
+use skeeks\cms\widgets\formInputs\richText\RichTextInputWidget;
 use skeeks\yii2\form\fields\BoolField;
 use skeeks\yii2\form\fields\FieldSet;
 use skeeks\yii2\form\fields\HtmlBlock;
@@ -659,20 +659,12 @@ CSS
                 ],
                 'fields'         => [
                     'description' => [
+                        // ShopStore cleans it with the same preset (RichTextBehavior).
                         'class'        => WidgetField::class,
-                        'widgetClass'  => CKEditorWidget::class,
+                        'widgetClass'  => RichTextInputWidget::class,
                         'widgetConfig' => [
-                            'preset'        => false,
-                            'clientOptions' => [
-                                'enterMode'      => 2,
-                                'height'         => 300,
-                                'allowedContent' => true,
-                                'extraPlugins'   => 'ckwebspeech,lineutils,dialogui',
-                                'toolbar'        => [
-                                    ['name' => 'basicstyles', 'groups' => ['basicstyles', 'cleanup'], 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
-                                ],
-                            ],
-
+                            'preset'    => 'basic',
+                            'minHeight' => 200,
                         ],
                     ],
                 ],

@@ -98,6 +98,11 @@ class ShopSite extends \skeeks\cms\base\ActiveRecord
                     'required_collection_fields',
                 ],
             ],
+            // The hidden description is edited with RichTextInputWidget (preset "standard") in the site form.
+            \skeeks\cms\behaviors\RichTextBehavior::class => [
+                'class'      => \skeeks\cms\behaviors\RichTextBehavior::class,
+                'attributes' => ['description_internal' => ['preset' => 'standard', 'images' => true]],
+            ],
         ]);
     }
     /**
