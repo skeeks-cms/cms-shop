@@ -10,6 +10,8 @@ namespace skeeks\cms\shop\controllers;
 
 use skeeks\cms\base\Controller;
 use skeeks\cms\shop\models\ShopBrand;
+use skeeks\cms\shop\models\ShopCmsContentElement;
+use skeeks\cms\shop\models\ShopCollection;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
@@ -250,13 +252,29 @@ class BrandController extends Controller
 
         $brandId = (int) \Yii::$app->request->get('brand_id');
 
-        $collections = \skeeks\cms\shop\models\ShopCollection::find()
+        $query = ShopCollection::find()
             ->active()
             ->andWhere([
                 'shop_brand_id' => $brandId,
             ])
-            ->orderBy(['name' => SORT_ASC])
-            ->all();
+            ->orderBy(['name' => SORT_ASC]);
+
+        //Если сайт показывает товары только в наличии — только коллекции, где такие товары есть
+        if ((int) \Yii::$app->skeeks->site->shopSite->is_show_product_only_quantity) {
+            $stockQuery = ShopCmsContentElement::find()
+                ->cmsSite()
+                ->active()
+                ->innerJoinWith('shopProduct as shopProduct', false)
+                ->innerJoinWith('shopProduct.collections as collections', false)
+                ->andWhere(['collections.shop_brand_id' => $brandId]);
+
+            \Yii::$app->shop->filterByQuantityQuery($stockQuery);
+            $stockQuery->groupBy(null)->distinct()->select(['collections.id']);
+
+            $query->andWhere([ShopCollection::tableName().'.id' => $stockQuery]);
+        }
+
+        $collections = $query->all();
 
         if (!$collections) {
             return '<div class="sx-brand-collections-empty">Коллекции не найдены</div>';
