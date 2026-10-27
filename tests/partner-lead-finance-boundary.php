@@ -57,7 +57,7 @@ if (strpos($commonConfig, "'name' => 'shop/admin-partner-payout'") === false
 
 foreach ([
     '$lead->addSystemActivity(',
-    "'Лид успешно завершён — начислено '",
+    "'Сделка успешно завершена — начислено '",
     "rtrim(rtrim(number_format((float)\$reward->reward_value, 2, '.', ' '), '0'), '.')",
     'Html::encode(',
 ] as $activityContract) {

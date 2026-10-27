@@ -327,7 +327,7 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
             'receiver_contractor_id'      => "Получатель",
             'receiver_contractor_bank_id' => "Банк получатель",
             'sender_contractor_bank_id'   => "Банк отправитель",
-            'deals'                       => "Сделки",
+            'deals'                       => "Услуги",
             'bills'                       => "Счета",
         ]);
     }

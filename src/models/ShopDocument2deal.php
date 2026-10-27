@@ -45,7 +45,7 @@ class ShopDocument2deal extends \skeeks\cms\base\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'shop_document_id' => Yii::t('skeeks/shop/app', 'Документ'),
-            'cms_deal_id'      => Yii::t('skeeks/shop/app', 'Сделка'),
+            'cms_deal_id'      => Yii::t('skeeks/shop/app', 'Услуга'),
         ]);
     }
 

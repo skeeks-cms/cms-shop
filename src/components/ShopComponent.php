@@ -153,7 +153,7 @@ class ShopComponent extends Component implements BootstrapInterface
             // announce a completed lead. A rejected activity entry throws and
             // rolls the whole success transition back.
             $lead->addSystemActivity(
-                'Лид успешно завершён — начислено '
+                'Сделка успешно завершена — начислено '
                 .Html::encode(rtrim(rtrim(number_format((float)$reward->reward_value, 2, '.', ' '), '0'), '.'))
                 .' бонусов'
             );

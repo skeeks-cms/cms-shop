@@ -380,7 +380,7 @@ CSS
                     <?= $entityCard('/cms/admin-cms-bill', $bill, 'Счет', '', 'fa fa-file'); ?>
                 <?php endforeach; ?>
                 <?php foreach ($model->deals as $deal) : ?>
-                    <?= $entityCard('/cms/admin-cms-deal', $deal, 'Сделка', '', 'fa fa-file'); ?>
+                    <?= $entityCard('/cms/admin-cms-deal', $deal, 'Услуга', '', 'fa fa-file'); ?>
                 <?php endforeach; ?>
                 <?php if ($model->shopOrder) : ?>
                     <?= $entityCard('/shop/admin-order', $model->shopOrder, 'Заказ', '', 'fa fa-shopping-cart'); ?>

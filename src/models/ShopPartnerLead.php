@@ -38,7 +38,7 @@ class ShopPartnerLead extends ActiveRecord
 
         $lead = $this->cmsLead;
         if (!$lead || !$lead->partner_id || $lead->status !== CmsLead::STATUS_SUCCESS) {
-            throw new Exception('Начисление возможно только по успешному партнёрскому лиду.');
+            throw new Exception('Начисление возможно только по успешной партнёрской сделке.');
         }
 
         $transaction = new ShopBonusTransaction();
@@ -46,7 +46,7 @@ class ShopPartnerLead extends ActiveRecord
         $transaction->cms_user_id = $lead->partner_id;
         $transaction->is_debit = 0;
         $transaction->value = (float)$this->reward_value;
-        $transaction->comment = 'Партнёрская программа: вознаграждение по лиду «'.$lead->name.'»';
+        $transaction->comment = 'Партнёрская программа: вознаграждение по сделке «'.$lead->name.'»';
         if (!$transaction->save()) {
             throw new Exception('Не удалось начислить бонусы: '.print_r($transaction->errors, true));
         }
@@ -58,7 +58,7 @@ class ShopPartnerLead extends ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'cms_lead_id' => 'Лид',
+            'cms_lead_id' => 'Сделка',
             'reward_value' => 'Вознаграждение, бонусов',
             'shop_bonus_transaction_id' => 'Транзакция начисления',
         ]);

@@ -555,7 +555,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
             'receiver_contractor_id'      => "Получатель",
             'receiver_contractor_bank_id' => "Банк получатель",
             'external_id'                 => Yii::t('skeeks/shop/app', 'Идентификатор внешней системы'),
-            'deals'                       => "Сделки",
+            'deals'                       => "Услуги",
         ]);
     }
 

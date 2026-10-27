@@ -251,7 +251,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             'external_name'                      => Yii::t('skeeks/shop/app', 'Внешняя система'),
             'external_data'                      => Yii::t('skeeks/shop/app', 'Данные внешней системы'),
             'bills'                              => Yii::t('skeeks/shop/app', 'Счета'),
-            'deals'                              => Yii::t('skeeks/shop/app', 'Сделки'),
+            'deals'                              => Yii::t('skeeks/shop/app', 'Услуги'),
         ]);
     }
 
