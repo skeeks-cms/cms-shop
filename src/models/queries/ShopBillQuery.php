@@ -41,19 +41,38 @@ class ShopBillQuery extends CmsActiveQuery
         //Если нет прав админа, нужно показать только доступные сделки
         if (!$isCanAdmin) {
 
-            $cmsCompanyQuery = CmsCompany::find()->forManager()->select(CmsCompany::tableName() . '.id');
-            $cmsUserQuery = CmsUser::find()->forManager()->select(CmsUser::tableName() . '.id');
-
-            //Поиск клиентов с которыми связан сотрудник + все дочерние сотрудники
-            $this->andWhere([
-                'or',
-                //Связь клиентов с менеджерами
-                [$this->getPrimaryTableName() . ".cms_company_id" => $cmsCompanyQuery],
-                //Искать конткты по всем доступным компаниям
-                [$this->getPrimaryTableName() . ".cms_user_id" => $cmsUserQuery],
-            ]);
+            $table = $this->getPrimaryTableName();
+            $this->andWhere(static::clientCondition($user, $table, static function (array $ownerIds) use ($table) {
+                // "Своё": a bill he or his subordinates issued (created_by).
+                return [[$table.'.created_by' => $ownerIds]];
+            }));
         }
 
         return $this;
+    }
+
+    /**
+     * The visibility of a client finance record (bill, payment, document) for
+     * an employee: the client seen in full, or "своё" for the level "Свои
+     * сделки" (skeeks/cms CrmAccess::clientRecordCondition()). $own gets the
+     * ids of the employee and his subordinates and returns OR conditions. With
+     * an older skeeks/cms — the former rule: every visible client.
+     *
+     * @param callable $own function (int[] $ownerIds): array
+     */
+    public static function clientCondition(User $user, string $table, callable $own): array
+    {
+        $accessClass = \skeeks\cms\crm\CrmAccess::class;
+        if (class_exists($accessClass) && method_exists($accessClass, 'clientRecordCondition')) {
+            $access = $accessClass::instance();
+
+            return $access->clientRecordCondition($user, $table, $own($access->ownerIds($user)));
+        }
+
+        return [
+            'or',
+            [$table.'.cms_company_id' => CmsCompany::find()->forManager($user)->select(CmsCompany::tableName().'.id')],
+            [$table.'.cms_user_id' => CmsUser::find()->forManager($user)->select(CmsUser::tableName().'.id')],
+        ];
     }
 }

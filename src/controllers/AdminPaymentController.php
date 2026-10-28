@@ -58,6 +58,9 @@ use yii\helpers\Html;
  */
 class AdminPaymentController extends BackendModelStandartController
 {
+    // A card opens only a record the employee sees (forManager()), otherwise 404.
+    use \skeeks\cms\controllers\traits\ManagerScopedModel;
+
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Платежи по заказам');

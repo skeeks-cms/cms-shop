@@ -12,6 +12,8 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopDocument2bill;
 
 class ShopDocumentQuery extends CmsActiveQuery
 {
@@ -29,14 +31,16 @@ class ShopDocumentQuery extends CmsActiveQuery
         }
 
         if (!$isCanAdmin) {
-            $cmsCompanyQuery = CmsCompany::find()->forManager()->select(CmsCompany::tableName().'.id');
-            $cmsUserQuery = CmsUser::find()->forManager()->select(CmsUser::tableName().'.id');
-
-            $this->andWhere([
-                'or',
-                [$this->getPrimaryTableName().'.cms_company_id' => $cmsCompanyQuery],
-                [$this->getPrimaryTableName().'.cms_user_id' => $cmsUserQuery],
-            ]);
+            $table = $this->getPrimaryTableName();
+            $this->andWhere(ShopBillQuery::clientCondition($user, $table, static function (array $ownerIds) use ($table) {
+                // "Своё": a document he or his subordinates made, or a document of his own bill.
+                return [
+                    [$table.'.created_by' => $ownerIds],
+                    [$table.'.id' => ShopDocument2bill::find()->alias('ownDocument2bill')->select('ownDocument2bill.shop_document_id')
+                        ->innerJoin(['ownBill' => ShopBill::tableName()], 'ownBill.id = ownDocument2bill.shop_bill_id')
+                        ->andWhere(['ownBill.created_by' => $ownerIds])],
+                ];
+            }));
         }
 
         return $this;

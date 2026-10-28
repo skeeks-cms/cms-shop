@@ -13,6 +13,8 @@ use skeeks\cms\models\CmsUser;
 use skeeks\cms\models\User;
 use skeeks\cms\query\CmsActiveQuery;
 use skeeks\cms\rbac\CmsManager;
+use skeeks\cms\shop\models\ShopBill;
+use skeeks\cms\shop\models\ShopBill2payment;
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
  */
@@ -41,17 +43,16 @@ class ShopPaymentQuery extends CmsActiveQuery
         //Если нет прав админа, нужно показать только доступные сделки
         if (!$isCanAdmin) {
 
-            $cmsCompanyQuery = CmsCompany::find()->forManager($user)->select(CmsCompany::tableName() . '.id');
-            $cmsUserQuery = CmsUser::find()->forManager($user)->select(CmsUser::tableName() . '.id');
-
-            //Поиск клиентов с которыми связан сотрудник + все дочерние сотрудники
-            $this->andWhere([
-                'or',
-                //Связь клиентов с менеджерами
-                [$this->getPrimaryTableName() . ".cms_company_id" => $cmsCompanyQuery],
-                //Искать конткты по всем доступным компаниям
-                [$this->getPrimaryTableName() . ".cms_user_id" => $cmsUserQuery],
-            ]);
+            $table = $this->getPrimaryTableName();
+            $this->andWhere(ShopBillQuery::clientCondition($user, $table, static function (array $ownerIds) use ($table) {
+                // "Своё": a payment he or his subordinates registered, or a payment of his own bill.
+                return [
+                    [$table.'.created_by' => $ownerIds],
+                    [$table.'.id' => ShopBill2payment::find()->alias('ownBill2payment')->select('ownBill2payment.shop_payment_id')
+                        ->innerJoin(['ownBill' => ShopBill::tableName()], 'ownBill.id = ownBill2payment.shop_bill_id')
+                        ->andWhere(['ownBill.created_by' => $ownerIds])],
+                ];
+            }));
         }
 
         return $this;
