@@ -32,14 +32,14 @@ return \yii\helpers\ArrayHelper::merge([
     'crm' => [
         'items' => [
             [
-                'priority' => 210,
+                'priority' => 140,
                 "label" => \Yii::t('skeeks/shop/app', 'Платежи'),
                 "url"   => ["shop/admin-payment"],
                 "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/payment.svg'],
             ],
 
             [
-                'priority' => 220,
+                'priority' => 180,
                 "label" => \Yii::t('skeeks/shop/app', 'Чеки'),
                 "url"   => ["shop/admin-shop-check"],
                 "img"   => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/cashbox.svg'],
