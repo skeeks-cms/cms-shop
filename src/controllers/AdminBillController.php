@@ -21,6 +21,10 @@ use yii\helpers\ArrayHelper;
  */
 class AdminBillController extends BackendModelStandartController
 {
+    // A card opens only a bill the employee sees (ShopBillQuery::forManager()), otherwise 404 —
+    // the view, the delete and every model action by a direct link (release rehearsal 30.10.2026, п. 4б).
+    use \skeeks\cms\controllers\traits\ManagerScopedModel;
+
     public function init()
     {
         $this->name = \Yii::t('skeeks/shop/app', 'Счета по заказам');
@@ -49,6 +53,11 @@ class AdminBillController extends BackendModelStandartController
                 ],
 
                 'grid'    => [
+                    // The list and its CSV export: only the bills the employee sees, as «Счета» of the CRM;
+                    // an administrator sees every bill (forManager() returns before).
+                    'on init' => function (\yii\base\Event $e) {
+                        $e->sender->dataProvider->query->forManager();
+                    },
                     'defaultOrder' => [
                         'created_at' => SORT_DESC,
                     ],
@@ -132,7 +141,10 @@ CSS
         ArrayHelper::remove($result, "create");
         ArrayHelper::remove($result, "update");
         /*ArrayHelper::remove($result, "delete");*/
-        /*ArrayHelper::remove($result, "delete-multi");*/
+        // Several bills at once by their ids: administrators only (the single delete is scoped by getModel()).
+        if (isset($result['delete-multi'])) {
+            $result['delete-multi']['accessCallback'] = static fn() => \Yii::$app->user->can(\skeeks\cms\rbac\CmsManager::PERMISSION_ROLE_ADMIN_ACCESS);
+        }
 
         return $result;
     }
