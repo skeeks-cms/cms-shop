@@ -209,11 +209,25 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
 
 
     /**
+     * The client of the payment, when an employee writes it (skeeks/cms CrmAccess::validateLeadLink(),
+     * audit F1): the client must be available to him; on «Свои сделки» — within his own open deal.
+     * A payment is tied to a deal through its bill.
+     */
+    public function validateClient($attribute)
+    {
+        $access = '\skeeks\cms\crm\CrmAccess';
+        if (method_exists($access, 'validateLeadLink')) {
+            $access::instance()->validateLeadLink($this, $attribute);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         $rules = [
+            [['cms_company_id'], 'validateClient', 'skipOnEmpty' => false],
             [
                 [
                     'created_by',

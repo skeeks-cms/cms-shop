@@ -116,7 +116,11 @@ abstract class PaysystemHandler extends Model implements IHasConfigForm
 
         $shopBill->description = "Оплата по заказу №".$shopOrder->id;
 
-        if (!$shopBill->save()) {
+        // A bill of an order is system work of its payment system, not an action of the employee
+        // whose request runs it (skeeks/cms CrmAccess::systemWrite()).
+        $access = '\skeeks\cms\crm\CrmAccess';
+        $saved = method_exists($access, 'systemWrite') ? $access::systemWrite(static fn() => $shopBill->save()) : $shopBill->save();
+        if (!$saved) {
             throw new UserException('Не создался платеж: '.print_r($shopBill->errors, true));
         }
 
