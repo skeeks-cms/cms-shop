@@ -260,6 +260,8 @@ class AdminPaymentController extends BackendModelStandartController
                         $query = $e->sender->dataProvider->query;
 
                         $query->forManager()->cmsSite();
+                        // The cells below read these relations for every row: load them per page, not per row.
+                        $query->with(['company.cmsImage', 'cmsUser', 'shopPaySystem', 'senderContractor', 'receiverContractor', 'deals', 'bills']);
                     },
 
                     'visibleColumns' => [
