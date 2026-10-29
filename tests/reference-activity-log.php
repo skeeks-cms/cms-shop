@@ -30,7 +30,9 @@ $app = new yii\console\Application([
 $app->set('cms', new class extends yii\base\Component {public $element_max_code_length = 255;});
 // Exercise actual storage-row cleanup, but never touch a filesystem or network.
 $app->set('storage', new class extends yii\base\Component {public function getCluster($id) {return null;}});
-$app->set('skeeks', new class extends yii\base\Component {public $modelsConfig = []; public $site;});
+$app->set('skeeks', new class extends yii\base\Component {public $modelsConfig = []; public $site;
+    // No log types of other packages: CmsLog::render() uses its own texts.
+    public function getLogRenderer($logType) {return null;}});
 (new skeeks\cms\shop\components\ShopComponent())->bootstrap($app);
 $db = $app->db;
 $database = 'reference_log_test_'.bin2hex(random_bytes(6));

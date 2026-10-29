@@ -11,10 +11,18 @@ $barcodes = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/product
 $measures = file_get_contents(dirname(__DIR__).'/src/widgets/admin/views/product-measure-matches.php');
 $composer = json_decode(file_get_contents(dirname(__DIR__).'/composer.json'), true);
 
-shopInputSortableExpect(
-    ($composer['require']['skeeks/cms-backend'] ?? null) === '^2.0 || dev-master@dev',
-    'cms-shop does not declare its backend adapter dependency.'
-);
+// BackendSortableAdapterAsset first shipped in skeeks/cms-backend 2.1.1.11: every
+// alternative of the constraint must be a caret range of major 2 starting at that
+// version or later (a stricter minimum is fine), or the development branch.
+$backendConstraint = $composer['require']['skeeks/cms-backend'] ?? null;
+shopInputSortableExpect(is_string($backendConstraint), 'cms-shop does not declare its backend adapter dependency.');
+foreach (preg_split('/\s*\|\|?\s*/', trim($backendConstraint)) as $alternative) {
+    shopInputSortableExpect(
+        $alternative === 'dev-master@dev'
+        || (preg_match('/^\^(2(?:\.\d+){0,3})$/', $alternative, $m) && version_compare($m[1], '2.1.1.11', '>=')),
+        'cms-shop backend dependency allows versions without the Sortable adapter: '.$backendConstraint
+    );
+}
 
 foreach ([$barcodes, $measures] as $view) {
     shopInputSortableExpect(
