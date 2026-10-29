@@ -27,8 +27,8 @@
     "require": {
         "skeeks/cms-agent": "^3.2.4 || dev-master",
         "skeeks/cms-job": "^1.4.0 || dev-master",
-        "skeeks/cms": "^6.4.9.60 || dev-master",
-        "skeeks/cms-backend": "^2.0 || dev-master@dev",
+        "skeeks/cms": "^6.4.9.75 || dev-master",
+        "skeeks/cms-backend": "^2.1.1.25 || dev-master@dev",
         "skeeks/cms-money": "^2.0 || dev-master",
 
         "chillerlan/php-qrcode": "^5.0",
