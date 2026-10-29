@@ -36,6 +36,7 @@ use yii\helpers\Url;
  * @property int|null            $issued_at
  * @property int|null            $cms_company_id
  * @property int|null            $cms_user_id
+ * @property int|null            $cms_lead_id Сделка (продажа), по которой сделан документ
  * @property int|null            $seller_contractor_id
  * @property int|null            $buyer_contractor_id
  * @property string|null         $seller_contractor_type
@@ -161,9 +162,28 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
         return parent::beforeDelete();
     }
 
+    /**
+     * The deal of the document (owner's decision 29.10.2026, skeeks/cms CrmAccess::validateLeadLink()):
+     * available, of the same client; «Свои сделки» and "edit" make a document only within their deal.
+     */
+    public function validateLead($attribute)
+    {
+        $access = '\skeeks\cms\crm\CrmAccess';
+        if (method_exists($access, 'validateLeadLink')) {
+            $access::instance()->validateLeadLink($this, $attribute);
+        }
+    }
+
+    /** @return \yii\db\ActiveQuery */
+    public function getCmsLead()
+    {
+        return $this->hasOne(\skeeks\cms\models\CmsLead::class, ['id' => 'cms_lead_id']);
+    }
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            [['cms_lead_id'], 'validateLead', 'skipOnEmpty' => false, 'when' => fn() => $this->hasAttribute('cms_lead_id')],
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'issued_at', 'cms_company_id', 'cms_user_id', 'seller_contractor_id', 'buyer_contractor_id'], 'integer'],
             [['type', 'status'], 'required'],
             [['type', 'status'], 'string', 'max' => 32],
@@ -234,6 +254,7 @@ class ShopDocument extends \skeeks\cms\base\ActiveRecord
             'issued_at'                          => Yii::t('skeeks/shop/app', 'Дата документа'),
             'cms_company_id'                     => Yii::t('skeeks/shop/app', 'Компания'),
             'cms_user_id'                        => Yii::t('skeeks/shop/app', 'Клиент'),
+            'cms_lead_id'                        => 'Сделка',
             'seller_contractor_id'               => Yii::t('skeeks/shop/app', 'Продавец / исполнитель'),
             'buyer_contractor_id'                => Yii::t('skeeks/shop/app', 'Покупатель / заказчик'),
             'seller_contractor_name'             => Yii::t('skeeks/shop/app', 'Продавец на момент создания документа'),

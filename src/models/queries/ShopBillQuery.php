@@ -42,13 +42,32 @@ class ShopBillQuery extends CmsActiveQuery
         if (!$isCanAdmin) {
 
             $table = $this->getPrimaryTableName();
-            $this->andWhere(static::clientCondition($user, $table, static function (array $ownerIds) use ($table) {
-                // "Своё": a bill he or his subordinates issued (created_by).
-                return [[$table.'.created_by' => $ownerIds]];
+            $this->andWhere(static::clientCondition($user, $table, static function (array $ownerIds) use ($table, $user) {
+                // "Своё": a bill he or his subordinates issued (created_by), or a bill of his deal.
+                return array_merge([[$table.'.created_by' => $ownerIds]],
+                    static::ownLeadConditions($user, $table.'.cms_lead_id', 'shop_bill'));
             }));
         }
 
         return $this;
+    }
+
+    /**
+     * "Своё" through a deal (owner's decision 29.10.2026): $column is a deal of the
+     * employee or of his subordinates (skeeks/cms CrmAccess::ownLeadCondition()).
+     * Empty with an older skeeks/cms or before the migration of the deal column.
+     *
+     * @param string $table the real table of $column (it may be qualified by an alias)
+     * @return array[] OR conditions
+     */
+    public static function ownLeadConditions(User $user, string $column, string $table): array
+    {
+        $accessClass = \skeeks\cms\crm\CrmAccess::class;
+        if (!class_exists($accessClass) || !method_exists($accessClass, 'ownLeadCondition') || !$accessClass::leadLinkReady($table)) {
+            return [];
+        }
+
+        return [$accessClass::instance()->ownLeadCondition($user, $column, $table)];
     }
 
     /**

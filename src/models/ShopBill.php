@@ -36,6 +36,7 @@ use yii\helpers\Url;
  * @property int               $updated_at
  * @property int|null          $cms_user_id Покупатель
  * @property int|null          $cms_company_id Компания
+ * @property int|null          $cms_lead_id Сделка (продажа), по которой выставлен счёт
  * @property int|null          $sender_contractor_id Контрагент отправитель
  * @property int|null          $receiver_contractor_id Контрагент получатель
  * @property int|null          $receiver_contractor_bank_id Банк получатель
@@ -252,9 +253,28 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    /**
+     * The deal of the bill (owner's decision 29.10.2026, skeeks/cms CrmAccess::validateLeadLink()):
+     * available, of the same client; «Свои сделки» and "edit" issue a bill only within their deal.
+     */
+    public function validateLead($attribute)
+    {
+        $access = '\skeeks\cms\crm\CrmAccess';
+        if (method_exists($access, 'validateLeadLink')) {
+            $access::instance()->validateLeadLink($this, $attribute);
+        }
+    }
+
+    /** @return \yii\db\ActiveQuery */
+    public function getCmsLead()
+    {
+        return $this->hasOne(\skeeks\cms\models\CmsLead::class, ['id' => 'cms_lead_id']);
+    }
+
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            [['cms_lead_id'], 'validateLead', 'skipOnEmpty' => false, 'when' => fn() => $this->hasAttribute('cms_lead_id')],
             [['created_by', 'updated_by', 'created_at', 'updated_at', 'cms_user_id', 'shop_order_id', 'shop_pay_system_id', 'paid_at', 'due_at', 'shop_payment_id', 'closed_at'], 'integer'],
             [
                 [
@@ -551,6 +571,7 @@ class ShopBill extends \skeeks\cms\base\ActiveRecord
             'description'                 => Yii::t('skeeks/shop/app', 'Основание или комментарий к счету'),
             'code'                        => Yii::t('skeeks/shop/app', 'Уникальный код счета'),
             'cms_company_id'              => "Компания",
+            'cms_lead_id'                 => "Сделка",
             'sender_contractor_id'        => "Плательщик",
             'receiver_contractor_id'      => "Получатель",
             'receiver_contractor_bank_id' => "Банк получатель",

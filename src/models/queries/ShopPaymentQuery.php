@@ -44,13 +44,15 @@ class ShopPaymentQuery extends CmsActiveQuery
         if (!$isCanAdmin) {
 
             $table = $this->getPrimaryTableName();
-            $this->andWhere(ShopBillQuery::clientCondition($user, $table, static function (array $ownerIds) use ($table) {
-                // "Своё": a payment he or his subordinates registered, or a payment of his own bill.
+            $this->andWhere(ShopBillQuery::clientCondition($user, $table, static function (array $ownerIds) use ($table, $user) {
+                // "Своё": a payment he or his subordinates registered, or a payment of his own bill
+                // (issued by him, or a bill of his deal — a payment is tied to a deal through its bill).
                 return [
                     [$table.'.created_by' => $ownerIds],
                     [$table.'.id' => ShopBill2payment::find()->alias('ownBill2payment')->select('ownBill2payment.shop_payment_id')
                         ->innerJoin(['ownBill' => ShopBill::tableName()], 'ownBill.id = ownBill2payment.shop_bill_id')
-                        ->andWhere(['ownBill.created_by' => $ownerIds])],
+                        ->andWhere(array_merge(['or', ['ownBill.created_by' => $ownerIds]],
+                            ShopBillQuery::ownLeadConditions($user, 'ownBill.cms_lead_id', 'shop_bill')))],
                 ];
             }));
         }

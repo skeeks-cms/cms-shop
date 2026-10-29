@@ -32,14 +32,16 @@ class ShopDocumentQuery extends CmsActiveQuery
 
         if (!$isCanAdmin) {
             $table = $this->getPrimaryTableName();
-            $this->andWhere(ShopBillQuery::clientCondition($user, $table, static function (array $ownerIds) use ($table) {
-                // "Своё": a document he or his subordinates made, or a document of his own bill.
-                return [
+            $this->andWhere(ShopBillQuery::clientCondition($user, $table, static function (array $ownerIds) use ($table, $user) {
+                // "Своё": a document he or his subordinates made, a document of his deal,
+                // or a document of his own bill (issued by him or a bill of his deal).
+                return array_merge([
                     [$table.'.created_by' => $ownerIds],
                     [$table.'.id' => ShopDocument2bill::find()->alias('ownDocument2bill')->select('ownDocument2bill.shop_document_id')
                         ->innerJoin(['ownBill' => ShopBill::tableName()], 'ownBill.id = ownDocument2bill.shop_bill_id')
-                        ->andWhere(['ownBill.created_by' => $ownerIds])],
-                ];
+                        ->andWhere(array_merge(['or', ['ownBill.created_by' => $ownerIds]],
+                            ShopBillQuery::ownLeadConditions($user, 'ownBill.cms_lead_id', 'shop_bill')))],
+                ], ShopBillQuery::ownLeadConditions($user, $table.'.cms_lead_id', 'shop_document'));
             }));
         }
 
