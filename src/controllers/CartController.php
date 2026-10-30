@@ -110,6 +110,12 @@ class CartController extends Controller
                     throw new Exception("Обновите страницу заказ уже не найден");
                 }
                 $rr->success = true;
+                $contacts = \Yii::$app->request->post('contacts', []);
+                if (!is_array($contacts)) {
+                    throw new UserException('Некорректные данные покупателя.');
+                }
+                $order->scenario = ShopOrder::SCENARIO_CHECKOUT;
+                $order->applyCheckoutContacts($contacts);
 
                 $previousDeliveryAmount = (float)$order->delivery_amount;
                 if (!$order->refreshDeliveryCalculation(true)) {
@@ -211,12 +217,6 @@ class CartController extends Controller
                     }
                     
                     $order->cms_user_id = $cmsUser->id;
-                } else {
-                    $cmsUser = $order->cmsUser;
-                    $order->contact_phone = $cmsUser->phone;
-                    $order->contact_email = $cmsUser->email;
-                    $order->contact_first_name = $cmsUser->first_name;
-                    $order->contact_last_name = $cmsUser->last_name;
                 }
                 
                 

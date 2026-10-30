@@ -150,6 +150,7 @@ class ShopOrder extends ActiveRecord
     const EVENT_BEFORE_RECALCULATE = 'beforeRecalculate';
 
     const SCENARIO_BUY_ONE_CLICK = 'buy-one-click';
+    const SCENARIO_CHECKOUT = 'checkout';
 
     protected $_email = null;
 
@@ -194,10 +195,31 @@ class ShopOrder extends ActiveRecord
     {
         $scenarios = parent::scenarios();
         $scenarios[static::SCENARIO_BUY_ONE_CLICK] = $scenarios[static::SCENARIO_DEFAULT];
+        $scenarios[static::SCENARIO_CHECKOUT] = $scenarios[static::SCENARIO_DEFAULT];
 
         return $scenarios;
     }
 
+
+    /**
+     * Order contacts are a snapshot, not an instruction to edit the account.
+     * Explicit values (including blanks) win; the profile only fills omissions.
+     */
+    public function applyCheckoutContacts(array $contacts = [])
+    {
+        $user = $this->cms_user_id ? $this->cmsUser : null;
+        foreach (['phone', 'email', 'first_name', 'last_name'] as $field) {
+            $attribute = 'contact_'.$field;
+            if (array_key_exists($attribute, $contacts)) {
+                if (!is_string($contacts[$attribute])) {
+                    throw new \InvalidArgumentException('Некорректные данные покупателя.');
+                }
+                $this->$attribute = trim($contacts[$attribute]);
+            } elseif (trim((string)$this->$attribute) === '' && $user) {
+                $this->$attribute = trim((string)$user->$field);
+            }
+        }
+    }
 
     public function orderTypes()
     {
@@ -685,7 +707,8 @@ class ShopOrder extends ActiveRecord
                 'required',
                 'when' => function () {
                     $requiredFields = $this->orderRequiredFields;
-                    return !$this->cms_user_id && in_array('last_name', $requiredFields);
+                    return (!$this->cms_user_id || $this->scenario === static::SCENARIO_CHECKOUT)
+                        && in_array('last_name', $requiredFields);
                 },
             ],
             [
@@ -693,7 +716,8 @@ class ShopOrder extends ActiveRecord
                 'required',
                 'when' => function () {
                     $requiredFields = $this->orderRequiredFields;
-                    return !$this->cms_user_id && in_array('first_name', $requiredFields);
+                    return (!$this->cms_user_id || $this->scenario === static::SCENARIO_CHECKOUT)
+                        && in_array('first_name', $requiredFields);
                 },
             ],
             [
@@ -701,7 +725,8 @@ class ShopOrder extends ActiveRecord
                 'required',
                 'when' => function () {
                     $requiredFields = $this->orderRequiredFields;
-                    return !$this->cms_user_id && in_array('email', $requiredFields);
+                    return (!$this->cms_user_id || $this->scenario === static::SCENARIO_CHECKOUT)
+                        && in_array('email', $requiredFields);
                 },
             ],
             [
@@ -709,7 +734,8 @@ class ShopOrder extends ActiveRecord
                 'required',
                 'when' => function () {
                     $requiredFields = $this->orderRequiredFields;
-                    return !$this->cms_user_id && in_array('phone', $requiredFields);
+                    return (!$this->cms_user_id || $this->scenario === static::SCENARIO_CHECKOUT)
+                        && in_array('phone', $requiredFields);
                 },
             ],
 
