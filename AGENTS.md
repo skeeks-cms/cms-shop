@@ -106,6 +106,15 @@ ShopComponent отвечает на событие CmsLeadReportService::EVENT_P
 shop_partner_lead. Подписка ставится только если класс отчёта есть в
 установленном skeeks/cms. Ядро не зависит от магазина.
 
+## Фильтр по характеристикам и товарные предложения
+
+ShopEavQueryFilterHandler::_applyToQuery отбирает элемент, если подходит он сам
+или его дочерний элемент: два условия IN, второе — подзапрос
+parent_content_element_id по подходящим дочерним id. JOIN childrenContentElements
+не добавлять: он размножал строки товара и ломал планы MariaDB во внешних
+запросах (подсчёт, коллекции). Замеры на рабочем каталоге — в
+skeeks-cms-package-development/references/storefront-performance.md.
+
 ## Контакты при оформлении заказа
 
 Контакты заказа — снимок для конкретной покупки. applyCheckoutContacts принимает

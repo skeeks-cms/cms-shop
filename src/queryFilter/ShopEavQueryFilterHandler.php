@@ -14,6 +14,7 @@ use skeeks\cms\shop\models\ShopCmsContentElement;
 use skeeks\cms\shop\models\ShopProduct;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
+use yii\db\Query;
 
 /**
  * @author Semenov Alexander <semenov@skeeks.com>
@@ -72,13 +73,24 @@ class ShopEavQueryFilterHandler extends CmsEavQueryFilterHandler
     }*/
 
 
+    /**
+     * Элемент подходит сам или через дочерний элемент (товарное предложение).
+     *
+     * Родители подходящих дочерних элементов выбираются подзапросом, без JOIN
+     * childrenContentElements: JOIN размножал строки товара по числу предложений
+     * и мешал MariaDB использовать индексы во внешних запросах (подсчёт товаров,
+     * список коллекций сохранённого фильтра).
+     */
     protected function _applyToQuery(ActiveQuery $activeQuery, $unionQuery) {
-        $activeQuery->joinWith("childrenContentElements as childrenContentElements");
+        $parentsQuery = (new Query())
+            ->select(['childrenContentElements.parent_content_element_id'])
+            ->from(['childrenContentElements' => CmsContentElement::tableName()])
+            ->andWhere(['in', 'childrenContentElements.id', $unionQuery]);
+
         $activeQuery->andWhere([
             'or',
-            //['in', CmsContentElement::tableName() . '.main_cce_id', $unionQuery],
             ['in', CmsContentElement::tableName().'.id', $unionQuery],
-            ['in', 'childrenContentElements.id', $unionQuery],
+            ['in', CmsContentElement::tableName().'.id', $parentsQuery],
         ]);
     }
 }
