@@ -1672,6 +1672,70 @@ class ShopOrder extends ActiveRecord
         return $this->hasMany(ShopOrderItem::class, ['shop_order_id' => 'id']);
     }
 
+    /** Refresh persisted line prices once per checkout, inside its transaction. */
+    public function refreshCheckoutItems()
+    {
+        if ($this->is_created) {
+            throw new \yii\base\UserException('Заказ уже оформлен. Обновите страницу.');
+        }
+        $items = $this->getShopOrderItems()->all();
+        if (!$items) {
+            throw new \yii\base\UserException('Корзина пуста.');
+        }
+        $elements = $this->availableCheckoutElements(ArrayHelper::getColumn($items, 'shop_product_id'));
+
+        $changes = [];
+        foreach ($items as $item) {
+            $element = $elements[$item->shop_product_id] ?? null;
+            $product = $element ? $element->shopProduct : null;
+            $label = \yii\helpers\Html::encode($item->name);
+            if (!$product || $product->isOffersProduct) {
+                throw new \yii\base\UserException("Товар «{$label}» больше недоступен. Удалите его из корзины.");
+            }
+            $helper = $this->getProductPriceHelper($element);
+            if (!$helper->price->id || $helper->price->price <= 0) {
+                throw new \yii\base\UserException("Для товара «{$label}» больше нет цены. Удалите его из корзины.");
+            }
+            $currency = $this->currency_code;
+            $net = (clone $helper->minMoney)->convertToCurrency($currency);
+            $discount = $helper->hasDiscount ? (float)$helper->discountMoney->convertToCurrency($currency)->amount : 0;
+            // Order lines store monetary amounts to two decimal places.
+            $amount = round((float)$net->amount + $discount, 2);
+            $discount = round($discount, 2);
+            if ($item->currency_code == $currency && (float)$item->amount === $amount
+                && (float)$item->discount_amount === $discount && $item->shop_product_price_id == $helper->price->id) {
+                continue;
+            }
+            if (!$item->updateAttributes([
+                'amount' => $amount, 'discount_amount' => $discount, 'currency_code' => $currency,
+                'shop_product_price_id' => $helper->price->id,
+                'discount_name' => $discount ? implode(' + ', ArrayHelper::getColumn($helper->applyedDiscounts, 'name')) : '',
+                'discount_value' => $discount ? \Yii::$app->formatter->asPercent($helper->percent) : '',
+            ])) {
+                throw new \yii\base\UserException('Корзина изменилась. Обновите страницу.');
+            }
+            $changes[] = $label.' — '.\yii\helpers\Html::encode((string)$net);
+        }
+        $this->populateRelation('shopOrderItems', $items);
+        return $changes ? 'Цены в корзине обновились: '.implode(', ', $changes).'.' : '';
+    }
+
+    protected function availableCheckoutElements(array $ids)
+    {
+        $query = ShopCmsContentElement::find()->active()->cmsSite()->publishedTime()
+            ->andWhere([ShopCmsContentElement::tableName().'.id' => $ids])
+            ->with('shopProduct.shopProductPrices');
+        \Yii::$app->shop->filterByQuantityQuery($query);
+        $elements = $query->indexBy('id')->all();
+        $parents = array_filter(ArrayHelper::getColumn($elements, 'shopProduct.offers_pid'));
+        $activeParents = $parents ? ShopCmsContentElement::find()->active()->cmsSite()->publishedTime()
+            ->andWhere(['id' => $parents])->select('id')->column() : [];
+        return array_filter($elements, static function ($element) use ($activeParents) {
+            $parent = $element->shopProduct ? $element->shopProduct->offers_pid : null;
+            return !$parent || in_array($parent, $activeParents);
+        });
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

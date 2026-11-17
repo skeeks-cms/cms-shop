@@ -117,19 +117,20 @@ class CartController extends Controller
                 $order->scenario = ShopOrder::SCENARIO_CHECKOUT;
                 $order->applyCheckoutContacts($contacts);
 
+                $priceMessage = $order->refreshCheckoutItems();
                 $previousDeliveryAmount = (float)$order->delivery_amount;
                 if (!$order->refreshDeliveryCalculation(true)) {
                     throw new Exception($order->deliveryHandlerCheckoutModel->deliveryCalculationError
                         ?: 'Не удалось обновить стоимость доставки. Повторите попытку.');
                 }
                 $order->recalculate();
-                if (abs($previousDeliveryAmount - (float)$order->delivery_amount) > 0.001) {
+                if ($priceMessage || abs($previousDeliveryAmount - (float)$order->delivery_amount) > 0.001) {
                     if (!$order->save(false)) {
                         throw new Exception('Не удалось сохранить обновлённую стоимость доставки.');
                     }
                     $t->commit();
                     $rr->success = false;
-                    $rr->message = 'Стоимость доставки обновилась. Проверьте итоговую сумму и повторите оформление заказа.';
+                    $rr->message = $priceMessage ? $priceMessage.' Итого: '.\yii\helpers\Html::encode((string)$order->money).'. Проверьте сумму и повторите оформление.' : 'Стоимость доставки обновилась. Проверьте итоговую сумму и повторите оформление заказа.';
                     $rr->data = $order->jsonSerialize();
                     return $rr;
                 }
