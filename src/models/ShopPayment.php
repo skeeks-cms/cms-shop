@@ -142,6 +142,8 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
 
         $this->on(static::EVENT_AFTER_UPDATE, [$this, "_afterSave"]);
         $this->on(static::EVENT_AFTER_INSERT, [$this, "_afterSave"]);
+        $this->on(static::EVENT_BEFORE_DELETE, [$this, "_beforeDelete"]);
+        $this->on(static::EVENT_AFTER_DELETE, [$this, "_afterDelete"]);
 
         return parent::init();
     }
@@ -177,6 +179,78 @@ class ShopPayment extends \skeeks\cms\base\ActiveRecord
 
             }
         }
+
+        //Счета, которые отвязали от платежа, пересчитываются: без этого платежа они могли перестать быть оплаченными
+        $behavior = $this->getBehavior(RelationalBehavior::class);
+        $oldBills = $behavior ? (array)ArrayHelper::getValue($behavior->getOldRelations(), 'bills', []) : [];
+        if ($oldBills) {
+            $currentBillIds = ArrayHelper::getColumn((array)$this->bills, 'id');
+            foreach ($oldBills as $oldBill) {
+                if ($oldBill instanceof ShopBill && !in_array($oldBill->id, $currentBillIds)) {
+                    $this->_refreshUnlinkedBill($oldBill->id);
+                }
+            }
+        }
+    }
+
+    /**
+     * @var int[] счета, привязанные к удаляемому платежу
+     */
+    private $_deletingBillIds = [];
+
+    public function _beforeDelete()
+    {
+        $this->_deletingBillIds = ShopBill2payment::find()
+            ->select('shop_bill_id')
+            ->andWhere(['shop_payment_id' => $this->id])
+            ->column();
+    }
+
+    public function _afterDelete()
+    {
+        foreach ($this->_deletingBillIds as $billId) {
+            $this->_refreshUnlinkedBill($billId);
+        }
+        $this->_deletingBillIds = [];
+    }
+
+    /**
+     * Счет, от которого отвязали этот платеж (или платеж удалили), остается оплаченным,
+     * только если оставшихся привязанных платежей хватает на его сумму.
+     * Счет, оплаченный другим платежом через платежную систему (shop_payment_id), не трогаем.
+     *
+     * @param int $billId
+     */
+    protected function _refreshUnlinkedBill($billId)
+    {
+        $bill = ShopBill::findOne($billId);
+        if (!$bill || !$bill->paid_at) {
+            return;
+        }
+
+        if ($bill->shop_payment_id && $bill->shop_payment_id != $this->id) {
+            return;
+        }
+
+        $amountPayment = 0;
+        foreach ($bill->payments as $payment) {
+            if ($payment->id == $this->id) {
+                continue;
+            }
+            $amountPayment = $amountPayment + $payment->amount;
+        }
+
+        if (static::isAmountEnoughForBill($amountPayment, $bill->amount)) {
+            return;
+        }
+
+        $bill->paid_at = null;
+        $attributes = ['paid_at'];
+        if ($bill->shop_payment_id) {
+            $bill->shop_payment_id = null;
+            $attributes[] = 'shop_payment_id';
+        }
+        $bill->update(false, $attributes);
     }
 
     /**
