@@ -116,6 +116,8 @@ class UrlRuleBrand
 
         ArrayHelper::remove($params, 'id');
         ArrayHelper::remove($params, 'model');
+        //code уже есть в пути; parseRequest кладёт его в GET, иначе пагинация и Url::current() дописывают ?code=
+        ArrayHelper::remove($params, 'code');
 
         return $model;
     }
