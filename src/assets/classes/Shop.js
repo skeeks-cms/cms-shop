@@ -657,12 +657,13 @@
                     'response': data.response,
                 });
 
-                self.trigger('remove', {
-                    'product': data.response.data.eventData.product,
-                });
-
-                console.log(data.response.data.eventData.product);
-
+                //Событие remove (аналитика) — только когда позиция действительно удалена
+                var eventData = data.response.data && data.response.data.eventData;
+                if (eventData && eventData.product) {
+                    self.trigger('remove', {
+                        'product': eventData.product,
+                    });
+                }
             });
 
             return ajax;

@@ -39,6 +39,36 @@ class CartController extends Controller
     public $defaultAction = 'cart';
 
     /**
+     * Поля заказа, которые покупатель может менять из корзины (order-update).
+     * Суммы, оплата, статус, владелец и служебные поля сюда не входят.
+     * Проект может расширить список через настройку контроллера.
+     *
+     * @var string[]
+     */
+    public $orderUpdateAttributes = [
+        'shop_person_type_id',
+        'shop_pay_system_id',
+        'shop_delivery_id',
+        'shop_store_id',
+        'contact_first_name',
+        'contact_last_name',
+        'contact_phone',
+        'contact_email',
+        'receiver_first_name',
+        'receiver_last_name',
+        'receiver_phone',
+        'receiver_email',
+        'comment',
+        'delivery_address',
+        'delivery_latitude',
+        'delivery_longitude',
+        'delivery_entrance',
+        'delivery_floor',
+        'delivery_apartment_number',
+        'delivery_comment',
+    ];
+
+    /**
      * @return array
      */
     public function behaviors()
@@ -393,16 +423,15 @@ class CartController extends Controller
 
         if ($rr->isRequestAjaxPost()) {
 
-            $order = null;
-            if ($shopOrderId = \Yii::$app->request->post("shop_order_id")) {
-                $order = ShopOrder::find()->cmsSite()->andWhere(['id' => $shopOrderId])->one();
-            }
-
+            $order = $this->findOrderForUpdate(\Yii::$app->request->post("shop_order_id"));
             if (!$order) {
-                $order = \Yii::$app->shop->shopUser->shopOrder;
+                $rr->success = false;
+                $rr->message = "Заказ не найден";
+                return $rr;
             }
 
             $data = \Yii::$app->request->post("data");
+            $data = is_array($data) ? $data : [];
 
             try {
 
@@ -435,6 +464,10 @@ class CartController extends Controller
                         }
                     }
                 } else {
+                    $data = array_intersect_key($data, array_flip($this->orderUpdateAttributes));
+                    if (!$data) {
+                        throw new Exception("Это поле заказа нельзя изменить");
+                    }
                     $order->setAttributes($data, false);
                     $attributeForUpdate = array_keys($data);
                 }
@@ -687,6 +720,53 @@ class CartController extends Controller
      * @return array|\yii\web\Response
      * @throws \Exception
      */
+    /**
+     * Позиция корзины текущего покупателя.
+     * Позиции чужих корзин и заказов по id не находятся.
+     *
+     * @param mixed $basket_id
+     * @return ShopOrderItem|null
+     */
+    protected function findCartItem($basket_id)
+    {
+        $basket_id = (int)$basket_id;
+        $order = \Yii::$app->shop->shopUser->shopOrder;
+        if ($basket_id <= 0 || !$order || !$order->id) {
+            return null;
+        }
+
+        return ShopOrderItem::find()->where([
+            'id'            => $basket_id,
+            'shop_order_id' => $order->id,
+        ])->one();
+    }
+
+    /**
+     * Заказ, который покупатель меняет из корзины: текущая корзина или,
+     * если передан shop_order_id, только свой заказ вошедшего покупателя на этом сайте.
+     *
+     * @param mixed $shopOrderId
+     * @return ShopOrder|null
+     */
+    protected function findOrderForUpdate($shopOrderId)
+    {
+        $current = \Yii::$app->shop->shopUser->shopOrder;
+        $shopOrderId = (int)$shopOrderId;
+
+        if ($shopOrderId <= 0 || ($current && (int)$current->id === $shopOrderId)) {
+            return $current;
+        }
+
+        if (\Yii::$app->user->isGuest) {
+            return null;
+        }
+
+        return ShopOrder::find()->cmsSite()->andWhere([
+            'id'          => $shopOrderId,
+            'cms_user_id' => \Yii::$app->user->id,
+        ])->one();
+    }
+
     public function actionRemoveBasket()
     {
         $rr = new RequestResponse();
@@ -696,7 +776,7 @@ class CartController extends Controller
 
             $eventData = [];
 
-            $shopBasket = ShopOrderItem::find()->where(['id' => $basket_id])->one();
+            $shopBasket = $this->findCartItem($basket_id);
             if ($shopBasket) {
 
 
@@ -704,11 +784,13 @@ class CartController extends Controller
                     $rr->success = true;
                     $rr->message = \Yii::t('skeeks/shop/app', 'Position successfully removed');
 
-                    $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
-                    $productData['quantity'] = (float)$shopBasket->quantity;
+                    if ($shopBasket->shopProduct) {
+                        $productData = ShopComponent::productDataForJsEvent($shopBasket->shopProduct->cmsContentElement);
+                        $productData['quantity'] = (float)$shopBasket->quantity;
 
-                    $eventData['event'] = 'remove';
-                    $eventData['product'] = $productData;
+                        $eventData['event'] = 'remove';
+                        $eventData['product'] = $productData;
+                    }
                 }
 
             }
@@ -771,7 +853,7 @@ class CartController extends Controller
             /**
              * @var $shopBasket ShopBasket
              */
-            $shopBasket = ShopOrderItem::find()->where(['id' => $basket_id])->one();
+            $shopBasket = $this->findCartItem($basket_id);
             if ($shopBasket) {
                 if ($quantity > 0) {
                     //Обновление корзины, это может быть как добавление позиции так и удаление
